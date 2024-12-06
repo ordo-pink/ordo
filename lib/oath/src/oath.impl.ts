@@ -1,15 +1,11 @@
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: Unlicense
+/*
+ * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ */
 
 // deno-lint-ignore-file no-explicit-any
 
-import type {
-	TArrayToUnion,
-	TOathIfExplosion,
-	TRecordToUnion,
-	TUnderOath,
-	TUnderOathRejected,
-} from "./oath.types.ts"
+import type { TArrayToUnion, TOathIfExplosion, TRecordToUnion, TUnderOath, TUnderOathRejected } from "./oath.types.ts"
 // deno-lint-ignore no-unused-vars
 import type { invokers0 } from "./invokers.ts" // eslint-disable-line @typescript-eslint/no-unused-vars
 // deno-lint-ignore no-unused-vars
@@ -211,8 +207,7 @@ export class Oath<$TResolve, $TReject = never> {
 		 * @optional
 		 */
 		abort_controller: AbortController = new AbortController(),
-	): Oath<$TResolve, $TReject> =>
-		new Oath((resolve, reject) => thunk().then(resolve, reject), abort_controller)
+	): Oath<$TResolve, $TReject> => new Oath((resolve, reject) => thunk().then(resolve, reject), abort_controller)
 
 	/**
 	 * Create an Oath that will lazily execute the provided function and resolve if the function
@@ -245,8 +240,7 @@ export class Oath<$TResolve, $TReject = never> {
 		 *
 		 * @optional
 		 */
-		on_error = (error: unknown) =>
-			error instanceof Error ? error : (new Error(String(error as any)) as any),
+		on_error = (error: unknown) => (error instanceof Error ? error : (new Error(String(error as any)) as any)),
 
 		/**
 		 * Optional abort controller for cases when Oath was cancelled when it already
@@ -621,9 +615,7 @@ export class Oath<$TResolve, $TReject = never> {
 		/**
 		 * Handler for the value Oath resolved with.
 		 */
-		on_resolve: (
-			x: $TResolve,
-		) => PromiseLike<NewResolve> | Oath<NewResolve, NewReject> | NewResolve,
+		on_resolve: (x: $TResolve) => PromiseLike<NewResolve> | Oath<NewResolve, NewReject> | NewResolve,
 	): Oath<NewResolve, NewReject extends unknown ? $TReject : $TReject | NewReject> {
 		return new Oath(
 			// eslint-disable-next-line @typescript-eslint/no-misused-promises
@@ -640,8 +632,7 @@ export class Oath<$TResolve, $TReject = never> {
 
 							if (!forked) return resolve(forked)
 							if (forked.is_oath) return forked.fork(reject, resolve)
-							if (forked.then)
-								return Oath.FromPromise(() => forked).fork(reject as any, resolve as any)
+							if (forked.then) return Oath.FromPromise(() => forked).fork(reject as any, resolve as any)
 							return resolve(forked)
 						} catch (e) {
 							reject(e instanceof Error ? e : (new Error(String(e)) as any))
@@ -670,9 +661,7 @@ export class Oath<$TResolve, $TReject = never> {
 		/**
 		 * Handler for the value Oath rejected with.
 		 */
-		on_reject: (
-			x: $TReject,
-		) => PromiseLike<_TNewResolve> | Oath<_TNewResolve, _TNewReject> | _TNewResolve,
+		on_reject: (x: $TReject) => PromiseLike<_TNewResolve> | Oath<_TNewResolve, _TNewReject> | _TNewResolve,
 	): Oath<$TResolve | _TNewResolve, _TNewReject> {
 		return new Oath(
 			// eslint-disable-next-line @typescript-eslint/no-misused-promises
@@ -713,9 +702,7 @@ export class Oath<$TResolve, $TReject = never> {
 	 * 	.then(console.log) // 1
 	 * ```
 	 */
-	public invoke<NewResolve>(
-		invoker: (o: Oath<$TResolve, $TReject>) => Promise<NewResolve>,
-	): Promise<NewResolve> {
+	public invoke<NewResolve>(invoker: (o: Oath<$TResolve, $TReject>) => Promise<NewResolve>): Promise<NewResolve> {
 		return invoker(this)
 	}
 
@@ -736,9 +723,7 @@ export class Oath<$TResolve, $TReject = never> {
 		on_resolve: (value: $TResolve) => _TNewResolve,
 	): Promise<_TNewResolve | _TNewReject> {
 		return new Promise<_TNewResolve>((resolve, reject) => {
-			this.is_cancelled
-				? reject(this.cancellation_reason)
-				: this.cata(resolve as any, reject as any)
+			this.is_cancelled ? reject(this.cancellation_reason) : this.cata(resolve as any, reject as any)
 		}).then((x: any) => on_resolve(x), on_reject) as any
 	}
 }

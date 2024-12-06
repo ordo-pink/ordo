@@ -1,5 +1,7 @@
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: Unlicense
+/*
+ * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ */
 
 import { TResult } from "@ordo-pink/result"
 
@@ -26,13 +28,9 @@ export type TOrElseOptionFn = <$TSome, $TNone>(
 	None: () => $TNone
 }
 
-export type TFromNullableOptionConstructorFn = <$TSome>(
-	value?: $TSome | null,
-) => TOption<NonNullable<$TSome>>
+export type TFromNullableOptionConstructorFn = <$TSome>(value?: $TSome | null) => TOption<NonNullable<$TSome>>
 
-export type TFromResultOptionConstructorFn = <$TSome>(
-	result: TResult<$TSome, any>,
-) => TOption<$TSome>
+export type TFromResultOptionConstructorFn = <$TSome>(result: TResult<$TSome, any>) => TOption<$TSome>
 
 /**
  * Type `Option` represents an optional value. Every `Option` is either `Some`
@@ -134,12 +132,7 @@ export type TOption<_TSome> = {
 	 * @param explosion - Definition of handling the arms of `TOption`.
 	 * @returns Union of return types of the handlers.
 	 */
-	cata: <TNewSome, TNewNone>(explosion: {
-		Some: (some: _TSome) => TNewSome
-		None: () => TNewNone
-	}) => TNewSome | TNewNone
+	cata: <TNewSome, TNewNone>(explosion: { Some: (some: _TSome) => TNewSome; None: () => TNewNone }) => TNewSome | TNewNone
 
-	pipe: <_TNewSome_>(
-		operator: (option: TOption<_TSome>) => TOption<_TNewSome_>,
-	) => TOption<_TNewSome_>
+	pipe: <_TNewSome_>(operator: (option: TOption<_TSome>) => TOption<_TNewSome_>) => TOption<_TNewSome_>
 }

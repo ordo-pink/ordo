@@ -1,21 +1,23 @@
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: AGPL-3.0-only
-
-// Ordo.pink is an all-in-one team workspace.
-// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
-
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+/*
+ * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ *
+ * Ordo.pink is an all-in-one team workspace.
+ * Copyright (C) 2024  谢尔盖 ||↓ and the Ordo.pink contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 import { filter, map, pipe, prop } from "ramda"
 import { Dirent } from "fs"
@@ -25,19 +27,82 @@ import chalk from "chalk"
 import { Oath, ops0 } from "@ordo-pink/oath"
 import { create_parent_if_not_exists0, file_exists0, is_file0, write_file0 } from "@ordo-pink/fs"
 
-import type { TLicenseType } from "./types"
+import type { TLicenseType, TOpts } from "./types"
+
+const is_long_option = (arg: string) => arg.startsWith("--")
+const is_short_option = (arg: string) => arg.startsWith("-")
+
+export const get_opts = (args: string[]): TOpts => {
+	const delimiter = args.indexOf("--")
+	const args_to_parse = delimiter >= 0 ? args.slice(0, delimiter) : args
+
+	const opts: TOpts = {
+		args: [],
+		long_options: {},
+		pass_through: delimiter >= 0 ? args.slice(delimiter + 1) : [],
+		short_options: {},
+	}
+
+	let index = 0
+
+	while (index < args_to_parse.length) {
+		if (!args_to_parse[index]) {
+			index++
+			continue
+		}
+
+		if (is_long_option(args_to_parse[index])) {
+			const value = args_to_parse[index + 1]
+
+			const value_is_arg = !!value && !is_long_option(value) && !is_short_option(value)
+
+			opts.long_options[args_to_parse[index].slice(2)] = value_is_arg ? value : true
+			index++
+
+			if (value_is_arg) index++
+
+			continue
+		}
+
+		if (is_short_option(args_to_parse[index])) {
+			const value = args_to_parse[index + 1]
+
+			const value_is_arg = !!value && !is_long_option(value) && !is_short_option(value)
+
+			let i = 1
+
+			while (i < args_to_parse[index].length - 1) {
+				opts.short_options[args_to_parse[index][i]] = true
+				i++
+			}
+
+			opts.short_options[args_to_parse[index].at(-1)!] = value_is_arg ? value : true
+			index++
+
+			if (value_is_arg) index++
+
+			continue
+		}
+
+		opts.args.push(args_to_parse[index])
+		index++
+	}
+
+	return opts
+}
 
 export const run_async_command: TRunCommandFn = (command, options) =>
 	Oath.Resolve(Bun.spawn(command.trim().split(" "), options)).pipe(
 		ops0.chain(proc =>
 			Oath.Try(async () => {
-				if (options?.stdout === "pipe" || options?.stdout === "inherit")
-					// @ts-ignore
-					for await (const chunk of proc.stdout) process.stdout.write(chunk)
-
-				if (options?.stderr === "pipe" || options?.stderr === "inherit")
-					// @ts-ignore
-					for await (const chunk of proc.stderr) process.stderr.write(chunk)
+				if (proc) {
+					if (proc && ((proc && options?.stdout === "pipe") || options?.stdout === "inherit"))
+						// @ts-ignore
+						for await (const chunk of proc.stdout) process.stdout.write(chunk)
+					if (proc && (options?.stderr === "pipe" || options?.stderr === "inherit"))
+						// @ts-ignore
+						for await (const chunk of proc.stderr) process.stderr.write(chunk)
+				}
 			}),
 		),
 	)
@@ -60,34 +125,28 @@ export const die =
 
 export const run_bun_command: TRunCommandFn = (command, options) => run_command(`opt/bun ${command}`, options)
 
-export const create_progress = () => {
-	let currentLine = ""
+export const create_progress = (message = "") => ({
+	start: (msg: string) => {
+		message += msg
+		process.stdout.write(`${chalk.yellow("◌")} ${message}`)
+	},
+	inc: (msg = ".") => {
+		message += msg
+		process.stdout.write(msg)
+	},
+	finish: () => {
+		process.stdout.moveCursor(-message.length, -Math.floor(message.length / process.stdout.columns))
+		process.stdout.write(`${chalk.green("✔")} ${message}\n`)
+		message = ""
+	},
+	break: (...details: any[]) => {
+		process.stdout.moveCursor(-message.length, -Math.floor(message.length / process.stdout.columns))
+		process.stdout.write(`${chalk.red("✘")} ${message}\n`)
+		message = ""
 
-	return {
-		start: (msg: string) => {
-			currentLine += msg
-			process.stdout.write(`${chalk.yellow("◌")} ${currentLine}`)
-		},
-		inc: () => {
-			currentLine += "."
-			process.stdout.write(".")
-		},
-		finish: () => {
-			process.stdout.clearLine(0)
-			process.stdout.cursorTo(0)
-			process.stdout.write(`${chalk.green("✔")} ${currentLine}\n`)
-			currentLine = ""
-		},
-		break: (error: unknown) => {
-			process.stdout.clearLine(0)
-			process.stdout.cursorTo(0)
-			process.stdout.write(`${chalk.red("✘")} ${currentLine}\n`)
-			currentLine = ""
-
-			console.error((error as Error).message)
-		},
-	}
-}
+		console.error(...details)
+	},
+})
 
 const _dirent_is_file = (dirent: Dirent): boolean => dirent.isFile()
 export const dirents_to_files: (dirents: Dirent[]) => Dirent[] = filter(_dirent_is_file)
@@ -110,33 +169,35 @@ export const create_repository_file = (path: string, content: string) =>
 		.pipe(ops0.chain(() => file_exists0(path)))
 		.pipe(ops0.chain(exists => (exists ? Oath.Empty() : write_file0(path, content, "utf-8"))))
 
-export const COPYRIGHT_OWNERS = "谢尔盖||↓ and the Ordo.pink contributors"
+export const COPYRIGHT_OWNERS = "谢尔盖 ||↓ and the Ordo.pink contributors"
 
 export const get_spdx_record = (license: TLicenseType) => {
 	const year = get_current_year()
 
-	return `// SPDX-FileCopyrightText: Copyright ${year}, ${COPYRIGHT_OWNERS}
-// SPDX-License-Identifier: ${license}
+	return `/*
+ * SPDX-FileCopyrightText: Copyright ${year}, ${COPYRIGHT_OWNERS}
+ * SPDX-License-Identifier: ${license}
 ${
 	license === "AGPL-3.0-only"
-		? `
-// Ordo.pink is an all-in-one team workspace.
-// Copyright (C) ${year}  ${COPYRIGHT_OWNERS}
-
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+		? ` *
+ * Ordo.pink is an all-in-one team workspace.
+ * Copyright (C) ${year}  ${COPYRIGHT_OWNERS}
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 `
-		: ""
+		: " */\n"
 }`
 }
 

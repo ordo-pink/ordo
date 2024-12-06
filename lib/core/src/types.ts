@@ -1,21 +1,23 @@
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: AGPL-3.0-only
-
-// Ordo.pink is an all-in-one team workspace.
-// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
-
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+/*
+ * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ *
+ * Ordo.pink is an all-in-one team workspace.
+ * Copyright (C) 2024  谢尔盖 ||↓ and the Ordo.pink contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 import type { BehaviorSubject, Observable } from "rxjs"
 
@@ -31,7 +33,9 @@ import { TMaokaComponent } from "@ordo-pink/maoka"
 
 export type TDropIsPrefix<T extends string> = T extends `is_${infer U}` ? U : never
 
-export type TValidation<$TEntity extends Record<string, unknown>, $TKey extends keyof $TEntity> = (x: unknown) => x is $TEntity[$TKey]
+export type TValidation<$TEntity extends Record<string, unknown>, $TKey extends keyof $TEntity> = (
+	x: unknown,
+) => x is $TEntity[$TKey]
 
 export type TValidations<$TEntity extends Record<string, unknown>> = {
 	[$TKey in keyof $TEntity extends string ? `is_${keyof $TEntity}` : never]: TValidation<$TEntity, TDropIsPrefix<$TKey>>
@@ -667,7 +671,10 @@ declare global {
 			}
 
 			type RepositoryAsync = {
-				get: (fsid: Ordo.Metadata.FSID, token: string) => Oath<Ordo.Content.Instance, Ordo.Rrr<"EIO" | "EACCES" | "EINVAL" | "ENOENT">>
+				get: (
+					fsid: Ordo.Metadata.FSID,
+					token: string,
+				) => Oath<Ordo.Content.Instance, Ordo.Rrr<"EIO" | "EACCES" | "EINVAL" | "ENOENT">>
 				put: (
 					fsid: Ordo.Metadata.FSID,
 					content: Ordo.Content.Instance,
@@ -802,7 +809,10 @@ declare global {
 
 				get: (options?: QueryOptions) => TResult<Ordo.Metadata.Instance[], Ordo.Rrr<"EAGAIN">>
 
-				get_by_fsid: (fsid: FSID, options?: QueryOptions) => TResult<TOption<Ordo.Metadata.Instance>, Ordo.Rrr<"EAGAIN" | "EINVAL">>
+				get_by_fsid: (
+					fsid: FSID,
+					options?: QueryOptions,
+				) => TResult<TOption<Ordo.Metadata.Instance>, Ordo.Rrr<"EAGAIN" | "EINVAL">>
 
 				total: (options?: QueryOptions) => TResult<number, Ordo.Rrr<"EAGAIN">>
 
@@ -840,7 +850,11 @@ declare global {
 					options?: QueryOptions,
 				) => TResult<boolean, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
-				has_child: (fsid: FSID, child: FSID, options?: QueryOptions) => TResult<boolean, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+				has_child: (
+					fsid: FSID,
+					child: FSID,
+					options?: QueryOptions,
+				) => TResult<boolean, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
 				has_children: (fsid: FSID, options?: QueryOptions) => TResult<boolean, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
 
@@ -1256,7 +1270,8 @@ declare global {
 
 				namespace CreateContent {
 					type Path = `/${Ordo.User.Current.DTO["id"]}`
-					type Url = `${string}${Path}?name=${string}&parent=${Ordo.Metadata.DTO["parent"]}&content_type=${Ordo.Metadata.DTO["type"]}`
+					type Url =
+						`${string}${Path}?name=${string}&parent=${Ordo.Metadata.DTO["parent"]}&content_type=${Ordo.Metadata.DTO["type"]}`
 					type Method = "POST"
 					type Cookies = void
 					type Params = { user_id?: string; name?: string; parent?: string }

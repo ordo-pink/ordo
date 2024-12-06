@@ -24,6 +24,6 @@
 			"@ordo-pink/*": ["../../lib/*"]
 		}
 	},
-	"include": ["src", "../../lib"],
+	"include": ["src", "../../lib", "bin"],
 	"references": [{ "path": "./tsconfig.node.json" }]
 }

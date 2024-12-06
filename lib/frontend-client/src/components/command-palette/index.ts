@@ -1,21 +1,23 @@
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: AGPL-3.0-only
-
-// Ordo.pink is an all-in-one team workspace.
-// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
-
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+/*
+ * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ *
+ * Ordo.pink is an all-in-one team workspace.
+ * Copyright (C) 2024  谢尔盖 ||↓ and the Ordo.pink contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 import { type Observable } from "rxjs"
 
@@ -35,10 +37,7 @@ import "./command-palette.css"
 // TODO Handle on_new_item
 // TODO Handle pinned_items
 // TODO Handle alternative layout characters
-export const CommandPalette = (
-	cp$: Observable<Ordo.CommandPalette.Instance>,
-	ctx: Ordo.CreateFunction.Params,
-) =>
+export const CommandPalette = (cp$: Observable<Ordo.CommandPalette.Instance>, ctx: Ordo.CreateFunction.Params) =>
 	Maoka.create("div", ({ use, on_unmount, after_mount }) => {
 		use(MaokaOrdo.Context.provide(ctx))
 		use(MaokaJabs.set_class("command-palette"))
@@ -49,7 +48,7 @@ export const CommandPalette = (
 		let current_item_index = 0
 		let current_item_location = CurrentItemLocation.SUGGESTED
 
-		const { emit } = use(MaokaOrdo.Jabs.Commands)
+		const { emit } = use(MaokaOrdo.Jabs.Commands.get)
 		const { t } = use(MaokaOrdo.Jabs.Translations)
 
 		const t_placeholder = t("t.common.components.command_palette.search_placeholder")
@@ -92,10 +91,7 @@ export const CommandPalette = (
 		const get_state = use(
 			MaokaOrdo.Jabs.from$(cp$, { items: [] }, value => {
 				current_item_index = 0
-				visible_items =
-					value.max_items && value.max_items > 0
-						? value.items.slice(0, value.max_items)
-						: value.items
+				visible_items = value.max_items && value.max_items > 0 ? value.items.slice(0, value.max_items) : value.items
 
 				if (VisibleItems.refresh) void VisibleItems.refresh()
 
@@ -154,8 +150,7 @@ export const CommandPalette = (
 		}
 
 		const handle_arrow_up = () => {
-			const source =
-				current_item_location === CurrentItemLocation.PINNED ? pinned_items : visible_items
+			const source = current_item_location === CurrentItemLocation.PINNED ? pinned_items : visible_items
 
 			if (!source.length) return
 
@@ -165,8 +160,7 @@ export const CommandPalette = (
 		}
 
 		const handle_arrow_down = () => {
-			const source =
-				current_item_location === CurrentItemLocation.PINNED ? pinned_items : visible_items
+			const source = current_item_location === CurrentItemLocation.PINNED ? pinned_items : visible_items
 
 			if (!source.length) return
 
@@ -183,9 +177,7 @@ export const CommandPalette = (
 			if (!state.is_multiple) return
 
 			current_item_location =
-				current_item_location === CurrentItemLocation.SUGGESTED
-					? CurrentItemLocation.PINNED
-					: CurrentItemLocation.SUGGESTED
+				current_item_location === CurrentItemLocation.SUGGESTED ? CurrentItemLocation.PINNED : CurrentItemLocation.SUGGESTED
 
 			current_item_index = 0
 

@@ -1,21 +1,23 @@
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: AGPL-3.0-only
-
-// Ordo.pink is an all-in-one team workspace.
-// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
-
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+/*
+ * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ *
+ * Ordo.pink is an all-in-one team workspace.
+ * Copyright (C) 2024  谢尔盖 ||↓ and the Ordo.pink contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 import { Dialog, Input, Select, color_class } from "@ordo-pink/maoka-components"
 import { is_non_empty_string, is_string, title_case } from "@ordo-pink/tau"
@@ -28,7 +30,7 @@ export const EditLabelModal = (ctx: Ordo.CreateFunction.Params, label: Ordo.Meta
 	Maoka.create("div", ({ use }) => {
 		use(MaokaOrdo.Context.provide(ctx))
 
-		const commands = use(MaokaOrdo.Jabs.Commands)
+		const commands = use(MaokaOrdo.Jabs.Commands.get)
 
 		const is_string_label = is_string(label)
 		const initial_name = is_string_label ? label : label.name
@@ -43,7 +45,9 @@ export const EditLabelModal = (ctx: Ordo.CreateFunction.Params, label: Ordo.Meta
 			render_info: () => LabelCircle(i),
 		}))
 
-		const current_color = is_string_label ? color_items[0] : color_items.find(item => item.value === label.color) ?? color_items[0] // TODO Log error, this is wrong
+		const current_color = is_string_label
+			? color_items[0]
+			: color_items.find(item => item.value === label.color) ?? color_items[0] // TODO Log error, this is wrong
 
 		return () =>
 			Dialog({
@@ -87,4 +91,5 @@ export const EditLabelModal = (ctx: Ordo.CreateFunction.Params, label: Ordo.Meta
 			})
 	})
 
-const LabelCircle = (color: LabelColor) => Maoka.styled("div", { class: `label ${color_class[color]} size-3 !rounded-full` })(() => {})
+const LabelCircle = (color: LabelColor) =>
+	Maoka.styled("div", { class: `label ${color_class[color]} size-3 !rounded-full` })(() => {})

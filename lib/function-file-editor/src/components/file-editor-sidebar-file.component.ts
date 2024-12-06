@@ -1,21 +1,23 @@
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: AGPL-3.0-only
-
-// Ordo.pink is an all-in-one team workspace.
-// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
-
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+/*
+ * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ *
+ * Ordo.pink is an all-in-one team workspace.
+ * Copyright (C) 2024  谢尔盖 ||↓ and the Ordo.pink contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 import { equals } from "ramda"
 
@@ -29,7 +31,7 @@ import { TOption } from "@ordo-pink/option"
 export const FileEditorSidebarFile = (metadata: Ordo.Metadata.Instance, depth = 0) =>
 	Maoka.create("div", ({ use, refresh }) => {
 		const fsid = metadata.get_fsid()
-		const { emit } = use(MaokaOrdo.Jabs.Commands)
+		const { emit } = use(MaokaOrdo.Jabs.Commands.get)
 
 		const file_editor_file_class = MaokaJabs.set_class(
 			"flex space-x-2 items-center rounded-sm",
@@ -72,20 +74,9 @@ export const FileEditorSidebarFile = (metadata: Ordo.Metadata.Instance, depth = 
 					),
 				)
 			else
-				use(
-					MaokaJabs.remove_class(
-						"bg-gradient-to-tr",
-						"to-rose-300",
-						"to-rose-300",
-						"dark:from-pink-900",
-						"dark:to-rose-900",
-					),
-				)
+				use(MaokaJabs.remove_class("bg-gradient-to-tr", "to-rose-300", "to-rose-300", "dark:from-pink-900", "dark:to-rose-900"))
 
-			return [
-				MetadataIcon({ metadata, show_emoji_picker: false }),
-				FileEditorFileName(metadata.get_name()),
-			]
+			return [MetadataIcon({ metadata, show_emoji_picker: false }), FileEditorFileName(metadata.get_name())]
 		}
 	})
 
@@ -95,7 +86,4 @@ const FileEditorFileName = (name: string) =>
 		return () => name
 	})
 
-const file_editor_file_text_classes = [
-	"text-ellipsis w-full line-clamp-1 cursor-pointer",
-	"file_editor_file_text",
-]
+const file_editor_file_text_classes = ["text-ellipsis w-full line-clamp-1 cursor-pointer", "file_editor_file_text"]

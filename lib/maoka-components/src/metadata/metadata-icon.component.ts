@@ -1,21 +1,23 @@
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: AGPL-3.0-only
-
-// Ordo.pink is an all-in-one team workspace.
-// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
-
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+/*
+ * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ *
+ * Ordo.pink is an all-in-one team workspace.
+ * Copyright (C) 2024  谢尔盖 ||↓ and the Ordo.pink contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 import { BsFileEarmark, BsFileEarmarkBinary, BsFolderOpen } from "@ordo-pink/frontend-icons"
 import { Maoka, type TMaokaElement } from "@ordo-pink/maoka"
@@ -28,9 +30,11 @@ import { emojis } from "@ordo-pink/emojis"
 type P = { metadata: Ordo.Metadata.Instance; custom_class?: string; show_emoji_picker?: boolean }
 export const MetadataIcon = ({ metadata, custom_class = "", show_emoji_picker = true }: P) =>
 	Maoka.create("div", ({ use, refresh, on_unmount }) => {
+		const icon_class = get_icon_class(custom_class)
+
 		let emoji = metadata.get_property("emoji_icon")
 
-		const commands = use(MaokaOrdo.Jabs.Commands)
+		const commands = use(MaokaOrdo.Jabs.Commands.get)
 		const metadata_query = use(MaokaOrdo.Jabs.MetadataQuery)
 
 		const subscription = metadata_query.$.subscribe(() => {
@@ -95,8 +99,8 @@ export const MetadataIcon = ({ metadata, custom_class = "", show_emoji_picker = 
 				})
 
 			return metadata_query.has_children(metadata.get_fsid()).cata({
-				Err: () => Icon({ metadata, custom_class, has_children: false }),
-				Ok: has_children => Icon({ metadata, custom_class, has_children }),
+				Err: () => Icon({ metadata, custom_class: icon_class, has_children: false }),
+				Ok: has_children => Icon({ metadata, custom_class: icon_class, has_children }),
 			})
 		}
 	})
@@ -106,7 +110,6 @@ const Icon = ({ metadata, custom_class, has_children }: P2) =>
 	Maoka.create("div", ({ use, refresh, element }) => {
 		let file_associations: Ordo.FileAssociation.Instance[] = []
 
-		const icon_class = `ml-1 shrink-0 ${custom_class}`
 		const metadata_content_type = metadata.get_type()
 
 		const $ = use(MaokaOrdo.Jabs.FileAssociations$)
@@ -118,19 +121,22 @@ const Icon = ({ metadata, custom_class, has_children }: P2) =>
 		use(MaokaOrdo.Jabs.subscribe($, handle_file_associations_update))
 
 		return async () => {
-			const fa = file_associations.find(association =>
-				association.types.some(type => metadata_content_type === type.name),
-			)
+			const fa = file_associations.find(association => association.types.some(type => metadata_content_type === type.name))
 
 			if (fa && fa.render_icon) {
 				element.innerHTML = ""
+				use(MaokaJabs.set_class(custom_class!))
 				await fa.render_icon(element as HTMLSpanElement)
 				return
 			}
 
 			return Switch.OfTrue()
-				.case(has_children, () => BsFolderOpen(icon_class) as TMaokaElement)
-				.case(metadata.get_size() === 0, () => BsFileEarmark(icon_class) as TMaokaElement)
-				.default(() => BsFileEarmarkBinary(icon_class) as TMaokaElement)
+				.case(has_children, () => BsFolderOpen(custom_class) as TMaokaElement)
+				.case(metadata.get_size() === 0, () => BsFileEarmark(custom_class) as TMaokaElement)
+				.default(() => BsFileEarmarkBinary(custom_class) as TMaokaElement)
 		}
 	})
+
+const ICON_CLASS = "px-[0.2rem] shrink-0"
+
+const get_icon_class = (custom_class?: string) => (custom_class ? `${ICON_CLASS} ${custom_class}` : ICON_CLASS)

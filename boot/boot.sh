@@ -101,12 +101,12 @@ function download_deno {
 
 # Build a binary from given source with Bun and puts it to the bin directory.
 function compile_init_script {
-  opt/bun build boot/src/init/index.ts --compile --outfile init && mv -f init bin/init
+  opt/bun build ./boot/src/bin.ts --compile --bytecode --minify --sourcemap --outfile bin/dog
 }
 
 # Start the init script
 function start_init_script {
-  bin/init
+  bin/dog init
 }
 
 # --- Run ---

@@ -1,5 +1,7 @@
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: Unlicense
+/*
+ * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ */
 
 // TODO: Comments
 // TODO: Full types
@@ -15,18 +17,12 @@ export type TMaokaElement = { [$TKey in keyof HTMLElement]: HTMLElement[$TKey] |
 
 export type TMaokaTextElement = Partial<{ [$TKey in keyof Text]: Text[$TKey] }> | string
 
-export type TMaokaCreateMaokaElementFn<$TElement extends TMaokaElement = TMaokaElement> = (
-	name: string,
-) => $TElement
+export type TMaokaCreateMaokaElementFn<$TElement extends TMaokaElement = TMaokaElement> = (name: string) => $TElement
 
 export type TMaokaCreateComponentFn = (name: string, callback: TMaokaCallback) => TMaokaComponent
 
 export type TMaokaComponent<$TElement extends TMaokaElement = TMaokaElement> = {
-	(
-		create_element: TMaokaCreateMaokaElementFn<$TElement>,
-		root_element: TMaokaElement,
-		root_id: string,
-	): Promise<TMaokaElement>
+	(create_element: TMaokaCreateMaokaElementFn<$TElement>, root_element: TMaokaElement, root_id: string): Promise<TMaokaElement>
 	id?: string
 	root_id?: string
 	element?: $TElement
@@ -42,14 +38,7 @@ export type TMaokaJab<$TReturn = void> = (props: TMaokaProps) => $TReturn
  * the child is undefined, it will not be rendered as a child but the changes made with the jabs
  * will be applied.
  */
-export type TMaokaChild =
-	| TMaokaElement
-	| TMaokaComponent
-	| string
-	| number
-	| undefined
-	| null
-	| void
+export type TMaokaChild = TMaokaElement | TMaokaComponent | string | number | undefined | null | void
 
 /**
  * TChildren is an expected return type of a Maoka callback.

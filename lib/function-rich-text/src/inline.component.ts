@@ -1,21 +1,23 @@
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: AGPL-3.0-only
-
-// Ordo.pink is an all-in-one team workspace.
-// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
-
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+/*
+ * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ *
+ * Ordo.pink is an all-in-one team workspace.
+ * Copyright (C) 2024  谢尔盖 ||↓ and the Ordo.pink contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 import { is_0, noop } from "@ordo-pink/tau"
 import { Maoka } from "@ordo-pink/maoka"
@@ -41,17 +43,13 @@ export const Inline = (
 			const fsid = metadata.get_fsid()
 			const content_type = metadata.get_type()
 
-			const commands = use(MaokaOrdo.Jabs.Commands)
-			const { caret_position$, state$, add_new_line, set_caret_position, remove_block } =
-				use(editor_context_jab)
+			const commands = use(MaokaOrdo.Jabs.Commands.get)
+			const { caret_position$, state$, add_new_line, set_caret_position, remove_block } = use(editor_context_jab)
 
 			after_mount(() => {
 				const current_position = caret_position$.getValue()
 
-				if (
-					current_position.block_index === block_index &&
-					current_position.inline_index === inline_index
-				) {
+				if (current_position.block_index === block_index && current_position.inline_index === inline_index) {
 					const el = element as unknown as HTMLInputElement
 					// set_position({ block_index, inline_index, anchor_offset: 0, focus_offset: 0 })
 					// el.focus()
@@ -122,8 +120,7 @@ export const Inline = (
 										state[block_index].children[inline_index - 1].value += node.value
 									} else {
 										const prev_block_last_inline_index = state[block_index - 1].children.length - 1
-										state[block_index - 1].children[prev_block_last_inline_index].value +=
-											node.value
+										state[block_index - 1].children[prev_block_last_inline_index].value += node.value
 
 										refocus = false
 									}

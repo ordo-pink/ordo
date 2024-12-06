@@ -1,21 +1,23 @@
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: AGPL-3.0-only
-
-// Ordo.pink is an all-in-one team workspace.
-// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
-
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+/*
+ * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ *
+ * Ordo.pink is an all-in-one team workspace.
+ * Copyright (C) 2024  谢尔盖 ||↓ and the Ordo.pink contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 import { type Context } from "koa"
 
@@ -80,13 +82,7 @@ export const create_id_server = async ({
 	)
 
 	const execute_handler =
-		(
-			f: (
-				ctx: Context,
-				params: Types.THandlerParams,
-			) => Oath<{ status: number; body?: any }, Ordo.Rrr>,
-		) =>
-		(ctx: Context) =>
+		(f: (ctx: Context, params: Types.THandlerParams) => Oath<{ status: number; body?: any }, Ordo.Rrr>) => (ctx: Context) =>
 			f(ctx, params).invoke(o => o.fork(send_error({ ctx, logger }), send_success({ ctx })))
 
 	return create_koa_server({
@@ -96,47 +92,20 @@ export const create_id_server = async ({
 		extend_router: router =>
 			// TODO: Check if method satisfies required type
 			router
-				.get(
-					"/users/handle/:handle" satisfies Ordo.Routes.ID.GetUserByHandle.Path,
-					execute_handler(get_by_handle0),
-				)
-				.get(
-					"/users/email/:email" satisfies Ordo.Routes.ID.GetUserByEmail.Path,
-					execute_handler(get_by_email0),
-				)
+				.get("/users/handle/:handle" satisfies Ordo.Routes.ID.GetUserByHandle.Path, execute_handler(get_by_handle0))
+				.get("/users/email/:email" satisfies Ordo.Routes.ID.GetUserByEmail.Path, execute_handler(get_by_email0))
 				.get("/users/id/:id" satisfies Ordo.Routes.ID.GetUserByID.Path, execute_handler(get_by_id0))
 				.get("/account" satisfies Ordo.Routes.ID.GetAccount.Path, execute_handler(get_account0))
 				.post("/account/sign-up" satisfies Ordo.Routes.ID.SignUp.Path, execute_handler(sign_up0))
 				.post("/account/sign-in" satisfies Ordo.Routes.ID.SignIn.Path, execute_handler(sign_in0))
 				.post("/account/sign-out" satisfies Ordo.Routes.ID.SignOut.Path, execute_handler(sign_out0))
-				.post(
-					"/account/refresh-token" satisfies Ordo.Routes.ID.RefreshToken.Path,
-					execute_handler(token_refresh0),
-				)
-				.post(
-					"/account/verify-token" satisfies Ordo.Routes.ID.VerifyToken.Path,
-					execute_handler(token_verify0),
-				)
-				.patch(
-					"/account/confirm-email" satisfies Ordo.Routes.ID.ConfirmEmail.Path,
-					execute_handler(confirm_email0),
-				)
-				.patch(
-					"/account/info" satisfies Ordo.Routes.ID.UpdateInfo.Path,
-					execute_handler(update_info0),
-				)
-				.patch(
-					"/account/email" satisfies Ordo.Routes.ID.UpdateEmail.Path,
-					execute_handler(update_email0),
-				)
-				.patch(
-					"/account/handle" satisfies Ordo.Routes.ID.UpdateHandle.Path,
-					execute_handler(update_handle0),
-				)
-				.patch(
-					"/account/password" satisfies Ordo.Routes.ID.UpdatePassword.Path,
-					execute_handler(update_password0),
-				),
+				.post("/account/refresh-token" satisfies Ordo.Routes.ID.RefreshToken.Path, execute_handler(token_refresh0))
+				.post("/account/verify-token" satisfies Ordo.Routes.ID.VerifyToken.Path, execute_handler(token_verify0))
+				.patch("/account/confirm-email" satisfies Ordo.Routes.ID.ConfirmEmail.Path, execute_handler(confirm_email0))
+				.patch("/account/info" satisfies Ordo.Routes.ID.UpdateInfo.Path, execute_handler(update_info0))
+				.patch("/account/email" satisfies Ordo.Routes.ID.UpdateEmail.Path, execute_handler(update_email0))
+				.patch("/account/handle" satisfies Ordo.Routes.ID.UpdateHandle.Path, execute_handler(update_handle0))
+				.patch("/account/password" satisfies Ordo.Routes.ID.UpdatePassword.Path, execute_handler(update_password0)),
 
 		// TODO: Forgot password
 	})

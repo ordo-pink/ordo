@@ -1,5 +1,7 @@
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: Unlicense
+/*
+ * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ */
 
 import { TOption } from "@ordo-pink/option"
 import type { TSwitch } from "@ordo-pink/switch"
@@ -29,7 +31,10 @@ export type TOkResultConstructorFn = <$TOk, $TErr = never>(ok: $TOk) => TResult<
 
 export type TErrResultConstructorFn = <$TErr, $TOk = never>(err: $TErr) => TResult<$TOk, $TErr>
 
-export type TFromOptionConstructorFn = <$TOk, $TErr = void>(option: TOption<$TOk>, on_none?: () => $TErr) => TResult<$TOk, $TErr>
+export type TFromOptionConstructorFn = <$TOk, $TErr = void>(
+	option: TOption<$TOk>,
+	on_none?: () => $TErr,
+) => TResult<$TOk, $TErr>
 
 export type TMergeResultConstructorFn = <TSomeThings extends readonly unknown[] | [] | Record<string, unknown>>(
 	results: TSomeThings,
@@ -83,7 +88,9 @@ export type TBiChainResultOperatorFn = <$TOk, $TErr, $TNewOk, $TNewRrr>(
 	on_ok: (x: $TOk) => TResult<$TNewOk, $TNewRrr>,
 ) => (result: TResult<$TOk, $TErr>) => TResult<$TNewOk, $TNewRrr>
 
-export type TTapResultOperatorFn = <$TOk, $TErr>(on_ok: (x: $TOk) => any) => (result: TResult<$TOk, $TErr>) => TResult<$TOk, $TErr>
+export type TTapResultOperatorFn = <$TOk, $TErr>(
+	on_ok: (x: $TOk) => any,
+) => (result: TResult<$TOk, $TErr>) => TResult<$TOk, $TErr>
 
 export type TErrTapResultOperatorFn = <$TOk, $TErr>(
 	on_err: (x: $TErr) => any,

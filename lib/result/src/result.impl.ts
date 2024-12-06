@@ -1,5 +1,7 @@
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: Unlicense
+/*
+ * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ */
 
 import { is_bool, is_false, is_fn, is_object, is_true, noop } from "@ordo-pink/tau"
 
@@ -95,14 +97,16 @@ export const cata_result_if_ok: Types.TIfOkCataFn = f => ({ Ok: x => f(x), Err: 
 
 export const map_result: Types.TMapResultOperatorFn = f => r => r.cata({ Ok: x => ResultOk(f(x)), Err: x => ResultErr(x) })
 
-export const err_map_result: Types.TErrMapResultOperatorFn = f => r => r.cata({ Ok: x => ResultOk(x), Err: x => ResultErr(f(x)) })
+export const err_map_result: Types.TErrMapResultOperatorFn = f => r =>
+	r.cata({ Ok: x => ResultOk(x), Err: x => ResultErr(f(x)) })
 
 export const bimap_result: Types.TBiMapResultOperatorFn = (f, g) => r =>
 	r.cata({ Ok: x => ResultOk(g(x)), Err: x => ResultErr(f(x)) as any })
 
 export const chain_result: Types.TChainResultOperatorFn = f => r => r.cata({ Ok: x => f(x), Err: x => ResultErr(x) })
 
-export const err_chain_result: Types.TErrChainResultOperatorFn = f => r => r.cata({ Ok: x => ResultOk(x), Err: x => f(x) as any })
+export const err_chain_result: Types.TErrChainResultOperatorFn = f => r =>
+	r.cata({ Ok: x => ResultOk(x), Err: x => f(x) as any })
 
 export const bichain_result: Types.TBiChainResultOperatorFn = (f, g) => r => r.cata({ Ok: x => g(x), Err: x => f(x) })
 

@@ -1,32 +1,25 @@
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: AGPL-3.0-only
+/*
+ * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ *
+ * Ordo.pink is an all-in-one team workspace.
+ * Copyright (C) 2024  谢尔盖 ||↓ and the Ordo.pink contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
-// Ordo.pink is an all-in-one team workspace.
-// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
-
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-import {
-	BehaviorSubject,
-	Observable,
-	Subject,
-	combineLatestWith,
-	map,
-	merge,
-	scan,
-	shareReplay,
-} from "rxjs"
+import { BehaviorSubject, Observable, Subject, combineLatestWith, map, merge, scan, shareReplay } from "rxjs"
 
 import { N, extend } from "@ordo-pink/tau"
 import { Maoka } from "@ordo-pink/maoka"
@@ -35,11 +28,7 @@ import { type TLogger } from "@ordo-pink/logger"
 
 import { ContextMenu } from "../components/context-menu"
 
-export const init_context_menu = (
-	logger: TLogger,
-	commands: Ordo.Command.Commands,
-	ctx: Ordo.CreateFunction.Params,
-) => {
+export const init_context_menu = (logger: TLogger, commands: Ordo.Command.Commands, ctx: Ordo.CreateFunction.Params) => {
 	logger.debug("🟡 Initialising context menu...")
 
 	custom_context_menu$.subscribe()
@@ -62,8 +51,7 @@ export const init_context_menu = (
 const add_p = (item: Ordo.ContextMenu.Item) => (state: Ordo.ContextMenu.Item[]) =>
 	state.filter(i => i.command !== item.command).concat([item])
 
-const remove_p = (name: string) => (state: Ordo.ContextMenu.Item[]) =>
-	state.filter(item => item.command !== name)
+const remove_p = (name: string) => (state: Ordo.ContextMenu.Item[]) => state.filter(item => item.command !== name)
 
 const add$ = new Subject<Ordo.ContextMenu.Item>()
 const remove$ = new Subject<string>()
@@ -82,8 +70,7 @@ const context_menu$: Observable<Ordo.ContextMenu.Instance | null> = custom_conte
 				Err: N,
 				Ok: extend(state => ({
 					structure: items.filter(item => {
-						const should_show =
-							item?.should_show({ event: state.event, payload: state.payload }) ?? false
+						const should_show = item?.should_show({ event: state.event, payload: state.payload }) ?? false
 
 						// Avoid showing native context menu if there is something to show
 						if (should_show && state.event.stopPropagation) state.event.stopPropagation()

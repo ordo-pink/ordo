@@ -1,21 +1,23 @@
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: AGPL-3.0-only
-
-// Ordo.pink is an all-in-one team workspace.
-// Copyright (C) 2024  谢尔盖||↓ and the Ordo.pink contributors
-
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published
-// by the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+/*
+ * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ *
+ * Ordo.pink is an all-in-one team workspace.
+ * Copyright (C) 2024  谢尔盖 ||↓ and the Ordo.pink contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 import { BehaviorSubject, Subject, combineLatestWith, map, merge, scan, shareReplay } from "rxjs"
 
@@ -37,19 +39,17 @@ export const init_command_palette = call_once(
 
 		let on_toggle_cp = () => on_show_custom_cp(commands, ctx)({ items: [] })
 
-		custom_command_palette$
-			.pipe(combineLatestWith(global_command_palette$))
-			.subscribe(([state, global]) => {
-				commands.off("cmd.application.command_palette.toggle", on_toggle_cp)
+		custom_command_palette$.pipe(combineLatestWith(global_command_palette$)).subscribe(([state, global]) => {
+			commands.off("cmd.application.command_palette.toggle", on_toggle_cp)
 
-				if (state.items.length > 0) {
-					on_toggle_cp = on_hide_custom_cp(commands)
-					commands.on("cmd.application.command_palette.toggle", on_toggle_cp)
-				} else {
-					on_toggle_cp = () => on_show_custom_cp(commands, ctx)(global)
-					commands.on("cmd.application.command_palette.toggle", on_toggle_cp)
-				}
-			})
+			if (state.items.length > 0) {
+				on_toggle_cp = on_hide_custom_cp(commands)
+				commands.on("cmd.application.command_palette.toggle", on_toggle_cp)
+			} else {
+				on_toggle_cp = () => on_show_custom_cp(commands, ctx)(global)
+				commands.on("cmd.application.command_palette.toggle", on_toggle_cp)
+			}
+		})
 
 		commands.emit("cmd.application.command_palette.add", {
 			on_select: () => commands.emit("cmd.application.command_palette.toggle"),
@@ -78,8 +78,7 @@ const custom_command_palette$ = new BehaviorSubject<Ordo.CommandPalette.Instance
 const on_add_global_item = (item: Ordo.CommandPalette.Item) => add$.next(item)
 const on_remove_global_item = (id: string) => remove$.next(id)
 const on_show_custom_cp =
-	(commands: Ordo.Command.Commands, ctx: Ordo.CreateFunction.Params) =>
-	(state: Ordo.CommandPalette.Instance) => {
+	(commands: Ordo.Command.Commands, ctx: Ordo.CreateFunction.Params) => (state: Ordo.CommandPalette.Instance) => {
 		commands.emit("cmd.application.modal.hide")
 		custom_command_palette$.next(state)
 
@@ -93,17 +92,13 @@ const on_hide_custom_cp = (commands: Ordo.Command.Commands) => () => {
 	commands.emit("cmd.application.modal.hide")
 }
 
-type AddP = (
-	item: Ordo.CommandPalette.Item,
-) => (state: Ordo.CommandPalette.Instance) => Ordo.CommandPalette.Instance
+type AddP = (item: Ordo.CommandPalette.Item) => (state: Ordo.CommandPalette.Instance) => Ordo.CommandPalette.Instance
 const addP: AddP = item => state =>
 	state.items.some(({ readable_name }) => readable_name === item.readable_name)
 		? state
 		: { ...state, items: [...state.items, item] }
 
-type RemoveP = (
-	item: string,
-) => (state: Ordo.CommandPalette.Instance) => Ordo.CommandPalette.Instance
+type RemoveP = (item: string) => (state: Ordo.CommandPalette.Instance) => Ordo.CommandPalette.Instance
 const removeP: RemoveP = id => state => ({
 	...state,
 	items: state.items.filter(a => a.readable_name !== id),
@@ -136,18 +131,17 @@ const create_hotkey_string = (event: KeyboardEvent, is_darwin: boolean) => {
 	return hotkey
 }
 
-const on_input =
-	(global_command_palette: Ordo.CommandPalette.Instance) => (event: KeyboardEvent) => {
-		if (IGNORED_KEYS.includes(event.key)) return
+const on_input = (global_command_palette: Ordo.CommandPalette.Instance) => (event: KeyboardEvent) => {
+	if (IGNORED_KEYS.includes(event.key)) return
 
-		const hotkey = create_hotkey_string(event, false)
+	const hotkey = create_hotkey_string(event, false)
 
-		const command = global_command_palette.items.find(item => item.hotkey && item.hotkey === hotkey)
+	const command = global_command_palette.items.find(item => item.hotkey && item.hotkey === hotkey)
 
-		if (command) {
-			event.preventDefault()
-			event.stopPropagation()
+	if (command) {
+		event.preventDefault()
+		event.stopPropagation()
 
-			command.on_select()
-		}
+		command.on_select()
 	}
+}

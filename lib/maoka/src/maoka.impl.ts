@@ -1,5 +1,7 @@
-// SPDX-FileCopyrightText: Copyright 2024, 谢尔盖||↓ and the Ordo.pink contributors
-// SPDX-License-Identifier: Unlicense
+/*
+ * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ */
 
 import type * as T from "./maoka.types"
 
@@ -50,13 +52,7 @@ export const create: T.TMaokaCreateComponentFn = (name, callback) => {
 		get_children = await callback(props)
 		if (!get_children) return element
 
-		const children = await render_children(
-			create_element,
-			root_element,
-			root_id,
-			get_children,
-			element,
-		)
+		const children = await render_children(create_element, root_element, root_id, get_children, element)
 
 		return children
 	}
@@ -64,8 +60,7 @@ export const create: T.TMaokaCreateComponentFn = (name, callback) => {
 	return result
 }
 
-export const lazy = (callback: () => Promise<{ default: T.TMaokaComponent }>) =>
-	callback().then(result => result.default)
+export const lazy = (callback: () => Promise<{ default: T.TMaokaComponent }>) => callback().then(result => result.default)
 
 export const styled =
 	(tag: string, attributes: Record<string, string> = {}) =>
@@ -84,24 +79,18 @@ export const html = (tag: string, html: string) =>
 export const render_dom: T.TMaokaRenderDOMFn = async (root, component) => {
 	const root_id: string = crypto.randomUUID()
 
-	const Component = component(
-		document.createElement.bind(document),
-		root as unknown as T.TMaokaElement,
-		root_id,
-	)
+	const Component = component(document.createElement.bind(document), root as unknown as T.TMaokaElement, root_id)
 
 	root.appendChild((await Component) as HTMLElement)
 
 	const unmount_element = (element: T.TMaokaElement) => {
-		if (is_arr(element.onunmount) && element.onunmount.length > 0)
-			element.onunmount.forEach(f => f())
+		if (is_arr(element.onunmount) && element.onunmount.length > 0) element.onunmount.forEach(f => f())
 
 		element.childNodes.forEach(child => unmount_element(child as any))
 	}
 
 	const after_mount_element = (element: T.TMaokaElement) => {
-		if (is_arr(element.aftermount) && element.aftermount.length > 0)
-			element.aftermount.forEach(f => f())
+		if (is_arr(element.aftermount) && element.aftermount.length > 0) element.aftermount.forEach(f => f())
 
 		element.childNodes.forEach(child => after_mount_element(child as any))
 	}
@@ -140,18 +129,13 @@ const render_children = async (
 	let children = await get_children()
 	if (!children) return element
 
-	if (!is_arr(children))
-		children = [is_fun(children) ? await children(create_element, root_element, root_id) : children]
+	if (!is_arr(children)) children = [is_fun(children) ? await children(create_element, root_element, root_id) : children]
 
 	const nodes: T.TMaokaChild[] = []
 
 	for (let i = 0; i < children.length; i++) {
 		const x = children[i]
-		const node = is_fun(x)
-			? await x(create_element, root_element, root_id)
-			: is_num(x)
-				? String(x)
-				: x
+		const node = is_fun(x) ? await x(create_element, root_element, root_id) : is_num(x) ? String(x) : x
 
 		if (node) nodes.push(node)
 	}

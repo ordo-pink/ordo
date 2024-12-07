@@ -89,8 +89,6 @@ export const RichText = (metadata: Ordo.Metadata.Instance, content: Ordo.Content
 							focus_offset: 0,
 						})
 
-					console.log(caret_position$.getValue())
-
 					void refresh()
 				},
 				add_new_line: (refocus = true) => {

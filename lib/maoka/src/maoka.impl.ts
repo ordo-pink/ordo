@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import type * as T from "./maoka.types"
+import type * as T from "./maoka.types.ts"
 
 export const create: T.TMaokaCreateComponentFn = (name, callback) => {
 	const result: T.TMaokaComponent = async (create_element, root_element, root_id) => {
@@ -60,18 +60,19 @@ export const create: T.TMaokaCreateComponentFn = (name, callback) => {
 	return result
 }
 
-export const lazy = (callback: () => Promise<{ default: T.TMaokaComponent }>) => callback().then(result => result.default)
+export const lazy = (callback: () => Promise<{ default: T.TMaokaComponent }>): Promise<T.TMaokaComponent> =>
+	callback().then(result => result.default)
 
 export const styled =
 	(tag: string, attributes: Record<string, string> = {}) =>
-	(children_thunk: ReturnType<T.TMaokaCallback>) =>
+	(children_thunk: ReturnType<T.TMaokaCallback>): T.TMaokaComponent =>
 		create(tag, ({ element: current_element }) => {
 			Object.keys(attributes).forEach(key => current_element.setAttribute(key, attributes[key]))
 
 			return children_thunk
 		})
 
-export const html = (tag: string, html: string) =>
+export const html = (tag: string, html: string): T.TMaokaComponent =>
 	create(tag, ({ element }) => {
 		element.innerHTML = html
 	})

@@ -28,8 +28,8 @@ SPDX-License-Identifier: MIT
 	font-family: system-ui;
 	font-style: normal;
 	font-weight: 400;
-	src: local(".SFNS-Regular"), local(".SFNSText-Regular"), local(".HelveticaNeueDeskInterface-Regular"), local(".LucidaGrandeUI"),
-		local("Segoe UI"), local("Ubuntu"), local("Roboto-Regular"), local("DroidSans"), local("Tahoma");
+	src: local(".SFNS-Regular"), local(".SFNSText-Regular"), local(".HelveticaNeueDeskInterface-Regular"),
+		local(".LucidaGrandeUI"), local("Segoe UI"), local("Ubuntu"), local("Roboto-Regular"), local("DroidSans"), local("Tahoma");
 }
 
 @font-face {
@@ -86,7 +86,7 @@ SPDX-License-Identifier: MIT
 
 body {
 	font-family: "Jost", sans-serif;
-	@apply min-h-[100svh] bg-gradient-to-br from-neutral-50 to-neutral-100 text-neutral-800 dark:from-neutral-800 dark:to-neutral-900 dark:text-neutral-200;
+	@apply bg-neutral-50 text-neutral-800 dark:bg-neutral-800  dark:text-neutral-200;
 }
 
 a {
@@ -107,12 +107,6 @@ a {
 	@apply visible;
 }
 
-.gutter {
-	@apply z-40 bg-transparent pl-2;
-	background-position: 50% 50%;
-}
-
-.gutter.gutter-horizontal {
-	@apply cursor-col-resize bg-no-repeat;
-	background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==");
+*::-webkit-scrollbar-track {
+	@apply bg-transparent;
 }

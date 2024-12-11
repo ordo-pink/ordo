@@ -19,8 +19,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export const ContentQuery: Ordo.Content.QueryStatic = {
-	Of: (repo: Ordo.Content.Repository) => ({
-		get: id => repo.get(id, ""),
-	}),
-}
+import { Maoka } from "@ordo-pink/maoka"
+
+import { App } from "./app"
+
+import "@ordo-pink/css/main.css"
+
+// TODO Move fonts to assets
+const app = document.getElementById("app")!
+
+void Maoka.render_dom(app, App)

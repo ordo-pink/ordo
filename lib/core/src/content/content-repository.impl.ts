@@ -22,7 +22,7 @@
 import { Oath, ops0 } from "@ordo-pink/oath"
 import { RRR } from "../rrr"
 
-export const CacheContentRepository: Ordo.Content.RepositoryAsyncStatic = {
+export const CacheContentRepository: Ordo.Content.RepositoryStatic = {
 	Of: () => {
 		const indexed_db = indexedDB.open("ordo.pink", 3)
 

@@ -19,8 +19,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export const ContentQuery: Ordo.Content.QueryStatic = {
-	Of: (repo: Ordo.Content.Repository) => ({
-		get: id => repo.get(id, ""),
-	}),
-}
+import { Maoka } from "@ordo-pink/maoka"
+import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { MaokaZAGS } from "@ordo-pink/maoka-zags"
+
+const zags = MaokaZAGS.Of({ counter: { value: 0 } })
+
+export const App = Maoka.create("div", ({ use }) => {
+	use(MaokaJabs.set_class("min-h-svh"))
+
+	return () => [Counter, Button]
+})
+
+const Counter = Maoka.create("div", ({ use }) => {
+	const get_counter = use(zags.select$(state => state.counter.value))
+
+	return () => String(get_counter())
+})
+
+const Button = Maoka.create("button", ({ element, use }) => {
+	const get_counter = use(zags.select$(state => state.counter.value))
+
+	element.onclick = () => zags.update("counter", { value: get_counter() + 1 })
+
+	return () => "Click Me!"
+})

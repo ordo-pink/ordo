@@ -657,20 +657,10 @@ declare global {
 			type Storage = Record<Ordo.Metadata.FSID, Ordo.Content.Instance>
 
 			type RepositoryStatic = {
-				Of: (content$: BehaviorSubject<Ordo.Content.Storage>) => Repository
+				Of: (data_host: string, fetch: Ordo.Fetch) => Repository
 			}
 
 			type Repository = {
-				get: () => TResult<Ordo.Content.Storage, Ordo.Rrr<"EAGAIN">>
-				put: (content: Ordo.Content.Storage) => TResult<void, Ordo.Rrr<"EINVAL">>
-				get $(): Observable<number>
-			}
-
-			type RepositoryAsyncStatic = {
-				Of: (data_host: string, fetch: Ordo.Fetch) => RepositoryAsync
-			}
-
-			type RepositoryAsync = {
 				get: (
 					fsid: Ordo.Metadata.FSID,
 					token: string,
@@ -683,7 +673,7 @@ declare global {
 			}
 
 			type QueryStatic = {
-				Of: (repository: Ordo.Content.RepositoryAsync) => Ordo.Content.Query
+				Of: (repository: Ordo.Content.Repository) => Ordo.Content.Query
 			}
 
 			type Query = {

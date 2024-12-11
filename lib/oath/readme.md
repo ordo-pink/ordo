@@ -1,11 +1,9 @@
 # Oath
 
-[![license](https://img.shields.io/badge/license-The%20Unlicense-green)](https://github.com/ordo-pink/ordo)
-[![license](https://img.shields.io/badge/by-ordo.pink-db2777)](https://github.com/ordo-pink/ordo)
-[![gitmoji](https://img.shields.io/badge/gitmoji-%20😜%20😍-FFDD67.svg)](https://gitmoji.carloscuesta.me/)
+[![License: Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg)](http://unlicense.org/)
 
-Oath is a dependency free package that introduces laziness, cancellation and rejected branch type
-definition support to your asynchronous code.
+Oath is a dependency free package that introduces laziness, cancellation and rejected branch type definition support to your
+asynchronous code.
 
 > Can you feel your heartbeat racing?
 
@@ -49,10 +47,9 @@ The Unlicense
 
 ## A benchmark of ten thousand, Mister Frisby
 
-As the name suggests, each check was done _100,000_ times. The benchmarking was done with the
-`benchmark.ts` (see the repo), running with **Bun v1.0.30** (`bun benchmark.ts`) and **Deno v2.0.0**
-(`deno benchmark.ts`). The benchmarking was done on an Intel Core Ultra 5 laptop with 16Gb of RAM,
-using Windows with Ubuntu inside WSL 2.0.
+As the name suggests, each check was done _100,000_ times. The benchmarking was done with the `benchmark.ts` (see the repo),
+running with **Bun v1.0.30** (`bun benchmark.ts`) and **Deno v2.0.0** (`deno benchmark.ts`). The benchmarking was done on an
+Intel Core Ultra 5 laptop with 16Gb of RAM, using Windows with Ubuntu inside WSL 2.0.
 
 ### Bun Results
 
@@ -78,6 +75,5 @@ As you can see, Oath is about 2 times slower than Promise.
 
 ## Pst Scrptm
 
-This package is a part of Ordo.pink monorepo. Feel free to ask for help, report bug reports,
-contribute, or suggest improvements
+This package is a part of Ordo.pink monorepo. Feel free to ask for help, report bug reports, contribute, or suggest improvements
 [here on GitHub](https://github.com/ordo-pink/ordo/tree/main/lib/oath). Cheers! 🍻

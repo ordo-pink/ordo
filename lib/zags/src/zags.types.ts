@@ -19,11 +19,12 @@ export type TPartner<$TState extends Record<string, unknown>> = (value: $TState,
  */
 export type TZags<$TState extends Record<string, unknown>> = {
 	/**
-	 * Subscribe to ZAGS state updates.
+	 * Subscribe to ZAGS state updates. Returns an extracted `divorce` function for easier
+	 * unsibscription maintenance.
 	 *
 	 * @param TPartner partner to be called when state updates. Also called when you marry.
 	 */
-	marry: (partner: TPartner<$TState>) => void
+	marry: (partner: TPartner<$TState>) => () => void
 
 	/**
 	 * Unsubscribe from ZAGS state updates.

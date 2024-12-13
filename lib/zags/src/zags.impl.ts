@@ -13,6 +13,8 @@ export const ZAGS: TZagsStatic = {
 		marry: f => {
 			handlers.push(f)
 			f(state, false)
+
+			return () => void handlers.splice(handlers.indexOf(f), 1)
 		},
 		divorce: f => void handlers.splice(handlers.indexOf(f), 1),
 		update: v => {

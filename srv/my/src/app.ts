@@ -19,28 +19,31 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { BackgroundTaskIndicator } from "@ordo-pink/frontend-background-task-status"
+import { BackgroundTaskStatus } from "@ordo-pink/core"
+import { ConsoleLogger } from "@ordo-pink/logger"
 import { Maoka } from "@ordo-pink/maoka"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
-import { MaokaZAGS } from "@ordo-pink/maoka-zags"
 
-const zags = MaokaZAGS.Of({ counter: { value: 0 } })
+import { init_commands } from "./core/commands"
+import { init_known_functions } from "./core/known-functions"
+// import { init_logger } from "./core/logger"
 
-export const App = Maoka.create("div", ({ use }) => {
-	use(MaokaJabs.set_class("min-h-svh"))
+// const zags = MaokaZAGS.Of({ counter: { value: 0 } })
 
-	return () => [Counter, Button]
-})
+const APP_NAME = "pink.ordo.app"
+const APP_FID = Symbol.for(APP_NAME)
+const APP_FN = { fid: APP_FID, name: APP_NAME, permissions: { commands: [], queries: [] } }
 
-const Counter = Maoka.create("div", ({ use }) => {
-	const get_counter = use(zags.select$(state => state.counter.value))
+const known_functions = init_known_functions(APP_FN)
 
-	return () => String(get_counter())
-})
+export const App = Maoka.create("div", ({ element }) => {
+	// const { get_logger } = init_logger(ConsoleLogger, known_functions)
+	const { commands } = init_commands(ConsoleLogger, known_functions, APP_FID)
 
-const Button = Maoka.create("button", ({ element, use }) => {
-	const get_counter = use(zags.select$(state => state.counter.value))
+	element.onclick = () => commands.emit("cmd.application.background_task.set_status", BackgroundTaskStatus.LOADING)
 
-	element.onclick = () => zags.update("counter", { value: get_counter() + 1 })
-
-	return () => "Click Me!"
+	return () => {
+		// ON_UPDATE
+		return ["adfasdfadsf", BackgroundTaskIndicator(commands)]
+	}
 })

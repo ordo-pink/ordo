@@ -25,6 +25,12 @@ export type TRequireFID<$TReturn> = (fid: symbol | null) => $TReturn
 
 declare global {
 	module OrdoInternal {
+		type KnownFunction = {
+			name: string
+			fid: symbol
+			permissions: Ordo.CreateFunction.Permissions
+		}
+
 		module User {
 			export type InternalDTO = Ordo.User.Current.DTO & {
 				email_code: string

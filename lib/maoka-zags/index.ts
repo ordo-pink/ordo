@@ -3,5 +3,4 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-export * from "./src/maoka-zags.impl"
-export * from "./src/maoka-zags.types"
+export * from "./src/maoka-zags.impl.ts"

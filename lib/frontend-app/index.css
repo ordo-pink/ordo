@@ -110,3 +110,7 @@ a {
 *::-webkit-scrollbar-track {
 	@apply bg-transparent;
 }
+
+.app {
+	@apply flex;
+}

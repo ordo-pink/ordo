@@ -19,9 +19,29 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { App } from "@ordo-pink/frontend-app"
-import { Maoka } from "@ordo-pink/maoka"
+import { MaokaZAGS } from "@ordo-pink/maoka-zags"
+import { type TLogger } from "@ordo-pink/logger"
 
-const app = document.getElementById("app")!
+export const ordo_app_state = MaokaZAGS.Of<TOrdoState>({} as any)
 
-void Maoka.render_dom(app, App)
+export type TOrdoState = {
+	logger: TLogger
+	commands: Ordo.Command.Commands
+	known_functions: OrdoInternal.KnownFunctions
+	hosts: Ordo.Hosts
+	translate: Ordo.I18N.TranslateFn
+	constants: {
+		app_name: "pink.ordo.app"
+		app_fid: symbol
+		is_dev: boolean
+		app_fn: OrdoInternal.KnownFunction
+		version: `v${string}.${string}.${string}`
+	}
+	current_route: Ordo.Router.Route
+	functions: {
+		current_activity?: Ordo.Activity.Instance
+		activities: OrdoInternal.TFIDAwareActivity[]
+		current_file_assoc?: Ordo.FileAssociation.Instance
+		file_assocs: Ordo.FileAssociation.Instance[]
+	}
+}

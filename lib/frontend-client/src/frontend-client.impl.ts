@@ -146,7 +146,6 @@ export const create_client = async ({ logger, is_dev, hosts }: P) => {
 		get_is_authenticated: get_is_authenticated(APP_FID),
 		get_logger: get_logger(APP_FID),
 		get_metadata_query: get_metadata_query(APP_FID),
-		get_sidebar: get_sidebar(APP_FID),
 		get_translations,
 		get_user_query: get_user_query(APP_FID),
 		get_current_file_association: get_current_file_association(APP_FID),

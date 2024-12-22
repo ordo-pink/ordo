@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { ZAGS } from "@ordo-pink/zags"
+import { TDotPath, TFromDotPath, TZags, ZAGS } from "@ordo-pink/zags"
 
 import { type TMaokaZags } from "./maoka-zags.types"
 
@@ -12,33 +12,13 @@ import { type TMaokaZags } from "./maoka-zags.types"
  * {@link https://jsr.io/@ordo-pink/maoka 🔗 Maoka}.
  */
 export const MaokaZAGS = {
-	/**
-	 * Create an instance of MaokaZAGS.
-	 *
-	 * @param initial_state state value to start with.
-	 */
-	Of: <$TState extends Record<string, unknown>>(initial_state: $TState): TMaokaZags<$TState> => {
-		const zags = ZAGS.Of(initial_state)
-		const selection_results = new Map<Parameters<TMaokaZags<$TState>["select_jab$"]>[0], unknown>()
-		const selection_subs = new Map<Parameters<TMaokaZags<$TState>["select_jab$"]>[0], string[]>()
+	From: <$TState extends Record<string, unknown>>($: TZags<$TState>): TMaokaZags<$TState> => {
+		const selection_results = new Map<TDotPath<$TState>, unknown>()
+		const selection_subs = new Map<TDotPath<$TState>, string[]>()
 
 		return {
-			/**
-			 * Update ZAGS state with given value.
-			 *
-			 * @param path path to the value to be set in the state.
-			 * @param value value to be assigned under given path.
-			 */
-			update: (path, value): void => {
-				const state = zags.unwrap()
-				const keys = (path as string).split(".")
-
-				const location: Record<string, unknown> = keys.slice(0, -1).reduce((acc, key) => (acc as any)[key], state)
-
-				if (location[keys[keys.length - 1]] !== value) {
-					location[keys[keys.length - 1]] = value
-					zags.update(state)
-				}
+			get zags() {
+				return $
 			},
 
 			/**
@@ -46,33 +26,33 @@ export const MaokaZAGS = {
 			 * component if the value changes. It automatically divorces the ZAGS state when the component
 			 * unmounts. The value is internally cached to avoid redundant refreshes.
 			 *
+			 * TODO Use path selector
+			 *
 			 * @param selector function that reduces state to desired value.
 			 */
 			select_jab$:
-				<$TResult>(selector: (state: $TState) => $TResult) =>
-				({ refresh, on_unmount, id }): (() => $TResult) => {
-					let value: $TResult
+				<K extends TDotPath<$TState>>(path: K) =>
+				({ refresh, on_unmount, id }) => {
+					let value: TFromDotPath<$TState, K>
 					let is_initial_render = true
 
-					if (!selection_subs.has(selector)) {
-						selection_subs.set(selector, [])
-					}
+					if (!selection_subs.has(path)) selection_subs.set(path, [])
 
-					const subs = selection_subs.get(selector)!
+					const subs = selection_subs.get(path)!
 
-					if (!subs.includes(id)) selection_subs.set(selector, [...subs, id])
+					if (!subs.includes(id)) selection_subs.set(path, [...subs, id])
 
-					const divorce = zags.marry(state => {
-						value = selector(state)
+					const divorce = $.marry(() => {
+						value = $.select(path)
 
 						if (is_initial_render) {
-							selection_results.set(selector, value)
+							selection_results.set(path, value)
 							is_initial_render = false
 							return
 						}
 
-						if (!selection_results.has(selector) || !deep_equals(selection_results.get(selector), value)) {
-							selection_results.set(selector, value)
+						if (!selection_results.has(path) || !deep_equals(selection_results.get(path), value)) {
+							selection_results.set(path, value)
 							void refresh()
 						}
 					})
@@ -80,21 +60,31 @@ export const MaokaZAGS = {
 					on_unmount(() => {
 						divorce()
 
-						let subs = selection_subs.get(selector)
+						let subs = selection_subs.get(path)
 						if (!subs) return
 
-						selection_subs.set(selector, subs.toSpliced(subs.indexOf(id), 1))
-						subs = selection_subs.get(selector)
+						selection_subs.set(path, subs.toSpliced(subs.indexOf(id), 1))
+						subs = selection_subs.get(path)
 
 						if (!subs || subs.length <= 0) {
-							selection_subs.delete(selector)
-							selection_results.delete(selector)
+							selection_subs.delete(path)
+							selection_results.delete(path)
 						}
 					})
 
 					return () => value
 				},
 		}
+	},
+	/**
+	 * Create an instance of MaokaZAGS.
+	 *
+	 * @param initial_state state value to start with.
+	 */
+	Of: <$TState extends Record<string, unknown>>(initial_state: $TState): TMaokaZags<$TState> => {
+		const zags = ZAGS.Of(initial_state)
+
+		return MaokaZAGS.From(zags)
 	},
 }
 

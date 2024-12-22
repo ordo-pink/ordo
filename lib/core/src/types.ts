@@ -21,15 +21,16 @@
 
 import type { BehaviorSubject, Observable } from "rxjs"
 
-import type { ISO_639_1_Locale, TwoLetterLocale } from "@ordo-pink/locale"
 import type { JTI, SUB } from "@ordo-pink/wjwt"
 import type { Oath } from "@ordo-pink/oath"
 import type { TLogger } from "@ordo-pink/logger"
 import type { TOption } from "@ordo-pink/option"
 import type { TResult } from "@ordo-pink/result"
+import type { TwoLetterLocale } from "@ordo-pink/locale"
 
 import type * as C from "./constants"
 import { TMaokaComponent } from "@ordo-pink/maoka"
+import { TZags } from "@ordo-pink/zags"
 
 export type TDropIsPrefix<T extends string> = T extends `is_${infer U}` ? U : never
 
@@ -145,9 +146,10 @@ declare global {
 		application: {
 			set_title: () => Ordo.I18N.TranslationKey
 			add_translations: () => {
-				lang: ISO_639_1_Locale
+				lang: keyof Ordo.I18N.Translations
 				translations: Partial<Record<Ordo.I18N.TranslationKey, string>>
 			}
+			set_language: () => keyof Ordo.I18N.Translations
 			background_task: {
 				set_status: () => C.BackgroundTaskStatus
 				start_saving: () => void
@@ -174,13 +176,12 @@ declare global {
 			sidebar: {
 				enable: () => void
 				disable: () => void
-				set_size: () => [number, number]
-				show: () => [number, number] | undefined
+				show: () => void
 				hide: () => void
 				toggle: () => void
 			}
 			router: {
-				navigate: () => Ordo.Router.NavigateParams | string
+				navigate: () => { url: Ordo.Router.Route["pathname"]; new_tab?: boolean }
 				open_external: () => Ordo.Router.OpenExternalParams
 			}
 			modal: {
@@ -392,13 +393,6 @@ declare global {
 			}
 		}
 
-		namespace Workspace {
-			type WorkspaceSplitSize = [number, number]
-			type DisabledSidebar = { disabled: true }
-			type EnabledSidebar = { disabled: false; sizes: WorkspaceSplitSize }
-			type SidebarState = EnabledSidebar | DisabledSidebar
-		}
-
 		namespace CreateFunction {
 			type QueryPermission =
 				| "application.title"
@@ -408,7 +402,6 @@ declare global {
 				| "application.logger"
 				| "application.commands"
 				| "application.current_fid"
-				| "application.current_language"
 				| "application.current_route"
 				| "application.current_activity"
 				| "users.current_user.achievements"
@@ -429,18 +422,17 @@ declare global {
 			type GetCurrentRouteFn = () => TResult<Observable<TOption<Ordo.Router.Route>>, Ordo.Rrr<"EPERM">>
 
 			// TODO Extract redundant types
-			type GetSidebarFn = () => TResult<Observable<Ordo.Workspace.SidebarState>, Ordo.Rrr<"EPERM">>
 			type GetTitleFn = () => TResult<Observable<string>, Ordo.Rrr<"EPERM">>
 			type GetHostsFn = () => TResult<Ordo.Hosts, Ordo.Rrr<"EPERM">>
-			type GetFetchFn = () => Ordo.Fetch
+			type GetFetchFn = () => TResult<Ordo.Fetch, Ordo.Rrr<"EPERM">>
 			type GetLoggerFn = () => TLogger
-			type GetCommandsFn = () => Ordo.Command.Commands
+			type GetCommandsFn = () => TResult<Ordo.Command.Commands, Ordo.Rrr<"EPERM">>
 			type GetIsAuthenticatedFn = () => TResult<Observable<boolean>, Ordo.Rrr<"EPERM">>
 			type GetMetadataQueryFn = () => TResult<Ordo.Metadata.Query, Ordo.Rrr<"EPERM">>
 			type GetContentQueryFn = () => TResult<Ordo.Content.Query, Ordo.Rrr<"EPERM">>
 			type GetUserQueryFn = () => TResult<Ordo.User.Query, Ordo.Rrr<"EPERM">>
-			type GetCurrentLanguageFn = () => TResult<Observable<TwoLetterLocale>, Ordo.Rrr<"EPERM">>
-			type GetTranslationsFn = () => Observable<TOption<Ordo.I18N.Translations>>
+			type GetCurrentLanguageFn = () => TResult<TwoLetterLocale, Ordo.Rrr<"EPERM">>
+			type GetTranslationsFn = () => TZags<Ordo.I18N.Translations>
 			type SetCurrentActivityFn = (name: string) => TResult<void, Ordo.Rrr<"EPERM" | "ENOENT">>
 
 			type GetCurrentActivityFn = () => TResult<Observable<TOption<Ordo.Activity.Instance>>, Ordo.Rrr<"EPERM" | "ENOENT">>
@@ -458,7 +450,6 @@ declare global {
 				fid: symbol
 				is_dev: boolean
 				get_commands: GetCommandsFn
-				get_sidebar: GetSidebarFn
 				get_logger: GetLoggerFn
 				get_current_route: GetCurrentRouteFn
 				get_hosts: GetHostsFn
@@ -478,10 +469,10 @@ declare global {
 		namespace I18N {
 			type TranslationKeys = TFlattenRecord<TRecordToKVUnion<t, "t">>
 			type TranslationKey = keyof TranslationKeys
-			type Translations = Record<TwoLetterLocale, Record<string, string>>
+			type Translations = Record<TwoLetterLocale, Record<TranslationKey, string>>
 			type TranslateFn = {
-				$: Observable<number>
 				(key: Ordo.I18N.TranslationKey, default_value?: string): string
+				$: TZags<{ version: number }>
 			}
 		}
 
@@ -1022,31 +1013,20 @@ declare global {
 		}
 
 		namespace Router {
-			/**
-			 * Route descriptor to be passed for navigating.
-			 */
-			type RouteConfig = {
-				route: string
-				queryString?: string | Record<string, string>
-				pageTitle?: string
-				data?: Record<string, unknown>
-				preserveQuery?: boolean
-				replace?: boolean
-				exec?: boolean
-			}
-
-			type NavigateParams = [routeConfig: string | RouteConfig, replace?: boolean, exec?: boolean]
-
 			type OpenExternalParams = { url: string; new_tab?: boolean }
 
-			type Route<$TParams extends Record<string, string | undefined> = Record<string, string | undefined>, $TData = null> = {
-				params?: $TParams
-				data: $TData
-				hash: string
-				hashRouting: boolean
+			type Route = {
+				params: URLSearchParams
+				host: string
+				hostname: string
+				href: string
+				origin: string
+				password: string
+				pathname: `/${string}`
+				port: string
+				protocol: `${string}:`
 				search: string
-				path: string
-				route: string
+				username: string
 			}
 		}
 

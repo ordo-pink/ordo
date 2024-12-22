@@ -39,7 +39,19 @@ export type TZags<$TState extends Record<string, unknown>> = {
 	 * @param $TState state update. May be partial state - then the old state and the new state
 	 * will be merged.
 	 */
-	update: (state: Partial<$TState>) => void
+	update: <_TKey extends TDotPath<$TState>>(
+		path: _TKey,
+		value_creator: (prev_value: TFromDotPath<$TState, _TKey>) => TFromDotPath<$TState, _TKey>,
+	) => void
+
+	/**
+	 * Fully override ZAGS state with provided value.
+	 *
+	 * @param new_state state to override with.
+	 */
+	replace: (new_state: $TState) => void
+
+	select: <_TKey extends TDotPath<$TState>>(path: _TKey) => TFromDotPath<$TState, _TKey>
 
 	/**
 	 * Returns a structured clone of ZAGS state. All `structuredClone` limitations apply.
@@ -89,3 +101,32 @@ export type TZagsStatic = {
 	 */
 	Of: <T extends Record<string, unknown>>(initial_state: T, partners?: TPartner<T>[]) => TZags<T>
 }
+
+/**
+ * Extract value type under given dot path (e.g. "key.sub_key.sub_sub_key").
+ *
+ * @example
+ * ```
+ * type THelloWorld = TFromDotPath<{ parent: { child: "Hello, World!" } }, "parent.child"> // "Hello, World!"
+ * ```
+ */
+export type TFromDotPath<T extends Record<string, unknown>, K extends TDotPath<T>> = K extends `${infer U}.${infer N}`
+	? T[U] extends Record<string, unknown>
+		? N extends TDotPath<T[U]>
+			? TFromDotPath<T[U], N>
+			: never
+		: never
+	: K extends keyof T
+		? T[K]
+		: never
+
+/**
+ * @see https://gist.github.com/j1mmie/03e1dfc7ca14296604843235ad32082a
+ */
+export type TDotPath<$TRecord> = TValues<{
+	[_TKey in keyof $TRecord]: $TRecord[_TKey] extends Record<string, unknown>
+		? `${string & _TKey}.${string & TDotPath<$TRecord[_TKey]>}` | _TKey
+		: _TKey
+}>
+
+type TValues<T> = T extends { [name in keyof T]: infer Type } ? Type : never

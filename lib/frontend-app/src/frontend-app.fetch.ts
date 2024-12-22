@@ -19,32 +19,29 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { TLogger } from "@ordo-pink/logger"
+import { R } from "@ordo-pink/result"
+import { RRR } from "@ordo-pink/core"
 import { call_once } from "@ordo-pink/tau"
 
-type TInitLoggerFn = (
-	logger: TLogger,
-	known_functions: OrdoInternal.KnownFunctions,
-) => {
-	get_logger: (fid: symbol) => Ordo.CreateFunction.GetLoggerFn
-}
-export const init_logger: TInitLoggerFn = call_once((logger, known_functions) => {
-	logger.debug("🟢 Initialised logger.")
+import { ordo_app_state } from "../app.state"
+
+const fetch = window.fetch
+
+type TF = () => { get_fetch: (fid: symbol) => Ordo.CreateFunction.GetFetchFn }
+export const init_fetch: TF = call_once(() => {
+	const { logger, known_functions } = ordo_app_state.zags.unwrap()
+
+	window.fetch = undefined as any
+	window.XMLHttpRequest = undefined as any
+
+	logger.debug("🟢 Initialised fetch.")
 
 	return {
-		get_logger: fid => () => {
-			const f = known_functions.exchange(fid).cata({ Some: x => x, None: () => "unauthorized" })
-
-			return {
-				panic: (...message) => logger.panic(`@${f} ::`, ...message),
-				alert: (...message) => logger.alert(`@${f} ::`, ...message),
-				crit: (...message) => logger.crit(`@${f} ::`, ...message),
-				error: (...message) => logger.error(`@${f} ::`, ...message),
-				warn: (...message) => logger.warn(`@${f} ::`, ...message),
-				notice: (...message) => logger.notice(`@${f} ::`, ...message),
-				info: (...message) => logger.info(`@${f} ::`, ...message),
-				debug: (...message) => logger.debug(`@${f} ::`, ...message),
-			}
-		},
+		get_fetch: fid => () =>
+			R.If(known_functions.has_permissions(fid, { queries: ["application.fetch"] }))
+				.pipe(R.ops.err_map(() => eperm("get_fetch -> fid", fid)))
+				.pipe(R.ops.map(() => fetch)),
 	}
 })
+
+const eperm = RRR.codes.eperm("init_hosts")

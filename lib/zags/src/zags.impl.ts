@@ -17,10 +17,34 @@ export const ZAGS: TZagsStatic = {
 			return () => void handlers.splice(handlers.indexOf(f), 1)
 		},
 		divorce: f => void handlers.splice(handlers.indexOf(f), 1),
-		update: v => {
-			state = { ...state, ...v }
+		update: (path, value_creator) => {
+			const prev_state = ZAGS.Of(state, handlers).unwrap()
+			const keys = (path as string).split(".")
+
+			const location: Record<string, any> = keys.slice(0, -1).reduce((acc, key) => (acc as any)[key], prev_state)
+			const current_value = location[keys[keys.length - 1]]
+			const value = value_creator(current_value)
+
+			if (current_value !== value) {
+				location[keys[keys.length - 1]] = value
+				state = { ...prev_state }
+			}
+
+			handlers.forEach(f => f(prev_state, true))
+		},
+		select: path => {
+			const current_state = ZAGS.Of(state, handlers).unwrap()
+
+			const keys = (path as string).split(".")
+			const location: Record<string, any> = keys.slice(0, -1).reduce((acc, key) => (acc as any)[key], current_state)
+
+			return location[keys[keys.length - 1]]
+		},
+		replace: new_state => {
+			state = { ...new_state }
 			handlers.forEach(f => f(state, true))
 		},
-		unwrap: () => structuredClone(state),
+		// TODO Deep cloning
+		unwrap: () => ({ ...state }),
 	}),
 }

@@ -19,9 +19,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { App } from "@ordo-pink/frontend-app"
-import { Maoka } from "@ordo-pink/maoka"
+import { R } from "@ordo-pink/result"
+import { RRR } from "@ordo-pink/core"
 
-const app = document.getElementById("app")!
+import { ordo_app_state } from "../app.state"
 
-void Maoka.render_dom(app, App)
+type TF = (hosts: Ordo.Hosts) => {
+	get_hosts: (fid: symbol) => Ordo.CreateFunction.GetHostsFn
+}
+export const init_hosts: TF = hosts => {
+	const { logger, known_functions } = ordo_app_state.zags.unwrap()
+
+	logger.debug("🟢 Initialised hosts.")
+
+	return {
+		get_hosts: fid => () =>
+			R.If(known_functions.has_permissions(fid, { queries: ["application.hosts"] }))
+				.pipe(R.ops.err_map(() => eperm("get_hosts -> fid", fid)))
+				.pipe(R.ops.map(() => hosts)),
+	}
+}
+
+const eperm = RRR.codes.eperm("init_hosts")

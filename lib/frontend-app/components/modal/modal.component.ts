@@ -19,9 +19,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { App } from "@ordo-pink/frontend-app"
 import { Maoka } from "@ordo-pink/maoka"
+import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 
-const app = document.getElementById("app")!
+import { modal_state } from "./modal.state"
 
-void Maoka.render_dom(app, App)
+export const Modal = Maoka.create("div", async ({ use, element }) => {
+	const state = modal_state.zags.select("state")!
+
+	use(MaokaJabs.set_class("modal"))
+	use(MaokaJabs.listen("onclick", event => handle_click(event)))
+
+	const handle_click = (event: MouseEvent) => event.stopPropagation()
+
+	await state.render(element as unknown as HTMLDivElement)
+})

@@ -19,9 +19,33 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { App } from "@ordo-pink/frontend-app"
-import { Maoka } from "@ordo-pink/maoka"
+import { ZAGS } from "@ordo-pink/zags"
+import { call_once } from "@ordo-pink/tau"
 
-const app = document.getElementById("app")!
+import { ordo_app_state } from "../app.state"
 
-void Maoka.render_dom(app, App)
+type TInitTitleStreamFn = () => void
+export const init_title_display: TInitTitleStreamFn = call_once(() => {
+	const { commands, logger, translate } = ordo_app_state.zags.unwrap()
+
+	commands.on("cmd.application.set_title", title => title$.update("title", () => title))
+
+	const title_element = document.querySelector("title") as HTMLTitleElement
+
+	translate.$.marry((_, is_update) => {
+		if (is_update) {
+			const title = title$.select("title")
+			title_element.innerText = `${translate(title)} | Ordo.pink`
+		}
+	})
+
+	title$.marry(({ title }) => {
+		title_element.innerText = `${translate(title)} | Ordo.pink`
+	})
+
+	logger.debug("🟢 Initialised title.")
+})
+
+// --- Internal ---
+
+const title$ = ZAGS.Of<{ title: Ordo.I18N.TranslationKey }>({ title: "t.common.state.loading" })

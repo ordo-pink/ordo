@@ -22,65 +22,50 @@
 import { Subject, combineLatestWith, map, merge, scan, shareReplay } from "rxjs"
 import { equals } from "ramda"
 
-import { Result } from "@ordo-pink/result"
-import { type TLogger } from "@ordo-pink/logger"
+import { R } from "@ordo-pink/result"
+import { RRR } from "@ordo-pink/core"
 import { call_once } from "@ordo-pink/tau"
 
-const create_forbidden_commands_message = (fid: symbol | null) =>
-	`🔴 FID "${String(fid)}" did not request permission to use commands.`
+import { ordo_app_state } from "../app.state"
 
 type TCommand = (Ordo.Command.Command | Ordo.Command.PayloadCommand) & { fid: symbol }
 type TCmdHandlerState = Record<string, Ordo.Command.TCommandHandler<any>[]>
 type TCmdListener<N extends Ordo.Command.Name = Ordo.Command.Name, P = any> = [N, Ordo.Command.TCommandHandler<P>, symbol]
 
-type TInitCommandsFn = (
-	logger: TLogger,
-	known_functions: OrdoInternal.KnownFunctions,
-	app_fid: symbol,
-	is_dev?: boolean,
-) => {
-	commands: Ordo.Command.Commands
-	get_commands: (fid: symbol) => Ordo.CreateFunction.GetCommandsFn
-}
-export const init_commands: TInitCommandsFn = call_once((logger, known_functions, APP_FID, is_dev = true) => {
-	logger.debug("🟡 Initializing commands...")
+type TF = () => { get_commands: (fid: symbol) => Ordo.CreateFunction.GetCommandsFn }
+export const init_commands: TF = call_once(() => {
+	const logger = ordo_app_state.zags.select("logger")
+	const is_dev = ordo_app_state.zags.select("constants.is_dev")
+	const known_functions = ordo_app_state.zags.select("known_functions")
 
-	const forbidden_commands = (fid: symbol | null): Ordo.Command.Commands => ({
-		on: () => {
-			logger.alert(create_forbidden_commands_message(fid))
-		},
-		off: () => {
-			logger.alert(create_forbidden_commands_message(fid))
-		},
-		emit: () => {
-			logger.alert(create_forbidden_commands_message(fid))
-		},
-		cancel: () => {
-			logger.alert(create_forbidden_commands_message(fid))
-		},
-	})
+	const get_commands =
+		(fid: symbol): Ordo.CreateFunction.GetCommandsFn =>
+		() =>
+			R.If(known_functions.has_permissions(fid, { queries: ["application.commands"] }))
+				.pipe(R.ops.err_map(() => eperm("get_commands -> fid", fid)))
+				.pipe(
+					R.ops.map(() => {
+						const func = known_functions.exchange(fid).cata({ Some: x => x, None: () => "unauthorized" })
 
-	const commands = (fid: symbol): Ordo.Command.Commands => {
-		const func = known_functions.exchange(fid).cata({ Some: x => x, None: () => "unauthorized" })
-
-		return {
-			on: (name, handler) => {
-				logger.debug(`🟣 Function "${func}" appended handler for command "${name}"`)
-				add_after$.next([name, handler, fid])
-			},
-			off: (name, handler) => {
-				logger.debug(`⚫ Function "${func}" removed handler for command "${name}"`)
-				remove$.next([name, handler, fid])
-			},
-			emit: (name, payload?, key = crypto.randomUUID()) => {
-				enqueue$.next({ name, payload, key, fid })
-			},
-			cancel: (name, payload?, key = crypto.randomUUID()) => {
-				logger.debug(`⚫ Function "${func}" cancelled command "${name}"`)
-				dequeue$.next({ name, payload, key, fid })
-			},
-		}
-	}
+						return {
+							on: (name, handler) => {
+								logger.debug(`🟣 Function "${func}" appended handler for command "${name}"`)
+								add_after$.next([name, handler, fid])
+							},
+							off: (name, handler) => {
+								logger.debug(`⚫ Function "${func}" removed handler for command "${name}"`)
+								remove$.next([name, handler, fid])
+							},
+							emit: (name, payload?, key = crypto.randomUUID()) => {
+								enqueue$.next({ name, payload, key, fid })
+							},
+							cancel: (name, payload?, key = crypto.randomUUID()) => {
+								logger.debug(`⚫ Function "${func}" cancelled command "${name}"`)
+								dequeue$.next({ name, payload, key, fid })
+							},
+						}
+					}),
+				)
 
 	command_queue$
 		.pipe(
@@ -131,15 +116,7 @@ export const init_commands: TInitCommandsFn = call_once((logger, known_functions
 
 	logger.debug("🟢 Initialised commands.")
 
-	return {
-		commands: commands(APP_FID),
-
-		get_commands: fid => () =>
-			Result.FromNullable(fid)
-				.pipe(Result.ops.chain(fid => Result.If(known_functions.validate(fid))))
-				.pipe(Result.ops.map(() => fid))
-				.cata({ Ok: commands, Err: () => forbidden_commands(fid) }),
-	}
+	return { get_commands }
 })
 
 const is_payload_command = (cmd: Ordo.Command.Command): cmd is Ordo.Command.PayloadCommand =>
@@ -219,3 +196,5 @@ const command_storage$ = merge(
 	scan((acc, f) => f(acc), {} as Record<string, TCmdListener[1][]>),
 	shareReplay(1),
 )
+
+const eperm = RRR.codes.eperm("init_hosts")

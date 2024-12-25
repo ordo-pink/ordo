@@ -1,5 +1,5 @@
 .modal-overlay {
-	@apply fixed inset-0 z-[500] hidden h-screen w-screen items-center justify-center overflow-hidden bg-gradient-to-tr from-neutral-900/50 to-stone-900/50 p-4 backdrop-blur-sm;
+	@apply fixed inset-0 z-40 hidden h-screen w-screen items-center justify-center overflow-hidden bg-gradient-to-tr from-neutral-400/50 to-stone-400/50 p-4 backdrop-blur-sm dark:from-neutral-900/50 dark:to-stone-900/50;
 }
 
 .modal-overlay.active {

@@ -47,7 +47,7 @@ export const init_modal = ({ commands, logger, ctx }: P) => {
 const $ = new BehaviorSubject<TOption<Ordo.Modal.Instance>>(O.None())
 
 // Define command handlers
-const on_modal_show: Ordo.Command.TCommandHandler<Ordo.Modal.Instance> = payload => {
+const on_modal_show: Ordo.Command.CommandHandler<Ordo.Modal.Instance> = payload => {
 	const show_close_button = payload.show_close_button ?? true
 	const on_unmount = payload.on_unmount ?? (() => void 0)
 	const render = payload.render

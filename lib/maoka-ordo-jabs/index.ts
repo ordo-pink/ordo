@@ -36,7 +36,7 @@ export const MaokaOrdo = {
 			add:
 				<$TKey extends Ordo.Command.Name>(
 					name: $TKey,
-					handler: Ordo.Command.TCommandHandler<Ordo.Command.Record[$TKey]>,
+					handler: Ordo.Command.CommandHandler<Ordo.Command.Record[$TKey]>,
 				): TMaokaJab =>
 				({ use, on_unmount }) => {
 					const commands = use(MaokaOrdo.Jabs.Commands.get)

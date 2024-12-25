@@ -24,6 +24,13 @@ import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { R } from "@ordo-pink/result"
 
+import { OrdoActivityBar } from "./components/activity-bar/activity-bar.component"
+import { OrdoBackgroundTaskIndicator } from "./components/background-task-indicator.component"
+import { OrdoModal } from "./components/modal/modal.overlay"
+import { OrdoNotifications } from "./components/notifications/notifications-list.component"
+import { OrdoSidebar } from "./components/sidebar.component"
+import { OrdoWorkspace } from "./components/workspace.component"
+import { init_command_palette } from "./components/command-palette"
 import { init_commands } from "./src/frontend-app.commands"
 import { init_functions } from "./src/frontend-app.functions"
 import { init_hosts } from "./src/frontend-app.hosts"
@@ -32,11 +39,6 @@ import { init_known_functions } from "./src/frontend-app.known-functions"
 import { init_logger } from "./src/frontend-app.logger"
 import { init_router } from "./src/frontend-app.router"
 import { init_title_display } from "./src/frontend-app.title"
-
-import { OrdoBackgroundTaskIndicator } from "./components/background-task-indicator.component"
-import { OrdoModal } from "./components/modal/modal.overlay"
-import { OrdoSidebar } from "./components/sidebar.component"
-import { OrdoWorkspace } from "./components/workspace.component"
 import { ordo_app_state } from "./app.state"
 
 // TODO Move fonts to assets
@@ -53,6 +55,7 @@ const hosts = {} as Ordo.Hosts
 
 // TODO Support for ignoring updates
 ordo_app_state.zags.update("constants", () => ({ app_fid, app_fn, app_name, is_dev, version }))
+ordo_app_state.zags.update("sections", () => ({ sidebar: 0 }) as any)
 
 // const indexed_db = indexedDB.open("ordo.pink", 3)
 
@@ -94,12 +97,17 @@ export const App = Maoka.create("div", ({ use }) => {
 	const router$ = init_router()
 	router$.marry(({ current_route }) => ordo_app_state.zags.update("current_route", () => current_route))
 
+	// TODO zags.consume(other_zags)
 	const functions$ = init_functions()
 	functions$.marry(state => ordo_app_state.zags.update("functions", () => state))
 
 	init_title_display()
+	init_command_palette()
 
-	return () => {
-		return [OrdoWorkspace, OrdoSidebar, OrdoBackgroundTaskIndicator, OrdoModal]
-	}
+	// TODO Init content
+	// TODO Init metadata
+	// TODO Adding functions
+
+	// TODO ContextMenu, CommandPalette
+	return () => [OrdoWorkspace, OrdoSidebar, OrdoModal, OrdoNotifications, OrdoActivityBar, OrdoBackgroundTaskIndicator]
 })

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { TDotPath, TFromDotPath, TZags, ZAGS } from "@ordo-pink/zags"
+import { type TDotPath, type TZags, ZAGS } from "@ordo-pink/zags"
 
 import { type TMaokaZags } from "./maoka-zags.types"
 
@@ -13,8 +13,7 @@ import { type TMaokaZags } from "./maoka-zags.types"
  */
 export const MaokaZAGS = {
 	From: <$TState extends Record<string, unknown>>($: TZags<$TState>): TMaokaZags<$TState> => {
-		const selection_results = new Map<TDotPath<$TState>, unknown>()
-		const selection_subs = new Map<TDotPath<$TState>, string[]>()
+		const selection_results = {} as Record<string, Record<any, any>>
 
 		return {
 			get zags() {
@@ -26,53 +25,37 @@ export const MaokaZAGS = {
 			 * component if the value changes. It automatically divorces the ZAGS state when the component
 			 * unmounts. The value is internally cached to avoid redundant refreshes.
 			 *
-			 * TODO Use path selector
-			 *
-			 * @param selector function that reduces state to desired value.
+			 * @param path path to desired value.
 			 */
 			select_jab$:
 				<K extends TDotPath<$TState>>(path: K) =>
 				({ refresh, on_unmount, id }) => {
-					let value: TFromDotPath<$TState, K>
 					let is_initial_render = true
 
-					if (!selection_subs.has(path)) selection_subs.set(path, [])
-
-					const subs = selection_subs.get(path)!
-
-					if (!subs.includes(id)) selection_subs.set(path, [...subs, id])
-
 					const divorce = $.marry(() => {
-						value = $.select(path)
+						const value = $.select(path)
+
+						if (!selection_results[id]) selection_results[id] = {}
 
 						if (is_initial_render) {
-							selection_results.set(path, value)
 							is_initial_render = false
+							selection_results[id][path as any] = value
+
 							return
 						}
 
-						if (!selection_results.has(path) || !deep_equals(selection_results.get(path), value)) {
-							selection_results.set(path, value)
+						if (!selection_results[id][path] || !deep_equals(selection_results[id][path], value)) {
+							selection_results[id][path as any] = value
 							void refresh()
 						}
 					})
 
 					on_unmount(() => {
 						divorce()
-
-						let subs = selection_subs.get(path)
-						if (!subs) return
-
-						selection_subs.set(path, subs.toSpliced(subs.indexOf(id), 1))
-						subs = selection_subs.get(path)
-
-						if (!subs || subs.length <= 0) {
-							selection_subs.delete(path)
-							selection_results.delete(path)
-						}
+						delete selection_results[id]
 					})
 
-					return () => value
+					return () => selection_results[id][path]!
 				},
 		}
 	},
@@ -92,24 +75,24 @@ export const MaokaZAGS = {
 const deep_equals = (x: unknown, y: unknown): boolean => {
 	const typeof_x = typeof x
 
-	if (typeof_x !== typeof y) {
-		return false
-	}
+	if (typeof_x !== typeof y) return false
 
 	if (typeof_x === "object") {
 		if (x === null || y === null) return x === y
 
-		if (Array.isArray(x)) {
-			if (!Array.isArray(y)) {
-				return false
-			}
+		if (Array.isArray(x))
+			return (
+				Array.isArray(y) && x.length === y.length && x.reduce((acc, item, index) => acc && deep_equals(item, y[index]), true)
+			)
 
-			return x.reduce((acc, item, index) => acc && deep_equals(item, y[index]), true)
-		}
+		const keys_of_x = Object.keys(x as Record<string, unknown>)
 
-		return Object.keys(x as Record<string, unknown>).reduce(
-			(acc, key) => acc && deep_equals((x as Record<string, unknown>)[key], (y as Record<string, unknown>)[key]),
-			true,
+		return (
+			keys_of_x.length === Object.keys(y as Record<string, unknown>).length &&
+			keys_of_x.reduce(
+				(acc, key) => acc && deep_equals((x as Record<string, unknown>)[key], (y as Record<string, unknown>)[key]),
+				true,
+			)
 		)
 	}
 

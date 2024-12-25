@@ -31,8 +31,8 @@ const create_forbidden_commands_message = (fid: symbol | null) =>
 	`🔴 FID "${String(fid)}" did not request permission to use commands.`
 
 type TCommand = (Ordo.Command.Command | Ordo.Command.PayloadCommand) & { fid: symbol }
-type TCmdHandlerState = Record<string, Ordo.Command.TCommandHandler<any>[]>
-type TCmdListener<N extends Ordo.Command.Name = Ordo.Command.Name, P = any> = [N, Ordo.Command.TCommandHandler<P>, symbol]
+type TCmdHandlerState = Record<string, Ordo.Command.CommandHandler<any>[]>
+type TCmdListener<N extends Ordo.Command.Name = Ordo.Command.Name, P = any> = [N, Ordo.Command.CommandHandler<P>, symbol]
 
 type TInitCommandsFn = (params: Pick<TInitCtx, "logger" | "is_dev" | "known_functions" | "APP_FID">) => {
 	commands: Ordo.Command.Commands

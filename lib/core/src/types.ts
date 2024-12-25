@@ -109,6 +109,9 @@ declare global {
 					hide: () => string
 					show: () => string
 				}
+				notifications: {
+					pending_notifications: () => string
+				}
 			}
 		}
 	}
@@ -481,8 +484,8 @@ declare global {
 
 			type Instance = {
 				name: string
-				routes: string[]
-				default_route?: string
+				routes: `/${string}`[]
+				default_route?: `/${string}`
 				render_workspace?: (div: HTMLDivElement) => void | Promise<void>
 				render_sidebar?: (div: HTMLDivElement) => void | Promise<void>
 				render_icon?: (span: HTMLSpanElement) => void | Promise<void>
@@ -964,11 +967,13 @@ declare global {
 			/**
 			 * Command handler.
 			 */
-			type TCommandHandler<$TPayload> = (payload: $TPayload) => unknown
+			type CommandHandler<$TPayload> = (payload: $TPayload) => unknown
 
-			type OnFn = <$TKey extends Ordo.Command.Name>(name: $TKey, handler: TCommandHandler<Ordo.Command.Record[$TKey]>) => void
+			type HandlerOf<$TKey extends Ordo.Command.Name> = CommandHandler<Ordo.Command.Record[$TKey]>
 
-			type OffFn = <$TKey extends Ordo.Command.Name>(name: $TKey, handler: TCommandHandler<Ordo.Command.Record[$TKey]>) => void
+			type OnFn = <$TKey extends Ordo.Command.Name>(name: $TKey, handler: CommandHandler<Ordo.Command.Record[$TKey]>) => void
+
+			type OffFn = <$TKey extends Ordo.Command.Name>(name: $TKey, handler: CommandHandler<Ordo.Command.Record[$TKey]>) => void
 
 			type EmitFn = <$TKey extends Ordo.Command.Name>(
 				name: $TKey,

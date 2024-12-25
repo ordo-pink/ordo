@@ -71,7 +71,7 @@ export const OrdoModal = Maoka.create("div", ({ use, on_unmount }) => {
 // --- Internal ---
 
 // Define command handlers
-const on_modal_show: Ordo.Command.TCommandHandler<Ordo.Modal.Instance> = payload => {
+const on_modal_show: Ordo.Command.HandlerOf<"cmd.application.modal.show"> = payload => {
 	const show_close_button = payload.show_close_button ?? true
 	const on_unmount = payload.on_unmount ?? (() => void 0)
 	const render = payload.render
@@ -79,7 +79,7 @@ const on_modal_show: Ordo.Command.TCommandHandler<Ordo.Modal.Instance> = payload
 	modal_state.zags.update("state", () => ({ render, show_close_button, on_unmount }))
 }
 
-const on_modal_hide = () => {
+const on_modal_hide: Ordo.Command.HandlerOf<"cmd.application.modal.hide"> = () => {
 	const state = modal_state.zags.select("state")
 
 	if (state && state.on_unmount) {

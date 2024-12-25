@@ -30,7 +30,7 @@ export const ZAGS: TZagsStatic = {
 				state = { ...prev_state }
 			}
 
-			handlers.forEach(f => f(prev_state, true))
+			handlers.forEach(f => f(state, true))
 		},
 		select: path => {
 			const current_state = ZAGS.Of(state, handlers).unwrap()

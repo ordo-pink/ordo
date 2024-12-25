@@ -23,12 +23,12 @@ import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { Result } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
-
-import "./hotkey.css"
 import { title_case } from "@ordo-pink/tau"
 
+import "./hotkey.css"
+
 // TODO Move to jabs
-const isDarwin = navigator.appVersion.indexOf("Mac") !== -1
+const is_darwin = navigator.appVersion.indexOf("Mac") !== -1
 
 export type THotkeyOptions = {
 	prevent_in_inputs?: boolean
@@ -120,8 +120,8 @@ const Key = (key: string) =>
 			.default(() => title_case(key)),
 	)
 
-const meta = isDarwin ? Key("⌥") : Key("Alt")
-const mod = isDarwin ? Key("⌘") : Key("Ctrl")
+const meta = is_darwin ? Key("⌥") : Key("Alt")
+const mod = is_darwin ? Key("⌘") : Key("Ctrl")
 const ctrl = Key("Ctrl")
 const option = Key("⌥")
 const shift = Key("⇧")

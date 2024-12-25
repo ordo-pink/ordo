@@ -22,6 +22,8 @@
 import { MaokaZAGS } from "@ordo-pink/maoka-zags"
 import { type TLogger } from "@ordo-pink/logger"
 
+import { OrdoSidebarStatus } from "./components/sidebar.component"
+
 export const ordo_app_state = MaokaZAGS.Of<TOrdoState>({} as any)
 
 export type TOrdoState = {
@@ -44,4 +46,22 @@ export type TOrdoState = {
 		current_file_assoc?: Ordo.FileAssociation.Instance
 		file_assocs: Ordo.FileAssociation.Instance[]
 	}
+	sections: {
+		sidebar: OrdoSidebarStatus
+		command_palette: {
+			global: Ordo.CommandPalette.Item[]
+			current: Ordo.CommandPalette.Instance
+		}
+	}
+}
+
+// TODO Move to core
+export type TFunctionState = {
+	logger: TLogger
+	fetch: Ordo.Fetch
+	commands: Ordo.Command.Commands
+	translate: Ordo.I18N.TranslateFn
+	user_query: Ordo.User.Query
+	metadata_query: Ordo.Metadata.Query
+	content_query: Ordo.Metadata.Query
 }

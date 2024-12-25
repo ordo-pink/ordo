@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Maoka, TMaokaComponent } from "@ordo-pink/maoka"
+import { Maoka, type TMaokaComponent } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 
 import "./action-list-item.css"

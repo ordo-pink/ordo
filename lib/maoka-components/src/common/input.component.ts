@@ -24,7 +24,6 @@ import { BehaviorSubject } from "rxjs"
 import { CurrentUser } from "@ordo-pink/core"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
-import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
 const is_valid$ = new BehaviorSubject(true)
 
@@ -54,7 +53,7 @@ const Text = ({
 	autocomplete,
 	required = false,
 	validate = () => true,
-	validation_error_message = "",
+	// validation_error_message = "",
 }: TInputProps) =>
 	Maoka.create("label", ({ use }) => {
 		use(MaokaJabs.set_class("w-full"))
@@ -106,12 +105,14 @@ const Text = ({
 			Maoka.create("div", ({ use }) => {
 				use(MaokaJabs.set_attribute("id", `error-info-${id}`))
 
-				const get_is_valid = use(MaokaOrdo.Jabs.from$(is_valid$, true))
+				// const get_is_valid = use(MaokaOrdo.Jabs.from$(is_valid$, true))
 
 				return () => {
-					const is_valid = get_is_valid()
+					// const is_valid = get_is_valid()
 
-					return is_valid ? void 0 : validation_error_message
+					return void 0
+
+					// return is_valid ? void 0 : validation_error_message
 				}
 			}),
 		]

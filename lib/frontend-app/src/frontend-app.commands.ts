@@ -29,8 +29,8 @@ import { call_once } from "@ordo-pink/tau"
 import { ordo_app_state } from "../app.state"
 
 type TCommand = (Ordo.Command.Command | Ordo.Command.PayloadCommand) & { fid: symbol }
-type TCmdHandlerState = Record<string, Ordo.Command.TCommandHandler<any>[]>
-type TCmdListener<N extends Ordo.Command.Name = Ordo.Command.Name, P = any> = [N, Ordo.Command.TCommandHandler<P>, symbol]
+type TCmdHandlerState = Record<string, Ordo.Command.CommandHandler<any>[]>
+type TCmdListener<N extends Ordo.Command.Name = Ordo.Command.Name, P = any> = [N, Ordo.Command.CommandHandler<P>, symbol]
 
 type TF = () => { get_commands: (fid: symbol) => Ordo.CreateFunction.GetCommandsFn }
 export const init_commands: TF = call_once(() => {
@@ -49,18 +49,18 @@ export const init_commands: TF = call_once(() => {
 
 						return {
 							on: (name, handler) => {
-								logger.debug(`🟣 Function "${func}" appended handler for command "${name}"`)
+								logger.debug(`🟣 "${func}" appended handler for command "${name}"`)
 								add_after$.next([name, handler, fid])
 							},
 							off: (name, handler) => {
-								logger.debug(`⚫ Function "${func}" removed handler for command "${name}"`)
+								logger.debug(`⚫ "${func}" removed handler for command "${name}"`)
 								remove$.next([name, handler, fid])
 							},
 							emit: (name, payload?, key = crypto.randomUUID()) => {
 								enqueue$.next({ name, payload, key, fid })
 							},
 							cancel: (name, payload?, key = crypto.randomUUID()) => {
-								logger.debug(`⚫ Function "${func}" cancelled command "${name}"`)
+								logger.debug(`⚫ "${func}" cancelled command "${name}"`)
 								dequeue$.next({ name, payload, key, fid })
 							},
 						}
@@ -77,7 +77,7 @@ export const init_commands: TF = call_once(() => {
 					const func = known_functions.exchange(fid).cata({ Some: x => x, None: () => "unauthorized" })
 
 					if (!known_functions.has_permissions(fid, { commands: [name] })) {
-						logger.alert(`🔴 Function "${func}" did not request permission to execute command "${name}".`)
+						logger.alert(`🔴 "${func}" did not request permission to execute command "${name}".`)
 
 						return
 					}

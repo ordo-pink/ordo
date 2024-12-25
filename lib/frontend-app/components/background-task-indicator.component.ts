@@ -6,6 +6,7 @@
 import { BS_CLOUD_DOWNLOAD, BS_CLOUD_UPLOAD } from "@ordo-pink/frontend-icons"
 import { BackgroundTaskStatus } from "@ordo-pink/core"
 import { Maoka } from "@ordo-pink/maoka"
+import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaZAGS } from "@ordo-pink/maoka-zags"
 import { Switch } from "@ordo-pink/switch"
 import { noop } from "@ordo-pink/tau"
@@ -22,6 +23,8 @@ const handle_reset_status = () => background_task_status_state.zags.update("stat
 export const OrdoBackgroundTaskIndicator = Maoka.create("div", ({ use, on_unmount }) => {
 	const get_status = use(background_task_status_state.select_jab$("status"))
 	const commands = ordo_app_state.zags.select("commands")
+
+	use(MaokaJabs.set_class("background-task-indicator"))
 
 	commands.on("cmd.application.background_task.set_status", handle_set_status)
 	commands.on("cmd.application.background_task.start_loading", handle_start_loading)

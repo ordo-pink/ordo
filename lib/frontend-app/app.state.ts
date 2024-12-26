@@ -23,7 +23,7 @@ import { MaokaZAGS } from "@ordo-pink/maoka-zags"
 import { type TLogger } from "@ordo-pink/logger"
 
 import { CommandPaletteLocation } from "./components/command-palette/constants"
-import { OrdoSidebarStatus } from "./components/sidebar.component"
+import { OrdoSidebarStatus } from "./components/sidebar/sidebar.constants"
 
 export const ordo_app_state = MaokaZAGS.Of<TOrdoState>({} as any)
 

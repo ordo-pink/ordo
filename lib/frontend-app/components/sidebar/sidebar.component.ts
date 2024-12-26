@@ -4,7 +4,8 @@ import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { Switch } from "@ordo-pink/switch"
 import { noop } from "@ordo-pink/tau"
 
-import { ordo_app_state } from "../app.state"
+import { OrdoSidebarStatus } from "./sidebar.constants"
+import { ordo_app_state } from "../../app.state"
 
 ordo_app_state.zags.update("sections", prev => ({ ...prev, sidebar: OrdoSidebarStatus.DISABLED }))
 
@@ -61,7 +62,6 @@ export const OrdoSidebarButton = Maoka.create("button", ({ use }) => {
 			}
 		} else {
 			prev_status = status
-
 			commands.emit("cmd.application.command_palette.remove", readable_name)
 		}
 
@@ -71,13 +71,6 @@ export const OrdoSidebarButton = Maoka.create("button", ({ use }) => {
 			.default(noop)
 	}
 })
-
-export enum OrdoSidebarStatus {
-	DISABLED,
-	HIDDEN,
-	VISIBLE,
-	length,
-}
 
 // --- Internal ---
 

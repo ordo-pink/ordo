@@ -28,7 +28,7 @@ import { OrdoActivityBarIcon } from "./activity-bar-icon.component"
 import { OrdoActivityBarLink } from "./activity-bar-link.component"
 
 import "./activity-bar.css"
-import { OrdoSidebarButton } from "../sidebar.component"
+import { OrdoSidebarButton } from "../sidebar/sidebar.component"
 
 export const OrdoActivityBar = Maoka.create("div", ({ use }) => {
 	use(MaokaJabs.set_class("activity-bar"))

@@ -2,7 +2,7 @@ import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { NotificationType } from "@ordo-pink/core"
 
-import { OrdoSidebarStatus } from "./sidebar.component"
+import { OrdoSidebarStatus } from "./sidebar/sidebar.constants"
 import { ordo_app_state } from "../app.state"
 
 export const OrdoWorkspace = Maoka.create("main", ({ use }) => {

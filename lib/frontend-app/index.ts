@@ -28,7 +28,7 @@ import { OrdoActivityBar } from "./components/activity-bar/activity-bar.componen
 import { OrdoBackgroundTaskIndicator } from "./components/background-task-indicator.component"
 import { OrdoModal } from "./components/modal/modal.overlay"
 import { OrdoNotifications } from "./components/notifications/notifications-list.component"
-import { OrdoSidebar } from "./components/sidebar.component"
+import { OrdoSidebar } from "./components/sidebar/sidebar.component"
 import { OrdoWorkspace } from "./components/workspace.component"
 import { init_command_palette } from "./components/command-palette"
 import { init_commands } from "./src/frontend-app.commands"

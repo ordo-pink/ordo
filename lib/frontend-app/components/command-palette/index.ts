@@ -19,23 +19,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Hotkey, Input } from "@ordo-pink/maoka-components"
-import { fuzzy_check, noop } from "@ordo-pink/tau"
+import { BsMenuButtonWideFill } from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/maoka"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
-import { Switch } from "@ordo-pink/switch"
 import { ordo_app_state } from "@ordo-pink/frontend-app/app.state"
 
-import { CurrentItemLocation } from "./constants"
-import { OrdoCommandPaletteItems } from "./command-palette-items.component"
+import { CommandPaletteLocation } from "./constants"
+import { OrdoCommandPalette } from "./command-palette.component"
 
 import "./command-palette.css"
-import { BsMenuButtonWideFill } from "@ordo-pink/frontend-icons"
 
 export const init_command_palette = () => {
 	const commands = ordo_app_state.zags.select("commands")
 
-	ordo_app_state.zags.update("sections", prev => ({ ...prev, command_palette: { current: EMPTY_COMMAND_PALETTE, global: [] } }))
+	ordo_app_state.zags.update("sections", prev => ({
+		...prev,
+		command_palette: {
+			current: EMPTY_COMMAND_PALETTE,
+			global_items: [],
+			index: 0,
+			location: CommandPaletteLocation.SUGGESTED,
+			visible_items: [],
+		},
+	}))
 
 	commands.on("cmd.application.command_palette.show", handle_show)
 	commands.on("cmd.application.command_palette.hide", handle_hide)
@@ -69,7 +74,7 @@ export const init_command_palette = () => {
 		if (IGNORED_KEYS.includes(event.key)) return
 
 		const hotkey = create_hotkey_string(event, false)
-		const current = ordo_app_state.zags.select("sections.command_palette.global")
+		const current = ordo_app_state.zags.select("sections.command_palette.global_items")
 
 		const command = current.find(item => item.hotkey && item.hotkey === hotkey)
 
@@ -84,219 +89,13 @@ export const init_command_palette = () => {
 	document.addEventListener("keydown", on_keydown)
 }
 
-// TODO Handle is_multiple
-// TODO Handle on_new_item
-// TODO Handle pinned_items
-// TODO Handle alternative layout characters
-const OrdoCommandPalette = Maoka.create("div", ({ use, on_unmount, after_mount }) => {
-	use(MaokaJabs.set_class("command-palette"))
-
-	let input = ""
-	let visible_items = [] as Ordo.CommandPalette.Item[]
-	let pinned_items = [] as Ordo.CommandPalette.Item[]
-	let current_item_index = 0
-	let current_item_location = CurrentItemLocation.SUGGESTED
-
-	const commands = ordo_app_state.zags.select("commands")
-	const t = ordo_app_state.zags.select("translate")
-
-	const t_placeholder = t("t.common.components.command_palette.search_placeholder")
-
-	const handle_click = (index: number, location: CurrentItemLocation) => {
-		current_item_index = index
-		current_item_location = location
-
-		handle_enter()
-	}
-
-	const VisibleItems = OrdoCommandPaletteItems(
-		() => visible_items,
-		() => current_item_index,
-		() => current_item_location,
-		CurrentItemLocation.SUGGESTED,
-		handle_click,
-	)
-
-	const PinnedItems = OrdoCommandPaletteItems(
-		() => pinned_items,
-		() => current_item_index,
-		() => current_item_location,
-		CurrentItemLocation.PINNED,
-		handle_click,
-	)
-
-	const SearchInput = Input.Text({
-		on_input: event => handle_input(event),
-		custom_class: "command-palette_search",
-		placeholder: t_placeholder,
-		autofocus: true,
-	})
-
-	const refresh_components = () => {
-		if (VisibleItems.refresh) void VisibleItems.refresh()
-		if (PinnedItems.refresh) void PinnedItems.refresh()
-	}
-
-	const get_current_items = use(ordo_app_state.select_jab$("sections.command_palette.current"))
-
-	const get_state = () => {
-		const value = get_current_items()
-
-		current_item_index = 0
-		visible_items = value.max_items && value.max_items > 0 ? value.items.slice(0, value.max_items) : value.items
-
-		if (VisibleItems.refresh) void VisibleItems.refresh()
-
-		if (value.pinned_items) {
-			pinned_items = value.pinned_items
-			if (PinnedItems.refresh) void PinnedItems.refresh()
-		}
-
-		return value
-	}
-
-	const handle_keydown = (event: KeyboardEvent) =>
-		Switch.Match(event.key)
-			.case("ArrowUp", handle_arrow_up)
-			.case("ArrowDown", handle_arrow_down)
-			.case("Tab", () => handle_tab(event))
-			.case("Enter", handle_enter)
-			.default(noop)
-
-	const handle_enter = () => {
-		const state = get_state()
-		const is_pinned = current_item_location === CurrentItemLocation.PINNED
-		const source = is_pinned ? pinned_items : visible_items
-
-		if (state.is_multiple) {
-			if (state.on_new_item && input && !visible_items[current_item_index] && !is_pinned) {
-				state.on_new_item?.(input)
-
-				current_item_index = 0
-			} else {
-				source[current_item_index].on_select()
-
-				if (is_pinned) {
-					visible_items.push(pinned_items[current_item_index])
-					pinned_items.splice(current_item_index, 1)
-				} else {
-					pinned_items.push(visible_items[current_item_index])
-					visible_items.splice(current_item_index, 1)
-				}
-
-				current_item_index = 0
-			}
-
-			if (is_pinned && source.length === 0) current_item_location = CurrentItemLocation.SUGGESTED
-
-			refresh_components()
-
-			input = ""
-			if (SearchInput.refresh) void SearchInput.refresh()
-		} else {
-			const invoke = source[current_item_index].on_select
-			commands.emit("cmd.application.command_palette.hide")
-			invoke()
-		}
-	}
-
-	const handle_arrow_up = () => {
-		const source = current_item_location === CurrentItemLocation.PINNED ? pinned_items : visible_items
-
-		if (!source.length) return
-
-		current_item_index = current_item_index === 0 ? source.length - 1 : current_item_index - 1
-
-		refresh_components()
-	}
-
-	const handle_arrow_down = () => {
-		const source = current_item_location === CurrentItemLocation.PINNED ? pinned_items : visible_items
-
-		if (!source.length) return
-
-		current_item_index = current_item_index === source.length - 1 ? 0 : current_item_index + 1
-
-		refresh_components()
-	}
-
-	const handle_tab = (event: KeyboardEvent) => {
-		event.preventDefault()
-
-		const state = get_state()
-
-		if (!state.is_multiple) return
-
-		current_item_location =
-			current_item_location === CurrentItemLocation.SUGGESTED ? CurrentItemLocation.PINNED : CurrentItemLocation.SUGGESTED
-
-		current_item_index = 0
-
-		refresh_components()
-	}
-
-	const handle_input = (event: Event) => {
-		input = (event.target as HTMLInputElement)?.value
-		const state = get_state()
-		const all = state.items
-
-		const source = input ? all.filter(item => fuzzy_check(t(item.readable_name), input, 1)) : all
-		const length = state.max_items && state.max_items > 0 ? state.max_items : source.length
-
-		visible_items = source.slice(0, length)
-		current_item_index = 0
-
-		refresh_components()
-	}
-
-	after_mount(() => document.addEventListener("keydown", handle_keydown))
-	on_unmount(() => document.removeEventListener("keydown", handle_keydown))
-
-	return () => {
-		const state = get_state()
-
-		return [
-			SearchInput,
-
-			ItemsWrapper(() => [state.is_multiple ? PinnedItems : void 0, VisibleItems]),
-
-			state.is_multiple ? WithPinnedItemsHint : NoPinnedItemsHint,
-		]
-	}
-})
-
-// --- Internal ---
-
-const Hint = Maoka.styled("div", { class: "command-palette_hint" })
-
-const ItemsWrapper = Maoka.styled("div", { class: "grow overflow-auto" })
-
-const DisplayHotkey = (key: string) => Hotkey(key, { smol: true, decoration_only: true })
-
-const WithPinnedItemsHint = Hint(() => [
-	DisplayHotkey("arrowup"),
-	DisplayHotkey("arrowdown"),
-	DisplayHotkey("tab"),
-	DisplayHotkey("enter"),
-	DisplayHotkey("escape"),
-])
-
-const NoPinnedItemsHint = Hint(() => [
-	DisplayHotkey("arrowup"),
-	DisplayHotkey("arrowdown"),
-	DisplayHotkey("enter"),
-	DisplayHotkey("escape"),
-])
-
-const EMPTY_COMMAND_PALETTE = { items: [] } as Ordo.CommandPalette.Instance
-
 const handle_add = (item: Ordo.CommandPalette.Item) =>
-	ordo_app_state.zags.update("sections.command_palette.global", is =>
+	ordo_app_state.zags.update("sections.command_palette.global_items", is =>
 		is.some(i => i.readable_name === item.readable_name) ? is : [...is, item],
 	)
 
 const handle_remove = (id: string) =>
-	ordo_app_state.zags.update("sections.command_palette.global", items => items.filter(item => item.readable_name === id))
+	ordo_app_state.zags.update("sections.command_palette.global_items", items => items.filter(item => item.readable_name === id))
 
 const handle_show = (state: Ordo.CommandPalette.Instance) => {
 	const commands = ordo_app_state.zags.select("commands")
@@ -325,6 +124,8 @@ const handle_toggle = () => {
 	if (current_state.items.length > 0) commands.emit("cmd.application.command_palette.hide")
 	else
 		commands.emit("cmd.application.command_palette.show", {
-			items: ordo_app_state.zags.select("sections.command_palette.global"),
+			items: ordo_app_state.zags.select("sections.command_palette.global_items"),
 		})
 }
+
+const EMPTY_COMMAND_PALETTE = { items: [] } as Ordo.CommandPalette.Instance

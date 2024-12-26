@@ -29,6 +29,17 @@ export const OrdoSidebar = Maoka.create("aside", ({ use, on_unmount }) => {
 	return () => {
 		const status = get_status()
 
+		// if (status === OrdoSidebarStatus.DISABLED) {
+		// commands.emit("cmd.application.command_palette.remove", "t.common.components.sidebar.toggle")
+		// } else {
+		commands.emit("cmd.application.command_palette.add", {
+			on_select: () => commands.emit("cmd.application.sidebar.toggle"),
+			hotkey: "mod+b",
+			readable_name: "t.common.components.sidebar.toggle",
+			render_icon: div => void div.appendChild(BsLayoutSidebarInsetReverse() as SVGSVGElement),
+		})
+		// }
+
 		return Switch.Match(status)
 			.case(OrdoSidebarStatus.VISIBLE, () => Sidebar)
 			.case(OrdoSidebarStatus.HIDDEN, noop) // TODO Hidden enabled sidebar state

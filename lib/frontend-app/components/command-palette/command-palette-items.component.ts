@@ -23,39 +23,51 @@ import { Hotkey } from "@ordo-pink/maoka-components"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 
-import { CurrentItemLocation } from "./constants"
+import { CommandPaletteLocation } from "./constants"
 import { OrdoCommandPaletteItem } from "./command-palette-item.component"
+import { ordo_app_state } from "@ordo-pink/frontend-app/app.state"
 
 export const OrdoCommandPaletteItems = (
-	get_items: () => Ordo.CommandPalette.Item[],
-	get_current_index: () => number,
-	get_current_location: () => CurrentItemLocation,
-	assigned_location: CurrentItemLocation,
-	on_click: (index: number, location: CurrentItemLocation) => void,
+	assigned_location: CommandPaletteLocation,
+	on_click: (index: number, location: CommandPaletteLocation) => void,
 ) =>
 	Maoka.create("div", ({ use }) => {
 		use(MaokaJabs.set_class("command-palette_items"))
 
+		const get_items = use(
+			ordo_app_state.select_jab$(
+				assigned_location === CommandPaletteLocation.PINNED
+					? "sections.command_palette.current.pinned_items"
+					: "sections.command_palette.visible_items",
+			),
+		)
+		const get_current_index = use(ordo_app_state.select_jab$("sections.command_palette.index"))
+		const get_current_location = use(ordo_app_state.select_jab$("sections.command_palette.location"))
+		const get_new_item_handler = use(ordo_app_state.select_jab$("sections.command_palette.current.on_new_item"))
+
 		return () => {
-			const items = get_items()
+			const items = get_items()!
 			const current_index = get_current_index()
-			const location = get_current_location()
+			const current_location = get_current_location()
+			const has_new_item_handler = !!get_new_item_handler()
 
 			// TODO Translations
-			if (!items.length && assigned_location === CurrentItemLocation.SUGGESTED) {
-				return CreateNewItemHint(() => ["press", Hotkey("Enter", { smol: true, decoration_only: true }), "to create"])
+			if (!items.length && assigned_location === CommandPaletteLocation.SUGGESTED) {
+				if (has_new_item_handler)
+					return CreateNewItemHint(() => ["press", Hotkey("Enter", { smol: true, decoration_only: true }), "to create"])
+				else return CreateNewItemHint(() => ["Nothing found :("])
 			}
 
 			return items.map((item, index) =>
 				OrdoCommandPaletteItem(
 					item,
 					() => on_click(index, assigned_location),
-					location === assigned_location && current_index === index,
+					current_location === assigned_location && current_index === index,
 				),
 			)
 		}
 	})
 
 const CreateNewItemHint = Maoka.styled("div", {
-	class: "action-list-item command-palette_create-new-item-hint",
+	class: "command-palette_create-new-item-hint",
 })

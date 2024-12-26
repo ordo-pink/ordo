@@ -44,7 +44,7 @@ export const MaokaZAGS = {
 							return
 						}
 
-						if (!selection_results[id][path] || !deep_equals(selection_results[id][path], value)) {
+						if (!deep_equals(selection_results[id][path], value)) {
 							selection_results[id][path as any] = value
 							void refresh()
 						}

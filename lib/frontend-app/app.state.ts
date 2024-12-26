@@ -22,6 +22,7 @@
 import { MaokaZAGS } from "@ordo-pink/maoka-zags"
 import { type TLogger } from "@ordo-pink/logger"
 
+import { CommandPaletteLocation } from "./components/command-palette/constants"
 import { OrdoSidebarStatus } from "./components/sidebar.component"
 
 export const ordo_app_state = MaokaZAGS.Of<TOrdoState>({} as any)
@@ -49,8 +50,11 @@ export type TOrdoState = {
 	sections: {
 		sidebar: OrdoSidebarStatus
 		command_palette: {
-			global: Ordo.CommandPalette.Item[]
+			global_items: Ordo.CommandPalette.Item[]
+			visible_items: Ordo.CommandPalette.Item[]
 			current: Ordo.CommandPalette.Instance
+			index: number
+			location: CommandPaletteLocation
 		}
 	}
 }

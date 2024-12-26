@@ -47,9 +47,8 @@ export const OrdoCommandPalette = Maoka.create("div", ({ use, on_unmount, after_
 
 	const get_state = () => {
 		const value = ordo_app_state.zags.select("sections.command_palette.current")
-		const visible = ordo_app_state.zags.select("sections.command_palette.visible_items")
 
-		if (!input && !visible.length)
+		if (!input)
 			ordo_app_state.zags.update("sections.command_palette.visible_items", () =>
 				value.max_items && value.max_items > 0 ? value.items.slice(0, value.max_items) : value.items,
 			)

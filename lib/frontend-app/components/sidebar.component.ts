@@ -29,17 +29,6 @@ export const OrdoSidebar = Maoka.create("aside", ({ use, on_unmount }) => {
 	return () => {
 		const status = get_status()
 
-		// if (status === OrdoSidebarStatus.DISABLED) {
-		// commands.emit("cmd.application.command_palette.remove", "t.common.components.sidebar.toggle")
-		// } else {
-		commands.emit("cmd.application.command_palette.add", {
-			on_select: () => commands.emit("cmd.application.sidebar.toggle"),
-			hotkey: "mod+b",
-			readable_name: "t.common.components.sidebar.toggle",
-			render_icon: div => void div.appendChild(BsLayoutSidebarInsetReverse() as SVGSVGElement),
-		})
-		// }
-
 		return Switch.Match(status)
 			.case(OrdoSidebarStatus.VISIBLE, () => Sidebar)
 			.case(OrdoSidebarStatus.HIDDEN, noop) // TODO Hidden enabled sidebar state
@@ -51,11 +40,30 @@ export const OrdoSidebarButton = Maoka.create("button", ({ use }) => {
 	const commands = ordo_app_state.zags.select("commands")
 	const get_status = use(ordo_app_state.select_jab$("sections.sidebar"))
 
+	let prev_status: OrdoSidebarStatus
+
 	use(MaokaJabs.set_class("activity-bar_link activity-bar_icon"))
 	use(MaokaJabs.listen("onclick", () => commands.emit("cmd.application.sidebar.toggle")))
 
 	return () => {
 		const status = get_status()
+		const readable_name = "t.common.components.sidebar.toggle"
+
+		if (status !== OrdoSidebarStatus.DISABLED) {
+			if (prev_status == null || prev_status === OrdoSidebarStatus.DISABLED) {
+				prev_status = status
+				commands.emit("cmd.application.command_palette.add", {
+					on_select: () => commands.emit("cmd.application.sidebar.toggle"),
+					hotkey: "mod+b",
+					readable_name,
+					render_icon: div => void div.appendChild(BsLayoutSidebarInsetReverse() as SVGSVGElement),
+				})
+			}
+		} else {
+			prev_status = status
+
+			commands.emit("cmd.application.command_palette.remove", readable_name)
+		}
 
 		return Switch.Match(status)
 			.case(OrdoSidebarStatus.VISIBLE, () => BsArrowLeft("rotate-180") as TMaokaElement)

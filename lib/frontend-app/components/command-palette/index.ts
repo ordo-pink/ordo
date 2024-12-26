@@ -90,12 +90,10 @@ export const init_command_palette = () => {
 }
 
 const handle_add = (item: Ordo.CommandPalette.Item) =>
-	ordo_app_state.zags.update("sections.command_palette.global_items", is =>
-		is.some(i => i.readable_name === item.readable_name) ? is : [...is, item],
-	)
+	ordo_app_state.zags.update("sections.command_palette.global_items", is => [...is, item])
 
 const handle_remove = (id: string) =>
-	ordo_app_state.zags.update("sections.command_palette.global_items", items => items.filter(item => item.readable_name === id))
+	ordo_app_state.zags.update("sections.command_palette.global_items", items => items.filter(item => item.readable_name !== id))
 
 const handle_show = (state: Ordo.CommandPalette.Instance) => {
 	const commands = ordo_app_state.zags.select("commands")

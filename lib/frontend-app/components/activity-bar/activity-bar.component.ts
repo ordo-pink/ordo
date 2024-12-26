@@ -48,7 +48,6 @@ export const OrdoActivityBar = Maoka.create("div", ({ use }) => {
 		const current_activity = get_current()
 
 		return [
-			OrdoSidebarButton,
 			Maoka.create("span", ({ use }) => {
 				use(MaokaJabs.set_class("activity-bar_link"))
 				use(
@@ -66,6 +65,7 @@ export const OrdoActivityBar = Maoka.create("div", ({ use }) => {
 						render_icon: span => void span.appendChild(BsMenuButtonWideFill() as SVGSVGElement),
 					})
 			}),
+
 			...activities.map(
 				({ name, routes, default_route, render_icon }) =>
 					render_icon &&
@@ -77,6 +77,8 @@ export const OrdoActivityBar = Maoka.create("div", ({ use }) => {
 						current_activity_name: current_activity?.name,
 					}),
 			),
+
+			OrdoSidebarButton,
 		]
 	}
 })

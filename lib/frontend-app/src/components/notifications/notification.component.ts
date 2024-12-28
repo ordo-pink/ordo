@@ -27,7 +27,7 @@ import { OrdoNotificationHideButton } from "./notification-hide-button.component
 import { OrdoNotificationIcon } from "./notification-icon.component"
 import { OrdoNotificationProgress } from "./notification-progress.component"
 import { get_readable_type } from "./utils/common"
-import { ordo_app_state } from "../../app.state"
+import { ordo_app_state } from "../../../app.state"
 
 type P = Ordo.Notification.Instance
 export const OrdoNotification = ({ on_click, id, message, duration, render_icon, title, type }: P) =>

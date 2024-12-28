@@ -23,7 +23,7 @@ import { type TPartner, ZAGS } from "@ordo-pink/zags"
 import { call_once, keys_of } from "@ordo-pink/tau"
 import { TwoLetterLocale } from "@ordo-pink/locale"
 
-import { frontend_app_en_translations } from "../translations/frontend-app-en.translations"
+import { frontend_app_en_translations } from "./translations/frontend-app-en.translations"
 import { ordo_app_state } from "../app.state"
 
 type TInitI18nFn = () => { translate: Ordo.I18N.TranslateFn }

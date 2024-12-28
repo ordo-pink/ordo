@@ -23,7 +23,7 @@ import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 
 import { get_readable_type } from "./utils/common"
-import { ordo_app_state } from "../../app.state"
+import { ordo_app_state } from "../../../app.state"
 import { ordo_notifications_state } from "./notifications.state"
 
 type P = Pick<Ordo.Notification.Instance, "id" | "type" | "duration">

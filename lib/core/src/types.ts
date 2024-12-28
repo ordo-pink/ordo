@@ -266,7 +266,7 @@ declare global {
 
 		type Fetch = typeof window.fetch
 
-		type Hosts = { id: string; dt: string; static: string; website: string; my: string }
+		type Hosts = { id: string; dt: string; static: string; website: string }
 
 		/**
 		 * User achievements and whatever else related to using them.
@@ -525,12 +525,11 @@ declare global {
 		namespace User {
 			type Handle = `@${string}` // TODO Disallow forbidden chars
 			type ID = `${string}-${string}-${string}-${string}-${string}` // TODO Strict type
-			type Email = `${string}@${string}` // TODO Strict type
+			type Email = `${string}@${string}.${string}` // TODO Strict type
 
 			namespace Current {
 				type DTO = Ordo.User.Public.DTO & {
 					email: Ordo.User.Email
-					email_confirmed: boolean
 					file_limit: number
 					max_upload_size: number
 					max_functions: number
@@ -582,7 +581,7 @@ declare global {
 			namespace Public {
 				type DTO = {
 					id: Ordo.User.ID
-					created_at: Date
+					created_at: number
 					subscription: C.UserSubscription
 					handle: Ordo.User.Handle
 					first_name?: string
@@ -764,13 +763,13 @@ declare global {
 				  }
 
 			type RepositoryStatic = {
-				Of: (metadata$: BehaviorSubject<Ordo.Metadata.Instance[] | null>) => Repository
+				Of: (metadata$: TZags<{ items: Ordo.Metadata.Instance[] | null }>) => Repository
 			}
 
 			type Repository = {
 				get: () => TResult<Ordo.Metadata.Instance[], Ordo.Rrr<"EAGAIN">>
 				put: (metadata: Ordo.Metadata.Instance[]) => TResult<void, Ordo.Rrr<"EINVAL">>
-				get $(): Observable<number>
+				get $(): TZags<{ version: number }>
 			}
 
 			type RepositoryAsyncStatic = {
@@ -789,7 +788,7 @@ declare global {
 			}
 
 			type Query = {
-				get $(): Observable<number>
+				get $(): TZags<{ version: number }>
 
 				get: (options?: QueryOptions) => TResult<Ordo.Metadata.Instance[], Ordo.Rrr<"EAGAIN">>
 
@@ -1010,11 +1009,7 @@ declare global {
 		}
 
 		namespace Modal {
-			type Instance = {
-				show_close_button?: boolean
-				on_unmount?: () => void
-				render: (div: HTMLDivElement) => void | Promise<void>
-			}
+			type Instance = { on_unmount?: () => void; render: (div: HTMLDivElement) => void | Promise<void> }
 		}
 
 		namespace Router {

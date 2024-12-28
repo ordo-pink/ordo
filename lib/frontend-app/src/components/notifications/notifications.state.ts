@@ -19,22 +19,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Maoka, type TMaokaElement } from "@ordo-pink/maoka"
-import { BsX } from "@ordo-pink/frontend-icons"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { MaokaZAGS } from "@ordo-pink/maoka-zags"
 
-import { ordo_app_state } from "../../app.state"
-
-export const ModalCloseButton = Maoka.create("button", ({ use }) => {
-	const commands = ordo_app_state.zags.select("commands")
-
-	use(MaokaJabs.set_class("modal_close-button"))
-	use(MaokaJabs.listen("onclick", event => handle_click(event)))
-
-	const handle_click = (event: MouseEvent) => {
-		event.preventDefault()
-		commands.emit("cmd.application.modal.hide")
-	}
-
-	return () => BsX() as TMaokaElement
+export const ordo_notifications_state = MaokaZAGS.Of({
+	notifications: [] as Ordo.Notification.Instance[],
+	progress_bars: {} as Record<string, number>,
 })

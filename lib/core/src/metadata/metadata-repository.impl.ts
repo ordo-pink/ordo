@@ -19,10 +19,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { map } from "rxjs"
-
 import { Oath, ops0 } from "@ordo-pink/oath"
 import { Result } from "@ordo-pink/result"
+import { ZAGS } from "@ordo-pink/zags"
 
 import { RRR } from "../rrr"
 
@@ -32,23 +31,25 @@ const eagain = RRR.codes.eagain(LOCATION)
 const einval = RRR.codes.einval(LOCATION)
 const eio = RRR.codes.eio(LOCATION)
 
+const version_zags = ZAGS.Of({ version: 0 })
+
 export const MetadataRepository: Ordo.Metadata.RepositoryStatic = {
 	Of: metadata$ => ({
 		get: () =>
-			Result.Try(() => metadata$.getValue())
+			Result.Try(() => metadata$.select("items"))
 				.pipe(Result.ops.chain(Result.FromNullable))
 				.pipe(Result.ops.err_map(() => eagain())),
 
 		put: metadata =>
 			Result.FromNullable(metadata)
 				.pipe(Result.ops.chain(() => Result.If(Array.isArray(metadata), { T: () => metadata }))) // TODO: Add validations
-				.pipe(Result.ops.chain(() => Result.Try(() => metadata$.next(metadata))))
+				.pipe(Result.ops.chain(() => Result.Try(() => metadata$.update("items", () => metadata))))
 				.pipe(Result.ops.err_map(() => einval(`.put: ${JSON.stringify(metadata)}`))),
 
 		get $() {
-			let i = -1
+			metadata$.marry((_, is_update) => is_update && version_zags.update("version", i => i + 1))
 
-			return metadata$.pipe(map(() => ++i))
+			return version_zags
 		},
 	}),
 }

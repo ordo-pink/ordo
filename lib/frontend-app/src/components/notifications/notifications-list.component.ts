@@ -24,7 +24,7 @@ import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { NotificationType } from "@ordo-pink/core"
 
 import { OrdoNotification } from "./notification.component"
-import { ordo_app_state } from "../../app.state"
+import { ordo_app_state } from "../../../app.state"
 import { ordo_notifications_state } from "./notifications.state"
 
 import "./notifications.css"

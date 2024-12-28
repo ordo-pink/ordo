@@ -21,26 +21,16 @@
 
 import { BsMenuButtonWideFill } from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/maoka"
+import { call_once } from "@ordo-pink/tau"
 import { ordo_app_state } from "@ordo-pink/frontend-app/app.state"
 
-import { CommandPaletteLocation } from "./constants"
+import { EMPTY_COMMAND_PALETTE } from "./constants"
 import { OrdoCommandPalette } from "./command-palette.component"
 
 import "./command-palette.css"
 
-export const init_command_palette = () => {
+export const init_command_palette = call_once(() => {
 	const commands = ordo_app_state.zags.select("commands")
-
-	ordo_app_state.zags.update("sections", prev => ({
-		...prev,
-		command_palette: {
-			current: EMPTY_COMMAND_PALETTE,
-			global_items: [],
-			index: 0,
-			location: CommandPaletteLocation.SUGGESTED,
-			visible_items: [],
-		},
-	}))
 
 	commands.on("cmd.application.command_palette.show", handle_show)
 	commands.on("cmd.application.command_palette.hide", handle_hide)
@@ -87,7 +77,7 @@ export const init_command_palette = () => {
 	}
 
 	document.addEventListener("keydown", on_keydown)
-}
+})
 
 const handle_add = (item: Ordo.CommandPalette.Item) =>
 	ordo_app_state.zags.update("sections.command_palette.global_items", is => [...is, item])
@@ -104,7 +94,6 @@ const handle_show = (state: Ordo.CommandPalette.Instance) => {
 	ordo_app_state.zags.update("sections.command_palette.current", () => state)
 
 	commands.emit("cmd.application.modal.show", {
-		show_close_button: false,
 		on_unmount: () => ordo_app_state.zags.update("sections.command_palette.current", () => EMPTY_COMMAND_PALETTE),
 		render: div => void Maoka.render_dom(div, OrdoCommandPalette),
 	})
@@ -125,5 +114,3 @@ const handle_toggle = () => {
 			items: ordo_app_state.zags.select("sections.command_palette.global_items"),
 		})
 }
-
-const EMPTY_COMMAND_PALETTE = { items: [] } as Ordo.CommandPalette.Instance

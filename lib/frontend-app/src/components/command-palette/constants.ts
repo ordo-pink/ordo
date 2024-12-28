@@ -19,18 +19,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Maoka } from "@ordo-pink/maoka"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+export enum CommandPaletteLocation {
+	SUGGESTED,
+	PINNED,
+	length,
+}
 
-import { modal_state } from "./modal.state"
-
-export const Modal = Maoka.create("div", async ({ use, element }) => {
-	const state = modal_state.zags.select("state")!
-
-	use(MaokaJabs.set_class("modal"))
-	use(MaokaJabs.listen("onclick", event => handle_click(event)))
-
-	const handle_click = (event: MouseEvent) => event.stopPropagation()
-
-	await state.render(element as unknown as HTMLDivElement)
-})
+export const EMPTY_COMMAND_PALETTE = { items: [] } as Ordo.CommandPalette.Instance

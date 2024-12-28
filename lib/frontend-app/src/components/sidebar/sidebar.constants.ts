@@ -19,8 +19,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export enum CommandPaletteLocation {
-	SUGGESTED,
-	PINNED,
+export enum OrdoSidebarStatus {
+	DISABLED,
+	HIDDEN,
+	VISIBLE,
 	length,
 }

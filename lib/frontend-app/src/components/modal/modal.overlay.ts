@@ -24,13 +24,12 @@ import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 
 import { Modal } from "./modal.component"
 import { ModalCloseButton } from "./close-button.component"
-import { modal_state } from "./modal.state"
-import { ordo_app_state } from "../../app.state"
+import { ordo_app_state } from "../../../app.state"
 
 import "./modal.css"
 
 export const OrdoModal = Maoka.create("div", ({ use, on_unmount }) => {
-	const get_modal_state = use(modal_state.select_jab$("state"))
+	const get_modal_state = use(ordo_app_state.select_jab$("sections.modal"))
 
 	const commands = ordo_app_state.zags.select("commands")
 
@@ -72,18 +71,17 @@ export const OrdoModal = Maoka.create("div", ({ use, on_unmount }) => {
 
 // Define command handlers
 const on_modal_show: Ordo.Command.HandlerOf<"cmd.application.modal.show"> = payload => {
-	const show_close_button = payload.show_close_button ?? true
 	const on_unmount = payload.on_unmount ?? (() => void 0)
 	const render = payload.render
 
-	modal_state.zags.update("state", () => ({ render, show_close_button, on_unmount }))
+	ordo_app_state.zags.update("sections.modal", () => ({ render, on_unmount }))
 }
 
 const on_modal_hide: Ordo.Command.HandlerOf<"cmd.application.modal.hide"> = () => {
-	const state = modal_state.zags.select("state")
+	const state = ordo_app_state.zags.select("sections.modal")
 
 	if (state && state.on_unmount) {
 		state.on_unmount()
-		modal_state.zags.update("state", () => null)
+		ordo_app_state.zags.update("sections.modal", () => null)
 	}
 }

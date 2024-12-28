@@ -22,10 +22,42 @@
 import { MaokaZAGS } from "@ordo-pink/maoka-zags"
 import { type TLogger } from "@ordo-pink/logger"
 
-import { CommandPaletteLocation } from "./components/command-palette/constants"
-import { OrdoSidebarStatus } from "./components/sidebar/sidebar.constants"
+import { CommandPaletteLocation, EMPTY_COMMAND_PALETTE } from "./src/components/command-palette/constants"
+import { OrdoSidebarStatus } from "./src/components/sidebar/sidebar.constants"
 
-export const ordo_app_state = MaokaZAGS.Of<TOrdoState>({} as any)
+const is_dev = true // TODO Take from env
+const app_name = "pink.ordo.app" // TODO Take from env
+const version = "v0.7.0" // TODO Take from env
+const hosts = {} as Ordo.Hosts // TODO Take from env
+const app_fid = Symbol.for(app_name)
+const app_fn = { fid: app_fid, name: app_name, permissions: { commands: [], queries: [] } }
+
+export const ordo_app_state = MaokaZAGS.Of<TOrdoState>({
+	constants: { is_dev, app_name, version, app_fid, app_fn },
+	hosts,
+	commands: null as any, // Assigned after initialization
+	current_route: null as any, // Assigned after initialization
+	functions: null as any, // Assigned after initialization
+	known_functions: null as any, // Assigned after initialization
+	logger: null as any, // Assigned after initialization
+	translate: null as any, // Assigned after initialization
+	query: {
+		content: null as any, // Assigned after initialization
+		metadata: null as any, // Assigned after initialization
+		user: null as any, // Assigned after initialization
+	},
+	sections: {
+		sidebar: { status: OrdoSidebarStatus.DISABLED },
+		modal: null,
+		command_palette: {
+			current: EMPTY_COMMAND_PALETTE,
+			global_items: [],
+			index: 0,
+			location: CommandPaletteLocation.SUGGESTED,
+			visible_items: [],
+		},
+	},
+})
 
 export type TOrdoState = {
 	logger: TLogger
@@ -40,6 +72,11 @@ export type TOrdoState = {
 		app_fn: OrdoInternal.KnownFunction
 		version: `v${string}.${string}.${string}`
 	}
+	query: {
+		user: Ordo.User.Query
+		metadata: Ordo.Metadata.Query
+		content: Ordo.Content.Query
+	}
 	current_route: Ordo.Router.Route
 	functions: {
 		current_activity?: Ordo.Activity.Instance
@@ -48,7 +85,9 @@ export type TOrdoState = {
 		file_assocs: Ordo.FileAssociation.Instance[]
 	}
 	sections: {
-		sidebar: OrdoSidebarStatus
+		sidebar: {
+			status: OrdoSidebarStatus
+		}
 		command_palette: {
 			global_items: Ordo.CommandPalette.Item[]
 			visible_items: Ordo.CommandPalette.Item[]
@@ -56,6 +95,7 @@ export type TOrdoState = {
 			index: number
 			location: CommandPaletteLocation
 		}
+		modal: Ordo.Modal.Instance | null
 	}
 }
 

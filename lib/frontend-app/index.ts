@@ -24,38 +24,26 @@ import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { R } from "@ordo-pink/result"
 
-import { OrdoActivityBar } from "./components/activity-bar/activity-bar.component"
-import { OrdoBackgroundTaskIndicator } from "./components/background-task-indicator.component"
-import { OrdoModal } from "./components/modal/modal.overlay"
-import { OrdoNotifications } from "./components/notifications/notifications-list.component"
-import { OrdoSidebar } from "./components/sidebar/sidebar.component"
-import { OrdoWorkspace } from "./components/workspace.component"
-import { init_command_palette } from "./components/command-palette"
+import { OrdoActivityBar } from "./src/components/activity-bar/activity-bar.component"
+import { OrdoBackgroundTaskIndicator } from "./src/components/background-task-indicator.component"
+import { OrdoModal } from "./src/components/modal/modal.overlay"
+import { OrdoNotifications } from "./src/components/notifications/notifications-list.component"
+import { OrdoSidebar } from "./src/components/sidebar/sidebar.component"
+import { OrdoWorkspace } from "./src/components/workspace.component"
+import { init_command_palette } from "./src/components/command-palette"
 import { init_commands } from "./src/frontend-app.commands"
 import { init_functions } from "./src/frontend-app.functions"
 import { init_hosts } from "./src/frontend-app.hosts"
 import { init_i18n } from "./src/frontend-app.i18n"
 import { init_known_functions } from "./src/frontend-app.known-functions"
 import { init_logger } from "./src/frontend-app.logger"
+import { init_metadata } from "./src/frontend-app.metadata"
 import { init_router } from "./src/frontend-app.router"
 import { init_title_display } from "./src/frontend-app.title"
 import { ordo_app_state } from "./app.state"
 
 // TODO Move fonts to assets
 import "./index.css"
-
-// const zags = MaokaZAGS.Of({ counter: { value: 0 } })
-
-const is_dev = true // TODO Take from env
-const app_name = "pink.ordo.app" // TODO Take from env
-const version = "v0.7.0" // TODO Take from env
-const app_fid = Symbol.for(app_name)
-const app_fn = { fid: app_fid, name: app_name, permissions: { commands: [], queries: [] } }
-const hosts = {} as Ordo.Hosts
-
-// TODO Support for ignoring updates
-ordo_app_state.zags.update("constants", () => ({ app_fid, app_fn, app_name, is_dev, version }))
-ordo_app_state.zags.update("sections", () => ({ sidebar: 0 }) as any)
 
 // const indexed_db = indexedDB.open("ordo.pink", 3)
 
@@ -72,6 +60,8 @@ ordo_app_state.zags.update("sections", () => ({ sidebar: 0 }) as any)
 
 export const App = Maoka.create("div", ({ use }) => {
 	use(MaokaJabs.set_class("app"))
+	const { app_fid, app_fn } = ordo_app_state.zags.select("constants")
+	const hosts = ordo_app_state.zags.select("hosts")
 
 	const known_functions = init_known_functions(app_fn)
 	ordo_app_state.zags.update("known_functions", () => known_functions)
@@ -104,10 +94,14 @@ export const App = Maoka.create("div", ({ use }) => {
 	init_title_display()
 	init_command_palette()
 
+	const { get_metadata_query } = init_metadata()
+	const get_app_metadata_query = get_metadata_query(app_fid)
+	ordo_app_state.zags.update("query.metadata", () => get_app_metadata_query().cata(R.catas.expect(log_rrr)))
+
+	// TODO Init user
 	// TODO Init content
-	// TODO Init metadata
 	// TODO Adding functions
 
-	// TODO ContextMenu, CommandPalette
+	// TODO ContextMenu
 	return () => [OrdoWorkspace, OrdoSidebar, OrdoModal, OrdoNotifications, OrdoActivityBar, OrdoBackgroundTaskIndicator]
 })

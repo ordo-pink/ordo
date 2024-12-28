@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ */
+
 import type { TDotPath, TFromDotPath, TZags } from "@ordo-pink/zags"
 import type { TMaokaJab } from "@ordo-pink/maoka"
 

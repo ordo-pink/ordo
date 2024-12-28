@@ -86,8 +86,6 @@ export const Metadata: Ordo.Metadata.Static = {
 	Validations: MetadataValidations,
 }
 
-export const M = Metadata
-
 // --- Internal ---
 
 const get_readable_size = (size: number, decimals = 2) => {

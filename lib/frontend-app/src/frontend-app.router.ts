@@ -35,11 +35,11 @@ export const init_router = () => {
 		else router$.update("current_route", () => create_route(url))
 	})
 
-	logger.debug("🟢 Initialised router.")
-
 	router$.marry(({ current_route }, is_update) => {
 		if (is_update) history.pushState(null, "", current_route.href)
 	})
+
+	logger.debug("🟢 Initialised router.")
 
 	return router$
 }

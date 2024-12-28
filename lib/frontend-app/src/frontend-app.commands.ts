@@ -22,8 +22,6 @@
 import { Subject, combineLatestWith, map, merge, scan, shareReplay } from "rxjs"
 import { equals } from "ramda"
 
-import { R } from "@ordo-pink/result"
-import { RRR } from "@ordo-pink/core"
 import { call_once } from "@ordo-pink/tau"
 
 import { ordo_app_state } from "../app.state"
@@ -32,40 +30,33 @@ type TCommand = (Ordo.Command.Command | Ordo.Command.PayloadCommand) & { fid: sy
 type TCmdHandlerState = Record<string, Ordo.Command.CommandHandler<any>[]>
 type TCmdListener<N extends Ordo.Command.Name = Ordo.Command.Name, P = any> = [N, Ordo.Command.CommandHandler<P>, symbol]
 
-type TF = () => { get_commands: (fid: symbol) => Ordo.CreateFunction.GetCommandsFn }
+type TF = () => { get_commands: (fid: symbol) => Ordo.Command.Commands }
 export const init_commands: TF = call_once(() => {
 	const logger = ordo_app_state.zags.select("logger")
 	const is_dev = ordo_app_state.zags.select("constants.is_dev")
 	const known_functions = ordo_app_state.zags.select("known_functions")
 
-	const get_commands =
-		(fid: symbol): Ordo.CreateFunction.GetCommandsFn =>
-		() =>
-			R.If(known_functions.has_permissions(fid, { queries: ["application.commands"] }))
-				.pipe(R.ops.err_map(() => eperm("get_commands -> fid", fid)))
-				.pipe(
-					R.ops.map(() => {
-						const func = known_functions.exchange(fid).cata({ Some: x => x, None: () => "unauthorized" })
+	const get_commands = (fid: symbol) => {
+		const func = known_functions.exchange(fid).cata({ Some: x => x, None: () => "unauthorized" })
 
-						return {
-							on: (name, handler) => {
-								logger.debug(`🟣 "${func}" appended handler for command "${name}"`)
-								add_after$.next([name, handler, fid])
-							},
-							off: (name, handler) => {
-								logger.debug(`⚫ "${func}" removed handler for command "${name}"`)
-								remove$.next([name, handler, fid])
-							},
-							emit: (name, payload?, key = crypto.randomUUID()) => {
-								enqueue$.next({ name, payload, key, fid })
-							},
-							cancel: (name, payload?, key = crypto.randomUUID()) => {
-								logger.debug(`⚫ "${func}" cancelled command "${name}"`)
-								dequeue$.next({ name, payload, key, fid })
-							},
-						}
-					}),
-				)
+		return {
+			on: (name, handler) => {
+				logger.debug(`🟣 "${func}" appended handler for command "${name}"`)
+				add_after$.next([name, handler, fid])
+			},
+			off: (name, handler) => {
+				logger.debug(`⚫ "${func}" removed handler for command "${name}"`)
+				remove$.next([name, handler, fid])
+			},
+			emit: (name, payload?, key = crypto.randomUUID()) => {
+				enqueue$.next({ name, payload, key, fid })
+			},
+			cancel: (name, payload?, key = crypto.randomUUID()) => {
+				logger.debug(`⚫ "${func}" cancelled command "${name}"`)
+				dequeue$.next({ name, payload, key, fid })
+			},
+		} satisfies Ordo.Command.Commands
+	}
 
 	command_queue$
 		.pipe(
@@ -77,7 +68,7 @@ export const init_commands: TF = call_once(() => {
 					const func = known_functions.exchange(fid).cata({ Some: x => x, None: () => "unauthorized" })
 
 					if (!known_functions.has_permissions(fid, { commands: [name] })) {
-						logger.alert(`🔴 "${func}" did not request permission to execute command "${name}".`)
+						logger.error(`"${func}" permission RRR. Did you forget to request command permission '${name}'?`)
 
 						return
 					}
@@ -196,5 +187,3 @@ const command_storage$ = merge(
 	scan((acc, f) => f(acc), {} as Record<string, TCmdListener[1][]>),
 	shareReplay(1),
 )
-
-const eperm = RRR.codes.eperm("init_hosts")

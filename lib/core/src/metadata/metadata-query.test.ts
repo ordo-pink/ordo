@@ -191,7 +191,7 @@ describe("MetadataQuery", () => {
 
 				m_repo.put([metadata])
 
-				const option = m_query.get_by_name_and_parent("123", null).unwrap() as TOption<Ordo.Metadata.Instance>
+				const option = m_query.get_by_name("123", null).unwrap() as TOption<Ordo.Metadata.Instance>
 				const result = option.unwrap()
 
 				expect(result).toEqual(metadata)
@@ -200,7 +200,7 @@ describe("MetadataQuery", () => {
 			it("should return none if metadata doesnt exist", () => {
 				m_repo.put([M.Of({ name: "a", parent: null, author_id: "a-a-a-a-a" })])
 
-				const option = m_query.get_by_name_and_parent("b", null).unwrap() as TOption<Ordo.Metadata.Instance>
+				const option = m_query.get_by_name("b", null).unwrap() as TOption<Ordo.Metadata.Instance>
 
 				expect(option.unwrap()).toEqual(O.None().unwrap() as any) // TODO
 			})
@@ -208,7 +208,7 @@ describe("MetadataQuery", () => {
 			it("should return EAGAIN if metadata was not loaded", () => {
 				metadata$.next(null)
 
-				const { key, location } = m_query.get_by_name_and_parent("a", null).unwrap() as Ordo.Rrr
+				const { key, location } = m_query.get_by_name("a", null).unwrap() as Ordo.Rrr
 
 				expect(location).toEqual("MetadataRepository")
 				expect(key).toEqual("EAGAIN")
@@ -217,7 +217,7 @@ describe("MetadataQuery", () => {
 			it("should return EINVAL if name is invalid", () => {
 				m_repo.put([M.Of({ name: "a", parent: null, author_id: "a-a-a-a-a" })])
 
-				const { location, key } = m_query.get_by_name_and_parent("", null).unwrap() as Ordo.Rrr
+				const { location, key } = m_query.get_by_name("", null).unwrap() as Ordo.Rrr
 
 				expect(location).toEqual("MetadataQuery")
 				expect(key).toEqual("EINVAL")
@@ -226,7 +226,7 @@ describe("MetadataQuery", () => {
 			it("should return EINVAL if parent is invalid", () => {
 				m_repo.put([M.Of({ name: "a", parent: null, author_id: "a-a-a-a-a" })])
 
-				const { location, key } = m_query.get_by_name_and_parent("a", "" as any).unwrap() as Ordo.Rrr
+				const { location, key } = m_query.get_by_name("a", "" as any).unwrap() as Ordo.Rrr
 
 				expect(location).toEqual("MetadataQuery")
 				expect(key).toEqual("EINVAL")

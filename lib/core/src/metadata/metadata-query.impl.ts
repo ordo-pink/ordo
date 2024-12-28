@@ -23,7 +23,7 @@ import { gt, negate, prop } from "@ordo-pink/tau"
 import { O } from "@ordo-pink/option"
 import { R } from "@ordo-pink/result"
 
-import { M } from "./metadata.impl"
+import { Metadata as M } from "./metadata.impl"
 import { RRR } from "../rrr"
 import { get_wrong_label } from "./metadata-utils.impl"
 
@@ -33,105 +33,122 @@ const inval = RRR.codes.einval(LOCATION)
 const enoent = RRR.codes.enoent(LOCATION)
 
 export const MetadataQuery: Ordo.Metadata.QueryStatic = {
-	Of: repo => ({
+	Of: (repo, check_query_permission) => ({
 		get $() {
 			return repo.$
 		},
 
 		get: ({ show_hidden } = { show_hidden: false }) =>
-			repo.get().pipe(R.ops.map(is => (show_hidden ? is : is.filter(negate(i => i.is_hidden()))))),
+			check_query_permission("metadata.get")
+				.pipe(R.ops.chain(() => repo.get()))
+				.pipe(R.ops.map(is => (show_hidden ? is : is.filter(negate(i => i.is_hidden()))))),
 
 		get_by_fsid: (fsid, options) =>
-			R.If(M.Validations.is_fsid(fsid))
-				.pipe(R.ops.err_map(() => inval(`by fsid -> fsid: ${fsid}`)))
-				.pipe(R.ops.chain(() => MetadataQuery.Of(repo).get(options)))
+			R.Merge([
+				check_query_permission("metadata.get_by_fsid"),
+				R.If(M.Validations.is_fsid(fsid), { F: () => inval(`MetadataQuery.get_by_fsid: Invalid FSID: ${fsid}`) }),
+			])
+				.pipe(R.ops.chain(() => MetadataQuery.Of(repo, check_query_permission).get(options)))
 				.pipe(R.ops.map(m => O.FromNullable(m.find(i => i.get_fsid() === fsid)))),
 
 		get_by_labels: (ls, options) =>
-			R.If(M.Validations.are_labels(ls))
-				.pipe(R.ops.err_map(() => inval("by labels -> label:", get_wrong_label(ls))))
-				.pipe(R.ops.chain(() => MetadataQuery.Of(repo).get(options)))
-				.pipe(R.ops.map(is => is.filter(has_all_labels(ls)))),
-
-		get_by_name_and_parent: (name, parent, options) =>
 			R.Merge([
-				R.If(M.Validations.is_name(name), { F: () => inval("by name & parent -> name", name) }),
-				R.If(M.Validations.is_parent(parent), {
-					F: () => inval(`name & parent -> parent: ${parent}`),
+				check_query_permission("metadata.get_by_labels"),
+				R.If(M.Validations.are_labels(ls), {
+					F: () => inval("MetadataQuery.get_by_labels: Invalid label:", get_wrong_label(ls)),
 				}),
 			])
-				.pipe(R.ops.chain(() => MetadataQuery.Of(repo).get(options)))
+				.pipe(R.ops.chain(() => MetadataQuery.Of(repo, check_query_permission).get(options)))
+				.pipe(R.ops.map(is => is.filter(has_all_labels(ls)))),
+
+		get_by_name: (name, parent, options) =>
+			R.Merge([
+				check_query_permission("metadata.get_by_name"),
+				R.If(M.Validations.is_name(name), { F: () => inval("MetadataQuery.get_by_name: Invalid name:", name) }),
+				R.If(M.Validations.is_parent(parent), { F: () => inval("MetadataQuery.get_by_name: Invalid parent:", parent) }),
+			])
+				.pipe(R.ops.chain(() => MetadataQuery.Of(repo, check_query_permission).get(options)))
 				.pipe(R.ops.map(m => O.FromNullable(m.find(_has_name_and_parent(name, parent))))),
 
 		get_children: (fsid, options) =>
 			fsid
-				? R.If(M.Validations.is_fsid(fsid))
-						.pipe(R.ops.err_map(() => inval(`children -> fsid: ${fsid}`)))
-						.pipe(R.ops.chain(() => MetadataQuery.Of(repo).get_by_fsid(fsid, options)))
+				? R.Merge([
+						check_query_permission("metadata.get_children"),
+						R.If(M.Validations.is_fsid(fsid), { F: () => inval(`MetadataQuery.get_children: Invalid FSID: ${fsid}`) }),
+					])
+						.pipe(R.ops.chain(() => MetadataQuery.Of(repo, check_query_permission).get_by_fsid(fsid, options)))
 						.pipe(R.ops.chain(o => R.FromOption(o, () => enoent(`.getChildren -> fsid: ${fsid}`))))
-						.pipe(R.ops.chain(() => MetadataQuery.Of(repo).get(options)))
+						.pipe(R.ops.chain(() => MetadataQuery.Of(repo, check_query_permission).get(options)))
 						.pipe(R.ops.map(is => is.filter(i => i.is_child_of(fsid))))
-				: MetadataQuery.Of(repo)
-						.get(options)
+				: check_query_permission("metadata.get_children")
+						.pipe(R.ops.chain(() => MetadataQuery.Of(repo, check_query_permission).get(options)))
 						.pipe(R.ops.map(is => is.filter(i => i.is_root_child()))),
 
 		get_parent: (fsid, options) =>
-			MetadataQuery.Of(repo)
-				.get_by_fsid(fsid, options)
+			check_query_permission("metadata.get_parent")
+				.pipe(R.ops.chain(() => MetadataQuery.Of(repo, check_query_permission).get_by_fsid(fsid, options)))
 				.pipe(R.ops.chain(o => R.FromOption(o, () => enoent(`.getParent -> fsid: ${fsid}`))))
 				.pipe(R.ops.map(i => i.get_parent()))
-				.pipe(R.ops.chain(i => (i ? MetadataQuery.Of(repo).get_by_fsid(i) : R.Ok(O.None())))),
+				.pipe(R.ops.chain(i => (i ? MetadataQuery.Of(repo, check_query_permission).get_by_fsid(i) : R.Ok(O.None())))),
 
 		has_child: (fsid, child, options) =>
-			R.If(M.Validations.is_fsid(child))
-				.pipe(R.ops.err_map(() => inval(`has -> child: ${child}`)))
-				.pipe(R.ops.chain(() => MetadataQuery.Of(repo).get_children(fsid, options)))
+			R.Merge([
+				check_query_permission("metadata.has_child"),
+				R.If(M.Validations.is_fsid(child), { F: () => inval(`MetadataQuery.has_child: Invalid child: ${child}`) }),
+			])
+				.pipe(R.ops.chain(() => MetadataQuery.Of(repo, check_query_permission).get_children(fsid, options)))
 				.pipe(R.ops.map(is => is.some(i => i.get_fsid() === child))),
 
 		get_incoming_links: (fsid, options) =>
-			R.If(M.Validations.is_fsid(fsid))
-				.pipe(R.ops.err_map(() => inval(`incoming links -> fsid: ${fsid}`)))
-				.pipe(R.ops.chain(() => MetadataQuery.Of(repo).get(options)))
+			R.Merge([
+				check_query_permission("metadata.get_incoming_links"),
+				R.If(M.Validations.is_fsid(fsid), { F: () => inval(`MetadataQuery.get_incoming_links: Invalid FSID: ${fsid}`) }),
+			])
+				.pipe(R.ops.chain(() => MetadataQuery.Of(repo, check_query_permission).get(options)))
 				.pipe(R.ops.map(is => is.filter(i => i.has_link_to(fsid)))),
 
 		has_incoming_links: (fsid, options) =>
-			MetadataQuery.Of(repo)
-				.get_incoming_links(fsid, options)
+			check_query_permission("metadata.has_incoming_links")
+				.pipe(R.ops.chain(() => MetadataQuery.Of(repo, check_query_permission).get_incoming_links(fsid, options)))
 				.pipe(R.ops.map(prop("length")))
 				.pipe(R.ops.map(gt(0))),
 
 		has_children: (fsid, options) =>
-			MetadataQuery.Of(repo)
-				.get_children(fsid, options)
+			check_query_permission("metadata.has_children")
+				.pipe(R.ops.chain(() => MetadataQuery.Of(repo, check_query_permission).get_children(fsid, options)))
 				.pipe(R.ops.map(prop("length")))
 				.pipe(R.ops.map(gt(0))),
 
 		has_ancestor: (fsid, ancestor, options) =>
-			R.If(M.Validations.is_fsid(ancestor))
-				.pipe(R.ops.err_map(() => inval(`has -> ancestor: ${ancestor}`)))
-				.pipe(R.ops.chain(() => MetadataQuery.Of(repo).get_ancestors(fsid, options)))
+			R.Merge([
+				check_query_permission("metadata.has_ancestor"),
+				R.If(M.Validations.is_fsid(ancestor), { F: () => inval(`MetadataQuery.has_ancestor: Invalid ancestor: ${ancestor}`) }),
+			])
+				.pipe(R.ops.chain(() => MetadataQuery.Of(repo, check_query_permission).get_ancestors(fsid, options)))
 				.pipe(R.ops.map(is => is.some(i => i.get_fsid() === ancestor))),
 
-		has_descendent: (fsid, descendent, options) =>
-			R.If(M.Validations.is_fsid(descendent))
-				.pipe(R.ops.err_map(() => inval(`has -> descendent: ${descendent}`)))
-				.pipe(R.ops.chain(() => MetadataQuery.Of(repo).get_descendents(fsid, options)))
-				.pipe(R.ops.map(is => is.some(i => i.get_fsid() === descendent))),
+		has_descendent: (fsid, desc, options) =>
+			R.Merge([
+				check_query_permission("metadata.has_descendent"),
+				R.If(M.Validations.is_fsid(desc), { F: () => inval(`MetadataQuery.has_descendent: Invalid descendent: ${desc}`) }),
+			])
+				.pipe(R.ops.chain(() => MetadataQuery.Of(repo, check_query_permission).get_descendents(fsid, options)))
+				.pipe(R.ops.map(is => is.some(i => i.get_fsid() === desc))),
 
 		has_descendents: (fsid, options) =>
-			MetadataQuery.Of(repo)
-				.get_descendents(fsid, options)
+			check_query_permission("metadata.has_descendents")
+				.pipe(R.ops.chain(() => MetadataQuery.Of(repo, check_query_permission).get_descendents(fsid, options)))
 				.pipe(R.ops.map(prop("length")))
 				.pipe(R.ops.map(gt(0))),
 
 		total: options =>
-			MetadataQuery.Of(repo)
-				.get(options)
+			check_query_permission("metadata.total")
+				.pipe(R.ops.chain(() => MetadataQuery.Of(repo, check_query_permission).get(options)))
 				.pipe(R.ops.map(prop("length"))),
 
 		get_ancestors: (fsid, options) =>
-			MetadataQuery.Of(repo)
-				.get_parent(fsid, options)
+			check_query_permission("metadata.get_ancestors")
+				.pipe(R.ops.chain(() => MetadataQuery.Of(repo, check_query_permission).get_parent(fsid, options)))
 				.pipe(
 					R.ops.map(option => {
 						const ancestors: Ordo.Metadata.Instance[] = []
@@ -143,7 +160,7 @@ export const MetadataQuery: Ordo.Metadata.QueryStatic = {
 
 							ancestors.push(parent)
 
-							MetadataQuery.Of(repo)
+							MetadataQuery.Of(repo, check_query_permission)
 								.get_parent(parent.get_fsid())
 								.pipe(
 									R.ops.tap(option => {
@@ -157,13 +174,13 @@ export const MetadataQuery: Ordo.Metadata.QueryStatic = {
 				),
 
 		get_descendents: (fsid, options, accumulator = []) =>
-			MetadataQuery.Of(repo)
-				.get_children(fsid, options)
+			check_query_permission("metadata.get_descendents")
+				.pipe(R.ops.chain(() => MetadataQuery.Of(repo, check_query_permission).get_children(fsid, options)))
 				.pipe(
 					R.ops.map(children => {
 						for (const child of children) {
 							accumulator.push(child)
-							MetadataQuery.Of(repo).get_descendents(child.get_fsid(), options, accumulator)
+							MetadataQuery.Of(repo, check_query_permission).get_descendents(child.get_fsid(), options, accumulator)
 						}
 
 						return accumulator

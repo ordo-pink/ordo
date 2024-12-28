@@ -19,15 +19,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { ConsoleLogger } from "@ordo-pink/logger"
 import { R } from "@ordo-pink/result"
-import { RRR } from "@ordo-pink/core"
 import { call_once } from "@ordo-pink/tau"
 
 import { ordo_app_state } from "../app.state"
 
 const fetch = window.fetch
 
-type TF = () => { get_fetch: (fid: symbol) => Ordo.CreateFunction.GetFetchFn }
+type TF = () => { get_fetch: (fid: symbol) => Ordo.Fetch }
 export const init_fetch: TF = call_once(() => {
 	const { logger, known_functions } = ordo_app_state.zags.unwrap()
 
@@ -37,11 +37,14 @@ export const init_fetch: TF = call_once(() => {
 	logger.debug("🟢 Initialised fetch.")
 
 	return {
-		get_fetch: fid => () =>
+		get_fetch: fid =>
 			R.If(known_functions.has_permissions(fid, { queries: ["application.fetch"] }))
-				.pipe(R.ops.err_map(() => eperm("get_fetch -> fid", fid)))
-				.pipe(R.ops.map(() => fetch)),
+				.pipe(R.ops.map(() => fetch))
+				.cata(R.catas.or_else(() => forbidden_fetch)),
 	}
 })
 
-const eperm = RRR.codes.eperm("init_hosts")
+const forbidden_fetch = () => {
+	ConsoleLogger.error("Fetch permission RRR. Did you forget to request query permission 'application.fetch'?")
+	return Promise.reject("Permission Denied")
+}

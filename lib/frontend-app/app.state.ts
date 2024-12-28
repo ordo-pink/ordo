@@ -98,14 +98,3 @@ export type TOrdoState = {
 		modal: Ordo.Modal.Instance | null
 	}
 }
-
-// TODO Move to core
-export type TFunctionState = {
-	logger: TLogger
-	fetch: Ordo.Fetch
-	commands: Ordo.Command.Commands
-	translate: Ordo.I18N.TranslateFn
-	user_query: Ordo.User.Query
-	metadata_query: Ordo.Metadata.Query
-	content_query: Ordo.Metadata.Query
-}

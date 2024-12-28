@@ -188,7 +188,7 @@ const create_tutorial_files = (emit: Ordo.Command.EmitFn, metadata_query: Ordo.M
 	emit("cmd.metadata.create", { name: "Start here!", parent: null, labels, type: "database/ordo" })
 
 	const parent = metadata_query
-		.get_by_name_and_parent("Start here!", null)
+		.get_by_name("Start here!", null)
 		.pipe(Result.ops.chain(Result.FromOption))
 		.pipe(Result.ops.map(x => x.get_fsid()))
 		.cata(Result.catas.or_else(() => null as never))
@@ -201,7 +201,7 @@ const create_tutorial_files = (emit: Ordo.Command.EmitFn, metadata_query: Ordo.M
 	emit("cmd.metadata.create", { name: "Click on this text to open file content", parent, labels })
 
 	const last_file_fsid = metadata_query
-		.get_by_name_and_parent("Click on this text to open file content", parent)
+		.get_by_name("Click on this text to open file content", parent)
 		.pipe(Result.ops.chain(Result.FromOption))
 		.pipe(Result.ops.map(x => x.get_fsid()))
 		.cata(Result.catas.or_else(() => null as never))

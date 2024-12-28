@@ -398,27 +398,10 @@ declare global {
 
 		namespace CreateFunction {
 			type QueryPermission =
-				| "application.title"
-				| "application.sidebar"
 				| "application.fetch"
-				| "application.hosts"
-				| "application.logger"
-				| "application.commands"
-				| "application.current_fid"
-				| "application.current_route"
-				| "application.current_activity"
-				| "users.current_user.achievements"
-				| "users.current_user.is_authenticated"
-				| "users.current_user.public_info" // Ordo.User.Public.Instance
-				| "users.current_user.internal_info" // Ordo.User.Current.Instance
-				| "users.users_query"
-				| "functions.activities"
-				| "functions.current_file_association"
-				| "functions.file_associations"
-				| "functions.editor_plugins"
-				| "functions.persisted_state"
-				| "data.metadata_query"
-				| "data.content_query"
+				| `metadata.${keyof Ordo.Metadata.Query}`
+				| `user.${keyof Ordo.User.Query}`
+				| `content.${keyof Ordo.Content.Query}`
 
 			type CommandPermission = Ordo.Command.Name
 
@@ -448,6 +431,22 @@ declare global {
 				queries: Ordo.CreateFunction.QueryPermission[]
 				commands: Ordo.CreateFunction.CommandPermission[]
 			}
+
+			type State = {
+				logger: TLogger
+				fetch: Ordo.Fetch
+				commands: Ordo.Command.Commands
+				translate: Ordo.I18N.TranslateFn
+				user_query: Ordo.User.Query
+				metadata_query: Ordo.Metadata.Query
+				content_query: Ordo.Content.Query
+			}
+
+			type Fn = (
+				name: string,
+				permissions: Ordo.CreateFunction.Permissions,
+				callback: (context: TZags<Ordo.CreateFunction.State>) => void | Promise<void>,
+			) => (params: OrdoInternal.Function.CreateFunctionInternalContext) => void | Promise<void>
 
 			type Params = {
 				fid: symbol
@@ -559,7 +558,7 @@ declare global {
 				}
 
 				type Repository = {
-					get: () => TResult<Ordo.User.Current.Instance, Ordo.Rrr<"EAGAIN">>
+					get: () => TResult<Ordo.User.Current.Instance, Ordo.Rrr<"EPERM" | "EAGAIN">>
 					put: (user: Ordo.User.Current.Instance) => TResult<void, Ordo.Rrr<"EPERM" | "EINVAL">>
 					get $(): Observable<number>
 				}
@@ -613,7 +612,7 @@ declare global {
 				}
 
 				type Repository = {
-					get: () => Oath<Ordo.User.Public.Instance[], Ordo.Rrr<"EAGAIN">>
+					get: () => Oath<Ordo.User.Public.Instance[], Ordo.Rrr<"EPERM" | "EAGAIN">>
 					put: (users: Ordo.User.Public.Instance[]) => Oath<void, Ordo.Rrr<"EINVAL">>
 					get $(): Observable<number>
 				}
@@ -624,15 +623,17 @@ declare global {
 			}
 
 			type Query = {
-				get_current: () => TResult<Ordo.User.Current.Instance, Ordo.Rrr<"EAGAIN">>
+				get_current: () => TResult<Ordo.User.Current.Instance, Ordo.Rrr<"EPERM" | "EAGAIN">>
 				// get_current_by_id: (
 				// id: Ordo.User.Current.Instance["id"],
-				// ) => Oath<TOption<Ordo.User.Current.Instance>, Ordo.Rrr<"EAGAIN" | "EINVAL" | "EIO">>
-				get_by_id: (email: Ordo.User.ID) => Oath<TOption<Ordo.User.Public.Instance>, Ordo.Rrr<"EAGAIN" | "EINVAL" | "EIO">>
+				// ) => Oath<TOption<Ordo.User.Current.Instance>, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "EIO">>
+				get_by_id: (
+					email: Ordo.User.ID,
+				) => Oath<TOption<Ordo.User.Public.Instance>, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "EIO">>
 
 				// get_by_handle: (
 				// handle: Ordo.User.Current.Instance["handle"],
-				// ) => Oath<TOption<Ordo.User.Public.Instance>, Ordo.Rrr<"EAGAIN" | "EINVAL" | "EIO">>
+				// ) => Oath<TOption<Ordo.User.Public.Instance>, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "EIO">>
 				get $(): Observable<number>
 			}
 
@@ -767,7 +768,7 @@ declare global {
 			}
 
 			type Repository = {
-				get: () => TResult<Ordo.Metadata.Instance[], Ordo.Rrr<"EAGAIN">>
+				get: () => TResult<Ordo.Metadata.Instance[], Ordo.Rrr<"EPERM" | "EAGAIN">>
 				put: (metadata: Ordo.Metadata.Instance[]) => TResult<void, Ordo.Rrr<"EINVAL">>
 				get $(): TZags<{ version: number }>
 			}
@@ -784,81 +785,93 @@ declare global {
 			type QueryOptions = { show_hidden?: boolean }
 
 			type QueryStatic = {
-				Of: (repository: Ordo.Metadata.Repository) => Query
+				Of: (
+					repository: Ordo.Metadata.Repository,
+					check_query_permission: (permission: Ordo.CreateFunction.QueryPermission) => TResult<void, Ordo.Rrr<"EPERM">>,
+				) => Query
 			}
 
 			type Query = {
 				get $(): TZags<{ version: number }>
 
-				get: (options?: QueryOptions) => TResult<Ordo.Metadata.Instance[], Ordo.Rrr<"EAGAIN">>
+				get: (options?: QueryOptions) => TResult<Ordo.Metadata.Instance[], Ordo.Rrr<"EPERM" | "EAGAIN">>
 
 				get_by_fsid: (
 					fsid: FSID,
 					options?: QueryOptions,
-				) => TResult<TOption<Ordo.Metadata.Instance>, Ordo.Rrr<"EAGAIN" | "EINVAL">>
+				) => TResult<TOption<Ordo.Metadata.Instance>, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL">>
 
-				total: (options?: QueryOptions) => TResult<number, Ordo.Rrr<"EAGAIN">>
+				total: (options?: QueryOptions) => TResult<number, Ordo.Rrr<"EPERM" | "EAGAIN">>
 
-				get_by_name_and_parent: (
+				get_by_name: (
 					name: string,
 					parent: FSID | null,
 					options?: QueryOptions,
-				) => TResult<TOption<Ordo.Metadata.Instance>, Ordo.Rrr<"EAGAIN" | "EINVAL">>
+				) => TResult<TOption<Ordo.Metadata.Instance>, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL">>
 
 				get_by_labels: (
 					labels: Ordo.Metadata.Label[],
 					options?: QueryOptions,
-				) => TResult<Ordo.Metadata.Instance[], Ordo.Rrr<"EAGAIN" | "EINVAL">>
+				) => TResult<Ordo.Metadata.Instance[], Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL">>
 
-				has_incoming_links: (fsid: FSID, options?: QueryOptions) => TResult<boolean, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+				has_incoming_links: (
+					fsid: FSID,
+					options?: QueryOptions,
+				) => TResult<boolean, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 
 				get_incoming_links: (
 					fsid: FSID,
 					options?: QueryOptions,
-				) => TResult<Ordo.Metadata.Instance[], Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+				) => TResult<Ordo.Metadata.Instance[], Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 
 				get_parent: (
 					fsid: FSID,
 					options?: QueryOptions,
-				) => TResult<TOption<Ordo.Metadata.Instance>, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+				) => TResult<TOption<Ordo.Metadata.Instance>, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 
 				get_ancestors: (
 					fsid: FSID,
 					options?: QueryOptions,
-				) => TResult<Ordo.Metadata.Instance[], Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+				) => TResult<Ordo.Metadata.Instance[], Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 
 				has_ancestor: (
 					fsid: FSID,
 					ancestor: FSID,
 					options?: QueryOptions,
-				) => TResult<boolean, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+				) => TResult<boolean, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 
 				has_child: (
 					fsid: FSID,
 					child: FSID,
 					options?: QueryOptions,
-				) => TResult<boolean, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+				) => TResult<boolean, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 
-				has_children: (fsid: FSID, options?: QueryOptions) => TResult<boolean, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+				has_children: (
+					fsid: FSID,
+					options?: QueryOptions,
+				) => TResult<boolean, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 
 				get_children: (
 					fsid: FSID | null,
 					options?: QueryOptions,
-				) => TResult<Ordo.Metadata.Instance[], Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+				) => TResult<Ordo.Metadata.Instance[], Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 
 				has_descendent: (
 					fsid: FSID,
 					descendent: FSID,
 					options?: QueryOptions,
-				) => TResult<boolean, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+				) => TResult<boolean, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 
-				has_descendents: (fsid: FSID, options?: QueryOptions) => TResult<boolean, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+				has_descendents: (
+					fsid: FSID,
+					options?: QueryOptions,
+				) => TResult<boolean, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 
 				get_descendents: (
 					fsid: FSID,
 					options?: QueryOptions,
 					accumulator?: Ordo.Metadata.Instance[],
-				) => TResult<Ordo.Metadata.Instance[], Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+				) => TResult<Ordo.Metadata.Instance[], Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 
 				// TODO: toTree: (source: TFSID | null) => typeof source extends null ? Ordo.Metadata.ItemBranch[] : Ordo.Metadata.ItemBranch
 
@@ -876,71 +889,76 @@ declare global {
 			}
 
 			type Command = {
-				create: (params: Ordo.Metadata.CreateParams) => TResult<void, Ordo.Rrr<"EAGAIN" | "EEXIST" | "EINVAL" | "ENOENT">>
+				create: (
+					params: Ordo.Metadata.CreateParams,
+				) => TResult<void, Ordo.Rrr<"EPERM" | "EAGAIN" | "EEXIST" | "EINVAL" | "ENOENT">>
 
-				replace: (value: Ordo.Metadata.Instance) => TResult<void, Ordo.Rrr<"EAGAIN" | "ENOENT" | "EINVAL">>
+				replace: (value: Ordo.Metadata.Instance) => TResult<void, Ordo.Rrr<"EPERM" | "EAGAIN" | "ENOENT" | "EINVAL">>
 
-				remove: (fsid: Ordo.Metadata.FSID) => TResult<void, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+				remove: (fsid: Ordo.Metadata.FSID) => TResult<void, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 
 				append_child: (
 					fsid: Ordo.Metadata.FSID,
 					child: Ordo.Metadata.FSID,
-				) => TResult<void, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT" | "EEXIST" | "ENXIO">>
+				) => TResult<void, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT" | "EEXIST" | "ENXIO">>
 
 				add_labels: (
 					fsid: Ordo.Metadata.FSID,
 					...labels: Ordo.Metadata.Label[]
-				) => TResult<void, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+				) => TResult<void, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 
 				remove_labels: (
 					fsid: Ordo.Metadata.FSID,
 					...labels: Ordo.Metadata.Label[]
-				) => TResult<void, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+				) => TResult<void, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 
 				update_label: (
 					old_label: Ordo.Metadata.Label,
 					new_label: Ordo.Metadata.Label,
-				) => TResult<void, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+				) => TResult<void, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 
 				replace_labels: (
 					fsid: Ordo.Metadata.FSID,
 					labels: Ordo.Metadata.Label[],
-				) => TResult<void, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+				) => TResult<void, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 
-				set_size: (fsid: Ordo.Metadata.FSID, size: number) => TResult<void, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+				set_size: (fsid: Ordo.Metadata.FSID, size: number) => TResult<void, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 
 				add_links: (
 					fsid: Ordo.Metadata.FSID,
 					...links: Ordo.Metadata.FSID[]
-				) => TResult<void, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+				) => TResult<void, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 
 				remove_links: (
 					fsid: Ordo.Metadata.FSID,
 					...links: Ordo.Metadata.FSID[]
-				) => TResult<void, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+				) => TResult<void, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 
 				replace_links: (
 					fsid: Ordo.Metadata.FSID,
 					links: Ordo.Metadata.FSID[],
-				) => TResult<void, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+				) => TResult<void, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 
 				set_parent: (
 					fsid: Ordo.Metadata.FSID,
 					parent: Ordo.Metadata.FSID | null,
-				) => TResult<void, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT" | "ENXIO" | "EEXIST">>
+				) => TResult<void, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT" | "ENXIO" | "EEXIST">>
 
-				set_name: (fsid: Ordo.Metadata.FSID, name: string) => TResult<void, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT" | "EEXIST">>
+				set_name: (
+					fsid: Ordo.Metadata.FSID,
+					name: string,
+				) => TResult<void, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT" | "EEXIST">>
 
 				set_property: <$TProps extends Ordo.Metadata.Props, $TKey extends keyof $TProps>(
 					fsid: Ordo.Metadata.FSID,
 					key: $TKey,
 					value: $TProps[$TKey],
-				) => TResult<void, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+				) => TResult<void, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 
 				remove_property: <$TProps extends Ordo.Metadata.Props, $TKey extends keyof $TProps>(
 					fsid: Ordo.Metadata.FSID,
 					key: $TKey,
-				) => TResult<void, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+				) => TResult<void, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 			}
 		}
 

@@ -74,11 +74,11 @@ export const init_content: TInitMetadataFn = ({ logger, known_functions, command
 		const size = get_size(content)
 
 		const metadata = metadata_query
-			.get_by_name_and_parent(name, parent)
+			.get_by_name(name, parent)
 			.pipe(R.ops.chain(R.FromOption))
 			// TODO Check if error is enoent
 			.pipe(R.ops.err_tap(() => commands.emit("cmd.metadata.create", { name, parent, type, size })))
-			.pipe(R.ops.err_chain(() => metadata_query.get_by_name_and_parent(name, parent)))
+			.pipe(R.ops.err_chain(() => metadata_query.get_by_name(name, parent)))
 			.cata(R.catas.or_nothing())
 
 		if (!Metadata.Validations.is_metadata(metadata)) {

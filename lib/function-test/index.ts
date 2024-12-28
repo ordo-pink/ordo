@@ -19,25 +19,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { R } from "@ordo-pink/result"
-import { RRR } from "@ordo-pink/core"
+import { create_function } from "@ordo-pink/core"
 
-import { ordo_app_state } from "../app.state"
-
-type TF = (hosts: Ordo.Hosts) => {
-	get_hosts: (fid: symbol) => Ordo.CreateFunction.GetHostsFn
-}
-export const init_hosts: TF = hosts => {
-	const { logger, known_functions } = ordo_app_state.zags.unwrap()
-
-	logger.debug("🟢 Initialised hosts.")
-
-	return {
-		get_hosts: fid => () =>
-			R.If(known_functions.has_permissions(fid, { queries: ["application.hosts"] }))
-				.pipe(R.ops.err_map(() => eperm("get_hosts -> fid", fid)))
-				.pipe(R.ops.map(() => hosts)),
-	}
-}
-
-const eperm = RRR.codes.eperm("init_hosts")
+export default create_function("pink.ordo.test", { queries: [], commands: [] }, state => {
+	const metadata_query = state.select("metadata_query")
+	const fetch = state.select("fetch")
+	metadata_query.get_by_fsid("asdf-asdf-adsf-adsf-asdf")
+	void fetch("http://test.com")
+})

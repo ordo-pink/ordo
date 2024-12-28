@@ -22,7 +22,7 @@
 import { R, type TResult } from "@ordo-pink/result"
 import { alpha_sort, concat, is_string, noop, override, thunk } from "@ordo-pink/tau"
 
-import { M, RRR, get_wrong_label, get_wrong_link } from "@ordo-pink/core"
+import { Metadata as M, RRR, get_wrong_label, get_wrong_link } from "@ordo-pink/core"
 
 const LOCATION = "MetadataCommand"
 
@@ -265,9 +265,9 @@ type TCheckExistsByNameAndParentRFn = (
 	metadata_query: Ordo.Metadata.Query,
 	name: string,
 	parent: Ordo.Metadata.FSID | null,
-) => TResult<void, Ordo.Rrr<"EEXIST" | "EINVAL" | "EAGAIN">>
+) => TResult<void, Ordo.Rrr<"EPERM" | "EEXIST" | "EINVAL" | "EAGAIN">>
 const _check_not_exists_by_name_r: TCheckExistsByNameAndParentRFn = (location, query, name, parent) =>
-	query.get_by_name_and_parent(name, parent).pipe(
+	query.get_by_name(name, parent).pipe(
 		R.ops.chain(option =>
 			option.cata({
 				Some: () => R.Err(exist(`${location} -> ${parent}/${name} exists`)),
@@ -279,7 +279,7 @@ const _check_not_exists_by_name_r: TCheckExistsByNameAndParentRFn = (location, q
 type TGetMetadataByFSIDRFn = (
 	location: string,
 	metadata_query: Ordo.Metadata.Query,
-) => (fsid: Ordo.Metadata.FSID) => TResult<Ordo.Metadata.Instance, Ordo.Rrr<"ENOENT" | "EAGAIN" | "EINVAL">>
+) => (fsid: Ordo.Metadata.FSID) => TResult<Ordo.Metadata.Instance, Ordo.Rrr<"EPERM" | "ENOENT" | "EAGAIN" | "EINVAL">>
 const _get_metadata_by_fsid_r: TGetMetadataByFSIDRFn = (location, query) => fsid =>
 	query
 		.get_by_fsid(fsid)
@@ -287,7 +287,7 @@ const _get_metadata_by_fsid_r: TGetMetadataByFSIDRFn = (location, query) => fsid
 
 type TResetUpdatedByRFn = (
 	user_query: Ordo.User.Query,
-) => (dto: Ordo.Metadata.DTO) => TResult<Ordo.Metadata.DTO, Ordo.Rrr<"EAGAIN">>
+) => (dto: Ordo.Metadata.DTO) => TResult<Ordo.Metadata.DTO, Ordo.Rrr<"EPERM" | "EAGAIN">>
 const _reset_updated_by_r: TResetUpdatedByRFn = query => metadata =>
 	query
 		.get_current()
@@ -329,7 +329,9 @@ type TCheckCircularReferenceRFn = (
 	metadata_query: Ordo.Metadata.Query,
 	fsid: Ordo.Metadata.FSID,
 	parent: Ordo.Metadata.FSID | null,
-) => (item: Ordo.Metadata.Instance) => TResult<Ordo.Metadata.Instance, Ordo.Rrr<"ENXIO" | "EAGAIN" | "EINVAL" | "ENOENT">>
+) => (
+	item: Ordo.Metadata.Instance,
+) => TResult<Ordo.Metadata.Instance, Ordo.Rrr<"EPERM" | "ENXIO" | "EAGAIN" | "EINVAL" | "ENOENT">>
 const _err_on_circular_reference_r: TCheckCircularReferenceRFn = (query, fsid, parent) => metadata =>
 	query
 		.get_descendents(fsid)

@@ -22,7 +22,6 @@
 import { ConsoleLogger } from "@ordo-pink/logger"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
-import { R } from "@ordo-pink/result"
 
 import { OrdoActivityBar } from "./src/components/activity-bar/activity-bar.component"
 import { OrdoBackgroundTaskIndicator } from "./src/components/background-task-indicator.component"
@@ -33,7 +32,6 @@ import { OrdoWorkspace } from "./src/components/workspace.component"
 import { init_command_palette } from "./src/components/command-palette"
 import { init_commands } from "./src/frontend-app.commands"
 import { init_functions } from "./src/frontend-app.functions"
-import { init_hosts } from "./src/frontend-app.hosts"
 import { init_i18n } from "./src/frontend-app.i18n"
 import { init_known_functions } from "./src/frontend-app.known-functions"
 import { init_logger } from "./src/frontend-app.logger"
@@ -44,6 +42,7 @@ import { ordo_app_state } from "./app.state"
 
 // TODO Move fonts to assets
 import "./index.css"
+import { init_fetch } from "./src/frontend-app.fetch"
 
 // const indexed_db = indexedDB.open("ordo.pink", 3)
 
@@ -61,25 +60,18 @@ import "./index.css"
 export const App = Maoka.create("div", ({ use }) => {
 	use(MaokaJabs.set_class("app"))
 	const { app_fid, app_fn } = ordo_app_state.zags.select("constants")
-	const hosts = ordo_app_state.zags.select("hosts")
 
 	const known_functions = init_known_functions(app_fn)
 	ordo_app_state.zags.update("known_functions", () => known_functions)
 
 	const { get_logger } = init_logger(ConsoleLogger)
-	const get_app_logger = get_logger(app_fid)
-	ordo_app_state.zags.update("logger", () => get_app_logger())
+	const app_logger = get_logger(app_fid)
+	ordo_app_state.zags.update("logger", () => app_logger)
 
-	const logger = ordo_app_state.zags.select("logger")
-	const log_rrr = (rrr: Ordo.Rrr) => logger.panic("PERMISSION DENIED", rrr)
+	const { get_fetch } = init_fetch()
 
 	const { get_commands } = init_commands()
-	const get_app_commands = get_commands(app_fid)
-	ordo_app_state.zags.update("commands", () => get_app_commands().cata(R.catas.expect(log_rrr)))
-
-	const { get_hosts } = init_hosts(hosts)
-	const get_app_hosts = get_hosts(app_fid)
-	ordo_app_state.zags.update("hosts", () => get_app_hosts().cata(R.catas.expect(log_rrr)))
+	ordo_app_state.zags.update("commands", () => get_commands(app_fid))
 
 	const { translate } = init_i18n()
 	ordo_app_state.zags.update("translate", () => translate)
@@ -95,12 +87,25 @@ export const App = Maoka.create("div", ({ use }) => {
 	init_command_palette()
 
 	const { get_metadata_query } = init_metadata()
-	const get_app_metadata_query = get_metadata_query(app_fid)
-	ordo_app_state.zags.update("query.metadata", () => get_app_metadata_query().cata(R.catas.expect(log_rrr)))
+	const app_metadata_query = get_metadata_query(app_fid)
+	ordo_app_state.zags.update("query.metadata", () => app_metadata_query)
 
+	void import("@ordo-pink/function-test")
+		.then(mod => mod.default)
+		.then(f =>
+			f({
+				get_commands,
+				get_content_query: () => null as any, // TODO Add content_query
+				get_fetch,
+				get_logger,
+				get_metadata_query,
+				get_user_query: () => null as any, // TODO Add user_query
+				known_functions,
+				translate,
+			}),
+		)
 	// TODO Init user
 	// TODO Init content
-	// TODO Adding functions
 
 	// TODO ContextMenu
 	return () => [OrdoWorkspace, OrdoSidebar, OrdoModal, OrdoNotifications, OrdoActivityBar, OrdoBackgroundTaskIndicator]

@@ -27,8 +27,8 @@ import { mklib_handler } from "./src/cmd-mklib.impl"
 // TODO Extract licence option
 export const mklib_command: TCommandRecord = {
 	mklib: {
-		help: `Create a new library in 'lib' with given name. Example: './bin mklib hello-world'
-			--unlicense, -U - Use The Unlicense instead of GNU AGPL 3.0`,
+		help: `Create a new library in 'lib' with given name. Example: './bin mklib hello-world'. Options:
+		--unlicense, -U :: Use The Unlicense instead of GNU AGPL 3.0`,
 		handler: mklib_handler,
 	},
 }

@@ -2,7 +2,7 @@
 
 # --- Configuration ---
 
-set -e
+set -ie
 
 # --- Variables ---
 

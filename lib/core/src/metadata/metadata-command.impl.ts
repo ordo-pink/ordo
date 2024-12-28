@@ -267,23 +267,16 @@ type TCheckExistsByNameAndParentRFn = (
 	parent: Ordo.Metadata.FSID | null,
 ) => TResult<void, Ordo.Rrr<"EPERM" | "EEXIST" | "EINVAL" | "EAGAIN">>
 const _check_not_exists_by_name_r: TCheckExistsByNameAndParentRFn = (location, query, name, parent) =>
-	query.get_by_name(name, parent).pipe(
-		R.ops.chain(option =>
-			option.cata({
-				Some: () => R.Err(exist(`${location} -> ${parent}/${name} exists`)),
-				None: () => R.Ok(undefined),
-			}),
-		),
-	)
+	query
+		.get_by_name(name, parent)
+		.pipe(R.ops.chain(option => (option ? R.Err(exist(`${location} -> ${parent}/${name} exists`)) : R.Ok(undefined))))
 
 type TGetMetadataByFSIDRFn = (
 	location: string,
 	metadata_query: Ordo.Metadata.Query,
 ) => (fsid: Ordo.Metadata.FSID) => TResult<Ordo.Metadata.Instance, Ordo.Rrr<"EPERM" | "ENOENT" | "EAGAIN" | "EINVAL">>
 const _get_metadata_by_fsid_r: TGetMetadataByFSIDRFn = (location, query) => fsid =>
-	query
-		.get_by_fsid(fsid)
-		.pipe(R.ops.chain(item => item.cata({ Some: R.Ok, None: () => R.Err(inval(`${location} -> fsid: ${fsid}`)) })))
+	query.get_by_fsid(fsid).pipe(R.ops.chain(item => (item ? R.Ok(item) : R.Err(inval(`${location} -> fsid: ${fsid}`)))))
 
 type TResetUpdatedByRFn = (
 	user_query: Ordo.User.Query,

@@ -31,27 +31,28 @@ const eagain = RRR.codes.eagain(LOCATION)
 const einval = RRR.codes.einval(LOCATION)
 const eio = RRR.codes.eio(LOCATION)
 
-const version_zags = ZAGS.Of({ version: 0 })
-
 export const MetadataRepository: Ordo.Metadata.RepositoryStatic = {
-	Of: metadata$ => ({
-		get: () =>
-			Result.Try(() => metadata$.select("items"))
-				.pipe(Result.ops.chain(Result.FromNullable))
-				.pipe(Result.ops.err_map(() => eagain())),
+	Of: metadata$ => {
+		const version_zags = ZAGS.Of({ version: 0 })
+		metadata$.marry((_, is_update) => is_update && version_zags.update("version", i => i + 1))
 
-		put: metadata =>
-			Result.FromNullable(metadata)
-				.pipe(Result.ops.chain(() => Result.If(Array.isArray(metadata), { T: () => metadata }))) // TODO: Add validations
-				.pipe(Result.ops.chain(() => Result.Try(() => metadata$.update("items", () => metadata))))
-				.pipe(Result.ops.err_map(() => einval(`.put: ${JSON.stringify(metadata)}`))),
+		return {
+			get: () =>
+				Result.Try(() => metadata$.select("items"))
+					.pipe(Result.ops.chain(Result.FromNullable))
+					.pipe(Result.ops.err_map(() => eagain())),
 
-		get $() {
-			metadata$.marry((_, is_update) => is_update && version_zags.update("version", i => i + 1))
+			put: metadata =>
+				Result.FromNullable(metadata)
+					.pipe(Result.ops.chain(() => Result.If(Array.isArray(metadata), { T: () => metadata }))) // TODO: Add validations
+					.pipe(Result.ops.chain(() => Result.Try(() => metadata$.update("items", () => metadata))))
+					.pipe(Result.ops.err_map(() => einval(`.put: ${JSON.stringify(metadata)}`))),
 
-			return version_zags
-		},
-	}),
+			get $() {
+				return version_zags
+			},
+		}
+	},
 }
 
 export const MR = MetadataRepository

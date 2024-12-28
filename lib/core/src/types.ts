@@ -19,12 +19,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { BehaviorSubject, Observable } from "rxjs"
-
 import type { JTI, SUB } from "@ordo-pink/wjwt"
 import type { Oath } from "@ordo-pink/oath"
 import type { TLogger } from "@ordo-pink/logger"
-import type { TOption } from "@ordo-pink/option"
 import type { TResult } from "@ordo-pink/result"
 import type { TwoLetterLocale } from "@ordo-pink/locale"
 
@@ -405,28 +402,6 @@ declare global {
 
 			type CommandPermission = Ordo.Command.Name
 
-			type GetCurrentRouteFn = () => TResult<Observable<TOption<Ordo.Router.Route>>, Ordo.Rrr<"EPERM">>
-
-			// TODO Extract redundant types
-			type GetTitleFn = () => TResult<Observable<string>, Ordo.Rrr<"EPERM">>
-			type GetHostsFn = () => TResult<Ordo.Hosts, Ordo.Rrr<"EPERM">>
-			type GetFetchFn = () => TResult<Ordo.Fetch, Ordo.Rrr<"EPERM">>
-			type GetLoggerFn = () => TLogger
-			type GetCommandsFn = () => TResult<Ordo.Command.Commands, Ordo.Rrr<"EPERM">>
-			type GetIsAuthenticatedFn = () => TResult<Observable<boolean>, Ordo.Rrr<"EPERM">>
-			type GetMetadataQueryFn = () => TResult<Ordo.Metadata.Query, Ordo.Rrr<"EPERM">>
-			type GetContentQueryFn = () => TResult<Ordo.Content.Query, Ordo.Rrr<"EPERM">>
-			type GetUserQueryFn = () => TResult<Ordo.User.Query, Ordo.Rrr<"EPERM">>
-			type GetCurrentLanguageFn = () => TResult<TwoLetterLocale, Ordo.Rrr<"EPERM">>
-			type GetTranslationsFn = () => TZags<Ordo.I18N.Translations>
-			type SetCurrentActivityFn = (name: string) => TResult<void, Ordo.Rrr<"EPERM" | "ENOENT">>
-
-			type GetCurrentActivityFn = () => TResult<Observable<TOption<Ordo.Activity.Instance>>, Ordo.Rrr<"EPERM" | "ENOENT">>
-
-			type GetCurrentFileAssociationFn = () => TResult<Observable<TOption<Ordo.FileAssociation.Instance>>, Ordo.Rrr<"EPERM">>
-
-			type GetFileAssociationsFn = () => TResult<Observable<Ordo.FileAssociation.Instance[]>, Ordo.Rrr<"EPERM">>
-
 			type Permissions = {
 				queries: Ordo.CreateFunction.QueryPermission[]
 				commands: Ordo.CreateFunction.CommandPermission[]
@@ -447,25 +422,6 @@ declare global {
 				permissions: Ordo.CreateFunction.Permissions,
 				callback: (context: TZags<Ordo.CreateFunction.State>) => void | Promise<void>,
 			) => (params: OrdoInternal.Function.CreateFunctionInternalContext) => void | Promise<void>
-
-			type Params = {
-				fid: symbol
-				is_dev: boolean
-				get_commands: GetCommandsFn
-				get_logger: GetLoggerFn
-				get_current_route: GetCurrentRouteFn
-				get_hosts: GetHostsFn
-				get_is_authenticated: GetIsAuthenticatedFn
-				get_fetch: GetFetchFn
-				get_translations: GetTranslationsFn
-				translate: Ordo.I18N.TranslateFn
-				get_current_language: GetCurrentLanguageFn
-				get_metadata_query: GetMetadataQueryFn
-				get_user_query: GetUserQueryFn
-				get_file_associations: GetFileAssociationsFn
-				get_current_file_association: GetCurrentFileAssociationFn
-				get_content_query: GetContentQueryFn
-			}
 		}
 
 		namespace I18N {
@@ -560,11 +516,11 @@ declare global {
 				type Repository = {
 					get: () => TResult<Ordo.User.Current.Instance, Ordo.Rrr<"EPERM" | "EAGAIN">>
 					put: (user: Ordo.User.Current.Instance) => TResult<void, Ordo.Rrr<"EPERM" | "EINVAL">>
-					get $(): Observable<number>
+					get $(): TZags<{ version: number }>
 				}
 
 				type RepositoryStatic = {
-					Of: ($: BehaviorSubject<TOption<Ordo.User.Current.Instance>>) => Ordo.User.Current.Repository
+					Of: ($: TZags<{ user: Ordo.User.Current.Instance | null }>) => Ordo.User.Current.Repository
 				}
 
 				type RepositoryAsync = {
@@ -614,11 +570,11 @@ declare global {
 				type Repository = {
 					get: () => Oath<Ordo.User.Public.Instance[], Ordo.Rrr<"EPERM" | "EAGAIN">>
 					put: (users: Ordo.User.Public.Instance[]) => Oath<void, Ordo.Rrr<"EINVAL">>
-					get $(): Observable<number>
+					get $(): TZags<{ version: number }>
 				}
 
 				type RepositoryStatic = {
-					Of: (known_user$: BehaviorSubject<Ordo.User.Public.Instance[]>) => Repository
+					Of: (known_user_zags: TZags<{ known_users: Ordo.User.Public.Instance[] }>) => Repository
 				}
 			}
 
@@ -629,12 +585,12 @@ declare global {
 				// ) => Oath<TOption<Ordo.User.Current.Instance>, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "EIO">>
 				get_by_id: (
 					email: Ordo.User.ID,
-				) => Oath<TOption<Ordo.User.Public.Instance>, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "EIO">>
+				) => Oath<Ordo.User.Public.Instance | null, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "EIO">>
 
 				// get_by_handle: (
 				// handle: Ordo.User.Current.Instance["handle"],
 				// ) => Oath<TOption<Ordo.User.Public.Instance>, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "EIO">>
-				get $(): Observable<number>
+				get $(): TZags<{ version: number }>
 			}
 
 			type QueryStatic = {
@@ -729,7 +685,7 @@ declare global {
 				get_updated_by: () => Ordo.User.ID
 				get_size: () => number
 				get_readable_size: () => string
-				get_property: <_TKey extends keyof $TProps>(key: _TKey) => TOption<NonNullable<$TProps[_TKey]>>
+				get_property: <_TKey extends keyof $TProps>(key: _TKey) => NonNullable<$TProps[_TKey]> | null
 				to_dto: () => Ordo.Metadata.DTO<$TProps>
 				equals: (other_metadata?: Ordo.Metadata.Instance) => boolean
 				is_item_of: (dto: Ordo.Metadata.DTO) => boolean
@@ -799,7 +755,7 @@ declare global {
 				get_by_fsid: (
 					fsid: FSID,
 					options?: QueryOptions,
-				) => TResult<TOption<Ordo.Metadata.Instance>, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL">>
+				) => TResult<Ordo.Metadata.Instance | null, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL">>
 
 				total: (options?: QueryOptions) => TResult<number, Ordo.Rrr<"EPERM" | "EAGAIN">>
 
@@ -807,7 +763,7 @@ declare global {
 					name: string,
 					parent: FSID | null,
 					options?: QueryOptions,
-				) => TResult<TOption<Ordo.Metadata.Instance>, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL">>
+				) => TResult<Ordo.Metadata.Instance | null, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL">>
 
 				get_by_labels: (
 					labels: Ordo.Metadata.Label[],
@@ -827,7 +783,7 @@ declare global {
 				get_parent: (
 					fsid: FSID,
 					options?: QueryOptions,
-				) => TResult<TOption<Ordo.Metadata.Instance>, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
+				) => TResult<Ordo.Metadata.Instance | null, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 
 				get_ancestors: (
 					fsid: FSID,

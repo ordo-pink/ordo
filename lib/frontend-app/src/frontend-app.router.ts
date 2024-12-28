@@ -26,14 +26,20 @@ import { ordo_app_state } from "../app.state"
 export const init_router = () => {
 	const { logger, commands } = ordo_app_state.zags.unwrap()
 
+	logger.debug("🟡 Initialising router...")
+
 	const window_open = window.open
 
 	window.open = undefined!
 
 	commands.on("cmd.application.router.navigate", ({ url, new_tab = false }) => {
-		if (new_tab) window_open(url, "_blank")?.focus()
+		if (new_tab) window_open(url, "_blank")
 		else router$.update("current_route", () => create_route(url))
 	})
+
+	commands.on("cmd.application.router.open_external", ({ url, new_tab = true }) =>
+		window_open(url, new_tab ? "_blank" : "_self"),
+	)
 
 	router$.marry(({ current_route }, is_update) => {
 		if (is_update) history.pushState(null, "", current_route.href)

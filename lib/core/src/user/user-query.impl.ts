@@ -19,19 +19,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { combineLatestWith, map } from "rxjs"
-
-import { O } from "@ordo-pink/option"
 import { Result } from "@ordo-pink/result"
 import { ops0 } from "@ordo-pink/oath"
 
 import { CurrentUser } from "./user.impl"
 import { UserSubscription } from "../constants"
+import { ZAGS } from "@ordo-pink/zags"
 
 const john_doe: Ordo.User.Current.Instance = CurrentUser.FromDTO({
-	created_at: new Date(Date.now()),
+	created_at: Date.now(),
 	email: "john_doe@ordo.pink",
-	email_confirmed: false,
 	file_limit: -1,
 	handle: "@johndoe",
 	id: "58c0d190-0fe5-4daf-be12-5a1ad0b08edc",
@@ -44,22 +41,27 @@ const john_doe: Ordo.User.Current.Instance = CurrentUser.FromDTO({
 })
 
 export const UserQuery: Ordo.User.QueryStatic = {
-	Of: (c_repo, k_repo) => ({
-		get_current: () => c_repo.get().cata({ Ok: Result.Ok, Err: () => Result.Ok(john_doe) }),
-		get_by_id: id =>
-			k_repo
-				.get()
-				.pipe(ops0.map(users => O.FromNullable(users.find(u => u.get_id() === id))))
-				.pipe(
-					ops0.tap(o => {
-						if (o === O.None()) {
-							// TODO: Go get remote
-						}
-					}),
-				),
-		get $() {
-			let i = 0
-			return c_repo.$.pipe(combineLatestWith(k_repo.$)).pipe(map(() => ++i))
-		},
-	}),
+	Of: (c_repo, k_repo) => {
+		const version_zags = ZAGS.Of({ version: 0 })
+		c_repo.$.marry((_, is_update) => is_update && version_zags.update("version", i => i + 1))
+		k_repo.$.marry((_, is_update) => is_update && version_zags.update("version", i => i + 1))
+
+		return {
+			get_current: () => c_repo.get().cata({ Ok: Result.Ok, Err: () => Result.Ok(john_doe) }),
+			get_by_id: id =>
+				k_repo
+					.get()
+					.pipe(ops0.map(users => users.find(u => u.get_id() === id) ?? null))
+					.pipe(
+						ops0.tap(o => {
+							if (!o) {
+								// TODO: Go get remote
+							}
+						}),
+					),
+			get $() {
+				return version_zags
+			},
+		}
+	},
 }

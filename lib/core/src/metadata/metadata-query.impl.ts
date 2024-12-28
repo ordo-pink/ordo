@@ -20,7 +20,6 @@
  */
 
 import { gt, negate, prop } from "@ordo-pink/tau"
-import { O } from "@ordo-pink/option"
 import { R } from "@ordo-pink/result"
 
 import { Metadata as M } from "./metadata.impl"
@@ -49,7 +48,7 @@ export const MetadataQuery: Ordo.Metadata.QueryStatic = {
 				R.If(M.Validations.is_fsid(fsid), { F: () => inval(`MetadataQuery.get_by_fsid: Invalid FSID: ${fsid}`) }),
 			])
 				.pipe(R.ops.chain(() => MetadataQuery.Of(repo, check_query_permission).get(options)))
-				.pipe(R.ops.map(m => O.FromNullable(m.find(i => i.get_fsid() === fsid)))),
+				.pipe(R.ops.map(m => m.find(i => i.get_fsid() === fsid) ?? null)),
 
 		get_by_labels: (ls, options) =>
 			R.Merge([
@@ -68,7 +67,7 @@ export const MetadataQuery: Ordo.Metadata.QueryStatic = {
 				R.If(M.Validations.is_parent(parent), { F: () => inval("MetadataQuery.get_by_name: Invalid parent:", parent) }),
 			])
 				.pipe(R.ops.chain(() => MetadataQuery.Of(repo, check_query_permission).get(options)))
-				.pipe(R.ops.map(m => O.FromNullable(m.find(_has_name_and_parent(name, parent))))),
+				.pipe(R.ops.map(m => m.find(_has_name_and_parent(name, parent)) ?? null)),
 
 		get_children: (fsid, options) =>
 			fsid
@@ -77,7 +76,7 @@ export const MetadataQuery: Ordo.Metadata.QueryStatic = {
 						R.If(M.Validations.is_fsid(fsid), { F: () => inval(`MetadataQuery.get_children: Invalid FSID: ${fsid}`) }),
 					])
 						.pipe(R.ops.chain(() => MetadataQuery.Of(repo, check_query_permission).get_by_fsid(fsid, options)))
-						.pipe(R.ops.chain(o => R.FromOption(o, () => enoent(`.getChildren -> fsid: ${fsid}`))))
+						.pipe(R.ops.chain(o => R.FromNullable(o, () => enoent(`.getChildren -> fsid: ${fsid}`))))
 						.pipe(R.ops.chain(() => MetadataQuery.Of(repo, check_query_permission).get(options)))
 						.pipe(R.ops.map(is => is.filter(i => i.is_child_of(fsid))))
 				: check_query_permission("metadata.get_children")
@@ -87,9 +86,9 @@ export const MetadataQuery: Ordo.Metadata.QueryStatic = {
 		get_parent: (fsid, options) =>
 			check_query_permission("metadata.get_parent")
 				.pipe(R.ops.chain(() => MetadataQuery.Of(repo, check_query_permission).get_by_fsid(fsid, options)))
-				.pipe(R.ops.chain(o => R.FromOption(o, () => enoent(`.getParent -> fsid: ${fsid}`))))
+				.pipe(R.ops.chain(o => R.FromNullable(o, () => enoent(`.getParent -> fsid: ${fsid}`))))
 				.pipe(R.ops.map(i => i.get_parent()))
-				.pipe(R.ops.chain(i => (i ? MetadataQuery.Of(repo, check_query_permission).get_by_fsid(i) : R.Ok(O.None())))),
+				.pipe(R.ops.chain(i => (i ? MetadataQuery.Of(repo, check_query_permission).get_by_fsid(i) : R.Ok(null)))),
 
 		has_child: (fsid, child, options) =>
 			R.Merge([
@@ -153,18 +152,16 @@ export const MetadataQuery: Ordo.Metadata.QueryStatic = {
 					R.ops.map(option => {
 						const ancestors: Ordo.Metadata.Instance[] = []
 
-						let parent_option = option
+						let parent = option
 
-						while (parent_option !== O.None()) {
-							const parent = parent_option.unwrap()!
-
+						while (parent) {
 							ancestors.push(parent)
 
 							MetadataQuery.Of(repo, check_query_permission)
 								.get_parent(parent.get_fsid())
 								.pipe(
 									R.ops.tap(option => {
-										parent_option = option
+										parent = option
 									}),
 								)
 						}

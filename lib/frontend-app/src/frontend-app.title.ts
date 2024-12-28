@@ -28,6 +28,8 @@ type TInitTitleStreamFn = () => void
 export const init_title_display: TInitTitleStreamFn = call_once(() => {
 	const { commands, logger, translate } = ordo_app_state.zags.unwrap()
 
+	logger.debug("🟡 Initialising title...")
+
 	commands.on("cmd.application.set_title", title => title$.update("title", () => title))
 
 	const title_element = document.querySelector("title") as HTMLTitleElement

@@ -19,14 +19,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { map } from "rxjs"
-
 import { Oath, ops0 } from "@ordo-pink/oath"
-import { O } from "@ordo-pink/option"
 import { Result } from "@ordo-pink/result"
 
 import { CurrentUser } from "./user.impl"
 import { RRR } from "../rrr"
+import { ZAGS } from "@ordo-pink/zags"
 
 const CURRENT_USER_REPOSITORY = "CurrentUserRepository"
 const CURRENT_USER_REPOSITORY_ASYNC = "CurrentUserRepositoryAsync"
@@ -39,25 +37,33 @@ const eio_current_user_async = RRR.codes.eio(CURRENT_USER_REPOSITORY_ASYNC)
 const einval_public_user = RRR.codes.einval(PUBLIC_USER_REPOSITORY)
 
 export const CurrentUserRepository: Ordo.User.Current.RepositoryStatic = {
-	Of: $ => ({
-		get: () => Result.FromOption($.getValue(), () => eagain_current_user()),
-		put: user => Result.Try(() => $.next(O.Some(user))), // TODO:
-		get $() {
-			let i = 0
-			return $.pipe(map(() => ++i))
-		},
-	}),
+	Of: $ => {
+		const version_zags = ZAGS.Of({ version: 0 })
+		$.marry((_, is_update) => is_update && version_zags.update("version", i => i + 1))
+
+		return {
+			get: () => Result.FromNullable($.select("user"), () => eagain_current_user()),
+			put: user => Result.Try(() => $.update("user", () => user)), // TODO:
+			get $() {
+				return version_zags
+			},
+		}
+	},
 }
 
 export const PublicUserRepository: Ordo.User.Public.RepositoryStatic = {
-	Of: $ => ({
-		get: () => Oath.Resolve($.getValue()),
-		put: () => Oath.Reject(einval_public_user("TODO: NOT IMPLEMENTED")),
-		get $() {
-			let i = 0
-			return $.pipe(map(() => i++))
-		},
-	}),
+	Of: $ => {
+		const version_zags = ZAGS.Of({ version: 0 })
+		$.marry((_, is_update) => is_update && version_zags.update("version", i => i + 1))
+
+		return {
+			get: () => Oath.Resolve($.select("known_users")),
+			put: () => Oath.Reject(einval_public_user("TODO: NOT IMPLEMENTED")),
+			get $() {
+				return version_zags
+			},
+		}
+	},
 }
 
 export const CurrentUserRepositoryAsync: Ordo.User.Current.RepositoryAsyncStatic = {

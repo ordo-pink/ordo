@@ -41,6 +41,7 @@ export const ordo_app_state = MaokaZAGS.Of<TOrdoState>({
 	known_functions: null as any, // Assigned after initialization
 	logger: null as any, // Assigned after initialization
 	translate: null as any, // Assigned after initialization
+	fetch: null as any, // Assigned after initialization
 	query: {
 		content: null as any, // Assigned after initialization
 		metadata: null as any, // Assigned after initialization
@@ -65,6 +66,7 @@ export type TOrdoState = {
 	known_functions: OrdoInternal.KnownFunctions
 	hosts: Ordo.Hosts
 	translate: Ordo.I18N.TranslateFn
+	fetch: Ordo.Fetch
 	constants: {
 		app_name: "pink.ordo.app"
 		app_fid: symbol

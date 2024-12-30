@@ -31,6 +31,8 @@ import { OrdoSidebar } from "./src/components/sidebar/sidebar.component"
 import { OrdoWorkspace } from "./src/components/workspace.component"
 import { init_command_palette } from "./src/components/command-palette"
 import { init_commands } from "./src/frontend-app.commands"
+import { init_content } from "./src/frontend-app.content"
+import { init_fetch } from "./src/frontend-app.fetch"
 import { init_functions } from "./src/frontend-app.functions"
 import { init_i18n } from "./src/frontend-app.i18n"
 import { init_known_functions } from "./src/frontend-app.known-functions"
@@ -42,7 +44,6 @@ import { ordo_app_state } from "./app.state"
 
 // TODO Move fonts to assets
 import "./index.css"
-import { init_fetch } from "./src/frontend-app.fetch"
 
 // const indexed_db = indexedDB.open("ordo.pink", 3)
 
@@ -86,6 +87,10 @@ export const App = Maoka.create("div", ({ use }) => {
 	init_title_display()
 	init_command_palette()
 
+	const { get_content_query } = init_content()
+	const app_get_content_query = get_content_query(app_fid)
+	ordo_app_state.zags.update("query.content", () => app_get_content_query)
+
 	const { get_metadata_query } = init_metadata()
 	const app_metadata_query = get_metadata_query(app_fid)
 	ordo_app_state.zags.update("query.metadata", () => app_metadata_query)
@@ -95,7 +100,7 @@ export const App = Maoka.create("div", ({ use }) => {
 		.then(f =>
 			f({
 				get_commands,
-				get_content_query: () => null as any, // TODO Add content_query
+				get_content_query,
 				get_fetch,
 				get_logger,
 				get_metadata_query,
@@ -104,9 +109,8 @@ export const App = Maoka.create("div", ({ use }) => {
 				translate,
 			}),
 		)
-	// TODO Init user
-	// TODO Init content
 
+	// TODO Init user
 	// TODO ContextMenu
 	return () => [OrdoWorkspace, OrdoSidebar, OrdoModal, OrdoNotifications, OrdoActivityBar, OrdoBackgroundTaskIndicator]
 })

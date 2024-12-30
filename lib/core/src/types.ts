@@ -623,7 +623,10 @@ declare global {
 			}
 
 			type QueryStatic = {
-				Of: (repository: Ordo.Content.Repository) => Ordo.Content.Query
+				Of: (
+					repository: Ordo.Content.Repository,
+					check_query_permission: (permission: Ordo.CreateFunction.QueryPermission) => TResult<void, Ordo.Rrr<"EPERM">>,
+				) => Ordo.Content.Query
 			}
 
 			type Query = {
@@ -720,7 +723,7 @@ declare global {
 				  }
 
 			type RepositoryStatic = {
-				Of: (metadata$: TZags<{ items: Ordo.Metadata.Instance[] | null }>) => Repository
+				Of: (metadata$: TZags<{ items: Ordo.Metadata.Instance[] | null }>, content_query: Ordo.Content.Query) => Repository
 			}
 
 			type Repository = {

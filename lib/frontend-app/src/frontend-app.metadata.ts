@@ -33,7 +33,7 @@ export const init_metadata: TInitMetadataFn = call_once(() => {
 
 	logger.debug("🟡 Initialising metadata...")
 
-	const metadata_repository = MetadataRepository.Of(metadata_zags)
+	const metadata_repository = MetadataRepository.Of(metadata_zags, query.content)
 	// const remote_metadata_repository = CacheMetadataRepository.Of(hosts.dt, fetch)
 
 	const app_metadata_query = MetadataQuery.Of(metadata_repository, () => Result.Ok(void 0))

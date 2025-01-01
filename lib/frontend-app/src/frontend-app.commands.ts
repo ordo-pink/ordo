@@ -61,13 +61,14 @@ export const init_commands: TF = call_once(() => {
 			const fid = command.fid
 			const func = known_functions.exchange(fid).cata({ Some: x => x, None: () => "unauthorized" })
 
+			const payload = is_payload_command(command) ? (command.payload as unknown) : undefined
+
 			if (!known_functions.has_permissions(fid, { commands: [name] })) {
 				logger.error(`${func} permission RRR. Did you forget to request command permission '${name}'?`)
+				dequeue({ name, payload, fid })
 
 				return
 			}
-
-			const payload = is_payload_command(command) ? (command.payload as unknown) : undefined
 
 			const listeners = storage[name]
 

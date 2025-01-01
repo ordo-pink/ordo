@@ -82,6 +82,6 @@ const on_modal_hide: Ordo.Command.HandlerOf<"cmd.application.modal.hide"> = () =
 
 	if (state && state.on_unmount) {
 		state.on_unmount()
-		ordo_app_state.zags.update("sections.modal", () => null)
+		ordo_app_state.zags.update("sections.modal", () => void 0)
 	}
 }

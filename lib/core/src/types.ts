@@ -160,12 +160,12 @@ declare global {
 				show: () => Partial<Ordo.Notification.Instance> & Pick<Ordo.Notification.Instance, "message">
 				hide: () => string
 			}
-			context_menu: {
-				add: () => Ordo.ContextMenu.Item
-				remove: () => string
-				show: () => Omit<Ordo.ContextMenu.Instance, "structure">
-				hide: () => void
-			}
+			// context_menu: {
+			// 	add: () => Ordo.ContextMenu.Item
+			// 	remove: () => string
+			// 	show: () => Omit<Ordo.ContextMenu.Instance, "structure">
+			// 	hide: () => void
+			// }
 			command_palette: {
 				add: () => Ordo.CommandPalette.Item
 				remove: () => string
@@ -191,15 +191,15 @@ declare global {
 		}
 		functions: {
 			activities: {
-				register: () => { fid: symbol; activity: Ordo.Activity.Instance }
-				unregister: () => { fid: symbol; name: Ordo.Activity.Instance["name"] }
+				register: () => Ordo.Activity.Instance
+				unregister: () => Ordo.Activity.Instance["name"]
 			}
 			persisted_state: {
 				update: () => { key: string; value: any }
 			}
 			file_associations: {
-				add: () => Ordo.FileAssociation.Instance
-				remove: () => Ordo.FileAssociation.Instance["name"]
+				register: () => Ordo.FileAssociation.Instance
+				unregister: () => Ordo.FileAssociation.Instance["name"]
 			}
 		}
 		user: {

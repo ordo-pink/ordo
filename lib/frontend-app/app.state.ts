@@ -37,19 +37,18 @@ export const ordo_app_state = MaokaZAGS.Of<TOrdoState>({
 	hosts,
 	commands: null as any, // Assigned after initialization
 	current_route: null as any, // Assigned after initialization
-	functions: null as any, // Assigned after initialization
+	functions: { activities: [], file_assocs: [], current_activity: undefined, current_file_assoc: undefined },
 	known_functions: null as any, // Assigned after initialization
 	logger: null as any, // Assigned after initialization
 	translate: null as any, // Assigned after initialization
 	fetch: null as any, // Assigned after initialization
-	query: {
+	queries: {
 		content: null as any, // Assigned after initialization
 		metadata: null as any, // Assigned after initialization
 		user: null as any, // Assigned after initialization
 	},
 	sections: {
 		sidebar: { status: OrdoSidebarStatus.DISABLED },
-		modal: null,
 		command_palette: {
 			current: EMPTY_COMMAND_PALETTE,
 			global_items: [],
@@ -67,36 +66,42 @@ export type TOrdoState = {
 	hosts: Ordo.Hosts
 	translate: Ordo.I18N.TranslateFn
 	fetch: Ordo.Fetch
-	constants: {
-		app_name: "pink.ordo.app"
-		app_fid: symbol
-		is_dev: boolean
-		app_fn: OrdoInternal.KnownFunction
-		version: `v${string}.${string}.${string}`
-	}
-	query: {
-		user: Ordo.User.Query
-		metadata: Ordo.Metadata.Query
-		content: Ordo.Content.Query
-	}
 	current_route: Ordo.Router.Route
-	functions: {
-		current_activity?: Ordo.Activity.Instance
-		activities: OrdoInternal.TFIDAwareActivity[]
-		current_file_assoc?: Ordo.FileAssociation.Instance
-		file_assocs: Ordo.FileAssociation.Instance[]
-	}
-	sections: {
-		sidebar: {
-			status: OrdoSidebarStatus
-		}
-		command_palette: {
-			global_items: Ordo.CommandPalette.Item[]
-			visible_items: Ordo.CommandPalette.Item[]
-			current: Ordo.CommandPalette.Instance
-			index: number
-			location: CommandPaletteLocation
-		}
-		modal: Ordo.Modal.Instance | null
-	}
+	constants: TConstants
+	queries: TQueries
+	functions: TFunctions
+	sections: TSections
 }
+
+type TAppName = "pink.ordo.app"
+
+type TVersion = `v${string}.${string}.${string}`
+
+type TConstants = {
+	app_name: TAppName
+	app_fid: symbol
+	is_dev: boolean
+	app_fn: OrdoInternal.KnownFunction
+	version: TVersion
+}
+
+type TFunctions = {
+	current_activity?: Ordo.Activity.Instance
+	activities: Ordo.Activity.Instance[]
+	current_file_assoc?: Ordo.FileAssociation.Instance
+	file_assocs: Ordo.FileAssociation.Instance[]
+}
+
+type TSidebarSection = { status: OrdoSidebarStatus }
+
+type TCommandPaletteSection = {
+	global_items: Ordo.CommandPalette.Item[]
+	visible_items: Ordo.CommandPalette.Item[]
+	current: Ordo.CommandPalette.Instance
+	index: number
+	location: CommandPaletteLocation
+}
+
+type TSections = { sidebar: TSidebarSection; command_palette: TCommandPaletteSection; modal?: Ordo.Modal.Instance }
+
+type TQueries = { user: Ordo.User.Query; metadata: Ordo.Metadata.Query; content: Ordo.Content.Query }

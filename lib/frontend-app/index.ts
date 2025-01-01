@@ -58,9 +58,10 @@ import "./index.css"
 // 	}
 // }
 
-export const App = Maoka.create("div", ({ use }) => {
+export const App = Maoka.create("div", ({ use, on_unmount }) => {
 	use(MaokaJabs.set_class("app"))
-	const { app_fid, app_fn } = ordo_app_state.zags.select("constants")
+
+	const { app_fid, app_fn, is_dev } = ordo_app_state.zags.select("constants")
 
 	const known_functions = init_known_functions(app_fn)
 	ordo_app_state.zags.update("known_functions", () => known_functions)
@@ -78,39 +79,64 @@ export const App = Maoka.create("div", ({ use }) => {
 	ordo_app_state.zags.update("translate", () => translate)
 
 	const router$ = init_router()
-	router$.marry(({ current_route }) => ordo_app_state.zags.update("current_route", () => current_route))
+	const divorce_router = router$.marry(({ current_route }) => {
+		ordo_app_state.zags.update("current_route", () => current_route)
 
+		const activities = ordo_app_state.zags.select("functions.activities")
+		const current_activity = activities?.find(activity => activity.routes.some(route => route === current_route.pathname))
+
+		// TODO dynamic routes support
+		if (current_activity) ordo_app_state.zags.update("functions.current_activity", () => current_activity)
+	})
+
+	// TODO zags.affair for partial subscription under given path
 	// TODO zags.consume(other_zags)
 	const functions$ = init_functions()
-	functions$.marry(state => ordo_app_state.zags.update("functions", () => state))
+	const divorce_functions = functions$.marry(state => {
+		ordo_app_state.zags.update("functions", () => state)
+
+		const current_route = ordo_app_state.zags.select("current_route")
+		const current_activity = ordo_app_state.zags.select("functions.current_activity")
+
+		if (!current_activity) {
+			// TODO dynamic routes support
+			const activity = state.activities.find(activity => activity.routes.some(route => route === current_route.pathname))
+			if (activity) ordo_app_state.zags.update("functions.current_activity", () => activity)
+		}
+	})
 
 	init_title_display()
 	init_command_palette()
 
 	const { get_content_query } = init_content()
 	const app_get_content_query = get_content_query(app_fid)
-	ordo_app_state.zags.update("query.content", () => app_get_content_query)
+	ordo_app_state.zags.update("queries.content", () => app_get_content_query)
 
 	const { get_metadata_query } = init_metadata()
 	const app_metadata_query = get_metadata_query(app_fid)
-	ordo_app_state.zags.update("query.metadata", () => app_metadata_query)
+	ordo_app_state.zags.update("queries.metadata", () => app_metadata_query)
 
-	void import("@ordo-pink/function-test")
-		.then(mod => mod.default)
-		.then(f =>
-			f({
-				get_commands,
-				get_content_query,
-				get_fetch,
-				get_logger,
-				get_metadata_query,
-				get_user_query: () => null as any, // TODO Add user_query
-				known_functions,
-				translate,
-			}),
-		)
+	const function_state_source = {
+		get_commands,
+		get_content_query,
+		get_fetch,
+		get_logger,
+		get_metadata_query,
+		get_user_query: () => null as any, // TODO Add user_query
+		known_functions,
+		translate,
+	}
+
+	// TODO Render user defined functions
+	// TODO .catch
+	if (is_dev) void import("@ordo-pink/function-test").then(({ default: f }) => f(function_state_source))
+
+	on_unmount(() => {
+		// TODO Uninstalling created functions
+		divorce_functions()
+		divorce_router()
+	})
 
 	// TODO Init user
-	// TODO ContextMenu
 	return () => [OrdoWorkspace, OrdoSidebar, OrdoModal, OrdoNotifications, OrdoActivityBar, OrdoBackgroundTaskIndicator]
 })

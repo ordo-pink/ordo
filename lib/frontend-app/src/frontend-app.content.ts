@@ -54,7 +54,7 @@ export const init_content: TF = () => {
 	}
 
 	commands.on("cmd.content.set", ({ fsid, content }) => {
-		const metadata_query = ordo_app_state.zags.select("query.metadata")
+		const metadata_query = ordo_app_state.zags.select("queries.metadata")
 		const size = get_size(content)
 
 		if (size > 0) {
@@ -71,7 +71,7 @@ export const init_content: TF = () => {
 	})
 
 	commands.on("cmd.content.upload", ({ content, type, name, parent }) => {
-		const metadata_query = ordo_app_state.zags.select("query.metadata")
+		const metadata_query = ordo_app_state.zags.select("queries.metadata")
 		const size = get_size(content)
 
 		const metadata = metadata_query

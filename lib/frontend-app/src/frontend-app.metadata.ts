@@ -29,7 +29,7 @@ import { ordo_app_state } from "../app.state"
 
 type TInitMetadataFn = () => { get_metadata_query: (fid: symbol) => Ordo.Metadata.Query }
 export const init_metadata: TInitMetadataFn = call_once(() => {
-	const { logger, commands, known_functions, query } = ordo_app_state.zags.unwrap()
+	const { logger, commands, known_functions, queries: query } = ordo_app_state.zags.unwrap()
 
 	logger.debug("🟡 Initialising metadata...")
 
@@ -42,7 +42,7 @@ export const init_metadata: TInitMetadataFn = call_once(() => {
 	const Err = (rrr: Ordo.Rrr) => {
 		console.error(rrr)
 		commands.emit("cmd.application.notification.show", {
-			message: (String(rrr.debug) as any) ?? "",
+			message: rrr.debug?.join("\n") ?? "",
 			duration: 15,
 			title: `t.common.error.${rrr.key.toLocaleLowerCase()}` as any,
 			type: NotificationType.RRR,

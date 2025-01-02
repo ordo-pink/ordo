@@ -31,6 +31,7 @@ const LOCATION = "MetadataQuery"
 const inval = RRR.codes.einval(LOCATION)
 const enoent = RRR.codes.enoent(LOCATION)
 
+// TODO Move to frontend-app
 export const MetadataQuery: Ordo.Metadata.QueryStatic = {
 	Of: (repo, check_query_permission) => ({
 		get $() {

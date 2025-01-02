@@ -62,8 +62,6 @@ const get_user_max_upload_size = (dto: Ordo.User.Current.DTO) => () => dto.max_u
 
 const get_user_subscription = (dto: Ordo.User.Public.DTO) => () => dto.subscription
 
-const is_user_email_confirmed = (dto: Ordo.User.Current.DTO) => () => dto.email_confirmed
-
 const is_user_newer_than = (dto: Ordo.User.Public.DTO) => (date: Date) => get_user_created_at(dto)() < date
 
 const is_user_older_than = (dto: Ordo.User.Public.DTO) => (date: Date) => get_user_created_at(dto)() > date
@@ -79,7 +77,6 @@ export const CurrentUserValidations: Ordo.User.Current.Validations = {
 	is_subscription: (x): x is Ordo.User.Current.DTO["subscription"] =>
 		TAU.is_number(x) && TAU.gte(0)(x) && TAU.lt(UserSubscription.length)(x),
 	is_email: (x): x is Ordo.User.Current.DTO["email"] => TAU.is_non_empty_string(x) && isEmail(x),
-	is_email_confirmed: (x): x is Ordo.User.Current.DTO["email_confirmed"] => TAU.is_bool(x),
 	is_file_limit: (x): x is Ordo.User.Current.DTO["file_limit"] => TAU.is_positive_number(x),
 	is_installed_functions: (x): x is Ordo.User.Current.DTO["installed_functions"] =>
 		TAU.is_array(x) && TAU.check_all(TAU.is_non_empty_string, x),
@@ -97,7 +94,6 @@ export const CurrentUserValidations: Ordo.User.Current.Validations = {
 			CurrentUser.Validations.is_last_name(y.last_name) &&
 			CurrentUser.Validations.is_subscription(y.subscription) &&
 			CurrentUser.Validations.is_email(y.email) &&
-			CurrentUser.Validations.is_email_confirmed(y.email_confirmed) &&
 			CurrentUser.Validations.is_file_limit(y.file_limit) &&
 			CurrentUser.Validations.is_installed_functions(y.installed_functions) &&
 			CurrentUser.Validations.is_max_functions(y.max_functions) &&
@@ -125,7 +121,6 @@ export const CurrentUser: Ordo.User.Current.Static = {
 		get_max_upload_size: get_user_max_upload_size(dto),
 		get_readable_name: get_user_readable_name(dto),
 		get_subscription: get_user_subscription(dto),
-		is_email_confirmed: is_user_email_confirmed(dto),
 		is_newer_than: is_user_newer_than(dto),
 		is_older_than: is_user_older_than(dto),
 		is_paid: is_user_subscription_paid(dto),

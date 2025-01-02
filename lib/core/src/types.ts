@@ -493,7 +493,6 @@ declare global {
 
 				type Instance = Ordo.User.Public.Instance & {
 					get_email: () => Ordo.User.Email
-					is_email_confirmed: () => boolean
 					get_file_limit: () => number
 					get_max_upload_size: () => number
 					get_max_functions: () => number

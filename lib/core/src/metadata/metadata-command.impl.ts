@@ -31,6 +31,7 @@ const exist = RRR.codes.eexist(LOCATION)
 const noent = RRR.codes.enoent(LOCATION)
 const enxio = RRR.codes.enxio(LOCATION)
 
+// TODO Move to frontend-app
 export const MetadataCommand: Ordo.Metadata.CommandStatic = {
 	Of: (m_repo, m_query, u_query) => ({
 		set_name: (fsid, name) =>

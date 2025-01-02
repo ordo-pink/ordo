@@ -36,6 +36,7 @@ const eio_current_user_async = RRR.codes.eio(CURRENT_USER_REPOSITORY_ASYNC)
 
 const einval_public_user = RRR.codes.einval(PUBLIC_USER_REPOSITORY)
 
+// TODO Move to frontend-app
 export const CurrentUserRepository: Ordo.User.Current.RepositoryStatic = {
 	Of: $ => {
 		const version_zags = ZAGS.Of({ version: 0 })

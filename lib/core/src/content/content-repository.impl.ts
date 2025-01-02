@@ -26,6 +26,7 @@ const INDEXEDDB_NAME = "ordo"
 const INDEXEDDB_OBJECT_STORE_NAME = "ordo_db"
 const INDEXEDDB_OBJECT_STORE_VERSION = 3
 
+// TODO Move to frontend-app
 // TODO Persistence strategy support
 export const CacheContentRepository: Ordo.Content.RepositoryStatic = {
 	Of: () => {

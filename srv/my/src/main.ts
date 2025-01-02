@@ -19,13 +19,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { first_matched, negate } from "@ordo-pink/tau"
+import { ConsoleLogger } from "@ordo-pink/logger"
+import { create_client } from "@ordo-pink/frontend-client"
 
-import { is_label, is_link } from "./metadata-validations.impl"
+const logger = ConsoleLogger
+const is_dev = import.meta.env.DEV
 
-// TODO Move to frontend-app
-type TGetWrongLabelFn = (labels: Ordo.Metadata.Label[]) => Ordo.Metadata.Label | undefined
-export const get_wrong_label: TGetWrongLabelFn = first_matched<Ordo.Metadata.Label>(negate(is_label))
+const hosts = {
+	id: import.meta.env.VITE_ORDO_ID_HOST,
+	website: import.meta.env.VITE_ORDO_WEBSITE_HOST,
+	static: import.meta.env.VITE_ORDO_STATIC_HOST,
+	dt: import.meta.env.VITE_ORDO_DT_HOST,
+	my: import.meta.env.VITE_ORDO_WORKSPACE_HOST,
+}
 
-type TGetWrongLinkFn = (links: Ordo.Metadata.FSID[]) => Ordo.Metadata.FSID | undefined
-export const get_wrong_link: TGetWrongLinkFn = first_matched<Ordo.Metadata.FSID>(negate(is_link))
+void create_client({ logger, hosts, is_dev })

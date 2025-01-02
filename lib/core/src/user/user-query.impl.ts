@@ -26,6 +26,7 @@ import { CurrentUser } from "./user.impl"
 import { UserSubscription } from "../constants"
 import { ZAGS } from "@ordo-pink/zags"
 
+// TODO Move to frontend-app
 const john_doe: Ordo.User.Current.Instance = CurrentUser.FromDTO({
 	created_at: Date.now(),
 	email: "john_doe@ordo.pink",

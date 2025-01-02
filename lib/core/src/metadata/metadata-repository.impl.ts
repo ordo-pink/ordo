@@ -31,6 +31,7 @@ const eagain = RRR.codes.eagain(LOCATION)
 const einval = RRR.codes.einval(LOCATION)
 const eio = RRR.codes.eio(LOCATION)
 
+// TODO Move to frontend-app
 export const MetadataRepository: Ordo.Metadata.RepositoryStatic = {
 	Of: metadata$ => {
 		const version_zags = ZAGS.Of({ version: 0 })

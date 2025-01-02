@@ -19,8 +19,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { O } from "@ordo-pink/option"
-
 import { F, is_string } from "@ordo-pink/tau"
 import { Switch } from "@ordo-pink/switch"
 
@@ -53,7 +51,7 @@ export const Metadata: Ordo.Metadata.Static = {
 		get_labels: () => dto.labels,
 		get_links: () => [...dto.links],
 		get_parent: () => dto.parent,
-		get_property: key => O.FromNullable(dto.props).pipe(O.ops.chain(props => O.FromNullable(props[key]))),
+		get_property: key => dto.props?.[key] ?? null,
 		get_readable_size: () => get_readable_size(dto.size),
 		get_label_index: label =>
 			dto.labels.findIndex(x =>

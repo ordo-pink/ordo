@@ -19,14 +19,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { LabelColor, NotificationType } from "@ordo-pink/core"
 import { BsCookie } from "@ordo-pink/frontend-icons"
 import { Button } from "@ordo-pink/maoka-components"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
-import { Result } from "@ordo-pink/result"
-import { T } from "@ordo-pink/tau"
+import { /*LabelColor,*/ NotificationType } from "@ordo-pink/core"
+// import { Result } from "@ordo-pink/result"
+// import { T } from "@ordo-pink/tau"
 
 import hero_layer_0 from "../static/index-hero-layer-0.png"
 import hero_layer_1 from "../static/index-hero-layer-1.png"
@@ -38,9 +38,11 @@ let is_cookie_modal_shown = false
 
 // TODO Translations
 export default Maoka.create("main", ({ use, on_unmount }) => {
-	const commands = use(MaokaOrdo.Jabs.Commands.get)
-	const { t } = use(MaokaOrdo.Jabs.Translations)
-	const metadata_query = use(MaokaOrdo.Jabs.MetadataQuery)
+	const commands = use(MaokaOrdo.Jabs.Commands)
+	const { t } = use(MaokaOrdo.Jabs.Translations$)
+	// const metadata_query = use(MaokaOrdo.Jabs.MetadataQuery)
+
+	commands.emit("cmd.application.set_title", "t.welcome.landing_page.title")
 
 	if (!is_cookie_modal_shown) show_cookie_modal(commands.emit)
 
@@ -68,8 +70,8 @@ export default Maoka.create("main", ({ use, on_unmount }) => {
 	// 	})
 
 	const handle_try_click = () => {
-		const has_files = metadata_query.get().cata({ Ok: x => x.length > 0, Err: T })
-		if (!has_files) create_tutorial_files(commands.emit, metadata_query)
+		// const has_files = metadata_query.get().cata({ Ok: x => x.length > 0, Err: T })
+		// if (!has_files) create_tutorial_files(commands.emit, metadata_query)
 
 		commands.emit("cmd.file_editor.open")
 	}
@@ -83,8 +85,6 @@ export default Maoka.create("main", ({ use, on_unmount }) => {
 		const t_beta_started = t("t.welcome.landing_page.sections.hero.beta_started_announcement")
 		const t_try_now = t("t.welcome.landing_page.sections.hero.try_now_button")
 		// const t_sign_up = t("t.welcome.landing_page.sections.hero.sign_up")
-
-		commands.emit("cmd.application.set_title", "t.welcome.landing_page.title")
 
 		return HeroSection(() => [
 			HeroSectionLayers(() => [
@@ -179,32 +179,32 @@ const show_cookie_modal = (emit: Ordo.Command.EmitFn) => {
 	is_cookie_modal_shown = true
 }
 
-const create_tutorial_files = (emit: Ordo.Command.EmitFn, metadata_query: Ordo.Metadata.Query) => {
-	const labels = [{ name: "🎉 Intro", color: LabelColor.PURPLE }]
-	const last_file_content =
-		// eslint-disable-next-line quotes
-		'[{"type":"p","children":[{"type":"text","value":"Hello, friend."}]},{"type":"p","children":[{"type":"text","value":""}]},{"type":"p","children":[{"type":"text","value":"This is basically the end of the road so far. But there is way more for us to go."}]},{"type":"p","children":[{"type":"text","value":"Keep in mind, that ORDO is local first, and all the stuff you have here is stored on your computer. Don\'t wipe it out with cleaners."}]},{"type":"p","children":[{"type":"text","value":"We\'ll soon add a way to sync between your devices but for now it is what it is. Enjoy!"}]},{"type":"p","children":[{"type":"text","value":""}]},{"type":"p","children":[{"type":"text","value":"To reach out to us, ping @ordo_pink on X or drop us an email hello@ordo.pink. Yes, as you can see, links are not supported yet. So as Ctrl + A."}]},{"type":"p","children":[{"type":"text","value":""}]},{"type":"p","children":[{"type":"text","value":"Cheers! 🍻"}]},{"type":"p","children":[{"type":"text","value":""}]},{"type":"p","children":[{"type":"text","value":"(To remove this tutorial, simply right-click on the `Start here!` file and then `Remove file`. It will cascade delete the others inside)"}]}]'
+// const create_tutorial_files = (emit: Ordo.Command.EmitFn, metadata_query: Ordo.Metadata.Query) => {
+// 	const labels = [{ name: "🎉 Intro", color: LabelColor.PURPLE }]
+// 	const last_file_content =
+// 		// eslint-disable-next-line quotes
+// 		'[{"type":"p","children":[{"type":"text","value":"Hello, friend."}]},{"type":"p","children":[{"type":"text","value":""}]},{"type":"p","children":[{"type":"text","value":"This is basically the end of the road so far. But there is way more for us to go."}]},{"type":"p","children":[{"type":"text","value":"Keep in mind, that ORDO is local first, and all the stuff you have here is stored on your computer. Don\'t wipe it out with cleaners."}]},{"type":"p","children":[{"type":"text","value":"We\'ll soon add a way to sync between your devices but for now it is what it is. Enjoy!"}]},{"type":"p","children":[{"type":"text","value":""}]},{"type":"p","children":[{"type":"text","value":"To reach out to us, ping @ordo_pink on X or drop us an email hello@ordo.pink. Yes, as you can see, links are not supported yet. So as Ctrl + A."}]},{"type":"p","children":[{"type":"text","value":""}]},{"type":"p","children":[{"type":"text","value":"Cheers! 🍻"}]},{"type":"p","children":[{"type":"text","value":""}]},{"type":"p","children":[{"type":"text","value":"(To remove this tutorial, simply right-click on the `Start here!` file and then `Remove file`. It will cascade delete the others inside)"}]}]'
 
-	emit("cmd.metadata.create", { name: "Start here!", parent: null, labels, type: "database/ordo" })
+// 	emit("cmd.metadata.create", { name: "Start here!", parent: null, labels, type: "database/ordo" })
 
-	const parent = metadata_query
-		.get_by_name("Start here!", null)
-		.pipe(Result.ops.chain(Result.FromOption))
-		.pipe(Result.ops.map(x => x.get_fsid()))
-		.cata(Result.catas.or_else(() => null as never))
+// 	const parent = metadata_query
+// 		.get_by_name("Start here!", null)
+// 		.pipe(Result.ops.chain(Result.FromNullable))
+// 		.pipe(Result.ops.map(x => x.get_fsid()))
+// 		.cata(Result.catas.or_else(() => null as never))
 
-	emit("cmd.metadata.create", { name: "Join ORDO", parent, props: { emoji_icon: "✅" }, labels })
-	emit("cmd.metadata.create", { name: "Try changing emoji to `check`", parent, labels, props: { emoji_icon: "👆" } })
-	emit("cmd.metadata.create", { name: "Enable labels in database column options", parent, labels })
-	emit("cmd.metadata.create", { name: "Click on a label to edit its options", parent, labels: [...labels, "BORING"] })
-	emit("cmd.metadata.create", { name: "Create a new file by clicking +New", parent, labels })
-	emit("cmd.metadata.create", { name: "Click on this text to open file content", parent, labels })
+// 	emit("cmd.metadata.create", { name: "Join ORDO", parent, props: { emoji_icon: "✅" }, labels })
+// 	emit("cmd.metadata.create", { name: "Try changing emoji to `check`", parent, labels, props: { emoji_icon: "👆" } })
+// 	emit("cmd.metadata.create", { name: "Enable labels in database column options", parent, labels })
+// 	emit("cmd.metadata.create", { name: "Click on a label to edit its options", parent, labels: [...labels, "BORING"] })
+// 	emit("cmd.metadata.create", { name: "Create a new file by clicking +New", parent, labels })
+// 	emit("cmd.metadata.create", { name: "Click on this text to open file content", parent, labels })
 
-	const last_file_fsid = metadata_query
-		.get_by_name("Click on this text to open file content", parent)
-		.pipe(Result.ops.chain(Result.FromOption))
-		.pipe(Result.ops.map(x => x.get_fsid()))
-		.cata(Result.catas.or_else(() => null as never))
+// 	const last_file_fsid = metadata_query
+// 		.get_by_name("Click on this text to open file content", parent)
+// 		.pipe(Result.ops.chain(Result.FromNullable))
+// 		.pipe(Result.ops.map(x => x.get_fsid()))
+// 		.cata(Result.catas.or_else(() => null as never))
 
-	emit("cmd.content.set", { fsid: last_file_fsid, content: last_file_content, content_type: "text/ordo" })
-}
+// 	emit("cmd.content.set", { fsid: last_file_fsid, content: last_file_content, content_type: "text/ordo" })
+// }

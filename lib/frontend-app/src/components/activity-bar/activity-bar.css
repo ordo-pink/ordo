@@ -1,5 +1,9 @@
 .activity-bar {
-	@apply fixed bottom-0 left-0 right-0 z-30 m-2 flex items-center justify-center space-x-4 self-center rounded-lg p-2 shadow-lg backdrop-blur-lg sm:left-auto sm:top-0 sm:shadow-none sm:backdrop-blur-none md:flex-col md:space-x-0 md:space-y-4;
+	@apply fixed bottom-0 left-0 right-0 z-30 m-2 flex items-center justify-between space-x-4 self-center rounded-lg p-2 shadow-lg backdrop-blur-lg sm:left-auto sm:top-0 sm:flex-col sm:space-x-0 sm:space-y-4 sm:shadow-none sm:backdrop-blur-none;
+}
+
+.activity-bar_activities {
+	@apply flex items-center justify-center space-x-4 self-center sm:flex-col sm:space-x-0 sm:space-y-4;
 }
 
 .activity-bar_link {
@@ -7,7 +11,7 @@
 }
 
 .activity-bar_icon {
-	@apply text-2xl text-neutral-800 transition-colors hover:text-pink-700 dark:text-neutral-200 hover:dark:text-pink-300;
+	@apply size-6 text-2xl text-neutral-800 transition-colors hover:text-pink-700 dark:text-neutral-200 hover:dark:text-pink-300;
 }
 
 .activity-bar_icon.active {

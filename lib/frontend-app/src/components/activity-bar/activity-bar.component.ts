@@ -32,16 +32,16 @@ import { OrdoSidebarButton } from "../sidebar/sidebar.component"
 
 export const OrdoActivityBar = Maoka.create("div", ({ use }) => {
 	use(MaokaJabs.set_class("activity-bar"))
-	use(MaokaJabs.listen("oncontextmenu", event => handle_context_menu(event)))
+	// use(MaokaJabs.listen("oncontextmenu", event => handle_context_menu(event)))
 
 	const commands = ordo_app_state.zags.select("commands")
 	const get_list = use(ordo_app_state.select_jab$("functions.activities"))
 	const get_current = use(ordo_app_state.select_jab$("functions.current_activity"))
 
-	const handle_context_menu = (event: MouseEvent) => {
-		event.preventDefault()
-		commands.emit("cmd.application.context_menu.show", { event })
-	}
+	// const handle_context_menu = (event: MouseEvent) => {
+	// 	event.preventDefault()
+	// 	commands.emit("cmd.application.context_menu.show", { event })
+	// }
 
 	return () => {
 		const activities = get_list()
@@ -66,19 +66,23 @@ export const OrdoActivityBar = Maoka.create("div", ({ use }) => {
 					})
 			}),
 
-			...activities.map(
-				({ name, routes, default_route, render_icon }) =>
-					render_icon &&
-					OrdoActivityBarLink({
-						name,
-						routes,
-						default_route,
-						render_icon,
-						current_activity_name: current_activity?.name,
-					}),
+			ActivityBarActivities(() =>
+				activities.map(
+					({ name, routes, default_route, render_icon }) =>
+						render_icon &&
+						OrdoActivityBarLink({
+							name,
+							routes,
+							default_route,
+							render_icon,
+							current_activity_name: current_activity?.name,
+						}),
+				),
 			),
 
 			OrdoSidebarButton,
 		]
 	}
 })
+
+const ActivityBarActivities = Maoka.styled("div", { class: "activity-bar_activities" })

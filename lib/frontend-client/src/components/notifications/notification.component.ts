@@ -34,7 +34,7 @@ export const Notification = ({ on_click, id, message, duration, render_icon, tit
 	return Maoka.create("div", ({ use }) => {
 		use(MaokaJabs.set_class("notification-card_container"))
 
-		const { t } = use(MaokaOrdo.Jabs.Translations)
+		const { t } = use(MaokaOrdo.Jabs.Translations$)
 
 		if (on_click) {
 			use(MaokaJabs.add_class("interactive"))

@@ -26,7 +26,7 @@ import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
 export const RemoveFileModal = (fsid: Ordo.Metadata.FSID) =>
 	Maoka.create("div", ({ use }) => {
-		const { t } = use(MaokaOrdo.Jabs.Translations)
+		const { t } = use(MaokaOrdo.Jabs.Translations$)
 		const commands = use(MaokaOrdo.Jabs.Commands.get)
 
 		const t_title = t("t.file_explorer.modals.remove_file.title")

@@ -121,11 +121,7 @@ a {
 }
 
 .workspace {
-	@apply h-dvh pb-10 sm:pb-0;
-}
-
-.workspace.no-sidebar {
-	@apply sm:pr-10;
+	@apply h-dvh w-full pb-10 sm:pb-0;
 }
 
 .background-task-indicator {

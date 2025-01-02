@@ -43,7 +43,7 @@ const TableHeadCell = (key: Ordo.I18N.TranslationKey) =>
 		use(MaokaJabs.add_class("database_table-head_cell"))
 		use(MaokaJabs.listen("onclick", event => handle_click(event)))
 
-		const { t } = use(MaokaOrdo.Jabs.Translations)
+		const { t } = use(MaokaOrdo.Jabs.Translations$)
 
 		const handle_click = (event: MouseEvent) => {
 			event.preventDefault()

@@ -30,7 +30,7 @@ export const DatabaseFilterModal = (state: TDatabaseState, on_change: (state: TD
 	Maoka.create("div", ({ use }) => {
 		use(MaokaJabs.set_class("w-96 max-w-full flex flex-col"))
 
-		const { t } = use(MaokaOrdo.Jabs.Translations)
+		const { t } = use(MaokaOrdo.Jabs.Translations$)
 		const commands = use(MaokaOrdo.Jabs.Commands.get)
 
 		const active_columns = state.columns ?? ["t.database.column_names.name"]

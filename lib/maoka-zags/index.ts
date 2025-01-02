@@ -4,3 +4,4 @@
  */
 
 export * from "./src/maoka-zags.impl.ts"
+export * from "./src/maoka-zags.types.ts"

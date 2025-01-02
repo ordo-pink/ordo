@@ -130,10 +130,15 @@ export const App = Maoka.create("div", ({ use, on_unmount }) => {
 
 	// TODO Render user defined functions
 	// TODO .catch
-	if (is_dev) void import("@ordo-pink/function-test").then(({ default: f }) => f(function_state_source))
+	// TODO await for rendering landing to string
+	void import("@ordo-pink/function-welcome")
+		.then(({ default: f }) => f(function_state_source))
+		.then(() => {
+			if (is_dev) void import("@ordo-pink/function-test").then(({ default: f }) => f(function_state_source))
+		})
 
+	// TODO Uninstalling created functions
 	on_unmount(() => {
-		// TODO Uninstalling created functions
 		data_manager.cancel()
 		divorce_functions()
 		divorce_router()

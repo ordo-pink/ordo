@@ -93,7 +93,7 @@ const HR = Maoka.styled("hr", { class: "context-menu_divider" })(() => void 0)
 const ContextMenuItem = (item: Ordo.ContextMenu.Item, payload: any, event: MouseEvent) =>
 	Maoka.create("div", ({ use }) => {
 		const { emit } = use(MaokaOrdo.Jabs.Commands.get)
-		const { t } = use(MaokaOrdo.Jabs.Translations)
+		const { t } = use(MaokaOrdo.Jabs.Translations$)
 
 		return () =>
 			ActionListItem({

@@ -19,8 +19,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { Oath } from "@ordo-pink/oath"
+
 export const ContentQuery: Ordo.Content.QueryStatic = {
-	Of: (repo: Ordo.Content.Repository) => ({
-		get: id => repo.get(id, ""),
+	Of: (repo: Ordo.Content.Repository, check_query_permission) => ({
+		get: (fsid, content_type) =>
+			check_query_permission("content.get").cata({ Ok: () => repo.get(fsid, content_type), Err: x => Oath.Reject(x) }),
 	}),
 }

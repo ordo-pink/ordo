@@ -22,12 +22,21 @@
 import { Oath, ops0 } from "@ordo-pink/oath"
 import { RRR } from "../rrr"
 
+const INDEXEDDB_NAME = "ordo"
+const INDEXEDDB_OBJECT_STORE_NAME = "ordo_db"
+const INDEXEDDB_OBJECT_STORE_VERSION = 3
+
 // TODO Persistence strategy support
 export const CacheContentRepository: Ordo.Content.RepositoryStatic = {
 	Of: () => {
-		const indexed_db = indexedDB.open("ordo.pink", 3)
+		const indexed_db = indexedDB.open(INDEXEDDB_NAME, INDEXEDDB_OBJECT_STORE_VERSION)
 
 		const db_promise = new Promise<IDBDatabase>((resolve, reject) => {
+			indexed_db.onupgradeneeded = () => {
+				const db = indexed_db.result
+				if (!db.objectStoreNames.contains(INDEXEDDB_OBJECT_STORE_NAME)) db.createObjectStore(INDEXEDDB_OBJECT_STORE_NAME)
+			}
+
 			indexed_db.onsuccess = (event: any) => {
 				resolve(event.target.result as IDBDatabase)
 			}
@@ -42,8 +51,8 @@ export const CacheContentRepository: Ordo.Content.RepositoryStatic = {
 				Oath.FromPromise(() => db_promise)
 					.pipe(ops0.chain(db => Oath.FromNullable(db)))
 					.pipe(ops0.rejected_map(rrr => eio("Failed to access IndexedDB cache", rrr)))
-					.pipe(ops0.chain(db => Oath.Try(() => db.transaction("content", "readonly"))))
-					.pipe(ops0.map(transaction => transaction.objectStore("content")))
+					.pipe(ops0.chain(db => Oath.Try(() => db.transaction(INDEXEDDB_OBJECT_STORE_NAME, "readonly"))))
+					.pipe(ops0.map(transaction => transaction.objectStore(INDEXEDDB_OBJECT_STORE_NAME)))
 					.pipe(ops0.map(storage => storage.get(fsid)))
 					.pipe(ops0.chain(dbr => new Oath(res => void (dbr.onsuccess = event => res((event.target as any)?.result ?? null)))))
 					.fix(() => null) as any, // TODO Fix types
@@ -52,8 +61,8 @@ export const CacheContentRepository: Ordo.Content.RepositoryStatic = {
 				Oath.FromPromise(() => db_promise)
 					.pipe(ops0.chain(db => Oath.FromNullable(db)))
 					.pipe(ops0.rejected_map(() => eio("Failed to access cache inside IndexedDB")))
-					.pipe(ops0.map(db => db.transaction("content", "readwrite")))
-					.pipe(ops0.map(transaction => transaction.objectStore("content")))
+					.pipe(ops0.map(db => db.transaction(INDEXEDDB_OBJECT_STORE_NAME, "readwrite")))
+					.pipe(ops0.map(transaction => transaction.objectStore(INDEXEDDB_OBJECT_STORE_NAME)))
 					.pipe(ops0.map(storage => storage.put(content, fsid)))
 					.pipe(
 						ops0.chain(

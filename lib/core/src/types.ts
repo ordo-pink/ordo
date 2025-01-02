@@ -610,8 +610,10 @@ declare global {
 				Of: (data_host: string, fetch: Ordo.Fetch) => Repository
 			}
 
+			type ContentType = "string" | "array_buffer"
+
 			type Repository = {
-				get: <$TContentType extends "string" | "array_buffer">(
+				get: <$TContentType extends Ordo.Content.ContentType>(
 					fsid: Ordo.Metadata.FSID,
 					content_type: $TContentType,
 				) => Oath<
@@ -629,7 +631,13 @@ declare global {
 			}
 
 			type Query = {
-				get: (fsid: Ordo.Metadata.FSID) => Oath<Ordo.Content.Instance, Ordo.Rrr<"EIO" | "EACCES" | "EINVAL" | "ENOENT">>
+				get: <$TContentType extends Ordo.Content.ContentType>(
+					fsid: Ordo.Metadata.FSID,
+					content_type: $TContentType,
+				) => Oath<
+					($TContentType extends "string" ? "string" : ArrayBuffer) | null,
+					Ordo.Rrr<"EPERM" | "EIO" | "EACCES" | "EINVAL" | "ENOENT">
+				>
 			}
 		}
 

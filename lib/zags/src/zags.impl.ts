@@ -16,9 +16,28 @@ export const ZAGS: TZagsStatic = {
 
 			return () => void handlers.splice(handlers.indexOf(f), 1)
 		},
+		cheat: (path, f) => {
+			let value: any
+
+			const wrapped_f = (state: any, is_update: boolean) => {
+				const keys = (path as string).split(".")
+				const location: Record<string, any> = keys.slice(0, -1).reduce((acc, key) => acc[key], state)
+				const current_value = location[keys[keys.length - 1]]
+
+				if (value !== current_value) {
+					value = current_value
+					f(value, is_update)
+				}
+			}
+
+			handlers.push(wrapped_f)
+			wrapped_f(state, false)
+
+			return () => void handlers.splice(handlers.indexOf(wrapped_f), 1)
+		},
 		divorce: f => void handlers.splice(handlers.indexOf(f), 1),
 		update: (path, value_creator) => {
-			const prev_state = ZAGS.Of(state, handlers).unwrap()
+			const prev_state = { ...state }
 			const keys = (path as string).split(".")
 
 			const location: Record<string, any> = keys.slice(0, -1).reduce((acc, key) => (acc as any)[key], prev_state)
@@ -33,7 +52,7 @@ export const ZAGS: TZagsStatic = {
 			handlers.forEach(f => f(state, true))
 		},
 		select: path => {
-			const current_state = ZAGS.Of(state, handlers).unwrap()
+			const current_state = { ...state }
 
 			const keys = (path as string).split(".")
 			const location: Record<string, any> = keys.slice(0, -1).reduce((acc, key) => (acc as any)[key], current_state)

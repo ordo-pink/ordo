@@ -27,17 +27,20 @@ import { ZAGS } from "@ordo-pink/zags"
 
 import { ordo_app_state } from "../app.state"
 
-type TInitMetadataFn = () => { get_metadata_query: (fid: symbol) => Ordo.Metadata.Query }
+type TInitMetadataFn = () => {
+	metadata_repository: Ordo.Metadata.Repository
+	get_metadata_query: (fid: symbol) => Ordo.Metadata.Query
+}
 export const init_metadata: TInitMetadataFn = call_once(() => {
-	const { logger, commands, known_functions, queries: query } = ordo_app_state.zags.unwrap()
+	const { logger, commands, known_functions, queries } = ordo_app_state.zags.unwrap()
 
 	logger.debug("🟡 Initialising metadata...")
 
-	const metadata_repository = MetadataRepository.Of(metadata_zags, query.content)
+	const metadata_repository = MetadataRepository.Of(metadata_zags)
 	// const remote_metadata_repository = CacheMetadataRepository.Of(hosts.dt, fetch)
 
 	const app_metadata_query = MetadataQuery.Of(metadata_repository, () => Result.Ok(void 0))
-	const metadata_command = MetadataCommand.Of(metadata_repository, app_metadata_query, query.user)
+	const metadata_command = MetadataCommand.Of(metadata_repository, app_metadata_query, queries.user)
 
 	const Err = (rrr: Ordo.Rrr) => {
 		console.error(rrr)
@@ -87,17 +90,10 @@ export const init_metadata: TInitMetadataFn = call_once(() => {
 		metadata_command.update_label(old_label, new_label).cata({ Ok: noop, Err }),
 	)
 
-	// MetadataManager.of(metadata_repository, remote_metadata_repository, auth$, fetch).start(state_change =>
-	// 	Switch.Match(state_change)
-	// 		.case("get-remote", () => commands.emit("cmd.application.background_task.start_loading"))
-	// 		.case("put-remote", () => commands.emit("cmd.application.background_task.start_saving"))
-	// 		.case(["get-remote-complete", "put-remote-complete"], () => commands.emit("cmd.application.background_task.reset_status"))
-	// 		.default(noop),
-	// )
-
 	logger.debug("🟢 Initialised metadata.")
 
 	return {
+		metadata_repository,
 		get_metadata_query: fid =>
 			MetadataQuery.Of(metadata_repository, permission =>
 				Result.If(known_functions.has_permissions(fid, { queries: [permission] }), {

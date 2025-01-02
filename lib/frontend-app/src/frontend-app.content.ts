@@ -28,7 +28,7 @@ import { Switch } from "@ordo-pink/switch"
 
 import { ordo_app_state } from "../app.state"
 
-type TF = () => { get_content_query: (fid: symbol) => Ordo.Content.Query }
+type TF = () => { content_repository: Ordo.Content.Repository; get_content_query: (fid: symbol) => Ordo.Content.Query }
 export const init_content: TF = () => {
 	const logger = ordo_app_state.zags.select("logger")
 	const commands = ordo_app_state.zags.select("commands")
@@ -38,7 +38,7 @@ export const init_content: TF = () => {
 
 	logger.debug("🟡 Initialising metadata...")
 
-	const remote_content_repository = CacheContentRepository.Of(hosts.dt, fetch)
+	const content_repository = CacheContentRepository.Of(hosts.dt, fetch)
 
 	// TODO Extract for common error handling
 	const Err = (rrr: Ordo.Rrr) => {
@@ -61,8 +61,8 @@ export const init_content: TF = () => {
 			// TODO Check if metadata exists
 			void metadata_query.get_by_fsid(fsid).cata(
 				R.catas.if_ok(() =>
-					remote_content_repository
-						.put(fsid, content, "")
+					content_repository
+						.put(fsid, content)
 						.pipe(ops0.tap(() => commands.emit("cmd.metadata.set_size", { fsid, size })))
 						.invoke(invokers0.or_else(Err)),
 				),
@@ -89,8 +89,8 @@ export const init_content: TF = () => {
 
 		const fsid = metadata.get_fsid()
 
-		void remote_content_repository
-			.put(metadata?.get_fsid(), content, "")
+		void content_repository
+			.put(metadata?.get_fsid(), content)
 			.pipe(ops0.tap(() => commands.emit("cmd.metadata.set_size", { fsid, size })))
 			.invoke(invokers0.or_else(Err))
 	})
@@ -99,8 +99,9 @@ export const init_content: TF = () => {
 
 	// TODO Extract and reuse check_query_permission
 	return {
+		content_repository,
 		get_content_query: fid =>
-			ContentQuery.Of(remote_content_repository, permission =>
+			ContentQuery.Of(content_repository, permission =>
 				R.If(known_functions.has_permissions(fid, { queries: [permission] }), {
 					F: () => {
 						const rrr = eperm(`ContentQuery permission RRR. Did you forget to request query permission '${permission}'?`)

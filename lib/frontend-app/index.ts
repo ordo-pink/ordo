@@ -22,7 +22,10 @@
 import { ConsoleLogger } from "@ordo-pink/logger"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { Switch } from "@ordo-pink/switch"
+import { noop } from "@ordo-pink/tau"
 
+import { DataManager } from "./src/frontend-app.data-manager"
 import { OrdoActivityBar } from "./src/components/activity-bar/activity-bar.component"
 import { OrdoBackgroundTaskIndicator } from "./src/components/background-task-indicator.component"
 import { OrdoModal } from "./src/components/modal/modal.overlay"
@@ -44,19 +47,6 @@ import { ordo_app_state } from "./app.state"
 
 // TODO Move fonts to assets
 import "./index.css"
-
-// const indexed_db = indexedDB.open("ordo.pink", 3)
-
-// indexed_db.onupgradeneeded = () => {
-// 	const db = indexed_db.result
-// 	if (!db.objectStoreNames.contains("content")) {
-// 		db.createObjectStore("content")
-// 	}
-
-// 	if (!db.objectStoreNames.contains("metadata")) {
-// 		db.createObjectStore("metadata")
-// 	}
-// }
 
 export const App = Maoka.create("div", ({ use, on_unmount }) => {
 	use(MaokaJabs.set_class("app"))
@@ -108,13 +98,24 @@ export const App = Maoka.create("div", ({ use, on_unmount }) => {
 	init_title_display()
 	init_command_palette()
 
-	const { get_content_query } = init_content()
+	const { content_repository, get_content_query } = init_content()
 	const app_get_content_query = get_content_query(app_fid)
 	ordo_app_state.zags.update("queries.content", () => app_get_content_query)
 
-	const { get_metadata_query } = init_metadata()
+	const { metadata_repository, get_metadata_query } = init_metadata()
 	const app_metadata_query = get_metadata_query(app_fid)
 	ordo_app_state.zags.update("queries.metadata", () => app_metadata_query)
+
+	const data_manager = DataManager.Of(metadata_repository, content_repository)
+	const commands = ordo_app_state.zags.select("commands")
+
+	void data_manager.start(state_change =>
+		Switch.Match(state_change)
+			.case("get-remote", () => commands.emit("cmd.application.background_task.start_loading"))
+			.case("put-remote", () => commands.emit("cmd.application.background_task.start_saving"))
+			.case(["get-remote-complete", "put-remote-complete"], () => commands.emit("cmd.application.background_task.reset_status"))
+			.default(noop),
+	)
 
 	const function_state_source = {
 		get_commands,
@@ -133,6 +134,7 @@ export const App = Maoka.create("div", ({ use, on_unmount }) => {
 
 	on_unmount(() => {
 		// TODO Uninstalling created functions
+		data_manager.cancel()
 		divorce_functions()
 		divorce_router()
 	})

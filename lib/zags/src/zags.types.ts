@@ -26,6 +26,11 @@ export type TZags<$TState extends Record<string, unknown>> = {
 	 */
 	marry: (partner: TPartner<$TState>) => () => void
 
+	cheat: <_TKey extends TDotPath<$TState>>(
+		path: _TKey,
+		partner: (value: TFromDotPath<$TState, _TKey>, is_update: boolean) => void,
+	) => () => void
+
 	/**
 	 * Unsubscribe from ZAGS state updates.
 	 *

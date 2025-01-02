@@ -611,15 +611,14 @@ declare global {
 			}
 
 			type Repository = {
-				get: (
+				get: <$TContentType extends "string" | "array_buffer">(
 					fsid: Ordo.Metadata.FSID,
-					token: string,
-				) => Oath<Ordo.Content.Instance, Ordo.Rrr<"EIO" | "EACCES" | "EINVAL" | "ENOENT">>
-				put: (
-					fsid: Ordo.Metadata.FSID,
-					content: Ordo.Content.Instance,
-					token: string,
-				) => Oath<void, Ordo.Rrr<"EINVAL" | "EACCES" | "EIO">>
+					content_type: $TContentType,
+				) => Oath<
+					($TContentType extends "string" ? "string" : ArrayBuffer) | null,
+					Ordo.Rrr<"EIO" | "EACCES" | "EINVAL" | "ENOENT">
+				>
+				put: (fsid: Ordo.Metadata.FSID, content: Ordo.Content.Instance) => Oath<void, Ordo.Rrr<"EINVAL" | "EACCES" | "EIO">>
 			}
 
 			type QueryStatic = {
@@ -723,7 +722,7 @@ declare global {
 				  }
 
 			type RepositoryStatic = {
-				Of: (metadata$: TZags<{ items: Ordo.Metadata.Instance[] | null }>, content_query: Ordo.Content.Query) => Repository
+				Of: (metadata$: TZags<{ items: Ordo.Metadata.Instance[] | null }>) => Repository
 			}
 
 			type Repository = {

@@ -61,8 +61,10 @@ const create_licenses = async (space: "lib" | "srv") => {
 
 			const file_path = node_path.join(entry_path, file)
 			const file_content = await node_fs.promises.readFile(file_path, "utf-8")
+			const spdx_2024 = spdx.replaceAll("2025", "2024")
 
-			if (!file_content.startsWith(spdx)) {
+			// TODO Find a better solution by 2026
+			if (!file_content.startsWith(spdx) && !file_content.startsWith(spdx_2024)) {
 				const updated_content = `${spdx}\n${file_content}`
 
 				await node_fs.promises.writeFile(file_path, updated_content, "utf-8")

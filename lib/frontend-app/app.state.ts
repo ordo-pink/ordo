@@ -25,6 +25,7 @@ import { type TLogger } from "@ordo-pink/logger"
 import { CommandPaletteLocation, EMPTY_COMMAND_PALETTE } from "./src/components/command-palette/constants"
 import { OrdoSidebarStatus } from "./src/components/sidebar/sidebar.constants"
 
+// @ts-ignore
 const is_dev = import.meta.env.DEV
 const app_name = "pink.ordo.app" // TODO Take from env
 const version = "v0.7.0" // TODO Take from env
@@ -37,7 +38,7 @@ export const ordo_app_state = MaokaZAGS.Of<TOrdoState>({
 	hosts,
 	commands: null as any, // Assigned after initialization
 	current_route: null as any, // Assigned after initialization
-	functions: { activities: [], file_assocs: [], current_activity: undefined, current_file_assoc: undefined },
+	functions: { activities: [], file_assocs: [] },
 	known_functions: null as any, // Assigned after initialization
 	logger: null as any, // Assigned after initialization
 	translate: null as any, // Assigned after initialization

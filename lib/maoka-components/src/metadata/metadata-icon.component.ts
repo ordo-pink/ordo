@@ -19,124 +19,118 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-// import { BsFileEarmark, BsFileEarmarkBinary, BsFolderOpen } from "@ordo-pink/frontend-icons"
-// import { Maoka, type TMaokaElement } from "@ordo-pink/maoka"
-// import { MaokaJabs } from "@ordo-pink/maoka-jabs"
-// import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
-// import { R } from "@ordo-pink/result"
-// import { Switch } from "@ordo-pink/switch"
-// import { emojis } from "@ordo-pink/emojis"
+import { BsFileEarmark, BsFileEarmarkBinary, BsFolderOpen } from "@ordo-pink/frontend-icons"
+import { Maoka, type TMaokaElement } from "@ordo-pink/maoka"
+import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
+import { R } from "@ordo-pink/result"
+import { Switch } from "@ordo-pink/switch"
+import { emojis } from "@ordo-pink/emojis"
+import { ordo_app_state } from "@ordo-pink/frontend-app/app.state"
 
-// type P = { metadata: Ordo.Metadata.Instance; custom_class?: string; show_emoji_picker?: boolean }
-// export const MetadataIcon = ({ metadata, custom_class = "", show_emoji_picker = true }: P) =>
-// 	Maoka.create("div", ({ use, refresh, on_unmount }) => {
-// 		const icon_class = get_icon_class(custom_class)
+type P = { metadata: Ordo.Metadata.Instance; custom_class?: string; show_emoji_picker?: boolean }
+export const MetadataIcon = ({ metadata, custom_class = "", show_emoji_picker = true }: P) =>
+	Maoka.create("div", ({ use, refresh, on_unmount }) => {
+		const icon_class = get_icon_class(custom_class)
 
-// 		let emoji = metadata.get_property("emoji_icon")
+		let emoji = metadata.get_property("emoji_icon")
 
-// 		const commands = use(MaokaOrdo.Jabs.Commands.get)
-// 		const metadata_query = use(MaokaOrdo.Jabs.MetadataQuery)
+		const commands = use(MaokaOrdo.Jabs.get_commands)
+		const metadata_query = use(MaokaOrdo.Jabs.get_metadata_query)
 
-// 		const subscription = metadata_query.$.subscribe(() => {
-// 			metadata_query
-// 				.get_by_fsid(metadata.get_fsid())
-// 				.pipe(R.ops.chain(R.FromOption))
-// 				.pipe(R.ops.map(metadata => metadata.get_property("emoji_icon")))
-// 				.cata(
-// 					R.catas.if_ok(icon => {
-// 						emoji = icon
-// 						void refresh()
-// 					}),
-// 				)
-// 		})
+		const divorce_metadata_query = metadata_query.$.marry(() => {
+			metadata_query
+				.get_by_fsid(metadata.get_fsid())
+				.pipe(R.ops.chain(R.FromNullable))
+				.pipe(R.ops.map(metadata => metadata.get_property("emoji_icon")))
+				.cata(
+					R.catas.if_ok(icon => {
+						emoji = icon
+						void refresh()
+					}),
+				)
+		})
 
-// 		on_unmount(() => subscription.unsubscribe())
+		on_unmount(() => divorce_metadata_query())
 
-// 		use(MaokaJabs.set_class("cursor-pointer"))
+		use(MaokaJabs.set_class("cursor-pointer"))
 
-// 		if (show_emoji_picker)
-// 			use(
-// 				MaokaJabs.listen("onclick", event => {
-// 					event.stopPropagation()
+		if (show_emoji_picker)
+			use(
+				MaokaJabs.listen("onclick", event => {
+					event.stopPropagation()
 
-// 					commands.emit("cmd.application.command_palette.show", {
-// 						max_items: 100,
-// 						items: [
-// 							{
-// 								readable_name: "Remove icon", // TODO Translation
-// 								on_select: () =>
-// 									commands.emit("cmd.metadata.set_property", {
-// 										fsid: metadata.get_fsid(),
-// 										key: "emoji_icon",
-// 										value: undefined,
-// 									}),
-// 							},
-// 							...emojis.map(
-// 								emoji =>
-// 									({
-// 										on_select: () => {
-// 											commands.emit("cmd.metadata.set_property", {
-// 												fsid: metadata.get_fsid(),
-// 												key: "emoji_icon",
-// 												value: emoji.icon,
-// 											})
+					commands.emit("cmd.application.command_palette.show", {
+						max_items: 100,
+						items: [
+							{
+								readable_name: "Remove icon", // TODO Translation
+								on_select: () =>
+									commands.emit("cmd.metadata.set_property", {
+										fsid: metadata.get_fsid(),
+										key: "emoji_icon",
+										value: undefined,
+									}),
+							},
+							...emojis.map(
+								emoji =>
+									({
+										on_select: () => {
+											commands.emit("cmd.metadata.set_property", {
+												fsid: metadata.get_fsid(),
+												key: "emoji_icon",
+												value: emoji.icon,
+											})
 
-// 											commands.emit("cmd.application.command_palette.hide")
-// 										},
-// 										readable_name: `${emoji.icon} ${emoji.description}` as any,
-// 									}) satisfies Ordo.CommandPalette.Item,
-// 							),
-// 						],
-// 					})
-// 				}),
-// 			)
+											commands.emit("cmd.application.command_palette.hide")
+										},
+										readable_name: `${emoji.icon} ${emoji.description}` as any,
+									}) satisfies Ordo.CommandPalette.Item,
+							),
+						],
+					})
+				}),
+			)
 
-// 		return () => {
-// 			if (emoji.is_some)
-// 				return Maoka.create("div", ({ use }) => {
-// 					use(MaokaJabs.set_class(custom_class))
-// 					return () => emoji.unwrap()
-// 				})
+		return () => {
+			if (emoji.is_some)
+				return Maoka.create("div", ({ use }) => {
+					use(MaokaJabs.set_class(custom_class))
+					return () => emoji.unwrap()
+				})
 
-// 			return metadata_query.has_children(metadata.get_fsid()).cata({
-// 				Err: () => Icon({ metadata, custom_class: icon_class, has_children: false }),
-// 				Ok: has_children => Icon({ metadata, custom_class: icon_class, has_children }),
-// 			})
-// 		}
-// 	})
+			return metadata_query.has_children(metadata.get_fsid()).cata({
+				Err: () => Icon({ metadata, custom_class: icon_class, has_children: false }),
+				Ok: has_children => Icon({ metadata, custom_class: icon_class, has_children }),
+			})
+		}
+	})
 
-// type P2 = P & { has_children: boolean }
-// const Icon = ({ metadata, custom_class, has_children }: P2) =>
-// 	Maoka.create("div", ({ use, refresh, element }) => {
-// 		let file_associations: Ordo.FileAssociation.Instance[] = []
+type P2 = P & { has_children: boolean }
+const Icon = ({ metadata, custom_class, has_children }: P2) =>
+	Maoka.create("div", ({ use, element }) => {
+		const metadata_content_type = metadata.get_type()
+		const get_file_associations = use(ordo_app_state.select_jab$("functions.file_assocs"))
 
-// 		const metadata_content_type = metadata.get_type()
+		return async () => {
+			const file_associations = get_file_associations()
 
-// 		const $ = use(MaokaOrdo.Jabs.FileAssociations$)
-// 		const handle_file_associations_update = (value: Ordo.FileAssociation.Instance[]) => {
-// 			file_associations = value
-// 			void refresh()
-// 		}
+			const fa = file_associations.find(association => association.types.some(type => metadata_content_type === type.name))
 
-// 		use(MaokaOrdo.Jabs.subscribe($, handle_file_associations_update))
+			if (fa && fa.render_icon) {
+				element.innerHTML = ""
+				use(MaokaJabs.set_class(custom_class!))
+				await fa.render_icon(element as HTMLSpanElement)
+				return
+			}
 
-// 		return async () => {
-// 			const fa = file_associations.find(association => association.types.some(type => metadata_content_type === type.name))
+			return Switch.OfTrue()
+				.case(has_children, () => BsFolderOpen(custom_class) as TMaokaElement)
+				.case(metadata.get_size() === 0, () => BsFileEarmark(custom_class) as TMaokaElement)
+				.default(() => BsFileEarmarkBinary(custom_class) as TMaokaElement)
+		}
+	})
 
-// 			if (fa && fa.render_icon) {
-// 				element.innerHTML = ""
-// 				use(MaokaJabs.set_class(custom_class!))
-// 				await fa.render_icon(element as HTMLSpanElement)
-// 				return
-// 			}
+const ICON_CLASS = "px-[0.2rem] shrink-0"
 
-// 			return Switch.OfTrue()
-// 				.case(has_children, () => BsFolderOpen(custom_class) as TMaokaElement)
-// 				.case(metadata.get_size() === 0, () => BsFileEarmark(custom_class) as TMaokaElement)
-// 				.default(() => BsFileEarmarkBinary(custom_class) as TMaokaElement)
-// 		}
-// 	})
-
-// const ICON_CLASS = "px-[0.2rem] shrink-0"
-
-// const get_icon_class = (custom_class?: string) => (custom_class ? `${ICON_CLASS} ${custom_class}` : ICON_CLASS)
+const get_icon_class = (custom_class?: string) => (custom_class ? `${ICON_CLASS} ${custom_class}` : ICON_CLASS)

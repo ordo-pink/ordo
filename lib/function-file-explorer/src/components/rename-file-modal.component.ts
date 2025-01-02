@@ -28,8 +28,8 @@ export const RenameFileModal = (ctx: Ordo.CreateFunction.Params, fsid: Ordo.Meta
 	Maoka.create("div", ({ use }) => {
 		use(MaokaOrdo.Context.provide(ctx))
 
-		const { t } = use(MaokaOrdo.Jabs.Translations$)
-		const commands = use(MaokaOrdo.Jabs.Commands.get)
+		const { t } = use(MaokaOrdo.Jabs.get_translations$)
+		const commands = use(MaokaOrdo.Jabs.get_commands.get)
 		const get_metadata = use(MaokaOrdo.Jabs.Metadata.get_by_fsid(fsid))
 
 		const t_title = t("t.file_explorer.modals.rename_file.title")

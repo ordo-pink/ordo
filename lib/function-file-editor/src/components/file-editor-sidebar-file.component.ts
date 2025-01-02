@@ -31,7 +31,7 @@ import { TOption } from "@ordo-pink/option"
 export const FileEditorSidebarFile = (metadata: Ordo.Metadata.Instance, depth = 0) =>
 	Maoka.create("div", ({ use, refresh }) => {
 		const fsid = metadata.get_fsid()
-		const { emit } = use(MaokaOrdo.Jabs.Commands.get)
+		const { emit } = use(MaokaOrdo.Jabs.get_commands.get)
 
 		const file_editor_file_class = MaokaJabs.set_class(
 			"flex space-x-2 items-center rounded-sm",

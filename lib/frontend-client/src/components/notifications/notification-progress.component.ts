@@ -34,7 +34,7 @@ export const NotificationProgress = ({ id, type, duration }: P) => {
 
 		let progress = 100
 
-		const commands = use(MaokaOrdo.Jabs.Commands.get)
+		const commands = use(MaokaOrdo.Jabs.get_commands.get)
 		const interval = setInterval(() => {
 			progress = progress > 0 ? progress - 1 : 0
 			void refresh()

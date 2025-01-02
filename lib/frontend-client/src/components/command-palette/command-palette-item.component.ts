@@ -25,7 +25,7 @@ import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
 export const CommandPaletteItem = (item: Ordo.CommandPalette.Item, on_click: () => void, is_current: boolean) =>
 	Maoka.create("div", ({ use, element, after_mount }) => {
-		const { t } = use(MaokaOrdo.Jabs.Translations$)
+		const { t } = use(MaokaOrdo.Jabs.get_translations$)
 
 		const title = t(item.readable_name)
 		const render_info = item.render_custom_info

@@ -29,7 +29,7 @@ export const FileMetadata = (metadata: Ordo.Metadata.Instance) =>
 		const fsid = metadata.get_fsid()
 		const name = metadata.get_name()
 
-		const commands = use(MaokaOrdo.Jabs.Commands.get)
+		const commands = use(MaokaOrdo.Jabs.get_commands.get)
 
 		use(MaokaJabs.add_class("p-2"))
 
@@ -59,7 +59,7 @@ const LabelsSection = (fsid: Ordo.Metadata.FSID) =>
 		use(MaokaJabs.set_class(label_section))
 		use(MaokaJabs.listen("onclick", () => handle_click()))
 
-		const commands = use(MaokaOrdo.Jabs.Commands.get)
+		const commands = use(MaokaOrdo.Jabs.get_commands.get)
 		const get_metadata = use(MaokaOrdo.Jabs.Metadata.get_by_fsid(fsid))
 
 		const handle_click = () => commands.emit("cmd.metadata.show_edit_labels_palette", fsid)

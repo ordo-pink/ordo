@@ -27,12 +27,17 @@ import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { R } from "@ordo-pink/result"
+import { type TZags } from "@ordo-pink/zags"
 
 import { type TEditorFocusPosition, type TEditorState } from "../rich-text.types"
 import { editor_context, editor_context_jab } from "../jabs/editor-context.jab"
 import { Line } from "./line.component"
 
-export const RichText = (metadata: Ordo.Metadata.Instance, content: Ordo.Content.Instance, ctx: Ordo.CreateFunction.Params) => {
+export const RichText = (
+	metadata: Ordo.Metadata.Instance,
+	content: Ordo.Content.Instance,
+	ctx: TZags<Ordo.CreateFunction.State>,
+) => {
 	const caret_position$ = new BehaviorSubject<TEditorFocusPosition>({
 		block_index: 0,
 		inline_index: 0,

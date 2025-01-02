@@ -38,7 +38,7 @@ export const ActivityBarLink = ({ render_icon, default_route, routes, name, curr
 		use(MaokaJabs.set_attribute("href", activity_link))
 		use(MaokaJabs.listen("onclick", event => handle_click(event)))
 
-		const { emit } = use(MaokaOrdo.Jabs.Commands.get)
+		const { emit } = use(MaokaOrdo.Jabs.get_commands.get)
 		const handle_click = on_click
 			? on_click
 			: (event: MouseEvent) => {

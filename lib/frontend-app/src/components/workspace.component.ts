@@ -28,12 +28,16 @@ import { ordo_app_state } from "../../app.state"
 export const OrdoWorkspace = Maoka.create("main", ({ use, element }) => {
 	use(MaokaJabs.set_class("workspace"))
 
+	// const commands = ordo_app_state.zags.select("commands")
 	const get_sidebar_status = use(ordo_app_state.select_jab$("sections.sidebar.status"))
 	const get_current_activity = use(ordo_app_state.select_jab$("functions.current_activity"))
 
 	return async () => {
 		const status = get_sidebar_status()
 		const current_activity = get_current_activity()
+
+		// if (current_activity?.render_sidebar) commands.emit("cmd.application.sidebar.enable")
+		// else commands.emit("cmd.application.sidebar.disable")
 
 		if (status !== OrdoSidebarStatus.VISIBLE) use(MaokaJabs.add_class("no-sidebar"))
 		else use(MaokaJabs.remove_class("no-sidebar"))

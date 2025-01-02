@@ -54,7 +54,7 @@ export const Database = (
 		use(show_filters_jab(metadata))
 		use(show_columns_jab(metadata))
 
-		const commands = use(MaokaOrdo.Jabs.Commands.get)
+		const commands = use(MaokaOrdo.Jabs.get_commands.get)
 		const get_children = use(MaokaOrdo.Jabs.Metadata.get_children(fsid))
 		const { get_db_state } = use(database_context.consume)
 

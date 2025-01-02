@@ -30,7 +30,7 @@ import { is_database_context_menu_payload } from "../database.constants"
 export const show_filters_jab =
 	(metadata: Ordo.Metadata.Instance): TMaokaJab =>
 	({ use }) => {
-		const commands = use(MaokaOrdo.Jabs.Commands.get)
+		const commands = use(MaokaOrdo.Jabs.get_commands.get)
 		const ctx = use(MaokaOrdo.Context.consume)
 		const { get_db_state, on_db_state_change } = use(database_context.consume)
 
@@ -42,7 +42,7 @@ export const show_filters_jab =
 			type: ContextMenuItemType.READ,
 		})
 
-		const add_filter_modal_cmd = MaokaOrdo.Jabs.Commands.add("cmd.database.show_filter_modal", () =>
+		const add_filter_modal_cmd = MaokaOrdo.Jabs.get_commands.add("cmd.database.show_filter_modal", () =>
 			commands.emit("cmd.application.modal.show", {
 				render: div =>
 					Maoka.render_dom(

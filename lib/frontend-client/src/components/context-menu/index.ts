@@ -34,7 +34,7 @@ export const ContextMenu = (ctx: Ordo.CreateFunction.Params, $: Observable<Ordo.
 		use(MaokaOrdo.Context.provide(ctx))
 		use(MaokaJabs.set_class("context-menu"))
 
-		const { emit } = use(MaokaOrdo.Jabs.Commands.get)
+		const { emit } = use(MaokaOrdo.Jabs.get_commands.get)
 		const get_state = use(MaokaOrdo.Jabs.from$($, null, state => state))
 
 		const handle_click_outside = () => emit("cmd.application.context_menu.hide")
@@ -92,8 +92,8 @@ const HR = Maoka.styled("hr", { class: "context-menu_divider" })(() => void 0)
 
 const ContextMenuItem = (item: Ordo.ContextMenu.Item, payload: any, event: MouseEvent) =>
 	Maoka.create("div", ({ use }) => {
-		const { emit } = use(MaokaOrdo.Jabs.Commands.get)
-		const { t } = use(MaokaOrdo.Jabs.Translations$)
+		const { emit } = use(MaokaOrdo.Jabs.get_commands.get)
+		const { t } = use(MaokaOrdo.Jabs.get_translations$)
 
 		return () =>
 			ActionListItem({

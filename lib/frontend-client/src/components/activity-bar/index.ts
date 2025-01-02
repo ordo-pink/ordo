@@ -45,7 +45,7 @@ export const ActivityBar = (
 
 		const init_as = [] as Ordo.Activity.Instance[]
 		const init_a = void 0
-		const commands = use(MaokaOrdo.Jabs.Commands.get)
+		const commands = use(MaokaOrdo.Jabs.get_commands.get)
 		const get_list = use(MaokaOrdo.Jabs.from$(as$, init_as))
 		const get_current = use(MaokaOrdo.Jabs.from$(ca$, init_a, x => x.unwrap()))
 

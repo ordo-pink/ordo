@@ -38,8 +38,8 @@ let is_cookie_modal_shown = false
 
 // TODO Translations
 export default Maoka.create("main", ({ use, on_unmount }) => {
-	const commands = use(MaokaOrdo.Jabs.Commands)
-	const { t } = use(MaokaOrdo.Jabs.Translations$)
+	const commands = use(MaokaOrdo.Jabs.get_commands)
+	const { t } = use(MaokaOrdo.Jabs.get_translations$)
 	// const metadata_query = use(MaokaOrdo.Jabs.MetadataQuery)
 
 	commands.emit("cmd.application.set_title", "t.welcome.landing_page.title")

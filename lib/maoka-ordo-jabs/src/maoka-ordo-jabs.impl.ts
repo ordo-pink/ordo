@@ -3,17 +3,11 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { MaokaZAGS, type TMaokaZags } from "@ordo-pink/maoka-zags"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { type TMaokaJab } from "@ordo-pink/maoka"
 import { TZags } from "@ordo-pink/zags"
 
 export const ordo_context = MaokaJabs.create_context<TZags<Ordo.CreateFunction.State>>()
-
-export const get_maoka_function_zags: TMaokaJab<TMaokaZags<Ordo.CreateFunction.State>> = ({ use }) => {
-	const zags = use(ordo_context.consume)
-	return use(computed("maoka_function_zags", () => MaokaZAGS.From(zags)))
-}
 
 export const get_commands: TMaokaJab<Ordo.Command.Commands> = ({ use }) => {
 	const zags = use(ordo_context.consume)
@@ -30,63 +24,19 @@ export const get_commands: TMaokaJab<Ordo.Command.Commands> = ({ use }) => {
 // 	return use(computed("fetch", get_fetch))
 // }
 
-// export const get_user_query: TMaokaJab<Ordo.User.Query> = ({ use }) => {
-// 	const { get_user_query } = use(ordo_context.consume)
-// 	const logger = use(get_logger)
-
-// 	const unwrap_user_query = () =>
-// 		get_user_query()
-// 			.pipe(R.ops.err_tap(logger.alert))
-// 			.cata(R.catas.or_else(() => null as never))
-
-// 	return use(computed("user_query", unwrap_user_query))
-// }
-
-// export const get_file_associations$: TMaokaJab<Observable<Ordo.FileAssociation.Instance[]>> = ({ use }) => {
-// 	const { get_file_associations } = use(ordo_context.consume)
-// 	const logger = use(get_logger)
-
-// 	const unwrap_file_associations$ = () =>
-// 		get_file_associations()
-// 			.pipe(R.ops.err_tap(logger.alert))
-// 			.cata(R.catas.or_else(() => null as never))
-
-// 	return use(computed("file_associations$", unwrap_file_associations$))
-// }
-
-// export const get_current_file_association$: TMaokaJab<Observable<TOption<Ordo.FileAssociation.Instance>>> = ({ use }) => {
-// 	const { get_current_file_association } = use(ordo_context.consume)
-// 	const logger = use(get_logger)
-
-// 	const unwrap_current_file_association$ = () =>
-// 		get_current_file_association()
-// 			.pipe(R.ops.err_tap(logger.alert))
-// 			.cata(R.catas.or_else(() => null as never))
-
-// 	return use(computed("current_file_association$", unwrap_current_file_association$))
-// }
-
-// export const get_is_authenticated$: TMaokaJab<Observable<boolean>> = ({ use }) => {
-// 	const { get_is_authenticated } = use(ordo_context.consume)
-// 	const logger = use(get_logger)
-
-// 	const unwrap_is_authenticated = () =>
-// 		get_is_authenticated()
-// 			.pipe(R.ops.err_tap(logger.alert))
-// 			.cata(R.catas.or_else(() => null as never))
-
-// 	return use(computed("is_authenticated$", unwrap_is_authenticated))
-// }
-
-// export const get_is_authenticated: TMaokaJab<() => boolean> = ({ use }) => {
-// 	const $ = use(get_is_authenticated$)
-
-// 	return use(from$($, false, x => x))
-// }
+export const get_user_query: TMaokaJab<Ordo.User.Query> = ({ use }) => {
+	const zags = use(ordo_context.consume)
+	return zags.select("user_query")
+}
 
 export const get_metadata_query: TMaokaJab<Ordo.Metadata.Query> = ({ use }) => {
 	const zags = use(ordo_context.consume)
 	return zags.select("metadata_query")
+}
+
+export const get_content_query: TMaokaJab<Ordo.Content.Query> = ({ use }) => {
+	const zags = use(ordo_context.consume)
+	return zags.select("content_query")
 }
 
 // export const get_content_query: TMaokaJab<Ordo.Content.Query> = ({ use }) => {

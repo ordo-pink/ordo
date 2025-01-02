@@ -7,15 +7,23 @@ import { Maoka, type TMaokaChildren } from "@ordo-pink/maoka"
 import { Result } from "@ordo-pink/result"
 import { type TZags } from "@ordo-pink/zags"
 import { keys_of } from "@ordo-pink/tau"
-import { ordo_context } from "./src/maoka-ordo-jabs.impl"
 
-import { get_commands, get_metadata_query, get_translations$ } from "./src/maoka-ordo-jabs.impl"
+import {
+	get_commands,
+	get_content_query,
+	get_metadata_query,
+	get_translations$,
+	get_user_query,
+	ordo_context,
+} from "./src/maoka-ordo-jabs.impl"
 
 export const MaokaOrdo = {
 	Jabs: {
-		Commands: get_commands,
-		Translations$: get_translations$,
-		MetadataQuery: get_metadata_query,
+		get_commands,
+		get_translations$,
+		get_metadata_query,
+		get_user_query,
+		get_content_query,
 	},
 	Ops: {
 		get_route_params: (route: Ordo.Router.Route | null) =>

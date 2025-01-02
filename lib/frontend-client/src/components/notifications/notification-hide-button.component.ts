@@ -29,7 +29,7 @@ import { get_readable_type } from "./common"
 type P = Pick<Ordo.Notification.Instance, "id" | "type">
 export const NotificationHideButton = ({ id, type }: P) =>
 	Maoka.create("button", ({ use }) => {
-		const commands = use(MaokaOrdo.Jabs.Commands.get)
+		const commands = use(MaokaOrdo.Jabs.get_commands.get)
 		const readable_type = get_readable_type(type)
 
 		use(MaokaJabs.set_inner_html(BS_X))

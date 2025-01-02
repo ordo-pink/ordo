@@ -48,8 +48,8 @@ export const CommandPalette = (cp$: Observable<Ordo.CommandPalette.Instance>, ct
 		let current_item_index = 0
 		let current_item_location = CurrentItemLocation.SUGGESTED
 
-		const { emit } = use(MaokaOrdo.Jabs.Commands.get)
-		const { t } = use(MaokaOrdo.Jabs.Translations$)
+		const { emit } = use(MaokaOrdo.Jabs.get_commands.get)
+		const { t } = use(MaokaOrdo.Jabs.get_translations$)
 
 		const t_placeholder = t("t.common.components.command_palette.search_placeholder")
 

@@ -39,7 +39,7 @@ export const FileEditorWorkspace = (ctx: Ordo.CreateFunction.Params) => {
 		use(MaokaOrdo.Context.provide(ctx))
 
 		const get_route_params = use(MaokaOrdo.Jabs.RouteParams)
-		const metadata_query = use(MaokaOrdo.Jabs.MetadataQuery)
+		const metadata_query = use(MaokaOrdo.Jabs.get_metadata_query)
 
 		return () =>
 			R.FromNullable(get_route_params())

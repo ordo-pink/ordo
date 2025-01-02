@@ -39,7 +39,7 @@ export const ModalOverlay = ($: Observable<TOption<Ordo.Modal.Instance>>, ctx: O
 
 		type TModalState = TOption<Ordo.Modal.Instance>
 
-		const commands = use(MaokaOrdo.Jabs.Commands.get)
+		const commands = use(MaokaOrdo.Jabs.get_commands.get)
 
 		use(MaokaJabs.set_class("modal-overlay"))
 		use(MaokaJabs.listen("onclick", event => handle_click(event)))

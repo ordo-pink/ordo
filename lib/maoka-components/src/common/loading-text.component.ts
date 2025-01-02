@@ -19,11 +19,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-// import { Maoka } from "@ordo-pink/maoka"
-// import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
+import { Maoka } from "@ordo-pink/maoka"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
-// export const LoadingText = Maoka.create("span", ({ use }) => {
-// 	const { t } = use(MaokaOrdo.Jabs.Translations)
+export const LoadingText = Maoka.create("span", ({ use }) => {
+	const { t } = use(MaokaOrdo.Jabs.get_translations$)
 
-// 	return () => t("t.common.state.loading")
-// })
+	return () => t("t.common.state.loading")
+})

@@ -30,7 +30,7 @@ export const RenderPicker = (metadata: Ordo.Metadata.Instance) =>
 		const metadata_fsid = metadata.get_fsid()
 		const metadata_type = metadata.get_type()
 
-		const content_query = use(MaokaOrdo.Jabs.ContentQuery)
+		const content_query = use(MaokaOrdo.Jabs.get_content_query)
 
 		const content0 = content_query.get(metadata_fsid)
 		const content = await content0.invoke(invokers0.or_else(() => null))

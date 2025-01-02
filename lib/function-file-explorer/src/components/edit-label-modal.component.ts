@@ -30,7 +30,7 @@ export const EditLabelModal = (ctx: Ordo.CreateFunction.Params, label: Ordo.Meta
 	Maoka.create("div", ({ use }) => {
 		use(MaokaOrdo.Context.provide(ctx))
 
-		const commands = use(MaokaOrdo.Jabs.Commands.get)
+		const commands = use(MaokaOrdo.Jabs.get_commands.get)
 
 		const is_string_label = is_string(label)
 		const initial_name = is_string_label ? label : label.name

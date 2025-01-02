@@ -19,64 +19,64 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-// import { Maoka, type TMaokaElement } from "@ordo-pink/maoka"
-// import { BsCaretRight } from "@ordo-pink/frontend-icons"
-// import { MaokaJabs } from "@ordo-pink/maoka-jabs"
-// import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
-// import { Result } from "@ordo-pink/result"
+import { Maoka, type TMaokaElement } from "@ordo-pink/maoka"
+import { BsCaretRight } from "@ordo-pink/frontend-icons"
+import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
+import { Result } from "@ordo-pink/result"
 
-// // TODO: Lead to user page
-// // TODO: Get actual user (id: string) =>
-// export const CurrentUserReference = Maoka.create("div", ({ use, refresh, on_unmount }) => {
-// 	let name = ""
+// TODO: Lead to user page
+// TODO: Get actual user (id: string) =>
+export const CurrentUserReference = Maoka.create("div", ({ use, refresh, on_unmount }) => {
+	let name = ""
 
-// 	use(MaokaJabs.set_class("flex gap-x-2 items-center text-sm"))
+	use(MaokaJabs.set_class("flex gap-x-2 items-center text-sm"))
 
-// 	const user_query = use(MaokaOrdo.Jabs.UserQuery)
+	const user_query = use(MaokaOrdo.Jabs.get_user_query)
 
-// 	const subscription = user_query.$.subscribe(() =>
-// 		user_query
-// 			.get_current()
-// 			.pipe(Result.ops.map(user => void (name = user.get_readable_name())))
-// 			.cata(Result.catas.if_ok(() => void refresh())),
-// 	)
+	const divorce_user_query_version = user_query.$.marry(() =>
+		user_query
+			.get_current()
+			.pipe(Result.ops.map(user => void (name = user.get_readable_name())))
+			.cata(Result.catas.if_ok(() => void refresh())),
+	)
 
-// 	on_unmount(() => subscription.unsubscribe())
+	on_unmount(() => divorce_user_query_version())
 
-// 	return () => [UserAvatar, UserName(name)]
-// })
+	return () => [UserAvatar, UserName(name)]
+})
 
-// const user_avatar_class = [
-// 	"flex shrink-0 cursor-pointer items-center justify-center rounded-full p-0.5 shadow-lg",
-// 	"bg-gradient-to-tr from-sky-400 via-purple-400 to-rose-400",
-// ]
+const user_avatar_class = [
+	"flex shrink-0 cursor-pointer items-center justify-center rounded-full p-0.5 shadow-lg",
+	"bg-gradient-to-tr from-sky-400 via-purple-400 to-rose-400",
+]
 
-// const UserAvatar = Maoka.create("div", ({ use }) => {
-// 	use(MaokaJabs.set_class(...user_avatar_class))
+const UserAvatar = Maoka.create("div", ({ use }) => {
+	use(MaokaJabs.set_class(...user_avatar_class))
 
-// 	return () =>
-// 		Maoka.create("div", ({ use }) => {
-// 			use(MaokaJabs.set_class("rounded-full bg-neutral-500"))
+	return () =>
+		Maoka.create("div", ({ use }) => {
+			use(MaokaJabs.set_class("rounded-full bg-neutral-500"))
 
-// 			return () => UserAvatarIcon
-// 		})
-// })
+			return () => UserAvatarIcon
+		})
+})
 
-// const UserAvatarIcon = Maoka.create("div", ({ use }) => {
-// 	use(MaokaJabs.set_class("size-3 rounded-full text-xs"))
+const UserAvatarIcon = Maoka.create("div", ({ use }) => {
+	use(MaokaJabs.set_class("size-3 rounded-full text-xs"))
 
-// 	// TODO: User icon
-// 	return () => BsCaretRight("size-3 white") as TMaokaElement
-// })
+	// TODO: User icon
+	return () => BsCaretRight("size-3 white") as TMaokaElement
+})
 
-// export const UserName = (name: string) =>
-// 	Maoka.create("div", ({ use }) => {
-// 		use(MaokaJabs.set_class(highlight_first_letter_class))
+export const UserName = (name: string) =>
+	Maoka.create("div", ({ use }) => {
+		use(MaokaJabs.set_class(highlight_first_letter_class))
 
-// 		return () => name
-// 	})
+		return () => name
+	})
 
-// // --- Internal ---
+// --- Internal ---
 
-// const highlight_first_letter_class =
-// 	"first-letter:bg-gradient-to-tr first-letter:from-pink-500 first-letter:to-purple-500 first-letter:bg-clip-text first-letter:text-transparent"
+const highlight_first_letter_class =
+	"first-letter:bg-gradient-to-tr first-letter:from-pink-500 first-letter:to-purple-500 first-letter:bg-clip-text first-letter:text-transparent"

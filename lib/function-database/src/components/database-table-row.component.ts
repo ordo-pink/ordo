@@ -55,7 +55,7 @@ const LabelsCell = (fsid: Ordo.Metadata.FSID) =>
 		use(MaokaJabs.set_class("flex items-start flex-wrap gap-1 p-1 size-full cursor-pointer"))
 		use(MaokaJabs.listen("onclick", () => handle_click()))
 
-		const commands = use(MaokaOrdo.Jabs.Commands.get)
+		const commands = use(MaokaOrdo.Jabs.get_commands.get)
 		const get_metadata = use(MaokaOrdo.Jabs.Metadata.get_by_fsid(fsid))
 
 		const handle_click = () => commands.emit("cmd.metadata.show_edit_labels_palette", fsid)
@@ -77,7 +77,7 @@ const DateCell = (date: Date) =>
 
 const FileNameCell = (metadata: Ordo.Metadata.Instance) =>
 	Maoka.create("td", ({ use }) => {
-		const { emit } = use(MaokaOrdo.Jabs.Commands.get)
+		const { emit } = use(MaokaOrdo.Jabs.get_commands.get)
 
 		const handle_context_menu = (event: MouseEvent) => emit("cmd.application.context_menu.show", { event, payload: metadata })
 
@@ -99,7 +99,7 @@ const FileNameCell = (metadata: Ordo.Metadata.Instance) =>
 							MetadataIcon({ metadata }),
 
 							Maoka.create("div", ({ use, element }) => {
-								const { emit } = use(MaokaOrdo.Jabs.Commands.get)
+								const { emit } = use(MaokaOrdo.Jabs.get_commands.get)
 								const keydown_listener = MaokaJabs.listen("onkeydown", event => {
 									if (event.key !== "Enter" && event.key !== "Escape") return
 

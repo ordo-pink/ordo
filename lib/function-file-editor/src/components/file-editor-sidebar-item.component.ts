@@ -35,8 +35,8 @@ export const FileEditorSidebarItem = (initial_metadata: Ordo.Metadata.Instance, 
 
 		use(MaokaJabs.set_class("cursor-pointer"))
 
-		const commands = use(MaokaOrdo.Jabs.Commands.get)
-		const metadata_query = use(MaokaOrdo.Jabs.MetadataQuery)
+		const commands = use(MaokaOrdo.Jabs.get_commands.get)
+		const metadata_query = use(MaokaOrdo.Jabs.get_metadata_query)
 
 		const subscription = metadata_query.$.subscribe(() => {
 			metadata_query

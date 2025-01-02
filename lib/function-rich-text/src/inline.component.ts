@@ -43,7 +43,7 @@ export const Inline = (
 			const fsid = metadata.get_fsid()
 			const content_type = metadata.get_type()
 
-			const commands = use(MaokaOrdo.Jabs.Commands.get)
+			const commands = use(MaokaOrdo.Jabs.get_commands)
 			const { caret_position$, state$, add_new_line, set_caret_position, remove_block } = use(editor_context_jab)
 
 			after_mount(() => {

@@ -21,16 +21,18 @@
 
 // import { BsLayoutTextWindow } from "react-icons/bs"
 
-import { Maoka, type TMaokaChildren } from "@ordo-pink/maoka"
 import { BsLayoutTextWindow } from "@ordo-pink/frontend-icons"
+import { Maoka } from "@ordo-pink/maoka"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MetadataIcon } from "@ordo-pink/maoka-components"
 import { Result } from "@ordo-pink/result"
+import { Switch } from "@ordo-pink/switch"
+import { type TZags } from "@ordo-pink/zags"
+import { TwoLetterLocale } from "@ordo-pink/locale"
 import { create_function } from "@ordo-pink/core"
 
 import { FileEditorSidebar } from "./src/file-editor.sidebar"
 import { FileEditorWorkspace } from "./src/file-editor.workspace"
-import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
-import { Switch } from "@ordo-pink/switch"
 
 declare global {
 	interface cmd {
@@ -58,7 +60,6 @@ export default create_function(
 			"cmd.application.command_palette.add",
 			"cmd.application.command_palette.hide",
 			"cmd.application.command_palette.show",
-			"cmd.application.context_menu.show",
 			"cmd.application.notification.show",
 			"cmd.application.router.navigate",
 			"cmd.application.set_title",
@@ -72,41 +73,35 @@ export default create_function(
 			"cmd.metadata.show_edit_label_modal",
 			"cmd.metadata.show_edit_labels_palette",
 		],
-		queries: [
-			"data.metadata_query",
-			"application.current_route",
-			"users.users_query",
-			"data.content_query",
-			"functions.file_associations",
-		],
+		queries: [],
 	},
 	ctx => {
-		const { on, emit } = ctx.get_commands()
-		const metadata_query = ctx.get_metadata_query()
+		const commands = ctx.select("commands")
+		const metadata_query = ctx.select("metadata_query")
 
-		on("cmd.file_editor.open", () => emit("cmd.application.router.navigate", "/editor"))
-		on("cmd.file_editor.open_file", x => emit("cmd.application.router.navigate", `/editor/${x}`))
+		commands.on("cmd.file_editor.open", () => commands.emit("cmd.application.router.navigate", { url: "/editor" }))
+		commands.on("cmd.file_editor.open_file", x => commands.emit("cmd.application.router.navigate", { url: `/editor/${x}` }))
 
-		emit("cmd.application.add_translations", {
-			lang: "en",
+		commands.emit("cmd.application.add_translations", {
+			lang: TwoLetterLocale.ENGLISH,
 			translations: {
 				"t.file_editor.command_palette.open": "Open File Editor",
 				"t.file_editor.command_palette.open_file": "Open in File Editor...",
 			},
 		})
 
-		emit("cmd.application.command_palette.add", {
-			on_select: () => emit("cmd.file_editor.open"),
+		commands.emit("cmd.application.command_palette.add", {
+			on_select: () => commands.emit("cmd.file_editor.open"),
 			readable_name: "t.file_editor.command_palette.open",
 			hotkey: "mod+e",
 			render_icon: div => void div.appendChild(BsLayoutTextWindow() as SVGSVGElement),
 		})
 
-		emit("cmd.application.command_palette.add", {
+		commands.emit("cmd.application.command_palette.add", {
 			on_select: () =>
-				metadata_query.pipe(Result.ops.chain(query => query.get())).cata(
+				metadata_query.get().cata(
 					Result.catas.if_ok(metadata =>
-						emit("cmd.application.command_palette.show", {
+						commands.emit("cmd.application.command_palette.show", {
 							items: metadata.map(metadata_to_command_palette_item(ctx, emit)),
 							max_items: 20,
 						}),
@@ -117,31 +112,20 @@ export default create_function(
 			render_icon: div => void div.appendChild(BsLayoutTextWindow() as SVGSVGElement),
 		})
 
-		emit("cmd.functions.activities.register", {
-			fid: ctx.fid,
-			activity: {
-				name: "pink.ordo.editor.activity",
-				routes: ["/editor", "/editor/:fsid"],
-				render_icon: div => void div.appendChild(BsLayoutTextWindow() as SVGSVGElement),
-				render_workspace: div => Maoka.render_dom(div, FileEditorWorkspace(ctx)),
-				render_sidebar: div => Maoka.render_dom(div, FileEditorSidebar(ctx)),
-			},
+		commands.emit("cmd.functions.activities.register", {
+			name: "pink.ordo.editor.activity",
+			routes: ["/editor", "/editor/:fsid"],
+			render_icon: div => void div.appendChild(BsLayoutTextWindow() as SVGSVGElement),
+			render_workspace: div => Maoka.render_dom(div, FileEditorWorkspace(ctx)),
+			render_sidebar: div => Maoka.render_dom(div, FileEditorSidebar(ctx)),
 		})
 	},
 )
 
-// TODO Move to core
-const WithCtx = (ctx: Ordo.CreateFunction.Params) => (children: () => TMaokaChildren) =>
-	Maoka.create("div", ({ use }) => {
-		use(MaokaOrdo.Context.provide(ctx))
-
-		return children
-	})
-
 const metadata_to_command_palette_item =
-	(ctx: Ordo.CreateFunction.Params, emit: Ordo.Command.Commands["emit"]) =>
+	(ctx: TZags<Ordo.CreateFunction.State>, emit: Ordo.Command.Commands["emit"]) =>
 	(metadata: Ordo.Metadata.Instance): Ordo.CommandPalette.Item => {
-		const metadata_query = ctx.get_metadata_query().unwrap() as Ordo.Metadata.Query
+		const metadata_query = ctx.select("metadata_query")
 
 		const path = metadata_query
 			.get_ancestors(metadata.get_fsid())
@@ -154,12 +138,9 @@ const metadata_to_command_palette_item =
 			readable_name: metadata.get_name() as Ordo.I18N.TranslationKey,
 			render_custom_info: () => FilePath(() => path),
 			render_icon: div => {
-				const Provider = WithCtx(ctx)
+				const Component = MaokaOrdo.Components.WithCtx(ctx, () => MetadataIcon({ metadata }))
 
-				return Maoka.render_dom(
-					div,
-					Provider(() => MetadataIcon({ metadata })),
-				)
+				return Maoka.render_dom(div, Component)
 			},
 		}
 	}

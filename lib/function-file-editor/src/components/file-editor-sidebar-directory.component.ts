@@ -39,7 +39,7 @@ export const FileEditorSidebarDirectory = (metadata: Ordo.Metadata.Instance, dep
 	Maoka.create("div", ({ use, refresh }) => {
 		const fsid = metadata.get_fsid()
 
-		const metadata_query = use(MaokaOrdo.Jabs.MetadataQuery)
+		const metadata_query = use(MaokaOrdo.Jabs.get_metadata_query)
 		const get_route_params = use(MaokaOrdo.Jabs.RouteParams)
 
 		const on_caret_click = (event: MouseEvent) => {
@@ -123,7 +123,7 @@ const FileEditorDirectoryName = (
 
 		use(MaokaOrdo.Jabs.subscribe($, handle_current_route_change))
 
-		const commands = use(MaokaOrdo.Jabs.Commands.get)
+		const commands = use(MaokaOrdo.Jabs.get_commands.get)
 
 		use(MaokaJabs.listen("onclick", () => commands.emit("cmd.file_editor.open_file", fsid)))
 		use(MaokaJabs.set_style({ paddingLeft: `${depth + 0.5}rem`, paddingRight: "0.5rem" }))

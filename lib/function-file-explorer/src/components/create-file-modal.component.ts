@@ -32,8 +32,8 @@ export const CreateFileModal = (ctx: Ordo.CreateFunction.Params, parent: Ordo.Me
 
 		let type = "text/ordo"
 
-		const { t } = use(MaokaOrdo.Jabs.Translations$)
-		const { emit } = use(MaokaOrdo.Jabs.Commands.get)
+		const { t } = use(MaokaOrdo.Jabs.get_translations$)
+		const { emit } = use(MaokaOrdo.Jabs.get_commands.get)
 
 		const t_title = t("t.file_explorer.modals.create_file.title")
 		const state = { name: "" }
@@ -152,7 +152,7 @@ const SelectItem = (
 							return () => [
 								Icon as TMaokaElement,
 								Maoka.create("div", ({ use }) => {
-									const { t } = use(MaokaOrdo.Jabs.Translations$)
+									const { t } = use(MaokaOrdo.Jabs.get_translations$)
 									return () => t(type.readable_name)
 								}),
 							]
@@ -160,7 +160,7 @@ const SelectItem = (
 
 						Maoka.create("div", ({ use }) => {
 							use(MaokaJabs.set_class("text-xs text-neutral-600 dark:text-neutral-400"))
-							const { t } = use(MaokaOrdo.Jabs.Translations$)
+							const { t } = use(MaokaOrdo.Jabs.get_translations$)
 							return () => t(type.description)
 						}),
 					]
@@ -171,7 +171,7 @@ const SelectItem = (
 
 const CreateFileModalInput = (handle_change: (event: Event) => void) =>
 	Maoka.create("label", ({ use }) => {
-		const { t } = use(MaokaOrdo.Jabs.Translations$)
+		const { t } = use(MaokaOrdo.Jabs.get_translations$)
 
 		return () => [
 			Maoka.create("div", ({ use }) => {

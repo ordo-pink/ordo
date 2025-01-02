@@ -70,7 +70,7 @@ export const OrdoSidebarButton = Maoka.create("button", ({ use }) => {
 		const readable_name = "t.common.components.sidebar.toggle"
 
 		if (status !== OrdoSidebarStatus.DISABLED) {
-			if (prev_status == null || prev_status === OrdoSidebarStatus.DISABLED) {
+			if (prev_status === OrdoSidebarStatus.DISABLED) {
 				prev_status = status
 				commands.emit("cmd.application.command_palette.add", {
 					on_select: () => commands.emit("cmd.application.sidebar.toggle"),

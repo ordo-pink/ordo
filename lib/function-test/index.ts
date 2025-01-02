@@ -23,21 +23,32 @@ import { NotificationType, create_function } from "@ordo-pink/core"
 import { BsFileEarmarkBinary } from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
-import { TZags } from "@ordo-pink/zags"
+import { type TZags } from "@ordo-pink/zags"
+import { TwoLetterLocale } from "@ordo-pink/locale"
 
 let ordo_state: TZags<Ordo.CreateFunction.State>
+
+declare global {
+	interface t {
+		test: {
+			title: () => string
+		}
+	}
+}
 
 export default create_function(
 	"pink.ordo.test",
 	{
 		queries: ["metadata.get_by_fsid", "metadata.get"],
 		commands: [
+			"cmd.application.add_translations",
 			"cmd.application.background_task.reset_status",
 			"cmd.application.background_task.set_status",
 			"cmd.application.background_task.start_loading",
 			"cmd.application.background_task.start_saving",
 			"cmd.application.modal.show",
 			"cmd.application.notification.show",
+			"cmd.application.set_title",
 			"cmd.application.sidebar.disable",
 			"cmd.application.sidebar.enable",
 			"cmd.application.sidebar.hide",
@@ -64,6 +75,15 @@ const test_activity_route = "/test"
 const TestActivityIcon = BsFileEarmarkBinary() as SVGSVGElement
 const TestActivityWorkspace = Maoka.create("div", () => {
 	const commands = ordo_state.select("commands")
+
+	commands.emit("cmd.application.add_translations", {
+		lang: TwoLetterLocale.ENGLISH,
+		translations: {
+			"t.test.title": "It's like Todd's test room, but in",
+		},
+	})
+
+	commands.emit("cmd.application.set_title", "t.test.title")
 
 	return () => {
 		return TestWrapper(() => [

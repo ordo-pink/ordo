@@ -25,7 +25,7 @@ import { type TLogger } from "@ordo-pink/logger"
 import { CommandPaletteLocation, EMPTY_COMMAND_PALETTE } from "./src/components/command-palette/constants"
 import { OrdoSidebarStatus } from "./src/components/sidebar/sidebar.constants"
 
-const is_dev = true // TODO Take from env
+const is_dev = import.meta.env.DEV
 const app_name = "pink.ordo.app" // TODO Take from env
 const version = "v0.7.0" // TODO Take from env
 const hosts = {} as Ordo.Hosts // TODO Take from env

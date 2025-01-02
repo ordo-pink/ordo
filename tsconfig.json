@@ -19,7 +19,7 @@
 		"skipLibCheck": true,
 		"isolatedModules": true,
 		"target": "ESNext",
-		"module": "CommonJS",
+		"module": "Preserve",
 		"baseUrl": ".",
 		"paths": {
 			"@ordo-pink/*": ["./lib/*"]

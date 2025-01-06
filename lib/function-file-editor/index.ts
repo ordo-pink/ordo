@@ -27,7 +27,6 @@ import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MetadataIcon } from "@ordo-pink/maoka-components"
 import { Result } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
-import { type TZags } from "@ordo-pink/zags"
 import { TwoLetterLocale } from "@ordo-pink/locale"
 import { create_function } from "@ordo-pink/core"
 
@@ -75,9 +74,9 @@ export default create_function(
 		],
 		queries: [],
 	},
-	ctx => {
-		const commands = ctx.select("commands")
-		const metadata_query = ctx.select("metadata_query")
+	state => {
+		const commands = state.commands
+		const metadata_query = state.metadata_query
 
 		commands.on("cmd.file_editor.open", () => commands.emit("cmd.application.router.navigate", { url: "/editor" }))
 		commands.on("cmd.file_editor.open_file", x => commands.emit("cmd.application.router.navigate", { url: `/editor/${x}` }))
@@ -102,8 +101,8 @@ export default create_function(
 				metadata_query.get().cata(
 					Result.catas.if_ok(metadata =>
 						commands.emit("cmd.application.command_palette.show", {
-							items: metadata.map(metadata_to_command_palette_item(ctx, emit)),
-							max_items: 20,
+							items: metadata.map(metadata_to_command_palette_item(state, commands.emit)),
+							max_items: 50,
 						}),
 					),
 				),
@@ -116,16 +115,24 @@ export default create_function(
 			name: "pink.ordo.editor.activity",
 			routes: ["/editor", "/editor/:fsid"],
 			render_icon: div => void div.appendChild(BsLayoutTextWindow() as SVGSVGElement),
-			render_workspace: div => Maoka.render_dom(div, FileEditorWorkspace(ctx)),
-			render_sidebar: div => Maoka.render_dom(div, FileEditorSidebar(ctx)),
+			render_workspace: div =>
+				Maoka.render_dom(
+					div,
+					MaokaOrdo.Components.WithState(state, () => FileEditorWorkspace),
+				),
+			render_sidebar: div =>
+				Maoka.render_dom(
+					div,
+					MaokaOrdo.Components.WithState(state, () => FileEditorSidebar),
+				),
 		})
 	},
 )
 
 const metadata_to_command_palette_item =
-	(ctx: TZags<Ordo.CreateFunction.State>, emit: Ordo.Command.Commands["emit"]) =>
+	(state: Ordo.CreateFunction.State, emit: Ordo.Command.Commands["emit"]) =>
 	(metadata: Ordo.Metadata.Instance): Ordo.CommandPalette.Item => {
-		const metadata_query = ctx.select("metadata_query")
+		const metadata_query = state.metadata_query
 
 		const path = metadata_query
 			.get_ancestors(metadata.get_fsid())
@@ -138,7 +145,7 @@ const metadata_to_command_palette_item =
 			readable_name: metadata.get_name() as Ordo.I18N.TranslationKey,
 			render_custom_info: () => FilePath(() => path),
 			render_icon: div => {
-				const Component = MaokaOrdo.Components.WithCtx(ctx, () => MetadataIcon({ metadata }))
+				const Component = MaokaOrdo.Components.WithState(state, () => MetadataIcon({ metadata }))
 
 				return Maoka.render_dom(div, Component)
 			},

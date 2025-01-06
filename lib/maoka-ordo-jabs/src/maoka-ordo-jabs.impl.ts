@@ -5,14 +5,45 @@
 
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { type TMaokaJab } from "@ordo-pink/maoka"
-import { TZags } from "@ordo-pink/zags"
+import { type TZags } from "@ordo-pink/zags"
+import { deep_equals } from "@ordo-pink/tau"
 
-export const ordo_context = MaokaJabs.create_context<TZags<Ordo.CreateFunction.State>>()
+export const ordo_context = MaokaJabs.create_context<Ordo.CreateFunction.State>()
 
 export const get_commands: TMaokaJab<Ordo.Command.Commands> = ({ use }) => {
 	const zags = use(ordo_context.consume)
-	return zags.select("commands")
+	return zags.commands
 }
+
+export const get_current_route$: TMaokaJab<() => Ordo.Router.Route | undefined> = ({ use }) => {
+	const { router$ } = use(ordo_context.consume)
+	const get_router = use(happy_marriage$(router$))
+
+	return () => get_router().current_route
+}
+
+export const get_route_params$: TMaokaJab<() => Record<string, string>> = ({ use }) => {
+	const get_current_route = use(get_current_route$)
+
+	return () => get_current_route()?.params ?? {}
+}
+
+export const happy_marriage$ =
+	<T extends Record<string, unknown>>(zags: TZags<T>): TMaokaJab<() => T> =>
+	({ on_unmount, refresh }) => {
+		let value: T
+
+		const divorce = zags.marry(state => {
+			if (deep_equals(value, state)) return
+
+			value = state
+			void refresh()
+		})
+
+		on_unmount(divorce)
+
+		return () => value
+	}
 
 // export const get_logger: TMaokaJab<TLogger> = ({ use }) => {
 // 	const { get_logger } = use(ordo_context.consume)
@@ -26,17 +57,17 @@ export const get_commands: TMaokaJab<Ordo.Command.Commands> = ({ use }) => {
 
 export const get_user_query: TMaokaJab<Ordo.User.Query> = ({ use }) => {
 	const zags = use(ordo_context.consume)
-	return zags.select("user_query")
+	return zags.user_query
 }
 
 export const get_metadata_query: TMaokaJab<Ordo.Metadata.Query> = ({ use }) => {
 	const zags = use(ordo_context.consume)
-	return zags.select("metadata_query")
+	return zags.metadata_query
 }
 
 export const get_content_query: TMaokaJab<Ordo.Content.Query> = ({ use }) => {
 	const zags = use(ordo_context.consume)
-	return zags.select("content_query")
+	return zags.content_query
 }
 
 // export const get_content_query: TMaokaJab<Ordo.Content.Query> = ({ use }) => {
@@ -52,8 +83,7 @@ export const get_content_query: TMaokaJab<Ordo.Content.Query> = ({ use }) => {
 // }
 
 export const get_translations$: TMaokaJab<{ t: Ordo.I18N.TranslateFn }> = ({ use, refresh }) => {
-	const zags = use(ordo_context.consume)
-	const translate = zags.select("translate")
+	const { translate } = use(ordo_context.consume)
 
 	translate.$.marry((_, is_update) => {
 		if (is_update) return

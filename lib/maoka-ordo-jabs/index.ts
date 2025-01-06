@@ -4,14 +4,13 @@
  */
 
 import { Maoka, type TMaokaChildren } from "@ordo-pink/maoka"
-import { Result } from "@ordo-pink/result"
-import { type TZags } from "@ordo-pink/zags"
-import { keys_of } from "@ordo-pink/tau"
 
 import {
 	get_commands,
 	get_content_query,
+	get_current_route$,
 	get_metadata_query,
+	get_route_params$,
 	get_translations$,
 	get_user_query,
 	ordo_context,
@@ -24,31 +23,17 @@ export const MaokaOrdo = {
 		get_metadata_query,
 		get_user_query,
 		get_content_query,
-	},
-	Ops: {
-		get_route_params: (route: Ordo.Router.Route | null) =>
-			Result.FromNullable(route)
-				.pipe(Result.ops.chain(route => Result.FromNullable(route.params)))
-				.pipe(
-					Result.ops.map(params =>
-						keys_of(params).reduce(
-							(acc, key) => ({
-								...acc,
-								[key]: params[key] ? decodeURIComponent((params as any)[key]) : void 0,
-							}),
-							{} as Record<string, string | undefined>,
-						),
-					),
-				),
+		get_route_params$,
+		get_current_route$,
 	},
 	Context: ordo_context,
 	Components: {
-		WithCtx: (ctx: TZags<Ordo.CreateFunction.State>, children: () => TMaokaChildren) =>
+		WithState: (ctx: Ordo.CreateFunction.State, children: () => TMaokaChildren) =>
 			Maoka.create("div", ({ use }) => {
 				use(MaokaOrdo.Context.provide(ctx))
 				return children
 			}),
-		WithCtxCurry: (ctx: TZags<Ordo.CreateFunction.State>) => (children: () => TMaokaChildren) =>
-			MaokaOrdo.Components.WithCtx(ctx, children),
+		WithStateCurry: (ctx: Ordo.CreateFunction.State) => (children: () => TMaokaChildren) =>
+			MaokaOrdo.Components.WithState(ctx, children),
 	},
 }

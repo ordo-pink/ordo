@@ -35,28 +35,18 @@ export const FileEditorSidebarItem = (initial_metadata: Ordo.Metadata.Instance, 
 
 		use(MaokaJabs.set_class("cursor-pointer"))
 
-		const commands = use(MaokaOrdo.Jabs.get_commands.get)
 		const metadata_query = use(MaokaOrdo.Jabs.get_metadata_query)
 
-		const subscription = metadata_query.$.subscribe(() => {
+		const divorce_metadata_query_version = metadata_query.$.marry(() => {
 			metadata_query
 				.get_by_fsid(initial_metadata.get_fsid())
-				.pipe(R.ops.chain(R.FromOption))
+				.pipe(R.ops.chain(R.FromNullable))
 				.pipe(R.ops.chain(x => R.If(!initial_metadata.equals(x), { T: () => x })))
 				.pipe(R.ops.map(x => void (metadata = x)))
 				.cata(R.catas.if_ok(() => void refresh()))
 		})
 
-		use(
-			MaokaJabs.listen("oncontextmenu", event => {
-				event.preventDefault()
-				event.stopPropagation()
-
-				commands.emit("cmd.application.context_menu.show", { event, payload: metadata })
-			}),
-		)
-
-		on_unmount(() => subscription.unsubscribe())
+		on_unmount(divorce_metadata_query_version)
 
 		return () =>
 			Switch.Match(metadata_query.has_children(metadata.get_fsid()).unwrap())

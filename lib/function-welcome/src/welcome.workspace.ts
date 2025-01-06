@@ -20,18 +20,7 @@
  */
 
 import { Maoka } from "@ordo-pink/maoka"
-import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
-import { type TZags } from "@ordo-pink/zags"
 
-export const WelcomeWorkspace = (ctx: TZags<Ordo.CreateFunction.State>) =>
-	Maoka.create("div", ({ use }) => {
-		use(MaokaOrdo.Context.provide(ctx))
+import Landing from "./pages/landing.page"
 
-		const is_authenticated = false // TODO
-
-		return () => {
-			return is_authenticated
-				? Maoka.lazy(() => import("./pages/welcome.page"))
-				: Maoka.lazy(() => import("./pages/landing.page"))
-		}
-	})
+export const WelcomeWorkspace = Maoka.create("div", () => () => Landing)

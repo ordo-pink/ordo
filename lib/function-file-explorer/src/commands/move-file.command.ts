@@ -99,7 +99,7 @@ const metadata_to_cp_items =
 		move_destinations.map(metadata => {
 			const new_parent = metadata.get_fsid()
 			const readable_name = metadata.get_name() as Ordo.I18N.TranslationKey
-			const Icon = MaokaOrdo.Components.WithCtx(ctx, () => MetadataIcon({ metadata, show_emoji_picker: false }))
+			const Icon = MaokaOrdo.Components.WithState(ctx, () => MetadataIcon({ metadata, show_emoji_picker: false }))
 
 			const on_select = () => commands.emit("cmd.metadata.move", { fsid, new_parent })
 			const render_icon = (div: HTMLDivElement) => Maoka.render_dom(div, Icon)

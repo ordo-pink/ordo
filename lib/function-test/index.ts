@@ -23,10 +23,8 @@ import { NotificationType, create_function } from "@ordo-pink/core"
 import { BsFileEarmarkBinary } from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
-import { type TZags } from "@ordo-pink/zags"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { TwoLetterLocale } from "@ordo-pink/locale"
-
-let ordo_state: TZags<Ordo.CreateFunction.State>
 
 declare global {
 	interface t {
@@ -58,14 +56,16 @@ export default create_function(
 		],
 	},
 	state => {
-		ordo_state = state
-
-		const commands = state.select("commands")
+		const commands = state.commands
 		commands.emit("cmd.functions.activities.register", {
 			name: "pink.ordo.test",
 			routes: [test_activity_route],
 			render_icon: span => void span.appendChild(TestActivityIcon),
-			render_workspace: div => Maoka.render_dom(div, TestActivityWorkspace),
+			render_workspace: div =>
+				Maoka.render_dom(
+					div,
+					MaokaOrdo.Components.WithState(state, () => TestActivityWorkspace),
+				),
 		})
 	},
 )
@@ -73,8 +73,8 @@ export default create_function(
 const test_activity_route = "/test"
 
 const TestActivityIcon = BsFileEarmarkBinary() as SVGSVGElement
-const TestActivityWorkspace = Maoka.create("div", () => {
-	const commands = ordo_state.select("commands")
+const TestActivityWorkspace = Maoka.create("div", ({ use }) => {
+	const commands = use(MaokaOrdo.Jabs.get_commands)
 
 	commands.emit("cmd.application.add_translations", {
 		lang: TwoLetterLocale.ENGLISH,

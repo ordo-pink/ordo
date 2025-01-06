@@ -47,7 +47,7 @@ export const show_filters_jab =
 				render: div =>
 					Maoka.render_dom(
 						div,
-						MaokaOrdo.Components.WithCtx(ctx, () => DatabaseFilterModal(get_db_state(), on_db_state_change)),
+						MaokaOrdo.Components.WithState(ctx, () => DatabaseFilterModal(get_db_state(), on_db_state_change)),
 					),
 			}),
 		)

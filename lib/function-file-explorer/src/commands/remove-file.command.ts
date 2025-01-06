@@ -34,7 +34,7 @@ export const register_remove_file = (ctx: Ordo.CreateFunction.Params) => {
 	const commands = ctx.get_commands()
 
 	commands.on("cmd.metadata.show_remove_modal", fsid => {
-		const Modal = MaokaOrdo.Components.WithCtx(ctx, () => RemoveFileModal(fsid))
+		const Modal = MaokaOrdo.Components.WithState(ctx, () => RemoveFileModal(fsid))
 
 		commands.emit("cmd.application.modal.show", { render: div => Maoka.render_dom(div, Modal) })
 	})

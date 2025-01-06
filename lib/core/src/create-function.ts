@@ -19,23 +19,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { ZAGS } from "@ordo-pink/zags"
-
 export const create_function: Ordo.CreateFunction.Fn =
 	(name, permissions, callback) => (ctx: OrdoInternal.Function.CreateFunctionInternalContext) => {
 		const fid = ctx.known_functions.register(name, permissions)
 
 		if (!fid) return
 
-		return callback(
-			ZAGS.Of<Ordo.CreateFunction.State>({
-				commands: ctx.get_commands(fid),
-				content_query: ctx.get_content_query(fid),
-				fetch: ctx.get_fetch(fid),
-				logger: ctx.get_logger(fid),
-				metadata_query: ctx.get_metadata_query(fid),
-				translate: ctx.translate,
-				user_query: ctx.get_user_query(fid),
-			}),
-		)
+		return callback({
+			commands: ctx.get_commands(fid),
+			content_query: ctx.get_content_query(fid),
+			fetch: ctx.get_fetch(fid),
+			logger: ctx.get_logger(fid),
+			router$: ctx.get_router(fid),
+			metadata_query: ctx.get_metadata_query(fid),
+			translate: ctx.translate,
+			user_query: ctx.get_user_query(fid),
+		})
 	}

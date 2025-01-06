@@ -24,6 +24,7 @@ import { type TLogger } from "@ordo-pink/logger"
 
 import { CommandPaletteLocation, EMPTY_COMMAND_PALETTE } from "./src/components/command-palette/constants"
 import { OrdoSidebarStatus } from "./src/components/sidebar/sidebar.constants"
+import { create_route } from "./src/frontend-app.router"
 
 // @ts-ignore
 const is_dev = import.meta.env.DEV
@@ -37,7 +38,7 @@ export const ordo_app_state = MaokaZAGS.Of<TOrdoState>({
 	constants: { is_dev, app_name, version, app_fid, app_fn },
 	hosts,
 	commands: null as any, // Assigned after initialization
-	current_route: null as any, // Assigned after initialization
+	router: { routes: {}, current_route: create_route(document.location.pathname, {}) }, // Assigned after initialization
 	functions: { activities: [], file_assocs: [] },
 	known_functions: null as any, // Assigned after initialization
 	logger: null as any, // Assigned after initialization
@@ -67,12 +68,14 @@ export type TOrdoState = {
 	hosts: Ordo.Hosts
 	translate: Ordo.I18N.TranslateFn
 	fetch: Ordo.Fetch
-	current_route: Ordo.Router.Route
+	router: TRouter
 	constants: TConstants
 	queries: TQueries
 	functions: TFunctions
 	sections: TSections
 }
+
+type TRouter = { current_route: Ordo.Router.Route; routes: Record<string, string> }
 
 type TAppName = "pink.ordo.app"
 
@@ -87,9 +90,9 @@ type TConstants = {
 }
 
 type TFunctions = {
-	current_activity?: Ordo.Activity.Instance
+	current_activity?: Ordo.Activity.Instance["name"]
 	activities: Ordo.Activity.Instance[]
-	current_file_assoc?: Ordo.FileAssociation.Instance
+	current_file_assoc?: Ordo.FileAssociation.Instance["name"]
 	file_assocs: Ordo.FileAssociation.Instance[]
 }
 

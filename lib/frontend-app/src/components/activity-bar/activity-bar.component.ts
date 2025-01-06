@@ -45,7 +45,7 @@ export const OrdoActivityBar = Maoka.create("div", ({ use }) => {
 
 	return () => {
 		const activities = get_list()
-		const current_activity = get_current()
+		const current_activity_name = get_current()
 
 		return [
 			Maoka.create("span", ({ use }) => {
@@ -69,14 +69,7 @@ export const OrdoActivityBar = Maoka.create("div", ({ use }) => {
 			ActivityBarActivities(() =>
 				activities.map(
 					({ name, routes, default_route, render_icon }) =>
-						render_icon &&
-						OrdoActivityBarLink({
-							name,
-							routes,
-							default_route,
-							render_icon,
-							current_activity_name: current_activity?.name,
-						}),
+						render_icon && OrdoActivityBarLink({ current_activity_name, default_route, name, render_icon, routes }),
 				),
 			),
 

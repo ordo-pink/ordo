@@ -22,12 +22,12 @@
 import type { JTI, SUB } from "@ordo-pink/wjwt"
 import type { Oath } from "@ordo-pink/oath"
 import type { TLogger } from "@ordo-pink/logger"
+import type { TMaokaComponent } from "@ordo-pink/maoka"
 import type { TResult } from "@ordo-pink/result"
+import type { TZags } from "@ordo-pink/zags"
 import type { TwoLetterLocale } from "@ordo-pink/locale"
 
 import type * as C from "./constants"
-import { TMaokaComponent } from "@ordo-pink/maoka"
-import { TZags } from "@ordo-pink/zags"
 
 export type TDropIsPrefix<T extends string> = T extends `is_${infer U}` ? U : never
 
@@ -396,6 +396,7 @@ declare global {
 		namespace CreateFunction {
 			type QueryPermission =
 				| "application.fetch"
+				| "application.router"
 				| `metadata.${keyof Ordo.Metadata.Query}`
 				| `user.${keyof Ordo.User.Query}`
 				| `content.${keyof Ordo.Content.Query}`
@@ -413,6 +414,7 @@ declare global {
 				commands: Ordo.Command.Commands
 				translate: Ordo.I18N.TranslateFn
 				user_query: Ordo.User.Query
+				router$: TZags<{ current_route?: Ordo.Router.Route; routes: Record<string, string> }>
 				metadata_query: Ordo.Metadata.Query
 				content_query: Ordo.Content.Query
 			}
@@ -420,7 +422,7 @@ declare global {
 			type Fn = (
 				name: string,
 				permissions: Ordo.CreateFunction.Permissions,
-				callback: (context: TZags<Ordo.CreateFunction.State>) => void | Promise<void>,
+				callback: (context: Ordo.CreateFunction.State) => void | Promise<void>,
 			) => (params: OrdoInternal.Function.CreateFunctionInternalContext) => void | Promise<void>
 		}
 
@@ -999,7 +1001,7 @@ declare global {
 			type OpenExternalParams = { url: string; new_tab?: boolean }
 
 			type Route = {
-				params: URLSearchParams
+				params: Record<string, string>
 				host: string
 				hostname: string
 				href: string

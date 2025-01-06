@@ -21,6 +21,7 @@
 
 import { BsCollection, BsEnvelopeAt, BsQuestionOctagon, BsSendCheck } from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/maoka"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { TwoLetterLocale } from "@ordo-pink/locale"
 import { create_function } from "@ordo-pink/core"
 
@@ -102,9 +103,9 @@ export default create_function(
 			"cmd.welcome.open_support_palette",
 		],
 	},
-	ctx => {
-		const commands = ctx.select("commands")
-		const translate = ctx.select("translate")
+	state => {
+		const commands = state.commands
+		const translate = state.translate
 
 		commands.emit("cmd.application.add_translations", {
 			lang: TwoLetterLocale.ENGLISH,
@@ -182,7 +183,11 @@ export default create_function(
 
 		commands.emit("cmd.functions.activities.register", {
 			name: "pink.ordo.welcome.landing-page",
-			render_workspace: div => Maoka.render_dom(div, WelcomeWorkspace(ctx)),
+			render_workspace: div =>
+				Maoka.render_dom(
+					div,
+					MaokaOrdo.Components.WithState(state, () => WelcomeWorkspace),
+				),
 			render_icon: span => void span.appendChild(BsCollection() as SVGSVGElement),
 			routes: ["/"],
 		})

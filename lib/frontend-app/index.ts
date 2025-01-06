@@ -68,32 +68,9 @@ export const App = Maoka.create("div", ({ use, on_unmount }) => {
 	const { translate } = init_i18n()
 	ordo_app_state.zags.update("translate", () => translate)
 
-	const router$ = init_router()
-	const divorce_router = router$.marry(({ current_route }) => {
-		ordo_app_state.zags.update("current_route", () => current_route)
+	init_functions()
 
-		const activities = ordo_app_state.zags.select("functions.activities")
-		const current_activity = activities?.find(activity => activity.routes.some(route => route === current_route.pathname))
-
-		// TODO dynamic routes support
-		if (current_activity) ordo_app_state.zags.update("functions.current_activity", () => current_activity)
-	})
-
-	// TODO zags.affair for partial subscription under given path
-	// TODO zags.consume(other_zags)
-	const functions$ = init_functions()
-	const divorce_functions = functions$.marry(state => {
-		ordo_app_state.zags.update("functions", () => state)
-
-		const current_route = ordo_app_state.zags.select("current_route")
-		const current_activity = ordo_app_state.zags.select("functions.current_activity")
-
-		if (!current_activity) {
-			// TODO dynamic routes support
-			const activity = state.activities.find(activity => activity.routes.some(route => route === current_route.pathname))
-			if (activity) ordo_app_state.zags.update("functions.current_activity", () => activity)
-		}
-	})
+	const { get_router } = init_router()
 
 	init_title_display()
 	init_command_palette()
@@ -123,6 +100,7 @@ export const App = Maoka.create("div", ({ use, on_unmount }) => {
 		get_fetch,
 		get_logger,
 		get_metadata_query,
+		get_router,
 		get_user_query: () => null as any, // TODO Add user_query
 		known_functions,
 		translate,
@@ -140,10 +118,10 @@ export const App = Maoka.create("div", ({ use, on_unmount }) => {
 	// TODO Uninstalling created functions
 	on_unmount(() => {
 		data_manager.cancel()
-		divorce_functions()
-		divorce_router()
 	})
 
 	// TODO Init user
-	return () => [OrdoWorkspace, OrdoSidebar, OrdoModal, OrdoNotifications, OrdoActivityBar, OrdoBackgroundTaskIndicator]
+	return () => {
+		return [OrdoWorkspace, OrdoSidebar, OrdoModal, OrdoNotifications, OrdoActivityBar, OrdoBackgroundTaskIndicator]
+	}
 })

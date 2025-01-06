@@ -47,7 +47,7 @@ export const show_columns_jab =
 				render: div =>
 					Maoka.render_dom(
 						div,
-						MaokaOrdo.Components.WithCtx(ordo_ctx, () => DatabaseColumnsModal(get_db_state(), on_db_state_change)),
+						MaokaOrdo.Components.WithState(ordo_ctx, () => DatabaseColumnsModal(get_db_state(), on_db_state_change)),
 					),
 			}),
 		)

@@ -19,38 +19,98 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { call_once, deep_equals } from "@ordo-pink/tau"
+import { colonoscope, is_colonoscopy_doctor } from "@ordo-pink/colonoscope"
+import { Result } from "@ordo-pink/result"
 import { ZAGS } from "@ordo-pink/zags"
 
 import { ordo_app_state } from "../app.state"
 
-export const init_router = () => {
-	const { logger, commands } = ordo_app_state.zags.unwrap()
+export const init_router = call_once(() => {
+	const { logger, commands, known_functions } = ordo_app_state.zags.unwrap()
 
 	logger.debug("🟡 Initialising router...")
 
-	const window_open = window.open
-
-	window.open = undefined!
-
 	commands.on("cmd.application.router.navigate", ({ url, new_tab = false }) => {
-		if (new_tab) window_open(url, "_blank")
-		else router$.update("current_route", () => create_route(url))
+		if (new_tab) return window.open(url, "_blank")
+
+		const routes = ordo_app_state.zags.select("router.routes")
+
+		for (const route of Object.keys(routes)) {
+			if (is_colonoscopy_doctor(route)) {
+				const params = colonoscope(route, url)
+
+				ordo_app_state.zags.update("functions.current_activity", () => (params ? routes[route] : void 0))
+				ordo_app_state.zags.update("router.current_route", () => create_route(url, params ?? {}))
+				return
+			}
+
+			if (url === route) {
+				ordo_app_state.zags.update("functions.current_activity", () => routes[route])
+				ordo_app_state.zags.update("router.current_route", () => create_route(url, {}))
+				return
+			}
+		}
+
+		ordo_app_state.zags.update("functions.current_activity", () => void 0)
+		ordo_app_state.zags.update("router.current_route", () => create_route(url, {}))
 	})
 
 	commands.on("cmd.application.router.open_external", ({ url, new_tab = true }) =>
-		window_open(url, new_tab ? "_blank" : "_self"),
+		window.open(url, new_tab ? "_blank" : "_self"),
 	)
 
-	router$.marry(({ current_route }, is_update) => {
-		if (is_update) history.pushState(null, "", current_route.href)
+	const divorce_router = ordo_app_state.zags.cheat("router.current_route", (current_route, is_update) => {
+		if (is_update && current_route) history.pushState(null, "", current_route.href)
+	})
+
+	const divorce_activities_updates = ordo_app_state.zags.cheat("functions.activities", activities => {
+		const routes = ordo_app_state.zags.select("router.routes")
+		const routes_copy = { ...routes }
+		const current_activity = ordo_app_state.zags.select("functions.current_activity")
+		const current_route = ordo_app_state.zags.select("router.current_route")
+
+		for (const activity of activities) {
+			for (const route of activity.routes) {
+				if (!routes[route]) routes[route] = activity.name
+			}
+		}
+
+		if (!deep_equals(routes, routes_copy)) ordo_app_state.zags.update("router.routes", () => routes)
+
+		if (!current_activity) {
+			const activity = activities.find(activity =>
+				activity.routes.some(route =>
+					is_colonoscopy_doctor(route) ? colonoscope(route, current_route.pathname) : route === current_route.pathname,
+				),
+			)
+
+			if (activity) commands.emit("cmd.application.router.navigate", { url: current_route.pathname })
+		}
+	})
+
+	window.addEventListener("beforeunload", () => {
+		divorce_activities_updates()
+		divorce_router()
 	})
 
 	logger.debug("🟢 Initialised router.")
 
-	return router$
-}
+	return {
+		get_router: (fid: symbol) =>
+			Result.If(known_functions.has_permissions(fid, { queries: ["application.router"] }))
+				.pipe(
+					Result.ops.map(() => {
+						const router$ = ZAGS.Of<{ current_route?: Ordo.Router.Route; routes: Record<string, string> }>({ routes: {} })
+						ordo_app_state.zags.cheat("router", router$.replace)
+						return router$
+					}),
+				)
+				.cata(Result.catas.or_else(() => null as never)),
+	}
+})
 
-const create_route = (href: string): Ordo.Router.Route => {
+export const create_route = (href: string, params: Record<string, string>): Ordo.Router.Route => {
 	const url = new URL(href, document.location.origin)
 
 	return {
@@ -64,8 +124,6 @@ const create_route = (href: string): Ordo.Router.Route => {
 		protocol: url.protocol as `${string}:`,
 		search: url.search,
 		username: url.username,
-		params: url.searchParams,
+		params,
 	}
 }
-
-const router$ = ZAGS.Of<{ current_route: Ordo.Router.Route }>({ current_route: create_route(document.location.pathname) })

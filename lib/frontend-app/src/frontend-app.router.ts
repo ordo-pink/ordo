@@ -21,7 +21,7 @@
 
 import { call_once, deep_equals } from "@ordo-pink/tau"
 import { colonoscope, is_colonoscopy_doctor } from "@ordo-pink/colonoscope"
-import { Result } from "@ordo-pink/result"
+import { R } from "@ordo-pink/result"
 import { ZAGS } from "@ordo-pink/zags"
 
 import { ordo_app_state } from "../app.state"
@@ -40,8 +40,10 @@ export const init_router = call_once(() => {
 			if (is_colonoscopy_doctor(route)) {
 				const params = colonoscope(route, url)
 
-				ordo_app_state.zags.update("functions.current_activity", () => (params ? routes[route] : void 0))
-				ordo_app_state.zags.update("router.current_route", () => create_route(url, params ?? {}))
+				if (!params) continue
+
+				ordo_app_state.zags.update("functions.current_activity", () => routes[route])
+				ordo_app_state.zags.update("router.current_route", () => create_route(url, params))
 				return
 			}
 
@@ -98,15 +100,22 @@ export const init_router = call_once(() => {
 
 	return {
 		get_router: (fid: symbol) =>
-			Result.If(known_functions.has_permissions(fid, { queries: ["application.router"] }))
+			R.If(known_functions.has_permissions(fid, { queries: ["application.router"] }))
 				.pipe(
-					Result.ops.map(() => {
-						const router$ = ZAGS.Of<{ current_route?: Ordo.Router.Route; routes: Record<string, string> }>({ routes: {} })
+					R.ops.map(() => {
+						const router$ = ZAGS.Of<{ current_route: Ordo.Router.Route; routes: Record<string, string> }>({
+							current_route: null as never,
+							routes: {},
+						})
 						ordo_app_state.zags.cheat("router", router$.replace)
 						return router$
 					}),
 				)
-				.cata(Result.catas.or_else(() => null as never)),
+				.cata(
+					R.catas.or_else(
+						() => "Router permission RRR. Did you forget to request query permission 'application.router'?" as never,
+					),
+				),
 	}
 })
 

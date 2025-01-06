@@ -21,7 +21,6 @@
 
 import { TLogger } from "@ordo-pink/logger"
 import { TOption } from "@ordo-pink/option"
-import { TZags } from "@ordo-pink/zags"
 
 export type TRequireFID<$TReturn> = (fid: symbol | null) => $TReturn
 
@@ -66,7 +65,8 @@ declare global {
 				get_logger: WithFIDFn<TLogger>
 				get_fetch: WithFIDFn<Ordo.Fetch>
 				translate: Ordo.I18N.TranslateFn
-				get_router: WithFIDFn<TZags<{ current_route?: Ordo.Router.Route; routes: Record<string, string> }>>
+				get_file_associations: WithFIDFn<Ordo.CreateFunction.State["file_associations$"]>
+				get_router: WithFIDFn<Ordo.CreateFunction.State["router$"]>
 				get_metadata_query: WithFIDFn<Ordo.Metadata.Query>
 				get_user_query: WithFIDFn<Ordo.User.Query>
 				get_content_query: WithFIDFn<Ordo.Content.Query>

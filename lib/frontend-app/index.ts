@@ -48,7 +48,7 @@ import { ordo_app_state } from "./app.state"
 // TODO Move fonts to assets
 import "./index.css"
 
-export const App = Maoka.create("div", ({ use, on_unmount }) => {
+export const App = Maoka.create("div", async ({ use, on_unmount }) => {
 	use(MaokaJabs.set_class("app"))
 
 	const { app_fid, app_fn, is_dev } = ordo_app_state.zags.select("constants")
@@ -68,7 +68,7 @@ export const App = Maoka.create("div", ({ use, on_unmount }) => {
 	const { translate } = init_i18n()
 	ordo_app_state.zags.update("translate", () => translate)
 
-	init_functions()
+	const { get_file_associations } = init_functions()
 
 	const { get_router } = init_router()
 
@@ -101,6 +101,7 @@ export const App = Maoka.create("div", ({ use, on_unmount }) => {
 		get_logger,
 		get_metadata_query,
 		get_router,
+		get_file_associations,
 		get_user_query: () => null as any, // TODO Add user_query
 		known_functions,
 		translate,
@@ -109,10 +110,12 @@ export const App = Maoka.create("div", ({ use, on_unmount }) => {
 	// TODO Render user defined functions
 	// TODO .catch
 	// TODO await for rendering landing to string
-	void import("@ordo-pink/function-welcome")
+	await import("@ordo-pink/function-welcome")
+		.then(({ default: f }) => f(function_state_source))
+		.then(() => import("@ordo-pink/function-file-editor"))
 		.then(({ default: f }) => f(function_state_source))
 		.then(() => {
-			if (is_dev) void import("@ordo-pink/function-test").then(({ default: f }) => f(function_state_source))
+			if (is_dev) return import("@ordo-pink/function-test").then(({ default: f }) => f(function_state_source))
 		})
 
 	// TODO Uninstalling created functions

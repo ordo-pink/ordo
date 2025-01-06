@@ -22,30 +22,22 @@
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 
-import { OrdoSidebarStatus } from "./sidebar/sidebar.constants"
 import { ordo_app_state } from "../../app.state"
 
 export const OrdoWorkspace = Maoka.create("main", ({ use, element }) => {
 	use(MaokaJabs.set_class("workspace"))
 
-	// const commands = ordo_app_state.zags.select("commands")
-	const get_sidebar_status = use(ordo_app_state.select_jab$("sections.sidebar.status"))
+	const commands = ordo_app_state.zags.select("commands")
 	const get_current_activity = use(ordo_app_state.select_jab$("functions.current_activity"))
 	const get_activities = use(ordo_app_state.select_jab$("functions.activities"))
 
 	return async () => {
-		const status = get_sidebar_status()
 		const current_activity_name = get_current_activity()
 		const activities = get_activities()
 		const current_activity = activities.find(activity => activity.name === current_activity_name)
 
-		element.innerHTML = ""
-
-		// if (current_activity?.render_sidebar) commands.emit("cmd.application.sidebar.enable")
-		// else commands.emit("cmd.application.sidebar.disable")
-
-		if (status !== OrdoSidebarStatus.VISIBLE) use(MaokaJabs.add_class("no-sidebar"))
-		else use(MaokaJabs.remove_class("no-sidebar"))
+		if (current_activity?.render_sidebar) commands.emit("cmd.application.sidebar.enable")
+		else commands.emit("cmd.application.sidebar.disable")
 
 		if (current_activity && current_activity.render_workspace)
 			await current_activity.render_workspace(element as unknown as HTMLDivElement) // TODO 404

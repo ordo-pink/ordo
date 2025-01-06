@@ -72,7 +72,7 @@ export default create_function(
 			"cmd.metadata.show_edit_label_modal",
 			"cmd.metadata.show_edit_labels_palette",
 		],
-		queries: [],
+		queries: ["application.router"],
 	},
 	state => {
 		const commands = state.commands

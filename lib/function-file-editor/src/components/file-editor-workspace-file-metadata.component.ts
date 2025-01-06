@@ -60,7 +60,7 @@ const LabelsSection = (fsid: Ordo.Metadata.FSID) =>
 		use(MaokaJabs.listen("onclick", () => handle_click()))
 
 		const commands = use(MaokaOrdo.Jabs.get_commands)
-		const get_metadata = use(MaokaOrdo.Jabs.Metadata.get_by_fsid(fsid))
+		const get_metadata = use(MaokaOrdo.Jabs.Metadata.get_by_fsid$(fsid))
 
 		const handle_click = () => commands.emit("cmd.metadata.show_edit_labels_palette", fsid)
 

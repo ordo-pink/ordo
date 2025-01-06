@@ -30,15 +30,12 @@ export const MaokaZAGS = {
 			select_jab$:
 				<K extends TDotPath<$TState>>(path: K) =>
 				({ refresh, on_unmount, id }) => {
-					let is_initial_render = true
-
-					const divorce = $.marry(() => {
+					const divorce = $.marry((_, is_update) => {
 						const value = $.select(path)
 
 						if (!selection_results[id]) selection_results[id] = {}
 
-						if (is_initial_render) {
-							is_initial_render = false
+						if (!is_update) {
 							selection_results[id][path as any] = value
 
 							return

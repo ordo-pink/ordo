@@ -397,6 +397,7 @@ declare global {
 			type QueryPermission =
 				| "application.fetch"
 				| "application.router"
+				| "application.file_associations"
 				| `metadata.${keyof Ordo.Metadata.Query}`
 				| `user.${keyof Ordo.User.Query}`
 				| `content.${keyof Ordo.Content.Query}`
@@ -414,9 +415,10 @@ declare global {
 				commands: Ordo.Command.Commands
 				translate: Ordo.I18N.TranslateFn
 				user_query: Ordo.User.Query
-				router$: TZags<{ current_route?: Ordo.Router.Route; routes: Record<string, string> }>
+				router$: TZags<{ current_route: Ordo.Router.Route; routes: Record<string, string> }>
 				metadata_query: Ordo.Metadata.Query
 				content_query: Ordo.Content.Query
+				file_associations$: TZags<{ value: Ordo.FileAssociation.Instance[] }>
 			}
 
 			type Fn = (
@@ -474,7 +476,7 @@ declare global {
 				div: HTMLDivElement
 				is_editable: boolean
 				is_embedded: boolean
-				content: Ordo.Content.Instance
+				content: Response | null
 				metadata: Ordo.Metadata.Instance
 			}
 		}
@@ -611,14 +613,27 @@ declare global {
 				Of: (data_host: string, fetch: Ordo.Fetch) => Repository
 			}
 
-			type ContentType = "string" | "array_buffer"
+			type ContentType = "text" | "array_buffer" | "blob" | "form_data" | "json" | "bytes" | "unwrapped"
 
 			type Repository = {
 				get: <$TContentType extends Ordo.Content.ContentType>(
 					fsid: Ordo.Metadata.FSID,
 					content_type: $TContentType,
 				) => Oath<
-					($TContentType extends "string" ? "string" : ArrayBuffer) | null,
+					| ($TContentType extends "text"
+							? string
+							: $TContentType extends "array_buffer"
+								? ArrayBuffer
+								: $TContentType extends "blob"
+									? Blob
+									: $TContentType extends "form_data"
+										? FormData
+										: $TContentType extends "bytes"
+											? Uint8Array
+											: $TContentType extends "unwrapped"
+												? Response
+												: unknown)
+					| null,
 					Ordo.Rrr<"EIO" | "EACCES" | "EINVAL" | "ENOENT">
 				>
 				put: (fsid: Ordo.Metadata.FSID, content: Ordo.Content.Instance) => Oath<void, Ordo.Rrr<"EINVAL" | "EACCES" | "EIO">>
@@ -636,7 +651,20 @@ declare global {
 					fsid: Ordo.Metadata.FSID,
 					content_type: $TContentType,
 				) => Oath<
-					($TContentType extends "string" ? "string" : ArrayBuffer) | null,
+					| ($TContentType extends "text"
+							? string
+							: $TContentType extends "array_buffer"
+								? ArrayBuffer
+								: $TContentType extends "blob"
+									? Blob
+									: $TContentType extends "form_data"
+										? FormData
+										: $TContentType extends "bytes"
+											? Uint8Array
+											: $TContentType extends "unwrapped"
+												? Response
+												: unknown)
+					| null,
 					Ordo.Rrr<"EPERM" | "EIO" | "EACCES" | "EINVAL" | "ENOENT">
 				>
 			}

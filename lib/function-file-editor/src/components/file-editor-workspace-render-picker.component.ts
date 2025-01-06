@@ -24,32 +24,22 @@ import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { invokers0 } from "@ordo-pink/oath"
 
 export const RenderPicker = (metadata: Ordo.Metadata.Instance) =>
-	Maoka.create("div", async ({ use, refresh, element, on_unmount }) => {
-		let file_associations: Ordo.FileAssociation.Instance[] = []
-
+	Maoka.create("div", async ({ use, element }) => {
 		const metadata_fsid = metadata.get_fsid()
 		const metadata_type = metadata.get_type()
 
 		const content_query = use(MaokaOrdo.Jabs.get_content_query)
 
-		const content0 = content_query.get(metadata_fsid)
+		const content0 = content_query.get(metadata_fsid, "unwrapped")
 		const content = await content0.invoke(invokers0.or_else(() => null))
 
-		const $ = use(MaokaOrdo.Jabs.FileAssociations$)
-		const handle_update = (value: Ordo.FileAssociation.Instance[]) => {
-			if (file_associations.length !== value.length) {
-				file_associations = value
-				void refresh()
-			}
-		}
-
-		on_unmount(() => content0.cancel())
-
-		use(MaokaOrdo.Jabs.subscribe($, handle_update))
+		const get_file_associations = use(MaokaOrdo.Jabs.get_file_associations$)
 
 		// TODO Unsupported file component
 		return async () => {
 			element.innerHTML = ""
+
+			const file_associations = get_file_associations()
 
 			const fa = file_associations.find(fa => fa.types.some(t => t.name === metadata_type))
 

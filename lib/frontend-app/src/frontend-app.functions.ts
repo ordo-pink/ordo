@@ -19,15 +19,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { type TZags, ZAGS } from "@ordo-pink/zags"
 import { R } from "@ordo-pink/result"
 import { RRR } from "@ordo-pink/core"
 import { call_once } from "@ordo-pink/tau"
 
 import { ordo_app_state } from "../app.state"
 
-type TF = () => void
+type TF = () => {
+	get_file_associations: (fid: symbol) => TZags<{ value: Ordo.FileAssociation.Instance[] }>
+}
 export const init_functions: TF = call_once(() => {
-	const { logger, commands } = ordo_app_state.zags.unwrap()
+	const { logger, commands, known_functions } = ordo_app_state.zags.unwrap()
 
 	commands.on("cmd.functions.file_associations.register", assoc =>
 		R.If(!ordo_app_state.zags.select("functions.file_assocs").some(f => f.name === assoc.name))
@@ -54,6 +57,24 @@ export const init_functions: TF = call_once(() => {
 	)
 
 	logger.debug("🟢 Initialised activities.")
+
+	return {
+		get_file_associations: fid =>
+			R.If(known_functions.has_permissions(fid, { queries: ["application.fetch"] }))
+				.pipe(
+					R.ops.map(() => {
+						const zags = ZAGS.Of({ value: [] as Ordo.FileAssociation.Instance[] })
+						ordo_app_state.zags.cheat("functions.file_assocs", state => zags.update("value", () => state))
+						return zags
+					}),
+				)
+				.cata(
+					R.catas.or_else(
+						() =>
+							"File associations permission RRR. Did you forget to request query permission 'application.file_associations'?" as never,
+					),
+				),
+	}
 })
 
 // --- Internal ---

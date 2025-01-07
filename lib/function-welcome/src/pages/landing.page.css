@@ -1,6 +1,6 @@
 .hero-section {
 	perspective: 1000px;
-	@apply overflow-hidden;
+	@apply w-dvw overflow-hidden;
 }
 
 .hero-layers {

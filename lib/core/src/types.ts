@@ -232,12 +232,11 @@ declare global {
 			set_size: () => { fsid: Ordo.Metadata.FSID; size: number }
 		}
 		content: {
-			get: () => Ordo.Metadata.FSID
-			set: () => { fsid: Ordo.Metadata.FSID; content: string | ArrayBuffer; content_type: string }
+			set: () => { fsid: Ordo.Metadata.FSID; content: Ordo.Content.Instance; content_type: string }
 			upload: () => {
 				name: string
 				parent: Ordo.Metadata.FSID | null
-				content: string | ArrayBuffer
+				content: Ordo.Content.Instance
 				type: string
 			}
 		}
@@ -476,7 +475,7 @@ declare global {
 				div: HTMLDivElement
 				is_editable: boolean
 				is_embedded: boolean
-				content: Response | null
+				content: Ordo.Content.Instance
 				metadata: Ordo.Metadata.Instance
 			}
 		}
@@ -606,7 +605,7 @@ declare global {
 		}
 
 		namespace Content {
-			type Instance = Response
+			type Instance = string | ArrayBuffer | Blob | FormData | Uint8Array | Record<string, unknown>
 
 			type Storage = Record<Ordo.Metadata.FSID, Ordo.Content.Instance>
 

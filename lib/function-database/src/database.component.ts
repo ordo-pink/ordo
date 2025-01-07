@@ -39,7 +39,7 @@ import "./database.css"
 
 export const Database = (metadata: Ordo.Metadata.Instance, content: Ordo.Content.Instance, state?: TDatabaseState) =>
 	Maoka.create("div", ({ use, refresh }) => {
-		const initial_state = state ? state : content ? (content.json() as TDatabaseState) : {}
+		const initial_state = state ? state : is_string(content) ? (JSON.parse(content) as TDatabaseState) : {}
 		const db_context = create_database_context(initial_state, state => on_state_change(state))
 		const fsid = metadata.get_fsid()
 

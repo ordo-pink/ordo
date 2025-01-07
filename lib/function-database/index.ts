@@ -122,7 +122,7 @@ export default create_function(
 			render: ({ div, metadata, content }) =>
 				Maoka.render_dom(
 					div,
-					MaokaOrdo.Components.WithState(ctx, () => Database(metadata, content!)),
+					MaokaOrdo.Components.WithState(ctx, () => Database(metadata, content)),
 				),
 			render_icon: span => span.replaceChildren(BsFileEarmarkRuled() as any),
 		})

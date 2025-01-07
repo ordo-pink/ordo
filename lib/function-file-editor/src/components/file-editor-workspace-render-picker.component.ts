@@ -30,7 +30,7 @@ export const RenderPicker = (metadata: Ordo.Metadata.Instance) =>
 
 		const content_query = use(MaokaOrdo.Jabs.get_content_query)
 
-		const content0 = content_query.get(metadata_fsid, "unwrapped")
+		const content0 = content_query.get(metadata_fsid, "text")
 		const content = await content0.invoke(invokers0.or_else(() => null))
 
 		const get_file_associations = use(MaokaOrdo.Jabs.get_file_associations$)
@@ -38,6 +38,8 @@ export const RenderPicker = (metadata: Ordo.Metadata.Instance) =>
 		// TODO Unsupported file component
 		return async () => {
 			element.innerHTML = ""
+
+			if (!content) return
 
 			const file_associations = get_file_associations()
 			const fa = file_associations.find(fa => fa.types.some(t => t.name === metadata_type))

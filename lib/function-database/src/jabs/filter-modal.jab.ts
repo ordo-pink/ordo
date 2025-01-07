@@ -30,7 +30,7 @@ import { is_database_context_menu_payload } from "../database.constants"
 export const show_filters_jab =
 	(metadata: Ordo.Metadata.Instance): TMaokaJab =>
 	({ use }) => {
-		const commands = use(MaokaOrdo.Jabs.get_commands.get)
+		const commands = use(MaokaOrdo.Jabs.get_commands)
 		const ctx = use(MaokaOrdo.Context.consume)
 		const { get_db_state, on_db_state_change } = use(database_context.consume)
 

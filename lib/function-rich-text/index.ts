@@ -21,10 +21,11 @@
 
 import { BsFileEarmarkRichText } from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/maoka"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
+import { TwoLetterLocale } from "@ordo-pink/locale"
 import { create_function } from "@ordo-pink/core"
 
 import { RichText } from "./src/rich-text.component"
-import { TwoLetterLocale } from "@ordo-pink/locale"
 
 declare global {
 	interface t {
@@ -52,7 +53,7 @@ export default create_function(
 		queries: [],
 	},
 	ctx => {
-		const commands = ctx.select("commands")
+		const commands = ctx.commands
 
 		commands.emit("cmd.application.add_translations", {
 			lang: TwoLetterLocale.ENGLISH,
@@ -75,7 +76,10 @@ export default create_function(
 			],
 			render: ({ div, metadata, content }) =>
 				// TODO Replace with text editor
-				Maoka.render_dom(div, RichText(metadata, content, ctx)),
+				Maoka.render_dom(
+					div,
+					MaokaOrdo.Components.WithState(ctx, () => RichText(metadata, content!)),
+				),
 			render_icon: span => {
 				span.appendChild(BsFileEarmarkRichText() as any)
 				return Promise.resolve()

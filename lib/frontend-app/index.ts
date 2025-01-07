@@ -117,6 +117,8 @@ export const App = Maoka.create("div", async ({ use, on_unmount }) => {
 		.then(({ default: f }) => f(function_state_source))
 		.then(() => import("@ordo-pink/function-file-editor"))
 		.then(({ default: f }) => f(function_state_source))
+		.then(() => import("@ordo-pink/function-rich-text"))
+		.then(({ default: f }) => f(function_state_source))
 		.then(() => import("@ordo-pink/function-database"))
 		.then(({ default: f }) => f(function_state_source))
 		.then(() => {

@@ -19,6 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { TZags } from "@ordo-pink/zags"
 import type { BehaviorSubject } from "rxjs" // TODO: Replace with view
 
 export type TOrdoRichTextEditorNode = { type: string }
@@ -41,8 +42,8 @@ export type TEditorFocusPosition = {
 	focus_offset: number
 }
 export type TEditorContext = {
-	caret_position$: BehaviorSubject<TEditorFocusPosition>
-	state$: BehaviorSubject<TEditorState>
+	caret_position$: TZags<TEditorFocusPosition>
+	state$: TZags<{ value: TEditorState }>
 	add_block: (block: TOrdoRichTextEditorBlockNode, refocus?: boolean) => void
 	add_inline: (inline: TOrdoRichTextEditorInlineNode, refocus?: boolean) => void
 	remove_block: (block_index: number, refocus?: boolean) => void

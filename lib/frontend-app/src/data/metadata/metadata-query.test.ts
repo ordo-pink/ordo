@@ -20,7 +20,6 @@
  */
 
 import { describe, expect, it } from "bun:test"
-import { BehaviorSubject } from "rxjs"
 
 import { O, type TOption } from "@ordo-pink/option"
 

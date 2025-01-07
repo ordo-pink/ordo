@@ -20,7 +20,6 @@
  */
 
 import { describe, expect, it } from "bun:test"
-import { BehaviorSubject } from "rxjs"
 
 import { MR } from "./metadata-repository.impl"
 import { Metadata } from "../../../../core/src/metadata.impl"

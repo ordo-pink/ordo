@@ -20,7 +20,6 @@
  */
 
 import { TZags } from "@ordo-pink/zags"
-import type { BehaviorSubject } from "rxjs" // TODO: Replace with view
 
 export type TOrdoRichTextEditorNode = { type: string }
 

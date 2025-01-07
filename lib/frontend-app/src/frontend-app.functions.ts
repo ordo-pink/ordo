@@ -60,7 +60,7 @@ export const init_functions: TF = call_once(() => {
 
 	return {
 		get_file_associations: fid =>
-			R.If(known_functions.has_permissions(fid, { queries: ["application.fetch"] }))
+			R.If(known_functions.has_permissions(fid, { queries: ["application.file_associations"] }))
 				.pipe(
 					R.ops.map(() => {
 						const zags = ZAGS.Of({ value: [] as Ordo.FileAssociation.Instance[] })

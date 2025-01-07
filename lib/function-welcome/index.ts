@@ -79,7 +79,7 @@ declare global {
 export default create_function(
 	"pink.ordo.welcome",
 	{
-		queries: ["application.fetch", "user.get_current"],
+		queries: ["user.get_current", "metadata.get", "metadata.$", "metadata.get_by_name"],
 		commands: [
 			"cmd.application.add_translations",
 			"cmd.application.background_task.reset_status",

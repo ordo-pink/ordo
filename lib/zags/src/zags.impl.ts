@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: Unlicense
  */
 
+import { deep_equals } from "@ordo-pink/tau/index.ts"
+
 import { type TZagsStatic } from "./zags.types.ts"
 
 /**
@@ -14,56 +16,63 @@ export const ZAGS: TZagsStatic = {
 			handlers.push(f)
 			f(state, false)
 
-			return () => void handlers.splice(handlers.indexOf(f), 1)
+			return () => {
+				const index = handlers.indexOf(f)
+
+				if (index >= 0) handlers.splice(index, 1)
+			}
 		},
 		cheat: (path, f) => {
-			let value: any
-
 			const wrapped_f = (state: any, is_update: boolean) => {
+				let value: any
+
 				const keys = (path as string).split(".")
 				const location: Record<string, any> = keys.slice(0, -1).reduce((acc, key) => acc[key], state)
 				const current_value = location[keys[keys.length - 1]]
 
-				if (value !== current_value) {
+				if (!deep_equals(value, current_value)) {
 					value = current_value
-					f(value, is_update)
+					f(current_value, is_update)
 				}
 			}
 
-			handlers.push(wrapped_f)
 			wrapped_f(state, false)
+			handlers.push(wrapped_f)
 
-			return () => void handlers.splice(handlers.indexOf(wrapped_f), 1)
+			return () => {
+				const index = handlers.indexOf(wrapped_f)
+
+				if (index >= 0) handlers.splice(index, 1)
+			}
 		},
-		divorce: f => void handlers.splice(handlers.indexOf(f), 1),
+		divorce: f => {
+			const index = handlers.indexOf(f)
+
+			if (index >= 0) handlers.splice(index, 1)
+		},
 		update: (path, value_creator) => {
-			const prev_state = { ...state }
 			const keys = (path as string).split(".")
 
-			const location: Record<string, any> = keys.slice(0, -1).reduce((acc, key) => (acc as any)[key], prev_state)
+			const location: Record<string, any> = keys.slice(0, -1).reduce((acc, key) => (acc as any)[key], state)
 			const current_value = location[keys[keys.length - 1]]
 			const value = value_creator(current_value)
 
-			if (current_value !== value) {
+			if (!deep_equals(value, current_value)) {
 				location[keys[keys.length - 1]] = value
-				state = { ...prev_state }
-			}
 
-			handlers.forEach(f => f(state, true))
+				handlers.forEach(f => f(Object.assign(state, {}), true))
+			}
 		},
 		select: path => {
-			const current_state = { ...state }
-
 			const keys = (path as string).split(".")
-			const location: Record<string, any> = keys.slice(0, -1).reduce((acc, key) => (acc as any)[key], current_state)
+			const location: Record<string, any> = keys.slice(0, -1).reduce((acc, key) => (acc as any)[key], state)
 
 			return location[keys[keys.length - 1]]
 		},
 		replace: new_state => {
-			state = { ...new_state }
+			state = Object.assign({}, new_state)
 			handlers.forEach(f => f(state, true))
 		},
-		// TODO Deep cloning
-		unwrap: () => ({ ...state }),
+		unwrap: () => Object.assign({}, state),
 	}),
 }

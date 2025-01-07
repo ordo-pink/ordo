@@ -32,30 +32,24 @@ import { DatabaseTableHead } from "./components/database-table-head.component"
 import { DatabaseTableRow } from "./components/database-table-row.component"
 import { SortingDirection } from "./database.constants"
 import { type TDatabaseState } from "./database.types"
-import { show_columns_jab } from "./jabs/show-columns-modal.jab"
-import { show_filters_jab } from "./jabs/filter-modal.jab"
+// import { show_columns_jab } from "./jabs/show-columns-modal.jab"
+// import { show_filters_jab } from "./jabs/filter-modal.jab"
 
 import "./database.css"
 
-export const Database = (
-	metadata: Ordo.Metadata.Instance,
-	content: Ordo.Content.Instance,
-	ctx: Ordo.CreateFunction.Params,
-	state?: TDatabaseState,
-) =>
+export const Database = (metadata: Ordo.Metadata.Instance, content: Ordo.Content.Instance, state?: TDatabaseState) =>
 	Maoka.create("div", ({ use, refresh }) => {
-		const initial_state = state ? state : content ? JSON.parse(content as string) : {}
+		const initial_state = state ? state : content ? (content.json() as TDatabaseState) : {}
 		const db_context = create_database_context(initial_state, state => on_state_change(state))
 		const fsid = metadata.get_fsid()
 
-		use(MaokaOrdo.Context.provide(ctx))
 		use(database_context.provide(db_context))
 		use(MaokaJabs.set_class("database_view"))
-		use(show_filters_jab(metadata))
-		use(show_columns_jab(metadata))
+		// use(show_filters_jab(metadata))
+		// use(show_columns_jab(metadata))
 
-		const commands = use(MaokaOrdo.Jabs.get_commands.get)
-		const get_children = use(MaokaOrdo.Jabs.Metadata.get_children(fsid))
+		const commands = use(MaokaOrdo.Jabs.get_commands)
+		const get_children = use(MaokaOrdo.Jabs.Metadata.get_children$(fsid))
 		const { get_db_state } = use(database_context.consume)
 
 		const on_state_change = (state: TDatabaseState) => {

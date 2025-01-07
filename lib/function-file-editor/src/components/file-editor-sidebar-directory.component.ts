@@ -61,10 +61,9 @@ export const FileEditorSidebarDirectory = (metadata: Ordo.Metadata.Instance, dep
 				.get_children(fsid)
 				.pipe(
 					// TODO Move to Metadata + add sorting from File Explorer (by name with numbers)
-					R.ops.map(is =>
-						is.sort((a, b) => {
+					R.ops.map(children =>
+						children.toSorted((a, b) => {
 							const a_dir = metadata_query.has_children(a.get_fsid()).cata(R.catas.or_else(() => false))
-
 							const b_dir = metadata_query.has_children(b.get_fsid()).cata(R.catas.or_else(() => false))
 
 							if (a_dir && !b_dir) return -1
@@ -75,9 +74,9 @@ export const FileEditorSidebarDirectory = (metadata: Ordo.Metadata.Instance, dep
 					),
 				)
 				.cata(
-					R.catas.if_ok(is => [
+					R.catas.if_ok(children => [
 						FileEditorDirectoryName(metadata, depth, on_caret_click),
-						FileEditorDirectoryChildren(metadata, is, depth),
+						FileEditorDirectoryChildren(metadata, children, depth),
 					]),
 				)
 		}
@@ -88,7 +87,7 @@ export const FileEditorSidebarDirectory = (metadata: Ordo.Metadata.Instance, dep
 const FileEditorDirectoryChildren = (metadata: Ordo.Metadata.Instance, children: Ordo.Metadata.Instance[], depth: number) =>
 	R.If(expanded_state[metadata.get_fsid()])
 		.pipe(R.ops.map(() => depth + 1))
-		.pipe(R.ops.map(depth => () => children.map(i => FileEditorSidebarItem(i, depth))))
+		.pipe(R.ops.map(depth => () => children.map(i => FileEditorSidebarItem(i.get_fsid(), depth))))
 		.cata(R.catas.if_ok(children => Maoka.create("div", () => children)))
 
 const FileEditorDirectoryName = (

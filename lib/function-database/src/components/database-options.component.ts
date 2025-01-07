@@ -29,7 +29,7 @@ import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 export const DatabaseOptions = Maoka.create("div", ({ use }) => {
 	use(MaokaJabs.set_class("pb-2 flex justify-end"))
 
-	const commands = use(MaokaOrdo.Jabs.get_commands.get)
+	const commands = use(MaokaOrdo.Jabs.get_commands)
 
 	return () =>
 		Button.Primary({

@@ -93,10 +93,10 @@ export const MetadataIcon = ({ metadata, custom_class = "", show_emoji_picker = 
 			)
 
 		return () => {
-			if (emoji.is_some)
+			if (emoji)
 				return Maoka.create("div", ({ use }) => {
-					use(MaokaJabs.set_class(custom_class))
-					return () => emoji.unwrap()
+					use(MaokaJabs.set_class(custom_class, "text-[0.85rem]"))
+					return () => emoji
 				})
 
 			return metadata_query.has_children(metadata.get_fsid()).cata({
@@ -131,6 +131,6 @@ const Icon = ({ metadata, custom_class, has_children }: P2) =>
 		}
 	})
 
-const ICON_CLASS = "px-[0.2rem] shrink-0"
+const ICON_CLASS = "shrink-0"
 
 const get_icon_class = (custom_class?: string) => (custom_class ? `${ICON_CLASS} ${custom_class}` : ICON_CLASS)

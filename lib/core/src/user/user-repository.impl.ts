@@ -88,7 +88,7 @@ const create_request_init = (token: string) => ({ headers: { Authorization: `Bea
 const validate_dto0 = (result: unknown) =>
 	Oath.If(CurrentUser.Validations.is_dto(result), {
 		T: () => result as Ordo.User.Current.DTO,
-		F: () => einval_current_user_async("Entity is not a DTO", result),
+		F: () => einval_current_user_async("Entity is not a user DTO", result),
 	})
 
 const get_response_result0 = (response_body: any) =>

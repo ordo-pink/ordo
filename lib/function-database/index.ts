@@ -21,6 +21,8 @@
 
 import { BsFileEarmarkRuled } from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/maoka"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
+import { TwoLetterLocale } from "@ordo-pink/locale"
 import { create_function } from "@ordo-pink/core"
 
 import { Database } from "./src/database.component"
@@ -70,15 +72,11 @@ export default create_function(
 			"cmd.application.add_translations",
 			"cmd.application.command_palette.hide",
 			"cmd.application.command_palette.show",
-			"cmd.application.context_menu.add",
-			"cmd.application.context_menu.remove",
-			"cmd.application.context_menu.show",
-			"cmd.application.context_menu.show",
 			"cmd.application.modal.hide",
 			"cmd.application.modal.show",
 			"cmd.application.router.navigate",
 			"cmd.content.set",
-			"cmd.functions.file_associations.add",
+			"cmd.functions.file_associations.register",
 			"cmd.metadata.add_labels",
 			"cmd.metadata.remove_labels",
 			"cmd.metadata.rename",
@@ -87,13 +85,13 @@ export default create_function(
 			"cmd.metadata.show_edit_label_modal",
 			"cmd.metadata.show_edit_labels_palette",
 		],
-		queries: ["application.commands", "data.metadata_query", "users.users_query", "functions.file_associations"],
+		queries: ["metadata.get", "metadata.$", "metadata.get_children", "metadata.get_by_fsid", "metadata.has_children"],
 	},
 	ctx => {
-		const commands = ctx.get_commands()
+		const commands = ctx.commands
 
 		commands.emit("cmd.application.add_translations", {
-			lang: "en",
+			lang: TwoLetterLocale.ENGLISH,
 			translations: {
 				"t.database.column_names.created_at": "Creation Date",
 				"t.database.column_names.labels": "Labels",
@@ -112,7 +110,7 @@ export default create_function(
 			},
 		})
 
-		commands.emit("cmd.functions.file_associations.add", {
+		commands.emit("cmd.functions.file_associations.register", {
 			name: "pink.ordo.database",
 			types: [
 				{
@@ -121,7 +119,11 @@ export default create_function(
 					description: "t.database.file_association.description",
 				},
 			],
-			render: ({ div, metadata, content }) => Maoka.render_dom(div, Database(metadata, content, ctx)),
+			render: ({ div, metadata, content }) =>
+				Maoka.render_dom(
+					div,
+					MaokaOrdo.Components.WithState(ctx, () => Database(metadata, content!)),
+				),
 			render_icon: span => span.replaceChildren(BsFileEarmarkRuled() as any),
 		})
 	},

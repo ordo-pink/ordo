@@ -10,7 +10,10 @@ import {
 	get_content_query,
 	get_current_route$,
 	get_file_associations$,
+	get_metadata$,
 	get_metadata_by_fsid$,
+	get_metadata_children$,
+	get_metadata_has_children$,
 	get_metadata_query,
 	get_route_params$,
 	get_translations$,
@@ -21,7 +24,10 @@ import {
 export const MaokaOrdo = {
 	Jabs: {
 		Metadata: {
+			get$: get_metadata$,
 			get_by_fsid$: get_metadata_by_fsid$,
+			has_children$: get_metadata_has_children$,
+			get_children$: get_metadata_children$,
 		},
 		get_commands,
 		get_content_query,

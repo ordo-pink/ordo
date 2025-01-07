@@ -600,12 +600,13 @@ declare global {
 				Of: (
 					current_user_repository: Ordo.User.Current.Repository,
 					public_user_repository: Ordo.User.Public.Repository,
+					check_query_permission: (permission: Ordo.CreateFunction.QueryPermission) => TResult<void, Ordo.Rrr<"EPERM">>,
 				) => Ordo.User.Query
 			}
 		}
 
 		namespace Content {
-			type Instance = string | ArrayBuffer | null
+			type Instance = Response
 
 			type Storage = Record<Ordo.Metadata.FSID, Ordo.Content.Instance>
 

@@ -29,7 +29,7 @@ const METADATA_CONTENT_FSID = "b68678af-6776-47c0-a0b8-4b6535664b8c"
 export const DataManager = {
 	Of: (metadata_repository: Ordo.Metadata.Repository, content_repository: Ordo.Content.Repository): TMetadataManager => {
 		const get_metadata_content0 = content_repository
-			.get(METADATA_CONTENT_FSID, "string")
+			.get(METADATA_CONTENT_FSID, "text")
 			.and(Oath.FromNullable)
 			.and(content => Oath.Try(() => JSON.parse(content) as Ordo.Metadata.DTO[]))
 			.fix(() => [] as Ordo.Metadata.DTO[])

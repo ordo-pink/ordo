@@ -36,11 +36,10 @@ export const OrdoWorkspace = Maoka.create("main", ({ use, element }) => {
 		const activities = get_activities()
 		const current_activity = activities.find(activity => activity.name === current_activity_name)
 
-		if (current_activity?.render_sidebar) commands.emit("cmd.application.sidebar.enable")
+		if (current_activity && current_activity.render_sidebar) commands.emit("cmd.application.sidebar.enable")
 		else commands.emit("cmd.application.sidebar.disable")
 
 		if (current_activity && current_activity.render_workspace)
-			await current_activity.render_workspace(element as unknown as HTMLDivElement) // TODO 404
-		else element.innerHTML = ""
+			return current_activity.render_workspace(element as unknown as HTMLDivElement) // TODO 404
 	}
 })

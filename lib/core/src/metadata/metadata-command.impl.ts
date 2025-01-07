@@ -196,7 +196,7 @@ export const MetadataCommand: Ordo.Metadata.CommandStatic = {
 			])
 				.pipe(R.ops.chain(u_query.get_current))
 				.pipe(R.ops.map(user => user.get_id()))
-				.pipe(R.ops.map(id => M.Of({ name, parent, author_id: id, type, labels, links, props, size: size ?? 0 })))
+				.pipe(R.ops.map(author_id => M.Of({ name, parent, author_id, type, labels, links, props, size: size ?? 0 })))
 				.pipe(R.ops.chain(item => m_query.get().pipe(R.ops.map(items => items.concat(item)))))
 				.pipe(R.ops.chain(m_repo.put)),
 

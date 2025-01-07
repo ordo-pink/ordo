@@ -72,7 +72,18 @@ export default create_function(
 			"cmd.metadata.show_edit_label_modal",
 			"cmd.metadata.show_edit_labels_palette",
 		],
-		queries: ["application.router"],
+		queries: [
+			"application.router",
+			"metadata.get",
+			"metadata.$",
+			"metadata.get_by_fsid",
+			"metadata.has_children",
+			"metadata.get_children",
+			"content.get",
+			"metadata.get_ancestors",
+			"metadata.get_parent",
+			"application.file_associations",
+		],
 	},
 	state => {
 		const commands = state.commands

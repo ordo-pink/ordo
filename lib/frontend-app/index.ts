@@ -43,6 +43,7 @@ import { init_logger } from "./src/frontend-app.logger"
 import { init_metadata } from "./src/frontend-app.metadata"
 import { init_router } from "./src/frontend-app.router"
 import { init_title_display } from "./src/frontend-app.title"
+import { init_user } from "./src/frontent-app.user"
 import { ordo_app_state } from "./app.state"
 
 // TODO Move fonts to assets
@@ -71,6 +72,8 @@ export const App = Maoka.create("div", async ({ use, on_unmount }) => {
 	const { get_file_associations } = init_functions()
 
 	const { get_router } = init_router()
+
+	const { get_user_query } = init_user()
 
 	init_title_display()
 	init_command_palette()
@@ -102,7 +105,7 @@ export const App = Maoka.create("div", async ({ use, on_unmount }) => {
 		get_metadata_query,
 		get_router,
 		get_file_associations,
-		get_user_query: () => null as any, // TODO Add user_query
+		get_user_query,
 		known_functions,
 		translate,
 	}
@@ -113,6 +116,8 @@ export const App = Maoka.create("div", async ({ use, on_unmount }) => {
 	await import("@ordo-pink/function-welcome")
 		.then(({ default: f }) => f(function_state_source))
 		.then(() => import("@ordo-pink/function-file-editor"))
+		.then(({ default: f }) => f(function_state_source))
+		.then(() => import("@ordo-pink/function-database"))
 		.then(({ default: f }) => f(function_state_source))
 		.then(() => {
 			if (is_dev) return import("@ordo-pink/function-test").then(({ default: f }) => f(function_state_source))

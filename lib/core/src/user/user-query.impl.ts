@@ -26,13 +26,15 @@ import { CurrentUser } from "./user.impl"
 import { UserSubscription } from "../constants"
 import { ZAGS } from "@ordo-pink/zags"
 
+const UNKNOWN_USER_ID = "58c0d190-0fe5-4daf-be12-5a1ad0b08edc"
+
 // TODO Move to frontend-app
 const john_doe: Ordo.User.Current.Instance = CurrentUser.FromDTO({
 	created_at: Date.now(),
 	email: "john_doe@ordo.pink",
 	file_limit: -1,
 	handle: "@johndoe",
-	id: "58c0d190-0fe5-4daf-be12-5a1ad0b08edc",
+	id: UNKNOWN_USER_ID,
 	installed_functions: [],
 	max_functions: 10,
 	max_upload_size: -1,

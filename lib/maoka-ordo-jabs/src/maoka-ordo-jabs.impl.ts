@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: Unlicense
  */
 
+import { type TMaokaElement, type TMaokaJab } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { R } from "@ordo-pink/result"
-import { type TMaokaJab } from "@ordo-pink/maoka"
 import { type TZags } from "@ordo-pink/zags"
 import { deep_equals } from "@ordo-pink/tau"
 
@@ -18,6 +18,7 @@ export const get_commands: TMaokaJab<Ordo.Command.Commands> = ({ use }) => {
 
 export const get_file_associations$: TMaokaJab<() => Ordo.FileAssociation.Instance[]> = ({ use }) => {
 	const { file_associations$ } = use(ordo_context.consume)
+
 	return use(happy_marriage$(file_associations$, x => x.value))
 }
 
@@ -48,9 +49,8 @@ export const get_content_query: TMaokaJab<Ordo.Content.Query> = ({ use }) => {
 
 export const get_current_route$: TMaokaJab<() => Ordo.Router.Route | undefined> = ({ use }) => {
 	const { router$ } = use(ordo_context.consume)
-	const get_router = use(happy_marriage$(router$))
 
-	return () => get_router().current_route
+	return use(happy_marriage$(router$, state => state.current_route))
 }
 
 export const get_route_params$: TMaokaJab<() => Record<string, string>> = ({ use }) => {
@@ -59,25 +59,30 @@ export const get_route_params$: TMaokaJab<() => Record<string, string>> = ({ use
 	return () => get_current_route()?.params ?? {}
 }
 
-export const happy_marriage$ =
-	<$TState extends Record<string, unknown>, $TResult = $TState>(
-		zags: TZags<$TState>,
-		handler: (state: $TState) => $TResult = x => x as unknown as $TResult,
-	): TMaokaJab<() => $TResult> =>
-	({ on_unmount, refresh }) => {
-		let value: $TResult
+export const happy_marriage$ = <$TState extends Record<string, unknown>, $TResult = $TState>(
+	zags: TZags<$TState>,
+	handler: (state: $TState) => $TResult = x => x as unknown as $TResult,
+): TMaokaJab<() => $TResult> => {
+	const storage: WeakMap<TMaokaElement, $TResult> = new WeakMap()
 
+	return ({ on_unmount, refresh, element }) => {
 		const divorce = zags.marry(state => {
-			if (deep_equals(value, state)) return
+			const updated_state = handler(state)
 
-			value = handler(state)
-			void refresh()
+			if (!storage.has(element) || !deep_equals(storage.get(element), updated_state)) {
+				storage.set(element, updated_state)
+				void refresh()
+			}
 		})
 
-		on_unmount(divorce)
+		on_unmount(() => {
+			storage.delete(element)
+			divorce()
+		})
 
-		return () => value
+		return () => storage.get(element)!
 	}
+}
 
 export const get_translations$: TMaokaJab<{ t: Ordo.I18N.TranslateFn }> = ({ use, refresh }) => {
 	const { translate } = use(ordo_context.consume)
@@ -90,6 +95,17 @@ export const get_translations$: TMaokaJab<{ t: Ordo.I18N.TranslateFn }> = ({ use
 	return { t: translate }
 }
 
+// --- Metadata ---
+// TODO Add error logging
+
+export const get_metadata$ =
+	(options?: Ordo.Metadata.QueryOptions): TMaokaJab<() => Ordo.Metadata.Instance[]> =>
+	({ use }) => {
+		const metadata_query = use(get_metadata_query)
+
+		return use(happy_marriage$(metadata_query.$, () => metadata_query.get(options).cata(R.catas.or_else(() => []))))
+	}
+
 export const get_metadata_by_fsid$ =
 	(fsid?: Ordo.Metadata.FSID | null, options?: Ordo.Metadata.QueryOptions): TMaokaJab<() => Ordo.Metadata.Instance | null> =>
 	({ use }) => {
@@ -100,6 +116,34 @@ export const get_metadata_by_fsid$ =
 				if (!fsid) return null
 
 				return metadata_query.get_by_fsid(fsid, options).cata(R.catas.or_else(() => null))
+			}),
+		)
+	}
+
+export const get_metadata_has_children$ =
+	(fsid?: Ordo.Metadata.FSID | null, options?: Ordo.Metadata.QueryOptions): TMaokaJab<() => boolean> =>
+	({ use }) => {
+		const metadata_query = use(get_metadata_query)
+
+		return use(
+			happy_marriage$(metadata_query.$, () => {
+				if (!fsid) return false
+
+				return metadata_query.has_children(fsid, options).cata(R.catas.or_else(() => false))
+			}),
+		)
+	}
+
+export const get_metadata_children$ =
+	(fsid?: Ordo.Metadata.FSID | null, options?: Ordo.Metadata.QueryOptions): TMaokaJab<() => Ordo.Metadata.Instance[]> =>
+	({ use }) => {
+		const metadata_query = use(get_metadata_query)
+
+		return use(
+			happy_marriage$(metadata_query.$, () => {
+				if (!fsid) return []
+
+				return metadata_query.get_children(fsid, options).cata(R.catas.or_else(() => []))
 			}),
 		)
 	}

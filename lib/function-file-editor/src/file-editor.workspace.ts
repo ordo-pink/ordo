@@ -38,8 +38,8 @@ export const FileEditorWorkspace = Maoka.create("div", ({ use }) => {
 	const get_route_params = use(MaokaOrdo.Jabs.get_route_params$)
 	const metadata_query = use(MaokaOrdo.Jabs.get_metadata_query)
 
-	return () =>
-		R.FromNullable(get_route_params())
+	return () => {
+		return R.FromNullable(get_route_params())
 			.pipe(R.ops.chain(({ fsid }) => R.FromNullable(fsid)))
 			.pipe(R.ops.chain(validate_fsid))
 			.pipe(R.ops.chain(metadata_query.get_by_fsid))
@@ -52,6 +52,7 @@ export const FileEditorWorkspace = Maoka.create("div", ({ use }) => {
 				],
 				Err: () => FileEditor.TitleSetter(null), // TODO No selected file component
 			})
+	}
 })
 
 // --- Internal ---

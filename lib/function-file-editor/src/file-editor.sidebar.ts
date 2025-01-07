@@ -22,31 +22,16 @@
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
-import { R } from "@ordo-pink/result"
 
 import { FileEditorSidebarItem } from "./components/file-editor-sidebar-item.component"
 
-export const FileEditorSidebar = Maoka.create("div", ({ use, refresh, on_unmount }) => {
-	let metadata: Ordo.Metadata.Instance[] = []
-
+export const FileEditorSidebar = Maoka.create("div", ({ use }) => {
 	use(MaokaJabs.set_class("flex flex-col p-2 h-full overflow-y-auto", "file_editor_sidebar"))
 
-	const metadata_query = use(MaokaOrdo.Jabs.get_metadata_query)
+	const get_metadata = use(MaokaOrdo.Jabs.Metadata.get$())
 
-	// TODO Move to MaokaOrdo.Jabs.Metadata
-	const divorce_metadata_query = metadata_query.$.marry(() => {
-		metadata_query
-			.get()
-			.pipe(R.ops.map(is => is.filter(i => i.is_root_child())))
-			.cata(
-				R.catas.if_ok(updated => {
-					metadata = updated
-					void refresh()
-				}),
-			)
-	})
-
-	on_unmount(() => divorce_metadata_query())
-
-	return () => metadata.map(i => FileEditorSidebarItem(i))
+	return () =>
+		get_metadata()
+			.filter(i => i.is_root_child())
+			.map(i => FileEditorSidebarItem(i.get_fsid()))
 })

@@ -93,10 +93,21 @@ export const OrdoSidebarButton = Maoka.create("button", ({ use }) => {
 
 // --- Internal ---
 
-const Sidebar = Maoka.create("div", ({ use }) => {
+const Sidebar = Maoka.create("div", ({ use, element }) => {
 	use(MaokaJabs.set_class("sidebar"))
 
-	return () => ["Sidebar"]
+	const get_current_activity = use(ordo_app_state.select_jab$("functions.current_activity"))
+	const get_activities = use(ordo_app_state.select_jab$("functions.activities"))
+
+	return async () => {
+		const current_activity_name = get_current_activity()
+		const activities = get_activities()
+		const current_activity = activities.find(activity => activity.name === current_activity_name)
+
+		if (current_activity && current_activity.render_sidebar)
+			await current_activity.render_sidebar(element as unknown as HTMLDivElement) // TODO 404
+		else element.innerHTML = ""
+	}
 })
 
 const handle_disable_sidebar = () => ordo_app_state.zags.update("sections.sidebar.status", () => OrdoSidebarStatus.DISABLED)

@@ -23,9 +23,10 @@ import { CurrentUser } from "@ordo-pink/core"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 
-const is_valid$ = new BehaviorSubject(true)
+const is_valid$ = ZAGS.Of({ value: true })
 
 import "./input.css"
+import { ZAGS } from "@ordo-pink/zags"
 
 type TInputProps = {
 	initial_value?: string
@@ -67,9 +68,9 @@ const Text = ({
 			Maoka.create("input", ({ use, element, after_mount }) => {
 				use(
 					MaokaJabs.listen("oninput", event => {
-						const current_is_valid = is_valid$.getValue()
+						const current_is_valid = is_valid$.select("value")
 
-						if (!current_is_valid) is_valid$.next(true)
+						if (!current_is_valid) is_valid$.update("value", () => true)
 
 						return on_input(event)
 					}),
@@ -79,9 +80,9 @@ const Text = ({
 					MaokaJabs.listen("onchange", event => {
 						const target = event.target as HTMLInputElement
 						const is_valid = validate(target.value)
-						const current_is_valid = is_valid$.getValue()
+						const current_is_valid = is_valid$.select("value")
 
-						if (is_valid !== current_is_valid) is_valid$.next(is_valid)
+						if (is_valid !== current_is_valid) is_valid$.update("value", () => is_valid)
 					}),
 				)
 

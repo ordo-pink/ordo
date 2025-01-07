@@ -22,15 +22,16 @@
 import { BsArrowLeft, BsLayoutSidebarInsetReverse } from "@ordo-pink/frontend-icons"
 import { Maoka, type TMaokaElement } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { Switch } from "@ordo-pink/switch"
 import { noop } from "@ordo-pink/tau"
 
-import { OrdoSidebarStatus } from "./sidebar.constants"
 import { ordo_app_state } from "../../../app.state"
+import { sidebar$ } from "./sidebar.state"
 
 export const OrdoSidebar = Maoka.create("aside", ({ use, on_unmount }) => {
 	const commands = ordo_app_state.zags.select("commands")
-	const get_status = use(ordo_app_state.select_jab$("sections.sidebar.status"))
+	const get_sidebar = use(MaokaOrdo.Jabs.happy_marriage$(sidebar$))
 
 	commands.on("cmd.application.sidebar.disable", handle_disable_sidebar)
 	commands.on("cmd.application.sidebar.enable", handle_enable_sidebar)
@@ -47,46 +48,52 @@ export const OrdoSidebar = Maoka.create("aside", ({ use, on_unmount }) => {
 	})
 
 	return () => {
-		const status = get_status()
+		const { visible, enabled } = get_sidebar()
 
-		return Switch.Match(status)
-			.case(OrdoSidebarStatus.VISIBLE, () => Sidebar)
-			.case(OrdoSidebarStatus.HIDDEN, noop) // TODO Hidden enabled sidebar state
+		return Switch.OfTrue()
+			.case(visible && enabled, () => Sidebar)
 			.default(noop)
 	}
 })
 
 export const OrdoSidebarButton = Maoka.create("button", ({ use }) => {
 	const commands = ordo_app_state.zags.select("commands")
-	const get_status = use(ordo_app_state.select_jab$("sections.sidebar.status"))
+	const get_sidebar = use(MaokaOrdo.Jabs.happy_marriage$(sidebar$))
+	const get_current_activity = use(ordo_app_state.select_jab$("functions.current_activity"))
 
-	let prev_status: OrdoSidebarStatus
+	let was_enabled = false
 
 	use(MaokaJabs.set_class("activity-bar_link activity-bar_icon"))
 	use(MaokaJabs.listen("onclick", () => commands.emit("cmd.application.sidebar.toggle")))
 
 	return () => {
-		const status = get_status()
+		const activities = ordo_app_state.zags.select("functions.activities")
+
+		const { visible, enabled } = get_sidebar()
+		const current_activity_name = get_current_activity()
+		const current_activity = activities.find(activity => activity.name === current_activity_name)
+
+		if (current_activity && current_activity.render_sidebar) commands.emit("cmd.application.sidebar.enable")
+		else commands.emit("cmd.application.sidebar.disable")
+
 		const readable_name = "t.common.components.sidebar.toggle"
 
-		if (status !== OrdoSidebarStatus.DISABLED) {
-			if (prev_status === OrdoSidebarStatus.DISABLED) {
-				prev_status = status
-				commands.emit("cmd.application.command_palette.add", {
-					on_select: () => commands.emit("cmd.application.sidebar.toggle"),
-					hotkey: "mod+b",
-					readable_name,
-					render_icon: div => void div.appendChild(BsLayoutSidebarInsetReverse() as SVGSVGElement),
-				})
-			}
-		} else {
-			prev_status = status
+		if (!was_enabled && enabled) {
+			commands.emit("cmd.application.command_palette.add", {
+				on_select: () => commands.emit("cmd.application.sidebar.toggle"),
+				hotkey: "mod+b",
+				readable_name,
+				render_icon: div => void div.appendChild(BsLayoutSidebarInsetReverse() as SVGSVGElement),
+			})
+		} else if (was_enabled && !enabled) {
 			commands.emit("cmd.application.command_palette.remove", readable_name)
 		}
 
-		return Switch.Match(status)
-			.case(OrdoSidebarStatus.VISIBLE, () => BsArrowLeft("rotate-180") as TMaokaElement)
-			.case(OrdoSidebarStatus.HIDDEN, () => BsLayoutSidebarInsetReverse() as TMaokaElement)
+		was_enabled = enabled
+
+		return Switch.OfTrue()
+			.case(enabled && visible, () => BsArrowLeft("rotate-180") as TMaokaElement)
+			.case(enabled && !visible, () => BsLayoutSidebarInsetReverse() as TMaokaElement)
 			.default(noop)
 	}
 })
@@ -110,14 +117,8 @@ const Sidebar = Maoka.create("div", ({ use, element }) => {
 	}
 })
 
-const handle_disable_sidebar = () => ordo_app_state.zags.update("sections.sidebar.status", () => OrdoSidebarStatus.DISABLED)
-const handle_enable_sidebar = () => ordo_app_state.zags.update("sections.sidebar.status", () => OrdoSidebarStatus.HIDDEN)
-const handle_show_sidebar = () => ordo_app_state.zags.update("sections.sidebar.status", () => OrdoSidebarStatus.VISIBLE)
-const handle_hide_sidebar = () => ordo_app_state.zags.update("sections.sidebar.status", () => OrdoSidebarStatus.HIDDEN)
-const handle_toggle_sidebar = () =>
-	ordo_app_state.zags.update("sections.sidebar.status", prev_status =>
-		Switch.Match(prev_status)
-			.case(OrdoSidebarStatus.VISIBLE, () => OrdoSidebarStatus.HIDDEN)
-			.case(OrdoSidebarStatus.HIDDEN, () => OrdoSidebarStatus.VISIBLE)
-			.default(() => OrdoSidebarStatus.DISABLED),
-	)
+const handle_disable_sidebar = () => sidebar$.update("enabled", () => false)
+const handle_enable_sidebar = () => sidebar$.update("enabled", () => true)
+const handle_hide_sidebar = () => sidebar$.update("visible", () => false)
+const handle_show_sidebar = () => sidebar$.update("visible", () => true)
+const handle_toggle_sidebar = () => sidebar$.select("enabled") && sidebar$.update("visible", prev => !prev)

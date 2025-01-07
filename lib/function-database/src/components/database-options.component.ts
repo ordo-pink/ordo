@@ -33,7 +33,7 @@ export const DatabaseOptions = Maoka.create("div", ({ use }) => {
 
 	return () =>
 		Button.Primary({
-			hotkey: "mod+,",
+			hotkey: "mod+shift+<", // TODO Fix usage of special symbols with shift
 			// TODO Set event pageX and pageY to the bounding rect of the element
 			on_click: event => commands.emit("cmd.application.context_menu.show", { event, payload: DATABASE_CONTEXT_MENU_PAYLOAD }),
 			text: "Options",

@@ -183,11 +183,12 @@ export default create_function(
 
 		commands.emit("cmd.functions.activities.register", {
 			name: "pink.ordo.welcome.landing-page",
-			render_workspace: div =>
-				Maoka.render_dom(
+			render_workspace: async div => {
+				await Maoka.render_dom(
 					div,
 					MaokaOrdo.Components.WithState(state, () => WelcomeWorkspace),
-				),
+				)
+			},
 			render_icon: span => void span.appendChild(BsCollection() as SVGSVGElement),
 			routes: ["/"],
 		})

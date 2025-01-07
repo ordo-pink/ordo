@@ -72,6 +72,10 @@ export default create_function(
 			"cmd.application.add_translations",
 			"cmd.application.command_palette.hide",
 			"cmd.application.command_palette.show",
+			"cmd.application.context_menu.add",
+			"cmd.application.context_menu.hide",
+			"cmd.application.context_menu.remove",
+			"cmd.application.context_menu.show",
 			"cmd.application.modal.hide",
 			"cmd.application.modal.show",
 			"cmd.application.router.navigate",
@@ -124,7 +128,7 @@ export default create_function(
 					div,
 					MaokaOrdo.Components.WithState(ctx, () => Database(metadata, content)),
 				),
-			render_icon: span => span.replaceChildren(BsFileEarmarkRuled() as any),
+			render_icon: span => void span.appendChild(BsFileEarmarkRuled() as SVGSVGElement),
 		})
 	},
 )

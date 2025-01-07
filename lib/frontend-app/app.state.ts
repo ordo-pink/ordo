@@ -23,7 +23,6 @@ import { MaokaZAGS } from "@ordo-pink/maoka-zags"
 import { type TLogger } from "@ordo-pink/logger"
 
 import { CommandPaletteLocation, EMPTY_COMMAND_PALETTE } from "./src/components/command-palette/constants"
-import { OrdoSidebarStatus } from "./src/components/sidebar/sidebar.constants"
 import { create_route } from "./src/frontend-app.router"
 
 // @ts-ignore
@@ -50,7 +49,7 @@ export const ordo_app_state = MaokaZAGS.Of<TOrdoState>({
 		user: null as any, // Assigned after initialization
 	},
 	sections: {
-		sidebar: { status: OrdoSidebarStatus.DISABLED },
+		context_menu: { items: [] },
 		command_palette: {
 			current: EMPTY_COMMAND_PALETTE,
 			global_items: [],
@@ -96,8 +95,6 @@ type TFunctions = {
 	file_assocs: Ordo.FileAssociation.Instance[]
 }
 
-type TSidebarSection = { status: OrdoSidebarStatus }
-
 type TCommandPaletteSection = {
 	global_items: Ordo.CommandPalette.Item[]
 	visible_items: Ordo.CommandPalette.Item[]
@@ -106,6 +103,12 @@ type TCommandPaletteSection = {
 	location: CommandPaletteLocation
 }
 
-type TSections = { sidebar: TSidebarSection; command_palette: TCommandPaletteSection; modal?: Ordo.Modal.Instance }
+type TContextMenu = { items: Ordo.ContextMenu.Item[]; state?: Ordo.ContextMenu.Instance }
+
+type TSections = {
+	context_menu: TContextMenu
+	command_palette: TCommandPaletteSection
+	modal?: Ordo.Modal.Instance
+}
 
 type TQueries = { user: Ordo.User.Query; metadata: Ordo.Metadata.Query; content: Ordo.Content.Query }

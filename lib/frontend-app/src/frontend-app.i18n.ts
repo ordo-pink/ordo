@@ -55,6 +55,8 @@ export const init_i18n: TInitI18nFn = call_once(() => {
 		translations: frontend_app_en_translations,
 	})
 
+	ordo_app_state.zags.update("translate", () => translate)
+
 	logger.debug("🟢 Initialised i18n.")
 
 	return { translate }

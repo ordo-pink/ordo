@@ -18,6 +18,7 @@ import {
 	get_route_params$,
 	get_translations$,
 	get_user_query,
+	happy_marriage$,
 	ordo_context,
 } from "./src/maoka-ordo-jabs.impl"
 
@@ -29,6 +30,7 @@ export const MaokaOrdo = {
 			has_children$: get_metadata_has_children$,
 			get_children$: get_metadata_children$,
 		},
+		happy_marriage$,
 		get_commands,
 		get_content_query,
 		get_current_route$,

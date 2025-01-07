@@ -27,10 +27,10 @@ import { ordo_app_state } from "../app.state"
 type TCommand = (Ordo.Command.Command | Ordo.Command.PayloadCommand) & { fid: symbol }
 type TCmdListener<N extends Ordo.Command.Name = Ordo.Command.Name, P = any> = [N, Ordo.Command.CommandHandler<P>, symbol]
 
-type TF = () => { get_commands: (fid: symbol) => Ordo.Command.Commands }
+type TF = () => { commands: Ordo.Command.Commands; get_commands: (fid: symbol) => Ordo.Command.Commands }
 export const init_commands: TF = call_once(() => {
 	const logger = ordo_app_state.zags.select("logger")
-	const is_dev = ordo_app_state.zags.select("constants.is_dev")
+	const { is_dev, app_fid } = ordo_app_state.zags.select("constants")
 	const known_functions = ordo_app_state.zags.select("known_functions")
 
 	const get_commands = (fid: symbol) => {
@@ -96,9 +96,13 @@ export const init_commands: TF = call_once(() => {
 		}
 	})
 
+	const app_commands = get_commands(app_fid)
+
+	ordo_app_state.zags.update("commands", () => app_commands)
+
 	logger.debug("🟢 Initialised commands.")
 
-	return { get_commands }
+	return { commands: app_commands, get_commands }
 })
 
 const is_payload_command = (cmd: Ordo.Command.Command): cmd is Ordo.Command.PayloadCommand =>

@@ -116,12 +116,16 @@ a {
 }
 
 .sidebar {
-	@apply fixed bottom-0 left-0 right-0 top-0 sm:relative sm:left-auto sm:h-dvh sm:w-96 sm:shadow-md;
+	@apply fixed bottom-0 left-0 right-0 top-0 sm:relative sm:left-auto sm:h-dvh sm:w-96 sm:pr-14 sm:shadow-md;
 	@apply bg-neutral-100 dark:bg-neutral-900;
 }
 
 .workspace {
 	@apply h-dvh w-full pb-10 sm:pb-0;
+}
+
+.workspace.no-sidebar {
+	@apply sm:pr-10;
 }
 
 .background-task-indicator {

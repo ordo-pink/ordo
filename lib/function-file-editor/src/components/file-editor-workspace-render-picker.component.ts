@@ -39,8 +39,6 @@ export const RenderPicker = (metadata: Ordo.Metadata.Instance) =>
 		return async () => {
 			element.innerHTML = ""
 
-			if (!content) return
-
 			const file_associations = get_file_associations()
 			const fa = file_associations.find(fa => fa.types.some(t => t.name === metadata_type))
 

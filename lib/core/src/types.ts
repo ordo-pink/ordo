@@ -160,12 +160,12 @@ declare global {
 				show: () => Partial<Ordo.Notification.Instance> & Pick<Ordo.Notification.Instance, "message">
 				hide: () => string
 			}
-			// context_menu: {
-			// 	add: () => Ordo.ContextMenu.Item
-			// 	remove: () => string
-			// 	show: () => Omit<Ordo.ContextMenu.Instance, "structure">
-			// 	hide: () => void
-			// }
+			context_menu: {
+				add: () => Ordo.ContextMenu.Item
+				remove: () => string
+				show: () => Omit<Ordo.ContextMenu.Instance, "structure">
+				hide: () => void
+			}
 			command_palette: {
 				add: () => Ordo.CommandPalette.Item
 				remove: () => string
@@ -475,7 +475,7 @@ declare global {
 				div: HTMLDivElement
 				is_editable: boolean
 				is_embedded: boolean
-				content: Ordo.Content.Instance
+				content: Ordo.Content.Instance | null
 				metadata: Ordo.Metadata.Instance
 			}
 		}

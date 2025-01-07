@@ -77,12 +77,12 @@ const DateCell = (date: Date) =>
 
 const FileNameCell = (metadata: Ordo.Metadata.Instance) =>
 	Maoka.create("td", ({ use }) => {
-		// const { emit } = use(MaokaOrdo.Jabs.get_commands)
+		const { emit } = use(MaokaOrdo.Jabs.get_commands)
 
-		// const handle_context_menu = (event: MouseEvent) => emit("cmd.application.context_menu.show", { event, payload: metadata })
+		const handle_context_menu = (event: MouseEvent) => emit("cmd.application.context_menu.show", { event, payload: metadata })
 
 		use(MaokaJabs.set_class("database_cell font-semibold"))
-		// use(MaokaJabs.listen("oncontextmenu", handle_context_menu))
+		use(MaokaJabs.listen("oncontextmenu", handle_context_menu))
 
 		return () =>
 			Maoka.create("div", ({ use }) => {

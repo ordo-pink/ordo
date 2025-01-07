@@ -80,8 +80,7 @@ const on_modal_show: Ordo.Command.HandlerOf<"cmd.application.modal.show"> = payl
 const on_modal_hide: Ordo.Command.HandlerOf<"cmd.application.modal.hide"> = () => {
 	const state = ordo_app_state.zags.select("sections.modal")
 
-	if (state && state.on_unmount) {
-		state.on_unmount()
-		ordo_app_state.zags.update("sections.modal", () => void 0)
-	}
+	if (state && state.on_unmount) state.on_unmount()
+
+	ordo_app_state.zags.update("sections.modal", () => void 0)
 }

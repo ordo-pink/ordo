@@ -19,27 +19,48 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Maoka } from "@ordo-pink/maoka"
+import { Maoka, TMaokaElement } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
+import { Switch } from "@ordo-pink/switch"
 
 import { ordo_app_state } from "../../app.state"
+import { sidebar$ } from "./sidebar/sidebar.state"
 
 export const OrdoWorkspace = Maoka.create("main", ({ use, element }) => {
 	use(MaokaJabs.set_class("workspace"))
 
-	const commands = ordo_app_state.zags.select("commands")
+	return () => [WorkspaceRenderer, SidebarPaddingContractor(element)]
+})
+
+const SidebarPaddingContractor = (element: TMaokaElement) =>
+	Maoka.create("div", ({ use }) => {
+		const get_sidebar = use(MaokaOrdo.Jabs.happy_marriage$(sidebar$))
+
+		return () => {
+			const sidebar = get_sidebar()
+
+			Switch.OfTrue()
+				.case(sidebar.enabled && sidebar.visible, () => element.classList?.remove("no-sidebar"))
+				.default(() => element.classList?.add("no-sidebar"))
+		}
+	})
+
+const WorkspaceRenderer = Maoka.create("div", ({ use, element }) => {
 	const get_current_activity = use(ordo_app_state.select_jab$("functions.current_activity"))
-	const get_activities = use(ordo_app_state.select_jab$("functions.activities"))
+	let prev_activity: Ordo.Activity.Instance | void
 
 	return async () => {
+		const activities = ordo_app_state.zags.select("functions.activities")
 		const current_activity_name = get_current_activity()
-		const activities = get_activities()
 		const current_activity = activities.find(activity => activity.name === current_activity_name)
 
-		if (current_activity && current_activity.render_sidebar) commands.emit("cmd.application.sidebar.enable")
-		else commands.emit("cmd.application.sidebar.disable")
+		if (prev_activity === current_activity) return
+		prev_activity = current_activity
 
-		if (current_activity && current_activity.render_workspace)
-			return current_activity.render_workspace(element as unknown as HTMLDivElement) // TODO 404
+		if (current_activity && current_activity.render_workspace) {
+			element.innerHTML = ""
+			await current_activity.render_workspace(element as unknown as HTMLDivElement) // TODO 404
+		}
 	}
 })

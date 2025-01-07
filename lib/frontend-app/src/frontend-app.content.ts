@@ -19,13 +19,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { CacheContentRepository, ContentQuery, Metadata, NotificationType, RRR } from "@ordo-pink/core"
+import { Metadata, NotificationType, RRR } from "@ordo-pink/core"
 import { invokers0, ops0 } from "@ordo-pink/oath"
 import { is_instance_of, is_string } from "@ordo-pink/tau"
 import { ConsoleLogger } from "@ordo-pink/logger"
 import { R } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
 
+import { CacheContentRepository } from "./data/content/content-repository.impl"
+import { ContentQuery } from "./data/content/content-query.impl"
 import { ordo_app_state } from "../app.state"
 
 type TF = () => { content_repository: Ordo.Content.Repository; get_content_query: (fid: symbol) => Ordo.Content.Query }
@@ -35,6 +37,7 @@ export const init_content: TF = () => {
 	const fetch = ordo_app_state.zags.select("fetch")
 	const hosts = ordo_app_state.zags.select("hosts")
 	const known_functions = ordo_app_state.zags.select("known_functions")
+	const app_fid = ordo_app_state.zags.select("constants.app_fid")
 
 	logger.debug("🟡 Initialising metadata...")
 
@@ -97,20 +100,21 @@ export const init_content: TF = () => {
 
 	logger.debug("🟢 Initialised metadata.")
 
+	const get_content_query = (fid: symbol) =>
+		ContentQuery.Of(content_repository, permission =>
+			R.If(known_functions.has_permissions(fid, { queries: [permission] }), {
+				F: () => {
+					const rrr = eperm(`ContentQuery permission RRR. Did you forget to request query permission '${permission}'?`)
+					ConsoleLogger.error(rrr.debug?.join(" "))
+					return rrr
+				},
+			}),
+		)
+
+	ordo_app_state.zags.update("queries.content", () => get_content_query(app_fid))
+
 	// TODO Extract and reuse check_query_permission
-	return {
-		content_repository,
-		get_content_query: fid =>
-			ContentQuery.Of(content_repository, permission =>
-				R.If(known_functions.has_permissions(fid, { queries: [permission] }), {
-					F: () => {
-						const rrr = eperm(`ContentQuery permission RRR. Did you forget to request query permission '${permission}'?`)
-						ConsoleLogger.error(rrr.debug?.join(" "))
-						return rrr
-					},
-				}),
-			),
-	}
+	return { content_repository, get_content_query }
 }
 
 // --- Internal ---

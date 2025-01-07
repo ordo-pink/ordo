@@ -82,7 +82,6 @@ export default create_function(
 				),
 			render_icon: span => {
 				span.appendChild(BsFileEarmarkRichText() as any)
-				return Promise.resolve()
 			},
 		})
 	},

@@ -27,25 +27,28 @@ import { ordo_app_state } from "../app.state"
 
 type TF = (logger: TLogger) => { get_logger: (fid: symbol) => TLogger }
 export const init_logger: TF = call_once(logger => {
-	const is_dev = ordo_app_state.zags.select("constants.is_dev")
+	const { is_dev, app_fid } = ordo_app_state.zags.select("constants")
 	const known_functions = ordo_app_state.zags.select("known_functions")
 
-	return {
-		get_logger: fid => {
-			// TODO Fix option cata
-			const known_function = known_functions.exchange(fid).cata(O.catas.or_else(() => "unauthorised")) as string
-			const prefix = `@${known_function} ::`
+	const get_logger = (fid: symbol): TLogger => {
+		// TODO Fix option cata
+		const known_function = known_functions.exchange(fid).cata(O.catas.or_else(() => "unauthorised")) as string
+		const prefix = `@${known_function} ::`
 
-			return {
-				panic: (...message) => logger.panic(prefix, ...message),
-				alert: (...message) => logger.alert(prefix, ...message),
-				crit: (...message) => logger.crit(prefix, ...message),
-				error: (...message) => logger.error(prefix, ...message),
-				warn: (...message) => logger.warn(prefix, ...message),
-				notice: (...message) => logger.notice(prefix, ...message),
-				info: (...message) => logger.info(prefix, ...message),
-				debug: (...message) => (is_dev ? logger.debug(prefix, ...message) : void 0),
-			}
-		},
+		return {
+			panic: (...message) => logger.panic(prefix, ...(message as any)),
+			alert: (...message) => logger.alert(prefix, ...(message as any)),
+			crit: (...message) => logger.crit(prefix, ...(message as any)),
+			error: (...message) => logger.error(prefix, ...(message as any)),
+			warn: (...message) => logger.warn(prefix, ...(message as any)),
+			notice: (...message) => logger.notice(prefix, ...(message as any)),
+			info: (...message) => logger.info(prefix, ...(message as any)),
+			debug: (...message) => (is_dev ? logger.debug(prefix, ...(message as any)) : void 0),
+		}
 	}
+
+	const app_logger = get_logger(app_fid)
+	ordo_app_state.zags.update("logger", () => app_logger)
+
+	return { get_logger }
 })

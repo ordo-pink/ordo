@@ -28,6 +28,7 @@ import { noop } from "@ordo-pink/tau"
 import { DataManager } from "./src/frontend-app.data-manager"
 import { OrdoActivityBar } from "./src/components/activity-bar/activity-bar.component"
 import { OrdoBackgroundTaskIndicator } from "./src/components/background-task-indicator.component"
+import { OrdoContextMenu } from "./src/components/context-menu/context-menu.component"
 import { OrdoModal } from "./src/components/modal/modal.overlay"
 import { OrdoNotifications } from "./src/components/notifications/notifications-list.component"
 import { OrdoSidebar } from "./src/components/sidebar/sidebar.component"
@@ -35,6 +36,7 @@ import { OrdoWorkspace } from "./src/components/workspace.component"
 import { init_command_palette } from "./src/components/command-palette"
 import { init_commands } from "./src/frontend-app.commands"
 import { init_content } from "./src/frontend-app.content"
+import { init_context_menu } from "./src/components/context-menu"
 import { init_fetch } from "./src/frontend-app.fetch"
 import { init_functions } from "./src/frontend-app.functions"
 import { init_i18n } from "./src/frontend-app.i18n"
@@ -49,46 +51,23 @@ import { ordo_app_state } from "./app.state"
 // TODO Move fonts to assets
 import "./index.css"
 
-export const App = Maoka.create("div", async ({ use, on_unmount }) => {
+export const App = Maoka.create("div", ({ use, on_unmount }) => {
 	use(MaokaJabs.set_class("app"))
 
-	const { app_fid, app_fn, is_dev } = ordo_app_state.zags.select("constants")
+	const is_dev = ordo_app_state.zags.select("constants.is_dev")
 
-	const known_functions = init_known_functions(app_fn)
-	ordo_app_state.zags.update("known_functions", () => known_functions)
-
+	const known_functions = init_known_functions()
 	const { get_logger } = init_logger(ConsoleLogger)
-	const app_logger = get_logger(app_fid)
-	ordo_app_state.zags.update("logger", () => app_logger)
-
 	const { get_fetch } = init_fetch()
-
-	const { get_commands } = init_commands()
-	ordo_app_state.zags.update("commands", () => get_commands(app_fid))
-
+	const { commands, get_commands } = init_commands()
 	const { translate } = init_i18n()
-	ordo_app_state.zags.update("translate", () => translate)
-
 	const { get_file_associations } = init_functions()
-
 	const { get_router } = init_router()
-
 	const { get_user_query } = init_user()
-
-	init_title_display()
-	init_command_palette()
-
 	const { content_repository, get_content_query } = init_content()
-	const app_get_content_query = get_content_query(app_fid)
-	ordo_app_state.zags.update("queries.content", () => app_get_content_query)
-
 	const { metadata_repository, get_metadata_query } = init_metadata()
-	const app_metadata_query = get_metadata_query(app_fid)
-	ordo_app_state.zags.update("queries.metadata", () => app_metadata_query)
 
 	const data_manager = DataManager.Of(metadata_repository, content_repository)
-	const commands = ordo_app_state.zags.select("commands")
-
 	void data_manager.start(state_change =>
 		Switch.Match(state_change)
 			.case("get-remote", () => commands.emit("cmd.application.background_task.start_loading"))
@@ -96,6 +75,10 @@ export const App = Maoka.create("div", async ({ use, on_unmount }) => {
 			.case(["get-remote-complete", "put-remote-complete"], () => commands.emit("cmd.application.background_task.reset_status"))
 			.default(noop),
 	)
+
+	init_context_menu()
+	init_title_display()
+	init_command_palette()
 
 	const function_state_source = {
 		get_commands,
@@ -113,7 +96,7 @@ export const App = Maoka.create("div", async ({ use, on_unmount }) => {
 	// TODO Render user defined functions
 	// TODO .catch
 	// TODO await for rendering landing to string
-	await import("@ordo-pink/function-welcome")
+	void import("@ordo-pink/function-welcome")
 		.then(({ default: f }) => f(function_state_source))
 		.then(() => import("@ordo-pink/function-file-editor"))
 		.then(({ default: f }) => f(function_state_source))
@@ -132,6 +115,14 @@ export const App = Maoka.create("div", async ({ use, on_unmount }) => {
 
 	// TODO Init user
 	return () => {
-		return [OrdoWorkspace, OrdoSidebar, OrdoModal, OrdoNotifications, OrdoActivityBar, OrdoBackgroundTaskIndicator]
+		return [
+			OrdoWorkspace,
+			OrdoSidebar,
+			OrdoModal,
+			OrdoNotifications,
+			OrdoContextMenu,
+			OrdoActivityBar,
+			OrdoBackgroundTaskIndicator,
+		]
 	}
 })

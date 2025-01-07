@@ -19,12 +19,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { MetadataCommand, MetadataQuery, MetadataRepository, NotificationType, RRR } from "@ordo-pink/core"
+import { NotificationType, RRR } from "@ordo-pink/core"
 import { call_once, noop } from "@ordo-pink/tau"
 import { ConsoleLogger } from "@ordo-pink/logger"
 import { Result } from "@ordo-pink/result"
 import { ZAGS } from "@ordo-pink/zags"
 
+import { MetadataCommand } from "./data/metadata/metadata-command.impl"
+import { MetadataQuery } from "./data/metadata/metadata-query.impl"
+import { MetadataRepository } from "./data/metadata/metadata-repository.impl"
 import { ordo_app_state } from "../app.state"
 
 type TInitMetadataFn = () => {
@@ -92,19 +95,20 @@ export const init_metadata: TInitMetadataFn = call_once(() => {
 
 	logger.debug("🟢 Initialised metadata.")
 
-	return {
-		metadata_repository,
-		get_metadata_query: fid =>
-			MetadataQuery.Of(metadata_repository, permission =>
-				Result.If(known_functions.has_permissions(fid, { queries: [permission] }), {
-					F: () => {
-						const rrr = eperm(`MetadataQuery permission RRR. Did you forget to request query permission '${permission}'?`)
-						ConsoleLogger.error(rrr.debug?.join(" "))
-						return rrr
-					},
-				}),
-			),
-	}
+	const get_metadata_query = (fid: symbol) =>
+		MetadataQuery.Of(metadata_repository, permission =>
+			Result.If(known_functions.has_permissions(fid, { queries: [permission] }), {
+				F: () => {
+					const rrr = eperm(`MetadataQuery permission RRR. Did you forget to request query permission '${permission}'?`)
+					ConsoleLogger.error(rrr.debug?.join(" "))
+					return rrr
+				},
+			}),
+		)
+
+	ordo_app_state.zags.update("queries.metadata", () => app_metadata_query)
+
+	return { metadata_repository, get_metadata_query }
 })
 
 // --- Internal ---

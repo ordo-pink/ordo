@@ -22,10 +22,13 @@
 import * as tau from "@ordo-pink/tau"
 import { Result, type TResult } from "@ordo-pink/result"
 import { Option } from "@ordo-pink/option"
+import { ordo_app_state } from "../app.state"
 
 // TODO: Extend query list :: data, etc.
-export const init_known_functions = tau.call_once((f: OrdoInternal.KnownFunction): OrdoInternal.KnownFunctions => {
-	const known_functions: OrdoInternal.KnownFunction[] = [f]
+export const init_known_functions = tau.call_once((): OrdoInternal.KnownFunctions => {
+	const app_fn = ordo_app_state.zags.select("constants.app_fn")
+
+	const known_functions: OrdoInternal.KnownFunction[] = [app_fn]
 
 	const find_by_fid = (fid: symbol | null) => Result.FromNullable(known_functions.find(f => f.fid === fid))
 
@@ -41,9 +44,9 @@ export const init_known_functions = tau.call_once((f: OrdoInternal.KnownFunction
 
 	const remove_known_f_by_index = (index: number) => known_functions.splice(index, 1)
 
-	const is_internal = (fid: symbol | null) => fid === f.fid
+	const is_internal = (fid: symbol | null) => fid === app_fn.fid
 
-	return {
+	const known_functions_manager = {
 		validate: (fid: symbol | null) => find_by_fid(fid).cata({ Err: tau.F, Ok: tau.T }),
 		exchange: (fid: symbol | null) =>
 			find_by_fid(fid)
@@ -71,6 +74,10 @@ export const init_known_functions = tau.call_once((f: OrdoInternal.KnownFunction
 				.pipe(Result.ops.map(remove_known_f_by_index))
 				.cata({ Err: tau.F, Ok: tau.T }),
 	}
+
+	ordo_app_state.zags.update("known_functions", () => known_functions_manager)
+
+	return known_functions_manager
 })
 
 // --- Internal ---

@@ -30,11 +30,11 @@ import { is_database_context_menu_payload } from "../database.constants"
 export const show_columns_jab =
 	(metadata: Ordo.Metadata.Instance): TMaokaJab =>
 	({ use }) => {
-		const commands = use(MaokaOrdo.Jabs.get_commands.get)
-		const ordo_ctx = use(MaokaOrdo.Context.consume)
+		const commands = use(MaokaOrdo.Jabs.get_commands)
+		const state = use(MaokaOrdo.Context.consume)
 		const { get_db_state, on_db_state_change } = use(database_context.consume)
 
-		const add_show_columns_modal_cm_item = MaokaOrdo.Jabs.ContextMenu.add({
+		commands.emit("cmd.application.context_menu.add", {
 			command: "cmd.database.show_columns_modal",
 			readable_name: "t.database.columns_modal.context_menu",
 			should_show: is_database_context_menu_payload,
@@ -42,16 +42,13 @@ export const show_columns_jab =
 			type: ContextMenuItemType.READ,
 		})
 
-		const add_show_columns_modal_cmd = MaokaOrdo.Jabs.get_commands.add("cmd.database.show_columns_modal", () =>
+		commands.on("cmd.database.show_columns_modal", () =>
 			commands.emit("cmd.application.modal.show", {
 				render: div =>
 					Maoka.render_dom(
 						div,
-						MaokaOrdo.Components.WithState(ordo_ctx, () => DatabaseColumnsModal(get_db_state(), on_db_state_change)),
+						MaokaOrdo.Components.WithState(state, () => DatabaseColumnsModal(get_db_state(), on_db_state_change)),
 					),
 			}),
 		)
-
-		use(add_show_columns_modal_cm_item)
-		use(add_show_columns_modal_cmd)
 	}

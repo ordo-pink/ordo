@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { deep_equals } from "@ordo-pink/tau/index.ts"
-
 import { type TZagsStatic } from "./zags.types.ts"
 
 /**
@@ -30,14 +28,14 @@ export const ZAGS: TZagsStatic = {
 				const location: Record<string, any> = keys.slice(0, -1).reduce((acc, key) => acc[key], state)
 				const current_value = location[keys[keys.length - 1]]
 
-				if (!deep_equals(value, current_value)) {
+				if (value !== current_value) {
 					value = current_value
 					f(current_value, is_update)
 				}
 			}
 
-			wrapped_f(state, false)
 			handlers.push(wrapped_f)
+			wrapped_f(state, false)
 
 			return () => {
 				const index = handlers.indexOf(wrapped_f)
@@ -52,20 +50,22 @@ export const ZAGS: TZagsStatic = {
 		},
 		update: (path, value_creator) => {
 			const keys = (path as string).split(".")
+			const state_copy = Object.assign({}, state)
 
-			const location: Record<string, any> = keys.slice(0, -1).reduce((acc, key) => (acc as any)[key], state)
+			const location: Record<string, any> = keys.slice(0, -1).reduce((acc, key) => (acc as any)[key], state_copy)
 			const current_value = location[keys[keys.length - 1]]
 			const value = value_creator(current_value)
 
-			if (!deep_equals(value, current_value)) {
+			if (value !== current_value) {
 				location[keys[keys.length - 1]] = value
+				state = state_copy
 
-				handlers.forEach(f => f(Object.assign(state, {}), true))
+				handlers.forEach(f => f(state_copy, true))
 			}
 		},
 		select: path => {
 			const keys = (path as string).split(".")
-			const location: Record<string, any> = keys.slice(0, -1).reduce((acc, key) => (acc as any)[key], state)
+			const location: Record<string, any> = keys.slice(0, -1).reduce((acc, key) => (acc as any)[key], Object.assign({}, state))
 
 			return location[keys[keys.length - 1]]
 		},

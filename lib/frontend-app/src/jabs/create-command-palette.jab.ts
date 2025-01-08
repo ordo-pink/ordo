@@ -32,32 +32,7 @@ import { create_hotkey_from_event } from "@ordo-pink/hotkey-from-event"
 export const create_command_palette: TMaokaJab = ({ on_mount, on_unmount, use }) => {
 	const commands = use(MaokaOrdo.Jabs.get_commands)
 
-	on_mount(() => {
-		commands.on("cmd.application.command_palette.show", handle_show)
-		commands.on("cmd.application.command_palette.hide", handle_hide)
-		commands.on("cmd.application.command_palette.add", handle_add)
-		commands.on("cmd.application.command_palette.remove", handle_remove)
-		commands.on("cmd.application.command_palette.toggle", handle_toggle)
-
-		commands.emit("cmd.application.command_palette.add", {
-			on_select: () => commands.emit("cmd.application.command_palette.toggle"),
-			readable_name: "t.common.components.command_palette.reset",
-			hotkey: "mod+shift+p",
-			render_icon: div => void div.appendChild(BsMenuButtonWideFill() as SVGSVGElement),
-		})
-	})
-
-	on_unmount(() => {
-		commands.off("cmd.application.command_palette.show", handle_show)
-		commands.off("cmd.application.command_palette.hide", handle_hide)
-		commands.off("cmd.application.command_palette.add", handle_add)
-		commands.off("cmd.application.command_palette.remove", handle_remove)
-		commands.off("cmd.application.command_palette.toggle", handle_toggle)
-
-		commands.emit("cmd.application.command_palette.remove", "t.common.components.command_palette.reset")
-	})
-
-	const on_keydown = (event: KeyboardEvent) => {
+	const handle_keydown = (event: KeyboardEvent) => {
 		if (IGNORED_KEYS.includes(event.key)) return
 
 		const hotkey = create_hotkey_from_event(event, false)
@@ -73,7 +48,34 @@ export const create_command_palette: TMaokaJab = ({ on_mount, on_unmount, use })
 		}
 	}
 
-	document.addEventListener("keydown", on_keydown)
+	on_mount(() => {
+		document.addEventListener("keydown", handle_keydown)
+
+		commands.on("cmd.application.command_palette.show", handle_show)
+		commands.on("cmd.application.command_palette.hide", handle_hide)
+		commands.on("cmd.application.command_palette.add", handle_add)
+		commands.on("cmd.application.command_palette.remove", handle_remove)
+		commands.on("cmd.application.command_palette.toggle", handle_toggle)
+
+		commands.emit("cmd.application.command_palette.add", {
+			on_select: () => commands.emit("cmd.application.command_palette.toggle"),
+			readable_name: "t.common.components.command_palette.reset",
+			hotkey: "mod+shift+p",
+			render_icon: div => void div.appendChild(BsMenuButtonWideFill() as SVGSVGElement),
+		})
+	})
+
+	on_unmount(() => {
+		document.removeEventListener("keydown", handle_keydown)
+
+		commands.off("cmd.application.command_palette.show", handle_show)
+		commands.off("cmd.application.command_palette.hide", handle_hide)
+		commands.off("cmd.application.command_palette.add", handle_add)
+		commands.off("cmd.application.command_palette.remove", handle_remove)
+		commands.off("cmd.application.command_palette.toggle", handle_toggle)
+
+		commands.emit("cmd.application.command_palette.remove", "t.common.components.command_palette.reset")
+	})
 }
 
 // --- Internal ---
@@ -81,7 +83,9 @@ export const create_command_palette: TMaokaJab = ({ on_mount, on_unmount, use })
 const IGNORED_KEYS = ["Control", "Shift", "Alt", "Meta"]
 
 const handle_add = (item: Ordo.CommandPalette.Item) =>
-	ordo_app_state.zags.update("sections.command_palette.global_items", is => [...is, item])
+	ordo_app_state.zags.update("sections.command_palette.global_items", is =>
+		is.some(i => i.readable_name === item.readable_name) ? is : [...is, item],
+	)
 
 const handle_remove = (id: string) =>
 	ordo_app_state.zags.update("sections.command_palette.global_items", items => items.filter(item => item.readable_name !== id))

@@ -19,71 +19,48 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { Maoka, type TMaokaJab } from "@ordo-pink/maoka"
 import { BsMenuButtonWideFill } from "@ordo-pink/frontend-icons"
-import { Maoka } from "@ordo-pink/maoka"
-import { call_once } from "@ordo-pink/tau"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { ordo_app_state } from "@ordo-pink/frontend-app/app.state"
 
-import { EMPTY_COMMAND_PALETTE } from "./constants"
-import { OrdoCommandPalette } from "./command-palette.component"
+import { EMPTY_COMMAND_PALETTE } from "../components/command-palette/constants"
+import { OrdoCommandPalette } from "../components/command-palette/command-palette.component"
 
-import { Switch } from "@ordo-pink/switch"
+import { create_hotkey_from_event } from "@ordo-pink/hotkey-from-event"
 
-export const init_command_palette = call_once(() => {
-	const commands = ordo_app_state.zags.select("commands")
+export const create_command_palette: TMaokaJab = ({ on_mount, on_unmount, use }) => {
+	const commands = use(MaokaOrdo.Jabs.get_commands)
 
-	commands.on("cmd.application.command_palette.show", handle_show)
-	commands.on("cmd.application.command_palette.hide", handle_hide)
-	commands.on("cmd.application.command_palette.add", handle_add)
-	commands.on("cmd.application.command_palette.remove", handle_remove)
-	commands.on("cmd.application.command_palette.toggle", handle_toggle)
+	on_mount(() => {
+		commands.on("cmd.application.command_palette.show", handle_show)
+		commands.on("cmd.application.command_palette.hide", handle_hide)
+		commands.on("cmd.application.command_palette.add", handle_add)
+		commands.on("cmd.application.command_palette.remove", handle_remove)
+		commands.on("cmd.application.command_palette.toggle", handle_toggle)
 
-	commands.emit("cmd.application.command_palette.add", {
-		on_select: () => commands.emit("cmd.application.command_palette.toggle"),
-		readable_name: "t.common.components.command_palette.reset",
-		hotkey: "mod+shift+p",
-		render_icon: div => void div.appendChild(BsMenuButtonWideFill() as SVGSVGElement),
+		commands.emit("cmd.application.command_palette.add", {
+			on_select: () => commands.emit("cmd.application.command_palette.toggle"),
+			readable_name: "t.common.components.command_palette.reset",
+			hotkey: "mod+shift+p",
+			render_icon: div => void div.appendChild(BsMenuButtonWideFill() as SVGSVGElement),
+		})
 	})
 
-	const IGNORED_KEYS = ["Control", "Shift", "Alt", "Meta"]
+	on_unmount(() => {
+		commands.off("cmd.application.command_palette.show", handle_show)
+		commands.off("cmd.application.command_palette.hide", handle_hide)
+		commands.off("cmd.application.command_palette.add", handle_add)
+		commands.off("cmd.application.command_palette.remove", handle_remove)
+		commands.off("cmd.application.command_palette.toggle", handle_toggle)
 
-	const create_hotkey_string = (event: KeyboardEvent, is_darwin: boolean) => {
-		let hotkey = ""
-
-		if (event.altKey) hotkey += "meta+"
-		if (event.ctrlKey) hotkey += is_darwin ? "ctrl+" : "mod+"
-		if (event.metaKey) hotkey += "mod+"
-		if (event.shiftKey) hotkey += "shift+"
-
-		hotkey += Switch.Match(event.code)
-			.case("Period", () => ".")
-			.case("Comma", () => ",")
-			.case("Backquote", () => "`")
-			.case("Minus", () => "-")
-			.case("Backslash", () => "\\")
-			.case("BracketLeft", () => "[")
-			.case("BracketRight", () => "]")
-			.case("Semicolon", () => ";")
-			.case("Quote", () => "'")
-			.case("Slash", () => "/")
-			.case("Space", () => " ")
-			.case(
-				code => code.startsWith("Key"),
-				() => event.code.slice(3).toLowerCase(),
-			)
-			.case(
-				code => code.startsWith("Digit"),
-				() => event.code.slice(5),
-			)
-			.default(() => event.code.toLowerCase())
-
-		return hotkey
-	}
+		commands.emit("cmd.application.command_palette.remove", "t.common.components.command_palette.reset")
+	})
 
 	const on_keydown = (event: KeyboardEvent) => {
 		if (IGNORED_KEYS.includes(event.key)) return
 
-		const hotkey = create_hotkey_string(event, false)
+		const hotkey = create_hotkey_from_event(event, false)
 		const current = ordo_app_state.zags.select("sections.command_palette.global_items")
 
 		const command = current.find(item => item.hotkey && item.hotkey === hotkey)
@@ -97,7 +74,11 @@ export const init_command_palette = call_once(() => {
 	}
 
 	document.addEventListener("keydown", on_keydown)
-})
+}
+
+// --- Internal ---
+
+const IGNORED_KEYS = ["Control", "Shift", "Alt", "Meta"]
 
 const handle_add = (item: Ordo.CommandPalette.Item) =>
 	ordo_app_state.zags.update("sections.command_palette.global_items", is => [...is, item])

@@ -31,9 +31,9 @@ import { OrdoNotifications } from "./src/components/notifications/notifications-
 import { OrdoSidebar } from "./src/components/sidebar/sidebar.component"
 import { OrdoTitleDisplay } from "./src/components/title.component"
 import { OrdoWorkspace } from "./src/components/workspace.component"
-import { init_command_palette } from "./src/components/command-palette"
 import { ordo_app_state } from "./app.state"
 
+import { create_command_palette } from "./src/jabs/create-command-palette.jab"
 import { create_function_state } from "./src/jabs/create-function-state.jab"
 import { create_function_state_source } from "./src/jabs/create-function-state-source.jab"
 import { move_file_command } from "./src/jabs/commands/move.command"
@@ -42,6 +42,7 @@ import { start_data_orchestrator } from "./src/jabs/start-data-orchestrator.jab"
 // TODO Move fonts to assets
 import "./index.css"
 
+// TODO Move translations from file explorer
 export const App = Maoka.create("div", ({ use }) => {
 	const { app_fid } = ordo_app_state.zags.select("constants")
 
@@ -52,12 +53,8 @@ export const App = Maoka.create("div", ({ use }) => {
 	use(start_data_orchestrator(repositories))
 
 	use(MaokaJabs.set_class("app"))
+	use(create_command_palette)
 	use(move_file_command)
-
-	// TODO Move to jabs
-	init_command_palette()
-
-	// TODO Move translations from file explorer
 
 	// TODO Render user defined functions
 	// TODO .catch

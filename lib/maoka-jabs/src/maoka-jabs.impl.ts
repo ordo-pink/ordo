@@ -38,29 +38,37 @@ export const set_class =
 export const add_class =
 	(...classes: string[]) =>
 	(ctx: TMaokaProps) => {
-		const current_classes = ctx.element.getAttribute("class") ?? ""
+		if (ctx.element.classList) {
+			ctx.element.classList.add(...classes.flatMap(cls => cls.split(" ")))
+		} else {
+			const current_classes = ctx.element.getAttribute("class") ?? ""
 
-		ctx.element.setAttribute(
-			"class",
-			current_classes
-				.split(" ")
-				.concat(classes.flatMap(cls => cls.split(" ")))
-				.join(" "),
-		)
+			ctx.element.setAttribute(
+				"class",
+				current_classes
+					.split(" ")
+					.concat(classes.flatMap(cls => cls.split(" ")))
+					.join(" "),
+			)
+		}
 	}
 
 export const remove_class =
 	<$TClass extends string>(...classes: TNoSpace<$TClass>[]) =>
 	(ctx: TMaokaProps) => {
-		const current_classes = ctx.element.getAttribute("class") ?? ""
+		if (ctx.element.classList) {
+			ctx.element.classList.remove(...classes.flatMap(cls => cls.split(" ")))
+		} else {
+			const current_classes = ctx.element.getAttribute("class") ?? ""
 
-		ctx.element.setAttribute(
-			"class",
-			current_classes
-				.split(" ")
-				.filter(cls => !classes.includes(cls as TNoSpace<$TClass>))
-				.join(" "),
-		)
+			ctx.element.setAttribute(
+				"class",
+				current_classes
+					.split(" ")
+					.filter(cls => !classes.includes(cls as TNoSpace<$TClass>))
+					.join(" "),
+			)
+		}
 	}
 
 export const replace_class =
@@ -115,3 +123,5 @@ export const is_sm_screen$: TMaokaJab<() => boolean> = ({ refresh, on_unmount })
 
 	return () => value
 }
+
+export const is_darwin: TMaokaJab<boolean> = () => navigator.appVersion.indexOf("Mac") !== -1

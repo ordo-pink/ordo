@@ -111,3 +111,5 @@ export enum ErrorType {
 	ENOSPC, // Out of memory
 	length,
 }
+
+export const SM_SCREEN_BREAKPOINT = 640

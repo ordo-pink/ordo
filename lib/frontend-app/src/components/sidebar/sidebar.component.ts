@@ -51,7 +51,7 @@ export const OrdoSidebar = Maoka.create("aside", ({ use, on_unmount }) => {
 		const { visible, enabled } = get_sidebar()
 
 		return Switch.OfTrue()
-			.case(visible && enabled, () => Sidebar)
+			.case(visible && enabled, () => SidebarRenderer)
 			.default(noop)
 	}
 })
@@ -60,8 +60,6 @@ export const OrdoSidebarButton = Maoka.create("button", ({ use }) => {
 	const commands = ordo_app_state.zags.select("commands")
 	const get_sidebar = use(MaokaOrdo.Jabs.happy_marriage$(sidebar$))
 	const get_current_activity = use(ordo_app_state.select_jab$("functions.current_activity"))
-
-	let was_enabled = false
 
 	use(MaokaJabs.set_class("activity-bar_link activity-bar_icon"))
 	use(MaokaJabs.listen("onclick", () => commands.emit("cmd.application.sidebar.toggle")))
@@ -78,18 +76,16 @@ export const OrdoSidebarButton = Maoka.create("button", ({ use }) => {
 
 		const readable_name = "t.common.components.sidebar.toggle"
 
-		if (!was_enabled && enabled) {
+		commands.emit("cmd.application.command_palette.remove", readable_name)
+
+		if (enabled) {
 			commands.emit("cmd.application.command_palette.add", {
 				on_select: () => commands.emit("cmd.application.sidebar.toggle"),
 				hotkey: "mod+b",
 				readable_name,
 				render_icon: div => void div.appendChild(BsLayoutSidebarInsetReverse() as SVGSVGElement),
 			})
-		} else if (was_enabled && !enabled) {
-			commands.emit("cmd.application.command_palette.remove", readable_name)
 		}
-
-		was_enabled = enabled
 
 		return Switch.OfTrue()
 			.case(enabled && visible, () => BsArrowLeft("rotate-180") as TMaokaElement)
@@ -100,7 +96,7 @@ export const OrdoSidebarButton = Maoka.create("button", ({ use }) => {
 
 // --- Internal ---
 
-const Sidebar = Maoka.create("div", ({ use, element }) => {
+const SidebarRenderer = Maoka.create("div", ({ use, element }) => {
 	use(MaokaJabs.set_class("sidebar"))
 
 	const get_current_activity = use(ordo_app_state.select_jab$("functions.current_activity"))

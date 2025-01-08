@@ -19,7 +19,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { type TMaokaProps } from "@ordo-pink/maoka"
+import { TMaokaJab, type TMaokaProps } from "@ordo-pink/maoka"
+import { SM_SCREEN_BREAKPOINT } from "@ordo-pink/core"
+import { lt } from "@ordo-pink/tau"
 
 import { TNoSpace } from "./maoka-jabs.types"
 
@@ -91,4 +93,25 @@ export const create_context = <$TValue>() => {
 			return state[props.root_id] ?? ({} as $TValue)
 		},
 	}
+}
+
+const is_sm = lt(SM_SCREEN_BREAKPOINT)
+
+export const is_sm_screen$: TMaokaJab<() => boolean> = ({ refresh, on_unmount }) => {
+	let value: boolean = is_sm(window.innerWidth)
+
+	const handle_resize = () => {
+		const is_sm_screen = is_sm(window.innerWidth)
+
+		if (value !== is_sm_screen) {
+			value = is_sm_screen
+			void refresh()
+		}
+	}
+
+	window.addEventListener("resize", handle_resize)
+
+	on_unmount(() => window.removeEventListener("resize", handle_resize))
+
+	return () => value
 }

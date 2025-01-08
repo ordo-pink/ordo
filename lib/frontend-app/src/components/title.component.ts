@@ -19,33 +19,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { Maoka } from "@ordo-pink/maoka"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { ZAGS } from "@ordo-pink/zags"
-import { call_once } from "@ordo-pink/tau"
 
-import { ordo_app_state } from "../app.state"
-
-type TInitTitleStreamFn = () => void
-export const init_title_display: TInitTitleStreamFn = call_once(() => {
-	const { commands, logger, translate } = ordo_app_state.zags.unwrap()
-
-	logger.debug("🟡 Initialising title...")
-
-	commands.on("cmd.application.set_title", title => title$.update("title", () => title))
-
+export const OrdoTitleDisplay = Maoka.create("div", ({ use, on_unmount }) => {
+	const commands = use(MaokaOrdo.Jabs.get_commands)
+	const { t } = use(MaokaOrdo.Jabs.get_translations$)
+	const get_title = use(MaokaOrdo.Jabs.happy_marriage$(title$, s => s.title))
 	const title_element = document.querySelector("title") as HTMLTitleElement
 
-	translate.$.marry((_, is_update) => {
-		if (is_update) {
-			const title = title$.select("title")
-			title_element.innerText = `${translate(title)} | Ordo.pink`
-		}
+	const handle_set_title = (title: Ordo.I18N.TranslationKey) => title$.update("title", () => title)
+
+	commands.on("cmd.application.set_title", handle_set_title)
+
+	on_unmount(() => {
+		commands.off("cmd.application.set_title", handle_set_title)
 	})
 
-	title$.marry(({ title }) => {
-		title_element.innerText = `${translate(title)} | Ordo.pink`
-	})
+	return () => {
+		const title = get_title()
+		const t_title = t(title).concat(" | Ordo.pink")
 
-	logger.debug("🟢 Initialised title.")
+		title_element.innerText = t_title
+	}
 })
 
 // --- Internal ---

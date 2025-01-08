@@ -12,7 +12,7 @@ export type TMaokaElement = { [$TKey in keyof HTMLElement]: HTMLElement[$TKey] |
 	replaceChildren: (...children: TMaokaChild[]) => void
 	childNodes: HTMLElement["childNodes"]
 	onunmount: (() => void)[] | undefined
-	aftermount: (() => void)[] | undefined
+	onmount: (() => void)[] | undefined
 }
 
 export type TMaokaTextElement = Partial<{ [$TKey in keyof Text]: Text[$TKey] }> | string
@@ -79,7 +79,7 @@ export type TMaokaProps<$TElement extends TMaokaElement = TMaokaElement> = {
 
 	on_unmount: TMaokaOnUnmountFn
 
-	after_mount: TMaokaAfterMountFn
+	on_mount: TMaokaAfterMountFn
 
 	use: <_TResult>(jab: TMaokaJab<_TResult>) => _TResult
 }

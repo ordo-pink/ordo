@@ -21,8 +21,8 @@
 
 import { BsFilesAlt, BsSlash } from "@ordo-pink/frontend-icons"
 import { ContextMenuItemType, Metadata } from "@ordo-pink/core"
+import { Maoka, type TMaokaJab } from "@ordo-pink/maoka"
 import { R, type TResult } from "@ordo-pink/result"
-import { Maoka } from "@ordo-pink/maoka"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MetadataIcon } from "@ordo-pink/maoka-components"
 
@@ -31,22 +31,22 @@ import { MetadataIcon } from "@ordo-pink/maoka-components"
  * {@link Ordo.Metadata.Instance}. The `Move...` command is essentially a setter for
  * the metadata parent value.
  */
-export const register_move_command = (ctx: Ordo.CreateFunction.State) => {
-	const { commands, metadata_query } = ctx
+export const move_file_command: TMaokaJab = ({ use, on_unmount }) => {
+	const ctx = use(MaokaOrdo.Context.consume)
 
 	const handle_show_move_palette = (fsid: Ordo.Metadata.FSID) =>
-		metadata_query
+		ctx.metadata_query
 			.get()
-			.pipe(R.ops.chain(get_descendents(fsid, metadata_query)))
-			.pipe(R.ops.map(filter_destinations(fsid, metadata_query)))
-			.pipe(R.ops.map(metadata_to_cp_items(fsid, ctx, commands)))
-			.pipe(R.ops.chain(unshift_move_to_root_r(fsid, metadata_query, commands)))
-			.pipe(R.ops.map(show_command_palette(commands)))
+			.pipe(R.ops.chain(get_descendents(fsid, ctx.metadata_query)))
+			.pipe(R.ops.map(filter_destinations(fsid, ctx.metadata_query)))
+			.pipe(R.ops.map(metadata_to_cp_items(fsid, ctx)))
+			.pipe(R.ops.chain(unshift_move_to_root_r(fsid, ctx.metadata_query, ctx.commands)))
+			.pipe(R.ops.map(show_command_palette(ctx.commands)))
 			.cata(R.catas.or_nothing())
 
-	commands.on("cmd.metadata.show_move_palette", handle_show_move_palette)
+	ctx.commands.on("cmd.metadata.show_move_palette", handle_show_move_palette)
 
-	commands.emit("cmd.application.context_menu.add", {
+	ctx.commands.emit("cmd.application.context_menu.add", {
 		command: "cmd.metadata.show_move_palette",
 		payload_creator: ({ payload }) => (payload as Ordo.Metadata.Instance).get_fsid(),
 		readable_name: "t.file_explorer.modals.move.title",
@@ -55,10 +55,10 @@ export const register_move_command = (ctx: Ordo.CreateFunction.State) => {
 		type: ContextMenuItemType.UPDATE,
 	})
 
-	return () => {
-		commands.off("cmd.metadata.show_move_palette", handle_show_move_palette)
-		commands.emit("cmd.application.context_menu.remove", "cmd.metadata.show_move_palette")
-	}
+	on_unmount(() => {
+		ctx.commands.off("cmd.metadata.show_move_palette", handle_show_move_palette)
+		ctx.commands.emit("cmd.application.context_menu.remove", "cmd.metadata.show_move_palette")
+	})
 }
 
 // --- Internal ---
@@ -95,7 +95,7 @@ const show_command_palette = (commands: Ordo.Command.Commands) => (items: Ordo.C
 	commands.emit("cmd.application.command_palette.show", { is_multiple: false, items, max_items: 100 })
 
 const metadata_to_cp_items =
-	(fsid: Ordo.Metadata.FSID, ctx: Ordo.CreateFunction.State, commands: Ordo.Command.Commands) =>
+	(fsid: Ordo.Metadata.FSID, ctx: Ordo.CreateFunction.State, commands = ctx.commands) =>
 	(move_destinations: Ordo.Metadata.Instance[]) =>
 		move_destinations.map(metadata => {
 			const new_parent = metadata.get_fsid()

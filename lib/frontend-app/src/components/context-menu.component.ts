@@ -23,17 +23,63 @@ import { ActionListItem } from "@ordo-pink/maoka-components"
 import { ContextMenuItemType } from "@ordo-pink/core"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
-import "./context-menu.css"
-import { ordo_app_state } from "../../../app.state"
+import { ordo_app_state } from "../../app.state"
 
-export const OrdoContextMenu = Maoka.create("div", ({ use, on_unmount }) => {
+export const OrdoContextMenu = Maoka.create("div", ({ on_mount, on_unmount, use }) => {
+	const commands = use(MaokaOrdo.Jabs.get_commands)
+
+	on_mount(() => {
+		commands.on("cmd.application.context_menu.show", handle_show)
+		commands.on("cmd.application.context_menu.hide", handle_hide)
+		commands.on("cmd.application.context_menu.add", handle_add)
+		commands.on("cmd.application.context_menu.remove", handle_remove)
+	})
+
+	on_unmount(() => {
+		commands.off("cmd.application.context_menu.show", handle_show)
+		commands.off("cmd.application.context_menu.hide", handle_hide)
+		commands.off("cmd.application.context_menu.add", handle_add)
+		commands.off("cmd.application.context_menu.remove", handle_remove)
+	})
+
+	return () => OrdoContextMenuDynamic
+})
+
+// --- Internal ---
+
+const handle_show: Ordo.Command.HandlerOf<"cmd.application.context_menu.show"> = menu => {
+	const structure = ordo_app_state.zags.select("sections.context_menu.items").filter(item => {
+		const should_show = item?.should_show({ event: menu.event, payload: menu.payload }) ?? false
+
+		// Avoid showing native context menu if there is something to show
+		if (should_show && menu.event.stopPropagation) menu.event.stopPropagation()
+
+		return should_show
+	})
+
+	ordo_app_state.zags.update("sections.context_menu.state", () => ({ ...menu, structure }))
+}
+
+const handle_hide: Ordo.Command.HandlerOf<"cmd.application.context_menu.hide"> = () =>
+	ordo_app_state.zags.update("sections.context_menu.state", () => void 0)
+
+const handle_add: Ordo.Command.HandlerOf<"cmd.application.context_menu.add"> = new_item =>
+	ordo_app_state.zags.update("sections.context_menu.items", items =>
+		items.some(item => item.command === new_item.command) ? items : items.concat(new_item),
+	)
+
+const handle_remove: Ordo.Command.HandlerOf<"cmd.application.context_menu.remove"> = command =>
+	ordo_app_state.zags.update("sections.context_menu.items", items => items.filter(item => item.command === command))
+
+const OrdoContextMenuDynamic = Maoka.create("div", ({ use, on_unmount }) => {
 	use(MaokaJabs.set_class("context-menu"))
 
-	const { emit } = ordo_app_state.zags.select("commands")
+	const commands = ordo_app_state.zags.select("commands")
 	const get_state = use(ordo_app_state.select_jab$("sections.context_menu.state"))
 
-	const handle_click_outside = () => emit("cmd.application.context_menu.hide")
+	const handle_click_outside = () => commands.emit("cmd.application.context_menu.hide")
 
 	document.addEventListener("click", handle_click_outside)
 	on_unmount(() => document.removeEventListener("click", handle_click_outside))
@@ -88,7 +134,7 @@ const HR = Maoka.styled("hr", { class: "context-menu_divider" })(() => void 0)
 
 const ContextMenuItem = (item: Ordo.ContextMenu.Item, payload: any, event: MouseEvent) =>
 	Maoka.create("div", () => {
-		const { emit } = ordo_app_state.zags.select("commands")
+		const commands = ordo_app_state.zags.select("commands")
 		const t = ordo_app_state.zags.select("translate")
 
 		return () =>
@@ -98,7 +144,7 @@ const ContextMenuItem = (item: Ordo.ContextMenu.Item, payload: any, event: Mouse
 				on_click: () => {
 					const current_payload = item.payload_creator ? item.payload_creator({ event, payload }) : payload
 
-					emit(item.command, current_payload)
+					commands.emit(item.command, current_payload)
 				},
 				render_icon: item.render_icon,
 			})

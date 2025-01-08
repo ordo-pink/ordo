@@ -46,7 +46,7 @@ export const Hotkey = (
 		decoration_only: false,
 	},
 ) =>
-	Maoka.create("div", ({ use, on_unmount, element, after_mount }) => {
+	Maoka.create("div", ({ use, on_unmount, element, on_mount: after_mount }) => {
 		const split = hotkey.split("+")
 
 		const symbol = split[split.length - 1].toLowerCase()
@@ -97,7 +97,27 @@ const create_hotkey_string = (event: KeyboardEvent, is_darwin: boolean) => {
 	if (event.metaKey) hotkey += "mod+"
 	if (event.shiftKey) hotkey += "shift+"
 
-	hotkey += event.key?.toLocaleLowerCase()
+	hotkey += Switch.Match(event.code)
+		.case("Period", () => ".")
+		.case("Comma", () => ",")
+		.case("Backquote", () => "`")
+		.case("Minus", () => "-")
+		.case("Backslash", () => "\\")
+		.case("BracketLeft", () => "[")
+		.case("BracketRight", () => "]")
+		.case("Semicolon", () => ";")
+		.case("Quote", () => "'")
+		.case("Slash", () => "/")
+		.case("Space", () => " ")
+		.case(
+			code => code.startsWith("Key"),
+			() => event.code.slice(3).toLowerCase(),
+		)
+		.case(
+			code => code.startsWith("Digit"),
+			() => event.code.slice(5),
+		)
+		.default(() => event.code.toLowerCase())
 
 	return hotkey
 }
@@ -117,25 +137,6 @@ const Key = (key: string) =>
 			.case("arrowright", () => "→")
 			.case("arrowup", () => "↑")
 			.case("arrowdown", () => "↓")
-			.case("<", () => ",")
-			.case(">", () => ".")
-			.case("?", () => "/")
-			.case("{", () => "[")
-			.case("}", () => "]")
-			.case("!", () => "1")
-			.case("@", () => "2")
-			.case("#", () => "3")
-			.case("$", () => "4")
-			.case("%", () => "5")
-			.case("^", () => "6")
-			.case("&", () => "7")
-			.case("*", () => "8")
-			.case("(", () => "9")
-			.case(")", () => "0")
-			.case("_", () => "-")
-			.case("+", () => "=")
-			.case("|", () => "\\")
-			.case("~", () => "`")
 			.default(() => title_case(key)),
 	)
 

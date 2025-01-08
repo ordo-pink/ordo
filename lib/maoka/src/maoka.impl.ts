@@ -36,9 +36,9 @@ export const create: T.TMaokaCreateComponentFn = (name, callback) => {
 				if (!element.onunmount) element.onunmount = []
 				element.onunmount.push(f)
 			},
-			after_mount: f => {
-				if (!element.aftermount) element.aftermount = []
-				element.aftermount.push(f)
+			on_mount: f => {
+				if (!element.onmount) element.onmount = []
+				element.onmount.push(f)
 			},
 		} as T.TMaokaProps
 
@@ -80,9 +80,9 @@ export const html = (tag: string, html: string): T.TMaokaComponent =>
 export const render_dom: T.TMaokaRenderDOMFn = async (root, component) => {
 	const root_id: string = crypto.randomUUID()
 
-	const Component = component(document.createElement.bind(document), root as unknown as T.TMaokaElement, root_id)
+	const Component = await component(document.createElement.bind(document), root as unknown as T.TMaokaElement, root_id)
 
-	root.appendChild((await Component) as HTMLElement)
+	root.appendChild(Component as HTMLElement)
 
 	const unmount_element = (element: T.TMaokaElement) => {
 		if (is_arr(element.onunmount) && element.onunmount.length > 0) element.onunmount.forEach(f => f())
@@ -90,11 +90,15 @@ export const render_dom: T.TMaokaRenderDOMFn = async (root, component) => {
 		element.childNodes.forEach(child => unmount_element(child as any))
 	}
 
-	const after_mount_element = (element: T.TMaokaElement) => {
-		if (is_arr(element.aftermount) && element.aftermount.length > 0) element.aftermount.forEach(f => f())
+	const mount_element = (element: T.TMaokaElement) => {
+		if (is_arr(element.onmount) && element.onmount.length > 0) {
+			element.onmount.forEach(f => f())
+		}
 
-		element.childNodes.forEach(child => after_mount_element(child as any))
+		element.childNodes.forEach(child => mount_element(child as any))
 	}
+
+	mount_element(Component)
 
 	const observer = new MutationObserver(records => {
 		for (const record of records) {
@@ -108,12 +112,16 @@ export const render_dom: T.TMaokaRenderDOMFn = async (root, component) => {
 
 			for (let i = 0; i < mounted_nodes.length; i++) {
 				const element = mounted_nodes[i]
-				after_mount_element(element)
+				mount_element(element)
 			}
 		}
 	})
 
-	observer.observe(root as HTMLElement, { childList: true, subtree: true })
+	observer.observe(root as HTMLElement, {
+		childList: true,
+		subtree: true,
+		attributeFilter: ["onmount", "onunmount"],
+	})
 }
 
 // --- Internal ---

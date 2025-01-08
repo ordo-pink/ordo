@@ -65,7 +65,7 @@ const Text = ({
 				return () => label
 			}),
 
-			Maoka.create("input", ({ use, element, after_mount }) => {
+			Maoka.create("input", ({ use, element, on_mount: after_mount }) => {
 				use(
 					MaokaJabs.listen("oninput", event => {
 						const current_is_valid = is_valid$.select("value")

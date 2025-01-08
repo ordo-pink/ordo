@@ -32,7 +32,7 @@ import { OrdoCommandPaletteItems } from "./command-palette-items.component"
 
 // TODO Handle on_new_item
 // TODO Handle alternative layout characters
-export const OrdoCommandPalette = Maoka.create("div", ({ use, on_unmount, after_mount }) => {
+export const OrdoCommandPalette = Maoka.create("div", ({ use, on_unmount, on_mount }) => {
 	use(MaokaJabs.set_class("command-palette"))
 
 	let input = ""
@@ -177,7 +177,7 @@ export const OrdoCommandPalette = Maoka.create("div", ({ use, on_unmount, after_
 		ordo_app_state.zags.update("sections.command_palette.index", () => 0)
 	}
 
-	after_mount(() => document.addEventListener("keydown", handle_keydown))
+	on_mount(() => document.addEventListener("keydown", handle_keydown))
 	on_unmount(() => document.removeEventListener("keydown", handle_keydown))
 
 	return () => {
@@ -185,9 +185,7 @@ export const OrdoCommandPalette = Maoka.create("div", ({ use, on_unmount, after_
 
 		return [
 			SearchInput,
-
 			ItemsWrapper(() => [state.is_multiple ? PinnedItems : void 0, VisibleItems]),
-
 			state.is_multiple ? WithPinnedItemsHint : NoPinnedItemsHint,
 		]
 	}

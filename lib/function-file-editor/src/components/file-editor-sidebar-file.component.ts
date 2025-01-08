@@ -29,6 +29,14 @@ export const FileEditorSidebarFile = (metadata: Ordo.Metadata.Instance, depth = 
 		const fsid = metadata.get_fsid()
 		const { emit } = use(MaokaOrdo.Jabs.get_commands)
 
+		const handle_context_menu = (event: MouseEvent) => {
+			event.preventDefault()
+
+			emit("cmd.application.context_menu.show", { event, payload: metadata })
+		}
+
+		use(MaokaJabs.listen("oncontextmenu", event => handle_context_menu(event)))
+
 		const file_editor_file_class = MaokaJabs.set_class(
 			"flex space-x-2 items-center rounded-sm",
 			"hover:bg-gradient-to-r hover:from-neutral-300 hover:to-stone-300",

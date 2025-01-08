@@ -50,11 +50,12 @@ import { ordo_app_state } from "./app.state"
 
 // TODO Move fonts to assets
 import "./index.css"
+import { register_move_command } from "./src/commands/move.command"
 
 export const App = Maoka.create("div", ({ use, on_unmount }) => {
 	use(MaokaJabs.set_class("app"))
 
-	const is_dev = ordo_app_state.zags.select("constants.is_dev")
+	const { is_dev, app_fid } = ordo_app_state.zags.select("constants")
 
 	const known_functions = init_known_functions()
 	const { get_logger } = init_logger(ConsoleLogger)
@@ -76,10 +77,6 @@ export const App = Maoka.create("div", ({ use, on_unmount }) => {
 			.default(noop),
 	)
 
-	init_context_menu()
-	init_title_display()
-	init_command_palette()
-
 	const function_state_source = {
 		get_commands,
 		get_content_query,
@@ -92,6 +89,26 @@ export const App = Maoka.create("div", ({ use, on_unmount }) => {
 		known_functions,
 		translate,
 	}
+
+	const app_state: Ordo.CreateFunction.State = {
+		commands: get_commands(app_fid),
+		content_query: get_content_query(app_fid),
+		fetch: get_fetch(app_fid),
+		file_associations$: get_file_associations(app_fid),
+		logger: get_logger(app_fid),
+		metadata_query: get_metadata_query(app_fid),
+		router$: get_router(app_fid),
+		translate,
+		user_query: get_user_query(app_fid),
+	}
+
+	// TODO Move to jabs
+	init_context_menu()
+	init_title_display()
+	init_command_palette()
+
+	// TODO Move translations from file explorer
+	const unregister_move_command = register_move_command(app_state)
 
 	// TODO Render user defined functions
 	// TODO .catch
@@ -111,6 +128,7 @@ export const App = Maoka.create("div", ({ use, on_unmount }) => {
 	// TODO Uninstalling created functions
 	on_unmount(() => {
 		data_manager.cancel()
+		unregister_move_command()
 	})
 
 	// TODO Init user

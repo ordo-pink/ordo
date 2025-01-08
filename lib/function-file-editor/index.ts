@@ -59,6 +59,7 @@ export default create_function(
 			"cmd.application.command_palette.add",
 			"cmd.application.command_palette.hide",
 			"cmd.application.command_palette.show",
+			"cmd.application.context_menu.show",
 			"cmd.application.notification.show",
 			"cmd.application.router.navigate",
 			"cmd.application.set_title",

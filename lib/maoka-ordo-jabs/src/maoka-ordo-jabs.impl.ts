@@ -147,3 +147,31 @@ export const get_metadata_children$ =
 			}),
 		)
 	}
+
+export const get_metadata_incoming_links$ =
+	(fsid?: Ordo.Metadata.FSID | null, options?: Ordo.Metadata.QueryOptions): TMaokaJab<() => Ordo.Metadata.Instance[]> =>
+	({ use }) => {
+		const metadata_query = use(get_metadata_query)
+
+		return use(
+			happy_marriage$(metadata_query.$, () => {
+				if (!fsid) return []
+
+				return metadata_query.get_incoming_links(fsid, options).cata(R.catas.or_else(() => []))
+			}),
+		)
+	}
+
+export const get_metadata_outgoing_links$ =
+	(fsid?: Ordo.Metadata.FSID | null, options?: Ordo.Metadata.QueryOptions): TMaokaJab<() => Ordo.Metadata.Instance[]> =>
+	({ use }) => {
+		const metadata_query = use(get_metadata_query)
+
+		return use(
+			happy_marriage$(metadata_query.$, () => {
+				if (!fsid) return []
+
+				return metadata_query.get_outgoing_links(fsid, options).cata(R.catas.or_else(() => []))
+			}),
+		)
+	}

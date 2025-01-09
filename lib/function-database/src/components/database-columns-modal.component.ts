@@ -33,11 +33,13 @@ export const DatabaseColumnsModal = (state: TDatabaseState, on_change: (state: T
 		const { t } = use(MaokaOrdo.Jabs.get_translations$)
 		const commands = use(MaokaOrdo.Jabs.get_commands)
 
-		const active_columns = state.columns ?? ["t.database.column_names.name"]
+		const active_columns = state.columns ?? ["t.database.column_names.name", "t.database.column_names.labels"]
+		// TODO Take columns from file content
 		const all_columns = [
 			"t.database.column_names.name",
 			"t.database.column_names.labels",
-			"t.database.column_names.links",
+			"t.database.column_names.outgoing_links",
+			"t.database.column_names.incoming_links",
 			"t.database.column_names.parent",
 			"t.database.column_names.created_at",
 			"t.database.column_names.created_by",
@@ -61,7 +63,8 @@ export const DatabaseColumnsModal = (state: TDatabaseState, on_change: (state: T
 										MaokaJabs.listen("onchange", () => {
 											const state_copy = { ...state }
 
-											if (!state_copy.columns) state_copy.columns = ["t.database.column_names.name"]
+											if (!state_copy.columns)
+												state_copy.columns = ["t.database.column_names.name", "t.database.column_names.labels"]
 											if (state_copy.columns.includes(column)) state_copy.columns.splice(state_copy.columns.indexOf(column), 1)
 											else state_copy.columns.push(column)
 

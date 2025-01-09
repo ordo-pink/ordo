@@ -819,6 +819,11 @@ declare global {
 					options?: QueryOptions,
 				) => TResult<Ordo.Metadata.Instance[], Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 
+				get_outgoing_links: (
+					fsid: FSID,
+					options?: QueryOptions,
+				) => TResult<Ordo.Metadata.Instance[], Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
+
 				get_parent: (
 					fsid: FSID,
 					options?: QueryOptions,

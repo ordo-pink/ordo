@@ -25,6 +25,7 @@ import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { R } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
+import { noop } from "@ordo-pink/tau"
 
 export const DatabaseTableRow = (keys: Ordo.I18N.TranslationKey[], child: Ordo.Metadata.Instance) =>
 	Maoka.create("tr", ({ use }) => {
@@ -36,6 +37,9 @@ export const DatabaseTableRow = (keys: Ordo.I18N.TranslationKey[], child: Ordo.M
 					.case("t.database.column_names.name", () => FileNameCell(child))
 					.case("t.database.column_names.labels", () => LabelsCell(child.get_fsid()))
 					.case("t.database.column_names.created_at", () => DateCell(child.get_created_at()))
+					.case("t.database.column_names.parent", () => LinksCell(child, "parent"))
+					.case("t.database.column_names.outgoing_links", () => LinksCell(child, "outgoing"))
+					.case("t.database.column_names.incoming_links", () => LinksCell(child, "incoming"))
 					.default(() => Cell("TODO")),
 			)
 	})
@@ -48,6 +52,36 @@ const Cell = (value: TMaokaChildren, on_click?: (event: MouseEvent) => void) =>
 		if (on_click) use(MaokaJabs.listen("onclick", on_click))
 
 		return () => value
+	})
+
+const LinksCell = (metadata: Ordo.Metadata.Instance, type: "parent" | "incoming" | "outgoing") =>
+	Maoka.create("td", ({ use }) => {
+		use(MaokaJabs.set_class("p-1 border database_border-color"))
+
+		return () =>
+			Switch.Match(type)
+				.case("parent", () =>
+					Maoka.create("div", ({ use }) => {
+						use(MaokaJabs.set_class("flex gap-1 text-sm"))
+						const get_parent = use(MaokaOrdo.Jabs.Metadata.get_by_fsid$(metadata.get_parent()))
+						return () => Link({ href: `/editor/${metadata.get_parent()}`, children: get_parent()?.get_name() ?? "/" })
+					}),
+				)
+				.case("outgoing", () =>
+					Maoka.create("div", ({ use }) => {
+						use(MaokaJabs.set_class("flex gap-1 text-sm"))
+						const get_links = use(MaokaOrdo.Jabs.Metadata.get_outgoing_links$(metadata.get_fsid()))
+						return () => get_links().map(link => Link({ href: `/editor/${link.get_fsid()}`, children: link.get_name() ?? "/" }))
+					}),
+				)
+				.case("incoming", () =>
+					Maoka.create("div", ({ use }) => {
+						use(MaokaJabs.set_class("flex gap-1 text-sm"))
+						const get_links = use(MaokaOrdo.Jabs.Metadata.get_incoming_links$(metadata.get_fsid()))
+						return () => get_links().map(link => Link({ href: `/editor/${link.get_fsid()}`, children: link.get_name() ?? "/" }))
+					}),
+				)
+				.default(noop)
 	})
 
 const LabelsCell = (fsid: Ordo.Metadata.FSID) =>

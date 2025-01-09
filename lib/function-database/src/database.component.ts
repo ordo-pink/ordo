@@ -66,7 +66,7 @@ export const Database = (metadata: Ordo.Metadata.Instance, content: Ordo.Content
 			const db_state = get_db_state()
 			const keys: Ordo.I18N.TranslationKey[] = db_state.columns
 				? (db_state.columns as Ordo.I18N.TranslationKey[])
-				: ["t.database.column_names.name"]
+				: ["t.database.column_names.name", "t.database.column_names.labels"]
 
 			if (!keys.includes("t.database.column_names.name")) keys.unshift("t.database.column_names.name")
 

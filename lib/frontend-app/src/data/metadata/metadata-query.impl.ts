@@ -108,6 +108,17 @@ export const MetadataQuery: Ordo.Metadata.QueryStatic = {
 				.pipe(R.ops.chain(() => MetadataQuery.Of(repo, check_query_permission).get(options)))
 				.pipe(R.ops.map(is => is.filter(i => i.has_link_to(fsid)))),
 
+		get_outgoing_links: (fsid, options) =>
+			R.Merge([
+				check_query_permission("metadata.get_outgoing_links"),
+				R.If(M.Validations.is_fsid(fsid), { F: () => inval(`MetadataQuery.get_incoming_links: Invalid FSID: ${fsid}`) }),
+			])
+				.pipe(R.ops.chain(() => MetadataQuery.Of(repo, check_query_permission).get_by_fsid(fsid, options)))
+				.pipe(R.ops.chain(i => R.FromNullable(i, () => enoent(`.get_outgoing_links -> fsid: ${fsid}`))))
+				.pipe(R.ops.map(i => i.get_links()))
+				.pipe(R.ops.chain(is => R.Merge(is.map(i => MetadataQuery.Of(repo, check_query_permission).get_by_fsid(i)))))
+				.pipe(R.ops.map(is => is.filter(Boolean) as Ordo.Metadata.Instance[])),
+
 		has_incoming_links: (fsid, options) =>
 			check_query_permission("metadata.has_incoming_links")
 				.pipe(R.ops.chain(() => MetadataQuery.Of(repo, check_query_permission).get_incoming_links(fsid, options)))

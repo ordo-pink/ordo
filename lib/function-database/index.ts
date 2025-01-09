@@ -40,7 +40,8 @@ declare global {
 				created_at: () => string
 				updated_at: () => string
 				size: () => string
-				links: () => string
+				outgoing_links: () => string
+				incoming_links: () => string
 				parent: () => string
 				created_by: () => string
 			}
@@ -89,7 +90,15 @@ export default create_function(
 			"cmd.metadata.show_edit_label_modal",
 			"cmd.metadata.show_edit_labels_palette",
 		],
-		queries: ["metadata.get", "metadata.$", "metadata.get_children", "metadata.get_by_fsid", "metadata.has_children"],
+		queries: [
+			"metadata.$",
+			"metadata.get_by_fsid",
+			"metadata.get_children",
+			"metadata.get_incoming_links",
+			"metadata.get_outgoing_links",
+			"metadata.get",
+			"metadata.has_children",
+		],
 	},
 	ctx => {
 		const commands = ctx.commands
@@ -104,7 +113,8 @@ export default create_function(
 				"t.database.column_names.updated_at": "Last Updated",
 				"t.database.file_association.readable_name": "Database",
 				"t.database.column_names.created_by": "Author",
-				"t.database.column_names.links": "Outgoing Links",
+				"t.database.column_names.outgoing_links": "Outgoing Links",
+				"t.database.column_names.incoming_links": "Incoming Links",
 				"t.database.column_names.parent": "Parent",
 				"t.database.columns_modal.context_menu": "Edit columns...",
 				"t.database.filter_modal.context_menu": "Edit filters...",

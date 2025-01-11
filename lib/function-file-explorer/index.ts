@@ -25,9 +25,9 @@ import { Maoka } from "@ordo-pink/maoka"
 import { R } from "@ordo-pink/result"
 import { is_string } from "@ordo-pink/tau"
 
-import { CreateFileModal } from "./src/components/create-file-modal.component"
-import { EditLabelModal } from "./src/components/edit-label-modal.component"
-import { RenameFileModal } from "./src/components/rename-file-modal.component"
+import { CreateFileModal } from "../frontend-app/src/components/create-file-modal.component"
+import { EditLabelModal } from "../frontend-app/src/components/edit-label-modal.component"
+import { RenameFileModal } from "../frontend-app/src/components/rename-file-modal.component"
 import { register_move_command } from "./src/commands/move-file.command"
 import { register_remove_file } from "./src/commands/remove-file.command"
 
@@ -94,99 +94,9 @@ export default create_function(
 		register_move_command(ctx)
 		register_remove_file(ctx)
 
-		commands.on("cmd.metadata.show_rename_modal", fsid =>
-			commands.emit("cmd.application.modal.show", {
-				render: div => void Maoka.render_dom(div, RenameFileModal(ctx, fsid)),
-			}),
-		)
-
-		commands.on("cmd.metadata.show_create_modal", fsid =>
-			commands.emit("cmd.application.modal.show", {
-				render: div => void Maoka.render_dom(div, CreateFileModal(ctx, fsid)),
-			}),
-		)
-
-		commands.emit("cmd.application.command_palette.add", {
-			on_select: () => commands.emit("cmd.metadata.show_create_modal", null),
-			hotkey: "mod+shift+n",
-			readable_name: "t.file_explorer.modals.create_file.title",
-			render_icon: div => void div.appendChild(BsFileEarmarkPlus() as SVGSVGElement),
-		})
-
 		commands.on("cmd.file_explorer.go_to_file", fsid => commands.emit("cmd.application.router.navigate", `/files/${fsid}`))
 
 		commands.on("cmd.file_explorer.open_file_explorer", () => commands.emit("cmd.application.router.navigate", "/files"))
-
-		commands.on("cmd.metadata.show_edit_label_modal", label => {
-			commands.emit("cmd.application.modal.show", {
-				show_close_button: true,
-				// TODO Grap ctx
-				render: div => void Maoka.render_dom(div, EditLabelModal(ctx, label)),
-			})
-		})
-
-		commands.on("cmd.metadata.show_edit_labels_palette", fsid => {
-			const show_labels_palette = () => {
-				const current_labels = mq
-					.get_by_fsid(fsid)
-					.pipe(R.ops.chain(R.FromOption))
-					.pipe(R.ops.map(metadata => metadata.get_labels()))
-					.cata(R.catas.or_else(() => [] as Ordo.Metadata.Label[]))
-
-				const available_labels = mq
-					.get()
-					.pipe(R.ops.map(metadata => metadata.flatMap(item => item.get_labels())))
-					.pipe(R.ops.map(labels => labels.filter(label => !current_labels.includes(label))))
-					.pipe(R.ops.map(labels => [...new Set(labels)]))
-					.cata(R.catas.or_else(() => [] as Ordo.Metadata.Label[]))
-
-				commands.emit("cmd.application.command_palette.show", {
-					is_multiple: true,
-					on_new_item: value => {
-						commands.emit("cmd.metadata.add_labels", { fsid, labels: [value] })
-						show_labels_palette()
-					},
-					items: available_labels.map(label => ({
-						readable_name: (is_string(label) ? label : label.name) as Ordo.I18N.TranslationKey,
-						on_select: () => commands.emit("cmd.metadata.add_labels", { fsid, labels: [label] }),
-					})),
-					max_items: 200,
-					pinned_items: current_labels.map(label => ({
-						readable_name: (is_string(label) ? label : label.name) as Ordo.I18N.TranslationKey,
-						on_select: () => commands.emit("cmd.metadata.remove_labels", { fsid, labels: [label] }),
-					})),
-				})
-			}
-
-			show_labels_palette()
-		})
-
-		commands.emit("cmd.application.context_menu.add", {
-			command: "cmd.metadata.show_edit_labels_palette",
-			// TODO render_icon: div => div.appendChild(BsFileEarmarkPlus() as SVGSVGElement),
-			readable_name: "t.common.metadata.show_edit_labels_palette", // TODO
-			should_show: ({ payload }) => Metadata.Validations.is_metadata(payload),
-			payload_creator: ({ payload }) => (Metadata.Validations.is_metadata(payload) ? payload.get_fsid() : null),
-			type: ContextMenuItemType.CREATE,
-		})
-
-		commands.emit("cmd.application.context_menu.add", {
-			command: "cmd.metadata.show_create_modal",
-			render_icon: div => div.appendChild(BsFileEarmarkPlus() as SVGSVGElement), // TODO: Move to icons
-			readable_name: "t.file_explorer.modals.create_file.title",
-			should_show: ({ payload }) => Metadata.Validations.is_metadata(payload) || payload === "root",
-			payload_creator: ({ payload }) => (Metadata.Validations.is_metadata(payload) ? payload.get_fsid() : null),
-			type: ContextMenuItemType.CREATE,
-		})
-
-		commands.emit("cmd.application.context_menu.add", {
-			command: "cmd.metadata.show_rename_modal",
-			render_icon: div => div.appendChild(BsFileEarmarkRichText() as SVGSVGElement),
-			readable_name: "t.file_explorer.modals.rename_file.title",
-			should_show: ({ payload }) => Metadata.Validations.is_metadata(payload),
-			payload_creator: ({ payload }) => Metadata.Validations.is_metadata(payload) && payload.get_fsid(),
-			type: ContextMenuItemType.UPDATE,
-		})
 
 		// commands.emit("cmd.functions.activities.register", {
 		// 	fid: ctx.fid,
@@ -211,30 +121,6 @@ declare global {
 		file_explorer: {
 			open_file_explorer: () => void
 			go_to_file: () => Ordo.Metadata.FSID | null
-		}
-	}
-
-	interface t {
-		file_explorer: {
-			modals: {
-				create_file: {
-					title: () => string
-					input_placeholder: () => string
-					input_label: () => string
-				}
-				move: {
-					title: () => string
-					move_to_root: () => string
-				}
-				remove_file: {
-					title: () => string
-					message: () => string
-				}
-				rename_file: {
-					title: () => string
-					input_label: () => string
-				}
-			}
 		}
 	}
 }

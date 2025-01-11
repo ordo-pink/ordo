@@ -26,11 +26,9 @@ import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
-export const EditLabelModal = (ctx: Ordo.CreateFunction.Params, label: Ordo.Metadata.Label) =>
+export const EditLabelModal = (label: Ordo.Metadata.Label) =>
 	Maoka.create("div", ({ use }) => {
-		use(MaokaOrdo.Context.provide(ctx))
-
-		const commands = use(MaokaOrdo.Jabs.get_commands.get)
+		const commands = use(MaokaOrdo.Jabs.get_commands)
 
 		const is_string_label = is_string(label)
 		const initial_name = is_string_label ? label : label.name

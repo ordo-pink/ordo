@@ -34,9 +34,13 @@ import { OrdoWorkspace } from "./src/components/workspace.component"
 import { ordo_app_state } from "./app.state"
 
 import { create_command_palette } from "./src/jabs/create-command-palette.jab"
+import { create_file_command } from "./src/jabs/commands/create-file.command"
 import { create_function_state } from "./src/jabs/create-function-state.jab"
 import { create_function_state_source } from "./src/jabs/create-function-state-source.jab"
-import { move_file_command } from "./src/jabs/commands/move.command"
+import { edit_file_labels_command } from "./src/jabs/commands/edit-file-labels.command"
+import { move_file_command } from "./src/jabs/commands/move-file.command"
+import { remove_file_command } from "./src/jabs/commands/remove-file.command"
+import { rename_file_command } from "./src/jabs/commands/rename-file.command"
 import { start_data_orchestrator } from "./src/jabs/start-data-orchestrator.jab"
 
 // TODO Move fonts to assets
@@ -55,14 +59,20 @@ export const App = Maoka.create("div", ({ use }) => {
 	use(MaokaJabs.set_class("app"))
 	use(create_command_palette)
 	use(move_file_command)
+	use(remove_file_command)
+	use(create_file_command)
+	use(rename_file_command)
+	use(edit_file_labels_command)
 
 	// TODO Render user defined functions
 	// TODO .catch
 	void Promise.any([
 		import("@ordo-pink/function-welcome").then(({ default: f }) => f(source)),
 		import("@ordo-pink/function-file-editor").then(({ default: f }) => f(source)),
-		import("@ordo-pink/function-rich-text").then(({ default: f }) => f(source)),
-		import("@ordo-pink/function-database").then(({ default: f }) => f(source)),
+		import("@ordo-pink/function-rich-text")
+			.then(({ default: f }) => f(source))
+			.then(() => import("@ordo-pink/function-database"))
+			.then(({ default: f }) => f(source)),
 	])
 
 	// TODO Init user

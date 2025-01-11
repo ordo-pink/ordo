@@ -24,27 +24,30 @@ import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
-import { TDatabaseState } from "../database.types"
+import { database$ } from "../database.state"
 
-export const DatabaseFilterModal = (state: TDatabaseState, on_change: (state: TDatabaseState) => void) =>
-	Maoka.create("div", ({ use }) => {
-		use(MaokaJabs.set_class("w-96 max-w-full flex flex-col"))
+export const DatabaseFilterModal = Maoka.create("div", ({ use }) => {
+	use(MaokaJabs.set_class("w-96 max-w-full flex flex-col"))
 
-		const { t } = use(MaokaOrdo.Jabs.get_translations$)
-		const commands = use(MaokaOrdo.Jabs.get_commands)
+	const { t } = use(MaokaOrdo.Jabs.get_translations$)
+	const commands = use(MaokaOrdo.Jabs.get_commands)
+	const get_db_state = use(MaokaOrdo.Jabs.happy_marriage$(database$))
 
+	const all_columns = [
+		"t.database.column_names.name",
+		"t.database.column_names.labels",
+		"t.database.column_names.outgoing_links",
+		"t.database.column_names.incoming_links",
+		"t.database.column_names.parent",
+		"t.database.column_names.created_at",
+		"t.database.column_names.created_by",
+	]
+
+	return () => {
+		const state = get_db_state()
 		const active_columns = state.columns ?? ["t.database.column_names.name", "t.database.column_names.labels"]
-		const all_columns = [
-			"t.database.column_names.name",
-			"t.database.column_names.labels",
-			"t.database.column_names.outgoing_links",
-			"t.database.column_names.incoming_links",
-			"t.database.column_names.parent",
-			"t.database.column_names.created_at",
-			"t.database.column_names.created_by",
-		]
 
-		return () => [
+		return [
 			Dialog({
 				action: () => commands.emit("cmd.application.modal.hide"),
 				title: "Columns",
@@ -60,17 +63,15 @@ export const DatabaseFilterModal = (state: TDatabaseState, on_change: (state: TD
 									use(MaokaJabs.set_attribute("type", "checkbox"))
 									use(
 										MaokaJabs.listen("onchange", () => {
-											const state_copy = { ...state }
+											database$.update("columns", columns => {
+												if (!columns) columns = ["t.database.column_names.name", "t.database.column_names.labels"]
+												if (columns.includes(column)) columns.splice(columns.indexOf(column), 1)
+												else columns.push(column)
 
-											if (!state_copy.columns)
-												state_copy.columns = ["t.database.column_names.name", "t.database.column_names.labels"]
-											if (state_copy.columns.includes(column)) state_copy.columns.splice(state_copy.columns.indexOf(column), 1)
-											else state_copy.columns.push(column)
+												if (!columns.includes("t.database.column_names.name")) columns.unshift("t.database.column_names.name")
 
-											if (!state_copy.columns.includes("t.database.column_names.name"))
-												state_copy.columns.unshift("t.database.column_names.name")
-
-											on_change(state_copy)
+												return columns
+											})
 										}),
 									)
 
@@ -81,4 +82,5 @@ export const DatabaseFilterModal = (state: TDatabaseState, on_change: (state: TD
 					),
 			}),
 		]
-	})
+	}
+})

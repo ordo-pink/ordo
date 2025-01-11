@@ -95,6 +95,25 @@ declare global {
 				show_edit_label_modal: () => string
 			}
 			components: {
+				modals: {
+					create_file: {
+						title: () => string
+						input_placeholder: () => string
+						input_label: () => string
+					}
+					move: {
+						title: () => string
+						move_to_root: () => string
+					}
+					remove_file: {
+						title: () => string
+						message: () => string
+					}
+					rename_file: {
+						title: () => string
+						input_label: () => string
+					}
+				}
 				command_palette: {
 					search_placeholder: () => string
 					hide: () => string

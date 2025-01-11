@@ -24,7 +24,7 @@ import { ContextMenuItemType } from "@ordo-pink/core"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
 import { DatabaseFilterModal } from "../components/database-filter-modal.component"
-import { database_context } from "../database.context"
+import { database$ } from "../database.state"
 import { is_database_context_menu_payload } from "../database.constants"
 
 export const show_filters_jab =
@@ -32,7 +32,7 @@ export const show_filters_jab =
 	({ use }) => {
 		const commands = use(MaokaOrdo.Jabs.get_commands)
 		const state = use(MaokaOrdo.Context.consume)
-		const { get_db_state, on_db_state_change } = use(database_context.consume)
+		const get_db_state = use(MaokaOrdo.Jabs.happy_marriage$(database$))
 
 		commands.emit("cmd.application.context_menu.add", {
 			command: "cmd.database.show_filter_modal",
@@ -47,7 +47,7 @@ export const show_filters_jab =
 				render: div =>
 					Maoka.render_dom(
 						div,
-						MaokaOrdo.Components.WithState(state, () => DatabaseFilterModal(get_db_state(), on_db_state_change)),
+						MaokaOrdo.Components.WithState(state, () => DatabaseFilterModal),
 					),
 			}),
 		)

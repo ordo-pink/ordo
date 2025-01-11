@@ -27,6 +27,7 @@ import { CommandPaletteLocation } from "./constants"
 import { OrdoCommandPaletteItem } from "./command-palette-item.component"
 import { ordo_app_state } from "@ordo-pink/frontend-app/app.state"
 
+// TODO A way to create an item that is a subset of found suggestion (e.g. "catalog" -> "cat")
 export const OrdoCommandPaletteItems = (
 	assigned_location: CommandPaletteLocation,
 	on_click: (index: number, location: CommandPaletteLocation) => void,
@@ -51,9 +52,12 @@ export const OrdoCommandPaletteItems = (
 			const current_location = get_current_location()
 			const has_new_item_handler = !!get_new_item_handler()
 
+			if (!items) return
+
 			// TODO Translations
 			if (!items.length && assigned_location === CommandPaletteLocation.SUGGESTED) {
 				if (has_new_item_handler)
+					// TODO Show item to be created
 					return CreateNewItemHint(() => ["press", Hotkey("Enter", { smol: true, decoration_only: true }), "to create"])
 				else return CreateNewItemHint(() => ["Nothing found :("])
 			}

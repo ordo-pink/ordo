@@ -49,11 +49,13 @@ export const move_file_command: TMaokaJab = ({ use, on_unmount }) => {
 	ctx.commands.emit("cmd.application.context_menu.add", {
 		command: "cmd.metadata.show_move_palette",
 		payload_creator: ({ payload }) => (payload as Ordo.Metadata.Instance).get_fsid(),
-		readable_name: "t.file_explorer.modals.move.title",
+		readable_name: "t.common.components.modals.move.title",
 		render_icon: div => div.appendChild(BsFilesAlt() as SVGSVGElement),
 		should_show: ({ payload }) => Metadata.Validations.is_metadata(payload),
 		type: ContextMenuItemType.UPDATE,
 	})
+
+	// TODO Command palette item if there is currently selected metadata
 
 	on_unmount(() => {
 		ctx.commands.off("cmd.metadata.show_move_palette", handle_show_move_palette)
@@ -88,7 +90,7 @@ const unshift_move_to_root_r =
 const create_to_root_item = (fsid: Ordo.Metadata.FSID, commands: Ordo.Command.Commands): Ordo.CommandPalette.Item => ({
 	render_icon: div => void div.appendChild(BsSlash() as SVGSVGElement),
 	on_select: () => commands.emit("cmd.metadata.move", { fsid, new_parent: null }),
-	readable_name: "t.file_explorer.modals.move.move_to_root",
+	readable_name: "t.common.components.modals.move.move_to_root",
 })
 
 const show_command_palette = (commands: Ordo.Command.Commands) => (items: Ordo.CommandPalette.Item[]) =>

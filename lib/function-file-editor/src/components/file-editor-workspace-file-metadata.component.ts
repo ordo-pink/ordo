@@ -24,6 +24,7 @@ import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
+// TODO Refresh if metadata was changed from the outside
 export const FileMetadata = (metadata: Ordo.Metadata.Instance) =>
 	Maoka.create("div", ({ use }) => {
 		const fsid = metadata.get_fsid()

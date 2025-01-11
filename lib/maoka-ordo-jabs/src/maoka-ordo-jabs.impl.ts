@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { type TMaokaElement, type TMaokaJab } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { R } from "@ordo-pink/result"
+import { type TMaokaJab } from "@ordo-pink/maoka"
 import { type TZags } from "@ordo-pink/zags"
 import { deep_equals } from "@ordo-pink/tau"
 
@@ -63,24 +63,21 @@ export const happy_marriage$ = <$TState extends Record<string, unknown>, $TResul
 	zags: TZags<$TState>,
 	handler: (state: $TState) => $TResult = x => x as unknown as $TResult,
 ): TMaokaJab<() => $TResult> => {
-	const storage: WeakMap<TMaokaElement, $TResult> = new WeakMap()
+	return ({ on_unmount, refresh }) => {
+		let value: $TResult
 
-	return ({ on_unmount, refresh, element }) => {
 		const divorce = zags.marry(state => {
-			const updated_state = handler(state)
+			const new_value = handler(state)
 
-			if (!storage.has(element) || !deep_equals(storage.get(element), updated_state)) {
-				storage.set(element, updated_state)
+			if (!deep_equals(value, new_value)) {
+				value = new_value
 				void refresh()
 			}
 		})
 
-		on_unmount(() => {
-			storage.delete(element)
-			divorce()
-		})
+		on_unmount(() => divorce())
 
-		return () => storage.get(element)!
+		return () => value
 	}
 }
 
@@ -152,14 +149,10 @@ export const get_metadata_incoming_links$ =
 	(fsid?: Ordo.Metadata.FSID | null, options?: Ordo.Metadata.QueryOptions): TMaokaJab<() => Ordo.Metadata.Instance[]> =>
 	({ use }) => {
 		const metadata_query = use(get_metadata_query)
+		const handle_get_incoming_links = () => metadata_query.get_incoming_links(fsid!, options).cata(R.catas.or_else(() => []))
+		const get_result = use(happy_marriage$(metadata_query.$, handle_get_incoming_links))
 
-		return use(
-			happy_marriage$(metadata_query.$, () => {
-				if (!fsid) return []
-
-				return metadata_query.get_incoming_links(fsid, options).cata(R.catas.or_else(() => []))
-			}),
-		)
+		return get_result
 	}
 
 export const get_metadata_outgoing_links$ =

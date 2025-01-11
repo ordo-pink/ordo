@@ -25,42 +25,39 @@ import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { Switch } from "@ordo-pink/switch"
 import { is_string } from "@ordo-pink/tau"
 
-import { create_database_context, database_context } from "./database.context"
 import { DatabaseOptions } from "./components/database-options.component"
 import { DatabaseTableActionsRow } from "./components/database-table-actions-row.component"
 import { DatabaseTableHead } from "./components/database-table-head.component"
 import { DatabaseTableRow } from "./components/database-table-row.component"
 import { SortingDirection } from "./database.constants"
 import { type TDatabaseState } from "./database.types"
+import { database$ } from "./database.state"
 import { show_columns_jab } from "./jabs/show-columns-modal.jab"
 import { show_filters_jab } from "./jabs/filter-modal.jab"
 
 import "./database.css"
 
-export const Database = (metadata: Ordo.Metadata.Instance, content: Ordo.Content.Instance | null, state?: TDatabaseState) =>
-	Maoka.create("div", ({ use, refresh }) => {
-		const initial_state = state ? state : is_string(content) ? (JSON.parse(content) as TDatabaseState) : {}
-		const db_context = create_database_context(initial_state, state => on_state_change(state))
+export const Database = (metadata: Ordo.Metadata.Instance, content: Ordo.Content.Instance | null, state?: TDatabaseState) => {
+	const initial_state = state ? state : is_string(content) ? (JSON.parse(content) as TDatabaseState) : {}
+	database$.replace(initial_state)
+
+	return Maoka.create("div", ({ use, on_unmount }) => {
+		const get_db_state = use(MaokaOrdo.Jabs.happy_marriage$(database$))
+
 		const fsid = metadata.get_fsid()
 
-		use(database_context.provide(db_context))
 		use(MaokaJabs.set_class("database_view"))
 		use(show_filters_jab(metadata))
 		use(show_columns_jab(metadata))
 
 		const commands = use(MaokaOrdo.Jabs.get_commands)
 		const get_children = use(MaokaOrdo.Jabs.Metadata.get_children$(fsid))
-		const { get_db_state } = use(database_context.consume)
 
-		const on_state_change = (state: TDatabaseState) => {
-			commands.emit("cmd.content.set", {
-				fsid,
-				content_type: "database/ordo",
-				content: JSON.stringify(state),
-			})
+		const divorce = database$.marry(state => {
+			commands.emit("cmd.content.set", { fsid, content_type: "database/ordo", content: JSON.stringify(state) })
+		})
 
-			void refresh()
-		}
+		on_unmount(divorce)
 
 		return () => {
 			const db_state = get_db_state()
@@ -82,6 +79,7 @@ export const Database = (metadata: Ordo.Metadata.Instance, content: Ordo.Content
 			]
 		}
 	})
+}
 
 // --- Internal ---
 

@@ -54,13 +54,19 @@ export const ZAGS: TZagsStatic = {
 
 			const location: Record<string, any> = keys.slice(0, -1).reduce((acc, key) => (acc as any)[key], state_copy)
 			const current_value = location[keys[keys.length - 1]]
-			const value = value_creator(current_value)
+			const value = value_creator(
+				Array.isArray(current_value)
+					? [...current_value]
+					: typeof current_value === "object" && current_value
+						? Object.assign({}, current_value)
+						: current_value,
+			)
 
 			if (value !== current_value) {
 				location[keys[keys.length - 1]] = value
-				state = state_copy
+				state = Object.assign({}, state_copy)
 
-				handlers.forEach(f => f(state_copy, true))
+				handlers.forEach(f => f(state, true))
 			}
 		},
 		select: path => {

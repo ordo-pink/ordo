@@ -24,7 +24,7 @@ import { BsFileEarmarkMinus } from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
-import { RemoveFileModal } from "../components/remove-file-modal.component"
+import { RemoveFileModal } from "../../../frontend-app/src/components/remove-file-modal.component"
 
 /**
  * Register `Remove` command in {@link Ordo.ContextMenu.Item Context Menu} of a

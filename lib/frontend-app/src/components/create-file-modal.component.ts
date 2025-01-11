@@ -26,16 +26,14 @@ import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { Switch } from "@ordo-pink/switch"
 
-export const CreateFileModal = (ctx: Ordo.CreateFunction.Params, parent: Ordo.Metadata.FSID | null = null) =>
+export const CreateFileModal = (parent: Ordo.Metadata.FSID | null = null) =>
 	Maoka.create("div", ({ use }) => {
-		use(MaokaOrdo.Context.provide(ctx))
-
 		let type = "text/ordo"
 
 		const { t } = use(MaokaOrdo.Jabs.get_translations$)
-		const { emit } = use(MaokaOrdo.Jabs.get_commands.get)
+		const commands = use(MaokaOrdo.Jabs.get_commands)
 
-		const t_title = t("t.file_explorer.modals.create_file.title")
+		const t_title = t("t.common.components.modals.create_file.title")
 		const state = { name: "" }
 
 		return () =>
@@ -43,8 +41,8 @@ export const CreateFileModal = (ctx: Ordo.CreateFunction.Params, parent: Ordo.Me
 				title: t_title,
 				render_icon: div => void div.appendChild(BsFileEarmarkPlus() as SVGSVGElement),
 				action: () => {
-					emit("cmd.application.modal.hide")
-					emit("cmd.metadata.create", { name: state.name, parent, type })
+					commands.emit("cmd.application.modal.hide")
+					commands.emit("cmd.metadata.create", { name: state.name, parent, type })
 				},
 				action_text: "OK", // TODO Translations
 				body: () => [
@@ -64,12 +62,11 @@ const FileAssociationSelector = (on_select_type: (file_association: Ordo.FileAss
 
 		let current_file_association: Ordo.FileAssociation.Instance | null = null
 		let current_type_index = 0
-		let file_associations: Ordo.FileAssociation.Instance[] = []
 		let is_expanded = false
 
 		use(MaokaJabs.set_class(select_class))
 
-		const file_associations$ = use(MaokaOrdo.Jabs.FileAssociations$)
+		const get_file_associations = use(MaokaOrdo.Jabs.get_file_associations$)
 
 		const handle_item_click = (fa: Ordo.FileAssociation.Instance, type: string) => {
 			is_expanded = !is_expanded
@@ -78,11 +75,6 @@ const FileAssociationSelector = (on_select_type: (file_association: Ordo.FileAss
 			on_select_type(fa, type)
 			void refresh()
 		}
-
-		const subscription = file_associations$.subscribe(value => {
-			file_associations = value
-			void refresh()
-		})
 
 		const handle_escape_press = (event: KeyboardEvent) => {
 			if (is_expanded && event.key === "Escape") {
@@ -98,28 +90,31 @@ const FileAssociationSelector = (on_select_type: (file_association: Ordo.FileAss
 		document.addEventListener("keydown", handle_escape_press)
 
 		on_unmount(() => {
-			subscription.unsubscribe()
 			document.removeEventListener("keydown", handle_escape_press)
 		})
 
-		return () => [
-			SelectItem(
-				current_file_association ? current_file_association.types[current_type_index] : file_associations[0].types[0],
-				current_file_association ? current_file_association : file_associations[0],
-				handle_item_click,
-			),
+		return () => {
+			const file_associations = get_file_associations()
 
-			is_expanded
-				? Maoka.create("div", ({ use }) => {
-						use(MaokaJabs.set_class("absolute top-0 left-0 right-0 bg-neutral-100 dark:bg-neutral-600 rounded-md"))
+			return [
+				SelectItem(
+					current_file_association ? current_file_association.types[current_type_index] : file_associations[0].types[0],
+					current_file_association ? current_file_association : file_associations[0],
+					handle_item_click,
+				),
 
-						return () =>
-							file_associations.flatMap(file_association =>
-								file_association.types.map(type => SelectItem(type, file_association, handle_item_click, true)),
-							)
-					})
-				: void 0,
-		]
+				is_expanded
+					? Maoka.create("div", ({ use }) => {
+							use(MaokaJabs.set_class("absolute top-0 left-0 right-0 bg-neutral-100 dark:bg-neutral-600 rounded-md"))
+
+							return () =>
+								file_associations.flatMap(file_association =>
+									file_association.types.map(type => SelectItem(type, file_association, handle_item_click, true)),
+								)
+						})
+					: void 0,
+			]
+		}
 	})
 
 const SelectItem = (
@@ -176,11 +171,11 @@ const CreateFileModalInput = (handle_change: (event: Event) => void) =>
 		return () => [
 			Maoka.create("div", ({ use }) => {
 				use(MaokaJabs.set_class("font-bold text-sm"))
-				return () => t("t.file_explorer.modals.create_file.input_label")
+				return () => t("t.common.components.modals.create_file.input_label")
 			}),
 
 			Input.Text({
-				placeholder: t("t.file_explorer.modals.create_file.input_placeholder"),
+				placeholder: t("t.common.components.modals.create_file.input_placeholder"),
 				autofocus: true,
 				custom_class:
 					"w-full rounded-md border-0 px-2 py-1 shadow-inner focus:ring-0 sm:text-sm sm:leading-6 bg-neutral-50 dark:bg-neutral-600 placeholder:text-neutral-500",

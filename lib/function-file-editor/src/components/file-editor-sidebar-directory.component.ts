@@ -37,6 +37,7 @@ export const FileEditorSidebarDirectory = (metadata: Ordo.Metadata.Instance, dep
 	Maoka.create("div", ({ use, refresh }) => {
 		const fsid = metadata.get_fsid()
 
+		const commands = use(MaokaOrdo.Jabs.get_commands)
 		const metadata_query = use(MaokaOrdo.Jabs.get_metadata_query)
 		const get_route_params = use(MaokaOrdo.Jabs.get_route_params$)
 
@@ -45,6 +46,14 @@ export const FileEditorSidebarDirectory = (metadata: Ordo.Metadata.Instance, dep
 			expanded_state[fsid] = !expanded_state[fsid]
 			void refresh()
 		}
+
+		const handle_context_menu = (event: MouseEvent) => {
+			event.preventDefault()
+
+			commands.emit("cmd.application.context_menu.show", { event, payload: metadata })
+		}
+
+		use(MaokaJabs.listen("oncontextmenu", event => handle_context_menu(event)))
 
 		return () => {
 			// Expand directory if it is an ancestor of the metadata that is identified by the fsid

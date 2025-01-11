@@ -36,4 +36,13 @@ export const frontend_app_en_translations: Partial<Record<Ordo.I18N.TranslationK
 	"t.common.metadata.show_edit_labels_palette": "Edit labels...",
 	"t.common.metadata.show_edit_label_modal": "Edit label",
 	"t.common.components.notifications.pending_notifications": "Pending notifications:",
+	"t.common.components.modals.create_file.input_placeholder": "Ordo Together Strong",
+	"t.common.components.modals.create_file.title": "Create File",
+	"t.common.components.modals.create_file.input_label": "File name",
+	"t.common.components.modals.remove_file.title": "Remove File",
+	"t.common.components.modals.remove_file.message": "Are you sure? Removing files is irreversible.",
+	"t.common.components.modals.rename_file.title": "Rename File",
+	"t.common.components.modals.rename_file.input_label": "New name",
+	"t.common.components.modals.move.title": "Move...",
+	"t.common.components.modals.move.move_to_root": "Move to root directory",
 }

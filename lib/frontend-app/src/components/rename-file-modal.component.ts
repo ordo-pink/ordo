@@ -24,16 +24,14 @@ import { BsFileEarmarkRichText } from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
-export const RenameFileModal = (ctx: Ordo.CreateFunction.Params, fsid: Ordo.Metadata.FSID) =>
+export const RenameFileModal = (fsid: Ordo.Metadata.FSID) =>
 	Maoka.create("div", ({ use }) => {
-		use(MaokaOrdo.Context.provide(ctx))
-
 		const { t } = use(MaokaOrdo.Jabs.get_translations$)
-		const commands = use(MaokaOrdo.Jabs.get_commands.get)
-		const get_metadata = use(MaokaOrdo.Jabs.Metadata.get_by_fsid(fsid))
+		const commands = use(MaokaOrdo.Jabs.get_commands)
+		const get_metadata = use(MaokaOrdo.Jabs.Metadata.get_by_fsid$(fsid))
 
-		const t_title = t("t.file_explorer.modals.rename_file.title")
-		const t_input_label = t("t.file_explorer.modals.rename_file.input_label")
+		const t_title = t("t.common.components.modals.rename_file.title")
+		const t_input_label = t("t.common.components.modals.rename_file.input_label")
 
 		const state = { name: "" }
 

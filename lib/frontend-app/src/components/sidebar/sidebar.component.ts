@@ -29,6 +29,7 @@ import { noop } from "@ordo-pink/tau"
 import { ordo_app_state } from "../../../app.state"
 import { sidebar$ } from "./sidebar.state"
 
+// TODO Automatically close sidebar in mobile if something was clicked
 export const OrdoSidebar = Maoka.create("aside", ({ use, on_unmount }) => {
 	const commands = ordo_app_state.zags.select("commands")
 	const get_sidebar = use(MaokaOrdo.Jabs.happy_marriage$(sidebar$))

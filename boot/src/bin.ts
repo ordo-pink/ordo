@@ -22,12 +22,19 @@ const educate = () => {
 }
 
 const show_help = () => {
+	const longest_name_length = Math.max(...Object.keys(commands).map(cmd => cmd.length))
+	const padding = 5
+
 	console.log(
 		`Usage: ./bin [command] [options]
 
 Commands:
 
-`.concat(...Object.keys(commands).map(key => `  ${key}                ${commands[key].help}\n`)),
+`.concat(
+			...Object.keys(commands).map(
+				key => `  ${key}${" ".repeat(longest_name_length - key.length + padding)}${commands[key].help}\n`,
+			),
+		),
 	)
 
 	process.exit(0)

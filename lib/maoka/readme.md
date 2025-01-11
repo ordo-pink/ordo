@@ -1,5 +1,7 @@
 # Maoka
 
+[![License: Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg)](http://unlicense.org/)
+
 Maoka is a 1.5Kb library for rendering user interfaces (and annoying JavaScript devs).
 
 ## Quick start
@@ -27,28 +29,24 @@ if (app) Maoka.render_dom(app, Discounter)
 
 ### Quick Start Explained
 
-It all starts with importing the entirety of Maoka. Since it's ridiculously small, it's ok to pick
-it up all together.
+It all starts with importing the entirety of Maoka. Since it's ridiculously small, it's ok to pick it up all together.
 
-Maoka components are created with `Maoka.create` that accepts a tag and a callback function. The
-whole point of Maoka rendering is that it does exactly zero automagic tricks for detecting if
-anything needs to be rerendered - instead you get a good old `refresh` function in callback params
-that you call when you want something to be rerendered. You also get a reference to the HTML element
-created for your Maoka component, and some other stuff we'll discuss a bit later.
+Maoka components are created with `Maoka.create` that accepts a tag and a callback function. The whole point of Maoka rendering
+is that it does exactly zero automagic tricks for detecting if anything needs to be rerendered - instead you get a good old
+`refresh` function in callback params that you call when you want something to be rerendered. You also get a reference to the
+HTML element created for your Maoka component, and some other stuff we'll discuss a bit later.
 
-Inside the callback we create a `let` variable of the counter state. YES! A `let` variable! For the
-state! Not an entire RxJS bundle, not a tuple of a getter and a setter, not even a class method - a
-simple `let` variable! Yay, innit?
+Inside the callback we create a `let` variable of the counter state. YES! A `let` variable! For the state! Not an entire RxJS
+bundle, not a tuple of a getter and a setter, not even a class method - a simple `let` variable! Yay, innit?
 
-We then assign a click listener to the element where we decrement the `counter_state` and call
-`refresh` to update the state of the component.
+We then assign a click listener to the element where we decrement the `counter_state` and call `refresh` to update the state of
+the component.
 
-At the end of the component declaration we return a thunk of a string representation of the
-`counter_state`. This thunk thing is very important, we'll discuss it in a second.
+At the end of the component declaration we return a thunk of a string representation of the `counter_state`. This thunk thing is
+very important, we'll discuss it in a second.
 
-Finally, we go get a div with an id of **app** and `Maoka.render_dom` our component there. And
-that's it - if you create an HTML page with this `<div id="app"></div>` and refer to this script
-there, it will count af.
+Finally, we go get a div with an id of **app** and `Maoka.render_dom` our component there. And that's it - if you create an HTML
+page with this `<div id="app"></div>` and refer to this script there, it will count af.
 
 Capital letters in component names are completely optional, btw. It's not react. 😏
 
@@ -74,8 +72,7 @@ const MyComponent = Maoka.create("div", ({ on_unmount }) => {
 })
 ```
 
-> Keep in mind that whenever a component is refreshed, all its child components are unmounted and
-> mounted again.
+> Keep in mind that whenever a component is refreshed, all its child components are unmounted and mounted again.
 
 If you want to pass additional parameters to a component, you can wrap it into a function:
 
@@ -88,11 +85,10 @@ const my_component = my_params =>
 
 ## Maoka.styled
 
-Maoka is shipped with a helper function that creates styled components. Styled components cannot be
-rerendered, and they are only updated when their parents refresh (do your parents refresh?). Since
-they are built that way, they have a slightly different API to make their reuse easier - they accept
-a tag string and an optional `Record<string, string>` of HTML attributes, and return a function that
-accepts a thunk of children:
+Maoka is shipped with a helper function that creates styled components. Styled components cannot be rerendered, and they are
+only updated when their parents refresh (do your parents refresh?). Since they are built that way, they have a slightly
+different API to make their reuse easier - they accept a tag string and an optional `Record<string, string>` of HTML attributes,
+and return a function that accepts a thunk of children:
 
 ```javascript
 import { Maoka } from "maoka"
@@ -121,25 +117,22 @@ Now that you know what Necromancers say, let's take a look at the internals:
 
 ## Maoka Component
 
-People always ask me - what a perfect component is? And here is a pro tip - make sure you hit the
-like button and subscribe to the channel - a perfect component is a function. When you call
-`Maoka.create`, it actually returns a function that accepts the following arguments:
+People always ask me - what a perfect component is? And here is a pro tip - make sure you hit the like button and subscribe to
+the channel - a perfect component is a function. When you call `Maoka.create`, it actually returns a function that accepts the
+following arguments:
 
-- `create_element: TMaokaCreateMaokaElementFn<$TElement>` - a function that creates actual elements.
-  With `render_dom` bundled with Maoka, it is the `document.createElement`. Yes, it doesn't work
-  with SVGs. Dirty hacks to the resque!
-- `root_element: TMaokaElement` - a root element of the tree where current element belongs. You
-  usually provide it via render functions like `render_dom`.
-- `root_id: string`, - a unique string identifier of the root element. It is safer to use this
-  identifier than the `root_element` itself because, unlike the element, this identifier is
-  unreachable outside the scope of the component tree. Might be useful for separating scopes in
-  scenarios where you have multiple roots reusing the same components (e.g. microfrontends, routing,
-  and other wars of nutrition).
+- `create_element: TMaokaCreateMaokaElementFn<$TElement>` - a function that creates actual elements. With `render_dom` bundled
+  with Maoka, it is the `document.createElement`. Yes, it doesn't work with SVGs. Dirty hacks to the resque!
+- `root_element: TMaokaElement` - a root element of the tree where current element belongs. You usually provide it via render
+  functions like `render_dom`.
+- `root_id: string`, - a unique string identifier of the root element. It is safer to use this identifier than the
+  `root_element` itself because, unlike the element, this identifier is unreachable outside the scope of the component tree.
+  Might be useful for separating scopes in scenarios where you have multiple roots reusing the same components (e.g.
+  microfrontends, routing, and other wars of nutrition).
 
-This function then waits until you pass it to a render function that passes those parameters, and
-then pass them to their children which in turn pass them to their children, and the circle of life
-continues until they reach you and me sitting here and reading this document. A good example of such
-render function is
+This function then waits until you pass it to a render function that passes those parameters, and then pass them to their
+children which in turn pass them to their children, and the circle of life continues until they reach you and me sitting here
+and reading this document. A good example of such render function is
 
 ## Maoka.render_dom
 
@@ -152,15 +145,15 @@ const root = document.querySelector("#root")
 if (root) Maoka.render_dom(root, App)
 ```
 
-As the name suggests, it renders a Maoka component to the DOM. The element itself remains untouched,
-the function does two things:
+As the name suggests, it renders a Maoka component to the DOM. The element itself remains untouched, the function does two
+things:
 
 1. It creates DOM structure of your component
-2. It appends a `MutationObserver` to the root element that keeps track of unmounted nodes and calls
-   their `on_unmount` callbacks if they are present
+2. It appends a `MutationObserver` to the root element that keeps track of unmounted nodes and calls their `on_unmount`
+   callbacks if they are present
 
-If you don't want a `MutationObserver` in your code, you can reimplement `render_dom` manually from
-scratch - but you'll need to track and call `on_unmount`s or not use them at all.
+If you don't want a `MutationObserver` in your code, you can reimplement `render_dom` manually from scratch - but you'll need to
+track and call `on_unmount`s or not use them at all.
 
 In fact, you can render your root Maoka component as simply as:
 
@@ -178,8 +171,7 @@ if (root) App(create_element, root, root_id)
 
 ### Asynchrony & Lazy Loading
 
-Maoka supports `async/await` for both the ON_MOUNT part of the component callback, and the
-ON_REFRESH part.
+Maoka supports `async/await` for both the ON_MOUNT part of the component callback, and the ON_REFRESH part.
 
 ```javascript
 import { Maoka } from "maoka"
@@ -209,10 +201,9 @@ const App = Maoka.create("div", async ({ refresh, on_unmount }) => {
 
 ### Jabs
 
-Jabs are like hooks in React because they start with `use`. Similarities end here. A jab is a
-function that accepts props of the Maoka component callback. You can then pass a jab to the `use`
-function, which is also available via Maoka component callback props. It basically sets you free
-from the necessity of providing the callback params manually.
+Jabs are like hooks in React because they start with `use`. Similarities end here. A jab is a function that accepts props of the
+Maoka component callback. You can then pass a jab to the `use` function, which is also available via Maoka component callback
+props. It basically sets you free from the necessity of providing the callback params manually.
 
 ```typescript
 import { Maoka, type TMaokaJab } from "maoka"
@@ -232,13 +223,11 @@ const MyComponent = Maoka.create("div", ({ use }) => {
 
 ### Browser Compatibility
 
-Maoka only works in modern browsers, but there are a few tricks you can use to extend compat with
-older browsers.
+Maoka only works in modern browsers, but there are a few tricks you can use to extend compat with older browsers.
 
 #### Adding Support for IE11, Chrome < 92, Edge < 92, Safari < 15.4, Firefox < 95, Opera < 78
 
-Since Maoka uses `crypto.randomUUID()` for generating root and element IDs, browsers from 2021 don't
-know how to work that out.
+Since Maoka uses `crypto.randomUUID()` for generating root and element IDs, browsers from 2021 don't know how to work that out.
 
 To fix that, you can polyfill `crypto.randomUUID()` globally:
 
@@ -256,9 +245,9 @@ if (!window.crypto.randomUUID) {
 #### Adding Support for Mesozoic Era
 
 If you fancy letting dinosaurs see your website, simply do not use `Maoka.render_dom` (see the
-[Maoka.render_dom](#maokarender_dom) section of the readme for reference). If IE9+ is ok for you,
-you can listen for mutation events like `DOMNodeRemoved` to handle `on_unmount` events.
-Alternatively, you can omit using `on_unmount` whatsoever - then Maoka will work evvvriwhere.
+[Maoka.render_dom](#maokarender_dom) section of the readme for reference). If IE9+ is ok for you, you can listen for mutation
+events like `DOMNodeRemoved` to handle `on_unmount` events. Alternatively, you can omit using `on_unmount` whatsoever - then
+Maoka will work evvvriwhere.
 
 ### License
 

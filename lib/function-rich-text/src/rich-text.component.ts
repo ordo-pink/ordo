@@ -20,30 +20,22 @@
  */
 
 // import { is_array, is_object, is_string } from "@ordo-pink/tau"
-import { BehaviorSubject } from "rxjs"
 
 import { is_array, is_string } from "@ordo-pink/tau"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
-import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { R } from "@ordo-pink/result"
+import { ZAGS } from "@ordo-pink/zags"
 
 import { type TEditorFocusPosition, type TEditorState } from "../rich-text.types"
 import { editor_context, editor_context_jab } from "../jabs/editor-context.jab"
 import { Line } from "./line.component"
 
-export const RichText = (metadata: Ordo.Metadata.Instance, content: Ordo.Content.Instance, ctx: Ordo.CreateFunction.Params) => {
-	const caret_position$ = new BehaviorSubject<TEditorFocusPosition>({
-		block_index: 0,
-		inline_index: 0,
-		anchor_offset: 0,
-		focus_offset: 0,
-	})
-
-	const state$ = new BehaviorSubject<TEditorState>([{ type: "p", children: [{ type: "text", value: "" }] }])
+export const RichText = (metadata: Ordo.Metadata.Instance, content: Ordo.Content.Instance) => {
+	const caret_position$ = ZAGS.Of<TEditorFocusPosition>({ block_index: 0, inline_index: 0, anchor_offset: 0, focus_offset: 0 })
+	const state$ = ZAGS.Of<{ value: TEditorState }>({ value: [{ type: "p", children: [{ type: "text", value: "" }] }] })
 
 	return Maoka.create("div", ({ use, refresh }) => {
-		use(MaokaOrdo.Context.provide(ctx))
 		use(MaokaJabs.set_class("p-2 size-full outline-none cursor-text"))
 		use(MaokaJabs.set_attribute("contenteditable", "true"))
 
@@ -52,14 +44,14 @@ export const RichText = (metadata: Ordo.Metadata.Instance, content: Ordo.Content
 				caret_position$,
 				state$,
 				set_caret_position: position => {
-					caret_position$.next(position)
+					caret_position$.replace(position)
 				},
 				// TODO Remove block
 				// TODO Remove inline
 				add_block: (block, refocus = true) => {
 					const { caret_position$, set_caret_position } = use(editor_context.consume)
-					const caret_position = caret_position$.getValue()
-					const state = state$.getValue()
+					const caret_position = caret_position$.unwrap()
+					const state = state$.select("value")
 
 					const { block_index, inline_index, anchor_offset, focus_offset } = caret_position
 
@@ -79,7 +71,7 @@ export const RichText = (metadata: Ordo.Metadata.Instance, content: Ordo.Content
 
 					state.splice(block_index + 1, 0, block)
 
-					state$.next(state)
+					state$.update("value", () => state)
 
 					if (refocus)
 						set_caret_position({
@@ -88,8 +80,6 @@ export const RichText = (metadata: Ordo.Metadata.Instance, content: Ordo.Content
 							anchor_offset: 0,
 							focus_offset: 0,
 						})
-
-					console.log(caret_position$.getValue())
 
 					void refresh()
 				},
@@ -100,15 +90,15 @@ export const RichText = (metadata: Ordo.Metadata.Instance, content: Ordo.Content
 				},
 				add_inline: inline => {
 					const { caret_position$: caret_position$ } = use(editor_context.consume)
-					const { block_index } = caret_position$.getValue()
-					const state = state$.getValue()
+					const { block_index } = caret_position$.unwrap()
+					const state = state$.select("value")
 
 					state[block_index].children.splice(block_index, 0, inline)
 
-					state$.next(state)
+					state$.update("value", () => state)
 				},
 				remove_block: (block_index, refocus = true) => {
-					const state = state$.getValue()
+					const state = state$.select("value")
 
 					const prev_line_last_inline_index = state[block_index - 1].children.length - 1
 					const prev_line_offset = state[block_index - 1].children[prev_line_last_inline_index].value.length
@@ -129,7 +119,7 @@ export const RichText = (metadata: Ordo.Metadata.Instance, content: Ordo.Content
 					if (refocus === true) {
 						const { set_caret_position } = use(editor_context_jab)
 
-						const state = state$.getValue()
+						const state = state$.select("value")
 						const new_block_index = block_index - 1
 						const inline_index = state[new_block_index].children.length - 1
 						const offset = state[new_block_index].children[inline_index].value.length
@@ -153,7 +143,7 @@ export const RichText = (metadata: Ordo.Metadata.Instance, content: Ordo.Content
 						})
 					}
 
-					state$.next(state)
+					state$.update("value", () => state)
 					void refresh()
 				},
 			}),
@@ -161,15 +151,15 @@ export const RichText = (metadata: Ordo.Metadata.Instance, content: Ordo.Content
 
 		R.FromNullable(content)
 			.pipe(R.ops.chain(x => R.If(is_string(x), { T: () => x as string })))
-			.pipe(R.ops.chain(json => R.Try(() => JSON.parse(json))))
+			.pipe(R.ops.chain(x => R.Try(() => JSON.parse(x))))
 			.pipe(R.ops.chain(x => R.If(is_array(x) && x.length > 0, { T: () => x })))
 			.cata({
-				Ok: state => state$.next(state as TEditorState),
-				Err: () => state$.next([{ type: "p", children: [{ type: "text", value: "" }] }]),
+				Err: () => state$.update("value", () => [{ type: "p", children: [{ type: "text", value: "" }] }]),
+				Ok: state => state$.update("value", () => state as TEditorState),
 			})
 
 		return () => {
-			const state = state$.getValue()
+			const state = state$.select("value")
 
 			return [...state.map((node, block_index) => Line(node, metadata, block_index))]
 		}

@@ -36,18 +36,18 @@ export const Inline = (
 	inline_index: number,
 ) =>
 	Switch.Match(node.type).default(() =>
-		Maoka.create("div", ({ use, element, after_mount, on_unmount }) => {
+		Maoka.create("div", ({ use, element, on_mount: after_mount, on_unmount }) => {
 			use(MaokaJabs.set_class("outline-none inline-block"))
 			use(MaokaJabs.set_attribute("contenteditable", "true"))
 
 			const fsid = metadata.get_fsid()
 			const content_type = metadata.get_type()
 
-			const commands = use(MaokaOrdo.Jabs.Commands.get)
+			const commands = use(MaokaOrdo.Jabs.get_commands)
 			const { caret_position$, state$, add_new_line, set_caret_position, remove_block } = use(editor_context_jab)
 
 			after_mount(() => {
-				const current_position = caret_position$.getValue()
+				const current_position = caret_position$.unwrap()
 
 				if (current_position.block_index === block_index && current_position.inline_index === inline_index) {
 					const el = element as unknown as HTMLInputElement
@@ -92,7 +92,7 @@ export const Inline = (
 						add_new_line()
 					})
 					.case("Backspace", () => {
-						const { anchor_offset, focus_offset } = caret_position$.getValue()
+						const { anchor_offset, focus_offset } = caret_position$.unwrap()
 
 						const is_first_block = is_0(block_index)
 						const is_first_inline = is_0(inline_index)
@@ -114,7 +114,7 @@ export const Inline = (
 								let refocus = true
 
 								if (node.value.length > 0) {
-									const state = state$.getValue()
+									const state = state$.select("value")
 
 									if (inline_index > 0) {
 										state[block_index].children[inline_index - 1].value += node.value
@@ -126,7 +126,7 @@ export const Inline = (
 									}
 
 									state[block_index].children[inline_index].value = ""
-									state$.next(state)
+									state$.update("value", () => state)
 								}
 
 								// Safely remove the block since it does not contain any content
@@ -164,7 +164,7 @@ export const Inline = (
 
 			use(
 				MaokaJabs.listen("oninput", event => {
-					const state = state$.getValue()
+					const state = state$.select("value")
 					const target = event.target as HTMLDivElement
 
 					const { anchor_offset, focus_offset } = get_window_selection_offsets()
@@ -172,7 +172,7 @@ export const Inline = (
 					set_caret_position({ block_index, inline_index, anchor_offset, focus_offset })
 
 					state[block_index].children[inline_index].value = target.innerText
-					state$.next(state)
+					state$.update("value", () => state)
 
 					commands.emit("cmd.content.set", { fsid, content_type, content: JSON.stringify(state) })
 				}),

@@ -21,6 +21,8 @@
 
 import { BsFileEarmarkRuled } from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/maoka"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
+import { TwoLetterLocale } from "@ordo-pink/locale"
 import { create_function } from "@ordo-pink/core"
 
 import { Database } from "./src/database.component"
@@ -38,7 +40,8 @@ declare global {
 				created_at: () => string
 				updated_at: () => string
 				size: () => string
-				links: () => string
+				outgoing_links: () => string
+				incoming_links: () => string
 				parent: () => string
 				created_by: () => string
 			}
@@ -71,14 +74,14 @@ export default create_function(
 			"cmd.application.command_palette.hide",
 			"cmd.application.command_palette.show",
 			"cmd.application.context_menu.add",
+			"cmd.application.context_menu.hide",
 			"cmd.application.context_menu.remove",
-			"cmd.application.context_menu.show",
 			"cmd.application.context_menu.show",
 			"cmd.application.modal.hide",
 			"cmd.application.modal.show",
 			"cmd.application.router.navigate",
 			"cmd.content.set",
-			"cmd.functions.file_associations.add",
+			"cmd.functions.file_associations.register",
 			"cmd.metadata.add_labels",
 			"cmd.metadata.remove_labels",
 			"cmd.metadata.rename",
@@ -87,13 +90,21 @@ export default create_function(
 			"cmd.metadata.show_edit_label_modal",
 			"cmd.metadata.show_edit_labels_palette",
 		],
-		queries: ["application.commands", "data.metadata_query", "users.users_query", "functions.file_associations"],
+		queries: [
+			"metadata.$",
+			"metadata.get_by_fsid",
+			"metadata.get_children",
+			"metadata.get_incoming_links",
+			"metadata.get_outgoing_links",
+			"metadata.get",
+			"metadata.has_children",
+		],
 	},
 	ctx => {
-		const commands = ctx.get_commands()
+		const commands = ctx.commands
 
 		commands.emit("cmd.application.add_translations", {
-			lang: "en",
+			lang: TwoLetterLocale.ENGLISH,
 			translations: {
 				"t.database.column_names.created_at": "Creation Date",
 				"t.database.column_names.labels": "Labels",
@@ -102,7 +113,8 @@ export default create_function(
 				"t.database.column_names.updated_at": "Last Updated",
 				"t.database.file_association.readable_name": "Database",
 				"t.database.column_names.created_by": "Author",
-				"t.database.column_names.links": "Outgoing Links",
+				"t.database.column_names.outgoing_links": "Outgoing Links",
+				"t.database.column_names.incoming_links": "Incoming Links",
 				"t.database.column_names.parent": "Parent",
 				"t.database.columns_modal.context_menu": "Edit columns...",
 				"t.database.filter_modal.context_menu": "Edit filters...",
@@ -112,7 +124,7 @@ export default create_function(
 			},
 		})
 
-		commands.emit("cmd.functions.file_associations.add", {
+		commands.emit("cmd.functions.file_associations.register", {
 			name: "pink.ordo.database",
 			types: [
 				{
@@ -121,8 +133,12 @@ export default create_function(
 					description: "t.database.file_association.description",
 				},
 			],
-			render: ({ div, metadata, content }) => Maoka.render_dom(div, Database(metadata, content, ctx)),
-			render_icon: span => span.replaceChildren(BsFileEarmarkRuled() as any),
+			render: ({ div, metadata, content }) =>
+				Maoka.render_dom(
+					div,
+					MaokaOrdo.Components.WithState(ctx, () => Database(metadata, content)),
+				),
+			render_icon: span => void span.appendChild(BsFileEarmarkRuled() as SVGSVGElement),
 		})
 	},
 )

@@ -23,7 +23,7 @@ import { Maoka } from "@ordo-pink/maoka"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
 export const LoadingText = Maoka.create("span", ({ use }) => {
-	const { t } = use(MaokaOrdo.Jabs.Translations)
+	const { t } = use(MaokaOrdo.Jabs.get_translations$)
 
 	return () => t("t.common.state.loading")
 })

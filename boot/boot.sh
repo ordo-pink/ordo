@@ -2,7 +2,7 @@
 
 # --- Configuration ---
 
-set -e
+set -ie
 
 # --- Variables ---
 
@@ -130,7 +130,7 @@ download_tailwind
 
 download_bun
 
-# download_deno
+download_deno
 
 ## Install bin dependencies
 opt/bun i

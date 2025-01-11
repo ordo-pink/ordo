@@ -19,10 +19,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-// import { BsCollection, BsEnvelope, BsQuestionOctagon, BsSendCheck } from "react-icons/bs"
-
 import { BsCollection, BsEnvelopeAt, BsQuestionOctagon, BsSendCheck } from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/maoka"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
+import { TwoLetterLocale } from "@ordo-pink/locale"
 import { create_function } from "@ordo-pink/core"
 
 import { WelcomeWorkspace } from "./src/welcome.workspace"
@@ -79,14 +79,7 @@ declare global {
 export default create_function(
 	"pink.ordo.welcome",
 	{
-		queries: [
-			"application.commands",
-			"application.current_language",
-			"application.fetch",
-			"application.hosts",
-			"users.current_user.is_authenticated",
-			"data.metadata_query",
-		],
+		queries: ["user.get_current", "metadata.get", "metadata.$", "metadata.get_by_name"],
 		commands: [
 			"cmd.application.add_translations",
 			"cmd.application.background_task.reset_status",
@@ -100,8 +93,6 @@ export default create_function(
 			"cmd.application.router.navigate",
 			"cmd.application.router.open_external",
 			"cmd.application.set_title",
-			"cmd.auth.open_sign_in",
-			"cmd.auth.open_sign_up",
 			"cmd.content.set",
 			"cmd.file_editor.open",
 			"cmd.functions.activities.register",
@@ -112,11 +103,12 @@ export default create_function(
 			"cmd.welcome.open_support_palette",
 		],
 	},
-	ctx => {
-		const { on, off, emit } = ctx.get_commands()
+	state => {
+		const commands = state.commands
+		const translate = state.translate
 
-		emit("cmd.application.add_translations", {
-			lang: "en",
+		commands.emit("cmd.application.add_translations", {
+			lang: TwoLetterLocale.ENGLISH,
 			translations: {
 				"t.welcome.go_to_welcome_page": "Open welcome page",
 				"t.welcome.landing_page.cookie_banner.message": "Wait, what?!",
@@ -137,46 +129,44 @@ export default create_function(
 			},
 		})
 
-		ctx.translate.$.subscribe(() => {
+		translate.$.marry(() => {
 			const on_email_support = (url: string) => () =>
-				emit("cmd.application.router.open_external", {
-					url: `mailto:${url}`,
-					new_tab: true,
-				})
+				commands.emit("cmd.application.router.open_external", { url: `mailto:${url}`, new_tab: true })
 
-			const on_messenger_support = (url: string) => () => emit("cmd.application.router.open_external", { url, new_tab: true })
+			const on_messenger_support = (url: string) => () =>
+				commands.emit("cmd.application.router.open_external", { url, new_tab: true })
 
-			const email_support = ctx.translate("t.common.urls.support_email")
-			const messenger_support = ctx.translate("t.common.urls.support_messenger")
+			const email_support = translate("t.common.urls.support_email")
+			const messenger_support = translate("t.common.urls.support_messenger")
 
-			off("cmd.welcome.go_to_messenger_support", on_messenger_support(messenger_support))
-			off("cmd.welcome.go_to_email_support", on_email_support(email_support))
+			commands.off("cmd.welcome.go_to_messenger_support", on_messenger_support(messenger_support))
+			commands.off("cmd.welcome.go_to_email_support", on_email_support(email_support))
 
-			on("cmd.welcome.go_to_messenger_support", on_messenger_support(messenger_support))
-			on("cmd.welcome.go_to_email_support", on_email_support(email_support))
+			commands.on("cmd.welcome.go_to_messenger_support", on_messenger_support(messenger_support))
+			commands.on("cmd.welcome.go_to_email_support", on_email_support(email_support))
 		})
 
-		on("cmd.welcome.go_to_welcome_page", () => emit("cmd.application.router.navigate", "/"))
+		commands.on("cmd.welcome.go_to_welcome_page", () => commands.emit("cmd.application.router.navigate", { url: "/" }))
 
-		emit("cmd.application.command_palette.add", {
+		commands.emit("cmd.application.command_palette.add", {
 			readable_name: "t.welcome.go_to_welcome_page",
-			on_select: () => emit("cmd.welcome.go_to_welcome_page"),
+			on_select: () => commands.emit("cmd.welcome.go_to_welcome_page"),
 			hotkey: "mod+shift+h",
 			render_icon: div => void div.appendChild(BsCollection() as SVGSVGElement),
 		})
 
-		on("cmd.welcome.open_support_palette", () => {
-			emit("cmd.application.command_palette.show", {
+		commands.on("cmd.welcome.open_support_palette", () => {
+			commands.emit("cmd.application.command_palette.show", {
 				items: [
 					{
 						readable_name: "t.welcome.command_palette.support.email",
-						on_select: () => emit("cmd.welcome.go_to_email_support"),
+						on_select: () => commands.emit("cmd.welcome.go_to_email_support"),
 						hotkey: "1",
 						render_icon: div => void div.appendChild(BsEnvelopeAt() as SVGSVGElement),
 					},
 					{
 						readable_name: "t.welcome.command_palette.support.messenger",
-						on_select: () => emit("cmd.welcome.go_to_messenger_support"),
+						on_select: () => commands.emit("cmd.welcome.go_to_messenger_support"),
 						hotkey: "2",
 						render_icon: div => void div.appendChild(BsSendCheck() as SVGSVGElement),
 					},
@@ -184,21 +174,23 @@ export default create_function(
 			})
 		})
 
-		emit("cmd.application.command_palette.add", {
+		commands.emit("cmd.application.command_palette.add", {
 			readable_name: "t.welcome.command_palette.support.open_support_palette",
-			on_select: () => emit("cmd.welcome.open_support_palette"),
+			on_select: () => commands.emit("cmd.welcome.open_support_palette"),
 			hotkey: "mod+h", // TODO: Should work with mod+/
 			render_icon: div => void div.appendChild(BsQuestionOctagon() as SVGSVGElement),
 		})
 
-		emit("cmd.functions.activities.register", {
-			fid: ctx.fid,
-			activity: {
-				name: "pink.ordo.welcome.landing-page",
-				render_workspace: div => Maoka.render_dom(div, WelcomeWorkspace(ctx)),
-				render_icon: span => void span.appendChild(BsCollection() as SVGSVGElement),
-				routes: ["/"],
+		commands.emit("cmd.functions.activities.register", {
+			name: "pink.ordo.welcome.landing-page",
+			render_workspace: async div => {
+				await Maoka.render_dom(
+					div,
+					MaokaOrdo.Components.WithState(state, () => WelcomeWorkspace),
+				)
 			},
+			render_icon: span => void span.appendChild(BsCollection() as SVGSVGElement),
+			routes: ["/"],
 		})
 	},
 )

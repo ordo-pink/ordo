@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-export type * from "./src/maoka.types"
+export type * from "./src/maoka.types.ts"
 
-import { create, html, lazy, render_dom, styled } from "./src/maoka.impl"
+import { create, html, lazy, render_dom, styled } from "./src/maoka.impl.ts"
 
 export const Maoka = { create, html, lazy, styled, render_dom }

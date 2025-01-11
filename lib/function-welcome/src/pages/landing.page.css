@@ -1,6 +1,6 @@
 .hero-section {
 	perspective: 1000px;
-	@apply overflow-hidden;
+	@apply w-dvw overflow-hidden;
 }
 
 .hero-layers {
@@ -30,7 +30,7 @@
 }
 
 .card-container {
-	@apply fixed top-0 flex h-svh w-screen items-center justify-center p-4 sm:p-12;
+	@apply fixed top-0 flex h-dvh w-screen items-center justify-center p-4 sm:p-12;
 }
 
 .card {
@@ -55,7 +55,7 @@
 
 .actions-container {
 	/* @apply flex flex-col items-center justify-between space-y-2 sm:flex-row sm:space-y-0; */
-	@apply flex flex-col items-center justify-center space-y-2 sm:flex-row sm:space-y-0;
+	@apply flex flex-col items-center justify-center space-y-2 sm:flex-row sm:space-x-2 sm:space-y-0;
 }
 
 .cta {

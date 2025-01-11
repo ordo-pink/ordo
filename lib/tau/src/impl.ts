@@ -179,3 +179,30 @@ export const map =
 	<T, U>(f: (item: T, index: number, collection: T[]) => U) =>
 	(arr: T[]) =>
 		arr.map(f)
+
+export const deep_equals = (x: unknown, y: unknown): boolean => {
+	const typeof_x = typeof x
+
+	if (typeof_x !== typeof y) return false
+
+	if (typeof_x === "object") {
+		if (x === null || y === null) return x === y
+
+		if (Array.isArray(x))
+			return (
+				Array.isArray(y) && x.length === y.length && x.reduce((acc, item, index) => acc && deep_equals(item, y[index]), true)
+			)
+
+		const keys_of_x = Object.keys(x as Record<string, unknown>)
+
+		return (
+			keys_of_x.length === Object.keys(y as Record<string, unknown>).length &&
+			keys_of_x.reduce(
+				(acc, key) => acc && deep_equals((x as Record<string, unknown>)[key], (y as Record<string, unknown>)[key]),
+				true,
+			)
+		)
+	}
+
+	return x === y
+}

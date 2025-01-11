@@ -21,10 +21,8 @@ export type TSomeOptionConstructorFn = <_TSome>(value: _TSome) => TOption<_TSome
  */
 export type TNoneOptionConstructorFn = () => TOption<never>
 
-export type TOrElseOptionFn = <$TSome, $TNone>(
-	on_none: () => $TNone,
-) => {
-	Some: () => $TSome
+export type TOrElseOptionFn = <$TNone>(on_none: () => $TNone) => {
+	Some: <_TSome>(some: _TSome) => _TSome
 	None: () => $TNone
 }
 

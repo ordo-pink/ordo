@@ -26,7 +26,7 @@ import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
 export const DatabaseTableActionsRow = (metadata: Ordo.Metadata.Instance) =>
 	Maoka.create("tr", ({ use }) => {
-		const { emit } = use(MaokaOrdo.Jabs.Commands.get)
+		const { emit } = use(MaokaOrdo.Jabs.get_commands)
 		use(MaokaJabs.set_class("border-y database_border-color"))
 
 		return () =>

@@ -26,6 +26,7 @@ import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { R } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
 import { emojis } from "@ordo-pink/emojis"
+import { ordo_app_state } from "@ordo-pink/frontend-app/app.state"
 
 type P = { metadata: Ordo.Metadata.Instance; custom_class?: string; show_emoji_picker?: boolean }
 export const MetadataIcon = ({ metadata, custom_class = "", show_emoji_picker = true }: P) =>
@@ -34,13 +35,13 @@ export const MetadataIcon = ({ metadata, custom_class = "", show_emoji_picker = 
 
 		let emoji = metadata.get_property("emoji_icon")
 
-		const commands = use(MaokaOrdo.Jabs.Commands.get)
-		const metadata_query = use(MaokaOrdo.Jabs.MetadataQuery)
+		const commands = use(MaokaOrdo.Jabs.get_commands)
+		const metadata_query = use(MaokaOrdo.Jabs.get_metadata_query)
 
-		const subscription = metadata_query.$.subscribe(() => {
+		const divorce_metadata_query = metadata_query.$.marry(() => {
 			metadata_query
 				.get_by_fsid(metadata.get_fsid())
-				.pipe(R.ops.chain(R.FromOption))
+				.pipe(R.ops.chain(R.FromNullable))
 				.pipe(R.ops.map(metadata => metadata.get_property("emoji_icon")))
 				.cata(
 					R.catas.if_ok(icon => {
@@ -50,7 +51,7 @@ export const MetadataIcon = ({ metadata, custom_class = "", show_emoji_picker = 
 				)
 		})
 
-		on_unmount(() => subscription.unsubscribe())
+		on_unmount(() => divorce_metadata_query())
 
 		use(MaokaJabs.set_class("cursor-pointer"))
 
@@ -92,10 +93,10 @@ export const MetadataIcon = ({ metadata, custom_class = "", show_emoji_picker = 
 			)
 
 		return () => {
-			if (emoji.is_some)
+			if (emoji)
 				return Maoka.create("div", ({ use }) => {
-					use(MaokaJabs.set_class(custom_class))
-					return () => emoji.unwrap()
+					use(MaokaJabs.set_class(custom_class, "text-[0.85rem]"))
+					return () => emoji
 				})
 
 			return metadata_query.has_children(metadata.get_fsid()).cata({
@@ -107,20 +108,13 @@ export const MetadataIcon = ({ metadata, custom_class = "", show_emoji_picker = 
 
 type P2 = P & { has_children: boolean }
 const Icon = ({ metadata, custom_class, has_children }: P2) =>
-	Maoka.create("div", ({ use, refresh, element }) => {
-		let file_associations: Ordo.FileAssociation.Instance[] = []
-
+	Maoka.create("div", ({ use, element }) => {
 		const metadata_content_type = metadata.get_type()
-
-		const $ = use(MaokaOrdo.Jabs.FileAssociations$)
-		const handle_file_associations_update = (value: Ordo.FileAssociation.Instance[]) => {
-			file_associations = value
-			void refresh()
-		}
-
-		use(MaokaOrdo.Jabs.subscribe($, handle_file_associations_update))
+		const get_file_associations = use(ordo_app_state.select_jab$("functions.file_assocs"))
 
 		return async () => {
+			const file_associations = get_file_associations()
+
 			const fa = file_associations.find(association => association.types.some(type => metadata_content_type === type.name))
 
 			if (fa && fa.render_icon) {
@@ -137,6 +131,6 @@ const Icon = ({ metadata, custom_class, has_children }: P2) =>
 		}
 	})
 
-const ICON_CLASS = "px-[0.2rem] shrink-0"
+const ICON_CLASS = "shrink-0"
 
 const get_icon_class = (custom_class?: string) => (custom_class ? `${ICON_CLASS} ${custom_class}` : ICON_CLASS)

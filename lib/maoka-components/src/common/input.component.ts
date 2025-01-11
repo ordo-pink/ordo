@@ -19,16 +19,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { BehaviorSubject } from "rxjs"
-
 import { CurrentUser } from "@ordo-pink/core"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
-import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
-const is_valid$ = new BehaviorSubject(true)
+const is_valid$ = ZAGS.Of({ value: true })
 
 import "./input.css"
+import { ZAGS } from "@ordo-pink/zags"
 
 type TInputProps = {
 	initial_value?: string
@@ -54,7 +52,7 @@ const Text = ({
 	autocomplete,
 	required = false,
 	validate = () => true,
-	validation_error_message = "",
+	// validation_error_message = "",
 }: TInputProps) =>
 	Maoka.create("label", ({ use }) => {
 		use(MaokaJabs.set_class("w-full"))
@@ -67,12 +65,12 @@ const Text = ({
 				return () => label
 			}),
 
-			Maoka.create("input", ({ use, element, after_mount }) => {
+			Maoka.create("input", ({ use, element, on_mount: after_mount }) => {
 				use(
 					MaokaJabs.listen("oninput", event => {
-						const current_is_valid = is_valid$.getValue()
+						const current_is_valid = is_valid$.select("value")
 
-						if (!current_is_valid) is_valid$.next(true)
+						if (!current_is_valid) is_valid$.update("value", () => true)
 
 						return on_input(event)
 					}),
@@ -82,9 +80,9 @@ const Text = ({
 					MaokaJabs.listen("onchange", event => {
 						const target = event.target as HTMLInputElement
 						const is_valid = validate(target.value)
-						const current_is_valid = is_valid$.getValue()
+						const current_is_valid = is_valid$.select("value")
 
-						if (is_valid !== current_is_valid) is_valid$.next(is_valid)
+						if (is_valid !== current_is_valid) is_valid$.update("value", () => is_valid)
 					}),
 				)
 
@@ -106,12 +104,14 @@ const Text = ({
 			Maoka.create("div", ({ use }) => {
 				use(MaokaJabs.set_attribute("id", `error-info-${id}`))
 
-				const get_is_valid = use(MaokaOrdo.Jabs.from$(is_valid$, true))
+				// const get_is_valid = use(MaokaOrdo.Jabs.from$(is_valid$, true))
 
 				return () => {
-					const is_valid = get_is_valid()
+					// const is_valid = get_is_valid()
 
-					return is_valid ? void 0 : validation_error_message
+					return void 0
+
+					// return is_valid ? void 0 : validation_error_message
 				}
 			}),
 		]

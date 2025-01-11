@@ -1,0 +1,161 @@
+/*
+SPDX-FileCopyrightText: Copyright 2023, 谢尔盖||↓ and the Ordo.pink contributors
+SPDX-License-Identifier: MIT
+*/
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+	font-family: system-ui;
+	font-style: normal;
+	font-weight: 300;
+	src: local(".SFNS-Light"), local(".SFNSText-Light"), local(".HelveticaNeueDeskInterface-Light"), local(".LucidaGrandeUI"),
+		local("Segoe UI Light"), local("Ubuntu Light"), local("Roboto-Light"), local("DroidSans"), local("Tahoma");
+}
+
+@font-face {
+	font-family: system-ui;
+	font-style: italic;
+	font-weight: 300;
+	src: local(".SFNS-LightItalic"), local(".SFNSText-LightItalic"), local(".HelveticaNeueDeskInterface-Italic"),
+		local(".LucidaGrandeUI"), local("Segoe UI Light Italic"), local("Ubuntu Light Italic"), local("Roboto-LightItalic"),
+		local("DroidSans"), local("Tahoma");
+}
+
+@font-face {
+	font-family: system-ui;
+	font-style: normal;
+	font-weight: 400;
+	src: local(".SFNS-Regular"), local(".SFNSText-Regular"), local(".HelveticaNeueDeskInterface-Regular"),
+		local(".LucidaGrandeUI"), local("Segoe UI"), local("Ubuntu"), local("Roboto-Regular"), local("DroidSans"), local("Tahoma");
+}
+
+@font-face {
+	font-family: system-ui;
+	font-style: italic;
+	font-weight: 400;
+	src: local(".SFNS-Italic"), local(".SFNSText-Italic"), local(".HelveticaNeueDeskInterface-Italic"), local(".LucidaGrandeUI"),
+		local("Segoe UI Italic"), local("Ubuntu Italic"), local("Roboto-Italic"), local("DroidSans"), local("Tahoma");
+}
+
+@font-face {
+	font-family: system-ui;
+	font-style: normal;
+	font-weight: 500;
+	src: local(".SFNS-Medium"), local(".SFNSText-Medium"), local(".HelveticaNeueDeskInterface-MediumP4"), local(".LucidaGrandeUI"),
+		local("Segoe UI Semibold"), local("Ubuntu Medium"), local("Roboto-Medium"), local("DroidSans-Bold"), local("Tahoma Bold");
+}
+
+@font-face {
+	font-family: system-ui;
+	font-style: italic;
+	font-weight: 500;
+	src: local(".SFNS-MediumItalic"), local(".SFNSText-MediumItalic"), local(".HelveticaNeueDeskInterface-MediumItalicP4"),
+		local(".LucidaGrandeUI"), local("Segoe UI Semibold Italic"), local("Ubuntu Medium Italic"), local("Roboto-MediumItalic"),
+		local("DroidSans-Bold"), local("Tahoma Bold");
+}
+
+@font-face {
+	font-family: system-ui;
+	font-style: normal;
+	font-weight: 700;
+	src: local(".SFNS-Bold"), local(".SFNSText-Bold"), local(".HelveticaNeueDeskInterface-Bold"), local(".LucidaGrandeUI"),
+		local("Segoe UI Bold"), local("Ubuntu Bold"), local("Roboto-Bold"), local("DroidSans-Bold"), local("Tahoma Bold");
+}
+
+@font-face {
+	font-family: system-ui;
+	font-style: italic;
+	font-weight: 700;
+	src: local(".SFNS-BoldItalic"), local(".SFNSText-BoldItalic"), local(".HelveticaNeueDeskInterface-BoldItalic"),
+		local(".LucidaGrandeUI"), local("Segoe UI Bold Italic"), local("Ubuntu Bold Italic"), local("Roboto-BoldItalic"),
+		local("DroidSans-Bold"), local("Tahoma Bold");
+}
+
+:root {
+	--font-system: system-ui;
+	--font-sans: Jost;
+	--font-mono: Jost;
+	--font-serif: Jost;
+	--index: calc(1vw + 1vh);
+	--transition: 0.5s cubic-bezier(0.05, 0.5, 0, 1);
+	font-family: var(--font-sans), system-ui;
+}
+
+body {
+	font-family: "Jost", sans-serif;
+	@apply bg-white text-neutral-800 dark:bg-neutral-800  dark:text-neutral-200;
+}
+
+a {
+	@apply text-sky-500 underline visited:text-purple-500 active:text-rose-500;
+}
+
+*::-webkit-scrollbar {
+	width: 5px;
+	height: 5px;
+	@apply bg-transparent transition-colors duration-300;
+}
+
+*::-webkit-scrollbar-thumb {
+	@apply invisible my-2 rounded-lg bg-neutral-500;
+}
+
+*:hover::-webkit-scrollbar-thumb {
+	@apply visible;
+}
+
+*::-webkit-scrollbar-track {
+	@apply bg-transparent;
+}
+
+.app {
+	@apply flex;
+}
+
+.sidebar {
+	@apply fixed bottom-0 left-0 right-0 top-0 sm:relative sm:left-auto sm:h-dvh sm:w-96 sm:pr-14 sm:shadow-md;
+	@apply bg-neutral-100 dark:bg-neutral-900;
+}
+
+.workspace {
+	@apply h-dvh w-full pb-10 sm:pb-0;
+}
+
+.workspace.no-sidebar {
+	@apply sm:pr-10;
+}
+
+.background-task-indicator {
+	@apply fixed left-1 top-1 z-50 animate-pulse text-sm text-neutral-500;
+}
+
+.context-menu {
+	@apply absolute z-40 w-[320px] rounded-sm bg-white shadow-lg dark:bg-neutral-700;
+}
+
+.context-menu_divider {
+	@apply my-1 h-px border-0 bg-neutral-200 dark:bg-neutral-600;
+}
+
+.command-palette {
+	@apply flex h-dvh max-h-96 w-full flex-col space-y-1 py-2;
+}
+
+.command-palette_search {
+	@apply !w-[95dvw] !max-w-2xl !bg-transparent !shadow-none md:!w-[50dvw];
+}
+
+.command-palette_items {
+	@apply w-full overflow-y-auto border-neutral-200 first-of-type:border-none has-[div]:last-of-type:border-t dark:border-neutral-600;
+}
+
+.command-palette_hint {
+	@apply flex items-center justify-center text-center text-xs text-neutral-600 dark:text-neutral-400;
+}
+
+.command-palette_create-new-item-hint {
+	@apply flex w-full items-center justify-center space-x-1 text-center text-sm text-neutral-600 dark:text-neutral-400;
+}

@@ -38,9 +38,11 @@ let is_cookie_modal_shown = false
 
 // TODO Translations
 export default Maoka.create("main", ({ use, on_unmount }) => {
-	const commands = use(MaokaOrdo.Jabs.Commands.get)
-	const { t } = use(MaokaOrdo.Jabs.Translations)
-	const metadata_query = use(MaokaOrdo.Jabs.MetadataQuery)
+	const commands = use(MaokaOrdo.Jabs.get_commands)
+	const { t } = use(MaokaOrdo.Jabs.get_translations$)
+	const metadata_query = use(MaokaOrdo.Jabs.get_metadata_query)
+
+	commands.emit("cmd.application.set_title", "t.welcome.landing_page.title")
 
 	if (!is_cookie_modal_shown) show_cookie_modal(commands.emit)
 
@@ -59,13 +61,13 @@ export default Maoka.create("main", ({ use, on_unmount }) => {
 		Object.assign(document.documentElement, { style })
 	}
 
-	// const handle_sign_up_click = () =>
-	// 	commands.emit("cmd.application.notification.show", {
-	// 		type: NotificationType.RRR,
-	// 		message: "t.welcome.landing_page.rrr_sign_up_unavailable.message",
-	// 		duration: 10,
-	// 		title: "t.welcome.landing_page.rrr_sign_up_unavailable.title",
-	// 	})
+	const handle_sign_up_click = () =>
+		commands.emit("cmd.application.notification.show", {
+			type: NotificationType.RRR,
+			message: "t.welcome.landing_page.rrr_sign_up_unavailable.message",
+			duration: 10,
+			title: "t.welcome.landing_page.rrr_sign_up_unavailable.title",
+		})
 
 	const handle_try_click = () => {
 		const has_files = metadata_query.get().cata({ Ok: x => x.length > 0, Err: T })
@@ -74,17 +76,15 @@ export default Maoka.create("main", ({ use, on_unmount }) => {
 		commands.emit("cmd.file_editor.open")
 	}
 
-	// const handle_more_click = () => console.log("HERE") // TODO Link to details
+	const handle_more_click = () => console.log("HERE") // TODO Link to details
 
 	return () => {
 		const t_ordo = "ORDO"
 		const t_bring_your_thoughts_to = "Bring your thoughts to"
-		// const t_more = t("t.welcome.landing_page.sections.hero.learn_more")
+		const t_more = t("t.welcome.landing_page.sections.hero.learn_more")
 		const t_beta_started = t("t.welcome.landing_page.sections.hero.beta_started_announcement")
 		const t_try_now = t("t.welcome.landing_page.sections.hero.try_now_button")
-		// const t_sign_up = t("t.welcome.landing_page.sections.hero.sign_up")
-
-		commands.emit("cmd.application.set_title", "t.welcome.landing_page.title")
+		const t_sign_up = t("t.welcome.landing_page.sections.hero.sign_up")
 
 		return HeroSection(() => [
 			HeroSectionLayers(() => [
@@ -97,9 +97,14 @@ export default Maoka.create("main", ({ use, on_unmount }) => {
 				HeroCardContent(() => [
 					HeroCardLogoSection(() => [
 						HeroCardLogoWrapper(() => [t_bring_your_thoughts_to, HeroCardLogoText(() => t_ordo)]),
-						// HeroCardLogoAction(() =>
-						// 	Button.Neutral({ text: t_more, on_click: handle_more_click, hotkey: "m", hotkey_options: { prevent_in_inputs: true } }),
-						// ),
+						HeroCardLogoAction(() =>
+							Button.Neutral({
+								text: t_more,
+								on_click: handle_more_click,
+								hotkey: "m",
+								hotkey_options: { prevent_in_inputs: true },
+							}),
+						),
 					]),
 
 					CallToActionSection(() =>
@@ -112,12 +117,12 @@ export default Maoka.create("main", ({ use, on_unmount }) => {
 									on_click: handle_try_click,
 									hotkey_options: { prevent_in_inputs: true },
 								}),
-								// Button.Neutral({
-								// 	text: t_sign_up,
-								// 	hotkey: "mod+u",
-								// 	on_click: handle_sign_up_click,
-								// 	hotkey_options: { prevent_in_inputs: true },
-								// }),
+								Button.Neutral({
+									text: t_sign_up,
+									hotkey: "mod+u",
+									on_click: handle_sign_up_click,
+									hotkey_options: { prevent_in_inputs: true },
+								}),
 							]),
 						]),
 					),
@@ -144,7 +149,7 @@ const HeroCardLogoText = Maoka.styled("span", { class: "logo_ordo-text" })
 const HeroSectionLayers = Maoka.styled("div", { class: "hero-layers" })
 const HeroCardLogoWrapper = Maoka.styled("h1", { class: "logo" })
 const HeroCardLogoSection = Maoka.styled("div", { class: "logo-section" })
-// const HeroCardLogoAction = Maoka.styled("div", { class: "logo_action" })
+const HeroCardLogoAction = Maoka.styled("div", { class: "logo_action" })
 
 const ActionsContainer = Maoka.styled("div", { class: "actions-container" })
 
@@ -188,10 +193,10 @@ const create_tutorial_files = (emit: Ordo.Command.EmitFn, metadata_query: Ordo.M
 	emit("cmd.metadata.create", { name: "Start here!", parent: null, labels, type: "database/ordo" })
 
 	const parent = metadata_query
-		.get_by_name_and_parent("Start here!", null)
-		.pipe(Result.ops.chain(Result.FromOption))
+		.get_by_name("Start here!", null)
+		.pipe(Result.ops.chain(Result.FromNullable))
 		.pipe(Result.ops.map(x => x.get_fsid()))
-		.cata(Result.catas.or_else(() => null as never))
+		.cata(Result.catas.or_else(() => null))
 
 	emit("cmd.metadata.create", { name: "Join ORDO", parent, props: { emoji_icon: "✅" }, labels })
 	emit("cmd.metadata.create", { name: "Try changing emoji to `check`", parent, labels, props: { emoji_icon: "👆" } })
@@ -201,8 +206,8 @@ const create_tutorial_files = (emit: Ordo.Command.EmitFn, metadata_query: Ordo.M
 	emit("cmd.metadata.create", { name: "Click on this text to open file content", parent, labels })
 
 	const last_file_fsid = metadata_query
-		.get_by_name_and_parent("Click on this text to open file content", parent)
-		.pipe(Result.ops.chain(Result.FromOption))
+		.get_by_name("Click on this text to open file content", parent)
+		.pipe(Result.ops.chain(Result.FromNullable))
 		.pipe(Result.ops.map(x => x.get_fsid()))
 		.cata(Result.catas.or_else(() => null as never))
 

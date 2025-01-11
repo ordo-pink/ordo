@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import type * as T from "./maoka.types"
+import type * as T from "./maoka.types.ts"
 
 export const create: T.TMaokaCreateComponentFn = (name, callback) => {
 	const result: T.TMaokaComponent = async (create_element, root_element, root_id) => {
@@ -36,9 +36,9 @@ export const create: T.TMaokaCreateComponentFn = (name, callback) => {
 				if (!element.onunmount) element.onunmount = []
 				element.onunmount.push(f)
 			},
-			after_mount: f => {
-				if (!element.aftermount) element.aftermount = []
-				element.aftermount.push(f)
+			on_mount: f => {
+				if (!element.onmount) element.onmount = []
+				element.onmount.push(f)
 			},
 		} as T.TMaokaProps
 
@@ -60,18 +60,19 @@ export const create: T.TMaokaCreateComponentFn = (name, callback) => {
 	return result
 }
 
-export const lazy = (callback: () => Promise<{ default: T.TMaokaComponent }>) => callback().then(result => result.default)
+export const lazy = (callback: () => Promise<{ default: T.TMaokaComponent }>): Promise<T.TMaokaComponent> =>
+	callback().then(result => result.default)
 
 export const styled =
 	(tag: string, attributes: Record<string, string> = {}) =>
-	(children_thunk: ReturnType<T.TMaokaCallback>) =>
+	(children_thunk: ReturnType<T.TMaokaCallback>): T.TMaokaComponent =>
 		create(tag, ({ element: current_element }) => {
 			Object.keys(attributes).forEach(key => current_element.setAttribute(key, attributes[key]))
 
 			return children_thunk
 		})
 
-export const html = (tag: string, html: string) =>
+export const html = (tag: string, html: string): T.TMaokaComponent =>
 	create(tag, ({ element }) => {
 		element.innerHTML = html
 	})
@@ -79,9 +80,9 @@ export const html = (tag: string, html: string) =>
 export const render_dom: T.TMaokaRenderDOMFn = async (root, component) => {
 	const root_id: string = crypto.randomUUID()
 
-	const Component = component(document.createElement.bind(document), root as unknown as T.TMaokaElement, root_id)
+	const Component = await component(document.createElement.bind(document), root as unknown as T.TMaokaElement, root_id)
 
-	root.appendChild((await Component) as HTMLElement)
+	root.appendChild(Component as HTMLElement)
 
 	const unmount_element = (element: T.TMaokaElement) => {
 		if (is_arr(element.onunmount) && element.onunmount.length > 0) element.onunmount.forEach(f => f())
@@ -89,11 +90,15 @@ export const render_dom: T.TMaokaRenderDOMFn = async (root, component) => {
 		element.childNodes.forEach(child => unmount_element(child as any))
 	}
 
-	const after_mount_element = (element: T.TMaokaElement) => {
-		if (is_arr(element.aftermount) && element.aftermount.length > 0) element.aftermount.forEach(f => f())
+	const mount_element = (element: T.TMaokaElement) => {
+		if (is_arr(element.onmount) && element.onmount.length > 0) {
+			element.onmount.forEach(f => f())
+		}
 
-		element.childNodes.forEach(child => after_mount_element(child as any))
+		element.childNodes.forEach(child => mount_element(child as any))
 	}
+
+	mount_element(Component)
 
 	const observer = new MutationObserver(records => {
 		for (const record of records) {
@@ -107,12 +112,16 @@ export const render_dom: T.TMaokaRenderDOMFn = async (root, component) => {
 
 			for (let i = 0; i < mounted_nodes.length; i++) {
 				const element = mounted_nodes[i]
-				after_mount_element(element)
+				mount_element(element)
 			}
 		}
 	})
 
-	observer.observe(root as HTMLElement, { childList: true, subtree: true })
+	observer.observe(root as HTMLElement, {
+		childList: true,
+		subtree: true,
+		attributeFilter: ["onmount", "onunmount"],
+	})
 }
 
 // --- Internal ---

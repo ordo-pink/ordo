@@ -26,10 +26,8 @@ import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { Metadata } from "@ordo-pink/core"
 import { MetadataIcon } from "@ordo-pink/maoka-components"
 import { R } from "@ordo-pink/result"
-import { type TOption } from "@ordo-pink/option"
 
 import { FileEditorSidebarItem } from "./file-editor-sidebar-item.component"
-import { equals } from "ramda"
 
 const expanded_state = {} as Record<Ordo.Metadata.FSID, boolean>
 
@@ -39,14 +37,23 @@ export const FileEditorSidebarDirectory = (metadata: Ordo.Metadata.Instance, dep
 	Maoka.create("div", ({ use, refresh }) => {
 		const fsid = metadata.get_fsid()
 
-		const metadata_query = use(MaokaOrdo.Jabs.MetadataQuery)
-		const get_route_params = use(MaokaOrdo.Jabs.RouteParams)
+		const commands = use(MaokaOrdo.Jabs.get_commands)
+		const metadata_query = use(MaokaOrdo.Jabs.get_metadata_query)
+		const get_route_params = use(MaokaOrdo.Jabs.get_route_params$)
 
 		const on_caret_click = (event: MouseEvent) => {
 			event.stopPropagation()
 			expanded_state[fsid] = !expanded_state[fsid]
 			void refresh()
 		}
+
+		const handle_context_menu = (event: MouseEvent) => {
+			event.preventDefault()
+
+			commands.emit("cmd.application.context_menu.show", { event, payload: metadata })
+		}
+
+		use(MaokaJabs.listen("oncontextmenu", event => handle_context_menu(event)))
 
 		return () => {
 			// Expand directory if it is an ancestor of the metadata that is identified by the fsid
@@ -63,10 +70,9 @@ export const FileEditorSidebarDirectory = (metadata: Ordo.Metadata.Instance, dep
 				.get_children(fsid)
 				.pipe(
 					// TODO Move to Metadata + add sorting from File Explorer (by name with numbers)
-					R.ops.map(is =>
-						is.sort((a, b) => {
+					R.ops.map(children =>
+						children.toSorted((a, b) => {
 							const a_dir = metadata_query.has_children(a.get_fsid()).cata(R.catas.or_else(() => false))
-
 							const b_dir = metadata_query.has_children(b.get_fsid()).cata(R.catas.or_else(() => false))
 
 							if (a_dir && !b_dir) return -1
@@ -77,9 +83,9 @@ export const FileEditorSidebarDirectory = (metadata: Ordo.Metadata.Instance, dep
 					),
 				)
 				.cata(
-					R.catas.if_ok(is => [
+					R.catas.if_ok(children => [
 						FileEditorDirectoryName(metadata, depth, on_caret_click),
-						FileEditorDirectoryChildren(metadata, is, depth),
+						FileEditorDirectoryChildren(metadata, children, depth),
 					]),
 				)
 		}
@@ -90,7 +96,7 @@ export const FileEditorSidebarDirectory = (metadata: Ordo.Metadata.Instance, dep
 const FileEditorDirectoryChildren = (metadata: Ordo.Metadata.Instance, children: Ordo.Metadata.Instance[], depth: number) =>
 	R.If(expanded_state[metadata.get_fsid()])
 		.pipe(R.ops.map(() => depth + 1))
-		.pipe(R.ops.map(depth => () => children.map(i => FileEditorSidebarItem(i, depth))))
+		.pipe(R.ops.map(depth => () => children.map(i => FileEditorSidebarItem(i.get_fsid(), depth))))
 		.cata(R.catas.if_ok(children => Maoka.create("div", () => children)))
 
 const FileEditorDirectoryName = (
@@ -98,39 +104,21 @@ const FileEditorDirectoryName = (
 	depth: number,
 	on_caret_click: (event: MouseEvent) => void,
 ) =>
-	Maoka.create("div", ({ use, refresh }) => {
+	Maoka.create("div", ({ use }) => {
 		const fsid = metadata.get_fsid()
 
-		let route: Ordo.Router.Route | null = null
-		const $ = use(MaokaOrdo.Jabs.CurrentRoute$)
-		const handle_current_route_change = (value: TOption<Ordo.Router.Route>) =>
-			R.FromOption(value, () => null)
-				.pipe(R.ops.chain(r => R.If(r.path !== route?.path, { T: () => r, F: () => r })))
-				.pipe(R.ops.chain(r => R.If(!equals(r, route), { T: () => r, F: () => r })))
-				.cata({
-					Ok: updated_route => {
-						route = updated_route
-						void refresh()
-					},
-					Err: null_or_same_route => {
-						// Skip since routes are equal
-						if (null_or_same_route || !route) return
+		const get_route = use(MaokaOrdo.Jabs.get_current_route$)
 
-						route = null_or_same_route
-						void refresh()
-					},
-				})
-
-		use(MaokaOrdo.Jabs.subscribe($, handle_current_route_change))
-
-		const commands = use(MaokaOrdo.Jabs.Commands.get)
+		const commands = use(MaokaOrdo.Jabs.get_commands)
 
 		use(MaokaJabs.listen("onclick", () => commands.emit("cmd.file_editor.open_file", fsid)))
 		use(MaokaJabs.set_style({ paddingLeft: `${depth + 0.5}rem`, paddingRight: "0.5rem" }))
 		use(MaokaJabs.set_class(...file_editor_sidebar_directory_name_classes))
 
 		return () => {
-			if (route?.params?.fsid === fsid) use(MaokaJabs.add_class(directory_active))
+			const route = get_route()
+
+			if (route?.params.fsid === fsid) use(MaokaJabs.add_class(directory_active))
 			else use(MaokaJabs.remove_class(...directory_active.split(" ")))
 
 			return [

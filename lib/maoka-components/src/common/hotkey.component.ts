@@ -23,12 +23,10 @@ import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { Result } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
-
-import "./hotkey.css"
+import { create_hotkey_from_event } from "@ordo-pink/hotkey-from-event"
 import { title_case } from "@ordo-pink/tau"
 
-// TODO Move to jabs
-const isDarwin = navigator.appVersion.indexOf("Mac") !== -1
+import "./hotkey.css"
 
 export type THotkeyOptions = {
 	prevent_in_inputs?: boolean
@@ -46,13 +44,20 @@ export const Hotkey = (
 		decoration_only: false,
 	},
 ) =>
-	Maoka.create("div", ({ use, on_unmount, element, after_mount }) => {
-		const split = hotkey.split("+")
-
-		const symbol = split[split.length - 1].toLowerCase()
-
+	Maoka.create("div", ({ use, on_unmount, element, on_mount: after_mount }) => {
 		use(MaokaJabs.set_class("hotkey"))
 		if (options.smol) use(MaokaJabs.add_class("smol"))
+		const is_darwin = use(MaokaJabs.is_darwin)
+
+		const split = hotkey.split("+")
+
+		const meta = is_darwin ? Key("⌥") : Key("Alt")
+		const mod = is_darwin ? Key("⌘") : Key("Ctrl")
+		const ctrl = Key("Ctrl")
+		const option = Key("⌥")
+		const shift = Key("⇧")
+
+		const symbol = split[split.length - 1].toLowerCase()
 
 		const handle_keydown = (event: KeyboardEvent) => {
 			if (IGNORED_KEYS.includes(event.key) || options.decoration_only) return
@@ -64,7 +69,7 @@ export const Hotkey = (
 				if (target.tagName === "INPUT") return
 			}
 
-			const parsed_hotkey = create_hotkey_string(event, false)
+			const parsed_hotkey = create_hotkey_from_event(event, is_darwin)
 
 			if (parsed_hotkey === hotkey) {
 				event.preventDefault()
@@ -89,19 +94,6 @@ export const Hotkey = (
 
 const IGNORED_KEYS = ["Control", "Shift", "Alt", "Meta"]
 
-const create_hotkey_string = (event: KeyboardEvent, is_darwin: boolean) => {
-	let hotkey = ""
-
-	if (event.altKey) hotkey += "meta+"
-	if (event.ctrlKey) hotkey += is_darwin ? "ctrl+" : "mod+"
-	if (event.metaKey) hotkey += "mod+"
-	if (event.shiftKey) hotkey += "shift+"
-
-	hotkey += event.key?.toLocaleLowerCase()
-
-	return hotkey
-}
-
 const KeyContainer = Maoka.styled("span", {
 	class: "key-container",
 })
@@ -119,9 +111,3 @@ const Key = (key: string) =>
 			.case("arrowdown", () => "↓")
 			.default(() => title_case(key)),
 	)
-
-const meta = isDarwin ? Key("⌥") : Key("Alt")
-const mod = isDarwin ? Key("⌘") : Key("Ctrl")
-const ctrl = Key("Ctrl")
-const option = Key("⌥")
-const shift = Key("⇧")

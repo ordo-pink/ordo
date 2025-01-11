@@ -1,7 +1,0 @@
-.context-menu {
-	@apply absolute z-[1000] w-[320px] rounded-sm bg-white shadow-lg dark:bg-neutral-700;
-}
-
-.context-menu_divider {
-	@apply my-1 h-px border-0 bg-neutral-200 dark:bg-neutral-600;
-}

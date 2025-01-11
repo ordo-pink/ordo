@@ -21,6 +21,8 @@
 
 import { BsFileEarmarkRichText } from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/maoka"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
+import { TwoLetterLocale } from "@ordo-pink/locale"
 import { create_function } from "@ordo-pink/core"
 
 import { RichText } from "./src/rich-text.component"
@@ -40,22 +42,21 @@ export default create_function(
 	"pink.ordo.rich-text",
 	{
 		commands: [
-			"cmd.functions.file_associations.add",
 			"cmd.application.add_translations",
 			"cmd.metadata.show_create_modal",
 			"cmd.application.router.navigate",
 			"cmd.application.command_palette.show",
-			"cmd.application.context_menu.show",
+			"cmd.functions.file_associations.register",
 			"cmd.metadata.rename",
 			"cmd.content.set",
 		],
-		queries: ["application.commands", "data.metadata_query", "users.users_query", "functions.file_associations"],
+		queries: [],
 	},
 	ctx => {
-		const commands = ctx.get_commands()
+		const commands = ctx.commands
 
 		commands.emit("cmd.application.add_translations", {
-			lang: "en",
+			lang: TwoLetterLocale.ENGLISH,
 			translations: {
 				"t.text.file_association.readable_name": "Rich Text",
 				"t.text.file_association.description":
@@ -64,7 +65,7 @@ export default create_function(
 		})
 
 		// TODO Move to text editor
-		commands.emit("cmd.functions.file_associations.add", {
+		commands.emit("cmd.functions.file_associations.register", {
 			name: "pink.ordo.rich-text",
 			types: [
 				{
@@ -75,10 +76,12 @@ export default create_function(
 			],
 			render: ({ div, metadata, content }) =>
 				// TODO Replace with text editor
-				Maoka.render_dom(div, RichText(metadata, content, ctx)),
+				Maoka.render_dom(
+					div,
+					MaokaOrdo.Components.WithState(ctx, () => RichText(metadata, content!)),
+				),
 			render_icon: span => {
 				span.appendChild(BsFileEarmarkRichText() as any)
-				return Promise.resolve()
 			},
 		})
 	},

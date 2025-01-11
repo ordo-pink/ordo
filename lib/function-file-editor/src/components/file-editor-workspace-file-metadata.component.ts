@@ -24,12 +24,13 @@ import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
+// TODO Refresh if metadata was changed from the outside
 export const FileMetadata = (metadata: Ordo.Metadata.Instance) =>
 	Maoka.create("div", ({ use }) => {
 		const fsid = metadata.get_fsid()
 		const name = metadata.get_name()
 
-		const commands = use(MaokaOrdo.Jabs.Commands.get)
+		const commands = use(MaokaOrdo.Jabs.get_commands)
 
 		use(MaokaJabs.add_class("p-2"))
 
@@ -59,8 +60,8 @@ const LabelsSection = (fsid: Ordo.Metadata.FSID) =>
 		use(MaokaJabs.set_class(label_section))
 		use(MaokaJabs.listen("onclick", () => handle_click()))
 
-		const commands = use(MaokaOrdo.Jabs.Commands.get)
-		const get_metadata = use(MaokaOrdo.Jabs.Metadata.get_by_fsid(fsid))
+		const commands = use(MaokaOrdo.Jabs.get_commands)
+		const get_metadata = use(MaokaOrdo.Jabs.Metadata.get_by_fsid$(fsid))
 
 		const handle_click = () => commands.emit("cmd.metadata.show_edit_labels_palette", fsid)
 

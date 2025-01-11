@@ -1,0 +1,13 @@
+{
+	"name": "@ordo-pink/maoka-zags",
+	"version": "0.1.0",
+	"exports": "./index.ts",
+	"exclude": ["**/*.test.ts"],
+	"compilerOptions": {
+		"lib": ["deno.window", "dom"]
+	},
+	"imports": {
+		"@ordo-pink/zags": "jsr:@ordo-pink/zags@0.1.0",
+		"@ordo-pink/maoka": "jsr:@ordo-pink/maoka@0.1.0"
+	}
+}

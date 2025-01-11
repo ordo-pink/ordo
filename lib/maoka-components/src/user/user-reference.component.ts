@@ -32,16 +32,16 @@ export const CurrentUserReference = Maoka.create("div", ({ use, refresh, on_unmo
 
 	use(MaokaJabs.set_class("flex gap-x-2 items-center text-sm"))
 
-	const user_query = use(MaokaOrdo.Jabs.UserQuery)
+	const user_query = use(MaokaOrdo.Jabs.get_user_query)
 
-	const subscription = user_query.$.subscribe(() =>
+	const divorce_user_query_version = user_query.$.marry(() =>
 		user_query
 			.get_current()
 			.pipe(Result.ops.map(user => void (name = user.get_readable_name())))
 			.cata(Result.catas.if_ok(() => void refresh())),
 	)
 
-	on_unmount(() => subscription.unsubscribe())
+	on_unmount(() => divorce_user_query_version())
 
 	return () => [UserAvatar, UserName(name)]
 })

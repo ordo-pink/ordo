@@ -19,12 +19,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { TLogger } from "@ordo-pink/logger"
 import { TOption } from "@ordo-pink/option"
 
 export type TRequireFID<$TReturn> = (fid: symbol | null) => $TReturn
 
 declare global {
 	module OrdoInternal {
+		type KnownFunction = {
+			name: string
+			fid: symbol
+			permissions: Ordo.CreateFunction.Permissions
+		}
+
 		module User {
 			export type InternalDTO = Ordo.User.Current.DTO & {
 				email_code: string
@@ -47,6 +54,23 @@ declare global {
 				maxUploadSize: number
 				code: string
 				password: string
+			}
+		}
+
+		module Function {
+			type WithFIDFn<$T> = (fid: symbol) => $T
+
+			type CreateFunctionInternalContext = {
+				get_commands: WithFIDFn<Ordo.Command.Commands>
+				get_logger: WithFIDFn<TLogger>
+				get_fetch: WithFIDFn<Ordo.Fetch>
+				translate: Ordo.I18N.TranslateFn
+				get_file_associations: WithFIDFn<Ordo.CreateFunction.State["file_associations$"]>
+				get_router: WithFIDFn<Ordo.CreateFunction.State["router$"]>
+				get_metadata_query: WithFIDFn<Ordo.Metadata.Query>
+				get_user_query: WithFIDFn<Ordo.User.Query>
+				get_content_query: WithFIDFn<Ordo.Content.Query>
+				known_functions: OrdoInternal.KnownFunctions
 			}
 		}
 

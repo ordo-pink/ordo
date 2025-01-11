@@ -19,17 +19,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { BehaviorSubject, Observable } from "rxjs"
-
-import type { ISO_639_1_Locale, TwoLetterLocale } from "@ordo-pink/locale"
 import type { JTI, SUB } from "@ordo-pink/wjwt"
 import type { Oath } from "@ordo-pink/oath"
 import type { TLogger } from "@ordo-pink/logger"
-import type { TOption } from "@ordo-pink/option"
+import type { TMaokaComponent } from "@ordo-pink/maoka"
 import type { TResult } from "@ordo-pink/result"
+import type { TZags } from "@ordo-pink/zags"
+import type { TwoLetterLocale } from "@ordo-pink/locale"
 
 import type * as C from "./constants"
-import { TMaokaComponent } from "@ordo-pink/maoka"
 
 export type TDropIsPrefix<T extends string> = T extends `is_${infer U}` ? U : never
 
@@ -97,6 +95,25 @@ declare global {
 				show_edit_label_modal: () => string
 			}
 			components: {
+				modals: {
+					create_file: {
+						title: () => string
+						input_placeholder: () => string
+						input_label: () => string
+					}
+					move: {
+						title: () => string
+						move_to_root: () => string
+					}
+					remove_file: {
+						title: () => string
+						message: () => string
+					}
+					rename_file: {
+						title: () => string
+						input_label: () => string
+					}
+				}
 				command_palette: {
 					search_placeholder: () => string
 					hide: () => string
@@ -107,6 +124,9 @@ declare global {
 					toggle: () => string
 					hide: () => string
 					show: () => string
+				}
+				notifications: {
+					pending_notifications: () => string
 				}
 			}
 		}
@@ -145,9 +165,10 @@ declare global {
 		application: {
 			set_title: () => Ordo.I18N.TranslationKey
 			add_translations: () => {
-				lang: ISO_639_1_Locale
+				lang: keyof Ordo.I18N.Translations
 				translations: Partial<Record<Ordo.I18N.TranslationKey, string>>
 			}
+			set_language: () => keyof Ordo.I18N.Translations
 			background_task: {
 				set_status: () => C.BackgroundTaskStatus
 				start_saving: () => void
@@ -174,13 +195,12 @@ declare global {
 			sidebar: {
 				enable: () => void
 				disable: () => void
-				set_size: () => [number, number]
-				show: () => [number, number] | undefined
+				show: () => void
 				hide: () => void
 				toggle: () => void
 			}
 			router: {
-				navigate: () => Ordo.Router.NavigateParams | string
+				navigate: () => { url: Ordo.Router.Route["pathname"]; new_tab?: boolean }
 				open_external: () => Ordo.Router.OpenExternalParams
 			}
 			modal: {
@@ -190,15 +210,15 @@ declare global {
 		}
 		functions: {
 			activities: {
-				register: () => { fid: symbol; activity: Ordo.Activity.Instance }
-				unregister: () => { fid: symbol; name: Ordo.Activity.Instance["name"] }
+				register: () => Ordo.Activity.Instance
+				unregister: () => Ordo.Activity.Instance["name"]
 			}
 			persisted_state: {
 				update: () => { key: string; value: any }
 			}
 			file_associations: {
-				add: () => Ordo.FileAssociation.Instance
-				remove: () => Ordo.FileAssociation.Instance["name"]
+				register: () => Ordo.FileAssociation.Instance
+				unregister: () => Ordo.FileAssociation.Instance["name"]
 			}
 		}
 		user: {
@@ -231,12 +251,11 @@ declare global {
 			set_size: () => { fsid: Ordo.Metadata.FSID; size: number }
 		}
 		content: {
-			get: () => Ordo.Metadata.FSID
-			set: () => { fsid: Ordo.Metadata.FSID; content: string | ArrayBuffer; content_type: string }
+			set: () => { fsid: Ordo.Metadata.FSID; content: Ordo.Content.Instance; content_type: string }
 			upload: () => {
 				name: string
 				parent: Ordo.Metadata.FSID | null
-				content: string | ArrayBuffer
+				content: Ordo.Content.Instance
 				type: string
 			}
 		}
@@ -262,7 +281,7 @@ declare global {
 
 		type Fetch = typeof window.fetch
 
-		type Hosts = { id: string; dt: string; static: string; website: string; my: string }
+		type Hosts = { id: string; dt: string; static: string; website: string }
 
 		/**
 		 * User achievements and whatever else related to using them.
@@ -392,96 +411,48 @@ declare global {
 			}
 		}
 
-		namespace Workspace {
-			type WorkspaceSplitSize = [number, number]
-			type DisabledSidebar = { disabled: true }
-			type EnabledSidebar = { disabled: false; sizes: WorkspaceSplitSize }
-			type SidebarState = EnabledSidebar | DisabledSidebar
-		}
-
 		namespace CreateFunction {
 			type QueryPermission =
-				| "application.title"
-				| "application.sidebar"
 				| "application.fetch"
-				| "application.hosts"
-				| "application.logger"
-				| "application.commands"
-				| "application.current_fid"
-				| "application.current_language"
-				| "application.current_route"
-				| "application.current_activity"
-				| "users.current_user.achievements"
-				| "users.current_user.is_authenticated"
-				| "users.current_user.public_info" // Ordo.User.Public.Instance
-				| "users.current_user.internal_info" // Ordo.User.Current.Instance
-				| "users.users_query"
-				| "functions.activities"
-				| "functions.current_file_association"
-				| "functions.file_associations"
-				| "functions.editor_plugins"
-				| "functions.persisted_state"
-				| "data.metadata_query"
-				| "data.content_query"
+				| "application.router"
+				| "application.file_associations"
+				| `metadata.${keyof Ordo.Metadata.Query}`
+				| `user.${keyof Ordo.User.Query}`
+				| `content.${keyof Ordo.Content.Query}`
 
 			type CommandPermission = Ordo.Command.Name
-
-			type GetCurrentRouteFn = () => TResult<Observable<TOption<Ordo.Router.Route>>, Ordo.Rrr<"EPERM">>
-
-			// TODO Extract redundant types
-			type GetSidebarFn = () => TResult<Observable<Ordo.Workspace.SidebarState>, Ordo.Rrr<"EPERM">>
-			type GetTitleFn = () => TResult<Observable<string>, Ordo.Rrr<"EPERM">>
-			type GetHostsFn = () => TResult<Ordo.Hosts, Ordo.Rrr<"EPERM">>
-			type GetFetchFn = () => Ordo.Fetch
-			type GetLoggerFn = () => TLogger
-			type GetCommandsFn = () => Ordo.Command.Commands
-			type GetIsAuthenticatedFn = () => TResult<Observable<boolean>, Ordo.Rrr<"EPERM">>
-			type GetMetadataQueryFn = () => TResult<Ordo.Metadata.Query, Ordo.Rrr<"EPERM">>
-			type GetContentQueryFn = () => TResult<Ordo.Content.Query, Ordo.Rrr<"EPERM">>
-			type GetUserQueryFn = () => TResult<Ordo.User.Query, Ordo.Rrr<"EPERM">>
-			type GetCurrentLanguageFn = () => TResult<Observable<TwoLetterLocale>, Ordo.Rrr<"EPERM">>
-			type GetTranslationsFn = () => Observable<TOption<Ordo.I18N.Translations>>
-			type SetCurrentActivityFn = (name: string) => TResult<void, Ordo.Rrr<"EPERM" | "ENOENT">>
-
-			type GetCurrentActivityFn = () => TResult<Observable<TOption<Ordo.Activity.Instance>>, Ordo.Rrr<"EPERM" | "ENOENT">>
-
-			type GetCurrentFileAssociationFn = () => TResult<Observable<TOption<Ordo.FileAssociation.Instance>>, Ordo.Rrr<"EPERM">>
-
-			type GetFileAssociationsFn = () => TResult<Observable<Ordo.FileAssociation.Instance[]>, Ordo.Rrr<"EPERM">>
 
 			type Permissions = {
 				queries: Ordo.CreateFunction.QueryPermission[]
 				commands: Ordo.CreateFunction.CommandPermission[]
 			}
 
-			type Params = {
-				fid: symbol
-				is_dev: boolean
-				get_commands: GetCommandsFn
-				get_sidebar: GetSidebarFn
-				get_logger: GetLoggerFn
-				get_current_route: GetCurrentRouteFn
-				get_hosts: GetHostsFn
-				get_is_authenticated: GetIsAuthenticatedFn
-				get_fetch: GetFetchFn
-				get_translations: GetTranslationsFn
+			type State = {
+				logger: TLogger
+				fetch: Ordo.Fetch
+				commands: Ordo.Command.Commands
 				translate: Ordo.I18N.TranslateFn
-				get_current_language: GetCurrentLanguageFn
-				get_metadata_query: GetMetadataQueryFn
-				get_user_query: GetUserQueryFn
-				get_file_associations: GetFileAssociationsFn
-				get_current_file_association: GetCurrentFileAssociationFn
-				get_content_query: GetContentQueryFn
+				user_query: Ordo.User.Query
+				router$: TZags<{ current_route: Ordo.Router.Route; routes: Record<string, string> }>
+				metadata_query: Ordo.Metadata.Query
+				content_query: Ordo.Content.Query
+				file_associations$: TZags<{ value: Ordo.FileAssociation.Instance[] }>
 			}
+
+			type Fn = (
+				name: string,
+				permissions: Ordo.CreateFunction.Permissions,
+				callback: (context: Ordo.CreateFunction.State) => void | Promise<void>,
+			) => (params: OrdoInternal.Function.CreateFunctionInternalContext) => void | Promise<void>
 		}
 
 		namespace I18N {
 			type TranslationKeys = TFlattenRecord<TRecordToKVUnion<t, "t">>
 			type TranslationKey = keyof TranslationKeys
-			type Translations = Record<TwoLetterLocale, Record<string, string>>
+			type Translations = Record<TwoLetterLocale, Record<TranslationKey, string>>
 			type TranslateFn = {
-				$: Observable<number>
 				(key: Ordo.I18N.TranslationKey, default_value?: string): string
+				$: TZags<{ version: number }>
 			}
 		}
 
@@ -490,8 +461,8 @@ declare global {
 
 			type Instance = {
 				name: string
-				routes: string[]
-				default_route?: string
+				routes: `/${string}`[]
+				default_route?: `/${string}`
 				render_workspace?: (div: HTMLDivElement) => void | Promise<void>
 				render_sidebar?: (div: HTMLDivElement) => void | Promise<void>
 				render_icon?: (span: HTMLSpanElement) => void | Promise<void>
@@ -523,7 +494,7 @@ declare global {
 				div: HTMLDivElement
 				is_editable: boolean
 				is_embedded: boolean
-				content: Ordo.Content.Instance
+				content: Ordo.Content.Instance | null
 				metadata: Ordo.Metadata.Instance
 			}
 		}
@@ -531,12 +502,11 @@ declare global {
 		namespace User {
 			type Handle = `@${string}` // TODO Disallow forbidden chars
 			type ID = `${string}-${string}-${string}-${string}-${string}` // TODO Strict type
-			type Email = `${string}@${string}` // TODO Strict type
+			type Email = `${string}@${string}.${string}` // TODO Strict type
 
 			namespace Current {
 				type DTO = Ordo.User.Public.DTO & {
 					email: Ordo.User.Email
-					email_confirmed: boolean
 					file_limit: number
 					max_upload_size: number
 					max_functions: number
@@ -545,7 +515,6 @@ declare global {
 
 				type Instance = Ordo.User.Public.Instance & {
 					get_email: () => Ordo.User.Email
-					is_email_confirmed: () => boolean
 					get_file_limit: () => number
 					get_max_upload_size: () => number
 					get_max_functions: () => number
@@ -566,13 +535,13 @@ declare global {
 				}
 
 				type Repository = {
-					get: () => TResult<Ordo.User.Current.Instance, Ordo.Rrr<"EAGAIN">>
+					get: () => TResult<Ordo.User.Current.Instance, Ordo.Rrr<"EPERM" | "EAGAIN">>
 					put: (user: Ordo.User.Current.Instance) => TResult<void, Ordo.Rrr<"EPERM" | "EINVAL">>
-					get $(): Observable<number>
+					get $(): TZags<{ version: number }>
 				}
 
 				type RepositoryStatic = {
-					Of: ($: BehaviorSubject<TOption<Ordo.User.Current.Instance>>) => Ordo.User.Current.Repository
+					Of: ($: TZags<{ user: Ordo.User.Current.Instance | null }>) => Ordo.User.Current.Repository
 				}
 
 				type RepositoryAsync = {
@@ -588,7 +557,7 @@ declare global {
 			namespace Public {
 				type DTO = {
 					id: Ordo.User.ID
-					created_at: Date
+					created_at: number
 					subscription: C.UserSubscription
 					handle: Ordo.User.Handle
 					first_name?: string
@@ -620,74 +589,103 @@ declare global {
 				}
 
 				type Repository = {
-					get: () => Oath<Ordo.User.Public.Instance[], Ordo.Rrr<"EAGAIN">>
+					get: () => Oath<Ordo.User.Public.Instance[], Ordo.Rrr<"EPERM" | "EAGAIN">>
 					put: (users: Ordo.User.Public.Instance[]) => Oath<void, Ordo.Rrr<"EINVAL">>
-					get $(): Observable<number>
+					get $(): TZags<{ version: number }>
 				}
 
 				type RepositoryStatic = {
-					Of: (known_user$: BehaviorSubject<Ordo.User.Public.Instance[]>) => Repository
+					Of: (known_user_zags: TZags<{ known_users: Ordo.User.Public.Instance[] }>) => Repository
 				}
 			}
 
 			type Query = {
-				get_current: () => TResult<Ordo.User.Current.Instance, Ordo.Rrr<"EAGAIN">>
+				get_current: () => TResult<Ordo.User.Current.Instance, Ordo.Rrr<"EPERM" | "EAGAIN">>
 				// get_current_by_id: (
 				// id: Ordo.User.Current.Instance["id"],
-				// ) => Oath<TOption<Ordo.User.Current.Instance>, Ordo.Rrr<"EAGAIN" | "EINVAL" | "EIO">>
-				get_by_id: (email: Ordo.User.ID) => Oath<TOption<Ordo.User.Public.Instance>, Ordo.Rrr<"EAGAIN" | "EINVAL" | "EIO">>
+				// ) => Oath<TOption<Ordo.User.Current.Instance>, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "EIO">>
+				get_by_id: (
+					email: Ordo.User.ID,
+				) => Oath<Ordo.User.Public.Instance | null, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "EIO">>
 
 				// get_by_handle: (
 				// handle: Ordo.User.Current.Instance["handle"],
-				// ) => Oath<TOption<Ordo.User.Public.Instance>, Ordo.Rrr<"EAGAIN" | "EINVAL" | "EIO">>
-				get $(): Observable<number>
+				// ) => Oath<TOption<Ordo.User.Public.Instance>, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "EIO">>
+				get $(): TZags<{ version: number }>
 			}
 
 			type QueryStatic = {
 				Of: (
 					current_user_repository: Ordo.User.Current.Repository,
 					public_user_repository: Ordo.User.Public.Repository,
+					check_query_permission: (permission: Ordo.CreateFunction.QueryPermission) => TResult<void, Ordo.Rrr<"EPERM">>,
 				) => Ordo.User.Query
 			}
 		}
 
 		namespace Content {
-			type Instance = string | ArrayBuffer | null
+			type Instance = string | ArrayBuffer | Blob | FormData | Uint8Array | Record<string, unknown>
 
 			type Storage = Record<Ordo.Metadata.FSID, Ordo.Content.Instance>
 
 			type RepositoryStatic = {
-				Of: (content$: BehaviorSubject<Ordo.Content.Storage>) => Repository
+				Of: (data_host: string, fetch: Ordo.Fetch) => Repository
 			}
+
+			type ContentType = "text" | "array_buffer" | "blob" | "form_data" | "json" | "bytes" | "unwrapped"
 
 			type Repository = {
-				get: () => TResult<Ordo.Content.Storage, Ordo.Rrr<"EAGAIN">>
-				put: (content: Ordo.Content.Storage) => TResult<void, Ordo.Rrr<"EINVAL">>
-				get $(): Observable<number>
-			}
-
-			type RepositoryAsyncStatic = {
-				Of: (data_host: string, fetch: Ordo.Fetch) => RepositoryAsync
-			}
-
-			type RepositoryAsync = {
-				get: (
+				get: <$TContentType extends Ordo.Content.ContentType>(
 					fsid: Ordo.Metadata.FSID,
-					token: string,
-				) => Oath<Ordo.Content.Instance, Ordo.Rrr<"EIO" | "EACCES" | "EINVAL" | "ENOENT">>
-				put: (
-					fsid: Ordo.Metadata.FSID,
-					content: Ordo.Content.Instance,
-					token: string,
-				) => Oath<void, Ordo.Rrr<"EINVAL" | "EACCES" | "EIO">>
+					content_type: $TContentType,
+				) => Oath<
+					| ($TContentType extends "text"
+							? string
+							: $TContentType extends "array_buffer"
+								? ArrayBuffer
+								: $TContentType extends "blob"
+									? Blob
+									: $TContentType extends "form_data"
+										? FormData
+										: $TContentType extends "bytes"
+											? Uint8Array
+											: $TContentType extends "unwrapped"
+												? Response
+												: unknown)
+					| null,
+					Ordo.Rrr<"EIO" | "EACCES" | "EINVAL" | "ENOENT">
+				>
+				put: (fsid: Ordo.Metadata.FSID, content: Ordo.Content.Instance) => Oath<void, Ordo.Rrr<"EINVAL" | "EACCES" | "EIO">>
 			}
 
 			type QueryStatic = {
-				Of: (repository: Ordo.Content.RepositoryAsync) => Ordo.Content.Query
+				Of: (
+					repository: Ordo.Content.Repository,
+					check_query_permission: (permission: Ordo.CreateFunction.QueryPermission) => TResult<void, Ordo.Rrr<"EPERM">>,
+				) => Ordo.Content.Query
 			}
 
 			type Query = {
-				get: (fsid: Ordo.Metadata.FSID) => Oath<Ordo.Content.Instance, Ordo.Rrr<"EIO" | "EACCES" | "EINVAL" | "ENOENT">>
+				get: <$TContentType extends Ordo.Content.ContentType>(
+					fsid: Ordo.Metadata.FSID,
+					content_type: $TContentType,
+				) => Oath<
+					| ($TContentType extends "text"
+							? string
+							: $TContentType extends "array_buffer"
+								? ArrayBuffer
+								: $TContentType extends "blob"
+									? Blob
+									: $TContentType extends "form_data"
+										? FormData
+										: $TContentType extends "bytes"
+											? Uint8Array
+											: $TContentType extends "unwrapped"
+												? Response
+												: unknown)
+					| null,
+					Ordo.Rrr<"EPERM" | "EIO" | "EACCES" | "EINVAL" | "ENOENT">
+				>
 			}
 		}
 
@@ -745,7 +743,7 @@ declare global {
 				get_updated_by: () => Ordo.User.ID
 				get_size: () => number
 				get_readable_size: () => string
-				get_property: <_TKey extends keyof $TProps>(key: _TKey) => TOption<NonNullable<$TProps[_TKey]>>
+				get_property: <_TKey extends keyof $TProps>(key: _TKey) => NonNullable<$TProps[_TKey]> | null
 				to_dto: () => Ordo.Metadata.DTO<$TProps>
 				equals: (other_metadata?: Ordo.Metadata.Instance) => boolean
 				is_item_of: (dto: Ordo.Metadata.DTO) => boolean
@@ -780,13 +778,13 @@ declare global {
 				  }
 
 			type RepositoryStatic = {
-				Of: (metadata$: BehaviorSubject<Ordo.Metadata.Instance[] | null>) => Repository
+				Of: (metadata$: TZags<{ items: Ordo.Metadata.Instance[] | null }>) => Repository
 			}
 
 			type Repository = {
-				get: () => TResult<Ordo.Metadata.Instance[], Ordo.Rrr<"EAGAIN">>
+				get: () => TResult<Ordo.Metadata.Instance[], Ordo.Rrr<"EPERM" | "EAGAIN">>
 				put: (metadata: Ordo.Metadata.Instance[]) => TResult<void, Ordo.Rrr<"EINVAL">>
-				get $(): Observable<number>
+				get $(): TZags<{ version: number }>
 			}
 
 			type RepositoryAsyncStatic = {
@@ -801,81 +799,98 @@ declare global {
 			type QueryOptions = { show_hidden?: boolean }
 
 			type QueryStatic = {
-				Of: (repository: Ordo.Metadata.Repository) => Query
+				Of: (
+					repository: Ordo.Metadata.Repository,
+					check_query_permission: (permission: Ordo.CreateFunction.QueryPermission) => TResult<void, Ordo.Rrr<"EPERM">>,
+				) => Query
 			}
 
 			type Query = {
-				get $(): Observable<number>
+				get $(): TZags<{ version: number }>
 
-				get: (options?: QueryOptions) => TResult<Ordo.Metadata.Instance[], Ordo.Rrr<"EAGAIN">>
+				get: (options?: QueryOptions) => TResult<Ordo.Metadata.Instance[], Ordo.Rrr<"EPERM" | "EAGAIN">>
 
 				get_by_fsid: (
 					fsid: FSID,
 					options?: QueryOptions,
-				) => TResult<TOption<Ordo.Metadata.Instance>, Ordo.Rrr<"EAGAIN" | "EINVAL">>
+				) => TResult<Ordo.Metadata.Instance | null, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL">>
 
-				total: (options?: QueryOptions) => TResult<number, Ordo.Rrr<"EAGAIN">>
+				total: (options?: QueryOptions) => TResult<number, Ordo.Rrr<"EPERM" | "EAGAIN">>
 
-				get_by_name_and_parent: (
+				get_by_name: (
 					name: string,
 					parent: FSID | null,
 					options?: QueryOptions,
-				) => TResult<TOption<Ordo.Metadata.Instance>, Ordo.Rrr<"EAGAIN" | "EINVAL">>
+				) => TResult<Ordo.Metadata.Instance | null, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL">>
 
 				get_by_labels: (
 					labels: Ordo.Metadata.Label[],
 					options?: QueryOptions,
-				) => TResult<Ordo.Metadata.Instance[], Ordo.Rrr<"EAGAIN" | "EINVAL">>
+				) => TResult<Ordo.Metadata.Instance[], Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL">>
 
-				has_incoming_links: (fsid: FSID, options?: QueryOptions) => TResult<boolean, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+				has_incoming_links: (
+					fsid: FSID,
+					options?: QueryOptions,
+				) => TResult<boolean, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 
 				get_incoming_links: (
 					fsid: FSID,
 					options?: QueryOptions,
-				) => TResult<Ordo.Metadata.Instance[], Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+				) => TResult<Ordo.Metadata.Instance[], Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
+
+				get_outgoing_links: (
+					fsid: FSID,
+					options?: QueryOptions,
+				) => TResult<Ordo.Metadata.Instance[], Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 
 				get_parent: (
 					fsid: FSID,
 					options?: QueryOptions,
-				) => TResult<TOption<Ordo.Metadata.Instance>, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+				) => TResult<Ordo.Metadata.Instance | null, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 
 				get_ancestors: (
 					fsid: FSID,
 					options?: QueryOptions,
-				) => TResult<Ordo.Metadata.Instance[], Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+				) => TResult<Ordo.Metadata.Instance[], Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 
 				has_ancestor: (
 					fsid: FSID,
 					ancestor: FSID,
 					options?: QueryOptions,
-				) => TResult<boolean, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+				) => TResult<boolean, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 
 				has_child: (
 					fsid: FSID,
 					child: FSID,
 					options?: QueryOptions,
-				) => TResult<boolean, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+				) => TResult<boolean, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 
-				has_children: (fsid: FSID, options?: QueryOptions) => TResult<boolean, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+				has_children: (
+					fsid: FSID,
+					options?: QueryOptions,
+				) => TResult<boolean, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 
 				get_children: (
 					fsid: FSID | null,
 					options?: QueryOptions,
-				) => TResult<Ordo.Metadata.Instance[], Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+				) => TResult<Ordo.Metadata.Instance[], Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 
 				has_descendent: (
 					fsid: FSID,
 					descendent: FSID,
 					options?: QueryOptions,
-				) => TResult<boolean, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+				) => TResult<boolean, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 
-				has_descendents: (fsid: FSID, options?: QueryOptions) => TResult<boolean, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+				has_descendents: (
+					fsid: FSID,
+					options?: QueryOptions,
+				) => TResult<boolean, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 
 				get_descendents: (
 					fsid: FSID,
 					options?: QueryOptions,
 					accumulator?: Ordo.Metadata.Instance[],
-				) => TResult<Ordo.Metadata.Instance[], Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+				) => TResult<Ordo.Metadata.Instance[], Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 
 				// TODO: toTree: (source: TFSID | null) => typeof source extends null ? Ordo.Metadata.ItemBranch[] : Ordo.Metadata.ItemBranch
 
@@ -893,71 +908,76 @@ declare global {
 			}
 
 			type Command = {
-				create: (params: Ordo.Metadata.CreateParams) => TResult<void, Ordo.Rrr<"EAGAIN" | "EEXIST" | "EINVAL" | "ENOENT">>
+				create: (
+					params: Ordo.Metadata.CreateParams,
+				) => TResult<void, Ordo.Rrr<"EPERM" | "EAGAIN" | "EEXIST" | "EINVAL" | "ENOENT">>
 
-				replace: (value: Ordo.Metadata.Instance) => TResult<void, Ordo.Rrr<"EAGAIN" | "ENOENT" | "EINVAL">>
+				replace: (value: Ordo.Metadata.Instance) => TResult<void, Ordo.Rrr<"EPERM" | "EAGAIN" | "ENOENT" | "EINVAL">>
 
-				remove: (fsid: Ordo.Metadata.FSID) => TResult<void, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+				remove: (fsid: Ordo.Metadata.FSID) => TResult<void, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 
 				append_child: (
 					fsid: Ordo.Metadata.FSID,
 					child: Ordo.Metadata.FSID,
-				) => TResult<void, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT" | "EEXIST" | "ENXIO">>
+				) => TResult<void, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT" | "EEXIST" | "ENXIO">>
 
 				add_labels: (
 					fsid: Ordo.Metadata.FSID,
 					...labels: Ordo.Metadata.Label[]
-				) => TResult<void, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+				) => TResult<void, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 
 				remove_labels: (
 					fsid: Ordo.Metadata.FSID,
 					...labels: Ordo.Metadata.Label[]
-				) => TResult<void, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+				) => TResult<void, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 
 				update_label: (
 					old_label: Ordo.Metadata.Label,
 					new_label: Ordo.Metadata.Label,
-				) => TResult<void, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+				) => TResult<void, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 
 				replace_labels: (
 					fsid: Ordo.Metadata.FSID,
 					labels: Ordo.Metadata.Label[],
-				) => TResult<void, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+				) => TResult<void, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 
-				set_size: (fsid: Ordo.Metadata.FSID, size: number) => TResult<void, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+				set_size: (fsid: Ordo.Metadata.FSID, size: number) => TResult<void, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 
 				add_links: (
 					fsid: Ordo.Metadata.FSID,
 					...links: Ordo.Metadata.FSID[]
-				) => TResult<void, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+				) => TResult<void, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 
 				remove_links: (
 					fsid: Ordo.Metadata.FSID,
 					...links: Ordo.Metadata.FSID[]
-				) => TResult<void, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+				) => TResult<void, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 
 				replace_links: (
 					fsid: Ordo.Metadata.FSID,
 					links: Ordo.Metadata.FSID[],
-				) => TResult<void, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+				) => TResult<void, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 
 				set_parent: (
 					fsid: Ordo.Metadata.FSID,
 					parent: Ordo.Metadata.FSID | null,
-				) => TResult<void, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT" | "ENXIO" | "EEXIST">>
+				) => TResult<void, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT" | "ENXIO" | "EEXIST">>
 
-				set_name: (fsid: Ordo.Metadata.FSID, name: string) => TResult<void, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT" | "EEXIST">>
+				set_name: (
+					fsid: Ordo.Metadata.FSID,
+					name: string,
+				) => TResult<void, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT" | "EEXIST">>
 
 				set_property: <$TProps extends Ordo.Metadata.Props, $TKey extends keyof $TProps>(
 					fsid: Ordo.Metadata.FSID,
 					key: $TKey,
 					value: $TProps[$TKey],
-				) => TResult<void, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+				) => TResult<void, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 
 				remove_property: <$TProps extends Ordo.Metadata.Props, $TKey extends keyof $TProps>(
 					fsid: Ordo.Metadata.FSID,
 					key: $TKey,
-				) => TResult<void, Ordo.Rrr<"EAGAIN" | "EINVAL" | "ENOENT">>
+				) => TResult<void, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "ENOENT">>
 			}
 		}
 
@@ -983,11 +1003,13 @@ declare global {
 			/**
 			 * Command handler.
 			 */
-			type TCommandHandler<$TPayload> = (payload: $TPayload) => unknown
+			type CommandHandler<$TPayload> = (payload: $TPayload) => unknown
 
-			type OnFn = <$TKey extends Ordo.Command.Name>(name: $TKey, handler: TCommandHandler<Ordo.Command.Record[$TKey]>) => void
+			type HandlerOf<$TKey extends Ordo.Command.Name> = CommandHandler<Ordo.Command.Record[$TKey]>
 
-			type OffFn = <$TKey extends Ordo.Command.Name>(name: $TKey, handler: TCommandHandler<Ordo.Command.Record[$TKey]>) => void
+			type OnFn = <$TKey extends Ordo.Command.Name>(name: $TKey, handler: CommandHandler<Ordo.Command.Record[$TKey]>) => void
+
+			type OffFn = <$TKey extends Ordo.Command.Name>(name: $TKey, handler: CommandHandler<Ordo.Command.Record[$TKey]>) => void
 
 			type EmitFn = <$TKey extends Ordo.Command.Name>(
 				name: $TKey,
@@ -1024,39 +1046,24 @@ declare global {
 		}
 
 		namespace Modal {
-			type Instance = {
-				show_close_button?: boolean
-				on_unmount?: () => void
-				render: (div: HTMLDivElement) => void | Promise<void>
-			}
+			type Instance = { on_unmount?: () => void; render: (div: HTMLDivElement) => void | Promise<void> }
 		}
 
 		namespace Router {
-			/**
-			 * Route descriptor to be passed for navigating.
-			 */
-			type RouteConfig = {
-				route: string
-				queryString?: string | Record<string, string>
-				pageTitle?: string
-				data?: Record<string, unknown>
-				preserveQuery?: boolean
-				replace?: boolean
-				exec?: boolean
-			}
-
-			type NavigateParams = [routeConfig: string | RouteConfig, replace?: boolean, exec?: boolean]
-
 			type OpenExternalParams = { url: string; new_tab?: boolean }
 
-			type Route<$TParams extends Record<string, string | undefined> = Record<string, string | undefined>, $TData = null> = {
-				params?: $TParams
-				data: $TData
-				hash: string
-				hashRouting: boolean
+			type Route = {
+				params: Record<string, string>
+				host: string
+				hostname: string
+				href: string
+				origin: string
+				password: string
+				pathname: `/${string}`
+				port: string
+				protocol: `${string}:`
 				search: string
-				path: string
-				route: string
+				username: string
 			}
 		}
 

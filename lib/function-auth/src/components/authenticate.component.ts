@@ -30,7 +30,7 @@ import "./authenticate.component.css"
 export default Maoka.create("div", ({ use }) => {
 	use(MaokaJabs.add_class("auth"))
 
-	const commands = use(MaokaOrdo.Jabs.Commands.get)
+	const commands = use(MaokaOrdo.Jabs.get_commands.get)
 
 	commands.emit("cmd.application.set_title", "t.auth.pages.sign_in.label")
 

@@ -19,79 +19,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-type CurryFIDFn<$TFn extends (...args: any) => any> = (fid: symbol) => $TFn
+export const create_function: Ordo.CreateFunction.Fn = (name, permissions, callback) => ctx => {
+	const fid = ctx.known_functions.register(name, permissions)
 
-export type TCreateFunctionFn = (
-	name: string,
-	permissions: Ordo.CreateFunction.Permissions,
-	callback: (context: Ordo.CreateFunction.Params) => void | Promise<void>,
-) => (params: TCreateFunctionInternalContext) => void | Promise<void>
+	if (!fid) return
 
-type TCreateFunctionInternalContext = {
-	is_dev: boolean
-	get_commands: CurryFIDFn<Ordo.CreateFunction.GetCommandsFn>
-	get_logger: CurryFIDFn<Ordo.CreateFunction.GetLoggerFn>
-	get_current_route: CurryFIDFn<Ordo.CreateFunction.GetCurrentRouteFn>
-	get_sidebar: CurryFIDFn<Ordo.CreateFunction.GetSidebarFn>
-	get_hosts: CurryFIDFn<Ordo.CreateFunction.GetHostsFn>
-	get_is_authenticated: CurryFIDFn<Ordo.CreateFunction.GetIsAuthenticatedFn>
-	get_fetch: CurryFIDFn<Ordo.CreateFunction.GetFetchFn>
-	get_translations: Ordo.CreateFunction.GetTranslationsFn
-	translate: Ordo.I18N.TranslateFn
-	get_current_language: CurryFIDFn<Ordo.CreateFunction.GetCurrentLanguageFn>
-	get_metadata_query: CurryFIDFn<Ordo.CreateFunction.GetMetadataQueryFn>
-	get_user_query: CurryFIDFn<Ordo.CreateFunction.GetUserQueryFn>
-	get_file_associations: CurryFIDFn<Ordo.CreateFunction.GetFileAssociationsFn>
-	get_current_file_association: CurryFIDFn<Ordo.CreateFunction.GetCurrentFileAssociationFn>
-	get_content_query: CurryFIDFn<Ordo.CreateFunction.GetContentQueryFn>
-	// get_content_query: TGetContentQueryFn
-	known_functions: OrdoInternal.KnownFunctions
+	return callback({
+		commands: ctx.get_commands(fid),
+		content_query: ctx.get_content_query(fid),
+		fetch: ctx.get_fetch(fid),
+		logger: ctx.get_logger(fid),
+		router$: ctx.get_router(fid),
+		metadata_query: ctx.get_metadata_query(fid),
+		translate: ctx.translate,
+		user_query: ctx.get_user_query(fid),
+		file_associations$: ctx.get_file_associations(fid),
+	})
 }
-
-export const create_function: TCreateFunctionFn =
-	(name, permissions, callback) =>
-	({
-		get_commands,
-		get_current_route,
-		get_hosts,
-		get_is_authenticated,
-		get_logger,
-		get_translations,
-		get_fetch,
-		get_metadata_query,
-		get_user_query,
-		get_sidebar,
-		is_dev,
-		known_functions,
-		translate,
-		get_current_language,
-		get_current_file_association,
-		get_file_associations,
-		get_content_query,
-	}) => {
-		const fid = known_functions.register(name, permissions)
-
-		if (!fid) return
-
-		const context: Ordo.CreateFunction.Params = {
-			fid,
-			is_dev,
-			get_commands: get_commands(fid),
-			get_logger: get_logger(fid),
-			get_current_route: get_current_route(fid),
-			get_hosts: get_hosts(fid),
-			get_is_authenticated: get_is_authenticated(fid),
-			get_fetch: get_fetch(fid),
-			get_translations,
-			get_current_language: get_current_language(fid),
-			translate,
-			get_metadata_query: get_metadata_query(fid),
-			get_user_query: get_user_query(fid),
-			get_sidebar: get_sidebar(fid),
-			get_current_file_association: get_current_file_association(fid),
-			get_file_associations: get_file_associations(fid),
-			get_content_query: get_content_query(fid),
-		}
-
-		return callback(context)
-	}

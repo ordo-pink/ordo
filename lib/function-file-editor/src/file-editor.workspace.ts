@@ -34,29 +34,26 @@ const FileEditor = {
 	TitleSetter,
 }
 
-export const FileEditorWorkspace = (ctx: Ordo.CreateFunction.Params) => {
-	return Maoka.create("div", ({ use }) => {
-		use(MaokaOrdo.Context.provide(ctx))
+export const FileEditorWorkspace = Maoka.create("div", ({ use }) => {
+	const get_route_params = use(MaokaOrdo.Jabs.get_route_params$)
+	const metadata_query = use(MaokaOrdo.Jabs.get_metadata_query)
 
-		const get_route_params = use(MaokaOrdo.Jabs.RouteParams)
-		const metadata_query = use(MaokaOrdo.Jabs.MetadataQuery)
-
-		return () =>
-			R.FromNullable(get_route_params())
-				.pipe(R.ops.chain(({ fsid }) => R.FromNullable(fsid)))
-				.pipe(R.ops.chain(validate_fsid))
-				.pipe(R.ops.chain(metadata_query.get_by_fsid))
-				.pipe(R.ops.chain(R.FromOption))
-				.cata({
-					Ok: metadata => [
-						FileEditor.TitleSetter(metadata),
-						FileEditor.FileMetadata(metadata),
-						FileEditor.RenderPicker(metadata),
-					],
-					Err: () => FileEditor.TitleSetter(null), // TODO No selected file component
-				})
-	})
-}
+	return () => {
+		return R.FromNullable(get_route_params())
+			.pipe(R.ops.chain(({ fsid }) => R.FromNullable(fsid)))
+			.pipe(R.ops.chain(validate_fsid))
+			.pipe(R.ops.chain(metadata_query.get_by_fsid))
+			.pipe(R.ops.chain(R.FromNullable))
+			.cata({
+				Ok: metadata => [
+					FileEditor.TitleSetter(metadata),
+					FileEditor.FileMetadata(metadata),
+					FileEditor.RenderPicker(metadata),
+				],
+				Err: () => FileEditor.TitleSetter(null), // TODO No selected file component
+			})
+	}
+})
 
 // --- Internal ---
 

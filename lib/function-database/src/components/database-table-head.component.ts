@@ -25,7 +25,7 @@ import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
 import { SortingDirection } from "../database.constants"
-import { database_context } from "../database.context"
+import { database$ } from "../database.state"
 
 export const DatabaseTableHead = (keys: Ordo.I18N.TranslationKey[]) =>
 	TableHead(() => TableHeadRow(() => keys.map(key => TableHeadCell(key))))
@@ -38,28 +38,28 @@ const TableHeadRow = Maoka.styled("tr", { class: "database_table-head_row" })
 // TODO: Add icons
 const TableHeadCell = (key: Ordo.I18N.TranslationKey) =>
 	Maoka.create("th", ({ use }) => {
-		const { get_db_state, on_db_state_change } = use(database_context.consume)
+		const get_db_state = use(MaokaOrdo.Jabs.happy_marriage$(database$))
 
 		use(MaokaJabs.add_class("database_table-head_cell"))
 		use(MaokaJabs.listen("onclick", event => handle_click(event)))
 
-		const { t } = use(MaokaOrdo.Jabs.Translations)
+		const { t } = use(MaokaOrdo.Jabs.get_translations$)
 
 		const handle_click = (event: MouseEvent) => {
 			event.preventDefault()
 
-			const state = get_db_state()
+			database$.update("sorting", sorting => {
+				if (!sorting) sorting = {}
 
-			if (!state.sorting) state.sorting = {}
+				sorting[key] =
+					sorting[key] === SortingDirection.ASC
+						? SortingDirection.DESC
+						: sorting[key] === SortingDirection.DESC
+							? undefined
+							: SortingDirection.ASC
 
-			state.sorting[key] =
-				state.sorting[key] === SortingDirection.ASC
-					? SortingDirection.DESC
-					: state.sorting[key] === SortingDirection.DESC
-						? undefined
-						: SortingDirection.ASC
-
-			on_db_state_change(state)
+				return sorting
+			})
 		}
 
 		const t_key = t(key)

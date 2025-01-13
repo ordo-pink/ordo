@@ -125,3 +125,8 @@ export const is_sm_screen$: TMaokaJab<() => boolean> = ({ refresh, on_unmount })
 }
 
 export const is_darwin: TMaokaJab<boolean> = () => navigator.appVersion.indexOf("Mac") !== -1
+
+export const is_mobile: TMaokaJab<boolean> = () =>
+	["Android", "webOS", "iPhone", "iPad", "iPod", "BlackBerry", "IEMobile", "Opera Mini"].some(platform =>
+		navigator.userAgent.includes(platform),
+	)

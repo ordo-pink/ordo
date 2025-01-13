@@ -6,8 +6,6 @@
 [![Lint](https://github.com/ordo-pink/ordo/actions/workflows/lint.yml/badge.svg)](https://github.com/ordo-pink/ordo/actions/workflows/lint.yml)
 [![license](https://img.shields.io/github/license/ordo-pink/ordo)](https://github.com/ordo-pink/ordo)
 [![https://good-labs.github.io/greater-good-affirmation/assets/images/badge.svg](https://good-labs.github.io/greater-good-affirmation/assets/images/badge.svg)](https://good-labs.github.io/greater-good-affirmation)
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fordo-pink%2Fordo.svg?type=shield&issueType=license)](https://app.fossa.com/projects/git%2Bgithub.com%2Fordo-pink%2Fordo?ref=badge_shield&issueType=license)
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fordo-pink%2Fordo.svg?type=shield&issueType=security)](https://app.fossa.com/projects/git%2Bgithub.com%2Fordo-pink%2Fordo?ref=badge_shield&issueType=security)
 
 Ordo is an extensible engine for data storage.
 

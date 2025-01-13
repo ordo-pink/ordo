@@ -21,11 +21,12 @@
 
 import { ContextMenuItemType, LabelColor, Metadata } from "@ordo-pink/core"
 import { Maoka, type TMaokaJab } from "@ordo-pink/maoka"
+import { BsTags } from "@ordo-pink/frontend-icons"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { R } from "@ordo-pink/result"
+import { color_class } from "@ordo-pink/maoka-components"
 
 import { EditLabelModal } from "../../components/edit-label-modal.component"
-import { color_class } from "@ordo-pink/maoka-components"
 
 export const edit_file_labels_command: TMaokaJab = ({ on_unmount, use }) => {
 	const state = use(MaokaOrdo.Context.consume)
@@ -86,7 +87,7 @@ export const edit_file_labels_command: TMaokaJab = ({ on_unmount, use }) => {
 
 	state.commands.emit("cmd.application.context_menu.add", {
 		command: "cmd.metadata.show_edit_labels_palette",
-		// TODO render_icon: div => div.appendChild(BsFileEarmarkPlus() as SVGSVGElement),
+		render_icon: div => div.appendChild(BsTags() as SVGSVGElement),
 		readable_name: "t.common.metadata.show_edit_labels_palette", // TODO
 		should_show: ({ payload }) => Metadata.Validations.is_metadata(payload),
 		payload_creator: ({ payload }) => (Metadata.Validations.is_metadata(payload) ? payload.get_fsid() : null),

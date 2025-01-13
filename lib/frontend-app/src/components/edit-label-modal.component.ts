@@ -20,7 +20,7 @@
  */
 
 import { Dialog, Input, Select, color_class } from "@ordo-pink/maoka-components"
-import { is_non_empty_string, is_string, title_case } from "@ordo-pink/tau"
+import { is_non_empty_string, title_case } from "@ordo-pink/tau"
 import { LabelColor } from "@ordo-pink/core"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
@@ -30,9 +30,8 @@ export const EditLabelModal = (label: Ordo.Metadata.Label) =>
 	Maoka.create("div", ({ use }) => {
 		const commands = use(MaokaOrdo.Jabs.get_commands)
 
-		const is_string_label = is_string(label)
-		const initial_name = is_string_label ? label : label.name
-		const initial_color = is_string_label ? LabelColor.DEFAULT : label.color
+		const initial_name = label.name
+		const initial_color = label.color
 
 		let name = initial_name
 		let color = initial_color
@@ -43,9 +42,7 @@ export const EditLabelModal = (label: Ordo.Metadata.Label) =>
 			render_info: () => LabelCircle(i),
 		}))
 
-		const current_color = is_string_label
-			? color_items[0]
-			: color_items.find(item => item.value === label.color) ?? color_items[0] // TODO Log error, this is wrong
+		const current_color = color_items.find(item => item.value === label.color) ?? color_items[0] // TODO Log error, this is wrong
 
 		return () =>
 			Dialog({
@@ -53,7 +50,7 @@ export const EditLabelModal = (label: Ordo.Metadata.Label) =>
 				action: () => {
 					commands.emit("cmd.metadata.edit_label", {
 						old_label: label,
-						new_label: is_string_label && color === LabelColor.DEFAULT ? name : { color, name },
+						new_label: { color, name },
 					})
 
 					commands.emit("cmd.application.modal.hide")

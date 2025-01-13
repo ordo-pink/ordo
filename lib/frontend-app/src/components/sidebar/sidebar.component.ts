@@ -81,7 +81,7 @@ export const OrdoSidebarButton = Maoka.create("button", ({ use }) => {
 
 		if (enabled) {
 			commands.emit("cmd.application.command_palette.add", {
-				on_select: () => commands.emit("cmd.application.sidebar.toggle"),
+				value: () => commands.emit("cmd.application.sidebar.toggle"),
 				hotkey: "mod+b",
 				readable_name,
 				render_icon: div => void div.appendChild(BsLayoutSidebarInsetReverse() as SVGSVGElement),

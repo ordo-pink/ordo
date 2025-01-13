@@ -7,7 +7,7 @@
 }
 
 .action-list-item_main {
-	@apply flex items-center space-x-2;
+	@apply flex items-center space-x-2 px-2;
 }
 
 .action-list-item.active {

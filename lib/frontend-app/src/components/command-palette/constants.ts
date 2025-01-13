@@ -19,6 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { noop } from "@ordo-pink/tau"
+
 // TODO Move to core
 export enum CommandPaletteLocation {
 	SUGGESTED,
@@ -26,4 +28,4 @@ export enum CommandPaletteLocation {
 	length,
 }
 
-export const EMPTY_COMMAND_PALETTE = { items: [] } as Ordo.CommandPalette.Instance
+export const EMPTY_COMMAND_PALETTE = { items: [], on_select: noop } as Ordo.CommandPalette.Instance

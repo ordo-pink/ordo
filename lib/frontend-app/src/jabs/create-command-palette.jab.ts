@@ -24,7 +24,7 @@ import { BsMenuButtonWideFill } from "@ordo-pink/frontend-icons"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { ordo_app_state } from "@ordo-pink/frontend-app/app.state"
 
-import { EMPTY_COMMAND_PALETTE } from "../components/command-palette/constants"
+import { CommandPaletteLocation, EMPTY_COMMAND_PALETTE } from "../components/command-palette/constants"
 import { OrdoCommandPalette } from "../components/command-palette/command-palette.component"
 
 import { create_hotkey_from_event } from "@ordo-pink/hotkey-from-event"
@@ -44,7 +44,7 @@ export const create_command_palette: TMaokaJab = ({ on_mount, on_unmount, use })
 			event.preventDefault()
 			event.stopPropagation()
 
-			command.on_select()
+			command.value()
 		}
 	}
 
@@ -58,7 +58,7 @@ export const create_command_palette: TMaokaJab = ({ on_mount, on_unmount, use })
 		commands.on("cmd.application.command_palette.toggle", handle_toggle)
 
 		commands.emit("cmd.application.command_palette.add", {
-			on_select: () => commands.emit("cmd.application.command_palette.toggle"),
+			value: () => commands.emit("cmd.application.command_palette.toggle"),
 			readable_name: "t.common.components.command_palette.reset",
 			hotkey: "mod+shift+p",
 			render_icon: div => void div.appendChild(BsMenuButtonWideFill() as SVGSVGElement),
@@ -100,7 +100,14 @@ const handle_show = (state: Ordo.CommandPalette.Instance) => {
 	ordo_app_state.zags.update("sections.command_palette.current", () => state)
 
 	commands.emit("cmd.application.modal.show", {
-		on_unmount: () => ordo_app_state.zags.update("sections.command_palette.current", () => EMPTY_COMMAND_PALETTE),
+		on_unmount: () =>
+			ordo_app_state.zags.update("sections.command_palette", cp => ({
+				...cp,
+				current: EMPTY_COMMAND_PALETTE,
+				index: 0,
+				location: CommandPaletteLocation.SUGGESTED,
+				visible_items: null,
+			})),
 		render: div => void Maoka.render_dom(div, OrdoCommandPalette),
 	})
 }
@@ -118,5 +125,6 @@ const handle_toggle = () => {
 	else
 		commands.emit("cmd.application.command_palette.show", {
 			items: ordo_app_state.zags.select("sections.command_palette.global_items"),
+			on_select: item => item.value(),
 		})
 }

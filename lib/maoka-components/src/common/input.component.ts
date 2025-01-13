@@ -65,7 +65,9 @@ const Text = ({
 				return () => label
 			}),
 
-			Maoka.create("input", ({ use, element, on_mount: after_mount }) => {
+			Maoka.create("input", ({ use, element, on_mount }) => {
+				const is_mobile = use(MaokaJabs.is_mobile)
+
 				use(
 					MaokaJabs.listen("oninput", event => {
 						const current_is_valid = is_valid$.select("value")
@@ -92,7 +94,7 @@ const Text = ({
 				if (autocomplete) use(MaokaJabs.set_attribute("autocomplete", autocomplete))
 				if (initial_value) use(MaokaJabs.set_attribute("value", initial_value))
 				if (placeholder) use(MaokaJabs.set_attribute("placeholder", placeholder))
-				if (autofocus) after_mount(() => element instanceof HTMLElement && element.focus())
+				if (autofocus && !is_mobile) on_mount(() => element instanceof HTMLElement && element.focus())
 
 				if (required) {
 					use(MaokaJabs.set_attribute("required", "true"))

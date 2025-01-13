@@ -24,7 +24,7 @@ import { Maoka } from "@ordo-pink/maoka"
 import { ordo_app_state } from "@ordo-pink/frontend-app/app.state"
 
 export const OrdoCommandPaletteItem = (item: Ordo.CommandPalette.Item, on_click: () => void, is_current: boolean) =>
-	Maoka.create("div", ({ element, on_mount: after_mount }) => {
+	Maoka.create("div", ({ element, on_mount }) => {
 		const t = ordo_app_state.zags.select("translate")
 
 		const title = t(item.readable_name)
@@ -40,7 +40,7 @@ export const OrdoCommandPaletteItem = (item: Ordo.CommandPalette.Item, on_click:
 				? () => Description(() => t(item.description!))
 				: void 0
 
-		after_mount(() => {
+		on_mount(() => {
 			if (is_current && !is_in_view(element as Element, element.parentElement!))
 				element.scrollIntoView?.({ behavior: "smooth", inline: "center", block: "center" })
 		})

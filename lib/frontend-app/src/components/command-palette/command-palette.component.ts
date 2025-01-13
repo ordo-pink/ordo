@@ -30,8 +30,6 @@ import { ordo_app_state } from "@ordo-pink/frontend-app/app.state"
 import { CommandPaletteLocation } from "./constants"
 import { OrdoCommandPaletteItems } from "./command-palette-items.component"
 
-// TODO Handle on_new_item
-// TODO Handle alternative layout characters
 export const OrdoCommandPalette = Maoka.create("div", ({ use, on_unmount, on_mount }) => {
 	use(MaokaJabs.set_class("command-palette"))
 
@@ -44,9 +42,7 @@ export const OrdoCommandPalette = Maoka.create("div", ({ use, on_unmount, on_mou
 	const custom_class = "command-palette_search"
 	const autofocus = true
 	const handle_click = (index: number, location: CommandPaletteLocation) => {
-		ordo_app_state.zags.update("sections.command_palette.index", () => index)
-		ordo_app_state.zags.update("sections.command_palette.location", () => location)
-
+		ordo_app_state.zags.update("sections.command_palette", cp => ({ ...cp, index, location }))
 		handle_enter()
 	}
 
@@ -58,8 +54,7 @@ export const OrdoCommandPalette = Maoka.create("div", ({ use, on_unmount, on_mou
 		const source = input ? all.filter(item => fuzzy_check(t(item.readable_name), input, 1)) : all
 		const length = state.max_items && state.max_items > 0 ? state.max_items : source.length
 
-		ordo_app_state.zags.update("sections.command_palette.index", () => 0)
-		ordo_app_state.zags.update("sections.command_palette.visible_items", () => source.slice(0, length))
+		ordo_app_state.zags.update("sections.command_palette", cp => ({ ...cp, index: 0, visible_items: source.slice(0, length) }))
 	}
 
 	const SearchInput = Input.Text({ on_input: handle_input, custom_class, placeholder, autofocus })
@@ -98,7 +93,6 @@ export const OrdoCommandPalette = Maoka.create("div", ({ use, on_unmount, on_mou
 		if (state.is_multiple) {
 			if (state.on_new_item && input && !visible[index] && !is_pinned) {
 				state.on_new_item?.(input)
-
 				ordo_app_state.zags.update("sections.command_palette.index", () => 0)
 			} else {
 				if (!source[index]) return
@@ -106,18 +100,23 @@ export const OrdoCommandPalette = Maoka.create("div", ({ use, on_unmount, on_mou
 				source[index].on_select()
 
 				if (is_pinned) {
-					ordo_app_state.zags.update("sections.command_palette.visible_items", items => [...items, pinned[index]])
-					ordo_app_state.zags.update("sections.command_palette.current.pinned_items", items => items!.toSpliced(index, 1))
+					ordo_app_state.zags.update("sections.command_palette", cp => ({
+						...cp,
+						index: 0,
+						location: is_pinned && source.length === 0 ? CommandPaletteLocation.SUGGESTED : cp.location,
+						items: [...cp.visible_items, pinned[index]],
+						current: { ...cp.current, pinned_items: cp.current.pinned_items!.toSpliced(index, 1) },
+					}))
 				} else {
-					ordo_app_state.zags.update("sections.command_palette.visible_items", items => items.toSpliced(index, 1))
-					ordo_app_state.zags.update("sections.command_palette.current.pinned_items", items => [...items!, visible[index]])
+					ordo_app_state.zags.update("sections.command_palette", cp => ({
+						...cp,
+						index: 0,
+						location: is_pinned && source.length === 0 ? CommandPaletteLocation.SUGGESTED : cp.location,
+						items: cp.visible_items.toSpliced(index, 1),
+						current: { ...cp.current, pinned_items: [...cp.current.pinned_items!, visible[index]] },
+					}))
 				}
-
-				ordo_app_state.zags.update("sections.command_palette.index", () => 0)
 			}
-
-			if (is_pinned && source.length === 0)
-				ordo_app_state.zags.update("sections.command_palette.location", () => CommandPaletteLocation.SUGGESTED)
 
 			input = ""
 
@@ -126,10 +125,9 @@ export const OrdoCommandPalette = Maoka.create("div", ({ use, on_unmount, on_mou
 			if (!source[index]) return
 			const invoke = source[index].on_select
 			commands.emit("cmd.application.command_palette.hide")
+			ordo_app_state.zags.update("sections.command_palette.index", () => 0)
 			invoke()
 		}
-
-		ordo_app_state.zags.update("sections.command_palette.index", () => 0)
 	}
 
 	const handle_arrow_up = () => {
@@ -168,13 +166,14 @@ export const OrdoCommandPalette = Maoka.create("div", ({ use, on_unmount, on_mou
 
 		if (!state.is_multiple) return
 
-		ordo_app_state.zags.update("sections.command_palette.location", () =>
-			current_item_location === CommandPaletteLocation.SUGGESTED
-				? CommandPaletteLocation.PINNED
-				: CommandPaletteLocation.SUGGESTED,
-		)
-
-		ordo_app_state.zags.update("sections.command_palette.index", () => 0)
+		ordo_app_state.zags.update("sections.command_palette", cp => ({
+			...cp,
+			location:
+				current_item_location === CommandPaletteLocation.SUGGESTED
+					? CommandPaletteLocation.PINNED
+					: CommandPaletteLocation.SUGGESTED,
+			index: 0,
+		}))
 	}
 
 	on_mount(() => document.addEventListener("keydown", handle_keydown))

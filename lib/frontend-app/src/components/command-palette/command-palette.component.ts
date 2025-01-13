@@ -26,8 +26,8 @@ import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { Switch } from "@ordo-pink/switch"
-import { ordo_app_state } from "@ordo-pink/frontend-app/app.state"
 
+import { type TOrdoState, ordo_app_state } from "../../../app.state"
 import { CommandPaletteLocation } from "./constants"
 import { OrdoCommandPaletteItems } from "./command-palette-items.component"
 
@@ -62,18 +62,19 @@ export const OrdoCommandPalette = Maoka.create("div", ({ use, refresh, on_unmoun
 	const VisibleItems = OrdoCommandPaletteItems(CommandPaletteLocation.SUGGESTED, handle_click)
 	const PinnedItems = OrdoCommandPaletteItems(CommandPaletteLocation.PINNED, handle_click)
 
-	const get_state = use(
-		MaokaOrdo.Jabs.happy_marriage$(ordo_app_state.zags, state => {
-			if (!input && !state.sections.command_palette.visible_items)
-				ordo_app_state.zags.update("sections.command_palette.visible_items", () =>
-					state.sections.command_palette.current.max_items && state.sections.command_palette.current.max_items > 0
-						? state.sections.command_palette.current.items.slice(0, state.sections.command_palette.current.max_items)
-						: state.sections.command_palette.current.items,
-				)
+	const handle_marry_ordo_state = (state: TOrdoState) => {
+		if (!input && !state.sections.command_palette.visible_items && state.sections.command_palette.current.items.length) {
+			ordo_app_state.zags.update("sections.command_palette.visible_items", () =>
+				state.sections.command_palette.current.max_items && state.sections.command_palette.current.max_items > 0
+					? state.sections.command_palette.current.items.slice(0, state.sections.command_palette.current.max_items)
+					: state.sections.command_palette.current.items,
+			)
+		}
 
-			return state.sections.command_palette.current
-		}),
-	)
+		return state.sections.command_palette.current
+	}
+
+	const get_state = use(MaokaOrdo.Jabs.happy_marriage$(ordo_app_state.zags, handle_marry_ordo_state))
 
 	const handle_keydown = (event: KeyboardEvent) =>
 		Switch.Match(event.key)

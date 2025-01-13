@@ -106,7 +106,7 @@ const handle_show = (state: Ordo.CommandPalette.Instance) => {
 				current: EMPTY_COMMAND_PALETTE,
 				index: 0,
 				location: CommandPaletteLocation.SUGGESTED,
-				visible_items: [],
+				visible_items: null,
 			})),
 		render: div => void Maoka.render_dom(div, OrdoCommandPalette),
 	})

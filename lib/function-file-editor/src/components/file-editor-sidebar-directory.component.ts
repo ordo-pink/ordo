@@ -33,6 +33,7 @@ const expanded_state = {} as Record<Ordo.Metadata.FSID, boolean>
 
 const is_fsid = Metadata.Validations.is_fsid
 
+// TODO Rewrite with ActionListItem
 export const FileEditorSidebarDirectory = (metadata: Ordo.Metadata.Instance, depth = 0) =>
 	Maoka.create("div", ({ use, refresh }) => {
 		const fsid = metadata.get_fsid()
@@ -47,11 +48,8 @@ export const FileEditorSidebarDirectory = (metadata: Ordo.Metadata.Instance, dep
 			void refresh()
 		}
 
-		const handle_context_menu = (event: MouseEvent) => {
-			event.preventDefault()
-
+		const handle_context_menu = (event: MouseEvent) =>
 			commands.emit("cmd.application.context_menu.show", { event, payload: metadata })
-		}
 
 		use(MaokaJabs.listen("oncontextmenu", event => handle_context_menu(event)))
 
@@ -132,7 +130,7 @@ const directory_active =
 	"bg-gradient-to-tr from-pink-300 to-rose-300 dark:from-pink-900 from-pink-300 to-rose-300 dark:to-rose-900"
 
 const file_editor_sidebar_directory_name_classes = [
-	"flex justify-between items-center w-full rounded-sm",
+	"flex justify-between items-center w-full rounded-sm select-none",
 	"hover:bg-gradient-to-r hover:from-neutral-300 hover:to-stone-300",
 	"hover:dark:bg-gradient-to-r hover:dark:from-neutral-700 hover:dark:to-stone-700",
 	"file_editor_sidebar_directory_name",

@@ -1,5 +1,5 @@
 .action-list-item {
-	@apply w-full cursor-pointer rounded-sm px-2 py-1 hover:bg-gradient-to-br hover:from-neutral-100 hover:to-stone-100 md:px-1 md:py-0.5 hover:dark:bg-gradient-to-br hover:dark:from-neutral-600 hover:dark:to-stone-600;
+	@apply w-full cursor-pointer select-none rounded-sm px-2 py-1 hover:bg-gradient-to-br hover:from-neutral-100 hover:to-stone-100 md:px-1 md:py-0.5 hover:dark:bg-gradient-to-br hover:dark:from-neutral-600 hover:dark:to-stone-600;
 }
 
 .action-list-item_layout {

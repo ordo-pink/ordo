@@ -24,6 +24,7 @@ import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MetadataIcon } from "@ordo-pink/maoka-components"
 
+// TODO Rewrite with ActionListItem
 export const FileEditorSidebarFile = (metadata: Ordo.Metadata.Instance, depth = 0) =>
 	Maoka.create("div", ({ use }) => {
 		const fsid = metadata.get_fsid()
@@ -38,7 +39,7 @@ export const FileEditorSidebarFile = (metadata: Ordo.Metadata.Instance, depth = 
 		use(MaokaJabs.listen("oncontextmenu", event => handle_context_menu(event)))
 
 		const file_editor_file_class = MaokaJabs.set_class(
-			"flex space-x-2 items-center rounded-sm",
+			"flex space-x-2 items-center rounded-sm select-none",
 			"hover:bg-gradient-to-r hover:from-neutral-300 hover:to-stone-300",
 			"hover:dark:bg-gradient-to-r hover:dark:from-neutral-700 hover:dark:to-stone-700",
 			"file_editor_file",

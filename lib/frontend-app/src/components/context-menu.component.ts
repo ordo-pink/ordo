@@ -111,12 +111,17 @@ const OrdoContextMenuDynamic = Maoka.create("div", ({ use, on_unmount }) => {
 
 		if (is_mobile) {
 			commands.emit("cmd.application.command_palette.show", {
+				on_select: item => {
+					const context_menu_item = item.value as Ordo.ContextMenu.Item
+					commands.emit(
+						context_menu_item.command,
+						context_menu_item.payload_creator
+							? context_menu_item.payload_creator(state.payload as any)
+							: (state.payload as any),
+					)
+				},
 				items: [...create_items, ...read_items, ...update_items, ...delete_items].map(item => ({
-					on_select: () =>
-						commands.emit(
-							item.command,
-							item.payload_creator ? item.payload_creator(state.payload as any) : (state.payload as any),
-						),
+					value: item,
 					readable_name: item.readable_name,
 					render_icon: item.render_icon,
 					hotkey: item.hotkey,

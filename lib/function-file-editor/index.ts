@@ -102,19 +102,20 @@ export default create_function(
 		})
 
 		commands.emit("cmd.application.command_palette.add", {
-			on_select: () => commands.emit("cmd.file_editor.open"),
+			value: () => commands.emit("cmd.file_editor.open"),
 			readable_name: "t.file_editor.command_palette.open",
 			hotkey: "mod+e",
 			render_icon: div => void div.appendChild(BsLayoutTextWindow() as SVGSVGElement),
 		})
 
 		commands.emit("cmd.application.command_palette.add", {
-			on_select: () =>
+			value: () =>
 				metadata_query.get().cata(
 					Result.catas.if_ok(metadata =>
 						commands.emit("cmd.application.command_palette.show", {
-							items: metadata.map(metadata_to_command_palette_item(state, commands.emit)),
+							items: metadata.map(metadata_to_command_palette_item(state)),
 							max_items: 50,
+							on_select: item => commands.emit("cmd.file_editor.open_file", item.value),
 						}),
 					),
 				),
@@ -142,7 +143,7 @@ export default create_function(
 )
 
 const metadata_to_command_palette_item =
-	(state: Ordo.CreateFunction.State, emit: Ordo.Command.Commands["emit"]) =>
+	(state: Ordo.CreateFunction.State) =>
 	(metadata: Ordo.Metadata.Instance): Ordo.CommandPalette.Item => {
 		const metadata_query = state.metadata_query
 
@@ -153,7 +154,7 @@ const metadata_to_command_palette_item =
 			.cata(Result.catas.or_else(() => "/"))
 
 		return {
-			on_select: () => emit("cmd.file_editor.open_file", metadata.get_fsid()),
+			value: () => metadata.get_fsid(),
 			readable_name: metadata.get_name() as Ordo.I18N.TranslationKey,
 			render_custom_info: () => FilePath(() => path),
 			render_icon: div => {

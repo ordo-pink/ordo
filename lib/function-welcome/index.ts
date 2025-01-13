@@ -150,23 +150,24 @@ export default create_function(
 
 		commands.emit("cmd.application.command_palette.add", {
 			readable_name: "t.welcome.go_to_welcome_page",
-			on_select: () => commands.emit("cmd.welcome.go_to_welcome_page"),
+			value: () => commands.emit("cmd.welcome.go_to_welcome_page"),
 			hotkey: "mod+shift+h",
 			render_icon: div => void div.appendChild(BsCollection() as SVGSVGElement),
 		})
 
 		commands.on("cmd.welcome.open_support_palette", () => {
 			commands.emit("cmd.application.command_palette.show", {
+				on_select: item => commands.emit(item.value),
 				items: [
 					{
 						readable_name: "t.welcome.command_palette.support.email",
-						on_select: () => commands.emit("cmd.welcome.go_to_email_support"),
+						value: "cmd.welcome.go_to_email_support",
 						hotkey: "1",
 						render_icon: div => void div.appendChild(BsEnvelopeAt() as SVGSVGElement),
 					},
 					{
 						readable_name: "t.welcome.command_palette.support.messenger",
-						on_select: () => commands.emit("cmd.welcome.go_to_messenger_support"),
+						value: "cmd.welcome.go_to_messenger_support",
 						hotkey: "2",
 						render_icon: div => void div.appendChild(BsSendCheck() as SVGSVGElement),
 					},
@@ -176,7 +177,7 @@ export default create_function(
 
 		commands.emit("cmd.application.command_palette.add", {
 			readable_name: "t.welcome.command_palette.support.open_support_palette",
-			on_select: () => commands.emit("cmd.welcome.open_support_palette"),
+			value: () => commands.emit("cmd.welcome.open_support_palette"),
 			hotkey: "mod+h", // TODO: Should work with mod+/
 			render_icon: div => void div.appendChild(BsQuestionOctagon() as SVGSVGElement),
 		})

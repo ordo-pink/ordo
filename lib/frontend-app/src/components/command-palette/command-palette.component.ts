@@ -24,13 +24,14 @@ import { Hotkey } from "@ordo-pink/maoka-components"
 import { Input } from "@ordo-pink/maoka-components"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { Switch } from "@ordo-pink/switch"
 import { ordo_app_state } from "@ordo-pink/frontend-app/app.state"
 
 import { CommandPaletteLocation } from "./constants"
 import { OrdoCommandPaletteItems } from "./command-palette-items.component"
 
-export const OrdoCommandPalette = Maoka.create("div", ({ use, on_unmount, on_mount }) => {
+export const OrdoCommandPalette = Maoka.create("div", ({ use, refresh, on_unmount, on_mount }) => {
 	use(MaokaJabs.set_class("command-palette"))
 
 	let input = ""
@@ -61,16 +62,18 @@ export const OrdoCommandPalette = Maoka.create("div", ({ use, on_unmount, on_mou
 	const VisibleItems = OrdoCommandPaletteItems(CommandPaletteLocation.SUGGESTED, handle_click)
 	const PinnedItems = OrdoCommandPaletteItems(CommandPaletteLocation.PINNED, handle_click)
 
-	const get_state = () => {
-		const value = ordo_app_state.zags.select("sections.command_palette.current")
+	const get_state = use(
+		MaokaOrdo.Jabs.happy_marriage$(ordo_app_state.zags, state => {
+			if (!input && !state.sections.command_palette.visible_items)
+				ordo_app_state.zags.update("sections.command_palette.visible_items", () =>
+					state.sections.command_palette.current.max_items && state.sections.command_palette.current.max_items > 0
+						? state.sections.command_palette.current.items.slice(0, state.sections.command_palette.current.max_items)
+						: state.sections.command_palette.current.items,
+				)
 
-		if (!input)
-			ordo_app_state.zags.update("sections.command_palette.visible_items", () =>
-				value.max_items && value.max_items > 0 ? value.items.slice(0, value.max_items) : value.items,
-			)
-
-		return value
-	}
+			return state.sections.command_palette.current
+		}),
+	)
 
 	const handle_keydown = (event: KeyboardEvent) =>
 		Switch.Match(event.key)
@@ -87,43 +90,63 @@ export const OrdoCommandPalette = Maoka.create("div", ({ use, on_unmount, on_mou
 		const visible = ordo_app_state.zags.select("sections.command_palette.visible_items")
 		const pinned = ordo_app_state.zags.select("sections.command_palette.current.pinned_items")!
 
+		if (!visible) return
+
 		const is_pinned = current_item_location === CommandPaletteLocation.PINNED
 		const source = is_pinned ? pinned : visible
 
+		if (state.on_new_item && input && !is_pinned && !visible[index]) {
+			const new_item = state.on_new_item(input)
+
+			ordo_app_state.zags.update("sections.command_palette", cp => ({
+				...cp,
+				index: 0,
+				location: CommandPaletteLocation.SUGGESTED,
+				current: {
+					...cp.current,
+					pinned_items: cp.current.pinned_items ? [new_item, ...cp.current.pinned_items] : [new_item],
+				},
+			}))
+
+			state.on_select(new_item)
+
+			return void refresh()
+		}
+
 		if (state.is_multiple) {
-			if (state.on_new_item && input && !visible[index] && !is_pinned) {
-				state.on_new_item?.(input)
-				ordo_app_state.zags.update("sections.command_palette.index", () => 0)
+			if (!source[index] || !state.on_select || !state.on_deselect) return
+
+			if (is_pinned) {
+				ordo_app_state.zags.update("sections.command_palette", cp => ({
+					...cp,
+					index: 0,
+					location: CommandPaletteLocation.SUGGESTED,
+					visible_items: [...cp.visible_items!, pinned[index]],
+					current: { ...cp.current, pinned_items: cp.current.pinned_items!.toSpliced(index, 1) },
+				}))
+
+				state.on_deselect(source[index])
 			} else {
-				if (!source[index]) return
+				ordo_app_state.zags.update("sections.command_palette", cp => ({
+					...cp,
+					index: 0,
+					location: CommandPaletteLocation.SUGGESTED,
+					visible_items: cp.visible_items!.toSpliced(index, 1),
+					current: {
+						...cp.current,
+						pinned_items: cp.current.pinned_items ? [visible[index], ...cp.current.pinned_items] : [visible[index]],
+					},
+				}))
 
-				source[index].on_select()
-
-				if (is_pinned) {
-					ordo_app_state.zags.update("sections.command_palette", cp => ({
-						...cp,
-						index: 0,
-						location: is_pinned && source.length === 0 ? CommandPaletteLocation.SUGGESTED : cp.location,
-						items: [...cp.visible_items, pinned[index]],
-						current: { ...cp.current, pinned_items: cp.current.pinned_items!.toSpliced(index, 1) },
-					}))
-				} else {
-					ordo_app_state.zags.update("sections.command_palette", cp => ({
-						...cp,
-						index: 0,
-						location: is_pinned && source.length === 0 ? CommandPaletteLocation.SUGGESTED : cp.location,
-						items: cp.visible_items.toSpliced(index, 1),
-						current: { ...cp.current, pinned_items: [...cp.current.pinned_items!, visible[index]] },
-					}))
-				}
+				state.on_select(source[index])
 			}
 
 			input = ""
 
 			if (SearchInput.refresh) void SearchInput.refresh()
 		} else {
-			if (!source[index]) return
-			const invoke = source[index].on_select
+			if (!source[index] || !state.on_select) return
+			const invoke = () => state.on_select(source[index])
 			commands.emit("cmd.application.command_palette.hide")
 			ordo_app_state.zags.update("sections.command_palette.index", () => 0)
 			invoke()
@@ -131,9 +154,12 @@ export const OrdoCommandPalette = Maoka.create("div", ({ use, on_unmount, on_mou
 	}
 
 	const handle_arrow_up = () => {
+		const visible_items = ordo_app_state.zags.select("sections.command_palette.visible_items")
+		if (!visible_items) return
+
 		const current_item_index = ordo_app_state.zags.select("sections.command_palette.index")
 		const current_item_location = ordo_app_state.zags.select("sections.command_palette.location")
-		const visible_items = ordo_app_state.zags.select("sections.command_palette.visible_items")
+
 		const pinned_items = ordo_app_state.zags.select("sections.command_palette.current.pinned_items")!
 		const source = current_item_location === CommandPaletteLocation.PINNED ? pinned_items : visible_items
 
@@ -145,9 +171,11 @@ export const OrdoCommandPalette = Maoka.create("div", ({ use, on_unmount, on_mou
 	}
 
 	const handle_arrow_down = () => {
+		const visible_items = ordo_app_state.zags.select("sections.command_palette.visible_items")
+		if (!visible_items) return
+
 		const current_item_index = ordo_app_state.zags.select("sections.command_palette.index")
 		const current_item_location = ordo_app_state.zags.select("sections.command_palette.location")
-		const visible_items = ordo_app_state.zags.select("sections.command_palette.visible_items")
 		const pinned_items = ordo_app_state.zags.select("sections.command_palette.current.pinned_items")!
 		const source = current_item_location === CommandPaletteLocation.PINNED ? pinned_items : visible_items
 
@@ -159,12 +187,12 @@ export const OrdoCommandPalette = Maoka.create("div", ({ use, on_unmount, on_mou
 	}
 
 	const handle_tab = (event: KeyboardEvent) => {
+		const state = get_state()
+		if (!state.is_multiple) return
+
 		event.preventDefault()
 
-		const state = get_state()
 		const current_item_location = ordo_app_state.zags.select("sections.command_palette.location")
-
-		if (!state.is_multiple) return
 
 		ordo_app_state.zags.update("sections.command_palette", cp => ({
 			...cp,

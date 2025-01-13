@@ -55,7 +55,7 @@ export const ordo_app_state = MaokaZAGS.Of<TOrdoState>({
 			global_items: [],
 			index: 0,
 			location: CommandPaletteLocation.SUGGESTED,
-			visible_items: [],
+			visible_items: null,
 		},
 	},
 })
@@ -97,7 +97,7 @@ type TFunctions = {
 
 type TCommandPaletteSection = {
 	global_items: Ordo.CommandPalette.Item[]
-	visible_items: Ordo.CommandPalette.Item[]
+	visible_items: Ordo.CommandPalette.Item[] | null
 	current: Ordo.CommandPalette.Instance
 	index: number
 	location: CommandPaletteLocation

@@ -19,7 +19,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { filter, map, pipe, prop } from "ramda"
 import { Dirent } from "fs"
 import { SpawnOptions } from "bun"
 import chalk from "chalk"
@@ -149,16 +148,17 @@ export const create_progress = (message = "") => ({
 })
 
 const _dirent_is_file = (dirent: Dirent): boolean => dirent.isFile()
-export const dirents_to_files: (dirents: Dirent[]) => Dirent[] = filter(_dirent_is_file)
+export const dirents_to_files: (dirents: Dirent[]) => Dirent[] = dirents => dirents.filter(_dirent_is_file)
 
 const _dirent_is_dir = (dirent: Dirent): boolean => dirent.isDirectory()
-export const dirents_to_dirs: (dirents: Dirent[]) => Dirent[] = filter(_dirent_is_dir)
+export const dirents_to_dirs: (dirents: Dirent[]) => Dirent[] = dirents => dirents.filter(_dirent_is_dir)
 
-const _get_name: (dirent: Dirent) => string = prop("name")
-export const get_dirent_names: (dirents: Dirent[]) => string[] = map(_get_name)
+const _get_name: (dirent: Dirent) => string = dirent => dirent.name
+export const get_dirent_names: (dirents: Dirent[]) => string[] = dirents => dirents.map(_get_name)
 
 const _check_file_exists0 = (path: string): Oath<string | boolean> => is_file0(path).pipe(ops0.map(e => (e ? path : e)))
-export const check_files_exist: (paths: string[]) => Oath<(string | boolean)[]> = pipe(map(_check_file_exists0), Oath.Merge)
+export const check_files_exist: (paths: string[]) => Oath<(string | boolean)[]> = paths =>
+	Oath.Merge(paths.map(_check_file_exists0))
 
 export const get_existing_paths = (paths: (string | boolean)[]): string[] => paths.filter(path => Boolean(path)) as string[]
 

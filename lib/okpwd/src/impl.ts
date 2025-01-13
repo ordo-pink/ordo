@@ -22,7 +22,6 @@
 import type * as T from "./types"
 
 import { Either } from "@ordo-pink/either"
-import { identity } from "ramda"
 
 export const okpwd: T.Fn = options => password => {
 	const o = (options ? options : {}) as Required<T.Options>
@@ -76,5 +75,8 @@ export const okpwd: T.Fn = options => password => {
 					"Password must contain contain special characters ([`!@#$%^&*()_+-=[]{};':\"\\|,.<>/?~]).",
 			),
 		)
-		.fold(identity, () => null)
+		.fold(
+			x => x,
+			() => null,
+		)
 }

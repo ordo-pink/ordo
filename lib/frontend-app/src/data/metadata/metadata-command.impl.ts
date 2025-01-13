@@ -20,7 +20,7 @@
  */
 
 import { R, type TResult } from "@ordo-pink/result"
-import { alpha_sort, concat, is_string, noop, override, thunk } from "@ordo-pink/tau"
+import { alpha_sort, concat, noop, override, thunk } from "@ordo-pink/tau"
 
 import { Metadata as M, RRR, get_wrong_label, get_wrong_link } from "@ordo-pink/core"
 
@@ -80,11 +80,7 @@ export const MetadataCommand: Ordo.Metadata.CommandStatic = {
 				m_query,
 			)(fsid)
 				.pipe(R.ops.map(item => item.get_labels()))
-				.pipe(
-					R.ops.map(lbls =>
-						concat(lbls, labels).sort((a, b) => alpha_sort("ASC")(is_string(a) ? a : a.name, is_string(b) ? b : b.name)),
-					),
-				)
+				.pipe(R.ops.map(lbls => concat(lbls, labels).sort((a, b) => alpha_sort("ASC")(a.name, b.name))))
 				.pipe(R.ops.chain(lbls => MC.Of(m_repo, m_query, u_query).replace_labels(fsid, lbls))),
 
 		update_label: (old_label, new_label) =>

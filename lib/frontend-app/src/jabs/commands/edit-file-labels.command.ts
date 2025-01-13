@@ -19,13 +19,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { ContextMenuItemType, Metadata } from "@ordo-pink/core"
+import { ContextMenuItemType, LabelColor, Metadata } from "@ordo-pink/core"
 import { Maoka, type TMaokaJab } from "@ordo-pink/maoka"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { R } from "@ordo-pink/result"
-import { is_string } from "@ordo-pink/tau"
 
 import { EditLabelModal } from "../../components/edit-label-modal.component"
+import { color_class } from "@ordo-pink/maoka-components"
 
 export const edit_file_labels_command: TMaokaJab = ({ on_unmount, use }) => {
 	const state = use(MaokaOrdo.Context.consume)
@@ -37,7 +37,7 @@ export const edit_file_labels_command: TMaokaJab = ({ on_unmount, use }) => {
 
 	const handle_show_edit_labels_palette: Ordo.Command.HandlerOf<"cmd.metadata.show_edit_labels_palette"> = fsid => {
 		const show_labels_palette = () => {
-			const current_labels = state.metadata_query
+			const cl = state.metadata_query
 				.get_by_fsid(fsid)
 				.pipe(R.ops.chain(R.FromNullable))
 				.pipe(R.ops.map(metadata => metadata.get_labels()))
@@ -46,34 +46,33 @@ export const edit_file_labels_command: TMaokaJab = ({ on_unmount, use }) => {
 			const available_labels = state.metadata_query
 				.get()
 				.pipe(R.ops.map(metadata => metadata.flatMap(item => item.get_labels())))
-				.pipe(R.ops.map(labels => labels.map(label => (is_string(label) ? label : label.name))))
-				.pipe(R.ops.map(labels => [...new Set(labels)]))
 				.pipe(
-					R.ops.map(labels =>
-						labels.filter(
-							label =>
-								!current_labels.some(current_label =>
-									is_string(current_label) ? current_label === label : current_label.name === label,
-								),
+					R.ops.map(ls =>
+						ls.reduce(
+							(acc, l) => (acc.some(i => i.name === l.name && i.color === l.color) ? acc : [...acc, l]),
+							[] as Ordo.Metadata.Label[],
 						),
 					),
 				)
+				.pipe(R.ops.map(ls => ls.filter(l => !cl.some(c_label => c_label.name === l.name && c_label.color === l.color))))
 				.cata(R.catas.or_else(() => [] as Ordo.Metadata.Label[]))
 
 			state.commands.emit("cmd.application.command_palette.show", {
 				is_multiple: true,
 				on_new_item: value => {
-					state.commands.emit("cmd.metadata.add_labels", { fsid, labels: [value] })
+					state.commands.emit("cmd.metadata.add_labels", { fsid, labels: [{ name: value, color: LabelColor.DEFAULT }] })
 					show_labels_palette()
 				},
 				items: available_labels.map(label => ({
-					readable_name: (is_string(label) ? label : label.name) as Ordo.I18N.TranslationKey,
+					readable_name: label.name as Ordo.I18N.TranslationKey,
 					on_select: () => state.commands.emit("cmd.metadata.add_labels", { fsid, labels: [label] }),
+					render_custom_info: () => LabelCircle(label.color),
 				})),
 				max_items: 200,
-				pinned_items: current_labels.map(label => ({
-					readable_name: (is_string(label) ? label : label.name) as Ordo.I18N.TranslationKey,
+				pinned_items: cl.map(label => ({
+					readable_name: label.name as Ordo.I18N.TranslationKey,
 					on_select: () => state.commands.emit("cmd.metadata.remove_labels", { fsid, labels: [label] }),
+					render_custom_info: () => LabelCircle(label.color),
 				})),
 			})
 		}
@@ -99,3 +98,6 @@ export const edit_file_labels_command: TMaokaJab = ({ on_unmount, use }) => {
 		state.commands.emit("cmd.application.context_menu.remove", "cmd.metadata.show_edit_labels_palette")
 	})
 }
+
+const LabelCircle = (color: LabelColor) =>
+	Maoka.styled("div", { class: `label ${color_class[color]} size-3 !rounded-full` })(() => {})

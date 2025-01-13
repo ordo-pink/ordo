@@ -105,10 +105,11 @@ const to_sorted_children = (db_state: TDatabaseState, children: Ordo.Metadata.In
 				.case("t.database.column_names.labels", () => {
 					const label_x = x.get_labels()[0]
 					const label_y = y.get_labels()[0]
-					const label_x_name = is_string(label_x) ? label_x : label_x.name
-					const label_y_name = is_string(label_y) ? label_y : label_y.name
 
-					return label_x_name.localeCompare(label_y_name)
+					if (label_x.color < label_y.color) return -1
+					else if (label_x.color > label_y.color) return 1
+
+					return label_x.name.localeCompare(label_y.name)
 				})
 				.default(() => 1)
 		})

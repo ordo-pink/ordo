@@ -770,12 +770,7 @@ declare global {
 				are_links: (x: unknown) => boolean
 			}
 
-			type Label =
-				| string
-				| {
-						name: string
-						color: C.LabelColor
-				  }
+			type Label = { name: string; color: C.LabelColor }
 
 			type RepositoryStatic = {
 				Of: (metadata$: TZags<{ items: Ordo.Metadata.Instance[] | null }>) => Repository
@@ -1188,7 +1183,7 @@ declare global {
 		namespace CommandPalette {
 			type Instance = {
 				items: Ordo.CommandPalette.Item[]
-				on_new_item?: (new_item: string) => any
+				on_new_item?: (new_item: any) => any
 				is_multiple?: boolean
 				pinned_items?: Ordo.CommandPalette.Item[]
 				max_items?: number

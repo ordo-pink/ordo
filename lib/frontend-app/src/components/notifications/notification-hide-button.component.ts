@@ -34,6 +34,7 @@ export const OrdoNotificationHideButton = ({ id, type }: P) =>
 
 		use(MaokaJabs.set_inner_html(BS_X))
 		use(MaokaJabs.set_class("notification-card_close", readable_type))
+		use(MaokaJabs.set_attribute("aria-label", "Close")) // TODO i18n
 		use(MaokaJabs.listen("onclick", event => handle_click(event)))
 
 		const handle_click = (event: MouseEvent) => {

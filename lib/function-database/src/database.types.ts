@@ -21,6 +21,8 @@
 
 import { ColumnType, SortingDirection } from "./database.constants"
 
+// TODO Add supported columns to persisted state
+
 export type TDatabaseState = {
 	sorting?: Partial<Record<TColumnName, SortingDirection>>
 	visible_columns?: TColumnName[]

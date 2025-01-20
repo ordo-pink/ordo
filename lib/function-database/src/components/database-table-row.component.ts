@@ -27,13 +27,13 @@ import { R } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
 import { noop } from "@ordo-pink/tau"
 
-export const DatabaseTableRow = (keys: Ordo.I18N.TranslationKey[], child: Ordo.Metadata.Instance) =>
+export const DatabaseTableRow = (columns: Ordo.I18N.TranslationKey[], child: Ordo.Metadata.Instance) =>
 	Maoka.create("tr", ({ use }) => {
 		use(MaokaJabs.set_class("database_table-row"))
 
 		return () =>
-			keys.map(key =>
-				Switch.Match(key)
+			columns.map(column =>
+				Switch.Match(column)
 					.case("t.database.column_names.name", () => FileNameCell(child))
 					.case("t.database.column_names.labels", () => LabelsCell(child.get_fsid()))
 					.case("t.database.column_names.created_at", () => DateCell(child.get_created_at()))
@@ -56,7 +56,7 @@ const Cell = (value: TMaokaChildren, on_click?: (event: MouseEvent) => void) =>
 
 const LinksCell = (metadata: Ordo.Metadata.Instance, type: "parent" | "incoming" | "outgoing") =>
 	Maoka.create("td", ({ use }) => {
-		use(MaokaJabs.set_class("p-1 border database_border-color"))
+		use(MaokaJabs.set_class("database_cell-links"))
 
 		return () =>
 			Switch.Match(type)

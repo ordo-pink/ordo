@@ -10,20 +10,24 @@
 	@apply database_border-color cursor-text break-words border px-2 py-1;
 }
 
+.database_cell-links {
+	@apply database_border-color border p-1;
+}
+
 .database_cell-multiple {
-	@apply flex gap-1 text-sm;
+	@apply database_border-color flex gap-1 text-sm;
 }
 
 .database_cell-labels {
-	@apply flex size-full cursor-pointer flex-wrap items-start gap-1 p-1;
+	@apply database_border-color flex size-full cursor-pointer flex-wrap items-start gap-1 p-1;
 }
 
 .database_cell-date {
-	@apply database_border-color cursor-default border p-1 text-xs text-neutral-500;
+	@apply database_border-color database_border-color cursor-default border p-1 text-xs text-neutral-500;
 }
 
 .database_cell-filename {
-	@apply database_cell font-semibold;
+	@apply database_border-color database_cell font-semibold;
 }
 
 .database_cell-filename-wrapper {

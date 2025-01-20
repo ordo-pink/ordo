@@ -90,7 +90,7 @@ export const MetadataIcon = ({ metadata, custom_class = "", show_emoji_picker = 
 		return () => {
 			if (emoji)
 				return Maoka.create("div", ({ use }) => {
-					use(MaokaJabs.set_class(custom_class, "text-[0.85rem]"))
+					use(MaokaJabs.set_class(custom_class, "text-[85%]"))
 					return () => emoji
 				})
 

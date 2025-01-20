@@ -81,8 +81,17 @@ declare global {
 	 */
 	interface t {
 		common: {
+			ok: () => string
+			cancel: () => string
+			search: () => string
+			yes: () => string
+			no: () => string
+			apply: () => string
+			save: () => string
+			load: () => string
 			state: {
 				loading: () => string
+				saving: () => string
 			}
 			urls: {
 				twitter_x: () => string

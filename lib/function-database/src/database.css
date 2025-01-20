@@ -10,10 +10,62 @@
 	@apply database_border-color cursor-text break-words border px-2 py-1;
 }
 
+.database_cell-multiple {
+	@apply flex gap-1 text-sm;
+}
+
+.database_cell-labels {
+	@apply flex size-full cursor-pointer flex-wrap items-start gap-1 p-1;
+}
+
+.database_cell-date {
+	@apply database_border-color cursor-default border p-1 text-xs text-neutral-500;
+}
+
+.database_cell-filename {
+	@apply database_cell font-semibold;
+}
+
+.database_cell-filename-wrapper {
+	@apply flex h-full items-center gap-x-1;
+}
+
+.database_cell-filename-text {
+	@apply w-full outline-none;
+}
+
+.database_table-actions_tr {
+	@apply database_border-color border-y;
+}
+
+.database_table-actions_td {
+	@apply flex cursor-pointer gap-x-1 px-2 py-1 text-sm text-neutral-500;
+}
+
 .database_table-head_row {
 	@apply text-left;
 }
 
 .database_table-head_cell {
 	@apply database_border-color cursor-pointer border px-2 py-1 text-sm font-bold text-neutral-500;
+}
+
+.database_table-head_cell-content {
+	@apply flex items-center justify-between;
+}
+
+.database_options {
+	@apply flex justify-end pb-2;
+}
+
+.database_modal_columns {
+	@apply flex w-96 max-w-full flex-col;
+}
+
+.database_modal_columns_item {
+	@apply flex justify-between px-2 py-1 text-sm;
+}
+
+.database_table-row {
+	@apply database_border-color h-full border-y;
 }

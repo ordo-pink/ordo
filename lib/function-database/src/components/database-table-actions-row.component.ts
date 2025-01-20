@@ -26,19 +26,26 @@ import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
 export const DatabaseTableActionsRow = (metadata: Ordo.Metadata.Instance) =>
 	Maoka.create("tr", ({ use }) => {
-		const { emit } = use(MaokaOrdo.Jabs.get_commands)
-		use(MaokaJabs.set_class("border-y database_border-color"))
+		const fsid = metadata.get_fsid()
 
-		return () =>
-			Maoka.create("td", ({ use }) => {
-				use(MaokaJabs.set_class("px-2 py-1 text-neutral-500 text-sm flex gap-x-1 cursor-pointer"))
-				use(MaokaJabs.listen("onclick", () => handle_column_title_click()))
+		use(MaokaJabs.set_class("database_table-actions_tr"))
 
-				const handle_column_title_click = () => emit("cmd.metadata.show_create_modal", metadata.get_fsid())
+		return () => DatabaseCreateEntryButton(fsid)
+	})
 
-				return () => [
-					BsPlus() as TMaokaElement,
-					Maoka.create("div", () => () => "New"), // TODO: i18n
-				]
-			})
+// --- Internal ---
+
+const DatabaseCreateEntryButton = (fsid: Ordo.Metadata.FSID) =>
+	Maoka.create("td", ({ use }) => {
+		use(MaokaJabs.set_class("database_table-actions_td"))
+		use(MaokaJabs.listen("onclick", () => handle_click()))
+
+		const commands = use(MaokaOrdo.Jabs.get_commands)
+
+		const handle_click = () => commands.emit("cmd.metadata.show_create_modal", fsid)
+
+		return () => [
+			BsPlus() as TMaokaElement,
+			Maoka.create("div", () => () => "New"), // TODO: i18n
+		]
 	})

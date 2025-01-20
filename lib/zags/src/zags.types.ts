@@ -49,6 +49,8 @@ export type TZags<$TState extends Record<string, unknown>> = {
 		value_creator: (prev_value: TFromDotPath<$TState, _TKey>) => TFromDotPath<$TState, _TKey>,
 	) => void
 
+	update_all: (value_creator: (prev_value: $TState) => $TState) => void
+
 	/**
 	 * Fully override ZAGS state with provided value.
 	 *

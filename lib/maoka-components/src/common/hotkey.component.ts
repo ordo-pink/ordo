@@ -33,6 +33,7 @@ export type THotkeyOptions = {
 	prevent_in_contenteditable?: boolean
 	smol?: boolean
 	decoration_only?: boolean
+	show_in_mobile?: boolean
 }
 
 export const Hotkey = (
@@ -42,11 +43,13 @@ export const Hotkey = (
 		prevent_in_contenteditable: true,
 		smol: false,
 		decoration_only: false,
+		show_in_mobile: false,
 	},
 ) =>
 	Maoka.create("div", ({ use, on_unmount, element, on_mount: after_mount }) => {
 		use(MaokaJabs.set_class("hotkey"))
 		if (options.smol) use(MaokaJabs.add_class("smol"))
+		if (options.show_in_mobile) use(MaokaJabs.add_class("mobile"))
 		const is_darwin = use(MaokaJabs.is_darwin)
 
 		const split = hotkey.split("+")

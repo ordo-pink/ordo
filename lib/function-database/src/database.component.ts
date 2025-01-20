@@ -33,7 +33,6 @@ import { SortingDirection } from "./database.constants"
 import { type TDatabaseState } from "./database.types"
 import { database$ } from "./database.state"
 import { show_columns_jab } from "./jabs/show-columns-modal.jab"
-import { show_filters_jab } from "./jabs/filter-modal.jab"
 
 import "./database.css"
 
@@ -41,38 +40,48 @@ export const Database = (metadata: Ordo.Metadata.Instance, content: Ordo.Content
 	const initial_state = state ? state : is_string(content) ? (JSON.parse(content) as TDatabaseState) : {}
 	database$.replace(initial_state)
 
-	return Maoka.create("div", ({ use, on_unmount }) => {
-		const get_db_state = use(MaokaOrdo.Jabs.happy_marriage$(database$))
-
+	return Maoka.create("div", ({ use, refresh, on_unmount }) => {
+		let db_state = initial_state
 		const fsid = metadata.get_fsid()
 
 		use(MaokaJabs.set_class("database_view"))
-		use(show_filters_jab(metadata))
 		use(show_columns_jab(metadata))
 
 		const commands = use(MaokaOrdo.Jabs.get_commands)
 		const get_children = use(MaokaOrdo.Jabs.Metadata.get_children$(fsid))
 
-		const divorce = database$.marry(state => {
+		const divorce_database$ = database$.marry(state => {
+			db_state = state
 			commands.emit("cmd.content.set", { fsid, content_type: "database/ordo", content: JSON.stringify(state) })
+			void refresh()
 		})
 
-		on_unmount(divorce)
+		commands.on("cmd.database.toggle_column", handle_toggle_column_cmd)
+		commands.on("cmd.database.toggle_sorting", handle_toggle_sorting_cmd)
+
+		on_unmount(() => {
+			divorce_database$()
+
+			commands.off("cmd.database.toggle_column", handle_toggle_column_cmd)
+			commands.off("cmd.database.toggle_sorting", handle_toggle_sorting_cmd)
+		})
 
 		return () => {
-			const db_state = get_db_state()
 			const keys: Ordo.I18N.TranslationKey[] = db_state.columns
 				? (db_state.columns as Ordo.I18N.TranslationKey[])
 				: ["t.database.column_names.name", "t.database.column_names.labels"]
 
 			if (!keys.includes("t.database.column_names.name")) keys.unshift("t.database.column_names.name")
 
+			const children = get_children()
+			const sorted_children = to_sorted_children(db_state, children)
+
 			return [
 				DatabaseOptions,
 				DatabaseTable(() => [
 					DatabaseTableHead(keys),
 					DatabaseTableBody(() => [
-						...to_sorted_children(db_state, get_children()).map(child => DatabaseTableRow(keys, child)),
+						...sorted_children.map(child => DatabaseTableRow(keys, child)),
 						DatabaseTableActionsRow(metadata),
 					]),
 				]),
@@ -116,4 +125,34 @@ const to_sorted_children = (db_state: TDatabaseState, children: Ordo.Metadata.In
 	})
 
 	return items
+}
+
+const handle_toggle_column_cmd: Ordo.Command.HandlerOf<"cmd.database.toggle_column"> = column =>
+	database$.update_all(({ columns, sorting }) => {
+		if (!columns) columns = ["t.database.column_names.name", "t.database.column_names.labels"]
+
+		if (columns.includes(column)) {
+			columns.splice(columns.indexOf(column), 1)
+
+			if (sorting && Object.keys(sorting).includes(column)) sorting[column] = void 0
+		} else columns.push(column)
+
+		if (!columns.includes("t.database.column_names.name")) columns.unshift("t.database.column_names.name")
+
+		return { columns, sorting }
+	})
+
+const handle_toggle_sorting_cmd: Ordo.Command.HandlerOf<"cmd.database.toggle_sorting"> = column => {
+	database$.update("sorting", sorting => {
+		if (!sorting) sorting = {}
+
+		sorting[column] =
+			sorting[column] === SortingDirection.ASC
+				? SortingDirection.DESC
+				: sorting[column] === SortingDirection.DESC
+					? undefined
+					: SortingDirection.ASC
+
+		return sorting
+	})
 }

@@ -52,17 +52,19 @@ export const OrdoCommandPaletteItems = (
 			const current_location = get_current_location()
 			const has_new_item_handler = !!get_new_item_handler()
 
-			if (!items) return
-
 			// TODO Translations
-			if (!items.length && assigned_location === CommandPaletteLocation.SUGGESTED) {
+			if ((!items || !items.length) && assigned_location === CommandPaletteLocation.SUGGESTED) {
 				if (has_new_item_handler)
 					// TODO Show item to be created
-					return CreateNewItemHint(() => ["press", Hotkey("Enter", { smol: true, decoration_only: true }), "to create"])
+					return CreateNewItemHint(() => [
+						"press",
+						Hotkey("Enter", { smol: true, decoration_only: true, show_in_mobile: true }),
+						"to create",
+					])
 				else return CreateNewItemHint(() => ["Nothing found :("])
 			}
 
-			return items.map((item, index) =>
+			return items?.map((item, index) =>
 				OrdoCommandPaletteItem(
 					item,
 					() => on_click(index, assigned_location),

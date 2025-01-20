@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { F, is_string } from "@ordo-pink/tau"
+import { F } from "@ordo-pink/tau"
 import { Switch } from "@ordo-pink/switch"
 
 import { MetadataValidations } from "./metadata-validations.impl"
@@ -53,10 +53,7 @@ export const Metadata: Ordo.Metadata.Static = {
 		get_parent: () => dto.parent,
 		get_property: key => dto.props?.[key] ?? null,
 		get_readable_size: () => get_readable_size(dto.size),
-		get_label_index: label =>
-			dto.labels.findIndex(x =>
-				is_string(label) ? x === label : !is_string(x) && x.color === label.color && x.name === label.name,
-			),
+		get_label_index: label => dto.labels.findIndex(x => x.color === label.color && x.name === label.name),
 		get_size: () => dto.size,
 		has_label: label => Metadata.FromDTO(dto).get_label_index(label) >= 0,
 		has_labels: () => dto.labels.length > 0,

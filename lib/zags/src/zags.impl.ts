@@ -76,8 +76,18 @@ export const ZAGS: TZagsStatic = {
 			return location[keys[keys.length - 1]]
 		},
 		replace: new_state => {
+			if (state === new_state) return
+
 			state = Object.assign({}, new_state)
 			handlers.forEach(f => f(state, true))
+		},
+		update_all: f => {
+			const updated_state = f(Object.assign({}, state))
+
+			if (updated_state !== state) {
+				state = Object.assign({}, updated_state)
+				handlers.forEach(f => f(state, true))
+			}
 		},
 		unwrap: () => Object.assign({}, state),
 	}),

@@ -201,7 +201,11 @@ const create_tutorial_files = (emit: Ordo.Command.EmitFn, metadata_query: Ordo.M
 	emit("cmd.metadata.create", { name: "Join ORDO", parent, props: { emoji_icon: "✅" }, labels })
 	emit("cmd.metadata.create", { name: "Try changing emoji to `check`", parent, labels, props: { emoji_icon: "👆" } })
 	emit("cmd.metadata.create", { name: "Enable labels in database column options", parent, labels })
-	emit("cmd.metadata.create", { name: "Click on a label to edit its options", parent, labels: [...labels, "BORING"] })
+	emit("cmd.metadata.create", {
+		name: "Click on a label to edit its options",
+		parent,
+		labels: [...labels, { name: "BORING", color: LabelColor.DEFAULT }],
+	})
 	emit("cmd.metadata.create", { name: "Create a new file by clicking +New", parent, labels })
 	emit("cmd.metadata.create", { name: "Click on this text to open file content", parent, labels })
 

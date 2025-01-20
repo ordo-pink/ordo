@@ -23,4 +23,4 @@ import { ZAGS } from "@ordo-pink/zags"
 
 import { type TDatabaseState } from "./database.types"
 
-export const database$ = ZAGS.Of<TDatabaseState>({ columns: ["t.database.column_names.name"] })
+export const database$ = ZAGS.Of<TDatabaseState>({ visible_columns: ["t.database.column_names.name"] })

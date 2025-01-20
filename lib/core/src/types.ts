@@ -81,8 +81,17 @@ declare global {
 	 */
 	interface t {
 		common: {
+			ok: () => string
+			cancel: () => string
+			search: () => string
+			yes: () => string
+			no: () => string
+			apply: () => string
+			save: () => string
+			load: () => string
 			state: {
 				loading: () => string
+				saving: () => string
 			}
 			urls: {
 				twitter_x: () => string
@@ -770,12 +779,7 @@ declare global {
 				are_links: (x: unknown) => boolean
 			}
 
-			type Label =
-				| string
-				| {
-						name: string
-						color: C.LabelColor
-				  }
+			type Label = { name: string; color: C.LabelColor }
 
 			type RepositoryStatic = {
 				Of: (metadata$: TZags<{ items: Ordo.Metadata.Instance[] | null }>) => Repository
@@ -1188,8 +1192,10 @@ declare global {
 		namespace CommandPalette {
 			type Instance = {
 				items: Ordo.CommandPalette.Item[]
-				on_new_item?: (new_item: string) => any
+				on_new_item?: (input: string) => Ordo.CommandPalette.Item
 				is_multiple?: boolean
+				on_select: (item: Ordo.CommandPalette.Item) => void
+				on_deselect?: (item: Ordo.CommandPalette.Item) => void
 				pinned_items?: Ordo.CommandPalette.Item[]
 				max_items?: number
 			}
@@ -1197,16 +1203,13 @@ declare global {
 			/**
 			 * Command palette item.
 			 */
-			type Item = {
+			type Item<T = any> = {
 				/**
 				 * Readable name of the command palette item. Put a translation key here, if you use i18n.
 				 */
 				readable_name: Ordo.I18N.TranslationKey
 
-				/**
-				 * Action to be executed when command palette item is used.
-				 */
-				on_select: () => void
+				value: T
 
 				/**
 				 * Icon to be displayed for the context menu item.

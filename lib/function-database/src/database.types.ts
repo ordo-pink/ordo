@@ -19,9 +19,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { SortingDirection } from "./database.constants"
+import { ColumnType, SortingDirection } from "./database.constants"
 
-export type TDatabaseState = Partial<{
-	sorting: Partial<Record<string, SortingDirection>>
-	columns: string[]
-}>
+// TODO Add supported columns to persisted state
+
+export type TDatabaseState = {
+	sorting?: Partial<Record<TColumnName, SortingDirection>>
+	visible_columns?: TColumnName[]
+	columns?: TColumn<any>[]
+}
+
+export type TColumnName = string
+
+export type TColumn<$TParams = void> = {
+	name: TColumnName
+	type: ColumnType
+	params: $TParams
+	sort?: (a: Ordo.Metadata.Instance, b: Ordo.Metadata.Instance) => -1 | 0 | 1
+	render_icon?: (div: HTMLDivElement) => void | Promise<void>
+	render_cell: (div: HTMLDivElement, metadata: Ordo.Metadata.Instance, params: $TParams) => void | Promise<void>
+}

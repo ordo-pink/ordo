@@ -23,12 +23,14 @@ import { Maoka, type TMaokaElement } from "@ordo-pink/maoka"
 import { BsCaretDown } from "@ordo-pink/frontend-icons"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
+import { Switch } from "@ordo-pink/switch"
+import { noop } from "@ordo-pink/tau"
 
 import { SortingDirection } from "../database.constants"
 import { database$ } from "../database.state"
 
-export const DatabaseTableHead = (keys: Ordo.I18N.TranslationKey[]) =>
-	TableHead(() => TableHeadRow(() => keys.map(key => TableHeadCell(key))))
+export const DatabaseTableHead = (columns: Ordo.I18N.TranslationKey[]) =>
+	TableHead(() => TableHeadRow(() => columns.map(TableHeadCell)))
 
 // --- Internal ---
 
@@ -36,47 +38,32 @@ const TableHead = Maoka.styled("thead")
 const TableHeadRow = Maoka.styled("tr", { class: "database_table-head_row" })
 
 // TODO: Add icons
-const TableHeadCell = (key: Ordo.I18N.TranslationKey) =>
+const TableHeadCell = (column: Ordo.I18N.TranslationKey) =>
 	Maoka.create("th", ({ use }) => {
 		const get_db_state = use(MaokaOrdo.Jabs.happy_marriage$(database$))
 
 		use(MaokaJabs.add_class("database_table-head_cell"))
-		use(MaokaJabs.listen("onclick", event => handle_click(event)))
+		use(MaokaJabs.listen("onclick", () => handle_click()))
 
 		const { t } = use(MaokaOrdo.Jabs.get_translations$)
+		const commands = use(MaokaOrdo.Jabs.get_commands)
 
-		const handle_click = (event: MouseEvent) => {
-			event.preventDefault()
-
-			database$.update("sorting", sorting => {
-				if (!sorting) sorting = {}
-
-				sorting[key] =
-					sorting[key] === SortingDirection.ASC
-						? SortingDirection.DESC
-						: sorting[key] === SortingDirection.DESC
-							? undefined
-							: SortingDirection.ASC
-
-				return sorting
-			})
+		const handle_click = () => {
+			commands.emit("cmd.database.toggle_sorting", column)
 		}
 
-		const t_key = t(key)
+		const t_column = t(column)
 
 		return () =>
 			DatabaseTableCellContent(() => {
 				const state = get_db_state()
+				const caret = Switch.Match(state.sorting?.[column])
+					.case(SortingDirection.ASC, () => BsCaretDown() as TMaokaElement)
+					.case(SortingDirection.DESC, () => BsCaretDown("rotate-180") as TMaokaElement)
+					.default(noop)
 
-				return [
-					t_key,
-					state.sorting?.[key] === SortingDirection.ASC
-						? (BsCaretDown() as TMaokaElement)
-						: state.sorting?.[key] === SortingDirection.DESC
-							? (BsCaretDown("rotate-180") as TMaokaElement)
-							: void 0,
-				]
+				return [t_column, caret]
 			})
 	})
 
-const DatabaseTableCellContent = Maoka.styled("div", { class: "flex items-center justify-between" })
+const DatabaseTableCellContent = Maoka.styled("div", { class: "database_table-head_cell-content" })

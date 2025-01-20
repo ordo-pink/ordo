@@ -33,6 +33,7 @@ import { sidebar$ } from "./sidebar.state"
 export const OrdoSidebar = Maoka.create("aside", ({ use, on_unmount }) => {
 	const commands = ordo_app_state.zags.select("commands")
 	const get_sidebar = use(MaokaOrdo.Jabs.happy_marriage$(sidebar$))
+	const is_mobile = use(MaokaJabs.is_mobile)
 
 	commands.on("cmd.application.sidebar.disable", handle_disable_sidebar)
 	commands.on("cmd.application.sidebar.enable", handle_enable_sidebar)
@@ -47,6 +48,12 @@ export const OrdoSidebar = Maoka.create("aside", ({ use, on_unmount }) => {
 		commands.off("cmd.application.sidebar.show", handle_show_sidebar)
 		commands.off("cmd.application.sidebar.toggle", handle_toggle_sidebar)
 	})
+
+	use(MaokaJabs.listen("onclick", () => handle_click()))
+
+	const handle_click = () => {
+		if (is_mobile) commands.emit("cmd.application.sidebar.hide")
+	}
 
 	return () => {
 		const { visible, enabled } = get_sidebar()
@@ -81,7 +88,7 @@ export const OrdoSidebarButton = Maoka.create("button", ({ use }) => {
 
 		if (enabled) {
 			commands.emit("cmd.application.command_palette.add", {
-				on_select: () => commands.emit("cmd.application.sidebar.toggle"),
+				value: () => commands.emit("cmd.application.sidebar.toggle"),
 				hotkey: "mod+b",
 				readable_name,
 				render_icon: div => void div.appendChild(BsLayoutSidebarInsetReverse() as SVGSVGElement),

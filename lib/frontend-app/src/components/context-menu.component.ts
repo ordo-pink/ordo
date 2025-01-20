@@ -75,6 +75,7 @@ const handle_remove: Ordo.Command.HandlerOf<"cmd.application.context_menu.remove
 
 const OrdoContextMenuDynamic = Maoka.create("div", ({ use, on_unmount }) => {
 	use(MaokaJabs.set_class("context-menu"))
+	const is_mobile = use(MaokaJabs.is_mobile)
 
 	const commands = ordo_app_state.zags.select("commands")
 	const get_state = use(ordo_app_state.select_jab$("sections.context_menu.state"))
@@ -88,16 +89,6 @@ const OrdoContextMenuDynamic = Maoka.create("div", ({ use, on_unmount }) => {
 		const state = get_state()
 
 		if (!state) return
-
-		const fits_width = state.event.clientX <= window.innerWidth - 320
-		const fits_height = state.event.clientY <= window.innerHeight - 400
-
-		const left = fits_width ? `${state.event.clientX}px` : ""
-		const top = fits_height ? `${state.event.clientY}px` : ""
-		const right = fits_width ? "" : `${window.innerWidth - state.event.clientX}px`
-		const bottom = fits_height ? "" : `${window.innerHeight - state.event.clientY}px`
-
-		use(MaokaJabs.set_style({ left, top, right, bottom }))
 
 		const all_items = state.structure.filter(
 			item =>
@@ -117,6 +108,38 @@ const OrdoContextMenuDynamic = Maoka.create("div", ({ use, on_unmount }) => {
 		const read_items = all_items.filter(item => item.type === ContextMenuItemType.READ)
 		const update_items = all_items.filter(item => item.type === ContextMenuItemType.UPDATE)
 		const delete_items = all_items.filter(item => item.type === ContextMenuItemType.DELETE)
+
+		if (is_mobile) {
+			commands.emit("cmd.application.command_palette.show", {
+				on_select: item => {
+					const context_menu_item = item.value as Ordo.ContextMenu.Item
+					commands.emit(
+						context_menu_item.command,
+						context_menu_item.payload_creator
+							? context_menu_item.payload_creator(state.payload as any)
+							: (state.payload as any),
+					)
+				},
+				items: [...create_items, ...read_items, ...update_items, ...delete_items].map(item => ({
+					value: item,
+					readable_name: item.readable_name,
+					render_icon: item.render_icon,
+					hotkey: item.hotkey,
+				})),
+			})
+
+			return
+		}
+
+		const fits_width = state.event.clientX <= window.innerWidth - 320
+		const fits_height = state.event.clientY <= window.innerHeight - 400
+
+		const left = fits_width ? `${state.event.clientX}px` : ""
+		const top = fits_height ? `${state.event.clientY}px` : ""
+		const right = fits_width ? "" : `${window.innerWidth - state.event.clientX}px`
+		const bottom = fits_height ? "" : `${window.innerHeight - state.event.clientY}px`
+
+		use(MaokaJabs.set_style({ left, top, right, bottom }))
 
 		return [
 			...create_items.map(item => ContextMenuItem(item, state.payload, state.event)),

@@ -32,12 +32,22 @@ export type TButtonProps = {
 	hotkey?: string
 	hotkey_options?: THotkeyOptions
 	custom_class?: string
+	aria_label?: string
 	disabled?: () => boolean
 }
 
-const Default = ({ on_click, hotkey, text, custom_class = "", hotkey_options, disabled = () => false }: TButtonProps) =>
+const Default = ({
+	on_click,
+	hotkey,
+	text,
+	aria_label = text,
+	custom_class = "",
+	hotkey_options,
+	disabled = () => false,
+}: TButtonProps) =>
 	Maoka.create("button", ({ use, element }) => {
 		use(MaokaJabs.set_class("button", custom_class))
+		use(MaokaJabs.set_attribute("aria-label", aria_label))
 		use(MaokaJabs.listen("onclick", event => handle_click(event)))
 
 		const handle_click = (event: MouseEvent) => {

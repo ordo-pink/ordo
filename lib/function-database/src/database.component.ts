@@ -67,8 +67,8 @@ export const Database = (metadata: Ordo.Metadata.Instance, content: Ordo.Content
 		})
 
 		return () => {
-			const keys: Ordo.I18N.TranslationKey[] = db_state.columns
-				? (db_state.columns as Ordo.I18N.TranslationKey[])
+			const keys: Ordo.I18N.TranslationKey[] = db_state.visible_columns
+				? (db_state.visible_columns as Ordo.I18N.TranslationKey[])
 				: ["t.database.column_names.name", "t.database.column_names.labels"]
 
 			if (!keys.includes("t.database.column_names.name")) keys.unshift("t.database.column_names.name")
@@ -128,7 +128,7 @@ const to_sorted_children = (db_state: TDatabaseState, children: Ordo.Metadata.In
 }
 
 const handle_toggle_column_cmd: Ordo.Command.HandlerOf<"cmd.database.toggle_column"> = column =>
-	database$.update_all(({ columns, sorting }) => {
+	database$.update_all(({ visible_columns: columns, sorting }) => {
 		if (!columns) columns = ["t.database.column_names.name", "t.database.column_names.labels"]
 
 		if (columns.includes(column)) {
@@ -139,7 +139,7 @@ const handle_toggle_column_cmd: Ordo.Command.HandlerOf<"cmd.database.toggle_colu
 
 		if (!columns.includes("t.database.column_names.name")) columns.unshift("t.database.column_names.name")
 
-		return { columns, sorting }
+		return { visible_columns: columns, sorting }
 	})
 
 const handle_toggle_sorting_cmd: Ordo.Command.HandlerOf<"cmd.database.toggle_sorting"> = column => {

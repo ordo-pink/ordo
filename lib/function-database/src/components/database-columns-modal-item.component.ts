@@ -16,7 +16,7 @@ export const DatabaseColumnModalItem = (column: TColumnName) =>
 
 		return () => {
 			const db_state = get_db_state()
-			const active_columns = db_state.columns ?? ["t.database.column_names.name", "t.database.column_names.labels"]
+			const active_columns = db_state.visible_columns ?? ["t.database.column_names.name", "t.database.column_names.labels"]
 			const is_checkbox_checked = active_columns.includes(column)
 			const handle_checkbox_change = () => commands.emit("cmd.database.toggle_column", column)
 

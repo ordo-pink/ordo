@@ -24,6 +24,28 @@ export enum SortingDirection {
 	DESC,
 }
 
+export enum ColumnType {
+	METADATA_NAME,
+	METADATA_FSID,
+	METADATA_LABELS,
+	METADATA_CREATED_AT,
+	METADATA_CREATED_BY,
+	METADATA_UPDATED_AT,
+	METADATA_UPDATED_BY,
+	METADATA_LINKS,
+	METADATA_SIZE,
+	METADATA_PARENT,
+	METADATA_TYPE,
+	CHECKBOX,
+	NUMBER,
+	TEXT,
+	DATE,
+	USER,
+	LINK,
+	SELECT,
+	MULTISELECT,
+}
+
 export const DATABASE_CONTEXT_MENU_PAYLOAD = "pink.ordo.database.context_menu_payload"
 
 export const is_database_context_menu_payload = ({ payload }: Ordo.ContextMenu.Params) =>

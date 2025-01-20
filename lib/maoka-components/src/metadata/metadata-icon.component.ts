@@ -62,29 +62,24 @@ export const MetadataIcon = ({ metadata, custom_class = "", show_emoji_picker = 
 
 					commands.emit("cmd.application.command_palette.show", {
 						max_items: 100,
+						on_select: item => {
+							commands.emit("cmd.metadata.set_property", {
+								fsid: metadata.get_fsid(),
+								key: "emoji_icon",
+								value: item.value,
+							})
+						},
 						items: [
 							{
-								readable_name: "Remove icon", // TODO Translation
-								on_select: () =>
-									commands.emit("cmd.metadata.set_property", {
-										fsid: metadata.get_fsid(),
-										key: "emoji_icon",
-										value: undefined,
-									}),
+								value: void 0,
+								readable_name: "Remove icon" as Ordo.I18N.TranslationKey, // TODO Translation
 							},
 							...emojis.map(
 								emoji =>
 									({
-										on_select: () => {
-											commands.emit("cmd.metadata.set_property", {
-												fsid: metadata.get_fsid(),
-												key: "emoji_icon",
-												value: emoji.icon,
-											})
-
-											commands.emit("cmd.application.command_palette.hide")
-										},
-										readable_name: `${emoji.icon} ${emoji.description}` as any,
+										value: emoji.icon,
+										readable_name: emoji.description as Ordo.I18N.TranslationKey,
+										render_icon: div => void (div.innerText = emoji.icon),
 									}) satisfies Ordo.CommandPalette.Item,
 							),
 						],

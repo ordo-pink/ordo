@@ -21,7 +21,9 @@
 
 import { SortingDirection } from "./database.constants"
 
-export type TDatabaseState = Partial<{
-	sorting: Partial<Record<string, SortingDirection>>
-	columns: string[]
-}>
+export type TDatabaseState = {
+	sorting?: Partial<Record<TColumnName, SortingDirection>>
+	columns?: TColumnName[]
+}
+
+export type TColumnName = string

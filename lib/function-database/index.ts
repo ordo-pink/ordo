@@ -26,10 +26,12 @@ import { TwoLetterLocale } from "@ordo-pink/locale"
 import { create_function } from "@ordo-pink/core"
 
 import { Database } from "./src/database.component"
+import { type TColumnName } from "./src/database.types"
 
 declare global {
 	interface t {
 		database: {
+			columns: () => string
 			file_association: {
 				readable_name: () => string
 				description: () => string
@@ -48,9 +50,6 @@ declare global {
 			sorting_modal: {
 				context_menu: () => string
 			}
-			filter_modal: {
-				context_menu: () => string
-			}
 			columns_modal: {
 				context_menu: () => string
 			}
@@ -60,8 +59,9 @@ declare global {
 	interface cmd {
 		database: {
 			show_sorting_modal: () => void
-			show_filter_modal: () => void
 			show_columns_modal: () => void
+			toggle_column: () => TColumnName
+			toggle_sorting: () => TColumnName
 		}
 	}
 }
@@ -81,6 +81,8 @@ export default create_function(
 			"cmd.application.modal.show",
 			"cmd.application.router.navigate",
 			"cmd.content.set",
+			"cmd.database.toggle_column",
+			"cmd.database.toggle_sorting",
 			"cmd.functions.file_associations.register",
 			"cmd.metadata.add_labels",
 			"cmd.metadata.remove_labels",
@@ -106,6 +108,7 @@ export default create_function(
 		commands.emit("cmd.application.add_translations", {
 			lang: TwoLetterLocale.ENGLISH,
 			translations: {
+				"t.database.columns": "Columns",
 				"t.database.column_names.created_at": "Creation Date",
 				"t.database.column_names.labels": "Labels",
 				"t.database.column_names.name": "Name",
@@ -117,7 +120,6 @@ export default create_function(
 				"t.database.column_names.incoming_links": "Incoming Links",
 				"t.database.column_names.parent": "Parent",
 				"t.database.columns_modal.context_menu": "Edit columns...",
-				"t.database.filter_modal.context_menu": "Edit filters...",
 				"t.database.sorting_modal.context_menu": "Edit sorting...",
 				"t.database.file_association.description":
 					"This file represents a database where each row is a separate file contained inside the database.",

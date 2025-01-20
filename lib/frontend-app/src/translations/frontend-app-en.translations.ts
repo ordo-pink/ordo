@@ -45,4 +45,13 @@ export const frontend_app_en_translations: Partial<Record<Ordo.I18N.TranslationK
 	"t.common.components.modals.rename_file.input_label": "New name",
 	"t.common.components.modals.move.title": "Move...",
 	"t.common.components.modals.move.move_to_root": "Move to root directory",
+	"t.common.ok": "OK",
+	"t.common.cancel": "Cancel",
+	"t.common.search": "Search",
+	"t.common.yes": "Yes",
+	"t.common.no": "No",
+	"t.common.apply": "Apply",
+	"t.common.save": "Save",
+	"t.common.load": "Load",
+	"t.common.state.saving": "Saving",
 }

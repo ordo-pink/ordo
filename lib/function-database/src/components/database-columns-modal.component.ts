@@ -24,64 +24,35 @@ import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
-import { database$ } from "../database.state"
+import { DatabaseColumnModalItem } from "./database-columns-modal-item.component"
+import { type TColumnName } from "../database.types"
 
 export const DatabaseColumnsModal = Maoka.create("div", ({ use }) => {
-	use(MaokaJabs.set_class("w-96 max-w-full flex flex-col"))
+	use(MaokaJabs.set_class("database_modal_columns"))
 
 	const { t } = use(MaokaOrdo.Jabs.get_translations$)
 	const commands = use(MaokaOrdo.Jabs.get_commands)
-	const get_db_state = use(MaokaOrdo.Jabs.happy_marriage$(database$))
 
-	// TODO Take columns from file content
-	const all_columns = [
-		"t.database.column_names.name",
-		"t.database.column_names.labels",
-		"t.database.column_names.outgoing_links",
-		"t.database.column_names.incoming_links",
-		"t.database.column_names.parent",
-		"t.database.column_names.created_at",
-		"t.database.column_names.created_by",
-	]
+	const handle_dialog_action = () => commands.emit("cmd.application.modal.hide")
+	const render_all_columns = () => ALL_COLUMNS.map(DatabaseColumnModalItem)
 
 	return () => {
-		const state = get_db_state()
-		const active_columns = state.columns ?? ["t.database.column_names.name", "t.database.column_names.labels"]
+		const t_action_text = t("t.common.ok")
+		const t_modal_title = t("t.database.columns")
 
-		return [
-			Dialog({
-				action: () => commands.emit("cmd.application.modal.hide"),
-				title: "Columns",
-				action_text: "OK",
-				body: () =>
-					all_columns.map(column =>
-						Maoka.create("div", ({ use }) => {
-							use(MaokaJabs.set_class("flex justify-between px-2 py-1 text-sm"))
-
-							return () => [
-								Maoka.create("div", () => () => t(column as Ordo.I18N.TranslationKey)),
-								Maoka.create("input", ({ use }) => {
-									use(MaokaJabs.set_attribute("type", "checkbox"))
-									use(
-										MaokaJabs.listen("onchange", () => {
-											database$.update("columns", columns => {
-												if (!columns) columns = ["t.database.column_names.name", "t.database.column_names.labels"]
-												if (columns.includes(column)) columns.splice(columns.indexOf(column), 1)
-												else columns.push(column)
-
-												if (!columns.includes("t.database.column_names.name")) columns.unshift("t.database.column_names.name")
-
-												return columns
-											})
-										}),
-									)
-
-									if (active_columns.includes(column)) use(MaokaJabs.set_attribute("checked"))
-								}),
-							]
-						}),
-					),
-			}),
-		]
+		return Dialog({ action: handle_dialog_action, title: t_modal_title, action_text: t_action_text, body: render_all_columns })
 	}
 })
+
+// --- Internal ---
+
+// TODO Take columns from file content
+const ALL_COLUMNS: TColumnName[] = [
+	"t.database.column_names.name",
+	"t.database.column_names.labels",
+	"t.database.column_names.outgoing_links",
+	"t.database.column_names.incoming_links",
+	"t.database.column_names.parent",
+	"t.database.column_names.created_at",
+	"t.database.column_names.created_by",
+]

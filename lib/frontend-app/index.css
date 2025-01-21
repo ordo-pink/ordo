@@ -116,11 +116,11 @@ a {
 }
 
 *::-webkit-scrollbar-thumb {
-	@apply invisible my-2 rounded-lg bg-neutral-500;
+	@apply bg-neutral-200 transition-opacity dark:bg-neutral-500;
 }
 
 *:hover::-webkit-scrollbar-thumb {
-	@apply visible;
+	@apply opacity-100;
 }
 
 *::-webkit-scrollbar-track {
@@ -128,16 +128,16 @@ a {
 }
 
 .app {
-	@apply flex;
+	@apply flex overflow-hidden;
 }
 
 .sidebar {
-	@apply fixed bottom-0 left-0 right-0 top-0 sm:relative sm:left-auto sm:h-dvh sm:w-96 sm:pr-14 sm:shadow-md;
+	@apply fixed bottom-0 left-0 right-0 top-0 overflow-auto sm:relative sm:left-auto sm:h-dvh sm:w-96 sm:pr-14 sm:shadow-md;
 	@apply bg-neutral-100 dark:bg-neutral-900;
 }
 
 .workspace {
-	@apply h-dvh w-full pb-10 sm:pb-0;
+	@apply h-dvh w-full overflow-auto pb-10 sm:pb-0;
 }
 
 .workspace.no-sidebar {

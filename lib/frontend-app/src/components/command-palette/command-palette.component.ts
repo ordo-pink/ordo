@@ -58,7 +58,7 @@ export const OrdoCommandPalette = Maoka.create("div", ({ use, refresh, on_unmoun
 		ordo_app_state.zags.update("sections.command_palette", cp => ({ ...cp, index: 0, visible_items: source.slice(0, length) }))
 	}
 
-	const SearchInput = Input.Text({ on_input: handle_input, custom_class, placeholder, autofocus })
+	const SearchInput = Input.Text({ on_input: handle_input, custom_class, placeholder, autofocus, transparent: true })
 	const VisibleItems = OrdoCommandPaletteItems(CommandPaletteLocation.SUGGESTED, handle_click)
 	const PinnedItems = OrdoCommandPaletteItems(CommandPaletteLocation.PINNED, handle_click)
 

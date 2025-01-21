@@ -58,7 +58,8 @@ export const CreateFileModal = (parent: Ordo.Metadata.FSID | null = null) =>
 // TODO Add caret showing expanded-contracted status
 const FileAssociationSelector = (on_select_type: (file_association: Ordo.FileAssociation.Instance, type: string) => void) =>
 	Maoka.create("div", ({ use, refresh, on_unmount }) => {
-		const select_class = "relative bg-neutral-100 shadow-inner dark:bg-neutral-600 rounded-md mt-2 cursor-pointer"
+		const select_class =
+			"relative bg-gradient-to-br from-neutral-100 to-stone-100 dark:from-neutral-600 dark:to-stone-600 shadow-inner rounded-md mt-2 cursor-pointer"
 
 		let current_file_association: Ordo.FileAssociation.Instance | null = null
 		let current_type_index = 0
@@ -178,7 +179,7 @@ const CreateFileModalInput = (handle_change: (event: Event) => void) =>
 				placeholder: t("t.common.components.modals.create_file.input_placeholder"),
 				autofocus: true,
 				custom_class:
-					"w-full rounded-md border-0 px-2 py-1 shadow-inner focus:ring-0 sm:text-sm sm:leading-6 bg-neutral-50 dark:bg-neutral-600 placeholder:text-neutral-500",
+					"w-full rounded-md border-0 px-2 py-1 shadow-inner focus:ring-0 sm:text-sm sm:leading-6 placeholder:text-neutral-500",
 				on_input: handle_change,
 			}),
 		]

@@ -35,6 +35,7 @@ type TInputProps = {
 	type?: "text" | "email"
 	label?: string
 	custom_class?: string
+	transparent?: boolean
 	autofocus?: boolean
 	autocomplete?: string
 	required?: boolean
@@ -48,6 +49,7 @@ const Text = ({
 	type = "text",
 	initial_value,
 	custom_class = "",
+	transparent,
 	autofocus = false,
 	autocomplete,
 	required = false,
@@ -91,6 +93,7 @@ const Text = ({
 				use(MaokaJabs.set_attribute("type", type))
 				use(MaokaJabs.set_class("input_text", custom_class))
 
+				if (!transparent) use(MaokaJabs.add_class("non-transparent"))
 				if (autocomplete) use(MaokaJabs.set_attribute("autocomplete", autocomplete))
 				if (initial_value) use(MaokaJabs.set_attribute("value", initial_value))
 				if (placeholder) use(MaokaJabs.set_attribute("placeholder", placeholder))

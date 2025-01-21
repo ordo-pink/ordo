@@ -39,8 +39,9 @@ export const FileMetadata = (metadata: Ordo.Metadata.Instance) =>
 				MetadataIcon({ metadata }),
 
 				Input.Text({
+					transparent: true,
 					custom_class:
-						"hover:dark:!bg-neutral-800 hover:!bg-neutral-200 rounded-sm font-extrabold !text-2xl cursor-text !w-full !bg-transparent !shadow-none",
+						"hover:bg-gradient-to-br hover:from-neutral-100 hover:to-stone-100 hover:dark:from-neutral-700 hover:dark:to-stone-700 rounded-sm font-extrabold !text-2xl cursor-text !w-full !shadow-none",
 					initial_value: name,
 					on_input: event => {
 						const target = event.target as HTMLInputElement
@@ -55,7 +56,7 @@ export const FileMetadata = (metadata: Ordo.Metadata.Instance) =>
 const LabelsSection = (fsid: Ordo.Metadata.FSID) =>
 	Maoka.create("div", ({ use }) => {
 		const label_section =
-			"flex flex-wrap gap-1 cursor-pointer rounded-sm hover:bg-neutral-200 hover:dark:bg-neutral-800 py-1 min-h-7"
+			"flex flex-wrap gap-1 cursor-pointer rounded-sm hover:bg-gradient-to-br hover:from-neutral-100 hover:to-stone-100 hover:dark:from-neutral-700 hover:dark:to-stone-700 py-1 min-h-7"
 
 		use(MaokaJabs.set_class(label_section))
 		use(MaokaJabs.listen("onclick", () => handle_click()))

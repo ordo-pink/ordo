@@ -91,6 +91,7 @@ export default create_function(
 			"cmd.metadata.show_create_modal",
 			"cmd.metadata.show_edit_label_modal",
 			"cmd.metadata.show_edit_labels_palette",
+			"cmd.metadata.show_edit_links_palette",
 		],
 		queries: [
 			"metadata.$",

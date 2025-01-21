@@ -102,6 +102,7 @@ declare global {
 			metadata: {
 				show_edit_labels_palette: () => string
 				show_edit_label_modal: () => string
+				show_edit_links_palette: () => string
 			}
 			components: {
 				modals: {

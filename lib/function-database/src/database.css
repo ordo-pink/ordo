@@ -14,8 +14,12 @@
 	@apply database_border-color border p-1;
 }
 
+.database_cell-links.clickable {
+	@apply cursor-pointer transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-700;
+}
+
 .database_cell-multiple {
-	@apply database_border-color flex gap-1 text-sm;
+	@apply database_border-color flex text-sm;
 }
 
 .database_cell-labels {

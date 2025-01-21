@@ -35,6 +35,7 @@ export const frontend_app_en_translations: Partial<Record<Ordo.I18N.TranslationK
 	"t.common.state.loading": "Loading...",
 	"t.common.metadata.show_edit_labels_palette": "Edit labels...",
 	"t.common.metadata.show_edit_label_modal": "Edit label",
+	"t.common.metadata.show_edit_links_palette": "Edit links...",
 	"t.common.components.notifications.pending_notifications": "Pending notifications:",
 	"t.common.components.modals.create_file.input_placeholder": "Ordo Together Strong",
 	"t.common.components.modals.create_file.title": "Create File",

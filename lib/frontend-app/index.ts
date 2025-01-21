@@ -38,6 +38,7 @@ import { create_file_command } from "./src/jabs/commands/create-file.command"
 import { create_function_state } from "./src/jabs/create-function-state.jab"
 import { create_function_state_source } from "./src/jabs/create-function-state-source.jab"
 import { edit_file_labels_command } from "./src/jabs/commands/edit-file-labels.command"
+import { edit_file_links_command } from "./src/jabs/commands/edit-file-links.command"
 import { move_file_command } from "./src/jabs/commands/move-file.command"
 import { remove_file_command } from "./src/jabs/commands/remove-file.command"
 import { rename_file_command } from "./src/jabs/commands/rename-file.command"
@@ -63,6 +64,7 @@ export const App = Maoka.create("div", ({ use }) => {
 	use(create_file_command)
 	use(rename_file_command)
 	use(edit_file_labels_command)
+	use(edit_file_links_command)
 
 	// TODO Render user defined functions
 	// TODO .catch

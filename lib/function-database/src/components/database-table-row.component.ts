@@ -56,7 +56,17 @@ const Cell = (value: TMaokaChildren, on_click?: (event: MouseEvent) => void) =>
 
 const LinksCell = (metadata: Ordo.Metadata.Instance, type: "parent" | "incoming" | "outgoing") =>
 	Maoka.create("td", ({ use }) => {
+		const fsid = metadata.get_fsid()
+
 		use(MaokaJabs.set_class("database_cell-links"))
+
+		if (type === "outgoing") {
+			const commands = use(MaokaOrdo.Jabs.get_commands)
+			const handle_click = () => commands.emit("cmd.metadata.show_edit_links_palette", fsid)
+
+			use(MaokaJabs.add_class("clickable"))
+			use(MaokaJabs.listen("onclick", () => handle_click()))
+		}
 
 		return () =>
 			Switch.Match(type)
@@ -70,19 +80,27 @@ const LinksCell = (metadata: Ordo.Metadata.Instance, type: "parent" | "incoming"
 				.case("outgoing", () =>
 					Maoka.create("div", ({ use }) => {
 						use(MaokaJabs.set_class("database-cell_multiple"))
-						const get_links = use(MaokaOrdo.Jabs.Metadata.get_outgoing_links$(metadata.get_fsid()))
-						return () => get_links().map(link => Link({ href: `/editor/${link.get_fsid()}`, children: link.get_name() ?? "/" }))
+						const get_links = use(MaokaOrdo.Jabs.Metadata.get_outgoing_links$(fsid))
+						return () =>
+							get_links().map(link =>
+								LinkBlock(() => Link({ href: `/editor/${link.get_fsid()}`, children: link.get_name() ?? "/" })),
+							)
 					}),
 				)
 				.case("incoming", () =>
 					Maoka.create("div", ({ use }) => {
 						use(MaokaJabs.set_class("database-cell_multiple"))
 						const get_links = use(MaokaOrdo.Jabs.Metadata.get_incoming_links$(metadata.get_fsid()))
-						return () => get_links().map(link => Link({ href: `/editor/${link.get_fsid()}`, children: link.get_name() ?? "/" }))
+						return () =>
+							get_links().map(link =>
+								LinkBlock(() => Link({ href: `/editor/${link.get_fsid()}`, children: link.get_name() ?? "/" })),
+							)
 					}),
 				)
 				.default(noop)
 	})
+
+const LinkBlock = Maoka.styled("div")
 
 const LabelsCell = (fsid: Ordo.Metadata.FSID) =>
 	Maoka.create("td", ({ use }) => {

@@ -51,4 +51,5 @@ const click_listener = (emit: Ordo.Command.Commands["emit"], url: `/${string}`) 
 
 const ignore_history_highlighting_class = "text-inherit visited:text-inherit"
 
-const default_class = "underline cursor-pointer decoration-neutral-500/50 decoration-1 underline-offset-2"
+const default_class =
+	"underline transition-all hover:text-rose-600 dark:hover:text-rose-300 rounded-sm cursor-pointer decoration-neutral-500/50 hover:decoration-rose-500/50 decoration-1 underline-offset-2"

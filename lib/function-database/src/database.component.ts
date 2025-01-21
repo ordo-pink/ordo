@@ -99,28 +99,39 @@ const DatabaseTable = Maoka.styled("table", { class: "w-full border database_bor
 const to_sorted_children = (db_state: TDatabaseState, children: Ordo.Metadata.Instance[]) => {
 	let items = children
 
-	Object.keys(db_state.sorting ?? {}).forEach(key => {
-		const sorting_key = key as keyof typeof db_state.sorting
+	Object.keys(db_state.sorting ?? {}).forEach(column => {
+		const sorting_key = column as keyof typeof db_state.sorting
 
-		if (db_state.sorting![key] == null) return
+		if (db_state.sorting![column] == null) return
 
 		items = items.toSorted((a, b) => {
-			const x = db_state.sorting![sorting_key] === SortingDirection.ASC ? a : b
-			const y = db_state.sorting![sorting_key] === SortingDirection.ASC ? b : a
+			const is_asc = db_state.sorting![sorting_key] === SortingDirection.ASC
+			const x = is_asc ? a : b
+			const y = is_asc ? b : a
 
-			return Switch.Match(key)
+			return Switch.Match(column)
 				.case("t.database.column_names.name", () => x.get_name().localeCompare(y.get_name()))
 				.case("t.database.column_names.created_at", () => (x.get_created_at() > y.get_created_at() ? -1 : 1))
 				.case("t.database.column_names.labels", () => {
-					const label_x = x.get_labels()[0]
-					const label_y = y.get_labels()[0]
+					const x_labels = x.get_labels()
+					const y_labels = y.get_labels()
 
-					if (label_x.color < label_y.color) return -1
-					else if (label_x.color > label_y.color) return 1
+					for (let i = 0; i < x_labels.length; i++) {
+						const x_label = x_labels[i]
+						const y_label = y_labels[i]
 
-					return label_x.name.localeCompare(label_y.name)
+						if (!x_label) return 1
+						if (!y_label) return -1
+
+						if (x_label.name === y_label.name && x_label.color === y_label.color) continue
+
+						if (x_label.color < y_label.color) return -1
+						if (x_label.color > y_label.color) return 1
+					}
+
+					return 0
 				})
-				.default(() => 1)
+				.default(() => 0)
 		})
 	})
 

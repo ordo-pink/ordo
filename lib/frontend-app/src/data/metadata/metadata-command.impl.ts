@@ -20,9 +20,9 @@
  */
 
 import { R, type TResult } from "@ordo-pink/result"
-import { alpha_sort, concat, noop, override, thunk } from "@ordo-pink/tau"
+import { alpha_sort, concat, override, thunk } from "@ordo-pink/tau"
 
-import { Metadata as M, RRR, get_wrong_label, get_wrong_link } from "@ordo-pink/core"
+import { Metadata as M, Metadata, RRR, get_wrong_label, get_wrong_link } from "@ordo-pink/core"
 
 const LOCATION = "MetadataCommand"
 
@@ -85,25 +85,21 @@ export const MetadataCommand: Ordo.Metadata.CommandStatic = {
 
 		update_label: (old_label, new_label) =>
 			m_query
-				.get_by_labels([old_label])
+				.get()
 				.pipe(
-					R.ops.chain(metadata_collection =>
-						R.Merge(
-							metadata_collection.map(metadata => {
-								if (!metadata.has_label(old_label)) return
+					R.ops.map(metadata_collection =>
+						metadata_collection.map(metadata => {
+							if (!metadata.has_label(old_label)) return metadata
 
-								const fsid = metadata.get_fsid()
-								const index = metadata.get_label_index(old_label)
-								const labels = metadata.get_labels()
+							const dto = metadata.to_dto() as any
+							const index = metadata.get_label_index(old_label)
+							dto.labels = dto.labels.toSpliced(index, 1, new_label)
 
-								return R.Ok(labels)
-									.pipe(R.ops.map(labels => labels.toSpliced(index, 1, new_label)))
-									.pipe(R.ops.chain(ls => MC.Of(m_repo, m_query, u_query).replace_labels(fsid, ls)))
-							}),
-						),
+							return Metadata.FromDTO(dto)
+						}),
 					),
 				)
-				.pipe(R.ops.map(noop)),
+				.pipe(R.ops.chain(m_repo.put)),
 
 		remove_labels: (fsid, ...labels) =>
 			_get_metadata_by_fsid_r(

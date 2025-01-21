@@ -40,7 +40,7 @@ export const move_file_command: TMaokaJab = ({ use, on_unmount }) => {
 			.pipe(R.ops.chain(get_descendents(fsid, ctx.metadata_query)))
 			.pipe(R.ops.map(filter_destinations(fsid, ctx.metadata_query)))
 			.pipe(R.ops.map(metadata_to_cp_items(fsid, ctx)))
-			.pipe(R.ops.chain(unshift_move_to_root_r(fsid, ctx.metadata_query, ctx.commands)))
+			.pipe(R.ops.chain(unshift_move_to_root_r(fsid, ctx.metadata_query)))
 			.pipe(R.ops.map(show_command_palette(ctx.commands)))
 			.cata(R.catas.or_nothing())
 
@@ -81,31 +81,35 @@ const filter_destinations =
 		)
 
 const unshift_move_to_root_r =
-	(fsid: Ordo.Metadata.FSID, metadata_query: Ordo.Metadata.Query, commands: Ordo.Command.Commands) =>
+	(fsid: Ordo.Metadata.FSID, metadata_query: Ordo.Metadata.Query) =>
 	(items: Ordo.CommandPalette.Item[]): TResult<Ordo.CommandPalette.Item[], Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL">> =>
 		metadata_query
 			.get_by_fsid(fsid)
-			.pipe(R.ops.map(metadata => (metadata?.is_root_child() ? items : [create_to_root_item(fsid, commands), ...items])))
+			.pipe(R.ops.map(metadata => (metadata?.is_root_child() ? items : [create_to_root_item(fsid), ...items])))
 
-const create_to_root_item = (fsid: Ordo.Metadata.FSID, commands: Ordo.Command.Commands): Ordo.CommandPalette.Item => ({
+const create_to_root_item = (fsid: Ordo.Metadata.FSID): Ordo.CommandPalette.Item => ({
 	render_icon: div => void div.appendChild(BsSlash() as SVGSVGElement),
-	on_select: () => commands.emit("cmd.metadata.move", { fsid, new_parent: null }),
+	value: { fsid, new_parent: null },
 	readable_name: "t.common.components.modals.move.move_to_root",
 })
 
 const show_command_palette = (commands: Ordo.Command.Commands) => (items: Ordo.CommandPalette.Item[]) =>
-	commands.emit("cmd.application.command_palette.show", { is_multiple: false, items, max_items: 100 })
+	commands.emit("cmd.application.command_palette.show", {
+		is_multiple: false,
+		items,
+		max_items: 100,
+		on_select: item => commands.emit("cmd.metadata.move", item.value),
+	})
 
 const metadata_to_cp_items =
-	(fsid: Ordo.Metadata.FSID, ctx: Ordo.CreateFunction.State, commands = ctx.commands) =>
-	(move_destinations: Ordo.Metadata.Instance[]) =>
+	(fsid: Ordo.Metadata.FSID, ctx: Ordo.CreateFunction.State) =>
+	(move_destinations: Ordo.Metadata.Instance[]): Ordo.CommandPalette.Item[] =>
 		move_destinations.map(metadata => {
 			const new_parent = metadata.get_fsid()
 			const readable_name = metadata.get_name() as Ordo.I18N.TranslationKey
 			const Icon = MaokaOrdo.Components.WithState(ctx, () => MetadataIcon({ metadata, show_emoji_picker: false }))
 
-			const on_select = () => commands.emit("cmd.metadata.move", { fsid, new_parent })
 			const render_icon = (div: HTMLDivElement) => Maoka.render_dom(div, Icon)
 
-			return { on_select, readable_name, render_icon }
+			return { value: { fsid, new_parent }, readable_name, render_icon }
 		})

@@ -69,8 +69,8 @@ export const App = Maoka.create("div", ({ use }) => {
 	// TODO Render user defined functions
 	// TODO .catch
 	void Promise.any([
-		import("@ordo-pink/function-welcome").then(({ default: f }) => f(source)),
-		import("@ordo-pink/function-file-editor").then(({ default: f }) => f(source)),
+		import("./src/sections/welcome").then(({ default: f }) => f(source)),
+		import("./src/sections/file-editor").then(({ default: f }) => f(source)),
 		import("@ordo-pink/function-rich-text")
 			.then(({ default: f }) => f(source))
 			.then(() => import("@ordo-pink/function-database"))

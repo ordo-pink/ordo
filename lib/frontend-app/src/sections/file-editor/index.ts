@@ -30,26 +30,8 @@ import { Switch } from "@ordo-pink/switch"
 import { TwoLetterLocale } from "@ordo-pink/locale"
 import { create_function } from "@ordo-pink/core"
 
-import { FileEditorSidebar } from "./src/file-editor.sidebar"
-import { FileEditorWorkspace } from "./src/file-editor.workspace"
-
-declare global {
-	interface cmd {
-		file_editor: {
-			open: () => void
-			open_file: () => Ordo.Metadata.FSID
-		}
-	}
-
-	interface t {
-		file_editor: {
-			command_palette: {
-				open: () => string
-				open_file: () => string
-			}
-		}
-	}
-}
+import { FileEditorSidebar } from "./file-editor.sidebar"
+import { FileEditorWorkspace } from "./file-editor.workspace"
 
 export default create_function(
 	"pink.ordo.editor",

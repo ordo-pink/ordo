@@ -25,56 +25,7 @@ import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { TwoLetterLocale } from "@ordo-pink/locale"
 import { create_function } from "@ordo-pink/core"
 
-import { WelcomeWorkspace } from "./src/welcome.workspace"
-
-declare global {
-	interface t {
-		welcome: {
-			go_to_welcome_page: () => string
-			command_palette: {
-				support: {
-					open_support_palette: () => string
-					email: () => string
-					messenger: () => string
-				}
-			}
-			start_page: {
-				title: () => string
-				news_widget: {
-					title: () => string
-				}
-			}
-			landing_page: {
-				title: () => string
-				cookie_banner: {
-					title: () => string
-					message: () => string
-				}
-				rrr_sign_up_unavailable: {
-					title: () => string
-					message: () => string
-				}
-				sections: {
-					hero: {
-						beta_started_announcement: () => string
-						learn_more: () => string
-						try_now_button: () => string
-						sign_up: () => string
-					}
-				}
-			}
-		}
-	}
-
-	interface cmd {
-		welcome: {
-			go_to_email_support: () => void
-			go_to_messenger_support: () => void
-			go_to_welcome_page: () => void
-			open_support_palette: () => void
-		}
-	}
-}
+import { WelcomeWorkspace } from "./welcome.workspace"
 
 export default create_function(
 	"pink.ordo.welcome",

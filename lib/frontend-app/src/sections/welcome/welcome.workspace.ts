@@ -21,6 +21,14 @@
 
 import { Maoka } from "@ordo-pink/maoka"
 
-import Landing from "./pages/landing.page"
+export const WelcomeWorkspace = Maoka.create("div", () => {
+	const get_is_authenticated = () => false // TODO auth
 
-export const WelcomeWorkspace = Maoka.create("div", () => () => Landing)
+	return () => {
+		const is_authenticated = get_is_authenticated()
+
+		return is_authenticated
+			? Maoka.lazy(() => import("./pages/welcome.page"))
+			: Maoka.lazy(() => import("./pages/landing.page"))
+	}
+})

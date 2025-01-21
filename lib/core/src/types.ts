@@ -140,6 +140,47 @@ declare global {
 				}
 			}
 		}
+		file_editor: {
+			command_palette: {
+				open: () => string
+				open_file: () => string
+			}
+		}
+		welcome: {
+			go_to_welcome_page: () => string
+			command_palette: {
+				support: {
+					open_support_palette: () => string
+					email: () => string
+					messenger: () => string
+				}
+			}
+			start_page: {
+				title: () => string
+				news_widget: {
+					title: () => string
+				}
+			}
+			landing_page: {
+				title: () => string
+				cookie_banner: {
+					title: () => string
+					message: () => string
+				}
+				rrr_sign_up_unavailable: {
+					title: () => string
+					message: () => string
+				}
+				sections: {
+					hero: {
+						beta_started_announcement: () => string
+						learn_more: () => string
+						try_now_button: () => string
+						sign_up: () => string
+					}
+				}
+			}
+		}
 	}
 
 	/**
@@ -268,6 +309,16 @@ declare global {
 				content: Ordo.Content.Instance
 				type: string
 			}
+		}
+		file_editor: {
+			open: () => void
+			open_file: () => Ordo.Metadata.FSID
+		}
+		welcome: {
+			go_to_email_support: () => void
+			go_to_messenger_support: () => void
+			go_to_welcome_page: () => void
+			open_support_palette: () => void
 		}
 	}
 

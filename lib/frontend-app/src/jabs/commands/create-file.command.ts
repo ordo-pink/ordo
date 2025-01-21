@@ -47,7 +47,7 @@ export const create_file_command: TMaokaJab = ({ on_unmount, use }) => {
 
 	state.commands.emit("cmd.application.command_palette.add", {
 		value: () => state.commands.emit("cmd.metadata.show_create_modal", null),
-		hotkey: "mod+shift+n",
+		hotkey: "mod+shift+c",
 		readable_name: "t.common.components.modals.create_file.title",
 		render_icon: div => void div.appendChild(BsFileEarmarkPlus() as SVGSVGElement),
 	})

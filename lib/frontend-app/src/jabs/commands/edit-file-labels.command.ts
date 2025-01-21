@@ -91,7 +91,7 @@ export const edit_file_labels_command: TMaokaJab = ({ on_unmount, use }) => {
 		readable_name: "t.common.metadata.show_edit_labels_palette", // TODO
 		should_show: ({ payload }) => Metadata.Validations.is_metadata(payload),
 		payload_creator: ({ payload }) => (Metadata.Validations.is_metadata(payload) ? payload.get_fsid() : null),
-		type: ContextMenuItemType.CREATE,
+		type: ContextMenuItemType.UPDATE,
 	})
 
 	on_unmount(() => {

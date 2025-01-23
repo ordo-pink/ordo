@@ -19,7 +19,7 @@ export const colonoscope: TColonoscope = (doctor, patient) => {
 		const is_colonized = doctor_parts[i].startsWith(":")
 
 		if (!doctor_parts[i]) continue
-		if (!is_colonized && doctor_parts[i] === patient_parts[i]) continue
+		if (!is_colonized && doctor_parts[i] !== patient_parts[i]) return null
 		if (is_colonized && patient_parts[i]) {
 			if (!result) result = {}
 			result[doctor_parts[i].slice(1)] = patient_parts[i]

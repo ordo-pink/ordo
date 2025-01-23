@@ -34,26 +34,11 @@ declare global {
 
 		module User {
 			export type InternalDTO = Ordo.User.Current.DTO & {
-				email_code: string
+				email_code?: string
 			}
 
 			export type PrivateDTO = User.InternalDTO & {
-				password: string
-				entity_version: number
-			}
-
-			export type V0 = {
-				email: string
-				createdAt: Date
-				subscription: string
-				firstName: string
-				lastName: string
-				id: Ordo.User.ID
-				emailConfirmed: boolean
-				fileLimit: number
-				maxUploadSize: number
-				code: string
-				password: string
+				password?: string
 			}
 		}
 

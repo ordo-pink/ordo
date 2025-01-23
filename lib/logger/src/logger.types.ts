@@ -33,7 +33,7 @@ export type TLogger = {
 	 * Setting verbose to true will only log the message if verbose mode is
 	 * enabled.
 	 */
-	panic: <T extends any[]>(...message: T) => void
+	panic: (...message: any[]) => void
 
 	/**
 	 * Severity Level 1: Alert: action must be taken immediately.
@@ -41,7 +41,7 @@ export type TLogger = {
 	 * Setting verbose to true will only log the message if verbose mode is
 	 * enabled.
 	 */
-	alert: <T extends any[]>(...message: T) => void
+	alert: (...message: any[]) => void
 
 	/**
 	 * Severity Level 2: Critical: critical conditions.
@@ -49,7 +49,7 @@ export type TLogger = {
 	 * Setting verbose to true will only log the message if verbose mode is
 	 * enabled.
 	 */
-	crit: <T extends any[]>(...message: T) => void
+	crit: (...message: any[]) => void
 
 	/**
 	 * Severity Level 3: Error: error conditions.
@@ -57,7 +57,7 @@ export type TLogger = {
 	 * Setting verbose to true will only log the message if verbose mode is
 	 * enabled.
 	 */
-	error: <T extends any[]>(...message: T) => void
+	error: (...message: any[]) => void
 
 	/**
 	 * Severity Level 4: Warning: warning conditions.
@@ -65,20 +65,20 @@ export type TLogger = {
 	 * Setting verbose to true will only log the message if verbose mode is
 	 * enabled.
 	 */
-	warn: <T extends any[]>(...message: T) => void
+	warn: (...message: any[]) => void
 
 	/**
 	 * Severity level 5: Notice: normal but significant condition.
 	 */
-	notice: <T extends any[]>(...message: T) => void
+	notice: (...message: any[]) => void
 
 	/**
 	 * Severity level 6: Informational: informational messages.
 	 */
-	info: <T extends any[]>(...message: T) => void
+	info: (...message: any[]) => void
 
 	/**
 	 * Severity level 7: Debug: debug-level messages.
 	 */
-	debug: <T extends any[]>(...message: T) => void
+	debug: (...message: any[]) => void
 }

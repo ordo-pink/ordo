@@ -124,7 +124,19 @@ export const CurrentUser: Ordo.User.Current.Static = {
 		is_newer_than: is_user_newer_than(dto),
 		is_older_than: is_user_older_than(dto),
 		is_paid: is_user_subscription_paid(dto),
-		to_dto: () => dto,
+		to_dto: () => ({
+			created_at: dto.created_at,
+			email: dto.email,
+			file_limit: dto.file_limit,
+			first_name: dto.first_name,
+			handle: dto.handle,
+			id: dto.id,
+			installed_functions: dto.installed_functions,
+			last_name: dto.last_name,
+			max_functions: dto.max_functions,
+			max_upload_size: dto.max_upload_size,
+			subscription: dto.subscription,
+		}),
 	}),
 }
 
@@ -153,6 +165,14 @@ export const PublicUserValidations: Ordo.User.Public.Validations = {
 
 export const PublicUser: Ordo.User.Public.Static = {
 	Validations: PublicUserValidations,
+	Serialize: dto => ({
+		created_at: dto.created_at,
+		first_name: dto.first_name,
+		handle: dto.handle,
+		id: dto.id,
+		last_name: dto.last_name,
+		subscription: dto.subscription,
+	}),
 	FromDTO: dto => ({
 		get_created_at: get_user_created_at(dto),
 		get_first_name: get_user_first_name(dto),
@@ -165,6 +185,6 @@ export const PublicUser: Ordo.User.Public.Static = {
 		is_newer_than: is_user_newer_than(dto),
 		is_older_than: is_user_older_than(dto),
 		is_paid: is_user_subscription_paid(dto),
-		to_dto: () => dto,
+		to_dto: () => PublicUser.Serialize(dto),
 	}),
 }

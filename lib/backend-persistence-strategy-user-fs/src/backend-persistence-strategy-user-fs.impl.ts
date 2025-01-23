@@ -19,87 +19,94 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { read_file0, write_file_rec0 } from "@ordo-pink/fs"
-import { O } from "@ordo-pink/option"
-import { Oath } from "@ordo-pink/oath"
-import { RRR } from "@ordo-pink/managers"
+import { Oath, ops0 } from "@ordo-pink/oath"
+import { RRR } from "@ordo-pink/core"
 import { type TPersistenceStrategyUser } from "@ordo-pink/backend-service-user"
+import { noop } from "@ordo-pink/tau"
 
-export const PersistenceStrategyUserFS = {
-	of: (path: string): TPersistenceStrategyUser => ({
-		create: user =>
-			_get_users0(path)
-				.pipe(Oath.ops.chain(_check_user_does_not_exist0("id", user)))
-				.pipe(Oath.ops.chain(_check_user_does_not_exist0("email", user)))
-				.pipe(Oath.ops.chain(_check_user_does_not_exist0("handle", user)))
-				.pipe(Oath.ops.chain(users => _save_users0(path, [...users, user]))),
+export const PersistenceStategyUserFS = {
+	Of: (db_path: string): TPersistenceStrategyUser => {
+		const users0 = Oath.FromPromise(() => Bun.file(db_path).json() as Promise<OrdoInternal.User.PrivateDTO[]>).pipe(
+			ops0.rejected_map(error => RRR.codes.eio(error.message, error.name, error.cause, error.stack)),
+		)
 
-		exists_by_email: e => _get_users0(path).pipe(Oath.ops.map(_check_exists("email", e))),
+		const save_users = (users: OrdoInternal.User.PrivateDTO[]) =>
+			Oath.FromPromise(() => Bun.write(db_path, JSON.stringify(users, null, 2))).pipe(
+				ops0.rejected_map(error => RRR.codes.eio(error.message, error.name, error.cause, error.stack)),
+			)
 
-		exists_by_id: i => _get_users0(path).pipe(Oath.ops.map(_check_exists("id", i))),
+		return {
+			create: user =>
+				users0
+					.pipe(
+						ops0.chain(users =>
+							Oath.Merge([
+								Oath.If(!exists(users, "id", user.id), { F: () => user_already_exists("id", user.id) }),
+								Oath.If(!exists(users, "email", user.email), { F: () => user_already_exists("email", user.email) }),
+							]).pipe(ops0.map(() => users)),
+						),
+					)
+					.pipe(ops0.chain(users => save_users([...users, user])))
+					.pipe(ops0.map(noop)),
 
-		exists_by_handle: h => _get_users0(path).pipe(Oath.ops.map(_check_exists("handle", h))),
+			exists_by_email: email => users0.pipe(ops0.map(users => exists(users, "email", email))),
 
-		get_by_email: email =>
-			_get_users0(path).pipe(Oath.ops.map(users => O.FromNullable(users.find(user => user.email === email)))),
+			exists_by_handle: handle => users0.pipe(ops0.map(users => exists(users, "handle", handle))),
 
-		get_by_id: id => _get_users0(path).pipe(Oath.ops.map(users => O.FromNullable(users.find(user => user.id === id)))),
+			exists_by_id: id => users0.pipe(ops0.map(users => exists(users, "id", id))),
 
-		get_by_handle: handle =>
-			_get_users0(path).pipe(Oath.ops.map(users => O.FromNullable(users.find(user => user.handle === handle)))),
+			get_by_email: email =>
+				users0
+					.pipe(ops0.map(users => users.find(u => u.email === email)))
+					.pipe(ops0.chain(user => Oath.FromNullable(user, () => user_not_found("email", email)))),
 
-		update: (id, updated_user) =>
-			_get_users0(path)
-				.pipe(Oath.ops.chain(_replace_in_user_array0(id, updated_user)))
-				.pipe(Oath.ops.chain(users => _save_users0(path, users)))
-				.pipe(Oath.ops.map(() => updated_user)),
+			get_by_handle: handle =>
+				users0
+					.pipe(ops0.map(users => users.find(u => u.handle === handle)))
+					.pipe(ops0.chain(user => Oath.FromNullable(user, () => user_not_found("handle", handle)))),
 
-		get_outdated: current_entity_version =>
-			_get_users0(path).pipe(
-				Oath.ops.map(users => users.filter(user => !user.entity_version || user.entity_version < current_entity_version)),
-			),
+			get_by_id: id =>
+				users0
+					.pipe(ops0.map(users => users.find(u => u.id === id)))
+					.pipe(ops0.chain(user => Oath.FromNullable(user, () => user_not_found("id", id)))),
 
-		migrate: () => Oath.Resolve(void 0),
-	}),
+			remove: id =>
+				users0
+					.pipe(ops0.chain(users => Oath.If(exists(users, "id", id), { T: () => users, F: () => user_not_found("id", id) })))
+					.pipe(ops0.map(users => users.filter(user => user.id !== id)))
+					.pipe(ops0.chain(save_users))
+					.pipe(ops0.map(noop)),
+
+			update: (id, user) =>
+				users0
+					.pipe(ops0.chain(users => Oath.If(exists(users, "id", id), { T: () => users, F: () => user_not_found("id", id) })))
+					.pipe(
+						ops0.map(users =>
+							users.toSpliced(
+								users.findIndex(u => u.id === id),
+								1,
+								user,
+							),
+						),
+					)
+					.pipe(ops0.chain(save_users))
+					.pipe(ops0.map(() => user)),
+		}
+	},
 }
 
-// --- Internal ---
+const exists = <$TKey extends keyof OrdoInternal.User.PrivateDTO>(
+	users: OrdoInternal.User.PrivateDTO[],
+	key: $TKey,
+	value: OrdoInternal.User.PrivateDTO[$TKey],
+) => users.some(u => u[key] === value)
 
-const LOCATION = "PersistenceStrategyUserFS"
+const user_already_exists = <$TKey extends keyof OrdoInternal.User.PrivateDTO>(
+	key: $TKey,
+	value: OrdoInternal.User.PrivateDTO[$TKey],
+) => RRR.codes.eexist("user already exists", key, value)
 
-const eio = RRR.codes.eio(LOCATION)
-const eexist = RRR.codes.eexist(LOCATION)
-const enoent = RRR.codes.enoent(LOCATION)
-
-const _check_user_does_not_exist0 = (key: "id" | "email" | "handle", user: User.PrivateUser) => (users: User.PrivateUser[]) =>
-	Oath.If(!users.some(u => u[key] === user[key]), {
-		T: () => users,
-		F: () => eexist(`create -> id: ${user.id}`),
-	})
-
-const _get_users0 = (path: string) =>
-	read_file0(path, "utf-8")
-		.fix(() => write_file_rec0(path, "[]", "utf-8").pipe(Oath.ops.map(() => "[]")))
-		.pipe(Oath.ops.chain(file => Oath.Try(() => JSON.parse(file as string) as User.PrivateUser[])))
-		.pipe(Oath.ops.rejected_map(error => eio(`get_users -> error: ${error.message}`)))
-
-const _save_users0 = (path: string, data: User.PrivateUser[]) =>
-	Oath.Try(() => JSON.stringify(data))
-		.pipe(Oath.ops.chain(file => write_file_rec0(path, file, "utf-8")))
-		.pipe(Oath.ops.rejected_map(error => eio(`save_users -> error: ${error.message}`)))
-
-const _replace_in_user_array0 = (id: User.PrivateUser["id"], updated_user: User.PrivateUser) => (users: User.PrivateUser[]) =>
-	Oath.FromNullable(
-		users.find(user => user.id === id),
-		() => enoent(`update -> id: ${id}`),
-	).pipe(
-		Oath.ops.map(existing_user =>
-			users
-				.slice(0, users.indexOf(existing_user))
-				.concat(updated_user)
-				.concat(users.slice(users.indexOf(existing_user) + 1)),
-		),
-	)
-
-const _check_exists = (key: "id" | "email" | "handle", value: string) => (users: User.PrivateUser[]) =>
-	users.some(user => user[key] === value)
+const user_not_found = <$TKey extends keyof OrdoInternal.User.PrivateDTO>(
+	key: $TKey,
+	value: OrdoInternal.User.PrivateDTO[$TKey],
+) => RRR.codes.enoent("user not found", key, value)

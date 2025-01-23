@@ -21,72 +21,36 @@
 
 import { ErrorType } from "@ordo-pink/core"
 
-export const eperm =
-	(location: string) =>
-	(...debug: any[]) =>
-		compose_rrr(location)("EPERM", debug)
-export const enoent =
-	(location: string) =>
-	(...debug: any[]) =>
-		compose_rrr(location)("ENOENT", debug)
-export const eintr =
-	(location: string) =>
-	(...debug: any[]) =>
-		compose_rrr(location)("EINTR", debug)
-export const eio =
-	(location: string) =>
-	(...debug: any[]) =>
-		compose_rrr(location)("EIO", debug)
-export const enxio =
-	(location: string) =>
-	(...debug: any[]) =>
-		compose_rrr(location)("ENXIO", debug)
-export const eagain =
-	(location: string) =>
-	(...debug: any[]) =>
-		compose_rrr(location)("EAGAIN", debug)
-export const eacces =
-	(location: string) =>
-	(...debug: any[]) =>
-		compose_rrr(location)("EACCES", debug)
-export const eexist =
-	(location: string) =>
-	(...debug: any[]) =>
-		compose_rrr(location)("EEXIST", debug)
-export const einval =
-	(location: string) =>
-	(...debug: any[]) =>
-		compose_rrr(location)("EINVAL", debug)
-export const emfile =
-	(location: string) =>
-	(...debug: any[]) =>
-		compose_rrr(location)("EMFILE", debug)
-export const efbig =
-	(location: string) =>
-	(...debug: any[]) =>
-		compose_rrr(location)("EFBIG", debug)
-export const enospc =
-	(location: string) =>
-	(...debug: any[]) =>
-		compose_rrr(location)("ENOSPC", debug)
+export const eperm = (message: string, ...debug: any[]) => compose_rrr(message)("EPERM", debug)
+export const enoent = (message: string, ...debug: any[]) => compose_rrr(message)("ENOENT", debug)
+export const eintr = (message: string, ...debug: any[]) => compose_rrr(message)("EINTR", debug)
+export const eio = (message: string, ...debug: any[]) => compose_rrr(message)("EIO", debug)
+export const enxio = (message: string, ...debug: any[]) => compose_rrr(message)("ENXIO", debug)
+export const eagain = (message: string, ...debug: any[]) => compose_rrr(message)("EAGAIN", debug)
+export const eacces = (message: string, ...debug: any[]) => compose_rrr(message)("EACCES", debug)
+export const eexist = (message: string, ...debug: any[]) => compose_rrr(message)("EEXIST", debug)
+export const einval = (message: string, ...debug: any[]) => compose_rrr(message)("EINVAL", debug)
+export const emfile = (message: string, ...debug: any[]) => compose_rrr(message)("EMFILE", debug)
+export const efbig = (message: string, ...debug: any[]) => compose_rrr(message)("EFBIG", debug)
+export const enospc = (message: string, ...debug: any[]) => compose_rrr(message)("ENOSPC", debug)
 
 export const compose_rrr =
-	(location: string) =>
+	(message: string) =>
 	<$TKey extends keyof typeof ErrorType>(key: $TKey, ...debug: any[]): Ordo.Rrr<$TKey> => ({
 		key,
 		code: ErrorType[key] as const,
 		debug,
-		location,
+		message,
 	})
 
 export const compose_rrr_thunk =
-	(location: string) =>
+	(message: string) =>
 	<$TKey extends keyof typeof ErrorType>(key: $TKey, ...debug: any[]) =>
 	(): Ordo.Rrr<$TKey> => ({
 		key,
 		code: ErrorType[key] as const,
 		debug,
-		location,
+		message,
 	})
 
 export const RRR = {

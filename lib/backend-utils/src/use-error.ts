@@ -30,7 +30,7 @@ type TSendErrorParams = { ctx: Context; logger: TLogger }
 export const send_error = (params: TSendErrorParams) => (err: Ordo.Rrr) => {
 	const { ctx, logger } = params
 
-	logger.debug(`[${chalk.red(err.key)}] ${err.location} :: ${err.debug ?? "No debug info provided"}`)
+	logger.debug(`[${chalk.red(err.key)}] ${err.message} :: ${err.debug ?? "No debug info provided"}`)
 
 	const status = Switch.Match(err.code)
 		.case(RRR.enum.EACCES, () => 401)
@@ -44,7 +44,7 @@ export const send_error = (params: TSendErrorParams) => (err: Ordo.Rrr) => {
 		.default(() => 500)
 
 	ctx.response.status = status
-	ctx.response.body = { success: false, error: `${err.code} ${err.key} ${err.location}` }
+	ctx.response.body = { success: false, error: `${err.code} ${err.key} ${err.message}` }
 }
 
 export type HandleErrorParams = { logger: TLogger }

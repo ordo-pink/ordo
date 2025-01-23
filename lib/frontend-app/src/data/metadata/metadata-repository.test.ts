@@ -33,7 +33,7 @@ describe("metadata-repository", () => {
 		it("should return EAGAIN if metadata$ is empty", () => {
 			metadata$.next(null)
 
-			const { key, code, location } = metadataRepository.get().unwrap() as Ordo.Rrr
+			const { key, code, message: location } = metadataRepository.get().unwrap() as Ordo.Rrr
 
 			expect(key).toEqual("EAGAIN")
 			expect(code).toEqual(RRR.enum.EAGAIN)
@@ -61,7 +61,7 @@ describe("metadata-repository", () => {
 
 		it("should return EINVAL if metadata is wrong", () => {
 			metadata$.next(null)
-			const { key, code, debug: spec, location } = metadataRepository.put(null as any).unwrap() as Ordo.Rrr
+			const { key, code, debug: spec, message: location } = metadataRepository.put(null as any).unwrap() as Ordo.Rrr
 			expect(key).toEqual("EINVAL")
 			expect(spec).toEqual(".put: null")
 			expect(code).toEqual(RRR.enum.EINVAL)

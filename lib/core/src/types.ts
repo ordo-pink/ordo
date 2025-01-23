@@ -336,7 +336,7 @@ declare global {
 		type Rrr<$TKey extends keyof typeof C.ErrorType = keyof typeof C.ErrorType> = {
 			key: $TKey
 			code: (typeof C.ErrorType)[$TKey]
-			location: string
+			message: string
 			debug?: any
 		}
 
@@ -631,6 +631,7 @@ declare global {
 
 				type Static = {
 					FromDTO: (dto: Ordo.User.Public.DTO) => Ordo.User.Public.Instance
+					Serialize: <$TDTO extends Ordo.User.Public.DTO>(dto: $TDTO) => Ordo.User.Public.DTO
 					Validations: Ordo.User.Public.Validations
 				}
 

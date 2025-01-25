@@ -51,6 +51,8 @@ const fetch = create_backend_id({
 	logger,
 	token_persistence_strategy: "hello" as any,
 	user_persistence_strategy: PersistenceStategyUserFS.Of(user_db_path),
+	// TODO
+	notification_strategy: { send_email: ({ from, content }) => logger.notice("Email code assigned:", from, "::", content) },
 })
 const port = Bun.env.ORDO_ID_PORT
 

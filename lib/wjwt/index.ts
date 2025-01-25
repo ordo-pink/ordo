@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-export * from "./src/_decode"
-export * from "./src/wjwt.constants"
+export * from "./src/decode"
 export * from "./src/wjwt"
 export * from "./src/wjwt.types"
 export { WJWT as defaut } from "./src/wjwt"

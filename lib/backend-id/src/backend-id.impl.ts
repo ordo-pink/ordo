@@ -28,37 +28,46 @@ import { log_request } from "@ordo-pink/backend-util-log-request"
 import { set_content_type_application_json_header } from "@ordo-pink/backend-util-set-header"
 
 import { type TIDChamber, type TSharedContext } from "./backend-id.types"
-import { handle_cors } from "./handlers/cors.handler"
 import { handle_delete_user } from "./handlers/user/delete-user.handler"
 import { handle_get_user_by_handle } from "./handlers/user/get-user-by-handle.handler"
 import { handle_get_user_by_id } from "./handlers/user/get-user-by-id.handler"
-import { handle_invalidate } from "./handlers/auth/invalidate.handler"
-import { handle_refresh } from "./handlers/auth/refresh.handler"
-import { handle_request_code } from "./handlers/auth/request-code.handler"
+import { handle_invalidate } from "./handlers/tokens/invalidate.handler"
+import { handle_refresh } from "./handlers/tokens/refresh.handler"
+import { handle_request_code } from "./handlers/codes/request-code.handler"
 import { handle_update_user } from "./handlers/user/update-user.handler"
-import { handle_validate_code } from "./handlers/auth/validate-code.handler"
+import { handle_validate_code } from "./handlers/codes/validate-code.handler"
+import { handle_validate_token } from "./handlers/tokens/validate.handler"
+import { routary_cors } from "@ordo-pink/routary-cors"
 
 // TODO Global stats when API is ready
 
-export const create_backend_id = ({ logger, user_persistence_strategy, token_persistence_strategy }: TIDChamber) =>
+export const create_backend_id = ({
+	logger,
+	user_persistence_strategy,
+	token_persistence_strategy,
+	notification_strategy,
+	wjwt,
+}: TIDChamber) =>
 	// TODO Routary.use
-	Routary.Start<TIDChamber>({ user_persistence_strategy, token_persistence_strategy, logger })
+	Routary.Of<TIDChamber>({ user_persistence_strategy, token_persistence_strategy, logger, notification_strategy, wjwt })
 		// TODO Split into two libs/srvs
-		.post("/auth/request-code", handle_request_code)
-		.post("/auth/validate-code", handle_validate_code)
-		.post("/auth/invalidate/:token_id", handle_invalidate)
-		.post("/auth/refresh", handle_refresh)
+		.post("/codes/request", handle_request_code)
+		.post("/codes/validate", handle_validate_code)
 
-		.get("/user/:user_id", handle_get_user_by_id)
-		.get("/user/handle/:user_handle", handle_get_user_by_handle)
-		.patch("/user/:user_id", handle_update_user)
-		.delete("/user/:user_id", handle_delete_user)
+		.post("/tokens/validate", handle_validate_token)
+		.delete("/tokens/invalidate", handle_invalidate)
+		.post("/tokens/refresh", handle_refresh)
 
-		.options("/:section/:handler", handle_cors) // TODO Extract to lib, provide via Routary.use
+		.get("/users/:user_id", handle_get_user_by_id)
+		.get("/users/handle/:user_handle", handle_get_user_by_handle)
+		.patch("/users/:user_id", handle_update_user)
+		.delete("/users/:user_id", handle_delete_user)
+
 		.get("/healthcheck", () => new Response("OK")) // TODO Extract to lib
+		.use(routary_cors({ allow_origin: "http://localhost:3004" })) // TODO Move to env
 
 		// TODO Extract to lib
-		.or_else(intake =>
+		.start(intake =>
 			Oath.Resolve<TIntake<TSharedContext>>({ ...intake, headers: {}, status: 404, request_ip: null })
 				.pipe(ops0.tap(start_response_timer))
 				.pipe(ops0.tap(extract_request_ip))

@@ -24,13 +24,28 @@ import { SocketAddress } from "bun"
 import type { TLogger } from "@ordo-pink/logger"
 import type { TPersistenceStrategyToken } from "@ordo-pink/backend-service-token"
 import type { TPersistenceStrategyUser } from "@ordo-pink/backend-service-user"
+import { TWJWT } from "@ordo-pink/wjwt"
+
+// TODO Move to lib
+export type TNotificationStrategy = {
+	send_email: (params: {
+		from: string
+		to: string
+		subject: string
+		content: string
+		cc?: string[]
+		bcc?: string[]
+		headers?: Record<string, string>
+	}) => void
+}
 
 export type TIDChamber = {
 	logger: TLogger
-	// TODO FS Strategy
-	user_persistence_strategy: TPersistenceStrategyUser // TODO
+	user_persistence_strategy: TPersistenceStrategyUser
 	// TODO FS Strategy
 	token_persistence_strategy: TPersistenceStrategyToken // TODO
+	notification_strategy: TNotificationStrategy
+	wjwt: TWJWT // TODO Custom payload
 }
 
 export type TSharedContext<$TPayload = unknown> = TIDChamber & {

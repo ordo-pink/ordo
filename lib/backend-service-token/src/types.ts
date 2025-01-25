@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { AUD, Algorithm, ISS, JTI, JWT, JWTPayload, SUB } from "@ordo-pink/wjwt"
+import type { AUD, TAlgorithm, ISS, JTI, TJWT, TStandardJWTPayload, SUB } from "@ordo-pink/wjwt"
 import type { Oath } from "@ordo-pink/oath"
 import type { TLogger } from "@ordo-pink/logger"
 import type { TOption } from "@ordo-pink/option"
@@ -35,7 +35,7 @@ export type TTokenRecord = Record<JTI, string>
 /**
  * Payload of the auth JWT.
  */
-export type TAuthTokenPayload = JWTPayload & {
+export type TAuthTokenPayload = TStandardJWTPayload & {
 	/**
 	 * @alias lim `user.file_limit`
 	 */
@@ -60,7 +60,7 @@ export type TAuthTokenPayload = JWTPayload & {
 /**
  * Parsed access token content.
  */
-export type TAuthJWT = JWT<TAuthTokenPayload>
+export type TAuthJWT = TJWT<TAuthTokenPayload>
 
 /**
  * Token persistence strategy implements approach to storing user tokens in the backend. Token
@@ -134,9 +134,9 @@ export type TTokenServiceOptions = {
 	readonly issuer: ISS
 
 	/**
-	 * @see Algorithm
+	 * @see TAlgorithm
 	 */
-	readonly alg: Algorithm
+	readonly alg: TAlgorithm
 
 	/**
 	 * Lifetime of an access token in seconds.

@@ -3,17 +3,39 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-// TODO Use promises
-import { Oath } from "@ordo-pink/oath"
-import { RRR } from "./wjwt.constants"
 import { UUIDv4 } from "@ordo-pink/tau"
 
-export type R = Record<string, unknown>
+export type TCustomPayload = Record<string, unknown>
 
-export type TWJWT = (params: { alg: Algorithm; publicKey: CryptoKey; privateKey: CryptoKey }) => {
-	sign0: ReturnType<WJWTSignFn>
-	verify0: ReturnType<WJWTVerifyFn>
-	decode0: WJWTDecodeFn
+export type TAlgorithm =
+	| {
+			name: "RSA-PSS"
+			hash: {
+				name: "SHA-256" | "SHA-384" | "SHA-512"
+			}
+			modulusLength: number
+			publicExponent: Uint8Array
+			saltLength: number
+	  }
+	| {
+			name: "ECDSA"
+			namedCurve: "P-256" | "P-384" | "P-512"
+			hash: {
+				name: "SHA-256" | "SHA-384" | "SHA-512"
+			}
+	  }
+
+export type TWJWTFn<$TPayload extends TCustomPayload = TCustomPayload> = (params: {
+	alg: TAlgorithm
+	public_key: CryptoKey
+	private_key: CryptoKey
+	aud: AUD
+}) => TWJWT<$TPayload>
+
+export type TWJWT<$TPayload extends TCustomPayload = TCustomPayload> = {
+	sign: ReturnType<TWJWTSignFn<$TPayload>>
+	decode: TWJWTDecodeFn<$TPayload>
+	verify: ReturnType<TWJWTVerifyFn>
 }
 
 /**
@@ -24,7 +46,7 @@ export type SUB = UUIDv4
 /**
  * JWT audience.
  */
-export type AUD = string[]
+export type AUD = string | string[]
 
 /**
  * JWT issue time stamp.
@@ -47,21 +69,7 @@ export type ISS = string
  */
 export type EXP = number
 
-export type Algorithm =
-	| {
-			name: "RSA-PSS"
-			hash: "SHA-256" | "SHA-384" | "SHA-512"
-			modulusLength: number
-			publicExponent: Uint8Array
-			saltLength: number
-	  }
-	| {
-			name: "ECDSA"
-			namedCurve: "P-256" | "P-384" | "P-512"
-			hash: "SHA-256" | "SHA-384" | "SHA-512"
-	  }
-
-export type JWTPayload = {
+export type TStandardJWTPayload = {
 	sub: SUB
 	aud: AUD
 	iat: IAT
@@ -70,32 +78,24 @@ export type JWTPayload = {
 	exp: EXP
 }
 
-export type JWTHeader = {
+export type TJWTHeader = {
 	typ: "JWT"
-	alg: Algorithm
+	alg: "ES256" | "ES384" | "ES512" | "ECDSA" | "RS256" | "RS384" | "RS512" | "RSA-PSS"
 }
 
-export type JWTSignature = Uint8Array
+export type TJWTSignature = Uint8Array
 
-export type JWT<T extends R = R> = {
-	header: JWTHeader
-	payload: T & JWTPayload
-	signature: JWTSignature
+export type TJWT<$TPayload extends TCustomPayload = TCustomPayload> = {
+	header: TJWTHeader
+	payload: $TPayload & TStandardJWTPayload
+	signature: TJWTSignature
 }
 
-export type WJWTVerifyFn = (params: {
-	key: CryptoKey
-	alg: Algorithm
-}) => (
-	token: string,
-	aud?: string,
-) => Oath<boolean, RRR<"INVALORDO_ID_TOKEN"> | RRR<"INVALORDO_ID_KEY"> | RRR<"ALG_KEY_MISMATCH">>
+export type TWJWTVerifyFn = (params: { key: CryptoKey; alg: TAlgorithm; aud: AUD }) => (token: string) => Promise<boolean>
 
-export type WJWTSignFn = <T extends R = R>(params: {
+export type TWJWTSignFn<$TPayload extends TCustomPayload = TCustomPayload> = (params: {
 	key: CryptoKey
-	alg: Algorithm
-}) => (payload: JWT<T>["payload"]) => Oath<string, RRR<"INVALORDO_ID_PAYLOAD"> | RRR<"ALG_KEY_MISMATCH">>
+	alg: TAlgorithm
+}) => (payload: TJWT<$TPayload>["payload"]) => Promise<string>
 
-export type WJWTDecodeFn = <T extends R = R>(
-	token: string,
-) => Oath<JWT<T>, RRR<"INVALORDO_ID_TOKEN"> | RRR<"TOKEN_NOT_PROVIDED">>
+export type TWJWTDecodeFn<T extends TCustomPayload = TCustomPayload> = (token: string) => TJWT<T>

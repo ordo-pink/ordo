@@ -31,14 +31,14 @@ export const TokenService: TTokenServiceStatic = {
 	of: (strategy, { alg, audience, at_expire_in, issuer, keys, rt_expire_in }) => {
 		const refresh_wjwt = WJWT({
 			alg,
-			privateKey: keys.refresh.privateKey,
-			publicKey: keys.refresh.publicKey,
+			private_key: keys.refresh.privateKey,
+			public_key: keys.refresh.publicKey,
 		})
 
 		const access_wjwt = WJWT({
 			alg: alg,
-			privateKey: keys.access.privateKey,
-			publicKey: keys.access.publicKey,
+			private_key: keys.access.privateKey,
+			public_key: keys.access.publicKey,
 		})
 
 		const wjwt = (type: "access" | "refresh") =>
@@ -51,21 +51,21 @@ export const TokenService: TTokenServiceStatic = {
 
 			verify: (token, type) =>
 				wjwt(type)
-					.verify0(token)
+					.verify(token)
 					.pipe(ops0.rejected_map(error => einval(`verify -> error: ${error}`))),
 
 			get_payload: (token, type) =>
 				wjwt(type)
-					.verify0(token)
+					.verify(token)
 					.pipe(ops0.chain(valid => Oath.If(valid, { T: () => token })))
-					.pipe(ops0.chain(token => wjwt(type).decode0(token)))
+					.pipe(ops0.chain(token => wjwt(type).decode(token)))
 					.pipe(ops0.rejected_map(error => einval(`get_payload -> error: ${error}`)))
 					.pipe(ops0.map(jwt => jwt.payload as any))
 					.pipe(ops0.chain(payload => strategy.get_token(payload.sub, payload.jti).pipe(ops0.map(() => O.Some(payload))))),
 
 			decode: token =>
 				wjwt("access")
-					.decode0(token)
+					.decode(token)
 					.pipe(ops0.map(jwt => O.Some(jwt as TAuthJWT)))
 					.pipe(ops0.rejected_map(error => einval(`decode -> error: ${error}`))),
 
@@ -91,10 +91,10 @@ export const TokenService: TTokenServiceStatic = {
 								aud,
 								tokens: Oath.Merge({
 									access: access_wjwt
-										.sign0({ ...data, jti, iat, iss, exp: aexp, sub, aud })
+										.sign({ ...data, jti, iat, iss, exp: aexp, sub, aud })
 										.pipe(ops0.rejected_map(e => einval(e))),
 									refresh: refresh_wjwt
-										.sign0({ ...data, jti, iat, iss, exp: rexp, sub, aud })
+										.sign({ ...data, jti, iat, iss, exp: rexp, sub, aud })
 										.pipe(ops0.rejected_map(e => einval(e))),
 								}),
 							}).pipe(ops0.chain(res => strategy.set_token(sub, jti, res.tokens.refresh).pipe(ops0.map(() => res)))),

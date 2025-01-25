@@ -47,7 +47,7 @@ export const PersistenceStategyUserFS = {
 						),
 					)
 					.pipe(ops0.chain(users => save_users([...users, user])))
-					.pipe(ops0.map(noop)),
+					.pipe(ops0.map(() => user)),
 
 			exists_by_email: email => users0.pipe(ops0.map(users => exists(users, "email", email))),
 

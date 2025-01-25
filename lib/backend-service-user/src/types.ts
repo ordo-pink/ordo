@@ -24,7 +24,7 @@ import type { TResult } from "@ordo-pink/result"
 import type { TValidations } from "@ordo-pink/core"
 
 export type TPersistenceStrategyUser = {
-	create: (user: OrdoInternal.User.PrivateDTO) => Oath<void, Ordo.Rrr<"EIO" | "EEXIST">>
+	create: (user: OrdoInternal.User.PrivateDTO) => Oath<OrdoInternal.User.PrivateDTO, Ordo.Rrr<"EIO" | "EEXIST">>
 	update: (
 		id: OrdoInternal.User.PrivateDTO["id"],
 		user: OrdoInternal.User.PrivateDTO,

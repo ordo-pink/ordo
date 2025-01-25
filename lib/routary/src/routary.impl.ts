@@ -5,26 +5,28 @@
 
 import { colonoscope, is_colonoscopy_doctor } from "@ordo-pink/colonoscope"
 
-import { type TBearing, type TRotary, type TShaft } from "./routary.types"
+import { type TBearing, type TRoutary, type TShaft } from "./routary.types"
 
+// TODO Drop requirement for colonoscope
 export const Routary = {
-	Start: <$TChamber>(chamber: $TChamber, shaft: TShaft<$TChamber> = {}): TRotary<$TChamber> => ({
-		get: (gasket, gear) => Routary.Start(chamber, shaft).each(gasket, ["GET"], gear),
-		put: (gasket, gear) => Routary.Start(chamber, shaft).each(gasket, ["PUT"], gear),
-		head: (gasket, gear) => Routary.Start(chamber, shaft).each(gasket, ["HEAD"], gear),
-		post: (gasket, gear) => Routary.Start(chamber, shaft).each(gasket, ["POST"], gear),
-		patch: (gasket, gear) => Routary.Start(chamber, shaft).each(gasket, ["PATCH"], gear),
-		delete: (gasket, gear) => Routary.Start(chamber, shaft).each(gasket, ["DELETE"], gear),
-		options: (gasket, gear) => Routary.Start(chamber, shaft).each(gasket, ["OPTIONS"], gear),
+	Of: <$TChamber>(chamber: $TChamber, shaft: TShaft<$TChamber> = {}): TRoutary<$TChamber> => ({
+		use: f => f(chamber, shaft),
+		get: (gasket, gear) => Routary.Of(chamber, shaft).each(gasket, ["GET"], gear),
+		put: (gasket, gear) => Routary.Of(chamber, shaft).each(gasket, ["PUT"], gear),
+		head: (gasket, gear) => Routary.Of(chamber, shaft).each(gasket, ["HEAD"], gear),
+		post: (gasket, gear) => Routary.Of(chamber, shaft).each(gasket, ["POST"], gear),
+		patch: (gasket, gear) => Routary.Of(chamber, shaft).each(gasket, ["PATCH"], gear),
+		delete: (gasket, gear) => Routary.Of(chamber, shaft).each(gasket, ["DELETE"], gear),
+		options: (gasket, gear) => Routary.Of(chamber, shaft).each(gasket, ["OPTIONS"], gear),
 		each: (gasket, bearings, gear) => {
 			bearings.forEach(bearing => {
 				if (!shaft[bearing]) shaft[bearing] = {}
 				shaft[bearing][gasket] = gear
 			})
 
-			return Routary.Start(chamber, shaft)
+			return Routary.Of(chamber, shaft)
 		},
-		or_else: crown_gear => (req, server) => {
+		start: crown_gear => (req, server) => {
 			const current_bearing = req.method as TBearing
 			let current_gasket = new URL(req.url).pathname
 			if (current_gasket.endsWith("/") && current_gasket.length > 1) current_gasket = current_gasket.slice(0, -1)

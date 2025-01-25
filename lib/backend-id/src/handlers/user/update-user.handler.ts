@@ -18,48 +18,53 @@ export const handle_update_user = default_handler(intake =>
 					.pipe(
 						ops0.chain(body =>
 							Oath.Merge([
-								body.email &&
-									Oath.If(CurrentUser.Validations.is_email(body.email), {
-										F: () => throw_invalid_email(body.email!, intake),
-										T: () => body.email!,
-									})
-										.pipe(ops0.chain(intake.user_persistence_strategy.get_by_email))
-										.pipe(
-											ops0.chain(user =>
-												Oath.If(!user || user.id === intake.params.user_id, {
-													F: () => throw_exists_by_email(body.email!, intake),
-												}),
-											),
-										),
+								body.email
+									? Oath.If(CurrentUser.Validations.is_email(body.email), {
+											F: () => throw_invalid_email(body.email!, intake),
+											T: () => body.email!,
+										})
+											.pipe(ops0.chain(email => intake.user_persistence_strategy.get_by_email(email).fix(() => null)))
+											.pipe(
+												ops0.chain(user =>
+													Oath.If(!user || user.id === intake.params.user_id, {
+														F: () => throw_exists_by_email(body.email!, intake),
+													}),
+												),
+											)
+									: Oath.Resolve(void 0),
 
-								body.handle &&
-									Oath.If(CurrentUser.Validations.is_handle(body.handle), {
-										F: () => throw_invalid_handle(body.handle!, intake),
-										T: () => body.handle!,
-									})
-										.pipe(ops0.chain(intake.user_persistence_strategy.get_by_handle))
-										.pipe(
-											ops0.chain(user =>
-												Oath.If(!user || user.id === intake.params.user_id, {
-													F: () => throw_exists_by_handle(body.handle!, intake),
-												}),
-											),
-										),
+								body.handle
+									? Oath.If(CurrentUser.Validations.is_handle(body.handle), {
+											F: () => throw_invalid_handle(body.handle!, intake),
+											T: () => body.handle!,
+										})
+											.pipe(ops0.chain(handle => intake.user_persistence_strategy.get_by_handle(handle).fix(() => null)))
+											.pipe(
+												ops0.chain(user =>
+													Oath.If(!user || user.id === intake.params.user_id, {
+														F: () => throw_exists_by_handle(body.handle!, intake),
+													}),
+												),
+											)
+									: Oath.Resolve(void 0),
 
-								body.installed_functions &&
-									Oath.If(CurrentUser.Validations.is_installed_functions(body.installed_functions), {
-										F: () => throw_invalid_installed_functions(body.installed_functions, intake),
-									}),
+								body.installed_functions
+									? Oath.If(CurrentUser.Validations.is_installed_functions(body.installed_functions), {
+											F: () => throw_invalid_installed_functions(body.installed_functions, intake),
+										})
+									: Oath.Resolve(void 0),
 
-								body.first_name &&
-									Oath.If(CurrentUser.Validations.is_first_name(body.first_name), {
-										F: () => throw_invalid_first_name(body.first_name, intake),
-									}),
+								body.first_name
+									? Oath.If(CurrentUser.Validations.is_first_name(body.first_name), {
+											F: () => throw_invalid_first_name(body.first_name, intake),
+										})
+									: Oath.Resolve(void 0),
 
-								body.last_name &&
-									Oath.If(CurrentUser.Validations.is_last_name(body.last_name), {
-										F: () => throw_invalid_last_name(body.last_name, intake),
-									}),
+								body.last_name
+									? Oath.If(CurrentUser.Validations.is_last_name(body.last_name), {
+											F: () => throw_invalid_last_name(body.last_name, intake),
+										})
+									: Oath.Resolve(void 0),
 							]).pipe(ops0.map(() => body)),
 						),
 					)

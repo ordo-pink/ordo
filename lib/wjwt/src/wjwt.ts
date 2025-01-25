@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import type { TWJWT } from "./wjwt.types"
-import { decode0 } from "./_decode"
-import { sign0 } from "./_sign"
-import { verify0 } from "./_verify"
+import type { TWJWTFn } from "./wjwt.types"
+import { decode } from "./decode"
+import { sign } from "./sign"
+import { verify } from "./verify"
 
-export const WJWT: TWJWT = ({ alg, privateKey, publicKey }) => ({
-	sign0: sign0({ alg, key: privateKey }),
-	verify0: verify0({ alg, key: publicKey }),
-	decode0,
+export const WJWT: TWJWTFn = ({ alg, private_key, public_key, aud }) => ({
+	sign: sign({ alg, key: private_key }),
+	verify: verify({ alg, key: public_key, aud }),
+	decode,
 })

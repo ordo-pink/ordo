@@ -40,6 +40,7 @@ export type TNotificationStrategy = {
 }
 
 export type TIDChamber = {
+	allow_origin: string[]
 	logger: TLogger
 	user_persistence_strategy: TPersistenceStrategyUser
 	// TODO FS Strategy

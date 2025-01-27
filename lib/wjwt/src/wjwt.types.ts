@@ -30,6 +30,7 @@ export type TWJWTFn<$TPayload extends TCustomPayload = TCustomPayload> = (params
 	public_key: CryptoKey
 	private_key: CryptoKey
 	aud: AUD
+	iss: ISS
 }) => TWJWT<$TPayload>
 
 export type TWJWT<$TPayload extends TCustomPayload = TCustomPayload> = {
@@ -96,6 +97,7 @@ export type TWJWTVerifyFn = (params: { key: CryptoKey; alg: TAlgorithm; aud: AUD
 export type TWJWTSignFn<$TPayload extends TCustomPayload = TCustomPayload> = (params: {
 	key: CryptoKey
 	alg: TAlgorithm
+	iss: ISS
 }) => (payload: TJWT<$TPayload>["payload"]) => Promise<string>
 
 export type TWJWTDecodeFn<T extends TCustomPayload = TCustomPayload> = (token: string) => TJWT<T>

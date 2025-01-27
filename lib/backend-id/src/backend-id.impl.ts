@@ -47,9 +47,17 @@ export const create_backend_id = ({
 	token_persistence_strategy,
 	notification_strategy,
 	wjwt,
+	allow_origin,
 }: TIDChamber) =>
 	// TODO Routary.use
-	Routary.Of<TIDChamber>({ user_persistence_strategy, token_persistence_strategy, logger, notification_strategy, wjwt })
+	Routary.Of<TIDChamber>({
+		user_persistence_strategy,
+		token_persistence_strategy,
+		logger,
+		notification_strategy,
+		wjwt,
+		allow_origin,
+	})
 		// TODO Split into two libs/srvs
 		.post("/codes/request", handle_request_code)
 		.post("/codes/validate", handle_validate_code)
@@ -64,7 +72,7 @@ export const create_backend_id = ({
 		.delete("/users/:user_id", handle_delete_user)
 
 		.get("/healthcheck", () => new Response("OK")) // TODO Extract to lib
-		.use(routary_cors({ allow_origin: "http://localhost:3004" })) // TODO Move to env
+		.use(routary_cors({ allow_origin }))
 
 		// TODO Extract to lib
 		.start(intake =>

@@ -8,8 +8,8 @@ import { decode } from "./decode"
 import { sign } from "./sign"
 import { verify } from "./verify"
 
-export const WJWT: TWJWTFn = ({ alg, private_key, public_key, aud }) => ({
-	sign: sign({ alg, key: private_key }),
+export const WJWT: TWJWTFn = ({ alg, private_key, public_key, aud, iss }) => ({
+	sign: sign({ alg, key: private_key, iss }),
 	verify: verify({ alg, key: public_key, aud }),
 	decode,
 })

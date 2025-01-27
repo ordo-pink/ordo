@@ -6,9 +6,12 @@
 import { TAlgorithm, type TJWTHeader, type TWJWTSignFn } from "./wjwt.types"
 
 export const sign: TWJWTSignFn =
-	({ alg, key }) =>
+	({ alg, key, iss }) =>
 	async data => {
 		const encoder = new TextEncoder()
+
+		if (!data.iss) data.iss = iss
+		if (data.iss !== iss) throw new TypeError(`Unexpected issuer "${data.iss}"`)
 
 		const header_str = JSON.stringify({ alg: get_alg_str(alg), typ: "JWT" })
 		const header = Buffer.from(encoder.encode(header_str)).toString("base64url")

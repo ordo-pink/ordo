@@ -31,8 +31,76 @@
 // // import { TokenPersistenceStrategyDynamoDB } from "@ordo-pink/backend-persistence-strategy-token-dynamodb"
 // import { create_id_server } from "@ordo-pink/backend-server-id"
 import { ConsoleLogger, type TLogger } from "@ordo-pink/logger"
+import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
+import { type TAlgorithm, WJWT } from "@ordo-pink/wjwt"
+import { type TIDChamber, create_backend_id } from "@ordo-pink/backend-id"
 import { PersistenceStategyUserFS } from "@ordo-pink/backend-persistence-strategy-user-fs"
-import { create_backend_id } from "@ordo-pink/backend-id"
+import { is_port } from "@ordo-pink/tau"
+
+const env_rrr = (env_var: string) => (value?: string | null) =>
+	value ? `Invalid value for ${env_var}: "${value}"` : `Missing value for ${env_var}`
+
+const get_env = () =>
+	Oath.Merge({
+		port: Oath.FromNullable(Bun.env.ORDO_ID_PORT)
+			.and(n => Oath.If(is_port(n), { T: () => n }))
+			.pipe(ops0.rejected_map(env_rrr("ORDO_ID_PORT"))),
+
+		allow_origin: Oath.FromNullable(Bun.env.ORDO_ID_ALLOW_ORIGIN)
+			.and(s => s.split(", "))
+			.pipe(ops0.rejected_map(env_rrr("ORDO_ID_ALLOW_ORIGIN"))),
+
+		aud: Oath.FromNullable(Bun.env.ORDO_ID_AUD)
+			.and(s => s.split(", "))
+			.pipe(ops0.rejected_map(env_rrr("ORDO_ID_AUD"))),
+
+		iss: Oath.FromNullable(Bun.env.ORDO_ID_ISS, env_rrr("ORDO_ID_ISS")),
+
+		jwt: Oath.FromNullable(Bun.env.ORDO_ID_ALGORITHM)
+			.fix(() => "ECDSA:384")
+			.and(a => a.split(":"))
+			.and(([name, c]) => ({ name, hash: { name: `SHA-${c}` }, namedCurve: `P-${c}` }) as TAlgorithm)
+			.and(alg =>
+				Oath.Merge({
+					alg,
+					private_key: Oath.FromNullable(Bun.env.ORDO_ID_TOKEN_PRIVATE_KEY)
+						.and(k => decode_base64_key(k, alg, "private"))
+						.pipe(ops0.rejected_map(env_rrr("ORDO_ID_TOKEN_PRIVATE_KEY"))),
+					public_key: Oath.FromNullable(Bun.env.ORDO_ID_TOKEN_PUBLIC_KEY)
+						.and(k => decode_base64_key(k, alg, "public"))
+						.pipe(ops0.rejected_map(env_rrr("ORDO_ID_TOKEN_PUBLIC_KEY"))),
+				}),
+			),
+		user_db_path: Oath.FromNullable(Bun.env.ORDO_ID_USER_DB_PATH, env_rrr("ORDO_ID_USER_DB_PATH")),
+	})
+
+const main = () =>
+	get_env()
+		.and(({ allow_origin, aud, iss, port, jwt: { alg, private_key, public_key }, user_db_path }) =>
+			Oath.Merge({
+				logger,
+				wjwt: WJWT({ aud, alg, private_key, public_key, iss }),
+				user_persistence_strategy: PersistenceStategyUserFS.Of(user_db_path),
+				notification_strategy: {
+					send_email: ({ from, content }) => logger.notice("Email code assigned:", from, "::", content),
+				}, // TODO
+				allow_origin,
+				token_persistence_strategy: "hello" as any, // TODO
+			} satisfies TIDChamber)
+				.and(create_backend_id)
+				.and(fetch => Bun.serve({ fetch, port })),
+		)
+		.pipe(ops0.tap(server => logger.info(`server running on http://${server.hostname}:${server.port}`)))
+		.invoke(
+			invokers0.or_else(e => {
+				logger.panic(e)
+				process.exit(1)
+			}),
+		)
+
+void main()
+
+// --- Internal ---
 
 const logger: TLogger = {
 	alert: (...message) => ConsoleLogger.alert("[ID]", ...message),
@@ -45,114 +113,14 @@ const logger: TLogger = {
 	warn: (...message) => ConsoleLogger.warn("[ID]", ...message),
 }
 
-const user_db_path = "var/srv/id/users.json"
-
-const fetch = create_backend_id({
-	logger,
-	token_persistence_strategy: "hello" as any,
-	user_persistence_strategy: PersistenceStategyUserFS.Of(user_db_path),
-	// TODO
-	notification_strategy: { send_email: ({ from, content }) => logger.notice("Email code assigned:", from, "::", content) },
-})
-const port = Bun.env.ORDO_ID_PORT
-
-const server = Bun.serve({ fetch, port })
-logger.info(`server running on ${server.hostname}:${server.port}`)
-
-// const port = Number(Bun.env.ORDO_ID_PORT!)
-// const at_expire_in = Number(Bun.env.ORDO_ID_ACCESS_TOKEN_EXPIRE_IN)
-// const rt_expire_in = Number(Bun.env.ORDO_ID_REFRESH_TOKEN_EXPIRE_IN)
-// const website_host = Bun.env.ORDO_WEB_HOST!
-// const logger = ConsoleLogger
-// const origin = [Bun.env.ORDO_DT_PRIVATE_HOST!, Bun.env.ORDO_WORKSPACE_HOST!, Bun.env.ORDO_WEB_HOST!, Bun.env.ORDO_DT_HOST!]
-
-// const user_strategy_type = Bun.env.ORDO_ID_USER_PERSISTENCE_STRATEGY!
-// const token_strategy_type = Bun.env.ORDO_ID_TOKEN_PERSISTENCE_STRATEGY!
-
-// // const user_dynamo_db_config = {
-// // 	region: Bun.env.ORDO_ID_USER_DYNAMODB_REGION!,
-// // 	endpoint: Bun.env.ORDO_ID_USER_DYNAMODB_ENDPOINT!,
-// // 	access_key: Bun.env.ORDO_ID_USER_DYNAMODB_ACCESS_KEY!,
-// // 	secret_key: Bun.env.ORDO_ID_USER_DYNAMODB_SECRET_KEY!,
-// // 	table_name: Bun.env.ORDO_ID_USER_DYNAMODB_USER_TABLE!,
-// // }
-
-// // const token_dynamo_db_config = {
-// // 	region: Bun.env.ORDO_ID_TOKEN_DYNAMODB_REGION!,
-// // 	endpoint: Bun.env.ORDO_ID_TOKEN_DYNAMODB_ENDPOINT!,
-// // 	access_key: Bun.env.ORDO_ID_TOKEN_DYNAMODB_ACCESS_KEY!,
-// // 	secret_key: Bun.env.ORDO_ID_TOKEN_DYNAMODB_SECRET_KEY!,
-// // 	table_name: Bun.env.ORDO_ID_TOKEN_DYNAMODB_USER_TABLE!,
-// // }
-
-// const alg = { name: "ECDSA", namedCurve: "P-384", hash: "SHA-384" } as const
-
-// const main = async () => {
-// 	const at_private_key = await get_key(Bun.env.ORDO_ID_ACCESS_TOKEN_PRIVATE_KEY!, "private")
-// 	const at_public_key = await get_key(Bun.env.ORDO_ID_ACCESS_TOKEN_PUBLIC_KEY!, "public")
-
-// 	const rt_private_key = await get_key(Bun.env.ORDO_ID_REFRESH_TOKEN_PRIVATE_KEY!, "private")
-// 	const rt_public_key = await get_key(Bun.env.ORDO_ID_REFRESH_TOKEN_PUBLIC_KEY!, "public")
-
-// 	const keys = {
-// 		access: { privateKey: at_private_key, publicKey: at_public_key },
-// 		refresh: { privateKey: rt_private_key, publicKey: rt_public_key },
-// 	}
-
-// 	// TODO: Move to env
-// 	const audience = ["https://ordo.pink", "https://id.ordo.pink", "https://dt.ordo.pink"]
-// 	const issuer = "https://id.ordo.pink"
-
-// 	const token_persistence_strategy = Switch.Match(token_strategy_type)
-// 		// 	.case("dynamodb", () => TokenPersistenceStrategyDynamoDB.of(token_dynamo_db_config))
-// 		.default(() => PersistenceStrategyTokenFS.of(Bun.env.ORDO_ID_TOKEN_FS_STRATEGY_PATH!))
-
-// 	const user_persistence_strategy = Switch.Match(user_strategy_type)
-// 		// .case("dynamodb", () => PersistenceStrategyUserDynamoDB.of(user_dynamo_db_config))
-// 		.default(() => PersistenceStrategyUserFS.of(Bun.env.ORDO_ID_USER_FS_STRATEGY_PATH!))
-
-// 	const email_strategy = EmailStrategyRusender.create({ key: Bun.env.ORDO_ID_EMAIL_API_KEY! })
-
-// 	const app = await create_id_server({
-// 		user_persistence_strategy,
-// 		token_persistence_strategy,
-// 		email_strategy,
-// 		origin,
-// 		logger,
-// 		token_service_options: {
-// 			alg,
-// 			at_expire_in,
-// 			audience,
-// 			issuer,
-// 			logger,
-// 			rt_expire_in,
-// 			keys,
-// 		},
-// 		website_host,
-// 		notification_sender: { name: "Привет от Ordo.pink", email: "hello@ordo.pink" },
-// 	})
-
-// 	app.listen({ port: Number(port) }, () => logger.info(`ID running on http://localhost:${chalk.blue(port)}`))
-// }
-
-// const get_key = (key: string, type: "public" | "private") =>
-// 	Oath.FromNullable(key)
-// 		.pipe(ops0.map(key => Buffer.from(key, "base64")))
-// 		.pipe(ops0.map(buffer => new Uint8Array(buffer)))
-// 		.pipe(
-// 			ops0.chain(key =>
-// 				Oath.FromPromise<CryptoKey>(() =>
-// 					type === "private"
-// 						? crypto.subtle.importKey("pkcs8", key, alg, true, ["sign"])
-// 						: crypto.subtle.importKey("spki", key, alg, true, ["verify"]),
-// 				),
-// 			),
-// 		)
-// 		.invoke(
-// 			invokers0.or_else(error => {
-// 				logger.panic(error)
-// 				process.exit(1)
-// 			}),
-// 		)
-
-// void main()
+const decode_base64_key = (key: string, alg: TAlgorithm, type: "public" | "private") =>
+	Oath.FromNullable(key)
+		.and(key => Buffer.from(key, "base64"))
+		.and(buffer => new Uint8Array(buffer))
+		.and(key =>
+			Oath.FromPromise<CryptoKey>(() =>
+				type === "private"
+					? crypto.subtle.importKey("pkcs8", key, alg, true, ["sign"])
+					: crypto.subtle.importKey("spki", key, alg, true, ["verify"]),
+			),
+		)

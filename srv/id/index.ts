@@ -25,6 +25,7 @@ import { type TAlgorithm, WJWT } from "@ordo-pink/wjwt"
 import { type TIDChamber, create_backend_id } from "@ordo-pink/backend-id"
 import { is_finite_non_negative_int, is_finite_positive_int, is_port, is_positive_number } from "@ordo-pink/tau"
 import { PersistenceStategyUserFS } from "@ordo-pink/backend-persistence-strategy-user-fs"
+import { PersistenceStrategyTokenFS } from "@ordo-pink/backend-persistence-strategy-token-fs"
 
 const env_rrr = (env_var: string) => (value?: any) =>
 	value != null ? `Invalid value for ${env_var}: "${value}"` : `Missing value for ${env_var}`
@@ -81,7 +82,14 @@ const get_env = () =>
 			.and(n => Oath.If(is_finite_positive_int(n), { T: () => n }))
 			.pipe(ops0.rejected_map(env_rrr("ORDO_ID_TOKEN_LIFETIME"))),
 
+		persisted_token_lifetime: Oath.FromNullable(Bun.env.ORDO_ID_PERSISTED_TOKEN_LIFETIME)
+			.and(s => Number.parseInt(s, 10))
+			.and(n => Oath.If(is_finite_positive_int(n), { T: () => n }))
+			.pipe(ops0.rejected_map(env_rrr("ORDO_ID_PERSISTED_TOKEN_LIFETIME"))),
+
 		user_db_path: Oath.FromNullable(Bun.env.ORDO_ID_USER_DB_PATH, env_rrr("ORDO_ID_USER_DB_PATH")),
+
+		token_db_path: Oath.FromNullable(Bun.env.ORDO_ID_TOKEN_DB_PATH, env_rrr("ORDO_ID_TOKEN_DB_PATH")),
 	})
 
 const main = () =>
@@ -90,25 +98,26 @@ const main = () =>
 			({
 				allow_origin,
 				aud,
-				iss,
-				port,
-				jwt: { alg, private_key, public_key },
-				user_db_path,
 				file_limit,
+				iss,
+				jwt: { alg, private_key, public_key },
 				max_functions,
 				max_upload_size,
+				persisted_token_lifetime,
+				port,
+				token_db_path,
 				token_lifetime,
+				user_db_path,
 			}) =>
 				Oath.Merge({
-					logger,
-					wjwt: WJWT({ aud, alg, private_key, public_key, iss, token_lifetime }),
-					user_persistence_strategy: PersistenceStategyUserFS.Of(user_db_path),
-					notification_strategy: {
-						send_email: ({ content }) => logger.notice("NOTIFICATION:", "::", content),
-					}, // TODO
 					allow_origin,
-					token_persistence_strategy: "hello" as any, // TODO
 					defaults: { file_limit, max_functions, max_upload_size },
+					logger,
+					notification_strategy: { send_email: ({ content }) => logger.notice("NOTIFICATION:", "::", content) }, // TODO
+					persisted_token_lifetime,
+					token_persistence_strategy: PersistenceStrategyTokenFS.Of(token_db_path), // TODO
+					user_persistence_strategy: PersistenceStategyUserFS.Of(user_db_path),
+					wjwt: WJWT({ aud, alg, private_key, public_key, iss, token_lifetime }),
 				} satisfies TIDChamber)
 					.and(create_backend_id)
 					.and(fetch => Bun.serve({ fetch, port })),

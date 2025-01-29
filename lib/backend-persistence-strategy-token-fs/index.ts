@@ -22,18 +22,19 @@
 import { Oath, ops0 } from "@ordo-pink/oath"
 import { noop, override } from "@ordo-pink/tau"
 import { RRR } from "@ordo-pink/core"
-import { type TPersistenceStrategyToken } from "@ordo-pink/backend-service-token"
-import { type TTokenRecord } from "@ordo-pink/backend-service-token"
+import { type SUB } from "@ordo-pink/wjwt"
 
 export type TPersistenceStrategyTokenFSStatic = {
-	Of: (path: string) => TPersistenceStrategyToken
+	Of: (path: string) => OrdoBackend.Tokens.PersistenceStrategy
 }
 
 export const PersistenceStrategyTokenFS: TPersistenceStrategyTokenFSStatic = {
 	Of: (db_path: string) => {
-		const get_tokens0 = Oath.FromPromise(() => Bun.file(db_path).json()).fix(() => ({}) as Record<string, TTokenRecord>)
+		const get_tokens0 = Oath.FromPromise(() => Bun.file(db_path).json()).fix(
+			() => ({}) as Record<SUB, OrdoBackend.Tokens.TokenRecord>,
+		)
 
-		const write_tokens0 = (tokens: Record<string, TTokenRecord>) =>
+		const write_tokens0 = (tokens: Record<string, OrdoBackend.Tokens.TokenRecord>) =>
 			Oath.Try(() => JSON.stringify(tokens, null, 2))
 				.pipe(ops0.chain(data => Oath.FromPromise(() => Bun.write(db_path, data))))
 				.pipe(ops0.map(noop))
@@ -42,7 +43,7 @@ export const PersistenceStrategyTokenFS: TPersistenceStrategyTokenFSStatic = {
 		return {
 			get_token: (sub, jti) => get_tokens0.pipe(ops0.map(storage => storage[sub]?.[jti])),
 
-			get_tokens: sub => get_tokens0.pipe(ops0.map(storage => storage[sub])),
+			get_token_record: sub => get_tokens0.pipe(ops0.map(storage => storage[sub])),
 
 			remove_token: (sub, jti) =>
 				get_tokens0
@@ -53,10 +54,15 @@ export const PersistenceStrategyTokenFS: TPersistenceStrategyTokenFSStatic = {
 								.pipe(ops0.rejected_map(() => RRR.codes.enoent("Token not found", sub))),
 						),
 					)
-					.pipe(ops0.map(storage => ({ ...storage, [sub]: override<TTokenRecord>({ [jti]: undefined })(storage[sub]) })))
+					.pipe(
+						ops0.map(storage => ({
+							...storage,
+							[sub]: override<OrdoBackend.Tokens.TokenRecord>({ [jti]: undefined })(storage[sub]),
+						})),
+					)
 					.pipe(ops0.chain(write_tokens0)),
 
-			remove_tokens: sub =>
+			remove_token_record: sub =>
 				get_tokens0
 					.pipe(
 						ops0.chain(storage =>
@@ -80,7 +86,7 @@ export const PersistenceStrategyTokenFS: TPersistenceStrategyTokenFSStatic = {
 					.pipe(ops0.map(storage => ({ ...storage, [sub]: { ...(storage[sub] ?? {}), [jti]: token } })))
 					.pipe(ops0.chain(write_tokens0)),
 
-			set_tokens: (sub, record) =>
+			set_token_record: (sub, record) =>
 				get_tokens0
 					.pipe(
 						ops0.chain(storage =>

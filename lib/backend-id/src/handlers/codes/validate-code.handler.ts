@@ -8,18 +8,19 @@ import { type TSharedContext } from "../../backend-id.types"
 import { create_auth_token } from "../../common/create-auth-token"
 import { default_handler } from "../default.handler"
 import { extract_body_email } from "./request-code.handler"
+import { persist_token } from "../../common/persist-token"
 import { redundant_auth_rrr } from "../../rrrs/redundant-auth.rrr"
 
 export const handle_validate_code = default_handler(intake =>
 	extract_request_body(intake)
-		.pipe(ops0.chain(validate_request_body(intake)))
-		.pipe(ops0.chain(validate_user_code(intake)))
-		.pipe(ops0.chain(drop_user_code(intake)))
+		.and(validate_request_body(intake))
+		.and(validate_user_code(intake))
+		.and(drop_user_code(intake))
 		.pipe(ops0.tap(send_sign_in_notification(intake)))
-		.pipe(ops0.chain(create_auth_token(intake)))
-		.pipe(ops0.tap(({ token, user }) => void (intake.payload = { token, user: CurrentUser.Serialize(user) })))
-		// TODO Save token
-		.pipe(ops0.map(() => intake)),
+		.and(create_auth_token(intake))
+		.and(persist_token(intake))
+		.pipe(ops0.tap(({ jwt, user }) => void (intake.payload = { token: jwt.token, user: CurrentUser.Serialize(user) })))
+		.and(() => intake),
 )
 
 // --- Internal ---

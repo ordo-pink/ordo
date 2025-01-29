@@ -40,7 +40,7 @@ import { handle_validate_code } from "./handlers/codes/validate-code.handler"
 import { handle_validate_token } from "./handlers/tokens/validate.handler"
 
 // TODO Global stats when API is ready
-// TODO Split into two libs/srvs
+// TODO Body & params validations
 export const create_backend_id = (chamber: TIDChamber) =>
 	Routary.Of<TIDChamber>(chamber)
 		.post("/codes/request", handle_request_code)

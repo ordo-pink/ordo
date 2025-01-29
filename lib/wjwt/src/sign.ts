@@ -30,7 +30,10 @@ export const sign: TWJWTSignFn =
 		const signature = await crypto.subtle.sign(alg, key, encoder.encode(base64_data))
 		const signature_str = Buffer.from(new Uint8Array(signature)).toString("base64url")
 
-		return `${base64_data}.${signature_str}`
+		return {
+			payload: data,
+			token: `${base64_data}.${signature_str}`,
+		}
 	}
 
 const get_alg_str = (alg: TAlgorithm): TJWTHeader["alg"] => {

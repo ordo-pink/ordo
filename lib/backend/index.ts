@@ -1,9 +1,9 @@
 /*
- * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
  * SPDX-License-Identifier: AGPL-3.0-only
  *
  * Ordo.pink is an all-in-one team workspace.
- * Copyright (C) 2024  谢尔盖 ||↓ and the Ordo.pink contributors
+ * Copyright (C) 2025  谢尔盖 ||↓ and the Ordo.pink contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -19,20 +19,4 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { type TCreateAuthTokenResult } from "./create-auth-token.fn"
-
-export const token_result_to_response_body = ({
-	user: { file_limit, max_functions, max_upload_size, id: sub, subscription },
-	expires,
-	jti,
-	token,
-}: TCreateAuthTokenResult) => ({
-	expires,
-	file_limit,
-	jti,
-	max_functions,
-	max_upload_size,
-	sub,
-	subscription,
-	token,
-})
+export * from "./src/backend.types"

@@ -95,11 +95,16 @@ export type TJWT<$TPayload extends TCustomPayload = TCustomPayload> = {
 
 export type TWJWTVerifyFn = (params: { key: CryptoKey; alg: TAlgorithm; aud: AUD }) => (token: string) => Promise<boolean>
 
+export type TWJWTSignResult<$TPayload extends TCustomPayload = TCustomPayload> = {
+	token: string
+	payload: $TPayload & TStandardJWTPayload
+}
+
 export type TWJWTSignFn<$TPayload extends TCustomPayload = TCustomPayload> = (params: {
 	key: CryptoKey
 	alg: TAlgorithm
 	iss: ISS
 	token_lifetime: EXP
-}) => (payload: Partial<TJWT<$TPayload>["payload"]> & { aud: AUD; sub: SUB }) => Promise<string>
+}) => (payload: Partial<TJWT<$TPayload>["payload"]> & { aud: AUD; sub: SUB }) => Promise<TWJWTSignResult>
 
 export type TWJWTDecodeFn<T extends TCustomPayload = TCustomPayload> = (token: string) => TJWT<T>

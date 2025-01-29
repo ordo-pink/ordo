@@ -14,5 +14,5 @@ export const create_auth_token = (intake: TIntake<TSharedContext>) => (user: Ord
 			sbs: user.subscription,
 		}),
 	)
-		.pipe(ops0.map(token => ({ token, user })))
+		.pipe(ops0.map(jwt => ({ jwt, user })))
 		.pipe(ops0.rejected_map(rrr => unknown_error(rrr, intake)))

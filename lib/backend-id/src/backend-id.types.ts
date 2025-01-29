@@ -22,7 +22,6 @@
 import { SocketAddress } from "bun"
 
 import type { TLogger } from "@ordo-pink/logger"
-import type { TPersistenceStrategyToken } from "@ordo-pink/backend-service-token"
 import type { TPersistenceStrategyUser } from "@ordo-pink/backend-service-user"
 import { TWJWT } from "@ordo-pink/wjwt"
 
@@ -44,9 +43,10 @@ export type TIDChamber = {
 	logger: TLogger
 	user_persistence_strategy: TPersistenceStrategyUser
 	// TODO FS Strategy
-	token_persistence_strategy: TPersistenceStrategyToken // TODO
+	token_persistence_strategy: OrdoBackend.Tokens.PersistenceStrategy // TODO
 	notification_strategy: TNotificationStrategy
 	wjwt: TWJWT // TODO Custom payload
+	persisted_token_lifetime: number
 	defaults: {
 		file_limit: number
 		max_upload_size: number

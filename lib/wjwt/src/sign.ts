@@ -6,12 +6,18 @@
 import { TAlgorithm, type TJWTHeader, type TWJWTSignFn } from "./wjwt.types"
 
 export const sign: TWJWTSignFn =
-	({ alg, key, iss }) =>
+	({ alg, key, iss, token_lifetime }) =>
 	async data => {
 		const encoder = new TextEncoder()
 
+		if (data.iss && data.iss !== iss) throw new TypeError(`Unexpected issuer "${data.iss}"`)
+		if (!data.sub) throw new TypeError("Token subject not provided")
+		if (!data.aud) throw new TypeError("Token audience not provided")
+
 		if (!data.iss) data.iss = iss
-		if (data.iss !== iss) throw new TypeError(`Unexpected issuer "${data.iss}"`)
+		if (!data.jti) data.jti = crypto.randomUUID()
+		if (!data.iat) data.iat = Math.floor(Date.now() / 1000)
+		if (!data.exp) data.exp = Math.floor(Date.now() / 1000) + token_lifetime
 
 		const header_str = JSON.stringify({ alg: get_alg_str(alg), typ: "JWT" })
 		const header = Buffer.from(encoder.encode(header_str)).toString("base64url")

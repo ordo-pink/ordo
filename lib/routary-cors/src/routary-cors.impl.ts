@@ -13,7 +13,7 @@ export const routary_cors: TRoutaryCORS =
 		const options = {} as Record<string, string[]>
 
 		Object.keys(shaft).forEach(bearing => {
-			if (bearing === "GET" || bearing === "HEAD" || bearing === "OPTIONS") return
+			if (bearing === "OPTIONS") return
 
 			Object.keys(shaft[bearing as TBearing] as Record<TGasket, TGear<Record<string, unknown>>>).forEach(gasket => {
 				if (!options[gasket]) options[gasket] = ["OPTIONS"]

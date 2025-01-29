@@ -14,10 +14,10 @@ export const handle_request_code = default_handler(intake =>
 		.pipe(
 			ops0.tap(({ codes, email }) =>
 				intake.notification_strategy.send_email({
-					from: "hello@ordo.pink",
+					from: "hello@ordo.pink", // TODO Take from intake
 					to: email,
-					subject: "Sign in code for your ORDO account",
-					content: codes.code,
+					subject: "Sign in code for your ORDO account", // TODO i18n
+					content: codes.code, // TODO Actual body
 				}),
 			),
 		)

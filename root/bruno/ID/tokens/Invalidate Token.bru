@@ -1,11 +1,11 @@
 meta {
-  name: Refresh Token
+  name: Invalidate Token
   type: http
-  seq: 2
+  seq: 3
 }
 
-post {
-  url: {{ID_HOST}}/tokens/refresh
+delete {
+  url: {{ID_HOST}}/tokens/invalidate
   body: none
   auth: bearer
 }

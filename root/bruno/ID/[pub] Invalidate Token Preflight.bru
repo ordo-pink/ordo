@@ -1,0 +1,19 @@
+meta {
+  name: [pub] Invalidate Token Preflight
+  type: http
+  seq: 8
+}
+
+options {
+  url: {{ID_HOST}}/tokens/invalidate
+  body: none
+  auth: none
+}
+
+headers {
+  Origin: {{ORIGIN}}
+}
+
+script:post-response {
+  bru.setVar("CURRENT_TOKEN",res.getBody().payload)
+}

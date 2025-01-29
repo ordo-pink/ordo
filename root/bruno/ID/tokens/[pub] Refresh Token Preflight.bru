@@ -1,11 +1,11 @@
 meta {
-  name: User By ID Preflight
+  name: [pub] Refresh Token Preflight
   type: http
-  seq: 4
+  seq: 3
 }
 
 options {
-  url: {{ID_HOST}}/users/{{USER_ID}}
+  url: {{ID_HOST}}/tokens/refresh
   body: none
   auth: none
 }

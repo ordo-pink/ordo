@@ -1,0 +1,15 @@
+meta {
+  name: [pub] User By Handle
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{ID_HOST}}/users/handle/:user_handle
+  body: none
+  auth: none
+}
+
+params:path {
+  user_handle: {{CURRENT_HANDLE}}
+}

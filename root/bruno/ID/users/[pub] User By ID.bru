@@ -1,0 +1,15 @@
+meta {
+  name: [pub] User By ID
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{ID_HOST}}/users/:user_id
+  body: none
+  auth: none
+}
+
+params:path {
+  user_id: {{CURRENT_ID}}
+}

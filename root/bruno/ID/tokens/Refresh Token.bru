@@ -1,0 +1,19 @@
+meta {
+  name: Refresh Token
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{ID_HOST}}/tokens/refresh
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{CURRENT_TOKEN}}
+}
+
+script:post-response {
+  bru.setVar("CURRENT_TOKEN",res.getBody().payload)
+}

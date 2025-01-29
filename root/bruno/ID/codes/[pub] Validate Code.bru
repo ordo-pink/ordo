@@ -1,0 +1,25 @@
+meta {
+  name: [pub] Validate Code
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{ID_HOST}}/codes/validate
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "{{USER_EMAIL}}",
+    "code": "190188"
+  }
+}
+
+script:post-response {
+  bru.setVar("CURRENT_TOKEN", res.getBody().payload.token)
+  bru.setVar("CURRENT_ID", res.getBody().payload.user.id)
+  bru.setVar("CURRENT_EMAIL", res.getBody().payload.user.email)
+  bru.setVar("CURRENT_HANDLE", res.getBody().payload.user.handle)
+}

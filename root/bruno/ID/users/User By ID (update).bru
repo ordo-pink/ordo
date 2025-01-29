@@ -1,0 +1,26 @@
+meta {
+  name: User By ID (update)
+  type: http
+  seq: 3
+}
+
+patch {
+  url: {{ID_HOST}}/users/:user_id
+  body: json
+  auth: bearer
+}
+
+params:path {
+  user_id: {{CURRENT_ID}}
+}
+
+auth:bearer {
+  token: {{CURRENT_TOKEN}}
+}
+
+body:json {
+  {
+    "handle": "{{USER_HANDLE}}",
+    "email": "{{USER_EMAIL}}"
+  }
+}

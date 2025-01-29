@@ -1,0 +1,19 @@
+meta {
+  name: User By ID (remove)
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{ID_HOST}}/users/:user_id
+  body: none
+  auth: bearer
+}
+
+params:path {
+  user_id: {{CURRENT_ID}}
+}
+
+auth:bearer {
+  token: {{CURRENT_TOKEN}}
+}

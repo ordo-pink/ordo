@@ -1,0 +1,19 @@
+meta {
+  name: [pub] User By Handle Preflight
+  type: http
+  seq: 5
+}
+
+options {
+  url: {{ID_HOST}}/users/handle/:user_handle
+  body: none
+  auth: none
+}
+
+params:path {
+  user_handle: {{CURRENT_HANDLE}}
+}
+
+headers {
+  Origin: {{ORIGIN}}
+}

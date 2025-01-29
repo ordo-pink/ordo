@@ -50,7 +50,7 @@ export default defineConfig({
 	},
 	assetsInclude: "./static/*",
 	server: {
-		port: Number(process.env.ORDO_WORKSPACE_PORT),
+		port: Number(process.env.ORDO_WEB_PORT),
 	},
 	resolve: {
 		alias: {

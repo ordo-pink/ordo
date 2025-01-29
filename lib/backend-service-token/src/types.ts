@@ -19,11 +19,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { AUD, TAlgorithm, ISS, JTI, TJWT, TStandardJWTPayload, SUB } from "@ordo-pink/wjwt"
+import type { AUD, ISS, JTI, SUB, TAlgorithm, TJWT, TStandardJWTPayload } from "@ordo-pink/wjwt"
 import type { Oath } from "@ordo-pink/oath"
 import type { TLogger } from "@ordo-pink/logger"
-import type { TOption } from "@ordo-pink/option"
-import type { TRrr } from "@ordo-pink/managers"
 
 // --- Public ---
 
@@ -76,32 +74,32 @@ export type TPersistenceStrategyToken = {
 	 *
 	 * @returns an Oath resolving into an option of the token or rejecting with `EIO`
 	 */
-	get_token: (sub: SUB, jti: JTI) => Oath<TOption<string>, TRrr<"EIO">>
+	get_token: (sub: SUB, jti: JTI) => Oath<string, Ordo.Rrr<"EIO">>
 
 	/**
 	 * Returns a record of all refresh tokens associated with given `SUB`.
 	 */
-	get_tokens: (sub: SUB) => Oath<TOption<TTokenRecord>, TRrr<"EIO">>
+	get_tokens: (sub: SUB) => Oath<TTokenRecord, Ordo.Rrr<"EIO">>
 
 	/**
 	 * Removes refresh token of given `SUB` associated with given `JTI`.
 	 */
-	remove_token: (sub: SUB, jti: JTI) => Oath<void, TRrr<"EIO" | "ENOENT">>
+	remove_token: (sub: SUB, jti: JTI) => Oath<void, Ordo.Rrr<"EIO" | "ENOENT">>
 
 	/**
 	 * Removes a record of all refresh tokens associated with given `SUB`.
 	 */
-	remove_tokens: (sub: SUB) => Oath<void, TRrr<"EIO" | "ENOENT">>
+	remove_tokens: (sub: SUB) => Oath<void, Ordo.Rrr<"EIO" | "ENOENT">>
 
 	/**
 	 * Assigns refresh token of given `SUB` associated with given `JTI`.
 	 */
-	set_token: (sub: SUB, jti: JTI, token: string) => Oath<void, TRrr<"EIO">>
+	set_token: (sub: SUB, jti: JTI, token: string) => Oath<void, Ordo.Rrr<"EIO">>
 
 	/**
 	 * Assigns a record of all refresh tokens associated with given `SUB`.
 	 */
-	set_tokens: (sub: SUB, record: TTokenRecord) => Oath<void, TRrr<"EIO">>
+	set_tokens: (sub: SUB, record: TTokenRecord) => Oath<void, Ordo.Rrr<"EIO">>
 }
 
 /**
@@ -159,20 +157,20 @@ export type TTokenServiceStatic = {
 }
 
 export type TTokenService = {
-	verify: <$TType extends "access" | "refresh">(token: string, type: $TType) => Oath<boolean, TRrr<"EINVAL">>
+	verify: <$TType extends "access" | "refresh">(token: string, type: $TType) => Oath<boolean, Ordo.Rrr<"EINVAL">>
 
 	get_payload: <$TType extends "access" | "refresh">(
 		token: string,
 		type: $TType,
-	) => Oath<TOption<TAuthTokenPayload>, TRrr<"EINVAL" | "EIO">>
+	) => Oath<TAuthTokenPayload, Ordo.Rrr<"EINVAL" | "EIO">>
 
-	decode: <$TType extends "access" | "refresh">(token: string, type: $TType) => Oath<TOption<TAuthJWT>, TRrr<"EINVAL">>
+	decode: <$TType extends "access" | "refresh">(token: string, type: $TType) => Oath<TAuthJWT, Ordo.Rrr<"EINVAL">>
 
 	create: (params: {
 		sub: SUB
 		data: { lim: number; mfs: number; sbs: string; mxf: number }
 		aud?: AUD
-	}) => Oath<TAuthTokenPayload & { token: string }, TRrr<"EINVAL" | "EIO">>
+	}) => Oath<TAuthTokenPayload & { token: string }, Ordo.Rrr<"EINVAL" | "EIO">>
 
 	strategy: TPersistenceStrategyToken
 }

@@ -104,6 +104,19 @@ export const CurrentUserValidations: Ordo.User.Current.Validations = {
 
 export const CurrentUser: Ordo.User.Current.Static = {
 	Validations: CurrentUserValidations,
+	Serialize: dto => ({
+		created_at: dto.created_at,
+		first_name: dto.first_name,
+		handle: dto.handle,
+		id: dto.id,
+		last_name: dto.last_name,
+		subscription: dto.subscription,
+		email: dto.email,
+		file_limit: dto.file_limit,
+		installed_functions: dto.installed_functions,
+		max_functions: dto.max_functions,
+		max_upload_size: dto.max_upload_size,
+	}),
 	FromDTO: dto => ({
 		can_add_function: can_user_add_function(dto),
 		can_create_files: can_user_create_files(dto),

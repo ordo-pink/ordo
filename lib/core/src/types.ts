@@ -592,6 +592,7 @@ declare global {
 
 				type Static = {
 					FromDTO: (dto: Ordo.User.Current.DTO) => Ordo.User.Current.Instance
+					Serialize: <$TDTO extends Ordo.User.Current.DTO>(dto: $TDTO) => Ordo.User.Current.DTO
 					Validations: Ordo.User.Current.Validations
 				}
 

@@ -29,7 +29,7 @@ import { TWJWT } from "@ordo-pink/wjwt"
 // TODO Move to lib
 export type TNotificationStrategy = {
 	send_email: (params: {
-		from: string
+		from?: string
 		to: string
 		subject: string
 		content: string
@@ -47,6 +47,11 @@ export type TIDChamber = {
 	token_persistence_strategy: TPersistenceStrategyToken // TODO
 	notification_strategy: TNotificationStrategy
 	wjwt: TWJWT // TODO Custom payload
+	defaults: {
+		file_limit: number
+		max_upload_size: number
+		max_functions: number
+	}
 }
 
 export type TSharedContext<$TPayload = unknown> = TIDChamber & {

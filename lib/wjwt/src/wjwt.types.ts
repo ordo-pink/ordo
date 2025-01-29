@@ -31,6 +31,7 @@ export type TWJWTFn<$TPayload extends TCustomPayload = TCustomPayload> = (params
 	private_key: CryptoKey
 	aud: AUD
 	iss: ISS
+	token_lifetime: number
 }) => TWJWT<$TPayload>
 
 export type TWJWT<$TPayload extends TCustomPayload = TCustomPayload> = {

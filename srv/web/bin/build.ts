@@ -30,7 +30,7 @@ const main = () =>
 
 // --- Internal ---
 
-const src_dir = "./srv/my"
+const src_dir = "./srv/web"
 const target_dir = "./var/out/my"
 
 const clean_up_cmd = `rm -rf ${target_dir}`

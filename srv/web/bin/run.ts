@@ -32,7 +32,7 @@ const { ORDO_STATIC_HOST, ORDO_ID_HOST, ORDO_WEB_HOST, ORDO_DT_HOST, ORDO_WORKSP
 ])
 
 void run_command("npm run dev", {
-	cwd: "./srv/my",
+	cwd: "./srv/web",
 	stdin: "inherit",
 	stdout: "inherit",
 	env: {

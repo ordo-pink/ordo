@@ -24,7 +24,7 @@ import { invokers0 } from "@ordo-pink/oath"
 
 // TODO Move dependencies to root
 void run_command("opt/bun i", {
-	cwd: "./srv/my",
+	cwd: "./srv/web",
 	stdin: "inherit",
 	stderr: "inherit",
 }).invoke(invokers0.or_else(die()))

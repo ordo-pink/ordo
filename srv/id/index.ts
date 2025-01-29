@@ -19,17 +19,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-// import chalk from "chalk"
-
-// import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
-// import { ConsoleLogger } from "@ordo-pink/logger"
-// import { EmailStrategyRusender } from "@ordo-pink/backend-email-strategy-rusender"
-// import { PersistenceStrategyTokenFS } from "@ordo-pink/backend-persistence-strategy-token-fs"
-// // import { PersistenceStrategyUserDynamoDB } from "@ordo-pink/backend-persistence-strategy-user-dynamodb"
-// import { PersistenceStrategyUserFS } from "@ordo-pink/backend-persistence-strategy-user-fs"
-// import { Switch } from "@ordo-pink/switch"
-// // import { TokenPersistenceStrategyDynamoDB } from "@ordo-pink/backend-persistence-strategy-token-dynamodb"
-// import { create_id_server } from "@ordo-pink/backend-server-id"
 import { ConsoleLogger, type TLogger } from "@ordo-pink/logger"
 import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
 import { type TAlgorithm, WJWT } from "@ordo-pink/wjwt"
@@ -71,6 +60,7 @@ const get_env = () =>
 						.pipe(ops0.rejected_map(env_rrr("ORDO_ID_TOKEN_PUBLIC_KEY"))),
 				}),
 			),
+
 		user_db_path: Oath.FromNullable(Bun.env.ORDO_ID_USER_DB_PATH, env_rrr("ORDO_ID_USER_DB_PATH")),
 	})
 

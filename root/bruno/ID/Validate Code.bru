@@ -1,0 +1,18 @@
+meta {
+  name: Validate Code
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{ID_HOST}}/codes/validate
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "{{USER_EMAIL}}",
+    "code": "479311"
+  }
+}

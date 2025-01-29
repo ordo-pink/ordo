@@ -1,0 +1,17 @@
+meta {
+  name: Request Code
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{ID_HOST}}/codes/request
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "{{USER_EMAIL}}"
+  }
+}

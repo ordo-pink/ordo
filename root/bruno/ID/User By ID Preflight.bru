@@ -1,0 +1,15 @@
+meta {
+  name: User By ID Preflight
+  type: http
+  seq: 4
+}
+
+options {
+  url: {{ID_HOST}}/users/{{USER_ID}}
+  body: none
+  auth: none
+}
+
+headers {
+  Origin: {{ORIGIN}}
+}

@@ -1,0 +1,15 @@
+meta {
+  name: Get User By Handle
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{ID_HOST}}/users/handle/{{USER_HANDLE}}
+  body: none
+  auth: none
+}
+
+vars:pre-request {
+  : 
+}

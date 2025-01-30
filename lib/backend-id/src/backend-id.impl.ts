@@ -56,7 +56,7 @@ export const create_backend_id = (chamber: TIDChamber) =>
 		.delete("/users/:user_id", handle_delete_user)
 
 		.get("/healthcheck", () => new Response("OK")) // TODO Extract to lib
-		.use(routary_cors({ allow_origin: chamber.allow_origin }))
+		.use(routary_cors({ allow_origin: chamber.allow_origin, allow_headers: ["Content-Type"] }))
 
 		.start(intake =>
 			// TODO Extract to lib

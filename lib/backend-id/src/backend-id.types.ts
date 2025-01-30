@@ -47,6 +47,8 @@ export type TIDChamber = {
 	notification_strategy: TNotificationStrategy
 	wjwt: TWJWT // TODO Custom payload
 	persisted_token_lifetime: number
+	status: number
+	headers: Record<string, string>
 	defaults: {
 		file_limit: number
 		max_upload_size: number
@@ -58,7 +60,6 @@ export type TSharedContext<$TPayload = unknown> = TIDChamber & {
 	response_timer?: [number, number]
 	response_time?: string
 	payload?: $TPayload
-	status: number
-	headers: Record<string, string>
+
 	request_ip: SocketAddress | null
 }

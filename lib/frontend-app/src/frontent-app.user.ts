@@ -50,7 +50,9 @@ export const init_user = call_once(() => {
 			UserQuery.Of(current_user_repository, public_user_repository, permission =>
 				Result.If(known_functions.has_permissions(fid, { queries: [permission] }), {
 					F: () => {
-						const rrr = eperm(`MetadataQuery permission RRR. Did you forget to request query permission '${permission}'?`)
+						const rrr = RRR.codes.eperm(
+							`MetadataQuery permission RRR. Did you forget to request query permission '${permission}'?`,
+						)
 						ConsoleLogger.error(rrr.debug?.join(" "))
 						return rrr
 					},
@@ -64,5 +66,3 @@ export const init_user = call_once(() => {
 // TODO Move to ordo_app_state
 const current_user$ = ZAGS.Of({ user: null as Ordo.User.Current.Instance | null })
 const public_user$ = ZAGS.Of({ known_users: [] as Ordo.User.Public.Instance[] })
-
-const eperm = RRR.codes.eperm("UserQuery")

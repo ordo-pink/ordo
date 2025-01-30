@@ -5,6 +5,7 @@
 
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { R } from "@ordo-pink/result"
+import { type TLogger } from "@ordo-pink/logger"
 import { type TMaokaJab } from "@ordo-pink/maoka"
 import { type TZags } from "@ordo-pink/zags"
 import { deep_equals } from "@ordo-pink/tau"
@@ -22,15 +23,15 @@ export const get_file_associations$: TMaokaJab<() => Ordo.FileAssociation.Instan
 	return use(happy_marriage$(file_associations$, x => x.value))
 }
 
-// export const get_logger: TMaokaJab<TLogger> = ({ use }) => {
-// 	const { get_logger } = use(ordo_context.consume)
-// 	return get_logger()
-// }
+export const get_logger: TMaokaJab<TLogger> = ({ use }) => {
+	const zags = use(ordo_context.consume)
+	return zags.logger
+}
 
-// export const get_fetch: TMaokaJab<Ordo.Fetch> = ({ use }) => {
-// 	const { get_fetch } = use(ordo_context.consume)
-// 	return use(computed("fetch", get_fetch))
-// }
+export const get_fetch: TMaokaJab<Ordo.Fetch> = ({ use }) => {
+	const zags = use(ordo_context.consume)
+	return zags.fetch
+}
 
 export const get_user_query: TMaokaJab<Ordo.User.Query> = ({ use }) => {
 	const zags = use(ordo_context.consume)

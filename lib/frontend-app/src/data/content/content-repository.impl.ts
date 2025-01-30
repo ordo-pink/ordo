@@ -51,7 +51,7 @@ export const CacheContentRepository: Ordo.Content.RepositoryStatic = {
 			get: fsid =>
 				Oath.FromPromise(() => db_promise)
 					.pipe(ops0.chain(db => Oath.FromNullable(db)))
-					.pipe(ops0.rejected_map(rrr => eio("Failed to access IndexedDB cache", rrr)))
+					.pipe(ops0.rejected_map(rrr => RRR.codes.eio("Failed to access IndexedDB cache", rrr)))
 					.pipe(ops0.chain(db => Oath.Try(() => db.transaction(INDEXEDDB_OBJECT_STORE_NAME, "readonly"))))
 					.pipe(ops0.map(transaction => transaction.objectStore(INDEXEDDB_OBJECT_STORE_NAME)))
 					.pipe(ops0.map(storage => storage.get(fsid)))
@@ -61,7 +61,7 @@ export const CacheContentRepository: Ordo.Content.RepositoryStatic = {
 			put: (fsid, content) =>
 				Oath.FromPromise(() => db_promise)
 					.pipe(ops0.chain(db => Oath.FromNullable(db)))
-					.pipe(ops0.rejected_map(() => eio("Failed to access cache inside IndexedDB")))
+					.pipe(ops0.rejected_map(() => RRR.codes.eio("Failed to access cache inside IndexedDB")))
 					.pipe(ops0.map(db => db.transaction(INDEXEDDB_OBJECT_STORE_NAME, "readwrite")))
 					.pipe(ops0.map(transaction => transaction.objectStore(INDEXEDDB_OBJECT_STORE_NAME)))
 					.pipe(ops0.map(storage => storage.put(content, fsid)))
@@ -70,14 +70,10 @@ export const CacheContentRepository: Ordo.Content.RepositoryStatic = {
 							result =>
 								new Oath((resolve, reject) => {
 									result.onsuccess = () => resolve(void 0)
-									result.onerror = () => reject(eio("Failed to access cache inside IndexedDB"))
+									result.onerror = () => reject(RRR.codes.eio("Failed to access cache inside IndexedDB"))
 								}),
 						),
 					),
 		}
 	},
 }
-
-const LOCATION = "ContentRepository"
-
-const eio = RRR.codes.eio(LOCATION)

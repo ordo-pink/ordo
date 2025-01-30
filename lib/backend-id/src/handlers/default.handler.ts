@@ -15,7 +15,7 @@ export const default_handler =
 		) => Oath<TIntake<TSharedContext>, { rrr: Ordo.Rrr; intake: TIntake<TSharedContext> }>,
 	): TGear<TIDChamber> =>
 	intake =>
-		Oath.Resolve<TIntake<TSharedContext>>({ ...intake, headers: {}, status: 200, request_ip: null })
+		Oath.Resolve<TIntake<TSharedContext>>({ ...intake, status: 200, request_ip: null })
 			.pipe(ops0.tap(start_response_timer))
 			.pipe(ops0.tap(extract_request_ip))
 			.pipe(ops0.tap(set_content_type_application_json_header))

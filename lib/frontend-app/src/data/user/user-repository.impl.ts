@@ -26,16 +26,6 @@ import { CurrentUser } from "../../../../core/src/user.impl"
 import { RRR } from "../../../../core/src/rrr"
 import { ZAGS } from "@ordo-pink/zags"
 
-const CURRENT_USER_REPOSITORY = "CurrentUserRepository"
-const CURRENT_USER_REPOSITORY_ASYNC = "CurrentUserRepositoryAsync"
-const PUBLIC_USER_REPOSITORY = "PublicUserRepository"
-
-const eagain_current_user = RRR.codes.eagain(CURRENT_USER_REPOSITORY)
-const einval_current_user_async = RRR.codes.einval(CURRENT_USER_REPOSITORY_ASYNC)
-const eio_current_user_async = RRR.codes.eio(CURRENT_USER_REPOSITORY_ASYNC)
-
-const einval_public_user = RRR.codes.einval(PUBLIC_USER_REPOSITORY)
-
 // TODO Move to frontend-app
 export const CurrentUserRepository: Ordo.User.Current.RepositoryStatic = {
 	Of: $ => {
@@ -43,7 +33,7 @@ export const CurrentUserRepository: Ordo.User.Current.RepositoryStatic = {
 		$.marry((_, is_update) => is_update && version_zags.update("version", i => i + 1))
 
 		return {
-			get: () => Result.FromNullable($.select("user"), () => eagain_current_user()),
+			get: () => Result.FromNullable($.select("user"), () => RRR.codes.eagain("Loading")),
 			put: user => Result.Try(() => $.update("user", () => user)), // TODO:
 			get $() {
 				return version_zags
@@ -59,7 +49,7 @@ export const PublicUserRepository: Ordo.User.Public.RepositoryStatic = {
 
 		return {
 			get: () => Oath.Resolve($.select("known_users")),
-			put: () => Oath.Reject(einval_public_user("TODO: NOT IMPLEMENTED")),
+			put: () => Oath.Reject(RRR.codes.einval("TODO: NOT IMPLEMENTED")),
 			get $() {
 				return version_zags
 			},
@@ -74,12 +64,12 @@ export const CurrentUserRepositoryAsync: Ordo.User.Current.RepositoryAsyncStatic
 				.pipe(ops0.map(path => id_host.concat(path)))
 				.pipe(ops0.chain(url => Oath.FromPromise(() => fetch(url, create_request_init(token)))))
 				.pipe(ops0.chain(response => Oath.FromPromise(() => response.json())))
-				.pipe(ops0.rejected_map(error => eio_current_user_async(error)))
+				.pipe(ops0.rejected_map(error => RRR.codes.eio(error.message)))
 				.pipe(ops0.chain(get_response_result0))
 				.pipe(ops0.chain(validate_dto0))
 				.pipe(ops0.map(CurrentUser.FromDTO)),
 
-		put: () => Oath.Reject(eio_current_user_async("TODO: UNIMPLEMENTED")),
+		put: () => Oath.Reject(RRR.codes.eio("TODO: UNIMPLEMENTED")),
 	}),
 }
 
@@ -88,11 +78,11 @@ const create_request_init = (token: string) => ({ headers: { Authorization: `Bea
 const validate_dto0 = (result: unknown) =>
 	Oath.If(CurrentUser.Validations.is_dto(result), {
 		T: () => result as Ordo.User.Current.DTO,
-		F: () => einval_current_user_async("Entity is not a user DTO", result),
+		F: () => RRR.codes.einval("Entity is not a user DTO", result),
 	})
 
 const get_response_result0 = (response_body: any) =>
 	Oath.If(response_body.success, {
 		T: () => response_body.result,
-		F: () => einval_current_user_async("Request error occured", response_body.error),
+		F: () => RRR.codes.einval("Request error occured", response_body.error),
 	})

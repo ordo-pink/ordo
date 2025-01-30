@@ -27,7 +27,7 @@ import { Hotkey, THotkeyOptions } from "./hotkey.component"
 import "./button.css"
 
 export type TButtonProps = {
-	on_click: (event: MouseEvent) => void
+	on_click: (event: MouseEvent) => void | Promise<void>
 	text: string
 	hotkey?: string
 	hotkey_options?: THotkeyOptions
@@ -52,7 +52,7 @@ const Default = ({
 
 		const handle_click = (event: MouseEvent) => {
 			if (element instanceof HTMLButtonElement) element.focus()
-			on_click(event)
+			return on_click(event)
 		}
 
 		return () => {

@@ -167,10 +167,6 @@ declare global {
 					title: () => string
 					message: () => string
 				}
-				rrr_sign_up_unavailable: {
-					title: () => string
-					message: () => string
-				}
 				sections: {
 					hero: {
 						beta_started_announcement: () => string
@@ -319,6 +315,12 @@ declare global {
 			go_to_messenger_support: () => void
 			go_to_welcome_page: () => void
 			open_support_palette: () => void
+		}
+		auth: {
+			show_request_code_modal: () => void
+			show_validate_code_modal: () => void
+			request_code: (email: Ordo.User.Email) => void
+			validate_code: (email: Ordo.User.Email, code: string) => void
 		}
 	}
 

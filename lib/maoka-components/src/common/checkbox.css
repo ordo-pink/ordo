@@ -1,3 +1,11 @@
 .checkbox {
-	@apply size-5 cursor-pointer accent-pink-400;
+	@apply size-5 shrink-0 cursor-pointer accent-pink-400;
+}
+
+.checkbox-label {
+	@apply flex w-full items-start gap-x-1;
+}
+
+.checkbox-label > .checkbox {
+	@apply mt-1 size-4;
 }

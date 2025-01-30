@@ -24,13 +24,6 @@ import { alpha_sort, concat, override, thunk } from "@ordo-pink/tau"
 
 import { Metadata as M, Metadata, RRR, get_wrong_label, get_wrong_link } from "@ordo-pink/core"
 
-const LOCATION = "MetadataCommand"
-
-const inval = RRR.codes.einval(LOCATION)
-const exist = RRR.codes.eexist(LOCATION)
-const noent = RRR.codes.enoent(LOCATION)
-const enxio = RRR.codes.enxio(LOCATION)
-
 // TODO Move to frontend-app
 export const MetadataCommand: Ordo.Metadata.CommandStatic = {
 	Of: (m_repo, m_query, u_query) => ({
@@ -221,37 +214,37 @@ export const MC = MetadataCommand
 type TInputValidatorFn<$TInput> = (location: string, input: $TInput) => TResult<boolean, Ordo.Rrr<"EINVAL">>
 
 const _check_fsid_r: TInputValidatorFn<Ordo.Metadata.FSID> = (location, fsid) =>
-	R.If(M.Validations.is_fsid(fsid), { F: () => inval(`${location} -> fsid: ${fsid}`) })
+	R.If(M.Validations.is_fsid(fsid), { F: () => RRR.codes.einval(`${location} -> fsid: ${fsid}`) })
 
 const _check_size_r: TInputValidatorFn<number> = (location, size) =>
-	R.If(M.Validations.is_size(size), { F: () => inval(`${location} -> size: ${size}`) })
+	R.If(M.Validations.is_size(size), { F: () => RRR.codes.einval(`${location} -> size: ${size}`) })
 
 const _check_parent_r: TInputValidatorFn<Ordo.Metadata.FSID | null> = (location, parent) =>
-	R.If(M.Validations.is_parent(parent), { F: () => inval(`${location} -> parent: ${parent}`) })
+	R.If(M.Validations.is_parent(parent), { F: () => RRR.codes.einval(`${location} -> parent: ${parent}`) })
 
 const _check_labels_r: TInputValidatorFn<Ordo.Metadata.Label[]> = (location, labels) =>
 	R.If(M.Validations.are_labels(labels), {
-		F: () => inval(`${location} -> label`, get_wrong_label(labels)),
+		F: () => RRR.codes.einval(`${location} -> label`, get_wrong_label(labels)),
 	})
 
 const _check_name_r: TInputValidatorFn<string> = (location, name) =>
-	R.If(M.Validations.is_name(name), { F: () => inval(`${location} -> name: ${name}`) })
+	R.If(M.Validations.is_name(name), { F: () => RRR.codes.einval(`${location} -> name: ${name}`) })
 
 const _check_links_r: TInputValidatorFn<Ordo.Metadata.FSID[]> = (location, links) =>
 	R.If(M.Validations.are_links(links), {
-		F: () => inval(`${location} -> link: ${get_wrong_link(links)}`),
+		F: () => RRR.codes.einval(`${location} -> link: ${get_wrong_link(links)}`),
 	})
 
 const _check_type_r: TInputValidatorFn<any> = (location, type) =>
-	R.If(M.Validations.is_type(type), { F: () => inval(`${location} -> type: ${type}`) })
+	R.If(M.Validations.is_type(type), { F: () => RRR.codes.einval(`${location} -> type: ${type}`) })
 
 const _check_props_r: TInputValidatorFn<Ordo.Metadata.Props> = (location, props) =>
 	R.If(M.Validations.is_props(props), {
-		F: () => inval(`${location} -> props: ${JSON.stringify(props)}`),
+		F: () => RRR.codes.einval(`${location} -> props: ${JSON.stringify(props)}`),
 	})
 
 const _check_prop_key_r: TInputValidatorFn<string | number | symbol> = (location, key) =>
-	R.If(M.Validations.is_prop_key(key), { F: () => inval(`${location} -> key: ${String(key)}`) })
+	R.If(M.Validations.is_prop_key(key), { F: () => RRR.codes.einval(`${location} -> key: ${String(key)}`) })
 
 type TCheckExistsByNameAndParentRFn = (
 	location: string,
@@ -262,14 +255,18 @@ type TCheckExistsByNameAndParentRFn = (
 const _check_not_exists_by_name_r: TCheckExistsByNameAndParentRFn = (location, query, name, parent) =>
 	query
 		.get_by_name(name, parent)
-		.pipe(R.ops.chain(option => (option ? R.Err(exist(`${location} -> ${parent}/${name} exists`)) : R.Ok(undefined))))
+		.pipe(
+			R.ops.chain(option => (option ? R.Err(RRR.codes.eexist(`${location} -> ${parent}/${name} exists`)) : R.Ok(undefined))),
+		)
 
 type TGetMetadataByFSIDRFn = (
 	location: string,
 	metadata_query: Ordo.Metadata.Query,
 ) => (fsid: Ordo.Metadata.FSID) => TResult<Ordo.Metadata.Instance, Ordo.Rrr<"EPERM" | "ENOENT" | "EAGAIN" | "EINVAL">>
 const _get_metadata_by_fsid_r: TGetMetadataByFSIDRFn = (location, query) => fsid =>
-	query.get_by_fsid(fsid).pipe(R.ops.chain(item => (item ? R.Ok(item) : R.Err(inval(`${location} -> fsid: ${fsid}`)))))
+	query
+		.get_by_fsid(fsid)
+		.pipe(R.ops.chain(item => (item ? R.Ok(item) : R.Err(RRR.codes.einval(`${location} -> fsid: ${fsid}`)))))
 
 type TResetUpdatedByRFn = (
 	user_query: Ordo.User.Query,
@@ -298,7 +295,7 @@ const _replace_metadata_r: TReplaceMetadataRFn = x => xs =>
 			R.ops.chain(index =>
 				R.If(index >= 0, {
 					T: () => ({ items: xs, index: index }),
-					F: () => noent(`replace: ${x.get_fsid()} not found`),
+					F: () => RRR.codes.enoent(`replace: ${x.get_fsid()} not found`),
 				}),
 			),
 		)
@@ -324,7 +321,7 @@ const _err_on_circular_reference_r: TCheckCircularReferenceRFn = (query, fsid, p
 		.pipe(
 			R.ops.chain(descendents =>
 				descendents.some(descendent => descendent.get_fsid() === parent)
-					? R.Err(enxio(`circular reference: ${parent} is descendent of ${fsid}`))
+					? R.Err(RRR.codes.enxio(`circular reference: ${parent} is descendent of ${fsid}`))
 					: R.Ok(metadata),
 			),
 		)

@@ -61,13 +61,7 @@ export default Maoka.create("main", ({ use, on_unmount }) => {
 		Object.assign(document.documentElement, { style })
 	}
 
-	const handle_sign_up_click = () =>
-		commands.emit("cmd.application.notification.show", {
-			type: NotificationType.RRR,
-			message: "t.welcome.landing_page.rrr_sign_up_unavailable.message",
-			duration: 10,
-			title: "t.welcome.landing_page.rrr_sign_up_unavailable.title",
-		})
+	const handle_sign_up_click = () => commands.emit("cmd.auth.show_request_code_modal")
 
 	const handle_try_click = () => {
 		const has_files = metadata_query.get().cata({ Ok: x => x.length > 0, Err: T })

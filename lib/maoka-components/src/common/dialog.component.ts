@@ -30,9 +30,10 @@ type TDialogParams = {
 	custom_class?: string
 	render_icon?: (div: HTMLDivElement) => void
 	body: () => TMaokaChildren
-	action: () => void
+	action: () => void | Promise<void>
 	action_text: string
 	action_hotkey?: string
+	action_disabled?: () => boolean
 }
 
 export const Dialog = ({
@@ -42,7 +43,8 @@ export const Dialog = ({
 	action,
 	render_icon,
 	action_text,
-	action_hotkey = "enter",
+	action_hotkey,
+	action_disabled = () => false,
 }: TDialogParams) =>
 	Maoka.create("div", ({ use }) => {
 		use(MaokaJabs.set_class("dialog", custom_class))
@@ -57,6 +59,7 @@ export const Dialog = ({
 					on_click: action,
 					text: action_text,
 					hotkey: action_hotkey,
+					disabled: action_disabled,
 				}),
 			),
 		]

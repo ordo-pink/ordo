@@ -44,6 +44,8 @@ export default create_function(
 			"cmd.application.router.navigate",
 			"cmd.application.router.open_external",
 			"cmd.application.set_title",
+			"cmd.auth.show_request_code_modal",
+			"cmd.auth.show_validate_code_modal",
 			"cmd.content.set",
 			"cmd.file_editor.open",
 			"cmd.functions.activities.register",
@@ -74,9 +76,6 @@ export default create_function(
 				"t.welcome.landing_page.sections.hero.learn_more": "Learn More",
 				"t.welcome.landing_page.sections.hero.try_now_button": "Try Now",
 				"t.welcome.landing_page.sections.hero.sign_up": "Sign Up",
-				"t.welcome.landing_page.rrr_sign_up_unavailable.message":
-					"Signing up is not available right now. You can use ORDO without credentials, tho!",
-				"t.welcome.landing_page.rrr_sign_up_unavailable.title": "Wrong button!",
 			},
 		})
 

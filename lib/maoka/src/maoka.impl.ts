@@ -6,12 +6,22 @@
 import type * as T from "./maoka.types.ts"
 
 export const create: T.TMaokaCreateComponentFn = (name, callback) => {
+	let refresh_requests = 0
+
 	const result: T.TMaokaComponent = async (create_element, root_element, root_id) => {
 		const internal_id = crypto.randomUUID()
 		const element = create_element(name)
 
 		// eslint-disable-next-line
 		let get_children: Awaited<ReturnType<T.TMaokaCallback>>
+
+		// Reducing the amount of redundant rerenders
+		element.refresh_interval = setInterval(() => {
+			if (refresh_requests > 0) {
+				void render_children(create_element, root_element, root_id, get_children, element)
+				refresh_requests = 0
+			}
+		}, 20)
 
 		const props: T.TMaokaProps = {
 			get id() {
@@ -27,10 +37,9 @@ export const create: T.TMaokaCreateComponentFn = (name, callback) => {
 				return root_element
 			},
 			use: f => f(props),
-			refresh: async () => {
+			refresh: () => {
 				if (!callback || !get_children) return
-
-				await render_children(create_element, root_element, root_id, get_children, element)
+				refresh_requests++
 			},
 			on_unmount: f => {
 				if (!element.onunmount) element.onunmount = []
@@ -86,6 +95,7 @@ export const render_dom: T.TMaokaRenderDOMFn = async (root, component) => {
 
 	const unmount_element = (element: T.TMaokaElement) => {
 		if (is_arr(element.onunmount) && element.onunmount.length > 0) element.onunmount.forEach(f => f())
+		clearInterval(element.refresh_interval)
 
 		element.childNodes.forEach(child => unmount_element(child as any))
 	}

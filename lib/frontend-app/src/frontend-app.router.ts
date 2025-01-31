@@ -31,9 +31,7 @@ export const init_router = call_once(() => {
 
 	logger.debug("🟡 Initialising router...")
 
-	window.addEventListener("popstate", event => {
-		console.log(event)
-	})
+	window.addEventListener("popstate", event => commands.emit("cmd.application.router.navigate", { url: event.state }))
 
 	commands.on("cmd.application.router.navigate", ({ url, new_tab = false }) => {
 		if (new_tab) return window.open(url, "_blank")

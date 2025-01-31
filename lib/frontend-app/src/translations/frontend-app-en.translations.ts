@@ -55,4 +55,6 @@ export const frontend_app_en_translations: Partial<Record<Ordo.I18N.TranslationK
 	"t.common.save": "Save",
 	"t.common.load": "Load",
 	"t.common.state.saving": "Saving",
+	"t.auth.join": "Join",
+	"t.auth.leave": "Sign Out",
 }

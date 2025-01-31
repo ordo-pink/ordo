@@ -20,10 +20,10 @@
  */
 
 import { BsCollection, BsEnvelopeAt, BsQuestionOctagon, BsSendCheck } from "@ordo-pink/frontend-icons"
+import { CommandPaletteItemType, create_function } from "@ordo-pink/core"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { TwoLetterLocale } from "@ordo-pink/locale"
-import { create_function } from "@ordo-pink/core"
 
 import { WelcomeWorkspace } from "./welcome.workspace"
 
@@ -101,6 +101,7 @@ export default create_function(
 		commands.emit("cmd.application.command_palette.add", {
 			readable_name: "t.welcome.go_to_welcome_page",
 			value: () => commands.emit("cmd.welcome.go_to_welcome_page"),
+			type: CommandPaletteItemType.PAGE_OPENER,
 			hotkey: "mod+shift+h",
 			render_icon: div => void div.appendChild(BsCollection() as SVGSVGElement),
 		})
@@ -128,6 +129,7 @@ export default create_function(
 		commands.emit("cmd.application.command_palette.add", {
 			readable_name: "t.welcome.command_palette.support.open_support_palette",
 			value: () => commands.emit("cmd.welcome.open_support_palette"),
+			type: CommandPaletteItemType.PAGE_OPENER,
 			hotkey: "mod+h", // TODO: Should work with mod+/
 			render_icon: div => void div.appendChild(BsQuestionOctagon() as SVGSVGElement),
 		})

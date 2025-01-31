@@ -21,6 +21,7 @@
 
 import { BsArrowLeft, BsLayoutSidebarInsetReverse } from "@ordo-pink/frontend-icons"
 import { Maoka, type TMaokaElement } from "@ordo-pink/maoka"
+import { CommandPaletteItemType } from "@ordo-pink/core"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { Switch } from "@ordo-pink/switch"
@@ -90,6 +91,7 @@ export const OrdoSidebarButton = Maoka.create("button", ({ use }) => {
 			commands.emit("cmd.application.command_palette.add", {
 				value: () => commands.emit("cmd.application.sidebar.toggle"),
 				hotkey: "mod+b",
+				type: CommandPaletteItemType.COMMON_ACTION,
 				readable_name,
 				render_icon: div => void div.appendChild(BsLayoutSidebarInsetReverse() as SVGSVGElement),
 			})

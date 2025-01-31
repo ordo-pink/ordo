@@ -23,7 +23,7 @@ import { die, run_command } from "@ordo-pink/binutil"
 import { invokers0 } from "@ordo-pink/oath"
 
 // TODO Move dependencies to root
-void run_command("opt/bun i", {
+void run_command("../../opt/bun i", {
 	cwd: "./srv/web",
 	stdin: "inherit",
 	stderr: "inherit",

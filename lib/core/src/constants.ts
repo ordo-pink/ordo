@@ -106,10 +106,20 @@ export enum ErrorType {
 	EACCES, // Access denied
 	EEXIST, // Already exists
 	EINVAL, // Invalid
-	EMFILE, // Too many open files
 	EFBIG, // File too big
 	ENOSPC, // Out of memory
 	length,
 }
 
 export const SM_SCREEN_BREAKPOINT = 640
+
+export enum CommandPaletteItemType {
+	PAGE_OPENER,
+	MODAL_OPENER,
+	FILE_CREATOR,
+	AUTOMATION_ACTION,
+	COMMON_ACTION,
+	INFORMATION,
+	DESTRUCTIVE_ACTION,
+	length,
+}

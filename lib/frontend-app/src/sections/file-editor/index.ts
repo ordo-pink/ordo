@@ -19,8 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-// import { BsLayoutTextWindow } from "react-icons/bs"
-
+import { CommandPaletteItemType, create_function } from "@ordo-pink/core"
 import { BsLayoutTextWindow } from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
@@ -28,7 +27,6 @@ import { MetadataIcon } from "@ordo-pink/maoka-components"
 import { Result } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
 import { TwoLetterLocale } from "@ordo-pink/locale"
-import { create_function } from "@ordo-pink/core"
 
 import { FileEditorSidebar } from "./file-editor.sidebar"
 import { FileEditorWorkspace } from "./file-editor.workspace"
@@ -89,6 +87,7 @@ export default create_function(
 		commands.emit("cmd.application.command_palette.add", {
 			value: () => commands.emit("cmd.file_editor.open"),
 			readable_name: "t.file_editor.command_palette.open",
+			type: CommandPaletteItemType.PAGE_OPENER,
 			hotkey: "mod+e",
 			render_icon: div => void div.appendChild(BsLayoutTextWindow() as SVGSVGElement),
 		})
@@ -104,6 +103,7 @@ export default create_function(
 						}),
 					),
 				),
+			type: CommandPaletteItemType.PAGE_OPENER,
 			readable_name: "t.file_editor.command_palette.open_file",
 			hotkey: "mod+p",
 			render_icon: div => void div.appendChild(BsLayoutTextWindow() as SVGSVGElement),
@@ -139,7 +139,7 @@ const metadata_to_command_palette_item =
 			.cata(Result.catas.or_else(() => "/"))
 
 		return {
-			value: () => metadata.get_fsid(),
+			value: metadata.get_fsid(),
 			readable_name: metadata.get_name() as Ordo.I18N.TranslationKey,
 			render_custom_info: () => FilePath(() => path),
 			render_icon: div => {

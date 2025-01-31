@@ -69,7 +69,7 @@ const is_user_older_than = (dto: Ordo.User.Public.DTO) => (date: Date) => get_us
 const is_user_subscription_paid = (dto: Ordo.User.Public.DTO) => () => dto.subscription > UserSubscription.FREE
 
 export const CurrentUserValidations: Ordo.User.Current.Validations = {
-	is_created_at: (x): x is Ordo.User.Current.DTO["created_at"] => TAU.is_date(x),
+	is_created_at: (x): x is Ordo.User.Current.DTO["created_at"] => TAU.is_number(x),
 	is_first_name: (x): x is Ordo.User.Current.DTO["first_name"] => TAU.is_undefined(x) || TAU.is_string(x),
 	is_handle: (x): x is Ordo.User.Current.DTO["handle"] => TAU.is_non_empty_string(x) && x.startsWith("@"),
 	is_id: (x): x is Ordo.User.Current.DTO["id"] => TAU.is_uuid(x),

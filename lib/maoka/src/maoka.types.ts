@@ -79,14 +79,14 @@ export type TMaokaProps<$TElement extends TMaokaElement = TMaokaElement> = {
 
 	on_unmount: TMaokaOnUnmountFn
 
-	on_mount: TMaokaAfterMountFn
+	on_mount: TMaokaOnMountFn
 
 	use: <_TResult>(jab: TMaokaJab<_TResult>) => _TResult
 }
 
-export type TMaokaOnUnmountFn = (f: () => void) => void
+export type TMaokaOnUnmountFn = (on_unmount_workload: () => void) => void
 
-export type TMaokaAfterMountFn = (f: () => void) => void
+export type TMaokaOnMountFn = (on_mount_workload: () => void) => void
 
 /**
  * A callback function that returns children of the current Maoka component. It accepts a record of

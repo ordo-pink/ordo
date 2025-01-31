@@ -21,14 +21,14 @@
 
 import { Maoka } from "@ordo-pink/maoka"
 
-export const WelcomeWorkspace = Maoka.create("div", () => {
-	const get_is_authenticated = () => false // TODO auth
+import { ordo_app_state } from "../../../app.state"
+
+export const WelcomeWorkspace = Maoka.create("div", ({ use }) => {
+	const get_user = use(ordo_app_state.select_jab$("auth.user"))
 
 	return () => {
-		const is_authenticated = get_is_authenticated()
+		const user = get_user()
 
-		return is_authenticated
-			? Maoka.lazy(() => import("./pages/welcome.page"))
-			: Maoka.lazy(() => import("./pages/landing.page"))
+		return user ? Maoka.lazy(() => import("./pages/welcome.page")) : Maoka.lazy(() => import("./pages/landing.page"))
 	}
 })

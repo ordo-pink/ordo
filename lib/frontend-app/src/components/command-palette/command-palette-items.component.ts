@@ -64,13 +64,22 @@ export const OrdoCommandPaletteItems = (
 				else return CreateNewItemHint(() => ["Nothing found :("])
 			}
 
-			return items?.map((item, index) =>
-				OrdoCommandPaletteItem(
-					item,
-					() => on_click(index, assigned_location),
-					current_location === assigned_location && current_index === index,
-				),
-			)
+			return items
+				.sort((a, b) => {
+					if (a.type != null && b.type == null) return -1
+					if (b.type != null && a.type == null) return 1
+					if (a.type! < b.type!) return -1
+					if (a.type! > b.type!) return 1
+
+					return 0
+				})
+				.map((item, index) =>
+					OrdoCommandPaletteItem(
+						item,
+						() => on_click(index, assigned_location),
+						current_location === assigned_location && current_index === index,
+					),
+				)
 		}
 	})
 

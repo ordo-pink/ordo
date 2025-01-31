@@ -21,13 +21,13 @@
 
 import { Maoka, type TMaokaJab } from "@ordo-pink/maoka"
 import { BsMenuButtonWideFill } from "@ordo-pink/frontend-icons"
+import { CommandPaletteItemType } from "@ordo-pink/core"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
+import { create_hotkey_from_event } from "@ordo-pink/hotkey-from-event"
 import { ordo_app_state } from "@ordo-pink/frontend-app/app.state"
 
 import { CommandPaletteLocation, EMPTY_COMMAND_PALETTE } from "../components/command-palette/constants"
 import { OrdoCommandPalette } from "../components/command-palette/command-palette.component"
-
-import { create_hotkey_from_event } from "@ordo-pink/hotkey-from-event"
 
 export const create_command_palette: TMaokaJab = ({ on_mount, on_unmount, use }) => {
 	const commands = use(MaokaOrdo.Jabs.get_commands)
@@ -60,6 +60,7 @@ export const create_command_palette: TMaokaJab = ({ on_mount, on_unmount, use })
 		commands.emit("cmd.application.command_palette.add", {
 			value: () => commands.emit("cmd.application.command_palette.toggle"),
 			readable_name: "t.common.components.command_palette.reset",
+			type: CommandPaletteItemType.COMMON_ACTION,
 			hotkey: "mod+shift+p",
 			render_icon: div => void div.appendChild(BsMenuButtonWideFill() as SVGSVGElement),
 		})

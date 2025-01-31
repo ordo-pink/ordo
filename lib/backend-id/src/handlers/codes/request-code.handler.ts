@@ -34,7 +34,7 @@ export const extract_body_email = (intake: I) => (request_body: any) =>
 		.pipe(ops0.chain(email => Oath.If(is_email(email), { T: () => email, F: () => invalid_email_rrr(email, intake) })))
 
 const create_handle = (email: Ordo.User.Email, id: Ordo.User.ID) =>
-	`@${email.split("@")[0]}${id.split("-")[0]}` as Ordo.User.Handle
+	`@${email.split("@")[0].replaceAll(".", "_").replaceAll("/", "")}${id.split("-")[0]}` as Ordo.User.Handle
 
 const check_handle_is_free = (handle: Ordo.User.Handle, intake: I) =>
 	intake.user_persistence_strategy
@@ -44,7 +44,7 @@ const check_handle_is_free = (handle: Ordo.User.Handle, intake: I) =>
 			ops0.chain(exists =>
 				Oath.If(!exists, {
 					T: () => handle,
-					F: () => unknown_error("cannot create user", intake),
+					F: () => unknown_error("Cannot create user", intake),
 				}),
 			),
 		)

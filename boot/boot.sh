@@ -8,7 +8,7 @@ set -ie
 
 PLATFORM=$(uname -ms)
 
-BUN_VERSION="1.0.30"
+BUN_VERSION="1.2.1"
 DENO_VERSION="2.0.0"
 TAILWIND_VERSION="v3.1.6"
 
@@ -130,7 +130,7 @@ download_tailwind
 
 download_bun
 
-download_deno
+# download_deno
 
 ## Install bin dependencies
 opt/bun i

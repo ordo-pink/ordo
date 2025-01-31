@@ -177,6 +177,10 @@ declare global {
 				}
 			}
 		}
+		auth: {
+			leave: () => string
+			join: () => string
+		}
 	}
 
 	/**
@@ -318,7 +322,7 @@ declare global {
 		}
 		auth: {
 			show_request_code_modal: () => void
-			show_validate_code_modal: () => void
+			show_validate_code_modal: () => Ordo.User.Email
 			request_code: (email: Ordo.User.Email) => void
 			validate_code: (email: Ordo.User.Email, code: string) => void
 		}
@@ -1283,6 +1287,8 @@ declare global {
 				hotkey?: string
 
 				description?: Ordo.I18N.TranslationKey
+
+				type?: C.CommandPaletteItemType
 
 				render_custom_footer?: () => TMaokaComponent // TODO Use standard render approach
 				render_custom_info?: () => TMaokaComponent // TODO Use standard render approach

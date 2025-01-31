@@ -44,6 +44,7 @@ export const CreateFileModal = (parent: Ordo.Metadata.FSID | null = null) =>
 					commands.emit("cmd.application.modal.hide")
 					commands.emit("cmd.metadata.create", { name: state.name, parent, type })
 				},
+				action_hotkey: "enter",
 				action_text: "OK", // TODO Translations
 				body: () => [
 					CreateFileModalInput(event => void (state.name = (event.target as any).value)),

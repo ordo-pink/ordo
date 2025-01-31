@@ -55,6 +55,7 @@ export const EditLabelModal = (label: Ordo.Metadata.Label) =>
 
 					commands.emit("cmd.application.modal.hide")
 				},
+				action_hotkey: "enter",
 				action_text: "Save",
 				body: () =>
 					Maoka.create("div", ({ use }) => {

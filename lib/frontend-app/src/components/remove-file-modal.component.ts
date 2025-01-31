@@ -40,6 +40,7 @@ export const RemoveFileModal = (fsid: Ordo.Metadata.FSID) =>
 					commands.emit("cmd.metadata.remove", fsid)
 					commands.emit("cmd.application.modal.hide")
 				},
+				action_hotkey: "enter",
 				action_text: "OK", // TODO Add translations
 				body: () => t_message,
 			})

@@ -59,11 +59,8 @@ export const OrdoActivityBar = Maoka.create("div", ({ use }) => {
 					}),
 				)
 
-				return () =>
-					OrdoActivityBarIcon({
-						name: "Command Palette", // TODO i18n
-						render_icon: span => void span.appendChild(BsMenuButtonWideFill() as SVGSVGElement),
-					})
+				// TODO i18n
+				return () => OrdoActivityBarIcon({ name: "Command Palette", render_icon: BsMenuButtonWideFill })
 			}),
 
 			ActivityBarActivities(() =>

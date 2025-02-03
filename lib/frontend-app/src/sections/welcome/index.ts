@@ -21,8 +21,6 @@
 
 import { BsCollection, BsEnvelopeAt, BsQuestionOctagon, BsSendCheck } from "@ordo-pink/frontend-icons"
 import { CommandPaletteItemType, create_function } from "@ordo-pink/core"
-import { Maoka } from "@ordo-pink/maoka"
-import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { TwoLetterLocale } from "@ordo-pink/locale"
 
 import { WelcomeWorkspace } from "./welcome.workspace"
@@ -103,7 +101,7 @@ export default create_function(
 			value: () => commands.emit("cmd.welcome.go_to_welcome_page"),
 			type: CommandPaletteItemType.PAGE_OPENER,
 			hotkey: "mod+shift+h",
-			render_icon: div => void div.appendChild(BsCollection() as SVGSVGElement),
+			render_icon: BsCollection,
 		})
 
 		commands.on("cmd.welcome.open_support_palette", () => {
@@ -114,13 +112,13 @@ export default create_function(
 						readable_name: "t.welcome.command_palette.support.email",
 						value: "cmd.welcome.go_to_email_support",
 						hotkey: "1",
-						render_icon: div => void div.appendChild(BsEnvelopeAt() as SVGSVGElement),
+						render_icon: BsEnvelopeAt,
 					},
 					{
 						readable_name: "t.welcome.command_palette.support.messenger",
 						value: "cmd.welcome.go_to_messenger_support",
 						hotkey: "2",
-						render_icon: div => void div.appendChild(BsSendCheck() as SVGSVGElement),
+						render_icon: BsSendCheck,
 					},
 				],
 			})
@@ -131,18 +129,13 @@ export default create_function(
 			value: () => commands.emit("cmd.welcome.open_support_palette"),
 			type: CommandPaletteItemType.PAGE_OPENER,
 			hotkey: "mod+h", // TODO: Should work with mod+/
-			render_icon: div => void div.appendChild(BsQuestionOctagon() as SVGSVGElement),
+			render_icon: BsQuestionOctagon,
 		})
 
 		commands.emit("cmd.functions.activities.register", {
 			name: "pink.ordo.welcome.landing-page",
-			render_workspace: async div => {
-				await Maoka.render_dom(
-					div,
-					MaokaOrdo.Components.WithState(state, () => WelcomeWorkspace),
-				)
-			},
-			render_icon: span => void span.appendChild(BsCollection() as SVGSVGElement),
+			render_workspace: () => WelcomeWorkspace,
+			render_icon: BsCollection,
 			routes: ["/"],
 		})
 	},

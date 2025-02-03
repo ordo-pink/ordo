@@ -157,7 +157,7 @@ const Icon =
 
 		svg.innerHTML = children
 
-		return svg as unknown as TMaokaElement | SVGSVGElement
+		return svg as unknown as TMaokaElement
 	}
 
 export const BsTags =

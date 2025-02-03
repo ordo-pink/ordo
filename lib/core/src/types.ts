@@ -20,9 +20,9 @@
  */
 
 import type { JTI, SUB } from "@ordo-pink/wjwt"
+import type { TMaokaChildren, TMaokaComponent } from "@ordo-pink/maoka"
 import type { Oath } from "@ordo-pink/oath"
 import type { TLogger } from "@ordo-pink/logger"
-import type { TMaokaComponent } from "@ordo-pink/maoka"
 import type { TResult } from "@ordo-pink/result"
 import type { TZags } from "@ordo-pink/zags"
 import type { TwoLetterLocale } from "@ordo-pink/locale"
@@ -530,9 +530,9 @@ declare global {
 				name: string
 				routes: `/${string}`[]
 				default_route?: `/${string}`
-				render_workspace?: (div: HTMLDivElement) => void | Promise<void>
-				render_sidebar?: (div: HTMLDivElement) => void | Promise<void>
-				render_icon?: (span: HTMLSpanElement) => void | Promise<void>
+				render_workspace?: (() => TMaokaChildren) | (() => Promise<TMaokaChildren>)
+				render_sidebar?: (() => TMaokaChildren) | (() => Promise<TMaokaChildren>)
+				render_icon?: (() => TMaokaChildren) | (() => Promise<TMaokaChildren>)
 				on_unmount?: (params: Ordo.Activity.OnUnmountParams) => void
 				is_background?: boolean
 				is_fullscreen?: boolean
@@ -542,7 +542,7 @@ declare global {
 		namespace FileAssociation {
 			type RenderFn = (params: Ordo.FileAssociation.RenderParams) => void | Promise<void>
 
-			type RenderIconFn = (span: HTMLSpanElement) => void | Promise<void>
+			type RenderIconFn = (() => TMaokaChildren) | (() => Promise<TMaokaChildren>)
 
 			type Type = {
 				name: string
@@ -1110,7 +1110,7 @@ declare global {
 		}
 
 		namespace Modal {
-			type Instance = { on_unmount?: () => void; render: (div: HTMLDivElement) => void | Promise<void> }
+			type Instance = { on_unmount?: () => void; render: (() => TMaokaChildren) | (() => Promise<TMaokaChildren>) }
 		}
 
 		namespace Router {
@@ -1276,7 +1276,7 @@ declare global {
 				 *
 				 * @optional
 				 */
-				render_icon?: (div: HTMLDivElement) => void | Promise<void>
+				render_icon?: (() => TMaokaChildren) | (() => Promise<TMaokaChildren>)
 
 				/**
 				 * Keyboard hotkey for the context menu item. It only works while the context menu is

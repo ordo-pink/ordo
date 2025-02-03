@@ -46,21 +46,16 @@ const SidebarPaddingContractor = (element: TMaokaElement) =>
 		}
 	})
 
-const WorkspaceRenderer = Maoka.create("div", ({ use, element }) => {
+const WorkspaceRenderer = Maoka.create("div", ({ use }) => {
 	const get_current_activity = use(ordo_app_state.select_jab$("functions.current_activity"))
-	let prev_activity: Ordo.Activity.Instance | void
+	const get_activities = use(ordo_app_state.select_jab$("functions.activities"))
 
 	return async () => {
-		const activities = ordo_app_state.zags.select("functions.activities")
+		const activities = get_activities()
 		const current_activity_name = get_current_activity()
 		const current_activity = activities.find(activity => activity.name === current_activity_name)
 
-		if (prev_activity === current_activity) return
-		prev_activity = current_activity
-
-		if (current_activity && current_activity.render_workspace) {
-			element.innerHTML = ""
-			await current_activity.render_workspace(element as unknown as HTMLDivElement) // TODO 404
-		}
+		if (!current_activity || !current_activity.render_workspace) return null // TODO 404
+		return current_activity.render_workspace()
 	}
 })

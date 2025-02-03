@@ -20,8 +20,8 @@
  */
 
 import { BsArrowLeft, BsLayoutSidebarInsetReverse } from "@ordo-pink/frontend-icons"
-import { Maoka, type TMaokaElement } from "@ordo-pink/maoka"
 import { CommandPaletteItemType } from "@ordo-pink/core"
+import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { Switch } from "@ordo-pink/switch"
@@ -88,7 +88,7 @@ export const OrdoSidebarButton = Maoka.create("button", ({ use }) => {
 				hotkey: "mod+b",
 				type: CommandPaletteItemType.COMMON_ACTION,
 				readable_name,
-				render_icon: div => void div.appendChild(BsLayoutSidebarInsetReverse() as SVGSVGElement),
+				render_icon: BsLayoutSidebarInsetReverse,
 			})
 		} else {
 			commands.emit("cmd.application.command_palette.remove", readable_name)
@@ -100,8 +100,8 @@ export const OrdoSidebarButton = Maoka.create("button", ({ use }) => {
 		}
 
 		return Switch.OfTrue()
-			.case(enabled && visible, () => BsArrowLeft("rotate-180") as TMaokaElement)
-			.case(enabled && !visible, () => BsLayoutSidebarInsetReverse() as TMaokaElement)
+			.case(enabled && visible, () => BsArrowLeft("rotate-180"))
+			.case(enabled && !visible, () => BsLayoutSidebarInsetReverse())
 			.default(noop)
 	}
 })
@@ -120,7 +120,7 @@ const SidebarRenderer = Maoka.create("div", ({ use, element }) => {
 		const current_activity = activities.find(activity => activity.name === current_activity_name)
 
 		if (current_activity && current_activity.render_sidebar)
-			await current_activity.render_sidebar(element as unknown as HTMLDivElement) // TODO 404
+			return current_activity.render_sidebar() // TODO 404
 		else element.innerHTML = ""
 	}
 })

@@ -30,7 +30,10 @@ export const create: T.TMaokaCreateComponentFn = (name, callback) => {
 			refresh: () => {
 				if (!callback || !get_children) return
 
-				const event = new CustomEvent("refresh", { detail: { get_children, element }, bubbles: true })
+				const event = new CustomEvent("refresh", {
+					detail: { get_children: () => get_children && get_children(), element, id: internal_id },
+					bubbles: true,
+				})
 
 				element.dispatchEvent(event)
 			},
@@ -83,45 +86,50 @@ export const render_dom: T.TMaokaRenderDOMFn = async (root, component) => {
 
 	const create_element = document.createElement.bind(document)
 	const Component = await component(create_element, root_element, root_id)
-	const refresh_queue = new Map<HTMLElement, () => Promise<T.TMaokaElement>>()
+	const refresh_queue = new Map<string, { element: T.TMaokaElement; get_children: () => Promise<T.TMaokaElement> }>()
 
 	root.appendChild(Component as HTMLElement)
 
 	root.addEventListener("refresh", event => {
 		event.stopPropagation()
+		event.preventDefault()
 
-		const { get_children, element } = (event as any).detail
+		const { get_children, element, id } = (event as any).detail as {
+			get_children: () => T.TMaokaComponent
+			element: T.TMaokaElement
+			id: string
+		}
 
 		const refresh_elements = refresh_queue.keys().toArray()
 
-		if (~refresh_elements.indexOf(element)) {
-			refresh_queue.set(element, () => render_children(create_element, root_element, root_id, get_children, element))
-			return
-		}
+		if (refresh_queue.has(id)) return
 
 		for (let i = 0; i < refresh_elements.length; i++) {
-			if (refresh_elements[i].contains(element)) return
+			const e = refresh_queue.get(refresh_elements[i])?.element as HTMLElement
 
-			if (element.contains(refresh_elements[i])) {
+			if (e && element.contains?.(e)) {
 				refresh_queue.delete(refresh_elements[i])
-				refresh_queue.set(element, () => render_children(create_element, root_element, root_id, get_children, element))
-
-				return
+				break
 			}
-
-			continue
 		}
 
-		refresh_queue.set(element, () => render_children(create_element, root_element, root_id, get_children, element))
+		refresh_queue.set(id, {
+			element,
+			get_children: () => render_children(create_element, root_element, root_id, get_children, element),
+		})
 	})
 
 	const request_idle_callback = requestIdleCallback ?? setTimeout
 
 	const render_loop = () =>
-		Promise.all(refresh_queue.entries().map(([key, f]) => f().then(() => key)))
-			.then(keys => keys.map(key => refresh_queue.delete(key)))
-			.then(() => request_idle_callback(() => void render_loop()))
-			.catch(console.error)
+		refresh_queue.size
+			? Promise.all(
+					refresh_queue.entries().map(([key, data]) => {
+						refresh_queue.delete(key)
+						return data.get_children()
+					}),
+				).then(() => request_idle_callback(() => void render_loop()))
+			: request_idle_callback(() => void render_loop())
 
 	// const render_loop = () => {
 	// 	const next = refresh_queue.entries().next()

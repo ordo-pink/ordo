@@ -6,22 +6,12 @@
 import type * as T from "./maoka.types.ts"
 
 export const create: T.TMaokaCreateComponentFn = (name, callback) => {
-	// let refresh_requests = 0
-
 	const result: T.TMaokaComponent = async (create_element, root_element, root_id) => {
 		const internal_id = crypto.randomUUID()
 		const element = create_element(name)
 
 		// eslint-disable-next-line
 		let get_children: Awaited<ReturnType<T.TMaokaCallback>>
-
-		// Reducing the amount of redundant rerenders
-		// element.refresh_interval = setInterval(() => {
-		// 	if (refresh_requests > 0) {
-		// 		void render_children(create_element, root_element, root_id, get_children, element)
-		// 		refresh_requests = 0
-		// 	}
-		// })
 
 		const props: T.TMaokaProps = {
 			get id() {
@@ -39,10 +29,10 @@ export const create: T.TMaokaCreateComponentFn = (name, callback) => {
 			use: f => f(props),
 			refresh: () => {
 				if (!callback || !get_children) return
-				// refresh_requests++
-				element.dispatchEvent?.(
-					new CustomEvent("refresh", { detail: { update: () => get_children!(), element }, bubbles: true }),
-				)
+
+				const event = new CustomEvent("refresh", { detail: { get_children, element }, bubbles: true })
+
+				element.dispatchEvent(event)
 			},
 			on_unmount: f => {
 				if (!element.onunmount) element.onunmount = []
@@ -91,24 +81,66 @@ export const html = (tag: string, html: string): T.TMaokaComponent =>
 
 export const render_dom: T.TMaokaRenderDOMFn = async (root, component) => {
 	const root_id: string = crypto.randomUUID()
+	const root_element = root as unknown as T.TMaokaElement
 
 	const create_element = document.createElement.bind(document)
 
-	const Component = await component(create_element, root as unknown as T.TMaokaElement, root_id)
+	const Component = await component(create_element, root_element, root_id)
 
 	root.appendChild(Component as HTMLElement)
+
+	const refresh_queue = new Map<HTMLElement, () => Promise<T.TMaokaElement>>()
 
 	root.addEventListener("refresh", event => {
 		event.stopPropagation()
 
-		const { update, element } = (event as any).detail
+		const { get_children, element } = (event as any).detail
 
-		void render_children(create_element, root as unknown as T.TMaokaElement, root_id, update, element)
+		const refresh_elements = refresh_queue.keys().toArray()
+
+		if (!~refresh_elements.indexOf(element)) return
+
+		for (let i = 0; i < refresh_elements.length; i++) {
+			if (refresh_elements[i].contains(element)) return
+
+			if (element.contains(refresh_elements[i])) {
+				refresh_queue.delete(refresh_elements[i])
+				refresh_queue.set(element, () => render_children(create_element, root_element, root_id, get_children, element))
+
+				return
+			}
+
+			continue
+		}
+
+		refresh_queue.set(element, () => render_children(create_element, root_element, root_id, get_children, element))
 	})
+
+	// @ts-ignore
+	const options = requestIdleCallback ? { timeout: 1000 } : void 0
+	const request_idle_callback = requestIdleCallback ?? setTimeout
+
+	const render_loop = () =>
+		Promise.all(refresh_queue.entries().map(([key, f]) => f().then(() => key)))
+			.then(keys => keys.map(key => refresh_queue.delete(key)))
+			.then(() => request_idle_callback(() => void render_loop(), options))
+
+	// const render_loop = () => {
+	// 	const next = refresh_nodes.entries().next()
+	//
+	// 	if (next.value) {
+	// 		console.log(next.value[0])
+	// 		refresh_nodes.delete(next.value[0])
+	// 		return void next.value[1]().then(() => request_idle_callback(render_loop, options))
+	// 	}
+	//
+	// 	request_idle_callback(render_loop)
+	// }
+
+	request_idle_callback(() => void render_loop(), options)
 
 	const unmount_element = (element: T.TMaokaElement) => {
 		if (is_arr(element.onunmount) && element.onunmount.length > 0) element.onunmount.forEach(f => f())
-		clearInterval(element.refresh_interval)
 
 		element.childNodes.forEach(child => unmount_element(child as any))
 	}

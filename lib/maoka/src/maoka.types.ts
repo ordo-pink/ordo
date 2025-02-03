@@ -11,9 +11,9 @@ export type TMaokaElement = { [$TKey in keyof HTMLElement]: HTMLElement[$TKey] |
 	appendChild: (child: TMaokaChild) => TMaokaChild
 	replaceChildren: (...children: TMaokaChild[]) => void
 	childNodes: HTMLElement["childNodes"]
+	dispatchEvent: (event: Event) => void
 	onunmount: (() => void)[] | undefined
 	onmount: (() => void)[] | undefined
-	refresh_interval: number | Timer
 }
 
 export type TMaokaTextElement = Partial<{ [$TKey in keyof Text]: Text[$TKey] }> | string

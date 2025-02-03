@@ -6,7 +6,7 @@
 import type * as T from "./maoka.types.ts"
 
 export const create: T.TMaokaCreateComponentFn = (name, callback) => {
-	let refresh_requests = 0
+	// let refresh_requests = 0
 
 	const result: T.TMaokaComponent = async (create_element, root_element, root_id) => {
 		const internal_id = crypto.randomUUID()
@@ -16,12 +16,12 @@ export const create: T.TMaokaCreateComponentFn = (name, callback) => {
 		let get_children: Awaited<ReturnType<T.TMaokaCallback>>
 
 		// Reducing the amount of redundant rerenders
-		element.refresh_interval = setInterval(() => {
-			if (refresh_requests > 0) {
-				void render_children(create_element, root_element, root_id, get_children, element)
-				refresh_requests = 0
-			}
-		}, 20)
+		// element.refresh_interval = setInterval(() => {
+		// 	if (refresh_requests > 0) {
+		// 		void render_children(create_element, root_element, root_id, get_children, element)
+		// 		refresh_requests = 0
+		// 	}
+		// })
 
 		const props: T.TMaokaProps = {
 			get id() {
@@ -39,7 +39,10 @@ export const create: T.TMaokaCreateComponentFn = (name, callback) => {
 			use: f => f(props),
 			refresh: () => {
 				if (!callback || !get_children) return
-				refresh_requests++
+				// refresh_requests++
+				element.dispatchEvent?.(
+					new CustomEvent("refresh", { detail: { update: () => get_children!(), element }, bubbles: true }),
+				)
 			},
 			on_unmount: f => {
 				if (!element.onunmount) element.onunmount = []
@@ -89,9 +92,19 @@ export const html = (tag: string, html: string): T.TMaokaComponent =>
 export const render_dom: T.TMaokaRenderDOMFn = async (root, component) => {
 	const root_id: string = crypto.randomUUID()
 
-	const Component = await component(document.createElement.bind(document), root as unknown as T.TMaokaElement, root_id)
+	const create_element = document.createElement.bind(document)
+
+	const Component = await component(create_element, root as unknown as T.TMaokaElement, root_id)
 
 	root.appendChild(Component as HTMLElement)
+
+	root.addEventListener("refresh", event => {
+		event.stopPropagation()
+
+		const { update, element } = (event as any).detail
+
+		void render_children(create_element, root as unknown as T.TMaokaElement, root_id, update, element)
+	})
 
 	const unmount_element = (element: T.TMaokaElement) => {
 		if (is_arr(element.onunmount) && element.onunmount.length > 0) element.onunmount.forEach(f => f())

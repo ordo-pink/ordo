@@ -112,16 +112,12 @@ const Icon = ({ metadata, custom_class, has_children }: P2) =>
 
 			const fa = file_associations.find(association => association.types.some(type => metadata_content_type === type.name))
 
-			if (fa && fa.render_icon) {
-				element.innerHTML = ""
-				use(MaokaJabs.set_class(custom_class!))
-				await fa.render_icon(element as HTMLSpanElement)
-				return
-			}
+			use(MaokaJabs.set_class(custom_class!))
 
 			return Switch.OfTrue()
 				.case(has_children, () => BsFolderOpen(custom_class) as TMaokaElement)
 				.case(metadata.get_size() === 0, () => BsFileEarmark(custom_class) as TMaokaElement)
+				.case(!!fa && !!fa.render_icon, () => fa!.render_icon!(element as HTMLSpanElement))
 				.default(() => BsFileEarmarkBinary(custom_class) as TMaokaElement)
 		}
 	})

@@ -24,13 +24,16 @@ import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { is_string } from "@ordo-pink/tau"
 
-type P = { href: `/${string}`; children?: TMaokaChildren; custom_class?: string; show_visited?: boolean }
-export const Link = ({ href, children, custom_class, show_visited }: P) =>
+import { MetadataIcon } from "../metadata/metadata-icon.component"
+
+type P = { href: `/${string}`; children?: TMaokaChildren; custom_class?: string; show_visited?: boolean; title?: string }
+export const Link = ({ href, children, custom_class, show_visited, title }: P) =>
 	Maoka.create("a", ({ use }) => {
 		const { emit } = use(MaokaOrdo.Jabs.get_commands)
 
 		use(MaokaJabs.listen("onclick", click_listener(emit, href)))
 		use(MaokaJabs.set_attribute("href", href))
+		use(MaokaJabs.set_attribute("title", title))
 		use(MaokaJabs.set_class(default_class))
 
 		if (custom_class) use(MaokaJabs.add_class(custom_class))
@@ -40,7 +43,33 @@ export const Link = ({ href, children, custom_class, show_visited }: P) =>
 		return () => children
 	})
 
+export const MetadataLink = ({
+	href,
+	children,
+	custom_class,
+	show_visited,
+	metadata,
+	title,
+}: P & { metadata: Ordo.Metadata.Instance }) =>
+	Link({
+		children: MetadataLinkWrapper(() => [
+			MetadataIcon({ metadata, show_emoji_picker: false }),
+			MetadataLinkTextWrapper(() => children),
+		]),
+		custom_class: `no-underline ${custom_class}`,
+		href,
+		show_visited,
+		title,
+	})
+
 // --- Internal ---
+
+const default_class =
+	"underline transition-all hover:text-rose-600 dark:hover:text-rose-300 rounded-sm cursor-pointer decoration-neutral-500/50 hover:decoration-rose-500/50 decoration-1 underline-offset-2"
+
+const MetadataLinkWrapper = Maoka.styled("div", { class: "w-fit flex items-center gap-x-1" })
+
+const MetadataLinkTextWrapper = Maoka.styled("div", { class: `${default_class} text-ellipsis line-clamp-1` })
 
 const click_listener = (emit: Ordo.Command.Commands["emit"], url: `/${string}`) => (event: MouseEvent) => {
 	event.preventDefault()
@@ -50,6 +79,3 @@ const click_listener = (emit: Ordo.Command.Commands["emit"], url: `/${string}`) 
 }
 
 const ignore_history_highlighting_class = "text-inherit visited:text-inherit"
-
-const default_class =
-	"underline transition-all hover:text-rose-600 dark:hover:text-rose-300 rounded-sm cursor-pointer decoration-neutral-500/50 hover:decoration-rose-500/50 decoration-1 underline-offset-2"

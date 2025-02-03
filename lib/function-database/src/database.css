@@ -19,7 +19,7 @@
 }
 
 .database_cell-multiple {
-	@apply database_border-color flex text-sm;
+	@apply database_border-color flex w-fit text-sm;
 }
 
 .database_cell-labels {
@@ -35,7 +35,7 @@
 }
 
 .database_cell-filename-wrapper {
-	@apply flex h-full items-center gap-x-1;
+	@apply flex h-full items-start gap-x-1;
 }
 
 .database_cell-filename-text {

@@ -27,7 +27,7 @@ export type TMaokaComponent<$TElement extends TMaokaElement = TMaokaElement> = {
 	id?: string
 	root_id?: string
 	element?: $TElement
-	refresh?: () => Promise<void>
+	refresh?: () => void
 }
 
 export type TMaokaJab<$TReturn = void> = (props: TMaokaProps) => $TReturn
@@ -76,7 +76,7 @@ export type TMaokaProps<$TElement extends TMaokaElement = TMaokaElement> = {
 	 * the Maoka component callback function in which this `refresh` function is available inside
 	 * `use` parameter.
 	 */
-	refresh: () => Promise<void>
+	refresh: () => void
 
 	on_unmount: TMaokaOnUnmountFn
 

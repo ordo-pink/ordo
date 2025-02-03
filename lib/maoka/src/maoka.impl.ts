@@ -54,9 +54,7 @@ export const create: T.TMaokaCreateComponentFn = (name, callback) => {
 		get_children = await callback(props)
 		if (!get_children) return element
 
-		const children = await render_children(create_element, root_element, root_id, get_children, element)
-
-		return children
+		return await render_children(create_element, root_element, root_id, get_children, element)
 	}
 
 	return result
@@ -84,12 +82,10 @@ export const render_dom: T.TMaokaRenderDOMFn = async (root, component) => {
 	const root_element = root as unknown as T.TMaokaElement
 
 	const create_element = document.createElement.bind(document)
-
 	const Component = await component(create_element, root_element, root_id)
+	const refresh_queue = new Map<HTMLElement, () => Promise<T.TMaokaElement>>()
 
 	root.appendChild(Component as HTMLElement)
-
-	const refresh_queue = new Map<HTMLElement, () => Promise<T.TMaokaElement>>()
 
 	root.addEventListener("refresh", event => {
 		event.stopPropagation()
@@ -98,7 +94,10 @@ export const render_dom: T.TMaokaRenderDOMFn = async (root, component) => {
 
 		const refresh_elements = refresh_queue.keys().toArray()
 
-		if (!~refresh_elements.indexOf(element)) return
+		if (~refresh_elements.indexOf(element)) {
+			refresh_queue.set(element, () => render_children(create_element, root_element, root_id, get_children, element))
+			return
+		}
 
 		for (let i = 0; i < refresh_elements.length; i++) {
 			if (refresh_elements[i].contains(element)) return
@@ -116,28 +115,27 @@ export const render_dom: T.TMaokaRenderDOMFn = async (root, component) => {
 		refresh_queue.set(element, () => render_children(create_element, root_element, root_id, get_children, element))
 	})
 
-	// @ts-ignore
-	const options = requestIdleCallback ? { timeout: 1000 } : void 0
 	const request_idle_callback = requestIdleCallback ?? setTimeout
 
 	const render_loop = () =>
 		Promise.all(refresh_queue.entries().map(([key, f]) => f().then(() => key)))
 			.then(keys => keys.map(key => refresh_queue.delete(key)))
-			.then(() => request_idle_callback(() => void render_loop(), options))
+			.then(() => request_idle_callback(() => void render_loop()))
+			.catch(console.error)
 
 	// const render_loop = () => {
-	// 	const next = refresh_nodes.entries().next()
-	//
+	// 	const next = refresh_queue.entries().next()
+
 	// 	if (next.value) {
 	// 		console.log(next.value[0])
-	// 		refresh_nodes.delete(next.value[0])
-	// 		return void next.value[1]().then(() => request_idle_callback(render_loop, options))
+	// 		refresh_queue.delete(next.value[0])
+	// 		return void next.value[1]().then(() => request_idle_callback(render_loop))
 	// 	}
-	//
+
 	// 	request_idle_callback(render_loop)
 	// }
 
-	request_idle_callback(() => void render_loop(), options)
+	request_idle_callback(() => void render_loop())
 
 	const unmount_element = (element: T.TMaokaElement) => {
 		if (is_arr(element.onunmount) && element.onunmount.length > 0) element.onunmount.forEach(f => f())

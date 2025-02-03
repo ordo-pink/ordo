@@ -80,12 +80,7 @@ export const OrdoSidebarButton = Maoka.create("button", ({ use }) => {
 		const current_activity_name = get_current_activity()
 		const current_activity = activities.find(activity => activity.name === current_activity_name)
 
-		if (current_activity && current_activity.render_sidebar) commands.emit("cmd.application.sidebar.enable")
-		else commands.emit("cmd.application.sidebar.disable")
-
 		const readable_name = "t.common.components.sidebar.toggle"
-
-		commands.emit("cmd.application.command_palette.remove", readable_name)
 
 		if (enabled) {
 			commands.emit("cmd.application.command_palette.add", {
@@ -95,6 +90,13 @@ export const OrdoSidebarButton = Maoka.create("button", ({ use }) => {
 				readable_name,
 				render_icon: div => void div.appendChild(BsLayoutSidebarInsetReverse() as SVGSVGElement),
 			})
+		} else {
+			commands.emit("cmd.application.command_palette.remove", readable_name)
+		}
+
+		if (current_activity && current_activity.render_sidebar) commands.emit("cmd.application.sidebar.enable")
+		else {
+			commands.emit("cmd.application.sidebar.disable")
 		}
 
 		return Switch.OfTrue()

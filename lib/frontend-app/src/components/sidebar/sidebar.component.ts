@@ -70,19 +70,21 @@ export const OrdoSidebarButton = Maoka.create("button", ({ use }) => {
 	const get_sidebar = use(MaokaOrdo.Jabs.happy_marriage$(sidebar$))
 	const get_current_activity = use(ordo_app_state.select_jab$("functions.current_activity"))
 
-	use(MaokaJabs.set_class("activity-bar_link activity-bar_icon"))
 	use(MaokaJabs.listen("onclick", () => commands.emit("cmd.application.sidebar.toggle")))
 
 	return () => {
 		const activities = ordo_app_state.zags.select("functions.activities")
 
 		const { visible, enabled } = get_sidebar()
+
 		const current_activity_name = get_current_activity()
 		const current_activity = activities.find(activity => activity.name === current_activity_name)
 
 		const readable_name = "t.common.components.sidebar.toggle"
 
 		if (enabled) {
+			use(MaokaJabs.add_class("activity-bar_link", "activity-bar_icon"))
+			use(MaokaJabs.remove_class("size-6", "invisible"))
 			commands.emit("cmd.application.command_palette.add", {
 				value: () => commands.emit("cmd.application.sidebar.toggle"),
 				hotkey: "mod+b",
@@ -91,6 +93,8 @@ export const OrdoSidebarButton = Maoka.create("button", ({ use }) => {
 				render_icon: BsLayoutSidebarInsetReverse,
 			})
 		} else {
+			use(MaokaJabs.remove_class("activity-bar_link", "activity-bar_icon"))
+			use(MaokaJabs.add_class("size-6", "invisible"))
 			commands.emit("cmd.application.command_palette.remove", readable_name)
 		}
 

@@ -1,0 +1,23 @@
+meta {
+  name: Invalidate Token
+  type: http
+  seq: 3
+}
+
+delete {
+  url: {{ID_HOST}}/tokens/invalidate
+  body: none
+  auth: bearer
+}
+
+headers {
+  Origin: {{ORIGIN}}
+}
+
+auth:bearer {
+  token: {{CURRENT_TOKEN}}
+}
+
+script:post-response {
+  bru.setVar("CURRENT_TOKEN",res.getBody().payload)
+}

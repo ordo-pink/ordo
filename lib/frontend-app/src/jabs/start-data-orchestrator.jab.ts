@@ -29,7 +29,7 @@ import { DataManager } from "../frontend-app.data-manager"
 type P = { metadata: Ordo.Metadata.Repository; content: Ordo.Content.Repository }
 export const start_data_orchestrator =
 	(repositories: P): TMaokaJab =>
-	async ({ use, on_unmount }) => {
+	async ({ use, onunmount }) => {
 		const commands = use(MaokaOrdo.Jabs.get_commands)
 
 		const data_manager = DataManager.Of(repositories.metadata, repositories.content)
@@ -43,7 +43,7 @@ export const start_data_orchestrator =
 				.default(noop),
 		)
 
-		on_unmount(() => {
+		onunmount(() => {
 			data_manager.cancel()
 		})
 	}

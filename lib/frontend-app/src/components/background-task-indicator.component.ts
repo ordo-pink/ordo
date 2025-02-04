@@ -41,7 +41,7 @@ const handle_start_loading = () => background_task_status_state.zags.update("sta
 const handle_start_saving = () => background_task_status_state.zags.update("status", () => BackgroundTaskStatus.SAVING)
 const handle_reset_status = () => background_task_status_state.zags.update("status", () => BackgroundTaskStatus.NONE)
 
-export const OrdoBackgroundTaskIndicator = Maoka.create("div", ({ use, on_unmount }) => {
+export const OrdoBackgroundTaskIndicator = Maoka.create("div", ({ use, onunmount }) => {
 	const get_status = use(background_task_status_state.select_jab$("status"))
 	const commands = ordo_app_state.zags.select("commands")
 
@@ -52,7 +52,7 @@ export const OrdoBackgroundTaskIndicator = Maoka.create("div", ({ use, on_unmoun
 	commands.on("cmd.application.background_task.start_saving", handle_start_saving)
 	commands.on("cmd.application.background_task.reset_status", handle_reset_status)
 
-	on_unmount(() => {
+	onunmount(() => {
 		commands.off("cmd.application.background_task.set_status", handle_set_status)
 		commands.off("cmd.application.background_task.start_loading", handle_start_loading)
 		commands.off("cmd.application.background_task.start_saving", handle_start_saving)

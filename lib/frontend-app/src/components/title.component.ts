@@ -23,7 +23,7 @@ import { Maoka } from "@ordo-pink/maoka"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { ZAGS } from "@ordo-pink/zags"
 
-export const OrdoTitleDisplay = Maoka.create("div", ({ use, on_unmount }) => {
+export const OrdoTitleDisplay = Maoka.create("div", ({ use, onunmount }) => {
 	const commands = use(MaokaOrdo.Jabs.get_commands)
 	const { t } = use(MaokaOrdo.Jabs.get_translations$)
 	const get_title = use(MaokaOrdo.Jabs.happy_marriage$(title$, s => s.title))
@@ -33,7 +33,7 @@ export const OrdoTitleDisplay = Maoka.create("div", ({ use, on_unmount }) => {
 
 	commands.on("cmd.application.set_title", handle_set_title)
 
-	on_unmount(() => {
+	onunmount(() => {
 		commands.off("cmd.application.set_title", handle_set_title)
 	})
 

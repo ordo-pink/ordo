@@ -20,7 +20,8 @@
  */
 
 import { BsArrowLeft, BsLayoutSidebarInsetReverse } from "@ordo-pink/frontend-icons"
-import { Maoka, type TMaokaElement } from "@ordo-pink/maoka"
+import { CommandPaletteItemType } from "@ordo-pink/core"
+import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { Switch } from "@ordo-pink/switch"
@@ -30,7 +31,7 @@ import { ordo_app_state } from "../../../app.state"
 import { sidebar$ } from "./sidebar.state"
 
 // TODO Automatically close sidebar in mobile if something was clicked
-export const OrdoSidebar = Maoka.create("aside", ({ use, on_unmount }) => {
+export const OrdoSidebar = Maoka.create("aside", ({ use, onunmount }) => {
 	const commands = ordo_app_state.zags.select("commands")
 	const get_sidebar = use(MaokaOrdo.Jabs.happy_marriage$(sidebar$))
 	const is_mobile = use(MaokaJabs.is_mobile)
@@ -41,7 +42,7 @@ export const OrdoSidebar = Maoka.create("aside", ({ use, on_unmount }) => {
 	commands.on("cmd.application.sidebar.show", handle_show_sidebar)
 	commands.on("cmd.application.sidebar.toggle", handle_toggle_sidebar)
 
-	on_unmount(() => {
+	onunmount(() => {
 		commands.off("cmd.application.sidebar.disable", handle_disable_sidebar)
 		commands.off("cmd.application.sidebar.enable", handle_enable_sidebar)
 		commands.off("cmd.application.sidebar.hide", handle_hide_sidebar)
@@ -69,35 +70,42 @@ export const OrdoSidebarButton = Maoka.create("button", ({ use }) => {
 	const get_sidebar = use(MaokaOrdo.Jabs.happy_marriage$(sidebar$))
 	const get_current_activity = use(ordo_app_state.select_jab$("functions.current_activity"))
 
-	use(MaokaJabs.set_class("activity-bar_link activity-bar_icon"))
 	use(MaokaJabs.listen("onclick", () => commands.emit("cmd.application.sidebar.toggle")))
 
 	return () => {
 		const activities = ordo_app_state.zags.select("functions.activities")
 
 		const { visible, enabled } = get_sidebar()
+
 		const current_activity_name = get_current_activity()
 		const current_activity = activities.find(activity => activity.name === current_activity_name)
 
-		if (current_activity && current_activity.render_sidebar) commands.emit("cmd.application.sidebar.enable")
-		else commands.emit("cmd.application.sidebar.disable")
-
 		const readable_name = "t.common.components.sidebar.toggle"
 
-		commands.emit("cmd.application.command_palette.remove", readable_name)
-
 		if (enabled) {
+			use(MaokaJabs.add_class("activity-bar_link", "activity-bar_icon"))
+			use(MaokaJabs.remove_class("size-6", "invisible"))
 			commands.emit("cmd.application.command_palette.add", {
 				value: () => commands.emit("cmd.application.sidebar.toggle"),
 				hotkey: "mod+b",
+				type: CommandPaletteItemType.COMMON_ACTION,
 				readable_name,
-				render_icon: div => void div.appendChild(BsLayoutSidebarInsetReverse() as SVGSVGElement),
+				render_icon: BsLayoutSidebarInsetReverse,
 			})
+		} else {
+			use(MaokaJabs.remove_class("activity-bar_link", "activity-bar_icon"))
+			use(MaokaJabs.add_class("size-6", "invisible"))
+			commands.emit("cmd.application.command_palette.remove", readable_name)
+		}
+
+		if (current_activity && current_activity.render_sidebar) commands.emit("cmd.application.sidebar.enable")
+		else {
+			commands.emit("cmd.application.sidebar.disable")
 		}
 
 		return Switch.OfTrue()
-			.case(enabled && visible, () => BsArrowLeft("rotate-180") as TMaokaElement)
-			.case(enabled && !visible, () => BsLayoutSidebarInsetReverse() as TMaokaElement)
+			.case(enabled && visible, () => BsArrowLeft("rotate-180"))
+			.case(enabled && !visible, () => BsLayoutSidebarInsetReverse())
 			.default(noop)
 	}
 })
@@ -116,7 +124,7 @@ const SidebarRenderer = Maoka.create("div", ({ use, element }) => {
 		const current_activity = activities.find(activity => activity.name === current_activity_name)
 
 		if (current_activity && current_activity.render_sidebar)
-			await current_activity.render_sidebar(element as unknown as HTMLDivElement) // TODO 404
+			return current_activity.render_sidebar() // TODO 404
 		else element.innerHTML = ""
 	}
 })

@@ -1,0 +1,33 @@
+meta {
+  name: [pub] Validate Code
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{ID_HOST}}/codes/validate?Origin={{ORIGIN}}
+  body: json
+  auth: none
+}
+
+params:query {
+  Origin: {{ORIGIN}}
+}
+
+headers {
+  Origin: {{ORIGIN}}
+}
+
+body:json {
+  {
+    "email": "{{USER_EMAIL}}",
+    "code": "143948"
+  }
+}
+
+script:post-response {
+  bru.setVar("CURRENT_TOKEN", res.getBody().payload.token)
+  bru.setVar("CURRENT_ID", res.getBody().payload.user.id)
+  bru.setVar("CURRENT_EMAIL", res.getBody().payload.user.email)
+  bru.setVar("CURRENT_HANDLE", res.getBody().payload.user.handle)
+}

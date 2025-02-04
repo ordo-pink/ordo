@@ -22,27 +22,35 @@
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { invokers0 } from "@ordo-pink/oath"
+import { ordo_app_state } from "@ordo-pink/frontend-app/app.state"
 
 export const RenderPicker = (metadata: Ordo.Metadata.Instance) =>
-	Maoka.create("div", ({ use, element }) => {
+	Maoka.create("div", ({ refresh, use }) => {
 		const metadata_fsid = metadata.get_fsid()
 		const metadata_type = metadata.get_type()
+
+		let fa: Ordo.FileAssociation.Instance | null = null
+
 		const content_query = use(MaokaOrdo.Jabs.get_content_query)
 		const content0 = content_query.get(metadata_fsid, "text")
-		const get_file_associations = use(MaokaOrdo.Jabs.get_file_associations$)
+
+		ordo_app_state.zags.cheat("functions.file_assocs", fas => {
+			if (fa) return
+
+			fa = fas.find(fa => fa.types.some(t => t.name === metadata_type)) ?? null
+
+			if (fa) refresh()
+		})
 
 		// TODO Unsupported file component
 		return async () => {
-			const file_associations = get_file_associations()
-			const fa = file_associations.find(fa => fa.types.some(t => t.name === metadata_type))
 			const content = await content0.invoke(invokers0.or_else(() => null))
 
 			if (!fa || !fa.render) return
 
-			const div = element as unknown as HTMLDivElement
 			const is_editable = true // TODO Check if user has edit rights
 			const is_embedded = false
 
-			await fa.render({ div, metadata, content, is_editable, is_embedded })
+			return fa.render({ metadata, content, is_editable, is_embedded })
 		}
 	})

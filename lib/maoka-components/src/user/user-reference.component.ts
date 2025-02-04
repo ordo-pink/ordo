@@ -19,15 +19,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Maoka, type TMaokaElement } from "@ordo-pink/maoka"
 import { BsCaretRight } from "@ordo-pink/frontend-icons"
+import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { Result } from "@ordo-pink/result"
 
 // TODO: Lead to user page
 // TODO: Get actual user (id: string) =>
-export const CurrentUserReference = Maoka.create("div", ({ use, refresh, on_unmount }) => {
+export const CurrentUserReference = Maoka.create("div", ({ use, refresh, onunmount }) => {
 	let name = ""
 
 	use(MaokaJabs.set_class("flex gap-x-2 items-center text-sm"))
@@ -38,10 +38,10 @@ export const CurrentUserReference = Maoka.create("div", ({ use, refresh, on_unmo
 		user_query
 			.get_current()
 			.pipe(Result.ops.map(user => void (name = user.get_readable_name())))
-			.cata(Result.catas.if_ok(() => void refresh())),
+			.cata(Result.catas.if_ok(() => refresh())),
 	)
 
-	on_unmount(() => divorce_user_query_version())
+	onunmount(() => divorce_user_query_version())
 
 	return () => [UserAvatar, UserName(name)]
 })
@@ -66,7 +66,7 @@ const UserAvatarIcon = Maoka.create("div", ({ use }) => {
 	use(MaokaJabs.set_class("size-3 rounded-full text-xs"))
 
 	// TODO: User icon
-	return () => BsCaretRight("size-3 white") as TMaokaElement
+	return () => BsCaretRight("size-3 white")
 })
 
 export const UserName = (name: string) =>

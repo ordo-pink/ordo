@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Label, Link, MetadataIcon } from "@ordo-pink/maoka-components"
+import { Label, Link, MetadataIcon, MetadataLink } from "@ordo-pink/maoka-components"
 import { Maoka, type TMaokaChildren } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
@@ -72,35 +72,51 @@ const LinksCell = (metadata: Ordo.Metadata.Instance, type: "parent" | "incoming"
 			Switch.Match(type)
 				.case("parent", () =>
 					Maoka.create("div", ({ use }) => {
-						use(MaokaJabs.set_class("database-cell_multiple"))
+						use(MaokaJabs.set_class("database_cell-multiple"))
 						const get_parent = use(MaokaOrdo.Jabs.Metadata.get_by_fsid$(metadata.get_parent()))
-						return () => Link({ href: `/editor/${metadata.get_parent()}`, children: get_parent()?.get_name() ?? "/" })
+
+						return () => {
+							const parent = get_parent()
+
+							if (!parent) return
+							else
+								return MetadataLink({
+									metadata: parent,
+									href: `/editor/${parent.get_fsid()}`,
+									children: parent.get_name(),
+									title: parent.get_name(),
+								})
+						}
 					}),
 				)
 				.case("outgoing", () =>
 					Maoka.create("div", ({ use }) => {
-						use(MaokaJabs.set_class("database-cell_multiple"))
+						use(MaokaJabs.set_class("database_cell-multiple"))
 						const get_links = use(MaokaOrdo.Jabs.Metadata.get_outgoing_links$(fsid))
 						return () =>
 							get_links().map(link =>
-								LinkBlock(() => Link({ href: `/editor/${link.get_fsid()}`, children: link.get_name() ?? "/" })),
+								LinkBlock(() =>
+									MetadataLink({ metadata: link, href: `/editor/${link.get_fsid()}`, children: link.get_name() ?? "/" }),
+								),
 							)
 					}),
 				)
 				.case("incoming", () =>
 					Maoka.create("div", ({ use }) => {
-						use(MaokaJabs.set_class("database-cell_multiple"))
+						use(MaokaJabs.set_class("database_cell-multiple"))
 						const get_links = use(MaokaOrdo.Jabs.Metadata.get_incoming_links$(metadata.get_fsid()))
 						return () =>
 							get_links().map(link =>
-								LinkBlock(() => Link({ href: `/editor/${link.get_fsid()}`, children: link.get_name() ?? "/" })),
+								LinkBlock(() =>
+									MetadataLink({ metadata: link, href: `/editor/${link.get_fsid()}`, children: link.get_name() ?? "/" }),
+								),
 							)
 					}),
 				)
 				.default(noop)
 	})
 
-const LinkBlock = Maoka.styled("div")
+const LinkBlock = Maoka.styled("span")
 
 const LabelsCell = (fsid: Ordo.Metadata.FSID) =>
 	Maoka.create("td", ({ use }) => {
@@ -152,7 +168,7 @@ const FileNameCell = (metadata: Ordo.Metadata.Instance) =>
 						.cata(R.catas.if_ok(new_name => commands.emit("cmd.metadata.rename", { fsid, new_name })))
 				}
 
-				return () => [MetadataIcon({ metadata }), EditableLink({ fsid, name, on_blur: handle_blur })]
+				return () => [MetadataIcon({ metadata, custom_class: "pt-0.5" }), EditableLink({ fsid, name, on_blur: handle_blur })]
 			})
 	})
 

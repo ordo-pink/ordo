@@ -56,5 +56,7 @@ const Block = (node: TOrdoRichTextEditorBlockNode, metadata: Ordo.Metadata.Insta
 			}),
 		)
 
-		return () => node.children.map((child, child_index) => Inline(child, metadata, block_index, child_index))
+		return () => {
+			return node.children.map((child, child_index) => Inline(child, metadata, block_index, child_index))
+		}
 	})

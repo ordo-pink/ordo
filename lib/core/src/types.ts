@@ -20,9 +20,9 @@
  */
 
 import type { JTI, SUB } from "@ordo-pink/wjwt"
+import type { TMaokaChildren, TMaokaComponent } from "@ordo-pink/maoka"
 import type { Oath } from "@ordo-pink/oath"
 import type { TLogger } from "@ordo-pink/logger"
-import type { TMaokaComponent } from "@ordo-pink/maoka"
 import type { TResult } from "@ordo-pink/result"
 import type { TZags } from "@ordo-pink/zags"
 import type { TwoLetterLocale } from "@ordo-pink/locale"
@@ -89,6 +89,9 @@ declare global {
 			apply: () => string
 			save: () => string
 			load: () => string
+			error: {
+				eexist: () => string
+			}
 			state: {
 				loading: () => string
 				saving: () => string
@@ -167,10 +170,6 @@ declare global {
 					title: () => string
 					message: () => string
 				}
-				rrr_sign_up_unavailable: {
-					title: () => string
-					message: () => string
-				}
 				sections: {
 					hero: {
 						beta_started_announcement: () => string
@@ -180,6 +179,10 @@ declare global {
 					}
 				}
 			}
+		}
+		auth: {
+			leave: () => string
+			join: () => string
 		}
 	}
 
@@ -319,6 +322,12 @@ declare global {
 			go_to_messenger_support: () => void
 			go_to_welcome_page: () => void
 			open_support_palette: () => void
+		}
+		auth: {
+			show_request_code_modal: () => void
+			show_validate_code_modal: () => Ordo.User.Email
+			request_code: (email: Ordo.User.Email) => void
+			validate_code: (email: Ordo.User.Email, code: string) => void
 		}
 	}
 
@@ -524,19 +533,19 @@ declare global {
 				name: string
 				routes: `/${string}`[]
 				default_route?: `/${string}`
-				render_workspace?: (div: HTMLDivElement) => void | Promise<void>
-				render_sidebar?: (div: HTMLDivElement) => void | Promise<void>
-				render_icon?: (span: HTMLSpanElement) => void | Promise<void>
-				on_unmount?: (params: Ordo.Activity.OnUnmountParams) => void
+				render_workspace?: () => TMaokaChildren | Promise<TMaokaChildren>
+				render_sidebar?: () => TMaokaChildren | Promise<TMaokaChildren>
+				render_icon?: () => TMaokaChildren | Promise<TMaokaChildren>
+				onunmount?: (params: Ordo.Activity.OnUnmountParams) => void
 				is_background?: boolean
 				is_fullscreen?: boolean
 			}
 		}
 
 		namespace FileAssociation {
-			type RenderFn = (params: Ordo.FileAssociation.RenderParams) => void | Promise<void>
+			type RenderFn = (params: Ordo.FileAssociation.RenderParams) => TMaokaChildren | Promise<TMaokaChildren>
 
-			type RenderIconFn = (span: HTMLSpanElement) => void | Promise<void>
+			type RenderIconFn = () => TMaokaChildren | Promise<TMaokaChildren>
 
 			type Type = {
 				name: string
@@ -552,7 +561,6 @@ declare global {
 			}
 
 			type RenderParams = {
-				div: HTMLDivElement
 				is_editable: boolean
 				is_embedded: boolean
 				content: Ordo.Content.Instance | null
@@ -592,6 +600,7 @@ declare global {
 
 				type Static = {
 					FromDTO: (dto: Ordo.User.Current.DTO) => Ordo.User.Current.Instance
+					Serialize: <$TDTO extends Ordo.User.Current.DTO>(dto: $TDTO) => Ordo.User.Current.DTO
 					Validations: Ordo.User.Current.Validations
 				}
 
@@ -1103,7 +1112,7 @@ declare global {
 		}
 
 		namespace Modal {
-			type Instance = { on_unmount?: () => void; render: (div: HTMLDivElement) => void | Promise<void> }
+			type Instance = { onunmount?: () => void; render: () => TMaokaChildren | Promise<TMaokaChildren> }
 		}
 
 		namespace Router {
@@ -1168,7 +1177,7 @@ declare global {
 				/**
 				 * Icon to be displayed for the context menu item.
 				 */
-				render_icon?: (div: HTMLDivElement) => void
+				render_icon?: () => TMaokaChildren | Promise<TMaokaChildren>
 
 				/**
 				 * Keyboard hotkey for the context menu item. It only works while the context menu is
@@ -1269,7 +1278,7 @@ declare global {
 				 *
 				 * @optional
 				 */
-				render_icon?: (div: HTMLDivElement) => void | Promise<void>
+				render_icon?: () => TMaokaChildren | Promise<TMaokaChildren>
 
 				/**
 				 * Keyboard hotkey for the context menu item. It only works while the context menu is
@@ -1280,6 +1289,8 @@ declare global {
 				hotkey?: string
 
 				description?: Ordo.I18N.TranslationKey
+
+				type?: C.CommandPaletteItemType
 
 				render_custom_footer?: () => TMaokaComponent // TODO Use standard render approach
 				render_custom_info?: () => TMaokaComponent // TODO Use standard render approach

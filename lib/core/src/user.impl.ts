@@ -69,7 +69,7 @@ const is_user_older_than = (dto: Ordo.User.Public.DTO) => (date: Date) => get_us
 const is_user_subscription_paid = (dto: Ordo.User.Public.DTO) => () => dto.subscription > UserSubscription.FREE
 
 export const CurrentUserValidations: Ordo.User.Current.Validations = {
-	is_created_at: (x): x is Ordo.User.Current.DTO["created_at"] => TAU.is_date(x),
+	is_created_at: (x): x is Ordo.User.Current.DTO["created_at"] => TAU.is_number(x),
 	is_first_name: (x): x is Ordo.User.Current.DTO["first_name"] => TAU.is_undefined(x) || TAU.is_string(x),
 	is_handle: (x): x is Ordo.User.Current.DTO["handle"] => TAU.is_non_empty_string(x) && x.startsWith("@"),
 	is_id: (x): x is Ordo.User.Current.DTO["id"] => TAU.is_uuid(x),
@@ -104,6 +104,19 @@ export const CurrentUserValidations: Ordo.User.Current.Validations = {
 
 export const CurrentUser: Ordo.User.Current.Static = {
 	Validations: CurrentUserValidations,
+	Serialize: dto => ({
+		created_at: dto.created_at,
+		first_name: dto.first_name,
+		handle: dto.handle,
+		id: dto.id,
+		last_name: dto.last_name,
+		subscription: dto.subscription,
+		email: dto.email,
+		file_limit: dto.file_limit,
+		installed_functions: dto.installed_functions,
+		max_functions: dto.max_functions,
+		max_upload_size: dto.max_upload_size,
+	}),
 	FromDTO: dto => ({
 		can_add_function: can_user_add_function(dto),
 		can_create_files: can_user_create_files(dto),

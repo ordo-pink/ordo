@@ -94,18 +94,18 @@ export const create_context = <$TValue>() => {
 
 	return {
 		provide: (value: $TValue) => (props: TMaokaProps) => {
-			if (!state[props.root_id]) state[props.root_id] = value
+			if (!state[props.rid]) state[props.rid] = value
 		},
 
 		consume: (props: TMaokaProps) => {
-			return state[props.root_id] ?? ({} as $TValue)
+			return state[props.rid] ?? ({} as $TValue)
 		},
 	}
 }
 
 const is_sm = lt(SM_SCREEN_BREAKPOINT)
 
-export const is_sm_screen$: TMaokaJab<() => boolean> = ({ refresh, on_unmount }) => {
+export const is_sm_screen$: TMaokaJab<() => boolean> = ({ refresh, onunmount }) => {
 	let value: boolean = is_sm(window.innerWidth)
 
 	const handle_resize = () => {
@@ -113,13 +113,13 @@ export const is_sm_screen$: TMaokaJab<() => boolean> = ({ refresh, on_unmount })
 
 		if (value !== is_sm_screen) {
 			value = is_sm_screen
-			void refresh()
+			refresh()
 		}
 	}
 
 	window.addEventListener("resize", handle_resize)
 
-	on_unmount(() => window.removeEventListener("resize", handle_resize))
+	onunmount(() => window.removeEventListener("resize", handle_resize))
 
 	return () => value
 }

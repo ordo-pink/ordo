@@ -1,3 +1,7 @@
+.input-wrapper {
+	@apply relative w-full;
+}
+
 .input_label {
 	@apply w-full text-sm font-bold;
 }
@@ -8,4 +12,8 @@
 
 .input_text.non-transparent {
 	@apply bg-gradient-to-br from-neutral-100 to-stone-100 hover:from-neutral-100 hover:to-stone-100 dark:from-neutral-600 dark:to-stone-600 hover:dark:from-neutral-600 hover:dark:to-stone-600;
+}
+
+.input_text-error {
+	@apply absolute top-0 w-full text-right text-sm font-bold text-rose-500;
 }

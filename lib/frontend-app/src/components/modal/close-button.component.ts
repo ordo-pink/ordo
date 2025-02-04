@@ -19,8 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Maoka, type TMaokaElement } from "@ordo-pink/maoka"
 import { BsX } from "@ordo-pink/frontend-icons"
+import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 
 import { ordo_app_state } from "../../../app.state"
@@ -36,5 +36,5 @@ export const ModalCloseButton = Maoka.create("button", ({ use }) => {
 		commands.emit("cmd.application.modal.hide")
 	}
 
-	return () => BsX() as TMaokaElement
+	return BsX
 })

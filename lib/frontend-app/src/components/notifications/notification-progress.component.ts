@@ -30,7 +30,7 @@ type P = Pick<Ordo.Notification.Instance, "id" | "type" | "duration">
 export const OrdoNotificationProgress = ({ id, type, duration }: P) => {
 	if (!duration) return
 
-	return Maoka.create("div", ({ use, on_unmount }) => {
+	return Maoka.create("div", ({ use, onunmount }) => {
 		const get_progress = use(ordo_notifications_state.select_jab$(`progress_bars.${id}`))
 		const commands = ordo_app_state.zags.select("commands")
 
@@ -44,7 +44,7 @@ export const OrdoNotificationProgress = ({ id, type, duration }: P) => {
 		update_progress_bar()
 		const interval = setInterval(update_progress_bar, duration * 10)
 
-		on_unmount(() => clearInterval(interval))
+		onunmount(() => clearInterval(interval))
 
 		use(MaokaJabs.set_class("notification-card_progress"))
 

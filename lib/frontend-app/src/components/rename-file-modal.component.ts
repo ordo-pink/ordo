@@ -46,6 +46,7 @@ export const RenameFileModal = (fsid: Ordo.Metadata.FSID) =>
 					commands.emit("cmd.metadata.rename", { fsid, new_name: state.name })
 					commands.emit("cmd.application.modal.hide")
 				},
+				action_hotkey: "enter",
 				action_text: "OK", // TODO Add translations
 				body: () =>
 					Input.Text({
@@ -57,7 +58,7 @@ export const RenameFileModal = (fsid: Ordo.Metadata.FSID) =>
 							state.name = target.value
 						},
 					}),
-				render_icon: div => void div.appendChild(BsFileEarmarkRichText() as SVGSVGElement),
+				render_icon: BsFileEarmarkRichText,
 			})
 		}
 	})

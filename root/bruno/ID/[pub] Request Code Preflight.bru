@@ -1,0 +1,15 @@
+meta {
+  name: [pub] Request Code Preflight
+  type: http
+  seq: 2
+}
+
+options {
+  url: {{ID_HOST}}/codes/request
+  body: none
+  auth: none
+}
+
+headers {
+  ORIGIN: {{ORIGIN}}
+}

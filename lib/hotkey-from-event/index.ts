@@ -26,6 +26,10 @@ export const create_hotkey_from_event = (event: KeyboardEvent, is_darwin: boolea
 		.case("Slash", () => "/")
 		.case("Space", () => " ")
 		.case(
+			code => !code,
+			() => "",
+		)
+		.case(
 			code => code.startsWith("Key"),
 			() => event.code.slice(3).toLowerCase(),
 		)

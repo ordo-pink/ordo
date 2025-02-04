@@ -19,26 +19,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-// import chalk from "chalk"
-
-// import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
-// import { ConsoleLogger } from "@ordo-pink/logger"
-// import { EmailStrategyRusender } from "@ordo-pink/backend-email-strategy-rusender"
-// import { PersistenceStrategyTokenFS } from "@ordo-pink/backend-persistence-strategy-token-fs"
-// // import { PersistenceStrategyUserDynamoDB } from "@ordo-pink/backend-persistence-strategy-user-dynamodb"
-// import { PersistenceStrategyUserFS } from "@ordo-pink/backend-persistence-strategy-user-fs"
-// import { Switch } from "@ordo-pink/switch"
-// // import { TokenPersistenceStrategyDynamoDB } from "@ordo-pink/backend-persistence-strategy-token-dynamodb"
-// import { create_id_server } from "@ordo-pink/backend-server-id"
 import { ConsoleLogger, type TLogger } from "@ordo-pink/logger"
 import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
 import { type TAlgorithm, WJWT } from "@ordo-pink/wjwt"
 import { type TIDChamber, create_backend_id } from "@ordo-pink/backend-id"
+import { is_finite_non_negative_int, is_finite_positive_int, is_port, is_positive_number } from "@ordo-pink/tau"
 import { PersistenceStategyUserFS } from "@ordo-pink/backend-persistence-strategy-user-fs"
-import { is_port } from "@ordo-pink/tau"
+import { PersistenceStrategyTokenFS } from "@ordo-pink/backend-persistence-strategy-token-fs"
 
-const env_rrr = (env_var: string) => (value?: string | null) =>
-	value ? `Invalid value for ${env_var}: "${value}"` : `Missing value for ${env_var}`
+const env_rrr = (env_var: string) => (value?: any) =>
+	value != null ? `Invalid value for ${env_var}: "${value}"` : `Missing value for ${env_var}`
 
 const get_env = () =>
 	Oath.Merge({
@@ -71,24 +61,68 @@ const get_env = () =>
 						.pipe(ops0.rejected_map(env_rrr("ORDO_ID_TOKEN_PUBLIC_KEY"))),
 				}),
 			),
+
+		file_limit: Oath.FromNullable(Bun.env.ORDO_ID_DEFAULT_FILE_LIMIT)
+			.and(s => Number.parseInt(s, 10))
+			.and(n => Oath.If(is_finite_positive_int(n), { T: () => n }))
+			.pipe(ops0.rejected_map(env_rrr("ORDO_ID_DEFAULT_FILE_LIMIT"))),
+
+		max_upload_size: Oath.FromNullable(Bun.env.ORDO_ID_DEFAULT_MAX_UPLOAD_SIZE)
+			.and(s => Number.parseFloat(s))
+			.and(n => Oath.If(is_positive_number(n), { T: () => n }))
+			.pipe(ops0.rejected_map(env_rrr("ORDO_ID_DEFAULT_MAX_UPLOAD_SIZE"))),
+
+		max_functions: Oath.FromNullable(Bun.env.ORDO_ID_DEFAULT_MAX_FUNCTIONS)
+			.and(s => Number.parseInt(s, 10))
+			.and(n => Oath.If(is_finite_non_negative_int(n), { T: () => n }))
+			.pipe(ops0.rejected_map(env_rrr("ORDO_ID_DEFAULT_MAX_FUNCTIONS"))),
+
+		token_lifetime: Oath.FromNullable(Bun.env.ORDO_ID_TOKEN_LIFETIME)
+			.and(s => Number.parseInt(s, 10))
+			.and(n => Oath.If(is_finite_positive_int(n), { T: () => n }))
+			.pipe(ops0.rejected_map(env_rrr("ORDO_ID_TOKEN_LIFETIME"))),
+
+		persisted_token_lifetime: Oath.FromNullable(Bun.env.ORDO_ID_PERSISTED_TOKEN_LIFETIME)
+			.and(s => Number.parseInt(s, 10))
+			.and(n => Oath.If(is_finite_positive_int(n), { T: () => n }))
+			.pipe(ops0.rejected_map(env_rrr("ORDO_ID_PERSISTED_TOKEN_LIFETIME"))),
+
 		user_db_path: Oath.FromNullable(Bun.env.ORDO_ID_USER_DB_PATH, env_rrr("ORDO_ID_USER_DB_PATH")),
+
+		token_db_path: Oath.FromNullable(Bun.env.ORDO_ID_TOKEN_DB_PATH, env_rrr("ORDO_ID_TOKEN_DB_PATH")),
 	})
 
 const main = () =>
 	get_env()
-		.and(({ allow_origin, aud, iss, port, jwt: { alg, private_key, public_key }, user_db_path }) =>
-			Oath.Merge({
-				logger,
-				wjwt: WJWT({ aud, alg, private_key, public_key, iss }),
-				user_persistence_strategy: PersistenceStategyUserFS.Of(user_db_path),
-				notification_strategy: {
-					send_email: ({ from, content }) => logger.notice("Email code assigned:", from, "::", content),
-				}, // TODO
+		.and(
+			({
 				allow_origin,
-				token_persistence_strategy: "hello" as any, // TODO
-			} satisfies TIDChamber)
-				.and(create_backend_id)
-				.and(fetch => Bun.serve({ fetch, port })),
+				aud,
+				file_limit,
+				iss,
+				jwt: { alg, private_key, public_key },
+				max_functions,
+				max_upload_size,
+				persisted_token_lifetime,
+				port,
+				token_db_path,
+				token_lifetime,
+				user_db_path,
+			}) =>
+				Oath.Merge({
+					allow_origin,
+					defaults: { file_limit, max_functions, max_upload_size },
+					logger,
+					notification_strategy: { send: ({ content }) => logger.notice("NOTIFICATION:", "::", content) }, // TODO
+					persisted_token_lifetime,
+					token_persistence_strategy: PersistenceStrategyTokenFS.Of(token_db_path), // TODO
+					user_persistence_strategy: PersistenceStategyUserFS.Of(user_db_path),
+					wjwt: WJWT({ aud, alg, private_key, public_key, iss, token_lifetime }),
+					status: 200,
+					headers: {},
+				} satisfies TIDChamber)
+					.and(create_backend_id)
+					.and(fetch => Bun.serve({ fetch, port })),
 		)
 		.pipe(ops0.tap(server => logger.info(`server running on http://${server.hostname}:${server.port}`)))
 		.invoke(

@@ -1,7 +1,7 @@
 import { Oath } from "@ordo-pink/oath"
+import { get_opts } from "@ordo-pink/binutil"
 
 import commands from "./cmd"
-import { get_opts } from "@ordo-pink/binutil"
 
 const all_args = process.argv.slice(2)
 
@@ -15,8 +15,8 @@ const main = () =>
 		.fork(educate, () => void 0)
 
 const educate = () => {
-	if (!all_args[0]) console.error("ERROR: Invalid usage: command not provided. Type './bin --help' for details.")
-	else console.error(`ERROR: Invalid usage: "${all_args[0]}" is not a valid command. Type './bin --help' for details.`)
+	if (!all_args[0]) console.error("ERROR: Invalid usage: command not provided. Type 'bin/dog --help' for details.")
+	else console.error(`ERROR: Invalid usage: "${all_args[0]}" is not a valid command. Type 'bin/dog --help' for details.`)
 
 	process.exit(1)
 }
@@ -26,7 +26,7 @@ const show_help = () => {
 	const padding = 5
 
 	console.log(
-		`Usage: ./bin [command] [options]
+		`Usage: bin/dog [command] [options]
 
 Commands:
 

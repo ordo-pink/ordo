@@ -21,8 +21,6 @@
 
 import type { DynamoDB } from "aws-sdk"
 
-import type { TPersistenceStrategyUser } from "@ordo-pink/backend-service-user"
-
 export type TDynamoDBConfig = {
 	region: string
 	endpoint: string
@@ -32,9 +30,9 @@ export type TDynamoDBConfig = {
 }
 
 export type TPersistenceStrategyDynamoDBStatic = {
-	of: (config: TDynamoDBConfig) => TPersistenceStrategyUser
+	Of: (config: TDynamoDBConfig) => OrdoBackend.User.PersistenceStrategy
 }
 
-export type TDeserialiseFn = (item: DynamoDB.AttributeMap) => User.PrivateUser
+export type TDeserialiseFn = (item: DynamoDB.AttributeMap) => OrdoBackend.User.DTO
 
-export type TSerialiseFn = (user: User.PrivateUser) => DynamoDB.PutItemInputAttributeMap
+export type TSerialiseFn = (user: OrdoBackend.User.DTO) => Record<keyof OrdoBackend.User.DTO, DynamoDB.AttributeValue>

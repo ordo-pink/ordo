@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Maoka, type TMaokaComponent } from "@ordo-pink/maoka"
+import { Maoka, type TMaokaChildren } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 
 import "./action-list-item.css"
@@ -28,9 +28,9 @@ export type TActionListItemProps = {
 	title: string
 	is_current?: boolean | "hover"
 	on_click?: (event: MouseEvent) => void
-	render_icon?: (div: HTMLDivElement) => void
-	render_footer?: () => TMaokaComponent
-	render_info?: () => TMaokaComponent
+	render_icon?: () => TMaokaChildren | Promise<TMaokaChildren>
+	render_footer?: () => TMaokaChildren | Promise<TMaokaChildren>
+	render_info?: () => TMaokaChildren | Promise<TMaokaChildren>
 }
 
 export const ActionListItem = ({
@@ -51,8 +51,8 @@ export const ActionListItem = ({
 			else use(MaokaJabs.remove_class("active", "active-hover"))
 
 			return Layout(() => [
-				Main(() => [Icon(render_icon), Title(() => title), render_info?.()]),
-				render_footer ? Footer(() => render_footer()) : void 0,
+				Main(() => [Icon(render_icon), Title(() => title), Info(render_info)]),
+				render_footer ? Footer(async () => render_footer()) : void 0,
 			])
 		}
 	})
@@ -62,9 +62,8 @@ const Layout = Maoka.styled("div", { class: "action-list-item_layout" })
 const Main = Maoka.styled("div", { class: "action-list-item_main" })
 const Footer = Maoka.styled("div", { class: "action-list-item_footer" })
 
-const Icon = (render_icon?: (div: HTMLDivElement) => void | Promise<void>) =>
-	render_icon
-		? Maoka.create("div", async ({ element }) => {
-				await render_icon(element as unknown as HTMLDivElement)
-			})
-		: void 0
+const Info = (render_info?: () => TMaokaChildren | Promise<TMaokaChildren>) =>
+	Maoka.create("div", () => async () => render_info && render_info())
+
+const Icon = (render_icon?: () => TMaokaChildren | Promise<TMaokaChildren>) =>
+	Maoka.create("div", () => async () => render_icon && render_icon())

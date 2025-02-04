@@ -5,7 +5,7 @@
 
 import { UUIDv4 } from "@ordo-pink/tau"
 
-export type TCustomPayload = Record<string, unknown>
+export type TCustomPayload = TStandardJWTPayload & Record<string, unknown>
 
 export type TAlgorithm =
 	| {
@@ -31,6 +31,7 @@ export type TWJWTFn<$TPayload extends TCustomPayload = TCustomPayload> = (params
 	private_key: CryptoKey
 	aud: AUD
 	iss: ISS
+	token_lifetime: number
 }) => TWJWT<$TPayload>
 
 export type TWJWT<$TPayload extends TCustomPayload = TCustomPayload> = {
@@ -94,10 +95,17 @@ export type TJWT<$TPayload extends TCustomPayload = TCustomPayload> = {
 
 export type TWJWTVerifyFn = (params: { key: CryptoKey; alg: TAlgorithm; aud: AUD }) => (token: string) => Promise<boolean>
 
+export type TWJWTSignResult<$TPayload extends TCustomPayload = TCustomPayload> = {
+	token: string
+	payload: $TPayload & TStandardJWTPayload
+}
+
 export type TWJWTSignFn<$TPayload extends TCustomPayload = TCustomPayload> = (params: {
 	key: CryptoKey
 	alg: TAlgorithm
 	iss: ISS
-}) => (payload: TJWT<$TPayload>["payload"]) => Promise<string>
+	aud: AUD
+	token_lifetime: EXP
+}) => (payload: Partial<TJWT<$TPayload>["payload"]> & { sub: SUB }) => Promise<TWJWTSignResult>
 
 export type TWJWTDecodeFn<T extends TCustomPayload = TCustomPayload> = (token: string) => TJWT<T>

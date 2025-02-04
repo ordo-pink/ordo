@@ -99,7 +99,9 @@ export const init_metadata: TInitMetadataFn = call_once(() => {
 		MetadataQuery.Of(metadata_repository, permission =>
 			Result.If(known_functions.has_permissions(fid, { queries: [permission] }), {
 				F: () => {
-					const rrr = eperm(`MetadataQuery permission RRR. Did you forget to request query permission '${permission}'?`)
+					const rrr = RRR.codes.eperm(
+						`MetadataQuery permission RRR. Did you forget to request query permission '${permission}'?`,
+					)
 					ConsoleLogger.error(rrr.debug?.join(" "))
 					return rrr
 				},
@@ -112,7 +114,5 @@ export const init_metadata: TInitMetadataFn = call_once(() => {
 })
 
 // --- Internal ---
-
-const eperm = RRR.codes.eperm("init_metadata")
 
 const metadata_zags = ZAGS.Of<{ items: Ordo.Metadata.Instance[] | null }>({ items: null })

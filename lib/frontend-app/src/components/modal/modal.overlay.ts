@@ -28,7 +28,7 @@ import { ordo_app_state } from "../../../app.state"
 
 import "./modal.css"
 
-export const OrdoModal = Maoka.create("div", ({ use, on_unmount }) => {
+export const OrdoModal = Maoka.create("div", ({ use, onunmount }) => {
 	const get_modal_state = use(ordo_app_state.select_jab$("sections.modal"))
 
 	const commands = ordo_app_state.zags.select("commands")
@@ -55,7 +55,7 @@ export const OrdoModal = Maoka.create("div", ({ use, on_unmount }) => {
 
 	document.addEventListener("keydown", handle_close)
 
-	on_unmount(() => document.removeEventListener("keydown", handle_close))
+	onunmount(() => document.removeEventListener("keydown", handle_close))
 
 	return () => {
 		if (get_modal_state()) {
@@ -71,16 +71,16 @@ export const OrdoModal = Maoka.create("div", ({ use, on_unmount }) => {
 
 // Define command handlers
 const on_modal_show: Ordo.Command.HandlerOf<"cmd.application.modal.show"> = payload => {
-	const on_unmount = payload.on_unmount ?? (() => void 0)
+	const onunmount = payload.onunmount ?? (() => void 0)
 	const render = payload.render
 
-	ordo_app_state.zags.update("sections.modal", () => ({ render, on_unmount }))
+	ordo_app_state.zags.update("sections.modal", () => ({ render, onunmount }))
 }
 
 const on_modal_hide: Ordo.Command.HandlerOf<"cmd.application.modal.hide"> = () => {
 	const state = ordo_app_state.zags.select("sections.modal")
 
-	if (state && state.on_unmount) state.on_unmount()
+	if (state && state.onunmount) state.onunmount()
 
 	ordo_app_state.zags.update("sections.modal", () => void 0)
 }

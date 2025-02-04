@@ -27,7 +27,7 @@ import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
 import { ordo_app_state } from "../../app.state"
 
-export const OrdoContextMenu = Maoka.create("div", ({ on_mount, on_unmount, use }) => {
+export const OrdoContextMenu = Maoka.create("div", ({ onmount: on_mount, onunmount, use }) => {
 	const commands = use(MaokaOrdo.Jabs.get_commands)
 
 	on_mount(() => {
@@ -37,7 +37,7 @@ export const OrdoContextMenu = Maoka.create("div", ({ on_mount, on_unmount, use 
 		commands.on("cmd.application.context_menu.remove", handle_remove)
 	})
 
-	on_unmount(() => {
+	onunmount(() => {
 		commands.off("cmd.application.context_menu.show", handle_show)
 		commands.off("cmd.application.context_menu.hide", handle_hide)
 		commands.off("cmd.application.context_menu.add", handle_add)
@@ -54,7 +54,10 @@ const handle_show: Ordo.Command.HandlerOf<"cmd.application.context_menu.show"> =
 		const should_show = item?.should_show({ event: menu.event, payload: menu.payload }) ?? false
 
 		// Avoid showing native context menu if there is something to show
-		if (should_show && menu.event.stopPropagation) menu.event.stopPropagation()
+		if (should_show && menu.event.stopPropagation) {
+			menu.event.preventDefault()
+			menu.event.stopPropagation()
+		}
 
 		return should_show
 	})
@@ -73,7 +76,7 @@ const handle_add: Ordo.Command.HandlerOf<"cmd.application.context_menu.add"> = n
 const handle_remove: Ordo.Command.HandlerOf<"cmd.application.context_menu.remove"> = command =>
 	ordo_app_state.zags.update("sections.context_menu.items", items => items.filter(item => item.command === command))
 
-const OrdoContextMenuDynamic = Maoka.create("div", ({ use, on_unmount }) => {
+const OrdoContextMenuDynamic = Maoka.create("div", ({ use, onunmount }) => {
 	use(MaokaJabs.set_class("context-menu"))
 	const is_mobile = use(MaokaJabs.is_mobile)
 
@@ -83,7 +86,7 @@ const OrdoContextMenuDynamic = Maoka.create("div", ({ use, on_unmount }) => {
 	const handle_click_outside = () => commands.emit("cmd.application.context_menu.hide")
 
 	document.addEventListener("click", handle_click_outside)
-	on_unmount(() => document.removeEventListener("click", handle_click_outside))
+	onunmount(() => document.removeEventListener("click", handle_click_outside))
 
 	return () => {
 		const state = get_state()

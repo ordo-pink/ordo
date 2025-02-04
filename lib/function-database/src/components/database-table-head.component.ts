@@ -19,8 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Maoka, type TMaokaElement } from "@ordo-pink/maoka"
 import { BsCaretDown } from "@ordo-pink/frontend-icons"
+import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { Switch } from "@ordo-pink/switch"
@@ -58,8 +58,8 @@ const TableHeadCell = (column: Ordo.I18N.TranslationKey) =>
 			DatabaseTableCellContent(() => {
 				const state = get_db_state()
 				const caret = Switch.Match(state.sorting?.[column])
-					.case(SortingDirection.ASC, () => BsCaretDown() as TMaokaElement)
-					.case(SortingDirection.DESC, () => BsCaretDown("rotate-180") as TMaokaElement)
+					.case(SortingDirection.ASC, () => BsCaretDown())
+					.case(SortingDirection.DESC, () => BsCaretDown("rotate-180"))
 					.default(noop)
 
 				return [t_column, caret]

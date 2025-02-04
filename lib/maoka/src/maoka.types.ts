@@ -11,8 +11,9 @@ export type TMaokaElement = { [$TKey in keyof HTMLElement]: HTMLElement[$TKey] |
 	appendChild: (child: TMaokaChild) => TMaokaChild
 	replaceChildren: (...children: TMaokaChild[]) => void
 	childNodes: HTMLElement["childNodes"]
-	onunmount: (() => void)[] | undefined
-	onmount: (() => void)[] | undefined
+	dispatchEvent: (event: Event) => void
+	onunmount: (() => void) | undefined
+	onmount: (() => void) | undefined
 }
 
 export type TMaokaTextElement = Partial<{ [$TKey in keyof Text]: Text[$TKey] }> | string
@@ -24,9 +25,9 @@ export type TMaokaCreateComponentFn = (name: string, callback: TMaokaCallback) =
 export type TMaokaComponent<$TElement extends TMaokaElement = TMaokaElement> = {
 	(create_element: TMaokaCreateMaokaElementFn<$TElement>, root_element: TMaokaElement, root_id: string): Promise<TMaokaElement>
 	id?: string
-	root_id?: string
+	rid?: string
 	element?: $TElement
-	refresh?: () => Promise<void>
+	refresh?: () => void
 }
 
 export type TMaokaJab<$TReturn = void> = (props: TMaokaProps) => $TReturn
@@ -66,27 +67,27 @@ export type TMaokaProps<$TElement extends TMaokaElement = TMaokaElement> = {
 	/**
 	 * Root id.
 	 */
-	get root_id(): string
+	get rid(): string
 
-	get root_element(): TMaokaElement
+	get root(): TMaokaElement
 
 	/**
 	 * Trigger refreshing current Maoka component. Technically, calling refresh is basically calling
 	 * the Maoka component callback function in which this `refresh` function is available inside
 	 * `use` parameter.
 	 */
-	refresh: () => Promise<void>
+	refresh: () => void
 
-	on_unmount: TMaokaOnUnmountFn
+	onunmount: TMaokaOnUnmountFn
 
-	on_mount: TMaokaAfterMountFn
+	onmount: TMaokaOnMountFn
 
 	use: <_TResult>(jab: TMaokaJab<_TResult>) => _TResult
 }
 
-export type TMaokaOnUnmountFn = (f: () => void) => void
+export type TMaokaOnUnmountFn = (onunmount_workload: () => void) => void
 
-export type TMaokaAfterMountFn = (f: () => void) => void
+export type TMaokaOnMountFn = (on_mount_workload: () => void) => void
 
 /**
  * A callback function that returns children of the current Maoka component. It accepts a record of

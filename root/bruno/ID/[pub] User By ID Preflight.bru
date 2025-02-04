@@ -1,0 +1,19 @@
+meta {
+  name: [pub] User By ID Preflight
+  type: http
+  seq: 6
+}
+
+options {
+  url: {{ID_HOST}}/users/:user_id
+  body: none
+  auth: none
+}
+
+params:path {
+  user_id: {{CURRENT_ID}}
+}
+
+headers {
+  Origin: {{ORIGIN}}
+}

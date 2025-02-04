@@ -1,0 +1,19 @@
+meta {
+  name: [pub] User By Handle
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{ID_HOST}}/users/handle/:user_handle
+  body: none
+  auth: none
+}
+
+params:path {
+  user_handle: {{USER_HANDLE}}
+}
+
+headers {
+  Origin: {{ORIGIN}}
+}

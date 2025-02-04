@@ -31,7 +31,7 @@ import { type TOrdoState, ordo_app_state } from "../../../app.state"
 import { CommandPaletteLocation } from "./constants"
 import { OrdoCommandPaletteItems } from "./command-palette-items.component"
 
-export const OrdoCommandPalette = Maoka.create("div", ({ use, refresh, on_unmount, on_mount }) => {
+export const OrdoCommandPalette = Maoka.create("div", ({ use, refresh, onunmount, onmount: on_mount }) => {
 	use(MaokaJabs.set_class("command-palette"))
 
 	let input = ""
@@ -111,7 +111,7 @@ export const OrdoCommandPalette = Maoka.create("div", ({ use, refresh, on_unmoun
 
 			state.on_select(new_item)
 
-			return void refresh()
+			return refresh()
 		}
 
 		if (state.is_multiple) {
@@ -214,7 +214,7 @@ export const OrdoCommandPalette = Maoka.create("div", ({ use, refresh, on_unmoun
 	}
 
 	on_mount(() => document.addEventListener("keydown", handle_keydown))
-	on_unmount(() => document.removeEventListener("keydown", handle_keydown))
+	onunmount(() => document.removeEventListener("keydown", handle_keydown))
 
 	return () => {
 		const state = get_state()

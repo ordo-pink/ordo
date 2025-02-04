@@ -37,7 +37,7 @@ import "./landing.page.css"
 let is_cookie_modal_shown = false
 
 // TODO Translations
-export default Maoka.create("main", ({ use, on_unmount }) => {
+export default Maoka.create("main", ({ use, onunmount }) => {
 	const commands = use(MaokaOrdo.Jabs.get_commands)
 	const { t } = use(MaokaOrdo.Jabs.get_translations$)
 	const metadata_query = use(MaokaOrdo.Jabs.get_metadata_query)
@@ -48,7 +48,7 @@ export default Maoka.create("main", ({ use, on_unmount }) => {
 
 	document.addEventListener("mousemove", event => handle_mouse_move(event))
 
-	on_unmount(() => {
+	onunmount(() => {
 		document.removeEventListener("mousemove", event => handle_mouse_move(event))
 		Object.assign(document.documentElement, { style: "" })
 	})
@@ -61,13 +61,7 @@ export default Maoka.create("main", ({ use, on_unmount }) => {
 		Object.assign(document.documentElement, { style })
 	}
 
-	const handle_sign_up_click = () =>
-		commands.emit("cmd.application.notification.show", {
-			type: NotificationType.RRR,
-			message: "t.welcome.landing_page.rrr_sign_up_unavailable.message",
-			duration: 10,
-			title: "t.welcome.landing_page.rrr_sign_up_unavailable.title",
-		})
+	const handle_sign_up_click = () => commands.emit("cmd.auth.show_request_code_modal")
 
 	const handle_try_click = () => {
 		const has_files = metadata_query.get().cata({ Ok: x => x.length > 0, Err: T })

@@ -21,16 +21,16 @@ export const ZAGS: TZagsStatic = {
 			}
 		},
 		cheat: (path, f) => {
-			const wrapped_f = (state: any, is_update: boolean) => {
-				let value: any
+			let value: any
 
+			const wrapped_f = (state: any, is_update: boolean) => {
 				const keys = (path as string).split(".")
 				const location: Record<string, any> = keys.slice(0, -1).reduce((acc, key) => acc[key], state)
 				const current_value = location[keys[keys.length - 1]]
 
 				if (value !== current_value) {
 					value = current_value
-					f(current_value, is_update)
+					f(value, is_update)
 				}
 			}
 

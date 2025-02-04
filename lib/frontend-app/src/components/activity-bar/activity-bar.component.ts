@@ -26,9 +26,9 @@ import { ordo_app_state } from "@ordo-pink/frontend-app/app.state"
 
 import { OrdoActivityBarIcon } from "./activity-bar-icon.component"
 import { OrdoActivityBarLink } from "./activity-bar-link.component"
+import { OrdoSidebarButton } from "../sidebar/sidebar.component"
 
 import "./activity-bar.css"
-import { OrdoSidebarButton } from "../sidebar/sidebar.component"
 
 export const OrdoActivityBar = Maoka.create("div", ({ use }) => {
 	use(MaokaJabs.set_class("activity-bar"))
@@ -59,11 +59,8 @@ export const OrdoActivityBar = Maoka.create("div", ({ use }) => {
 					}),
 				)
 
-				return () =>
-					OrdoActivityBarIcon({
-						name: "Command Palette", // TODO i18n
-						render_icon: span => void span.appendChild(BsMenuButtonWideFill() as SVGSVGElement),
-					})
+				// TODO i18n
+				return () => OrdoActivityBarIcon({ name: "Command Palette", render_icon: BsMenuButtonWideFill })
 			}),
 
 			ActivityBarActivities(() =>

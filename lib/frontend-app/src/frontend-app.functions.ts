@@ -79,13 +79,8 @@ export const init_functions: TF = call_once(() => {
 
 // --- Internal ---
 
-const LOCATION = "init_functions"
-
-const eexist = RRR.codes.eexist(LOCATION)
-const enoent = RRR.codes.enoent(LOCATION)
-
 type TLogAlreadyExistsFn = (name: string) => () => Ordo.Rrr<"EEXIST">
-const log_rrr_exists: TLogAlreadyExistsFn = name => () => eexist(`Activity "${name}" already registered`)
+const log_rrr_exists: TLogAlreadyExistsFn = name => () => RRR.codes.eexist(`Activity "${name}" already registered`)
 
 type TLogActivityNotFoundFn = (name: string) => () => Ordo.Rrr<"ENOENT">
-const log_rrr_enoent: TLogActivityNotFoundFn = name => () => enoent(`Activity with name "${name}" is not registerred`)
+const log_rrr_enoent: TLogActivityNotFoundFn = name => () => RRR.codes.enoent(`Activity with name "${name}" is not registerred`)

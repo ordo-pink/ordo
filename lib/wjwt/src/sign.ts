@@ -6,12 +6,18 @@
 import { TAlgorithm, type TJWTHeader, type TWJWTSignFn } from "./wjwt.types"
 
 export const sign: TWJWTSignFn =
-	({ alg, key, iss }) =>
+	({ alg, key, iss, token_lifetime, aud }) =>
 	async data => {
 		const encoder = new TextEncoder()
 
+		if (data.iss && data.iss !== iss) throw new TypeError(`Unexpected issuer "${data.iss}"`)
+		if (!data.sub) throw new TypeError("Token subject not provided")
+
+		if (!data.aud) data.aud = aud
 		if (!data.iss) data.iss = iss
-		if (data.iss !== iss) throw new TypeError(`Unexpected issuer "${data.iss}"`)
+		if (!data.jti) data.jti = crypto.randomUUID()
+		if (!data.iat) data.iat = Math.floor(Date.now() / 1000)
+		if (!data.exp) data.exp = Math.floor(Date.now() / 1000) + token_lifetime
 
 		const header_str = JSON.stringify({ alg: get_alg_str(alg), typ: "JWT" })
 		const header = Buffer.from(encoder.encode(header_str)).toString("base64url")
@@ -24,7 +30,10 @@ export const sign: TWJWTSignFn =
 		const signature = await crypto.subtle.sign(alg, key, encoder.encode(base64_data))
 		const signature_str = Buffer.from(new Uint8Array(signature)).toString("base64url")
 
-		return `${base64_data}.${signature_str}`
+		return {
+			payload: data as any,
+			token: `${base64_data}.${signature_str}`,
+		}
 	}
 
 const get_alg_str = (alg: TAlgorithm): TJWTHeader["alg"] => {

@@ -25,7 +25,7 @@ import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { R } from "@ordo-pink/result"
 import { type TMaokaJab } from "@ordo-pink/maoka"
 
-export const edit_file_links_command: TMaokaJab = ({ on_unmount, use }) => {
+export const edit_file_links_command: TMaokaJab = ({ onunmount, use }) => {
 	const state = use(MaokaOrdo.Context.consume)
 
 	const handle_show_edit_links_palette: Ordo.Command.HandlerOf<"cmd.metadata.show_edit_links_palette"> = fsid => {
@@ -65,14 +65,14 @@ export const edit_file_links_command: TMaokaJab = ({ on_unmount, use }) => {
 
 	state.commands.emit("cmd.application.context_menu.add", {
 		command: "cmd.metadata.show_edit_links_palette",
-		render_icon: div => div.appendChild(BsLink() as SVGSVGElement),
+		render_icon: BsLink,
 		readable_name: "t.common.metadata.show_edit_links_palette",
 		should_show: ({ payload }) => Metadata.Validations.is_metadata(payload),
 		payload_creator: ({ payload }) => (Metadata.Validations.is_metadata(payload) ? payload.get_fsid() : null),
 		type: ContextMenuItemType.UPDATE,
 	})
 
-	on_unmount(() => {
+	onunmount(() => {
 		state.commands.off("cmd.metadata.show_edit_links_palette", handle_show_edit_links_palette)
 		state.commands.emit("cmd.application.context_menu.remove", "cmd.metadata.show_edit_links_palette")
 	})

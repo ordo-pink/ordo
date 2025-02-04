@@ -32,16 +32,6 @@ declare global {
 			permissions: Ordo.CreateFunction.Permissions
 		}
 
-		module User {
-			export type InternalDTO = Ordo.User.Current.DTO & {
-				email_code?: string
-			}
-
-			export type PrivateDTO = User.InternalDTO & {
-				password?: string
-			}
-		}
-
 		module Function {
 			type WithFIDFn<$T> = (fid: symbol) => $T
 

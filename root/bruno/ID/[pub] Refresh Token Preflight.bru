@@ -1,0 +1,15 @@
+meta {
+  name: [pub] Refresh Token Preflight
+  type: http
+  seq: 5
+}
+
+options {
+  url: {{ID_HOST}}/tokens/refresh
+  body: none
+  auth: none
+}
+
+headers {
+  Origin: {{ORIGIN}}
+}

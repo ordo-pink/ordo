@@ -20,7 +20,7 @@
  */
 
 import { BsCaretDown, BsCaretRight } from "@ordo-pink/frontend-icons"
-import { Maoka, TMaokaElement, type TMaokaJab } from "@ordo-pink/maoka"
+import { Maoka, type TMaokaJab } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { Metadata } from "@ordo-pink/core"
@@ -45,7 +45,7 @@ export const FileEditorSidebarDirectory = (metadata: Ordo.Metadata.Instance, dep
 		const on_caret_click = (event: MouseEvent) => {
 			event.stopPropagation()
 			expanded_state[fsid] = !expanded_state[fsid]
-			void refresh()
+			refresh()
 		}
 
 		const handle_context_menu = (event: MouseEvent) =>
@@ -159,8 +159,5 @@ const FileEditorDirectoryNameCaret = (fsid: Ordo.Metadata.FSID, click_listener: 
 		use(click_listener)
 		use(MaokaJabs.set_class("cursor-pointer hover:scale-150 transition-all"))
 
-		return () =>
-			expanded_state[fsid]
-				? (BsCaretDown("p-1 shrink-0 size-5") as TMaokaElement)
-				: (BsCaretRight("p-1 shrink-0 size-5 rotate-180") as TMaokaElement)
+		return () => (expanded_state[fsid] ? BsCaretDown("p-1 shrink-0 size-5") : BsCaretRight("p-1 shrink-0 size-5 rotate-180"))
 	})

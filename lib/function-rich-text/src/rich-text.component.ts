@@ -35,6 +35,15 @@ export const RichText = (metadata: Ordo.Metadata.Instance, content: Ordo.Content
 	const caret_position$ = ZAGS.Of<TEditorFocusPosition>({ block_index: 0, inline_index: 0, anchor_offset: 0, focus_offset: 0 })
 	const state$ = ZAGS.Of<{ value: TEditorState }>({ value: [{ type: "p", children: [{ type: "text", value: "" }] }] })
 
+	R.FromNullable(content)
+		.pipe(R.ops.chain(x => R.If(is_string(x), { T: () => x as string })))
+		.pipe(R.ops.chain(x => R.Try(() => JSON.parse(x))))
+		.pipe(R.ops.chain(x => R.If(is_array(x) && x.length > 0, { T: () => x })))
+		.cata({
+			Err: () => state$.update("value", () => [{ type: "p", children: [{ type: "text", value: "" }] }]),
+			Ok: state => state$.update("value", () => state as TEditorState),
+		})
+
 	return Maoka.create("div", ({ use, refresh }) => {
 		use(MaokaJabs.set_class("p-2 size-full outline-none cursor-text"))
 		use(MaokaJabs.set_attribute("contenteditable", "true"))
@@ -46,7 +55,6 @@ export const RichText = (metadata: Ordo.Metadata.Instance, content: Ordo.Content
 				set_caret_position: position => {
 					caret_position$.replace(position)
 				},
-				// TODO Remove block
 				// TODO Remove inline
 				add_block: (block, refocus = true) => {
 					const { caret_position$, set_caret_position } = use(editor_context.consume)
@@ -69,9 +77,9 @@ export const RichText = (metadata: Ordo.Metadata.Instance, content: Ordo.Content
 						}
 					}
 
-					state.splice(block_index + 1, 0, block)
+					const updated_state = state.toSpliced(block_index + 1, 0, block)
 
-					state$.update("value", () => state)
+					state$.update("value", () => updated_state)
 
 					if (refocus)
 						set_caret_position({
@@ -81,7 +89,7 @@ export const RichText = (metadata: Ordo.Metadata.Instance, content: Ordo.Content
 							focus_offset: 0,
 						})
 
-					void refresh()
+					refresh()
 				},
 				add_new_line: (refocus = true) => {
 					const { add_block } = use(editor_context.consume)
@@ -144,19 +152,10 @@ export const RichText = (metadata: Ordo.Metadata.Instance, content: Ordo.Content
 					}
 
 					state$.update("value", () => state)
-					void refresh()
+					refresh()
 				},
 			}),
 		)
-
-		R.FromNullable(content)
-			.pipe(R.ops.chain(x => R.If(is_string(x), { T: () => x as string })))
-			.pipe(R.ops.chain(x => R.Try(() => JSON.parse(x))))
-			.pipe(R.ops.chain(x => R.If(is_array(x) && x.length > 0, { T: () => x })))
-			.cata({
-				Err: () => state$.update("value", () => [{ type: "p", children: [{ type: "text", value: "" }] }]),
-				Ok: state => state$.update("value", () => state as TEditorState),
-			})
 
 		return () => {
 			const state = state$.select("value")

@@ -21,17 +21,17 @@
 
 import { BsFilesAlt, BsSlash } from "@ordo-pink/frontend-icons"
 import { ContextMenuItemType, Metadata } from "@ordo-pink/core"
-import { Maoka, type TMaokaJab } from "@ordo-pink/maoka"
 import { R, type TResult } from "@ordo-pink/result"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MetadataIcon } from "@ordo-pink/maoka-components"
+import { type TMaokaJab } from "@ordo-pink/maoka"
 
 /**
  * Register `Move...` command in {@link Ordo.ContextMenu.Item Context Menu} of a
  * {@link Ordo.Metadata.Instance}. The `Move...` command is essentially a setter for
  * the metadata parent value.
  */
-export const move_file_command: TMaokaJab = ({ use, on_unmount }) => {
+export const move_file_command: TMaokaJab = ({ use, onunmount }) => {
 	const ctx = use(MaokaOrdo.Context.consume)
 
 	const handle_show_move_palette = (fsid: Ordo.Metadata.FSID) =>
@@ -39,7 +39,7 @@ export const move_file_command: TMaokaJab = ({ use, on_unmount }) => {
 			.get()
 			.pipe(R.ops.chain(get_descendents(fsid, ctx.metadata_query)))
 			.pipe(R.ops.map(filter_destinations(fsid, ctx.metadata_query)))
-			.pipe(R.ops.map(metadata_to_cp_items(fsid, ctx)))
+			.pipe(R.ops.map(metadata_to_cp_items(fsid)))
 			.pipe(R.ops.chain(unshift_move_to_root_r(fsid, ctx.metadata_query)))
 			.pipe(R.ops.map(show_command_palette(ctx.commands)))
 			.cata(R.catas.or_nothing())
@@ -50,14 +50,14 @@ export const move_file_command: TMaokaJab = ({ use, on_unmount }) => {
 		command: "cmd.metadata.show_move_palette",
 		payload_creator: ({ payload }) => (payload as Ordo.Metadata.Instance).get_fsid(),
 		readable_name: "t.common.components.modals.move.title",
-		render_icon: div => div.appendChild(BsFilesAlt() as SVGSVGElement),
+		render_icon: BsFilesAlt,
 		should_show: ({ payload }) => Metadata.Validations.is_metadata(payload),
 		type: ContextMenuItemType.UPDATE,
 	})
 
 	// TODO Command palette item if there is currently selected metadata
 
-	on_unmount(() => {
+	onunmount(() => {
 		ctx.commands.off("cmd.metadata.show_move_palette", handle_show_move_palette)
 		ctx.commands.emit("cmd.application.context_menu.remove", "cmd.metadata.show_move_palette")
 	})
@@ -88,7 +88,7 @@ const unshift_move_to_root_r =
 			.pipe(R.ops.map(metadata => (metadata?.is_root_child() ? items : [create_to_root_item(fsid), ...items])))
 
 const create_to_root_item = (fsid: Ordo.Metadata.FSID): Ordo.CommandPalette.Item => ({
-	render_icon: div => void div.appendChild(BsSlash() as SVGSVGElement),
+	render_icon: BsSlash,
 	value: { fsid, new_parent: null },
 	readable_name: "t.common.components.modals.move.move_to_root",
 })
@@ -102,14 +102,13 @@ const show_command_palette = (commands: Ordo.Command.Commands) => (items: Ordo.C
 	})
 
 const metadata_to_cp_items =
-	(fsid: Ordo.Metadata.FSID, ctx: Ordo.CreateFunction.State) =>
+	(fsid: Ordo.Metadata.FSID) =>
 	(move_destinations: Ordo.Metadata.Instance[]): Ordo.CommandPalette.Item[] =>
 		move_destinations.map(metadata => {
 			const new_parent = metadata.get_fsid()
 			const readable_name = metadata.get_name() as Ordo.I18N.TranslationKey
-			const Icon = MaokaOrdo.Components.WithState(ctx, () => MetadataIcon({ metadata, show_emoji_picker: false }))
 
-			const render_icon = (div: HTMLDivElement) => Maoka.render_dom(div, Icon)
+			const render_icon = () => MetadataIcon({ metadata, show_emoji_picker: false })
 
 			return { value: { fsid, new_parent }, readable_name, render_icon }
 		})

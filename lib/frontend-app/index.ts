@@ -46,6 +46,7 @@ import { start_data_orchestrator } from "./src/jabs/start-data-orchestrator.jab"
 
 // TODO Move fonts to assets
 import "./index.css"
+import { auth_commands } from "./src/jabs/commands/auth.command"
 
 // TODO Move translations from file explorer
 export const App = Maoka.create("div", ({ use }) => {
@@ -65,6 +66,7 @@ export const App = Maoka.create("div", ({ use }) => {
 	use(rename_file_command)
 	use(edit_file_labels_command)
 	use(edit_file_links_command)
+	use(auth_commands)
 
 	// TODO Render user defined functions
 	// TODO .catch

@@ -1,0 +1,15 @@
+meta {
+  name: [pub] Validate Token Preflight
+  type: http
+  seq: 4
+}
+
+options {
+  url: {{ID_HOST}}/tokens/validate
+  body: none
+  auth: none
+}
+
+headers {
+  Origin: {{ORIGIN}}
+}

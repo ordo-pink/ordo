@@ -25,6 +25,7 @@ import { set_x_response_time_header, start_response_timer, stop_response_timer }
 import { create_response } from "@ordo-pink/backend-util-create-response"
 import { extract_request_ip } from "@ordo-pink/backend-util-extract-request-ip"
 import { log_request } from "@ordo-pink/backend-util-log-request"
+import { routary_cors } from "@ordo-pink/routary-cors"
 import { set_content_type_application_json_header } from "@ordo-pink/backend-util-set-header"
 
 import { type TIDChamber, type TSharedContext } from "./backend-id.types"
@@ -37,28 +38,10 @@ import { handle_request_code } from "./handlers/codes/request-code.handler"
 import { handle_update_user } from "./handlers/user/update-user.handler"
 import { handle_validate_code } from "./handlers/codes/validate-code.handler"
 import { handle_validate_token } from "./handlers/tokens/validate.handler"
-import { routary_cors } from "@ordo-pink/routary-cors"
 
 // TODO Global stats when API is ready
-
-export const create_backend_id = ({
-	logger,
-	user_persistence_strategy,
-	token_persistence_strategy,
-	notification_strategy,
-	wjwt,
-	allow_origin,
-}: TIDChamber) =>
-	// TODO Routary.use
-	Routary.Of<TIDChamber>({
-		user_persistence_strategy,
-		token_persistence_strategy,
-		logger,
-		notification_strategy,
-		wjwt,
-		allow_origin,
-	})
-		// TODO Split into two libs/srvs
+export const create_backend_id = (chamber: TIDChamber) =>
+	Routary.Of<TIDChamber>(chamber)
 		.post("/codes/request", handle_request_code)
 		.post("/codes/validate", handle_validate_code)
 
@@ -72,10 +55,11 @@ export const create_backend_id = ({
 		.delete("/users/:user_id", handle_delete_user)
 
 		.get("/healthcheck", () => new Response("OK")) // TODO Extract to lib
-		.use(routary_cors({ allow_origin }))
 
-		// TODO Extract to lib
+		.use(routary_cors({ allow_origin: chamber.allow_origin, allow_headers: ["Content-Type"] }))
+
 		.start(intake =>
+			// TODO Extract to lib
 			Oath.Resolve<TIntake<TSharedContext>>({ ...intake, headers: {}, status: 404, request_ip: null })
 				.pipe(ops0.tap(start_response_timer))
 				.pipe(ops0.tap(extract_request_ip))

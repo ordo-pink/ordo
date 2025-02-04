@@ -86,7 +86,7 @@ export const init_content: TF = () => {
 			.cata(R.catas.or_nothing())
 
 		if (!Metadata.Validations.is_metadata(metadata)) {
-			Err(enoent("Metadata creation failed", { type, name, parent }))
+			Err(RRR.codes.enoent("Metadata creation failed", { type, name, parent }))
 			return
 		}
 
@@ -104,7 +104,9 @@ export const init_content: TF = () => {
 		ContentQuery.Of(content_repository, permission =>
 			R.If(known_functions.has_permissions(fid, { queries: [permission] }), {
 				F: () => {
-					const rrr = eperm(`ContentQuery permission RRR. Did you forget to request query permission '${permission}'?`)
+					const rrr = RRR.codes.eperm(
+						`ContentQuery permission RRR. Did you forget to request query permission '${permission}'?`,
+					)
 					ConsoleLogger.error(rrr.debug?.join(" "))
 					return rrr
 				},
@@ -118,9 +120,6 @@ export const init_content: TF = () => {
 }
 
 // --- Internal ---
-
-const eperm = RRR.codes.eperm("init_content")
-const enoent = RRR.codes.enoent("init_content")
 
 const get_string_size = (str: string) => new Blob([str]).size
 

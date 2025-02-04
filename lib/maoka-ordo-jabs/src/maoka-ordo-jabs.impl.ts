@@ -5,6 +5,7 @@
 
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { R } from "@ordo-pink/result"
+import { type TLogger } from "@ordo-pink/logger"
 import { type TMaokaJab } from "@ordo-pink/maoka"
 import { type TZags } from "@ordo-pink/zags"
 import { deep_equals } from "@ordo-pink/tau"
@@ -22,15 +23,15 @@ export const get_file_associations$: TMaokaJab<() => Ordo.FileAssociation.Instan
 	return use(happy_marriage$(file_associations$, x => x.value))
 }
 
-// export const get_logger: TMaokaJab<TLogger> = ({ use }) => {
-// 	const { get_logger } = use(ordo_context.consume)
-// 	return get_logger()
-// }
+export const get_logger: TMaokaJab<TLogger> = ({ use }) => {
+	const zags = use(ordo_context.consume)
+	return zags.logger
+}
 
-// export const get_fetch: TMaokaJab<Ordo.Fetch> = ({ use }) => {
-// 	const { get_fetch } = use(ordo_context.consume)
-// 	return use(computed("fetch", get_fetch))
-// }
+export const get_fetch: TMaokaJab<Ordo.Fetch> = ({ use }) => {
+	const zags = use(ordo_context.consume)
+	return zags.fetch
+}
 
 export const get_user_query: TMaokaJab<Ordo.User.Query> = ({ use }) => {
 	const zags = use(ordo_context.consume)
@@ -63,7 +64,7 @@ export const happy_marriage$ = <$TState extends Record<string, unknown>, $TResul
 	zags: TZags<$TState>,
 	handler: (state: $TState) => $TResult = x => x as unknown as $TResult,
 ): TMaokaJab<() => $TResult> => {
-	return ({ on_unmount, refresh }) => {
+	return ({ onunmount, refresh }) => {
 		let value: $TResult
 
 		const divorce = zags.marry(state => {
@@ -71,11 +72,11 @@ export const happy_marriage$ = <$TState extends Record<string, unknown>, $TResul
 
 			if (!deep_equals(value, new_value)) {
 				value = new_value
-				void refresh()
+				refresh()
 			}
 		})
 
-		on_unmount(() => divorce())
+		onunmount(() => divorce())
 
 		return () => value
 	}
@@ -86,7 +87,7 @@ export const get_translations$: TMaokaJab<{ t: Ordo.I18N.TranslateFn }> = ({ use
 
 	translate.$.marry((_, is_update) => {
 		if (is_update) return
-		void refresh()
+		refresh()
 	})
 
 	return { t: translate }
@@ -141,6 +142,23 @@ export const get_metadata_children$ =
 				if (!fsid) return []
 
 				return metadata_query.get_children(fsid, options).cata(R.catas.or_else(() => []))
+			}),
+		)
+	}
+
+export const get_metadata_children_count$ =
+	(fsid?: Ordo.Metadata.FSID | null, options?: Ordo.Metadata.QueryOptions): TMaokaJab<() => number> =>
+	({ use }) => {
+		const metadata_query = use(get_metadata_query)
+
+		return use(
+			happy_marriage$(metadata_query.$, () => {
+				if (!fsid) return 0
+
+				return metadata_query
+					.get_children(fsid, options)
+					.pipe(R.ops.map(children => children.length))
+					.cata(R.catas.or_else(() => 0))
 			}),
 		)
 	}

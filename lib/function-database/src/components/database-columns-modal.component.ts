@@ -40,7 +40,13 @@ export const DatabaseColumnsModal = Maoka.create("div", ({ use }) => {
 		const t_action_text = t("t.common.ok")
 		const t_modal_title = t("t.database.columns")
 
-		return Dialog({ action: handle_dialog_action, title: t_modal_title, action_text: t_action_text, body: render_all_columns })
+		return Dialog({
+			action: handle_dialog_action,
+			action_hotkey: "enter",
+			title: t_modal_title,
+			action_text: t_action_text,
+			body: render_all_columns,
+		})
 	}
 })
 

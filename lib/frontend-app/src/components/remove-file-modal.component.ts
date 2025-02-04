@@ -35,11 +35,12 @@ export const RemoveFileModal = (fsid: Ordo.Metadata.FSID) =>
 		return () =>
 			Dialog({
 				title: t_title,
-				render_icon: div => void div.appendChild(BsFileEarmarkMinus() as SVGSVGElement),
+				render_icon: BsFileEarmarkMinus,
 				action: () => {
 					commands.emit("cmd.metadata.remove", fsid)
 					commands.emit("cmd.application.modal.hide")
 				},
+				action_hotkey: "enter",
 				action_text: "OK", // TODO Add translations
 				body: () => t_message,
 			})

@@ -36,3 +36,17 @@ export const Checkbox = ({ on_change, checked }: TCheckboxParams) =>
 
 		if (checked) use(MaokaJabs.set_attribute("checked"))
 	})
+
+export type TCheckboxInputParams = {
+	on_change: (event: Event) => void
+	checked?: boolean
+	label?: string
+}
+export const CheckboxInput = ({ on_change, checked, label }: TCheckboxInputParams) =>
+	Maoka.create("label", ({ use }) => {
+		use(MaokaJabs.set_class("checkbox-label"))
+
+		return () => [Checkbox({ on_change, checked }), LabelText(() => label)]
+	})
+
+const LabelText = Maoka.styled("span", { class: "block" })

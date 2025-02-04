@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Maoka, TMaokaComponent } from "@ordo-pink/maoka"
+import { Maoka, type TMaokaChildren } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 
 import { ActionListItem } from "./action-list-item.component"
@@ -30,9 +30,9 @@ import { BsChevronDown } from "@ordo-pink/frontend-icons"
 export type TSelectOption<$TValue> = {
 	title: string
 	value: $TValue
-	render_icon?: (div: HTMLDivElement) => void
-	render_info?: () => TMaokaComponent
-	render_footer?: () => TMaokaComponent
+	render_icon?: () => TMaokaChildren | Promise<TMaokaChildren>
+	render_info?: () => TMaokaChildren | Promise<TMaokaChildren>
+	render_footer?: () => TMaokaChildren | Promise<TMaokaChildren>
 }
 
 export type TSelectProps<$TValue> = {
@@ -66,10 +66,7 @@ export const Select = <$TValue>({ current_value, on_select, items }: TSelectProp
 				is_current: false,
 				title: value.title,
 				on_click: handle_inactive_select_click,
-				render_icon: div =>
-					div.replaceChildren(
-						is_active ? (BsChevronDown("rotate-180 transition-all") as SVGSVGElement) : (BsChevronDown() as SVGSVGElement),
-					),
+				render_icon: () => (is_active ? BsChevronDown("rotate-180 transition-all") : BsChevronDown()),
 				render_footer: value.render_footer,
 				render_info: value.render_info,
 			}),

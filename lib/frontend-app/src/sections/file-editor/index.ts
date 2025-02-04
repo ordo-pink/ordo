@@ -138,7 +138,7 @@ const metadata_to_command_palette_item =
 	}
 
 const FilePath = Maoka.styled("div", {
-	class: "text-xs shrink-0 text-neutral-600 dark:text-neutral-400",
+	class: "text-xs text-neutral-600 dark:text-neutral-400 w-fit whitespace-nowrap",
 })
 
 // TODO Move to utils

@@ -89,6 +89,9 @@ declare global {
 			apply: () => string
 			save: () => string
 			load: () => string
+			error: {
+				eexist: () => string
+			}
 			state: {
 				loading: () => string
 				saving: () => string

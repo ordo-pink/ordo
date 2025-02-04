@@ -40,7 +40,6 @@ import { handle_validate_code } from "./handlers/codes/validate-code.handler"
 import { handle_validate_token } from "./handlers/tokens/validate.handler"
 
 // TODO Global stats when API is ready
-// TODO Body & params validations
 export const create_backend_id = (chamber: TIDChamber) =>
 	Routary.Of<TIDChamber>(chamber)
 		.post("/codes/request", handle_request_code)
@@ -56,6 +55,7 @@ export const create_backend_id = (chamber: TIDChamber) =>
 		.delete("/users/:user_id", handle_delete_user)
 
 		.get("/healthcheck", () => new Response("OK")) // TODO Extract to lib
+
 		.use(routary_cors({ allow_origin: chamber.allow_origin, allow_headers: ["Content-Type"] }))
 
 		.start(intake =>

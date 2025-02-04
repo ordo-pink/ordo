@@ -21,16 +21,15 @@
 
 import { Oath, ops0 } from "@ordo-pink/oath"
 import { RRR } from "@ordo-pink/core"
-import { type TPersistenceStrategyUser } from "@ordo-pink/backend-service-user"
 import { noop } from "@ordo-pink/tau"
 
 export const PersistenceStategyUserFS = {
-	Of: (db_path: string): TPersistenceStrategyUser => {
-		const users0 = Oath.FromPromise(() => Bun.file(db_path).json() as Promise<OrdoInternal.User.PrivateDTO[]>).pipe(
+	Of: (db_path: string): OrdoBackend.User.PersistenceStrategy => {
+		const users0 = Oath.FromPromise(() => Bun.file(db_path).json() as Promise<OrdoBackend.User.DTO[]>).pipe(
 			ops0.rejected_map(error => RRR.codes.eio(error.message, error.name, error.cause, error.stack)),
 		)
 
-		const save_users = (users: OrdoInternal.User.PrivateDTO[]) =>
+		const save_users = (users: OrdoBackend.User.DTO[]) =>
 			Oath.FromPromise(() => Bun.write(db_path, JSON.stringify(users, null, 2))).pipe(
 				ops0.rejected_map(error => RRR.codes.eio(error.message, error.name, error.cause, error.stack)),
 			)
@@ -95,18 +94,14 @@ export const PersistenceStategyUserFS = {
 	},
 }
 
-const exists = <$TKey extends keyof OrdoInternal.User.PrivateDTO>(
-	users: OrdoInternal.User.PrivateDTO[],
+const exists = <$TKey extends keyof OrdoBackend.User.DTO>(
+	users: OrdoBackend.User.DTO[],
 	key: $TKey,
-	value: OrdoInternal.User.PrivateDTO[$TKey],
+	value: OrdoBackend.User.DTO[$TKey],
 ) => users.some(u => u[key] === value)
 
-const user_already_exists = <$TKey extends keyof OrdoInternal.User.PrivateDTO>(
-	key: $TKey,
-	value: OrdoInternal.User.PrivateDTO[$TKey],
-) => RRR.codes.eexist("user already exists", key, value)
+const user_already_exists = <$TKey extends keyof OrdoBackend.User.DTO>(key: $TKey, value: OrdoBackend.User.DTO[$TKey]) =>
+	RRR.codes.eexist("user already exists", key, value)
 
-const user_not_found = <$TKey extends keyof OrdoInternal.User.PrivateDTO>(
-	key: $TKey,
-	value: OrdoInternal.User.PrivateDTO[$TKey],
-) => RRR.codes.enoent("user not found", key, value)
+const user_not_found = <$TKey extends keyof OrdoBackend.User.DTO>(key: $TKey, value: OrdoBackend.User.DTO[$TKey]) =>
+	RRR.codes.enoent("user not found", key, value)

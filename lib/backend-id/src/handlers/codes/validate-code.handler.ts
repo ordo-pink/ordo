@@ -33,7 +33,7 @@ const validate_request_body = (intake: I) => (body: any) =>
 		code: extract_body_email_code(intake)(body),
 	})
 
-const verify_password = (code: string, intake: I) => (user: OrdoInternal.User.PrivateDTO) =>
+const verify_password = (code: string, intake: I) => (user: OrdoBackend.User.DTO) =>
 	Oath.FromPromise(() => Bun.password.verify(code, user.email_code!))
 		.pipe(ops0.chain(is_valid => Oath.If(is_valid, { T: () => user })))
 		.pipe(ops0.rejected_map(() => invalid_code_error(code, intake)))
@@ -47,17 +47,18 @@ const validate_user_code =
 			.pipe(ops0.chain(u => Oath.FromNullable(u.email_code, () => redundant_auth_rrr(email, intake)).pipe(ops0.map(() => u))))
 			.pipe(ops0.chain(verify_password(code, intake)))
 
-const drop_user_code = (intake: I) => (user: OrdoInternal.User.PrivateDTO) =>
+const drop_user_code = (intake: I) => (user: OrdoBackend.User.DTO) =>
 	intake.user_persistence_strategy
 		.update(user.id, { ...user, email_code: void 0 })
 		.pipe(ops0.rejected_map(rrr => ({ rrr, intake })))
 		.pipe(ops0.map(() => user))
 
-const send_sign_in_notification = (intake: I) => (user: OrdoInternal.User.PrivateDTO) =>
-	intake.notification_strategy.send_email({
+// TODO Create email with Maoka
+const send_sign_in_notification = (intake: I) => (user: OrdoBackend.User.DTO) =>
+	intake.notification_strategy.send({
 		to: user.email,
-		subject: "Account login", // TODO i18n
-		content: `Someone logged in (IP ${intake.request_ip?.address ?? "not detected"})`, // TODO Actual body
+		subject: "Account login",
+		content: `Someone logged in (IP ${intake.request_ip?.address ?? "not detected"})`,
 	})
 
 export const invalid_code_error = (code: string, intake: I) => ({

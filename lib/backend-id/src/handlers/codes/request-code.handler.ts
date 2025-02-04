@@ -54,7 +54,7 @@ const get_or_create_user = (i: I) => (email: Ordo.User.Email) =>
 			),
 		)
 
-const update_user_code = (i: I) => (user: OrdoInternal.User.PrivateDTO) =>
+const update_user_code = (i: I) => (user: OrdoBackend.User.DTO) =>
 	Oath.Resolve(new Uint8Array(6))
 		.pipe(ops0.map(ua => crypto.getRandomValues(ua)))
 		.pipe(ops0.map(nums => nums.join("")))
@@ -89,8 +89,9 @@ type P2 = { codes: { code: string; hash: string }; email: Ordo.User.Email }
 const send_code =
 	(i: I) =>
 	({ codes, email }: P2) =>
-		i.notification_strategy.send_email({
+		// TODO Create email with Maoka
+		i.notification_strategy.send({
 			to: email,
-			subject: "Sign in code for your ORDO account", // TODO i18n
-			content: `Code: ${codes.code}; Link: http://localhost:3004/auth/verify?email=${email}&code=${codes.code}`, // TODO Actual body
+			subject: "Sign in code for your ORDO account",
+			content: `Code: ${codes.code}; Link: http://localhost:3004/auth/verify?email=${email}&code=${codes.code}`,
 		})

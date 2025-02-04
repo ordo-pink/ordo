@@ -25,16 +25,14 @@ import { RRR } from "@ordo-pink/core"
 import { type SUB } from "@ordo-pink/wjwt"
 
 export type TPersistenceStrategyTokenFSStatic = {
-	Of: (path: string) => OrdoBackend.Tokens.PersistenceStrategy
+	Of: (path: string) => OrdoBackend.Token.PersistenceStrategy
 }
 
 export const PersistenceStrategyTokenFS: TPersistenceStrategyTokenFSStatic = {
 	Of: (db_path: string) => {
-		const get_tokens0 = Oath.FromPromise(() => Bun.file(db_path).json()).fix(
-			() => ({}) as Record<SUB, OrdoBackend.Tokens.TokenRecord>,
-		)
+		const get_tokens0 = Oath.FromPromise(() => Bun.file(db_path).json()).fix(() => ({}) as Record<SUB, OrdoBackend.Token.Dict>)
 
-		const write_tokens0 = (tokens: Record<string, OrdoBackend.Tokens.TokenRecord>) =>
+		const write_tokens0 = (tokens: Record<string, OrdoBackend.Token.Dict>) =>
 			Oath.Try(() => JSON.stringify(tokens, null, 2))
 				.pipe(ops0.chain(data => Oath.FromPromise(() => Bun.write(db_path, data))))
 				.pipe(ops0.map(noop))
@@ -43,7 +41,7 @@ export const PersistenceStrategyTokenFS: TPersistenceStrategyTokenFSStatic = {
 		return {
 			get_token: (sub, jti) => get_tokens0.pipe(ops0.map(storage => storage[sub]?.[jti])),
 
-			get_token_record: sub => get_tokens0.pipe(ops0.map(storage => storage[sub])),
+			get_token_dict: sub => get_tokens0.pipe(ops0.map(storage => storage[sub])),
 
 			remove_token: (sub, jti) =>
 				get_tokens0
@@ -57,12 +55,12 @@ export const PersistenceStrategyTokenFS: TPersistenceStrategyTokenFSStatic = {
 					.pipe(
 						ops0.map(storage => ({
 							...storage,
-							[sub]: override<OrdoBackend.Tokens.TokenRecord>({ [jti]: undefined })(storage[sub]),
+							[sub]: override<OrdoBackend.Token.Dict>({ [jti]: undefined })(storage[sub]),
 						})),
 					)
 					.pipe(ops0.chain(write_tokens0)),
 
-			remove_token_record: sub =>
+			remove_token_dict: sub =>
 				get_tokens0
 					.pipe(
 						ops0.chain(storage =>
@@ -86,7 +84,7 @@ export const PersistenceStrategyTokenFS: TPersistenceStrategyTokenFSStatic = {
 					.pipe(ops0.map(storage => ({ ...storage, [sub]: { ...(storage[sub] ?? {}), [jti]: token } })))
 					.pipe(ops0.chain(write_tokens0)),
 
-			set_token_record: (sub, record) =>
+			set_token_dict: (sub, record) =>
 				get_tokens0
 					.pipe(
 						ops0.chain(storage =>

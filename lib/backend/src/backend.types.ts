@@ -21,16 +21,63 @@
 
 import type { EXP, JTI, SUB } from "@ordo-pink/wjwt"
 import type { Oath } from "@ordo-pink/oath"
+import type { TValidations } from "@ordo-pink/core"
 
 declare global {
 	module OrdoBackend {
-		module Tokens {
-			export type TokenContent = { exp: EXP }
+		module Notification {
+			type EmailStrategy = {
+				send: (params: {
+					from?: string
+					to: string
+					subject: string
+					content: string
+					cc?: string[]
+					bcc?: string[]
+					headers?: Record<string, string>
+				}) => void
+			}
+		}
+
+		module User {
+			export type DTO = Ordo.User.Current.DTO & {
+				email_code?: string
+				password?: string
+			}
+
+			type PersistenceStrategy = {
+				exists_by_id: (id: Ordo.User.ID) => Oath<boolean, Ordo.Rrr<"EIO">>
+				exists_by_email: (email: Ordo.User.Email) => Oath<boolean, Ordo.Rrr<"EIO">>
+				exists_by_handle: (handle: Ordo.User.Handle) => Oath<boolean, Ordo.Rrr<"EIO">>
+				get_by_id: (id: Ordo.User.ID) => Oath<DTO, Ordo.Rrr<"EIO" | "ENOENT">>
+				get_by_email: (email: Ordo.User.Email) => Oath<DTO, Ordo.Rrr<"EIO" | "ENOENT">>
+				get_by_handle: (handle: Ordo.User.Handle) => Oath<DTO, Ordo.Rrr<"EIO" | "ENOENT">>
+				create: (user: DTO) => Oath<DTO, Ordo.Rrr<"EIO" | "EEXIST">>
+				update: (id: Ordo.User.ID, user: DTO) => Oath<DTO, Ordo.Rrr<"EIO" | "ENOENT" | "EINVAL">>
+				remove: (id: Ordo.User.ID) => Oath<void, Ordo.Rrr<"EIO" | "ENOENT">>
+			}
+
+			export type Validations = TValidations<OrdoBackend.User.DTO>
+
+			export type Static = {
+				Validations: OrdoBackend.User.Validations
+				Of: (dto: OrdoBackend.User.DTO) => OrdoBackend.User.Instance
+				New: (email: Ordo.User.Email) => OrdoBackend.User.Instance
+			}
+
+			export type Instance = Ordo.User.Current.Instance & {
+				validate_code: (code: string) => Oath<boolean, Ordo.Rrr<"EINVAL" | "ENOENT">>
+				validate_password: (password: string) => Oath<boolean, Ordo.Rrr<"EINVAL" | "ENOENT">>
+			}
+		}
+
+		module Token {
+			export type Value = { exp: EXP }
 
 			/**
 			 * A record of refresh token ids and tokens.
 			 */
-			export type TokenRecord = Record<JTI, TokenContent>
+			export type Dict = Record<JTI, Value>
 
 			/**
 			 * Token persistence strategy implements approach to storing user tokens in the backend. Token
@@ -46,12 +93,12 @@ declare global {
 				 *
 				 * @returns an Oath resolving into an option of the token or rejecting with `EIO`
 				 */
-				get_token: (sub: SUB, jti: JTI) => Oath<TokenContent, Ordo.Rrr<"EIO" | "ENOENT">>
+				get_token: (sub: SUB, jti: JTI) => Oath<Value, Ordo.Rrr<"EIO" | "ENOENT">>
 
 				/**
-				 * Returns a record of all refresh tokens associated with given `SUB`.
+				 * Returns a dict of all refresh tokens associated with given `SUB`.
 				 */
-				get_token_record: (sub: SUB) => Oath<TokenRecord, Ordo.Rrr<"EIO" | "ENOENT">>
+				get_token_dict: (sub: SUB) => Oath<Dict, Ordo.Rrr<"EIO" | "ENOENT">>
 
 				/**
 				 * Removes refresh token of given `SUB` associated with given `JTI`.
@@ -59,19 +106,19 @@ declare global {
 				remove_token: (sub: SUB, jti: JTI) => Oath<void, Ordo.Rrr<"EIO" | "ENOENT">>
 
 				/**
-				 * Removes a record of all refresh tokens associated with given `SUB`.
+				 * Removes a dict of all refresh tokens associated with given `SUB`.
 				 */
-				remove_token_record: (sub: SUB) => Oath<void, Ordo.Rrr<"EIO" | "ENOENT">>
+				remove_token_dict: (sub: SUB) => Oath<void, Ordo.Rrr<"EIO" | "ENOENT">>
 
 				/**
 				 * Assigns refresh token of given `SUB` associated with given `JTI`.
 				 */
-				set_token: (sub: SUB, jti: JTI, content: TokenContent) => Oath<void, Ordo.Rrr<"EIO">>
+				set_token: (sub: SUB, jti: JTI, content: Value) => Oath<void, Ordo.Rrr<"EIO">>
 
 				/**
-				 * Assigns a record of all refresh tokens associated with given `SUB`.
+				 * Assigns a dict of all refresh tokens associated with given `SUB`.
 				 */
-				set_token_record: (sub: SUB, record: TokenRecord) => Oath<void, Ordo.Rrr<"EIO">>
+				set_token_dict: (sub: SUB, record: Dict) => Oath<void, Ordo.Rrr<"EIO">>
 			}
 		}
 	}

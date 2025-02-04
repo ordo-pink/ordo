@@ -113,7 +113,7 @@ const main = () =>
 					allow_origin,
 					defaults: { file_limit, max_functions, max_upload_size },
 					logger,
-					notification_strategy: { send_email: ({ content }) => logger.notice("NOTIFICATION:", "::", content) }, // TODO
+					notification_strategy: { send: ({ content }) => logger.notice("NOTIFICATION:", "::", content) }, // TODO
 					persisted_token_lifetime,
 					token_persistence_strategy: PersistenceStrategyTokenFS.Of(token_db_path), // TODO
 					user_persistence_strategy: PersistenceStategyUserFS.Of(user_db_path),

@@ -1,11 +1,11 @@
-import { CurrentUser, UserSubscription } from "@ordo-pink/core"
 import { Oath, ops0 } from "@ordo-pink/oath"
 import { extract_request_body, unknown_error } from "@ordo-pink/backend-util-extract-body"
 import { type TIntake } from "@ordo-pink/routary"
+import { UserSubscription } from "@ordo-pink/core"
 
-import { email_missing_rrr, invalid_email_rrr } from "../../rrrs/invalid-user-email.rrr"
 import { type TSharedContext } from "../../backend-id.types"
 import { default_handler } from "../default.handler"
+import { extract_body_email } from "../../common/extract-body-email"
 
 export const handle_request_code = default_handler(intake =>
 	extract_request_body(intake)
@@ -20,18 +20,10 @@ export const handle_request_code = default_handler(intake =>
 
 type I = TIntake<TSharedContext>
 
-const is_email = CurrentUser.Validations.is_email
-
 const hash_argon2 = (intake: I) => (code: string) =>
 	Oath.FromPromise(() => Bun.password.hash(code))
 		.pipe(ops0.map(hash => ({ code, hash })))
 		.pipe(ops0.rejected_map(e => unknown_error(e, intake)))
-
-// TODO Move to util
-export const extract_body_email = (intake: I) => (request_body: any) =>
-	Oath.FromNullable(request_body.email)
-		.pipe(ops0.rejected_map(() => email_missing_rrr(intake)))
-		.pipe(ops0.chain(email => Oath.If(is_email(email), { T: () => email, F: () => invalid_email_rrr(email, intake) })))
 
 const create_handle = (email: Ordo.User.Email, id: Ordo.User.ID) =>
 	`@${email.split("@")[0].replaceAll(".", "_").replaceAll("/", "")}${id.split("-")[0]}` as Ordo.User.Handle

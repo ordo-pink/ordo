@@ -7,7 +7,7 @@ import { is_non_empty_string } from "@ordo-pink/tau"
 import { type TSharedContext } from "../../backend-id.types"
 import { create_auth_token } from "../../common/create-auth-token"
 import { default_handler } from "../default.handler"
-import { extract_body_email } from "./request-code.handler"
+import { extract_body_email } from "../../common/extract-body-email"
 import { persist_token } from "../../common/persist-token"
 import { redundant_auth_rrr } from "../../rrrs/redundant-auth.rrr"
 

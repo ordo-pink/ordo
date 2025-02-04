@@ -22,7 +22,6 @@ export const routary_cors: TRoutaryCORS =
 				const gear = shaft[bearing as TBearing]![gasket]
 
 				shaft[bearing as TBearing]![gasket] = intake => {
-					console.log(bearing, gasket)
 					if (typeof allow_origin === "string") allow_origin = [allow_origin]
 					const origin = intake.req.headers.get("origin")
 

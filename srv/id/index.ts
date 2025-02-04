@@ -118,6 +118,8 @@ const main = () =>
 					token_persistence_strategy: PersistenceStrategyTokenFS.Of(token_db_path), // TODO
 					user_persistence_strategy: PersistenceStategyUserFS.Of(user_db_path),
 					wjwt: WJWT({ aud, alg, private_key, public_key, iss, token_lifetime }),
+					status: 200,
+					headers: {},
 				} satisfies TIDChamber)
 					.and(create_backend_id)
 					.and(fetch => Bun.serve({ fetch, port })),

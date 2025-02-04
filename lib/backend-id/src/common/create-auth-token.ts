@@ -7,7 +7,6 @@ import { type TSharedContext } from "../backend-id.types"
 export const create_auth_token = (intake: TIntake<TSharedContext>) => (user: OrdoInternal.User.PrivateDTO) =>
 	Oath.FromPromise(() =>
 		intake.wjwt.sign({
-			aud: ["http://localhost:3004"], // TODO Take from intake
 			sub: user.id,
 			lim: user.file_limit,
 			mus: user.max_upload_size,

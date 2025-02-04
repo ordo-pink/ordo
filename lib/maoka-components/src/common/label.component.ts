@@ -19,9 +19,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Maoka, type TMaokaElement } from "@ordo-pink/maoka"
 import { BsX } from "@ordo-pink/frontend-icons"
 import { LabelColor } from "@ordo-pink/core"
+import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { is_string } from "@ordo-pink/tau"
 
@@ -63,7 +63,7 @@ const RemoveLabel = (fsid: Ordo.Metadata.FSID, label: Ordo.Metadata.Label, emit:
 			emit("cmd.metadata.remove_labels", { fsid, labels: [label] })
 		}
 
-		return () => BsX("label_remove") as TMaokaElement
+		return () => BsX("label_remove")
 	})
 
 export const color_class = [

@@ -100,5 +100,5 @@ const send_code =
 		i.notification_strategy.send_email({
 			to: email,
 			subject: "Sign in code for your ORDO account", // TODO i18n
-			content: codes.code, // TODO Actual body
+			content: `Code: ${codes.code}; Link: http://localhost:3004/auth/verify?email=${email}&code=${codes.code}`, // TODO Actual body
 		})

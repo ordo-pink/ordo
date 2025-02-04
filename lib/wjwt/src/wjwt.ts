@@ -9,7 +9,7 @@ import { sign } from "./sign"
 import { verify } from "./verify"
 
 export const WJWT: TWJWTFn = ({ alg, private_key, public_key, aud, iss, token_lifetime }) => ({
-	sign: sign({ alg, key: private_key, iss, token_lifetime }),
+	sign: sign({ alg, key: private_key, iss, token_lifetime, aud }),
 	verify: verify({ alg, key: public_key, aud }),
 	decode,
 })

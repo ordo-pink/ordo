@@ -10,6 +10,10 @@ post {
   auth: none
 }
 
+headers {
+  Origin: {{ORIGIN}}
+}
+
 body:json {
   {
     "email": "{{USER_EMAIL}}"

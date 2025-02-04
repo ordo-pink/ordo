@@ -14,6 +14,10 @@ params:path {
   user_id: {{CURRENT_ID}}
 }
 
+headers {
+  Origin: {{ORIGIN}}
+}
+
 auth:bearer {
   token: {{CURRENT_TOKEN}}
 }
@@ -21,6 +25,8 @@ auth:bearer {
 body:json {
   {
     "handle": "{{USER_HANDLE}}",
-    "email": "{{USER_EMAIL}}"
+    "email": "{{USER_EMAIL}}",
+    "first_name": "Yuri",
+    "last_name": "Gagarin"
   }
 }

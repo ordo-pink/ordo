@@ -10,6 +10,10 @@ post {
   auth: bearer
 }
 
+headers {
+  Origin: {{ORIGIN}}
+}
+
 auth:bearer {
   token: {{CURRENT_TOKEN}}
 }

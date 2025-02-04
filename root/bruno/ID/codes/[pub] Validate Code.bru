@@ -5,15 +5,23 @@ meta {
 }
 
 post {
-  url: {{ID_HOST}}/codes/validate
+  url: {{ID_HOST}}/codes/validate?Origin={{ORIGIN}}
   body: json
   auth: none
+}
+
+params:query {
+  Origin: {{ORIGIN}}
+}
+
+headers {
+  Origin: {{ORIGIN}}
 }
 
 body:json {
   {
     "email": "{{USER_EMAIL}}",
-    "code": "541802"
+    "code": "143948"
   }
 }
 

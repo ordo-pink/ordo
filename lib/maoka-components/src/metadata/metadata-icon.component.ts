@@ -73,6 +73,12 @@ export const MetadataIcon = ({ metadata, custom_class = "", show_emoji_picker = 
 							{
 								value: void 0,
 								readable_name: "Remove icon" as Ordo.I18N.TranslationKey, // TODO Translation
+								render_icon: () =>
+									Icon({
+										metadata,
+										has_children: metadata_query.has_children(metadata.get_fsid()).cata(R.catas.or_else(() => false)),
+										custom_class: "px-0.5",
+									}),
 							},
 							...emojis.map(
 								emoji =>

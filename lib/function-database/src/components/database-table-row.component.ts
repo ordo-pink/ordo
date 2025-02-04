@@ -174,7 +174,7 @@ const FileNameCell = (metadata: Ordo.Metadata.Instance) =>
 
 type TEditableLinkParams = { name: string; on_blur: (event: FocusEvent) => void; fsid: Ordo.Metadata.FSID }
 const EditableLink = ({ name, on_blur, fsid }: TEditableLinkParams) =>
-	Maoka.create("div", ({ use, element: element }) => {
+	Maoka.create("div", ({ use, element }) => {
 		const handle_keydown = (event: KeyboardEvent) => {
 			if (event.key !== "Enter" && event.key !== "Escape") return
 

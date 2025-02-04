@@ -42,7 +42,7 @@ export type TSelectProps<$TValue> = {
 }
 
 export const Select = <$TValue>({ current_value, on_select, items }: TSelectProps<$TValue>) =>
-	Maoka.create("div", ({ use, refresh: refresh }) => {
+	Maoka.create("div", ({ use, refresh }) => {
 		use(MaokaJabs.set_attribute("tabindex", "1"))
 		use(MaokaJabs.set_class("relative"))
 
@@ -52,13 +52,13 @@ export const Select = <$TValue>({ current_value, on_select, items }: TSelectProp
 		const handle_active_select_click = (selected_item: TSelectOption<$TValue>) => {
 			is_active = false
 			value = selected_item
-			void refresh()
+			refresh()
 			on_select(selected_item.value)
 		}
 
 		const handle_inactive_select_click = () => {
 			is_active = !is_active
-			void refresh()
+			refresh()
 		}
 
 		return () => [

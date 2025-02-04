@@ -45,7 +45,7 @@ const Default = ({
 	hotkey_options,
 	disabled = () => false,
 }: TButtonProps) =>
-	Maoka.create("button", ({ use, element: element }) => {
+	Maoka.create("button", ({ use, element }) => {
 		use(MaokaJabs.set_class("button", custom_class))
 		use(MaokaJabs.set_attribute("aria-label", aria_label))
 		use(MaokaJabs.listen("onclick", event => handle_click(event)))

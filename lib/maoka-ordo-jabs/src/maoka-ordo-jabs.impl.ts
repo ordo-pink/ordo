@@ -64,7 +64,7 @@ export const happy_marriage$ = <$TState extends Record<string, unknown>, $TResul
 	zags: TZags<$TState>,
 	handler: (state: $TState) => $TResult = x => x as unknown as $TResult,
 ): TMaokaJab<() => $TResult> => {
-	return ({ onunmount, refresh: refresh }) => {
+	return ({ onunmount, refresh }) => {
 		let value: $TResult
 
 		const divorce = zags.marry(state => {
@@ -72,7 +72,7 @@ export const happy_marriage$ = <$TState extends Record<string, unknown>, $TResul
 
 			if (!deep_equals(value, new_value)) {
 				value = new_value
-				void refresh()
+				refresh()
 			}
 		})
 
@@ -82,12 +82,12 @@ export const happy_marriage$ = <$TState extends Record<string, unknown>, $TResul
 	}
 }
 
-export const get_translations$: TMaokaJab<{ t: Ordo.I18N.TranslateFn }> = ({ use, refresh: refresh }) => {
+export const get_translations$: TMaokaJab<{ t: Ordo.I18N.TranslateFn }> = ({ use, refresh }) => {
 	const { translate } = use(ordo_context.consume)
 
 	translate.$.marry((_, is_update) => {
 		if (is_update) return
-		void refresh()
+		refresh()
 	})
 
 	return { t: translate }
@@ -142,6 +142,23 @@ export const get_metadata_children$ =
 				if (!fsid) return []
 
 				return metadata_query.get_children(fsid, options).cata(R.catas.or_else(() => []))
+			}),
+		)
+	}
+
+export const get_metadata_children_count$ =
+	(fsid?: Ordo.Metadata.FSID | null, options?: Ordo.Metadata.QueryOptions): TMaokaJab<() => number> =>
+	({ use }) => {
+		const metadata_query = use(get_metadata_query)
+
+		return use(
+			happy_marriage$(metadata_query.$, () => {
+				if (!fsid) return 0
+
+				return metadata_query
+					.get_children(fsid, options)
+					.pipe(R.ops.map(children => children.length))
+					.cata(R.catas.or_else(() => 0))
 			}),
 		)
 	}

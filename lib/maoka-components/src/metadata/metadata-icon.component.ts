@@ -30,7 +30,7 @@ import { ordo_app_state } from "@ordo-pink/frontend-app/app.state"
 
 type P = { metadata: Ordo.Metadata.Instance; custom_class?: string; show_emoji_picker?: boolean }
 export const MetadataIcon = ({ metadata, custom_class = "", show_emoji_picker = true }: P) =>
-	Maoka.create("div", ({ use, refresh: refresh, onunmount }) => {
+	Maoka.create("div", ({ use, refresh, onunmount }) => {
 		const icon_class = get_icon_class(custom_class)
 
 		let emoji = metadata.get_property("emoji_icon")
@@ -46,7 +46,7 @@ export const MetadataIcon = ({ metadata, custom_class = "", show_emoji_picker = 
 				.cata(
 					R.catas.if_ok(icon => {
 						emoji = icon
-						void refresh()
+						refresh()
 					}),
 				)
 		})

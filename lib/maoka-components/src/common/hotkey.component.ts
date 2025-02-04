@@ -46,7 +46,7 @@ export const Hotkey = (
 		show_in_mobile: false,
 	},
 ) =>
-	Maoka.create("div", ({ use, onunmount, element: element, onmount: after_mount }) => {
+	Maoka.create("div", ({ use, onunmount, element, onmount: after_mount }) => {
 		use(MaokaJabs.set_class("hotkey"))
 		if (options.smol) use(MaokaJabs.add_class("smol"))
 		if (options.show_in_mobile) use(MaokaJabs.add_class("mobile"))

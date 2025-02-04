@@ -105,7 +105,7 @@ export const create_context = <$TValue>() => {
 
 const is_sm = lt(SM_SCREEN_BREAKPOINT)
 
-export const is_sm_screen$: TMaokaJab<() => boolean> = ({ refresh: refresh, onunmount }) => {
+export const is_sm_screen$: TMaokaJab<() => boolean> = ({ refresh, onunmount }) => {
 	let value: boolean = is_sm(window.innerWidth)
 
 	const handle_resize = () => {
@@ -113,7 +113,7 @@ export const is_sm_screen$: TMaokaJab<() => boolean> = ({ refresh: refresh, onun
 
 		if (value !== is_sm_screen) {
 			value = is_sm_screen
-			void refresh()
+			refresh()
 		}
 	}
 

@@ -29,7 +29,7 @@ export const MaokaZAGS = {
 			 */
 			select_jab$:
 				<K extends TDotPath<$TState>>(path: K) =>
-				({ refresh: refresh, onunmount, id }) => {
+				({ refresh, onunmount, id }) => {
 					let is_initial_render = true
 
 					const divorce = $.marry(() => {
@@ -46,7 +46,7 @@ export const MaokaZAGS = {
 
 						if (!deep_equals(selection_results[id][path], value)) {
 							selection_results[id][path as any] = value
-							void refresh()
+							refresh()
 						}
 					})
 

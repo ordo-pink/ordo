@@ -27,7 +27,7 @@ import { Result } from "@ordo-pink/result"
 
 // TODO: Lead to user page
 // TODO: Get actual user (id: string) =>
-export const CurrentUserReference = Maoka.create("div", ({ use, refresh: refresh, onunmount }) => {
+export const CurrentUserReference = Maoka.create("div", ({ use, refresh, onunmount }) => {
 	let name = ""
 
 	use(MaokaJabs.set_class("flex gap-x-2 items-center text-sm"))
@@ -38,7 +38,7 @@ export const CurrentUserReference = Maoka.create("div", ({ use, refresh: refresh
 		user_query
 			.get_current()
 			.pipe(Result.ops.map(user => void (name = user.get_readable_name())))
-			.cata(Result.catas.if_ok(() => void refresh())),
+			.cata(Result.catas.if_ok(() => refresh())),
 	)
 
 	onunmount(() => divorce_user_query_version())

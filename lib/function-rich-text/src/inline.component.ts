@@ -36,7 +36,7 @@ export const Inline = (
 	inline_index: number,
 ) =>
 	Switch.Match(node.type).default(() =>
-		Maoka.create("div", ({ use, element: element, onmount: after_mount, onunmount }) => {
+		Maoka.create("div", ({ use, element, onmount: after_mount, onunmount }) => {
 			use(MaokaJabs.set_class("outline-none inline-block"))
 			use(MaokaJabs.set_attribute("contenteditable", "true"))
 

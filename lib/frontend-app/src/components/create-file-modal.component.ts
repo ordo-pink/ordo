@@ -58,7 +58,7 @@ export const CreateFileModal = (parent: Ordo.Metadata.FSID | null = null) =>
 // TODO Extract select
 // TODO Add caret showing expanded-contracted status
 const FileAssociationSelector = (on_select_type: (file_association: Ordo.FileAssociation.Instance, type: string) => void) =>
-	Maoka.create("div", ({ use, refresh: refresh, onunmount }) => {
+	Maoka.create("div", ({ use, refresh, onunmount }) => {
 		const select_class =
 			"relative bg-gradient-to-br from-neutral-100 to-stone-100 dark:from-neutral-600 dark:to-stone-600 shadow-inner rounded-md mt-2 cursor-pointer"
 
@@ -75,7 +75,7 @@ const FileAssociationSelector = (on_select_type: (file_association: Ordo.FileAss
 			current_file_association = fa
 			current_type_index = fa.types.findIndex(t => t.name === type)
 			on_select_type(fa, type)
-			void refresh()
+			refresh()
 		}
 
 		const handle_escape_press = (event: KeyboardEvent) => {
@@ -85,7 +85,7 @@ const FileAssociationSelector = (on_select_type: (file_association: Ordo.FileAss
 
 				is_expanded = false
 
-				void refresh()
+				refresh()
 			}
 		}
 

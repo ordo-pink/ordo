@@ -74,7 +74,7 @@ export const styled =
 		})
 
 export const html = (tag: string, html: string): T.TMaokaComponent =>
-	create(tag, ({ element: element }) => {
+	create(tag, ({ element }) => {
 		element.innerHTML = html
 	})
 

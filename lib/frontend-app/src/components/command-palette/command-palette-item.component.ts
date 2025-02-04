@@ -24,7 +24,7 @@ import { Maoka } from "@ordo-pink/maoka"
 import { ordo_app_state } from "@ordo-pink/frontend-app/app.state"
 
 export const OrdoCommandPaletteItem = (item: Ordo.CommandPalette.Item, on_click: () => void, is_current: boolean) =>
-	Maoka.create("div", ({ element: element, onmount: on_mount }) => {
+	Maoka.create("div", ({ element, onmount: on_mount }) => {
 		const t = ordo_app_state.zags.select("translate")
 
 		const title = t(item.readable_name)

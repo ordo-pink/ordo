@@ -22,6 +22,7 @@
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
+import { R } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
 import { is_string } from "@ordo-pink/tau"
 
@@ -40,20 +41,21 @@ export const Database = (metadata: Ordo.Metadata.Instance, content: Ordo.Content
 	const initial_state = state ? state : is_string(content) ? (JSON.parse(content) as TDatabaseState) : {}
 	database$.replace(initial_state)
 
-	return Maoka.create("div", ({ use, refresh: refresh, onunmount }) => {
+	return Maoka.create("div", ({ use, onunmount }) => {
 		let db_state = initial_state
 		const fsid = metadata.get_fsid()
 
 		use(MaokaJabs.set_class("database_view"))
+
 		use(show_columns_jab(metadata))
 
 		const commands = use(MaokaOrdo.Jabs.get_commands)
-		const get_children = use(MaokaOrdo.Jabs.Metadata.get_children$(fsid))
+		const metadata_query = use(MaokaOrdo.Jabs.get_metadata_query)
+		use(MaokaOrdo.Jabs.Metadata.get_children_count$(fsid))
 
 		const divorce_database$ = database$.marry(state => {
 			db_state = state
 			commands.emit("cmd.content.set", { fsid, content_type: "database/ordo", content: JSON.stringify(state) })
-			void refresh()
 		})
 
 		commands.on("cmd.database.toggle_column", handle_toggle_column_cmd)
@@ -73,7 +75,7 @@ export const Database = (metadata: Ordo.Metadata.Instance, content: Ordo.Content
 
 			if (!keys.includes("t.database.column_names.name")) keys.unshift("t.database.column_names.name")
 
-			const children = get_children()
+			const children = metadata_query.get_children(fsid).cata(R.catas.or_else(() => []))
 			const sorted_children = to_sorted_children(db_state, children)
 
 			return [

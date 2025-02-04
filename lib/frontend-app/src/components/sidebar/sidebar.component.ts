@@ -108,7 +108,7 @@ export const OrdoSidebarButton = Maoka.create("button", ({ use }) => {
 
 // --- Internal ---
 
-const SidebarRenderer = Maoka.create("div", ({ use, element: element }) => {
+const SidebarRenderer = Maoka.create("div", ({ use, element }) => {
 	use(MaokaJabs.set_class("sidebar"))
 
 	const get_current_activity = use(ordo_app_state.select_jab$("functions.current_activity"))

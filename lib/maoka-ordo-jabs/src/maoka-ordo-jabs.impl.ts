@@ -64,7 +64,7 @@ export const happy_marriage$ = <$TState extends Record<string, unknown>, $TResul
 	zags: TZags<$TState>,
 	handler: (state: $TState) => $TResult = x => x as unknown as $TResult,
 ): TMaokaJab<() => $TResult> => {
-	return ({ on_unmount, refresh }) => {
+	return ({ onunmount, refresh: refresh }) => {
 		let value: $TResult
 
 		const divorce = zags.marry(state => {
@@ -76,13 +76,13 @@ export const happy_marriage$ = <$TState extends Record<string, unknown>, $TResul
 			}
 		})
 
-		on_unmount(() => divorce())
+		onunmount(() => divorce())
 
 		return () => value
 	}
 }
 
-export const get_translations$: TMaokaJab<{ t: Ordo.I18N.TranslateFn }> = ({ use, refresh }) => {
+export const get_translations$: TMaokaJab<{ t: Ordo.I18N.TranslateFn }> = ({ use, refresh: refresh }) => {
 	const { translate } = use(ordo_context.consume)
 
 	translate.$.marry((_, is_update) => {

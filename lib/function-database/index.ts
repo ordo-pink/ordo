@@ -20,8 +20,6 @@
  */
 
 import { BsFileEarmarkRuled } from "@ordo-pink/frontend-icons"
-import { Maoka } from "@ordo-pink/maoka"
-import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { TwoLetterLocale } from "@ordo-pink/locale"
 import { create_function } from "@ordo-pink/core"
 
@@ -136,12 +134,8 @@ export default create_function(
 					description: "t.database.file_association.description",
 				},
 			],
-			render: ({ div, metadata, content }) =>
-				Maoka.render_dom(
-					div,
-					MaokaOrdo.Components.WithState(ctx, () => Database(metadata, content)),
-				),
-			render_icon: span => void span.appendChild(BsFileEarmarkRuled() as SVGSVGElement),
+			render: ({ metadata, content }) => Database(metadata, content),
+			render_icon: BsFileEarmarkRuled,
 		})
 	},
 )

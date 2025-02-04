@@ -37,7 +37,7 @@ import "./landing.page.css"
 let is_cookie_modal_shown = false
 
 // TODO Translations
-export default Maoka.create("main", ({ use, on_unmount }) => {
+export default Maoka.create("main", ({ use, onunmount }) => {
 	const commands = use(MaokaOrdo.Jabs.get_commands)
 	const { t } = use(MaokaOrdo.Jabs.get_translations$)
 	const metadata_query = use(MaokaOrdo.Jabs.get_metadata_query)
@@ -48,7 +48,7 @@ export default Maoka.create("main", ({ use, on_unmount }) => {
 
 	document.addEventListener("mousemove", event => handle_mouse_move(event))
 
-	on_unmount(() => {
+	onunmount(() => {
 		document.removeEventListener("mousemove", event => handle_mouse_move(event))
 		Object.assign(document.documentElement, { style: "" })
 	})

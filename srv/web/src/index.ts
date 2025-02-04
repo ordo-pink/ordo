@@ -24,4 +24,4 @@ import { Maoka } from "@ordo-pink/maoka"
 
 const app = document.getElementById("app")!
 
-void Maoka.render_dom(app, App)
+void Maoka.dom(app, App)

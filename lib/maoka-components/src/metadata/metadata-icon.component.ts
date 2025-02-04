@@ -20,7 +20,7 @@
  */
 
 import { BsFileEarmark, BsFileEarmarkBinary, BsFolderOpen } from "@ordo-pink/frontend-icons"
-import { Maoka, type TMaokaElement } from "@ordo-pink/maoka"
+import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { R } from "@ordo-pink/result"
@@ -30,7 +30,7 @@ import { ordo_app_state } from "@ordo-pink/frontend-app/app.state"
 
 type P = { metadata: Ordo.Metadata.Instance; custom_class?: string; show_emoji_picker?: boolean }
 export const MetadataIcon = ({ metadata, custom_class = "", show_emoji_picker = true }: P) =>
-	Maoka.create("div", ({ use, refresh, on_unmount }) => {
+	Maoka.create("div", ({ use, refresh: refresh, onunmount }) => {
 		const icon_class = get_icon_class(custom_class)
 
 		let emoji = metadata.get_property("emoji_icon")
@@ -51,7 +51,7 @@ export const MetadataIcon = ({ metadata, custom_class = "", show_emoji_picker = 
 				)
 		})
 
-		on_unmount(() => divorce_metadata_query())
+		onunmount(() => divorce_metadata_query())
 
 		use(MaokaJabs.set_class("cursor-pointer"))
 
@@ -79,7 +79,7 @@ export const MetadataIcon = ({ metadata, custom_class = "", show_emoji_picker = 
 									({
 										value: emoji.icon,
 										readable_name: emoji.description as Ordo.I18N.TranslationKey,
-										render_icon: div => void (div.innerText = emoji.icon),
+										render_icon: () => Maoka.html("div", emoji.icon),
 									}) satisfies Ordo.CommandPalette.Item,
 							),
 						],
@@ -103,7 +103,7 @@ export const MetadataIcon = ({ metadata, custom_class = "", show_emoji_picker = 
 
 type P2 = P & { has_children: boolean }
 const Icon = ({ metadata, custom_class, has_children }: P2) =>
-	Maoka.create("div", ({ use, element }) => {
+	Maoka.create("div", ({ use }) => {
 		const metadata_content_type = metadata.get_type()
 		const get_file_associations = use(ordo_app_state.select_jab$("functions.file_assocs"))
 
@@ -115,10 +115,10 @@ const Icon = ({ metadata, custom_class, has_children }: P2) =>
 			use(MaokaJabs.set_class(custom_class!))
 
 			return Switch.OfTrue()
-				.case(has_children, () => BsFolderOpen(custom_class) as TMaokaElement)
-				.case(metadata.get_size() === 0, () => BsFileEarmark(custom_class) as TMaokaElement)
-				.case(!!fa && !!fa.render_icon, () => fa!.render_icon!(element as HTMLSpanElement))
-				.default(() => BsFileEarmarkBinary(custom_class) as TMaokaElement)
+				.case(has_children, () => BsFolderOpen(custom_class))
+				.case(metadata.get_size() === 0, () => BsFileEarmark(custom_class))
+				.case(!!fa && !!fa.render_icon, () => fa!.render_icon!())
+				.default(() => BsFileEarmarkBinary(custom_class))
 		}
 	})
 

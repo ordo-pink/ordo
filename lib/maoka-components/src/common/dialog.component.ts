@@ -28,7 +28,7 @@ import "./dialog.css"
 type TDialogParams = {
 	title: string
 	custom_class?: string
-	render_icon?: (div: HTMLDivElement) => void
+	render_icon?: (() => TMaokaChildren) | (() => Promise<TMaokaChildren>)
 	body: () => TMaokaChildren
 	action: () => void | Promise<void>
 	action_text: string
@@ -49,7 +49,7 @@ export const Dialog = ({
 	Maoka.create("div", ({ use }) => {
 		use(MaokaJabs.set_class("dialog", custom_class))
 
-		const Icon = render_icon ? Maoka.create("div", ({ element }) => render_icon(element as unknown as HTMLDivElement)) : void 0
+		const Icon = render_icon ? Maoka.create("div", () => render_icon) : void 0
 
 		return () => [
 			Header(() => [Icon, Title(() => title)]),

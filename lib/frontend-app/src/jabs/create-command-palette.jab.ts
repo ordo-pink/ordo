@@ -19,17 +19,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Maoka, type TMaokaJab } from "@ordo-pink/maoka"
 import { BsMenuButtonWideFill } from "@ordo-pink/frontend-icons"
 import { CommandPaletteItemType } from "@ordo-pink/core"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
+import { type TMaokaJab } from "@ordo-pink/maoka"
 import { create_hotkey_from_event } from "@ordo-pink/hotkey-from-event"
 import { ordo_app_state } from "@ordo-pink/frontend-app/app.state"
 
 import { CommandPaletteLocation, EMPTY_COMMAND_PALETTE } from "../components/command-palette/constants"
 import { OrdoCommandPalette } from "../components/command-palette/command-palette.component"
 
-export const create_command_palette: TMaokaJab = ({ on_mount, on_unmount, use }) => {
+export const create_command_palette: TMaokaJab = ({ onmount: on_mount, onunmount, use }) => {
 	const commands = use(MaokaOrdo.Jabs.get_commands)
 
 	const handle_keydown = (event: KeyboardEvent) => {
@@ -62,11 +62,11 @@ export const create_command_palette: TMaokaJab = ({ on_mount, on_unmount, use })
 			readable_name: "t.common.components.command_palette.reset",
 			type: CommandPaletteItemType.COMMON_ACTION,
 			hotkey: "mod+shift+p",
-			render_icon: div => void div.appendChild(BsMenuButtonWideFill() as SVGSVGElement),
+			render_icon: BsMenuButtonWideFill,
 		})
 	})
 
-	on_unmount(() => {
+	onunmount(() => {
 		document.removeEventListener("keydown", handle_keydown)
 
 		commands.off("cmd.application.command_palette.show", handle_show)
@@ -101,7 +101,7 @@ const handle_show = (state: Ordo.CommandPalette.Instance) => {
 	ordo_app_state.zags.update("sections.command_palette.current", () => state)
 
 	commands.emit("cmd.application.modal.show", {
-		on_unmount: () =>
+		onunmount: () =>
 			ordo_app_state.zags.update("sections.command_palette", cp => ({
 				...cp,
 				current: EMPTY_COMMAND_PALETTE,
@@ -109,7 +109,7 @@ const handle_show = (state: Ordo.CommandPalette.Instance) => {
 				location: CommandPaletteLocation.SUGGESTED,
 				visible_items: null,
 			})),
-		render: div => void Maoka.render_dom(div, OrdoCommandPalette),
+		render: () => OrdoCommandPalette,
 	})
 }
 

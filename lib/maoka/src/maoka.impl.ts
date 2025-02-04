@@ -20,10 +20,10 @@ export const create: T.TMaokaCreateComponentFn = (name, callback) => {
 			get element() {
 				return element
 			},
-			get root_id() {
+			get rid() {
 				return root_id
 			},
-			get root_element() {
+			get root() {
 				return root_element
 			},
 			use: f => f(props),
@@ -31,25 +31,23 @@ export const create: T.TMaokaCreateComponentFn = (name, callback) => {
 				if (!callback || !get_children) return
 
 				const event = new CustomEvent("refresh", {
-					detail: { get_children: () => get_children && get_children(), element, id: internal_id },
+					detail: [internal_id, element, () => get_children && get_children()],
 					bubbles: true,
 				})
 
 				element.dispatchEvent(event)
 			},
-			on_unmount: f => {
-				if (!element.onunmount) element.onunmount = []
-				element.onunmount.push(f)
+			onunmount: f => {
+				element.onunmount = f
 			},
-			on_mount: f => {
-				if (!element.onmount) element.onmount = []
-				element.onmount.push(f)
+			onmount: f => {
+				element.onmount = f
 			},
 		} as T.TMaokaProps
 
 		result.element = element
 		result.id = internal_id
-		result.root_id = root_id
+		result.rid = root_id
 		result.refresh = props.refresh
 
 		if (!callback) return element
@@ -76,11 +74,11 @@ export const styled =
 		})
 
 export const html = (tag: string, html: string): T.TMaokaComponent =>
-	create(tag, ({ element }) => {
+	create(tag, ({ element: element }) => {
 		element.innerHTML = html
 	})
 
-export const render_dom: T.TMaokaRenderDOMFn = async (root, component) => {
+export const dom: T.TMaokaRenderDOMFn = async (root, component) => {
 	const root_id: string = crypto.randomUUID()
 	const root_element = root as unknown as T.TMaokaElement
 
@@ -92,13 +90,8 @@ export const render_dom: T.TMaokaRenderDOMFn = async (root, component) => {
 
 	root.addEventListener("refresh", event => {
 		event.stopPropagation()
-		event.preventDefault()
 
-		const { get_children, element, id } = (event as any).detail as {
-			get_children: () => T.TMaokaComponent
-			element: T.TMaokaElement
-			id: string
-		}
+		const [id, element, get_children] = (event as any).detail as [string, T.TMaokaElement, () => T.TMaokaComponent]
 
 		const refresh_elements = refresh_queue.keys().toArray()
 
@@ -146,15 +139,13 @@ export const render_dom: T.TMaokaRenderDOMFn = async (root, component) => {
 	request_idle_callback(() => void render_loop())
 
 	const unmount_element = (element: T.TMaokaElement) => {
-		if (is_arr(element.onunmount) && element.onunmount.length > 0) element.onunmount.forEach(f => f())
+		if (element.onunmount) element.onunmount()
 
 		element.childNodes.forEach(child => unmount_element(child as any))
 	}
 
 	const mount_element = (element: T.TMaokaElement) => {
-		if (is_arr(element.onmount) && element.onmount.length > 0) {
-			element.onmount.forEach(f => f())
-		}
+		if (element.onmount) element.onmount()
 
 		element.childNodes.forEach(child => mount_element(child as any))
 	}

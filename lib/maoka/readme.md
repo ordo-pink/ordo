@@ -55,15 +55,15 @@ Now, regarding the `refresh` and the thunk... Let's talk about
 ## Component Lifecycle
 
 ```javascript
-// NOTE: on_unmount is available via parameters of the component callback
-const MyComponent = Maoka.create("div", ({ on_mount, on_unmount }) => {
+// NOTE: onunmount is available via parameters of the component callback
+const MyComponent = Maoka.create("div", ({ on_mount, onunmount }) => {
 	// ON_CREATE: this part is executed ONCE the component is created
 
 	on_mount(() => {
 		// ON_MOUNT: this part is executed ONCE the component is mounted into the DOM
 	})
 
-	on_unmount(() => {
+	onunmount(() => {
 		// ON_UNMOUNT: this part is executed ONCE the component is removed from the DOM
 	})
 
@@ -150,11 +150,11 @@ As the name suggests, it renders a Maoka component to the DOM. The element itsel
 things:
 
 1. It creates DOM structure of your component
-2. It appends a `MutationObserver` to the root element that keeps track of unmounted nodes and calls their `on_unmount`
-   callbacks if they are present
+2. It appends a `MutationObserver` to the root element that keeps track of unmounted nodes and calls their `onunmount` callbacks
+   if they are present
 
 If you don't want a `MutationObserver` in your code, you can reimplement `render_dom` manually from scratch - but you'll need to
-track and call `on_unmount`s or not use them at all.
+track and call `onunmount`s or not use them at all.
 
 In fact, you can render your root Maoka component as simply as:
 
@@ -177,7 +177,7 @@ Maoka supports `async/await` for both the ON_CREATE part of the component callba
 ```javascript
 import { Maoka } from "@ordo-pink/maoka"
 
-const App = Maoka.create("div", async ({ refresh, on_unmount }) => {
+const App = Maoka.create("div", async ({ refresh, onunmount }) => {
 	let timeout
 
 	// Force the component to wait for 2 seconds before loading
@@ -186,7 +186,7 @@ const App = Maoka.create("div", async ({ refresh, on_unmount }) => {
 		timeout = setTimeout(resolve, 2000)
 	})
 
-	on_unmount(() => clearTimeout(timeout))
+	onunmount(() => clearTimeout(timeout))
 
 	return async () => {
 		// There is a helper function in Maoka, called `lazy`.
@@ -247,8 +247,8 @@ if (!window.crypto.randomUUID) {
 
 If you fancy letting dinosaurs see your website, simply do not use `Maoka.render_dom` (see the
 [Maoka.render_dom](#maokarender_dom) section of the readme for reference). If IE9+ is ok for you, you can listen for mutation
-events like `DOMNodeRemoved` and `DOMNodeInserted` to handle `on_mount` and `on_unmount` events. Alternatively, you can omit
-using `on_mount` and `on_unmount` whatsoever - then Maoka will work evvvriwhere.
+events like `DOMNodeRemoved` and `DOMNodeInserted` to handle `on_mount` and `onunmount` events. Alternatively, you can omit
+using `on_mount` and `onunmount` whatsoever - then Maoka will work evvvriwhere.
 
 ### License
 
@@ -270,6 +270,6 @@ The Unlicense
   - _A_: Here's the whole minified Maoka code in 2279 chars:
 
 ```
-var E=(P,F)=>{let z=async(j,L,M)=>{let U=crypto.randomUUID(),D=j(P),O,B={get id(){return U},get element(){return D},get root_id(){return M},get root_element(){return L},use:(w)=>w(B),refresh:()=>{if(!F||!O)return;let w=new CustomEvent("refresh",{detail:{get_children:O,element:D},bubbles:!0});D.dispatchEvent(w)},on_unmount:(w)=>{if(!D.onunmount)D.onunmount=[];D.onunmount.push(w)},on_mount:(w)=>{if(!D.onmount)D.onmount=[];D.onmount.push(w)}};if(z.element=D,z.id=U,z.root_id=M,z.refresh=B.refresh,!F)return D;if(O=await F(B),!O)return D;return await I(j,L,M,O,D)};return z},N=(P)=>P().then((F)=>F.default),Q=(P,F={})=>(z)=>E(P,({element:j})=>{return Object.keys(F).forEach((L)=>j.setAttribute(L,F[L])),z}),R=(P,F)=>E(P,({element:z})=>{z.innerHTML=F}),V=async(P,F)=>{let z=crypto.randomUUID(),j=P,L=document.createElement.bind(document),M=await F(L,j,z);P.appendChild(M);let U=new Map;P.addEventListener("refresh",(S)=>{S.stopPropagation();let{get_children:X,element:A}=S.detail,C=U.keys().toArray();if(~C.indexOf(A))return;for(let T=0;T<C.length;T++){if(C[T].contains(A))return;if(A.contains(C[T])){U.delete(C[T]),U.set(A,()=>I(L,j,z,X,A));return}continue}U.set(A,()=>I(L,j,z,X,A))});let D=requestIdleCallback?{timeout:1000}:void 0,O=requestIdleCallback??setTimeout,B=()=>Promise.all(U.entries().map(([S,X])=>X().then(()=>S))).then((S)=>S.map((X)=>U.delete(X))).then(()=>O(()=>void B(),D));O(()=>void B(),D);let G=(S)=>{if(J(S.onunmount)&&S.onunmount.length>0)S.onunmount.forEach((X)=>X());S.childNodes.forEach((X)=>G(X))},w=(S)=>{if(J(S.onmount)&&S.onmount.length>0)S.onmount.forEach((X)=>X());S.childNodes.forEach((X)=>w(X))};w(M),new MutationObserver((S)=>{for(let X of S){let{removedNodes:A,addedNodes:C}=X;for(let T=0;T<A.length;T++){let H=A[T];G(H)}for(let T=0;T<C.length;T++){let H=C[T];w(H)}}}).observe(P,{childList:!0,subtree:!0,attributeFilter:["onmount","onunmount"]})},I=async(P,F,z,j,L)=>{if(!j)return L;L.innerHTML="";let M=await j();if(!M)return L;if(!J(M))M=[K(M)?await M(P,F,z):M];let U=[];for(let D=0;D<M.length;D++){let O=M[D],B=K(O)?await O(P,F,z):W(O)?String(O):O;if(B)U.push(B)}return L.replaceChildren(...U),L},K=(P)=>typeof P==="function",W=(P)=>typeof P==="number",J=Array.isArray;var y={create:E,html:R,lazy:N,styled:Q,render_dom:V};export{y as Maoka};
+var E=(P,F)=>{let z=async(j,L,M)=>{let U=crypto.randomUUID(),D=j(P),O,B={get id(){return U},get element(){return D},get root_id(){return M},get root_element(){return L},use:(w)=>w(B),refresh:()=>{if(!F||!O)return;let w=new CustomEvent("refresh",{detail:{get_children:O,element:D},bubbles:!0});D.dispatchEvent(w)},onunmount:(w)=>{if(!D.onunmount)D.onunmount=[];D.onunmount.push(w)},on_mount:(w)=>{if(!D.onmount)D.onmount=[];D.onmount.push(w)}};if(z.element=D,z.id=U,z.root_id=M,z.refresh=B.refresh,!F)return D;if(O=await F(B),!O)return D;return await I(j,L,M,O,D)};return z},N=(P)=>P().then((F)=>F.default),Q=(P,F={})=>(z)=>E(P,({element:j})=>{return Object.keys(F).forEach((L)=>j.setAttribute(L,F[L])),z}),R=(P,F)=>E(P,({element:z})=>{z.innerHTML=F}),V=async(P,F)=>{let z=crypto.randomUUID(),j=P,L=document.createElement.bind(document),M=await F(L,j,z);P.appendChild(M);let U=new Map;P.addEventListener("refresh",(S)=>{S.stopPropagation();let{get_children:X,element:A}=S.detail,C=U.keys().toArray();if(~C.indexOf(A))return;for(let T=0;T<C.length;T++){if(C[T].contains(A))return;if(A.contains(C[T])){U.delete(C[T]),U.set(A,()=>I(L,j,z,X,A));return}continue}U.set(A,()=>I(L,j,z,X,A))});let D=requestIdleCallback?{timeout:1000}:void 0,O=requestIdleCallback??setTimeout,B=()=>Promise.all(U.entries().map(([S,X])=>X().then(()=>S))).then((S)=>S.map((X)=>U.delete(X))).then(()=>O(()=>void B(),D));O(()=>void B(),D);let G=(S)=>{if(J(S.onunmount)&&S.onunmount.length>0)S.onunmount.forEach((X)=>X());S.childNodes.forEach((X)=>G(X))},w=(S)=>{if(J(S.onmount)&&S.onmount.length>0)S.onmount.forEach((X)=>X());S.childNodes.forEach((X)=>w(X))};w(M),new MutationObserver((S)=>{for(let X of S){let{removedNodes:A,addedNodes:C}=X;for(let T=0;T<A.length;T++){let H=A[T];G(H)}for(let T=0;T<C.length;T++){let H=C[T];w(H)}}}).observe(P,{childList:!0,subtree:!0,attributeFilter:["onmount","onunmount"]})},I=async(P,F,z,j,L)=>{if(!j)return L;L.innerHTML="";let M=await j();if(!M)return L;if(!J(M))M=[K(M)?await M(P,F,z):M];let U=[];for(let D=0;D<M.length;D++){let O=M[D],B=K(O)?await O(P,F,z):W(O)?String(O):O;if(B)U.push(B)}return L.replaceChildren(...U),L},K=(P)=>typeof P==="function",W=(P)=>typeof P==="number",J=Array.isArray;var y={create:E,html:R,lazy:N,styled:Q,render_dom:V};export{y as Maoka};
 
 ```

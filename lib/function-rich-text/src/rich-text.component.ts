@@ -35,7 +35,7 @@ export const RichText = (metadata: Ordo.Metadata.Instance, content: Ordo.Content
 	const caret_position$ = ZAGS.Of<TEditorFocusPosition>({ block_index: 0, inline_index: 0, anchor_offset: 0, focus_offset: 0 })
 	const state$ = ZAGS.Of<{ value: TEditorState }>({ value: [{ type: "p", children: [{ type: "text", value: "" }] }] })
 
-	return Maoka.create("div", ({ use, refresh }) => {
+	return Maoka.create("div", ({ use, refresh: refresh }) => {
 		use(MaokaJabs.set_class("p-2 size-full outline-none cursor-text"))
 		use(MaokaJabs.set_attribute("contenteditable", "true"))
 

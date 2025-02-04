@@ -22,12 +22,11 @@ import { ordo_app_state } from "@ordo-pink/frontend-app/app.state"
  * TODO Persist user info in browser
  * TODO Trigger merging remote and local user content after authentication (ContentManager)
  */
-export const auth_commands: TMaokaJab = ({ on_unmount, use }) => {
+export const auth_commands: TMaokaJab = ({ onunmount, use }) => {
 	let is_authenticated = false
 
 	const commands = use(MaokaOrdo.Jabs.get_commands)
 	const fetch = use(MaokaOrdo.Jabs.get_fetch)
-	const state = use(MaokaOrdo.Context.consume)
 
 	R.FromNullable(localStorage.getItem("user"))
 		.pipe(R.ops.chain(str => R.Try(() => JSON.parse(str))))
@@ -56,18 +55,12 @@ export const auth_commands: TMaokaJab = ({ on_unmount, use }) => {
 
 	const handle_show_request_code: Ordo.Command.HandlerOf<"cmd.auth.show_request_code_modal"> = () =>
 		commands.emit("cmd.application.modal.show", {
-			render: div => {
-				const Component = MaokaOrdo.Components.WithState(state, () => RequestCodeModal)
-				return Maoka.render_dom(div, Component)
-			},
+			render: () => RequestCodeModal,
 		})
 
 	const handle_show_validate_code: Ordo.Command.HandlerOf<"cmd.auth.show_validate_code_modal"> = email =>
 		commands.emit("cmd.application.modal.show", {
-			render: div => {
-				const Component = MaokaOrdo.Components.WithState(state, () => ValidateCodeModal(email))
-				return Maoka.render_dom(div, Component)
-			},
+			render: () => ValidateCodeModal(email),
 		})
 
 	commands.on("cmd.auth.show_request_code_modal", handle_show_request_code)
@@ -76,7 +69,7 @@ export const auth_commands: TMaokaJab = ({ on_unmount, use }) => {
 		readable_name: "t.auth.join",
 		type: CommandPaletteItemType.MODAL_OPENER,
 		value: handle_show_request_code,
-		render_icon: span => void span.appendChild(BsBoxArrowInRight() as SVGSVGElement),
+		render_icon: BsBoxArrowInRight,
 	})
 
 	// TODO use other means but localStorage for storing user info
@@ -99,7 +92,7 @@ export const auth_commands: TMaokaJab = ({ on_unmount, use }) => {
 					readable_name: "t.auth.leave",
 					value: handle_sign_out,
 					type: CommandPaletteItemType.DESTRUCTIVE_ACTION,
-					render_icon: span => void span.appendChild(BsBoxArrowRight() as SVGSVGElement),
+					render_icon: BsBoxArrowRight,
 				})
 
 				is_authenticated = true
@@ -112,14 +105,14 @@ export const auth_commands: TMaokaJab = ({ on_unmount, use }) => {
 				readable_name: "t.auth.join",
 				type: CommandPaletteItemType.MODAL_OPENER,
 				value: handle_show_request_code,
-				render_icon: span => void span.appendChild(BsBoxArrowInRight() as SVGSVGElement),
+				render_icon: BsBoxArrowInRight,
 			})
 
 			is_authenticated = false
 		}
 	})
 
-	on_unmount(() => {
+	onunmount(() => {
 		divorce_auth()
 
 		commands.off("cmd.auth.show_request_code_modal", handle_show_request_code)

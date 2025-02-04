@@ -27,7 +27,7 @@ import { Switch } from "@ordo-pink/switch"
 import { ordo_app_state } from "../../app.state"
 import { sidebar$ } from "./sidebar/sidebar.state"
 
-export const OrdoWorkspace = Maoka.create("main", ({ use, element }) => {
+export const OrdoWorkspace = Maoka.create("main", ({ use, element: element }) => {
 	use(MaokaJabs.set_class("workspace"))
 
 	return () => [WorkspaceRenderer, SidebarPaddingContractor(element)]

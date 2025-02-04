@@ -36,7 +36,7 @@ export const Inline = (
 	inline_index: number,
 ) =>
 	Switch.Match(node.type).default(() =>
-		Maoka.create("div", ({ use, element, on_mount: after_mount, on_unmount }) => {
+		Maoka.create("div", ({ use, element: element, onmount: after_mount, onunmount }) => {
 			use(MaokaJabs.set_class("outline-none inline-block"))
 			use(MaokaJabs.set_attribute("contenteditable", "true"))
 
@@ -157,7 +157,7 @@ export const Inline = (
 			document.addEventListener("keydown", handle_keydown)
 			document.addEventListener("keyup", handle_keyup)
 
-			on_unmount(() => {
+			onunmount(() => {
 				document.removeEventListener("keydown", handle_keydown)
 				document.removeEventListener("keyup", handle_keyup)
 			})

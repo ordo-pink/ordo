@@ -530,19 +530,19 @@ declare global {
 				name: string
 				routes: `/${string}`[]
 				default_route?: `/${string}`
-				render_workspace?: (() => TMaokaChildren) | (() => Promise<TMaokaChildren>)
-				render_sidebar?: (() => TMaokaChildren) | (() => Promise<TMaokaChildren>)
-				render_icon?: (() => TMaokaChildren) | (() => Promise<TMaokaChildren>)
-				on_unmount?: (params: Ordo.Activity.OnUnmountParams) => void
+				render_workspace?: () => TMaokaChildren | Promise<TMaokaChildren>
+				render_sidebar?: () => TMaokaChildren | Promise<TMaokaChildren>
+				render_icon?: () => TMaokaChildren | Promise<TMaokaChildren>
+				onunmount?: (params: Ordo.Activity.OnUnmountParams) => void
 				is_background?: boolean
 				is_fullscreen?: boolean
 			}
 		}
 
 		namespace FileAssociation {
-			type RenderFn = (params: Ordo.FileAssociation.RenderParams) => void | Promise<void>
+			type RenderFn = (params: Ordo.FileAssociation.RenderParams) => TMaokaChildren | Promise<TMaokaChildren>
 
-			type RenderIconFn = (() => TMaokaChildren) | (() => Promise<TMaokaChildren>)
+			type RenderIconFn = () => TMaokaChildren | Promise<TMaokaChildren>
 
 			type Type = {
 				name: string
@@ -558,7 +558,6 @@ declare global {
 			}
 
 			type RenderParams = {
-				div: HTMLDivElement
 				is_editable: boolean
 				is_embedded: boolean
 				content: Ordo.Content.Instance | null
@@ -1110,7 +1109,7 @@ declare global {
 		}
 
 		namespace Modal {
-			type Instance = { on_unmount?: () => void; render: (() => TMaokaChildren) | (() => Promise<TMaokaChildren>) }
+			type Instance = { onunmount?: () => void; render: () => TMaokaChildren | Promise<TMaokaChildren> }
 		}
 
 		namespace Router {
@@ -1175,7 +1174,7 @@ declare global {
 				/**
 				 * Icon to be displayed for the context menu item.
 				 */
-				render_icon?: (div: HTMLDivElement) => void
+				render_icon?: () => TMaokaChildren | Promise<TMaokaChildren>
 
 				/**
 				 * Keyboard hotkey for the context menu item. It only works while the context menu is
@@ -1276,7 +1275,7 @@ declare global {
 				 *
 				 * @optional
 				 */
-				render_icon?: (() => TMaokaChildren) | (() => Promise<TMaokaChildren>)
+				render_icon?: () => TMaokaChildren | Promise<TMaokaChildren>
 
 				/**
 				 * Keyboard hotkey for the context menu item. It only works while the context menu is

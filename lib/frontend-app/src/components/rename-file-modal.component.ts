@@ -58,7 +58,7 @@ export const RenameFileModal = (fsid: Ordo.Metadata.FSID) =>
 							state.name = target.value
 						},
 					}),
-				render_icon: div => void div.appendChild(BsFileEarmarkRichText() as SVGSVGElement),
+				render_icon: BsFileEarmarkRichText,
 			})
 		}
 	})

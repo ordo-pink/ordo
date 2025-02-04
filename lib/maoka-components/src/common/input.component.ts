@@ -68,7 +68,7 @@ const Text = ({
 				return () => label
 			}),
 
-			Maoka.create("input", ({ use, element, on_mount }) => {
+			Maoka.create("input", ({ use, element: element, onmount: on_mount }) => {
 				const is_mobile = use(MaokaJabs.is_mobile)
 
 				use(

@@ -34,5 +34,5 @@ export const OrdoActivityBarIcon = ({ name, render_icon, current_activity_name }
 		if (is_current) use(MaokaJabs.add_class("active"))
 		else use(MaokaJabs.remove_class("active"))
 
-		return render_icon
+		return async () => render_icon()
 	})

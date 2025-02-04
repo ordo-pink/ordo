@@ -28,12 +28,12 @@ import { color_class } from "@ordo-pink/maoka-components"
 
 import { EditLabelModal } from "../../components/edit-label-modal.component"
 
-export const edit_file_labels_command: TMaokaJab = ({ on_unmount, use }) => {
+export const edit_file_labels_command: TMaokaJab = ({ onunmount, use }) => {
 	const state = use(MaokaOrdo.Context.consume)
 
 	const handle_show_edit_label_modal: Ordo.Command.HandlerOf<"cmd.metadata.show_edit_label_modal"> = label => {
 		const Component = MaokaOrdo.Components.WithState(state, () => EditLabelModal(label))
-		state.commands.emit("cmd.application.modal.show", { render: div => void Maoka.render_dom(div, Component) })
+		state.commands.emit("cmd.application.modal.show", { render: () => Component })
 	}
 
 	const handle_show_edit_labels_palette: Ordo.Command.HandlerOf<"cmd.metadata.show_edit_labels_palette"> = fsid => {
@@ -87,14 +87,14 @@ export const edit_file_labels_command: TMaokaJab = ({ on_unmount, use }) => {
 
 	state.commands.emit("cmd.application.context_menu.add", {
 		command: "cmd.metadata.show_edit_labels_palette",
-		render_icon: div => div.appendChild(BsTags() as SVGSVGElement),
+		render_icon: BsTags,
 		readable_name: "t.common.metadata.show_edit_labels_palette", // TODO
 		should_show: ({ payload }) => Metadata.Validations.is_metadata(payload),
 		payload_creator: ({ payload }) => (Metadata.Validations.is_metadata(payload) ? payload.get_fsid() : null),
 		type: ContextMenuItemType.UPDATE,
 	})
 
-	on_unmount(() => {
+	onunmount(() => {
 		state.commands.off("cmd.metadata.show_edit_label_modal", handle_show_edit_label_modal)
 		state.commands.off("cmd.metadata.show_edit_labels_palette", handle_show_edit_labels_palette)
 		state.commands.emit("cmd.application.context_menu.remove", "cmd.metadata.show_edit_labels_palette")

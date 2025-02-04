@@ -40,7 +40,7 @@ export const Database = (metadata: Ordo.Metadata.Instance, content: Ordo.Content
 	const initial_state = state ? state : is_string(content) ? (JSON.parse(content) as TDatabaseState) : {}
 	database$.replace(initial_state)
 
-	return Maoka.create("div", ({ use, refresh, on_unmount }) => {
+	return Maoka.create("div", ({ use, refresh: refresh, onunmount }) => {
 		let db_state = initial_state
 		const fsid = metadata.get_fsid()
 
@@ -59,7 +59,7 @@ export const Database = (metadata: Ordo.Metadata.Instance, content: Ordo.Content
 		commands.on("cmd.database.toggle_column", handle_toggle_column_cmd)
 		commands.on("cmd.database.toggle_sorting", handle_toggle_sorting_cmd)
 
-		on_unmount(() => {
+		onunmount(() => {
 			divorce_database$()
 
 			commands.off("cmd.database.toggle_column", handle_toggle_column_cmd)
@@ -112,6 +112,24 @@ const to_sorted_children = (db_state: TDatabaseState, children: Ordo.Metadata.In
 			return Switch.Match(column)
 				.case("t.database.column_names.name", () => x.get_name().localeCompare(y.get_name()))
 				.case("t.database.column_names.created_at", () => (x.get_created_at() > y.get_created_at() ? -1 : 1))
+				.case("t.database.column_names.outgoing_links", () => {
+					const x_links = x.get_links()
+					const y_links = y.get_links()
+
+					for (let i = 0; i < x_links.length; i++) {
+						const x_link = x_links[i]
+						const y_link = y_links[i]
+
+						if (!x_link) return 1
+						if (!y_link) return -1
+
+						if (x_link === y_link) continue
+
+						return x_link.localeCompare(y_link)
+					}
+
+					return 0
+				})
 				.case("t.database.column_names.labels", () => {
 					const x_labels = x.get_labels()
 					const y_labels = y.get_labels()

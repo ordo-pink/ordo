@@ -42,7 +42,7 @@ export type TSelectProps<$TValue> = {
 }
 
 export const Select = <$TValue>({ current_value, on_select, items }: TSelectProps<$TValue>) =>
-	Maoka.create("div", ({ use, refresh }) => {
+	Maoka.create("div", ({ use, refresh: refresh }) => {
 		use(MaokaJabs.set_attribute("tabindex", "1"))
 		use(MaokaJabs.set_class("relative"))
 

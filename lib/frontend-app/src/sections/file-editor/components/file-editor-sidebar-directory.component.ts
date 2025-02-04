@@ -35,7 +35,7 @@ const is_fsid = Metadata.Validations.is_fsid
 
 // TODO Rewrite with ActionListItem
 export const FileEditorSidebarDirectory = (metadata: Ordo.Metadata.Instance, depth = 0) =>
-	Maoka.create("div", ({ use, refresh }) => {
+	Maoka.create("div", ({ use, refresh: refresh }) => {
 		const fsid = metadata.get_fsid()
 
 		const commands = use(MaokaOrdo.Jabs.get_commands)

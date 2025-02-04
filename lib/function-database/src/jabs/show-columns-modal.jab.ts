@@ -19,9 +19,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Maoka, type TMaokaJab } from "@ordo-pink/maoka"
 import { ContextMenuItemType } from "@ordo-pink/core"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
+import { type TMaokaJab } from "@ordo-pink/maoka"
 
 import { DatabaseColumnsModal } from "../components/database-columns-modal.component"
 import { database$ } from "../database.state"
@@ -31,7 +31,6 @@ export const show_columns_jab =
 	(metadata: Ordo.Metadata.Instance): TMaokaJab =>
 	({ use }) => {
 		const commands = use(MaokaOrdo.Jabs.get_commands)
-		const state = use(MaokaOrdo.Context.consume)
 		const get_db_state = use(MaokaOrdo.Jabs.happy_marriage$(database$))
 
 		commands.emit("cmd.application.context_menu.add", {
@@ -44,11 +43,7 @@ export const show_columns_jab =
 
 		commands.on("cmd.database.show_columns_modal", () =>
 			commands.emit("cmd.application.modal.show", {
-				render: div =>
-					Maoka.render_dom(
-						div,
-						MaokaOrdo.Components.WithState(state, () => DatabaseColumnsModal),
-					),
+				render: () => DatabaseColumnsModal,
 			}),
 		)
 	}

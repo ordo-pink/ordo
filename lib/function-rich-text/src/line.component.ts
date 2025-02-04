@@ -38,7 +38,7 @@ export const Line = (node: TOrdoRichTextEditorBlockNode, metadata: Ordo.Metadata
 const LineNumber = Maoka.styled("div", { class: "w-12 text-right font-mono text-neutral-500" })
 
 const Block = (node: TOrdoRichTextEditorBlockNode, metadata: Ordo.Metadata.Instance, block_index: number) =>
-	Maoka.create("div", ({ use, element }) => {
+	Maoka.create("div", ({ use, element: element }) => {
 		use(MaokaJabs.set_class("outline-none cursor-text w-full"))
 		use(MaokaJabs.set_attribute("contenteditable", "false"))
 

@@ -31,14 +31,14 @@ import "./notifications.css"
 
 // BUG Notification duration gets reset when rerendering
 // TODO Notification stack when there are more than 5 notifications
-export const OrdoNotifications = Maoka.create("div", ({ use, on_unmount }) => {
+export const OrdoNotifications = Maoka.create("div", ({ use, onunmount }) => {
 	const commands = ordo_app_state.zags.select("commands")
 	const translate = ordo_app_state.zags.select("translate")
 
 	commands.on("cmd.application.notification.hide", handle_notification_hide)
 	commands.on("cmd.application.notification.show", handle_notification_show)
 
-	on_unmount(() => {
+	onunmount(() => {
 		commands.off("cmd.application.notification.hide", handle_notification_hide)
 		commands.off("cmd.application.notification.show", handle_notification_show)
 	})

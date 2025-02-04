@@ -46,7 +46,7 @@ export const Hotkey = (
 		show_in_mobile: false,
 	},
 ) =>
-	Maoka.create("div", ({ use, on_unmount, element, on_mount: after_mount }) => {
+	Maoka.create("div", ({ use, onunmount, element: element, onmount: after_mount }) => {
 		use(MaokaJabs.set_class("hotkey"))
 		if (options.smol) use(MaokaJabs.add_class("smol"))
 		if (options.show_in_mobile) use(MaokaJabs.add_class("mobile"))
@@ -82,7 +82,7 @@ export const Hotkey = (
 		}
 
 		after_mount(() => document.addEventListener("keydown", handle_keydown))
-		on_unmount(() => document.removeEventListener("keydown", handle_keydown))
+		onunmount(() => document.removeEventListener("keydown", handle_keydown))
 
 		return () => [
 			Result.If(split.includes("ctrl")).cata(Result.catas.if_ok(() => ctrl)),

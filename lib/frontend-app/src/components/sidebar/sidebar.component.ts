@@ -31,7 +31,7 @@ import { ordo_app_state } from "../../../app.state"
 import { sidebar$ } from "./sidebar.state"
 
 // TODO Automatically close sidebar in mobile if something was clicked
-export const OrdoSidebar = Maoka.create("aside", ({ use, on_unmount }) => {
+export const OrdoSidebar = Maoka.create("aside", ({ use, onunmount }) => {
 	const commands = ordo_app_state.zags.select("commands")
 	const get_sidebar = use(MaokaOrdo.Jabs.happy_marriage$(sidebar$))
 	const is_mobile = use(MaokaJabs.is_mobile)
@@ -42,7 +42,7 @@ export const OrdoSidebar = Maoka.create("aside", ({ use, on_unmount }) => {
 	commands.on("cmd.application.sidebar.show", handle_show_sidebar)
 	commands.on("cmd.application.sidebar.toggle", handle_toggle_sidebar)
 
-	on_unmount(() => {
+	onunmount(() => {
 		commands.off("cmd.application.sidebar.disable", handle_disable_sidebar)
 		commands.off("cmd.application.sidebar.enable", handle_enable_sidebar)
 		commands.off("cmd.application.sidebar.hide", handle_hide_sidebar)
@@ -108,7 +108,7 @@ export const OrdoSidebarButton = Maoka.create("button", ({ use }) => {
 
 // --- Internal ---
 
-const SidebarRenderer = Maoka.create("div", ({ use, element }) => {
+const SidebarRenderer = Maoka.create("div", ({ use, element: element }) => {
 	use(MaokaJabs.set_class("sidebar"))
 
 	const get_current_activity = use(ordo_app_state.select_jab$("functions.current_activity"))

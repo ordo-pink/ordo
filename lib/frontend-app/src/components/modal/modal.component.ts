@@ -24,7 +24,7 @@ import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 
 import { ordo_app_state } from "../../../app.state"
 
-export const Modal = Maoka.create("div", async ({ use, element }) => {
+export const Modal = Maoka.create("div", ({ use }) => {
 	const state = ordo_app_state.zags.select("sections.modal")!
 
 	use(MaokaJabs.set_class("modal"))
@@ -32,5 +32,5 @@ export const Modal = Maoka.create("div", async ({ use, element }) => {
 
 	const handle_click = (event: MouseEvent) => event.stopPropagation()
 
-	await state.render(element as unknown as HTMLDivElement)
+	return async () => state.render()
 })

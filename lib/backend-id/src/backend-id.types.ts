@@ -24,8 +24,6 @@ import { SocketAddress } from "bun"
 import type { TLogger } from "@ordo-pink/logger"
 import { TWJWT } from "@ordo-pink/wjwt"
 
-// TODO Move to lib
-
 export type TIDChamber = {
 	allow_origin: string[]
 	logger: TLogger
@@ -47,6 +45,5 @@ export type TSharedContext<$TPayload = unknown> = TIDChamber & {
 	response_timer?: [number, number]
 	response_time?: string
 	payload?: $TPayload
-
 	request_ip: SocketAddress | null
 }

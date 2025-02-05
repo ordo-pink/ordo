@@ -1,22 +1,6 @@
 /*
- * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
- * SPDX-License-Identifier: AGPL-3.0-only
- *
- * Ordo.pink is an all-in-one team workspace.
- * Copyright (C) 2024  谢尔盖 ||↓ and the Ordo.pink contributors
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published
- * by the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
  */
 
 import { BunFile } from "bun"
@@ -26,20 +10,20 @@ import { Oath, ops0 } from "@ordo-pink/oath"
 import { RRR } from "@ordo-pink/core"
 import { prop } from "@ordo-pink/tau"
 
-import { TPersistenceStategyContentFS } from "./backend-persistence-strategy-content-fs.types"
+import { TPersistenceStategyDataFS } from "./backend-persistence-strategy-data-fs.types"
 
 /**
- * `ContentPersistenceStrategyFS` implements `ContentPersistenceStrategy` for storing content using
- * file system. To create a `ContentPersistenceStrategyFS`, you need to provide the root directory
+ * `PersistenceStrategyDataFS` implements `OrdoBackend.Data.PersistenceStrategy` for storing data
+ * using file system. To create a `PersistenceStrategyDataFS`, you need to provide the root directory
  * where all the content will be stored. This strategy will automatically create the root directory
  * if it does not exist.
  *
  * @warning This strategy is not intended to be used in production.
  *
  * @example
- * const contentPersistenceStrategy = ContentPersistenceStrategyFS.of("/var/dt/files")
+ * const data_ps = PersistenceStrategyDataFS.of("/var/dt/files")
  */
-export const PersistenceStrategyContentFS: TPersistenceStategyContentFS = {
+export const PersistenceStrategyDataFS: TPersistenceStategyDataFS = {
 	Of: root => {
 		const get_path = get_path_from_root(root)
 

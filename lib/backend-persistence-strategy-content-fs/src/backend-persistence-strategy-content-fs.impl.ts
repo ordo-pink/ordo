@@ -19,14 +19,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Readable, Writable } from "stream"
-import { createReadStream, createWriteStream } from "fs"
+import { BunFile } from "bun"
 import { resolve } from "path"
 
-import { create_parent_if_not_exists0, removeFile0, stat0, write_file0 } from "@ordo-pink/fs"
-import { Oath } from "@ordo-pink/oath"
+import { Oath, ops0 } from "@ordo-pink/oath"
+import { RRR } from "@ordo-pink/core"
+import { prop } from "@ordo-pink/tau"
 
-import { TPersistenceStrategyContentFSParams } from "./backend-persistence-strategy-content-fs.types"
+import { TPersistenceStategyContentFS } from "./backend-persistence-strategy-content-fs.types"
 
 /**
  * `ContentPersistenceStrategyFS` implements `ContentPersistenceStrategy` for storing content using
@@ -37,69 +37,87 @@ import { TPersistenceStrategyContentFSParams } from "./backend-persistence-strat
  * @warning This strategy is not intended to be used in production.
  *
  * @example
- * const contentPersistenceStrategy = ContentPersistenceStrategyFS.of({
- *   root: "/var/ordo/content",
- * })
+ * const contentPersistenceStrategy = ContentPersistenceStrategyFS.of("/var/dt/files")
  */
-export const ContentPersistenceStrategyFS = {
-	/**
-	 * `ContentPersistenceStrategyFS` factory.
-	 */
-	of: ({ root }: TPersistenceStrategyContentFSParams): ContentPersistenceStrategy<Readable> => ({
-		create: (uid, fsid) =>
-			Oath.Resolve(getPath(root, uid, fsid))
-				.pipe(chain_oath(createParentDirIfNotExists0))
-				.pipe(chain_oath(createEmptyFileContent0))
-				.pipe(map_oath(ok)),
+export const PersistenceStrategyContentFS: TPersistenceStategyContentFS = {
+	Of: root => {
+		const get_path = get_path_from_root(root)
 
-		delete: (uid, fsid) =>
-			Oath.Resolve(getPath(root, uid, fsid))
-				.pipe(chain_oath(removeFile0))
-				.pipe(bimap_oath(() => Data.Errors.DataNotFound, ok)),
+		return {
+			exists: (uid, fsid) =>
+				get_path(uid, fsid)
+					.pipe(ops0.chain(check_file_exists))
+					.pipe(ops0.map(prop("exists"))),
 
-		read: (uid, fsid) => Oath.Resolve(getPath(root, uid, fsid)).pipe(chain_oath(readFileContent0)),
+			create: (uid, fsid, content) =>
+				get_path(uid, fsid)
+					.pipe(ops0.chain(validate_file_does_not_exist))
+					.pipe(ops0.map(prop("path")))
+					.pipe(ops0.chain(write_file(content))),
 
-		write: (uid, fsid, content) =>
-			Oath.Resolve(getPath(root, uid, fsid))
-				.pipe(chain_oath(createParentDirIfNotExists0))
-				.pipe(chain_oath(writeFileContent0(content)))
-				.pipe(chain_oath(getFileSize0)),
-	}),
+			read: (uid, fsid) =>
+				get_path(uid, fsid)
+					.pipe(ops0.chain(validate_file_exists))
+					.pipe(ops0.map(prop("file")))
+					.pipe(ops0.chain(get_file_content)),
+
+			update: (uid, fsid, content) =>
+				get_path(uid, fsid)
+					.pipe(ops0.chain(get_file))
+					.pipe(ops0.chain(write_file(content))),
+
+			delete: (uid, fsid) =>
+				get_path(uid, fsid)
+					.pipe(ops0.chain(validate_file_exists))
+					.pipe(ops0.map(prop("file")))
+					.pipe(ops0.chain(delete_file)),
+		}
+	},
 }
 
 // --- Internal ---
 
-const ok = () => "OK" as const
+const already_exists_rrr = () => RRR.codes.eexist("File already exists")
+const not_found_rrr = () => RRR.codes.enoent("File not found")
+const io_rrr = (e: Error) => RRR.codes.eio(e.message)
 
-const getPath = (root: string, uid: string, fsid: string): string => resolve(root, ...uid.split("-"), ...fsid.split("-"))
+const get_file = (path: string) => Oath.Try(() => Bun.file(path)).pipe(ops0.rejected_map(io_rrr))
 
-const createParentDirIfNotExists0 = (path: string) =>
-	create_parent_if_not_exists0(path).pipe(bimap_oath(UnexpectedError, () => path))
+const check_file_exists = (path: string) =>
+	get_file(path).pipe(
+		ops0.chain(file =>
+			Oath.FromPromise(() => file.exists())
+				.fix(() => false)
+				.pipe(ops0.map(exists => ({ file, exists }))),
+		),
+	)
 
-const getFileSize0 = (path: string) => stat0(path).pipe(bimap_oath(UnexpectedError, stat => Number(stat.size)))
+const write_file = (content: ReadableStream) => (path: BunFile | string) =>
+	Oath.Try(() => new Response(content))
+		.pipe(ops0.chain(input => Oath.FromPromise(() => Bun.write(path as BunFile, input))))
+		.pipe(ops0.rejected_map(io_rrr))
 
-const createWriteStream0 = (path: string) => try_oath(() => createWriteStream(path, { autoClose: true }))
+const delete_file = (file: BunFile) => Oath.Try(() => file.delete()).pipe(ops0.rejected_map(io_rrr))
 
-const awaitStreamWriteCompleteP = (file: Writable, content: Readable) =>
-	new Promise<void>((resolve, reject) => {
-		file.on("finish", resolve)
-		file.on("error", reject)
-		content.on("error", reject)
-		content.pipe(file)
-	})
+const validate_file_exists = (path: string) =>
+	check_file_exists(path).pipe(
+		ops0.chain(({ exists, file }) =>
+			Oath.If(exists)
+				.pipe(ops0.rejected_map(not_found_rrr))
+				.pipe(ops0.map(() => ({ path, file }))),
+		),
+	)
 
-const readFileContent0 = (path: string) =>
-	try_oath(() => createReadStream(path)).fix(() => {
-		const stream = new Readable()
-		stream.push("")
-		stream.push(null)
+const validate_file_does_not_exist = (path: string) =>
+	check_file_exists(path).pipe(
+		ops0.chain(({ exists, file }) =>
+			Oath.If(!exists)
+				.pipe(ops0.rejected_map(already_exists_rrr))
+				.pipe(ops0.map(() => ({ path, file }))),
+		),
+	)
 
-		return stream
-	})
+const get_file_content = (file: BunFile) => Oath.Try(() => file.readable).pipe(ops0.rejected_map(io_rrr))
 
-const writeFileContent0 = (content: Readable) => (path: string) =>
-	createWriteStream0(path)
-		.pipe(chain_oath(file => from_promise_oath<void, Error>(() => awaitStreamWriteCompleteP(file, content))))
-		.pipe(bimap_oath(UnexpectedError, () => path))
-
-const createEmptyFileContent0 = (path: string) => write_file0(path, "", "utf8").pipe(rejected_map_oath(UnexpectedError))
+const get_path_from_root = (root: string) => (uid: Ordo.User.ID, fsid: Ordo.Metadata.FSID) =>
+	Oath.Try(() => resolve(root, uid, ...fsid.split("-"))).pipe(ops0.rejected_map(io_rrr))

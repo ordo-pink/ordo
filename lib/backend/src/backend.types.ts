@@ -25,6 +25,16 @@ import type { TValidations } from "@ordo-pink/core"
 
 declare global {
 	module OrdoBackend {
+		module Data {
+			type PersistenceStrategy = {
+				exists: (uid: Ordo.User.ID, fsid: Ordo.Metadata.FSID) => Oath<boolean, Ordo.Rrr<"EIO">>
+				create: (uid: Ordo.User.ID, fsid: Ordo.Metadata.FSID, input: ReadableStream) => Oath<number, Ordo.Rrr<"EIO" | "EEXIST">>
+				read: (uid: Ordo.User.ID, fsid: Ordo.Metadata.FSID) => Oath<ReadableStream, Ordo.Rrr<"EIO" | "ENOENT">>
+				update: (uid: Ordo.User.ID, fsid: Ordo.Metadata.FSID, input: ReadableStream) => Oath<number, Ordo.Rrr<"EIO" | "ENOENT">>
+				delete: (uid: Ordo.User.ID, fsid: Ordo.Metadata.FSID) => Oath<void, Ordo.Rrr<"EIO" | "ENOENT">>
+			}
+		}
+
 		module Notification {
 			type EmailStrategy = {
 				send: (params: {

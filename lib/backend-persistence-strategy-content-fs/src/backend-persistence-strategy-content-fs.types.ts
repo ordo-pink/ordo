@@ -20,3 +20,7 @@
  */
 
 export type TPersistenceStrategyContentFSParams = { root: string }
+
+export type TPersistenceStategyContentFS = {
+	Of: (root: string) => OrdoBackend.Data.PersistenceStrategy
+}

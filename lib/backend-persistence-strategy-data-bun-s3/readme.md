@@ -5,6 +5,12 @@ This strategy implements storing user data in S3. The strategy is used by `backe
 NOTE: This implementation relies on Bun S3 client. Make sure you run your `backend-dt` instance with Bun to make it work
 properly.
 
+## Installation
+
+```sh
+bunx jsr add @ordo-pink/backend-persistence-strategy-data-s3 @ordo-pink/oath @ordo-pink/tau @ordo-pink/core
+```
+
 ## Usage
 
 ```typescript

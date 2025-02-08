@@ -1,0 +1,15 @@
+meta {
+  name: [pub] Healthcheck
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{DT_HOST}}/healthcheck
+  body: none
+  auth: none
+}
+
+headers {
+  Origin: {{ORIGIN}}
+}

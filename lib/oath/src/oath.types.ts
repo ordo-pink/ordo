@@ -25,7 +25,7 @@ export type TUnderOathRejected<T> = T extends object & {
 	fix(on_reject: infer F): any
 }
 	? F extends (value: infer V) => any
-		? TUnderOathRejected<V>
+		? V
 		: never
 	: never
 

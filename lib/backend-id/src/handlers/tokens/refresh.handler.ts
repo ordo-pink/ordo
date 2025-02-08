@@ -19,15 +19,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { default_handler } from "@ordo-pink/backend-util-default-handler"
+
+import { type TIDContext } from "../../backend-id.types"
 import { create_auth_token } from "../../common/create-auth-token"
-import { default_handler } from "../default.handler"
 import { get_token_from_authorization_header } from "../../common/get-auth-token-from-authorization-header"
 import { get_user_from_token } from "../../common/get-user-from-token"
 import { persist_token } from "../../common/persist-token"
 import { remove_token } from "../../common/remove-token"
 import { verify_persisted_auth_token } from "../../common/verify-auth-token"
 
-export const handle_refresh = default_handler(intake =>
+export const handle_refresh = default_handler<TIDContext>(intake =>
 	get_token_from_authorization_header(intake)
 		.and(verify_persisted_auth_token(intake))
 		.and(remove_token(intake))

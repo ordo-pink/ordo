@@ -74,7 +74,6 @@ export const CacheMetadataRepository: Ordo.Metadata.RepositoryAsyncStatic = {
 				Oath.FromPromise(() => result_p)
 					.pipe(ops0.chain(db => Oath.FromNullable(db)))
 					.pipe(ops0.rejected_map(rrr => RRR.codes.eio("Failed to access IndexedDB cache", rrr)))
-					.pipe(ops0.rejected_tap(console.log))
 					.pipe(ops0.map(db => db.transaction("metadata", "readonly")))
 					.pipe(ops0.map(transaction => transaction.objectStore("metadata")))
 					.pipe(ops0.map(storage => storage.get("items")))

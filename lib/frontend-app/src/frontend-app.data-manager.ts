@@ -20,12 +20,10 @@
  */
 
 import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
+import { METADATA_CONTENT_FSID } from "@ordo-pink/core"
 import { Result } from "@ordo-pink/result"
 
 import { Metadata } from "../../core/src/metadata.impl"
-
-// TODO Think at least a bit!
-const METADATA_CONTENT_FSID = "b68678af-6776-47c0-a0b8-4b6535664b8c"
 
 export const DataManager = {
 	Of: (metadata_repository: Ordo.Metadata.Repository, content_repository: Ordo.Content.Repository): TMetadataManager => {

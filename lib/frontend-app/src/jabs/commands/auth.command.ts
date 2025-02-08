@@ -48,6 +48,7 @@ export const auth_commands: TMaokaJab = ({ onunmount, use }) => {
 
 	const commands = use(MaokaOrdo.Jabs.get_commands)
 	const fetch = use(MaokaOrdo.Jabs.get_fetch)
+	const id_host = ordo_app_state.zags.select("hosts.id")
 
 	R.FromNullable(localStorage.getItem("user"))
 		.pipe(R.ops.chain(str => R.Try(() => JSON.parse(str))))
@@ -65,7 +66,7 @@ export const auth_commands: TMaokaJab = ({ onunmount, use }) => {
 					.and(() => headers),
 			)
 			.and(headers => ({ headers, method: "DELETE" }))
-			.and(init => Oath.Try(() => fetch("http://localhost:3001/tokens/invalidate", init)))
+			.and(init => Oath.Try(() => fetch(`${id_host}/tokens/invalidate`, init)))
 			.invoke(invokers0.force_resolve)
 			.then(clean_up_local_storage)
 			.then(() => {
@@ -148,6 +149,7 @@ const RequestCodeModal = Maoka.create("div", ({ use }) => {
 
 	const commands = use(MaokaOrdo.Jabs.get_commands)
 	const fetch = use(MaokaOrdo.Jabs.get_fetch)
+	const id_host = ordo_app_state.zags.select("hosts.id")
 
 	// TODO Show hint
 	// const t_hint = "We'll send you a magic link that will let you in." // TODO i18n
@@ -181,7 +183,7 @@ const RequestCodeModal = Maoka.create("div", ({ use }) => {
 					.and(headers => ({ headers, method: "POST" }))
 					.and(init => ({ ...init, body: JSON.stringify({ email }) }))
 					// TODO Get input from env
-					.and(init => Oath.FromPromise(() => fetch("http://localhost:3001/codes/request", init)))
+					.and(init => Oath.FromPromise(() => fetch(`${id_host}/codes/request`, init)))
 					.and(res => res.json())
 					.and(res => Oath.If(res.success))
 					.and(() => commands.emit("cmd.auth.show_validate_code_modal", email as Ordo.User.Email))
@@ -228,6 +230,7 @@ const ValidateCodeModal = (email: Ordo.User.Email) =>
 
 		const commands = use(MaokaOrdo.Jabs.get_commands)
 		const fetch = use(MaokaOrdo.Jabs.get_fetch)
+		const id_host = ordo_app_state.zags.select("hosts.id")
 
 		const validate = (x: string) => /^\d{6}$/.test(x)
 
@@ -248,7 +251,7 @@ const ValidateCodeModal = (email: Ordo.User.Email) =>
 						.and(headers => ({ headers, method: "POST" }))
 						.and(init => ({ ...init, body: JSON.stringify({ email, code }) }))
 						// TODO Get input from env
-						.and(init => Oath.FromPromise(() => fetch("http://localhost:3001/codes/validate", init)))
+						.and(init => Oath.FromPromise(() => fetch(`${id_host}/codes/validate`, init)))
 						.and(res => res.json())
 						.and(res => Oath.If(res.success, { T: () => res.payload }))
 						.and(({ token, user }) => ordo_app_state.zags.update("auth", () => ({ token, user: CurrentUser.FromDTO(user) })))

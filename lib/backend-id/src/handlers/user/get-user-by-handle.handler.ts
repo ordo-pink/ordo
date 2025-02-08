@@ -22,12 +22,12 @@
 import { Oath, ops0 } from "@ordo-pink/oath"
 import { PublicUser } from "@ordo-pink/core"
 import { type TIntake } from "@ordo-pink/routary"
+import { default_handler } from "@ordo-pink/backend-util-default-handler"
 
-import { type TSharedContext } from "../../backend-id.types"
-import { default_handler } from "../default.handler"
+import { type TIDContext } from "../../backend-id.types"
 import { invalid_handle_rrr } from "../../rrrs/invalid-user-handle.rrr"
 
-export const handle_get_user_by_handle = default_handler(intake =>
+export const handle_get_user_by_handle = default_handler<TIDContext>(intake =>
 	Oath.Resolve(intake.params.user_handle)
 		.pipe(ops0.chain(validate_user_handle(intake)))
 		.pipe(ops0.chain(get_user_by_handle(intake)))
@@ -38,7 +38,7 @@ export const handle_get_user_by_handle = default_handler(intake =>
 
 // --- Internal ---
 
-type I = TIntake<TSharedContext>
+type I = TIntake<TIDContext>
 
 const is_handle = PublicUser.Validations.is_handle
 

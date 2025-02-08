@@ -23,12 +23,12 @@ import { die, run_command } from "@ordo-pink/binutil"
 import { getc } from "@ordo-pink/getc"
 import { invokers0 } from "@ordo-pink/oath"
 
-const { ORDO_STATIC_HOST, ORDO_ID_HOST, ORDO_WEB_HOST, ORDO_DT_HOST, ORDO_WORKSPACE_HOST } = getc([
+const { ORDO_STATIC_HOST, ORDO_ID_HOST, ORDO_WEB_PORT, ORDO_DT_HOST, ORDO_WEB_HOST } = getc([
 	"ORDO_STATIC_HOST",
 	"ORDO_ID_HOST",
-	"ORDO_WEB_HOST",
+	"ORDO_WEB_PORT",
 	"ORDO_DT_HOST",
-	"ORDO_WORKSPACE_HOST",
+	"ORDO_WEB_HOST",
 ])
 
 void run_command("npm run dev", {
@@ -41,7 +41,7 @@ void run_command("npm run dev", {
 		VITE_ORDO_ID_HOST: ORDO_ID_HOST,
 		VITE_ORDO_WEBSITE_HOST: ORDO_WEB_HOST,
 		VITE_ORDO_DT_HOST: ORDO_DT_HOST,
-		VITE_ORDO_WORKSPACE_HOST: ORDO_WORKSPACE_HOST,
+		VITE_ORDO_WEB_PORT: ORDO_WEB_PORT,
 		FORCE_COLOR: "1",
 	},
 }).invoke(invokers0.or_else(die()))

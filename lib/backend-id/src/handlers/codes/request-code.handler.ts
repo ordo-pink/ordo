@@ -23,12 +23,12 @@ import { Oath, ops0 } from "@ordo-pink/oath"
 import { extract_request_body, unknown_error } from "@ordo-pink/backend-util-extract-body"
 import { type TIntake } from "@ordo-pink/routary"
 import { UserSubscription } from "@ordo-pink/core"
+import { default_handler } from "@ordo-pink/backend-util-default-handler"
 
-import { type TSharedContext } from "../../backend-id.types"
-import { default_handler } from "../default.handler"
+import { type TIDContext } from "../../backend-id.types"
 import { extract_body_email } from "../../common/extract-body-email"
 
-export const handle_request_code = default_handler(intake =>
+export const handle_request_code = default_handler<TIDContext>(intake =>
 	extract_request_body(intake)
 		.pipe(ops0.chain(extract_body_email(intake)))
 		.pipe(ops0.chain(get_or_create_user(intake)))
@@ -39,7 +39,7 @@ export const handle_request_code = default_handler(intake =>
 
 // --- Internal ---
 
-type I = TIntake<TSharedContext>
+type I = TIntake<TIDContext>
 
 const hash_argon2 = (intake: I) => (code: string) =>
 	Oath.FromPromise(() => Bun.password.hash(code))
@@ -108,11 +108,11 @@ const create_user = (email: Ordo.User.Email, id: Ordo.User.ID, handle: Ordo.User
 
 type P2 = { codes: { code: string; hash: string }; email: Ordo.User.Email }
 const send_code =
-	(i: I) =>
+	(intake: I) =>
 	({ codes, email }: P2) =>
 		// TODO Create email with Maoka
-		i.notification_strategy.send({
+		intake.notification_strategy.send({
 			to: email,
 			subject: "Sign in code for your ORDO account",
-			content: `Code: ${codes.code}; Link: http://localhost:3004/auth/verify?email=${email}&code=${codes.code}`,
+			content: `Code: ${codes.code} -> Link: ${intake.web_host}/auth/verify?email=${email}&code=${codes.code}`,
 		})

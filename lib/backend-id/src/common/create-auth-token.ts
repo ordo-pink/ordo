@@ -23,9 +23,9 @@ import { Oath, ops0 } from "@ordo-pink/oath"
 import { type TIntake } from "@ordo-pink/routary"
 import { unknown_error } from "@ordo-pink/backend-util-extract-body"
 
-import { type TSharedContext } from "../backend-id.types"
+import { type TIDContext } from "../backend-id.types"
 
-export const create_auth_token = (intake: TIntake<TSharedContext>) => (user: OrdoInternal.User.PrivateDTO) =>
+export const create_auth_token = (intake: TIntake<TIDContext>) => (user: OrdoBackend.User.DTO) =>
 	Oath.FromPromise(() =>
 		intake.wjwt.sign({
 			sub: user.id,

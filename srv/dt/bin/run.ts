@@ -19,13 +19,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Oath, invokers0 } from "@ordo-pink/oath"
-import { create_dir_if_not_exists0 } from "@ordo-pink/fs"
-import { die } from "@ordo-pink/binutil"
-import { getc } from "@ordo-pink/getc"
+import { die, run_async_command } from "@ordo-pink/binutil"
+import { invokers0 } from "@ordo-pink/oath"
 
-const { ORDO_DT_DATA_PATH, ORDO_DT_CONTENT_PATH } = getc(["ORDO_DT_DATA_PATH", "ORDO_DT_CONTENT_PATH"])
-
-void Oath.Merge([create_dir_if_not_exists0(ORDO_DT_DATA_PATH), create_dir_if_not_exists0(ORDO_DT_CONTENT_PATH)]).invoke(
-	invokers0.or_else(die()),
-)
+void run_async_command("opt/bun run --watch srv/dt/index.ts", {
+	stdout: "pipe",
+	stderr: "pipe",
+	env: { ...process.env, FORCE_COLOR: "1" },
+}).invoke(invokers0.or_else(die()))

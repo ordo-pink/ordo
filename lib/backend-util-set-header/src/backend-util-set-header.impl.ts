@@ -5,8 +5,8 @@
 
 export const set_header =
 	(key: string, value: string) =>
-	<$TIntake extends { headers: Record<string, string> }>(intake: $TIntake) => {
-		intake.headers[key] = value
+	<$TIntake extends { headers: Headers }>(intake: $TIntake) => {
+		intake.headers.set(key, value)
 	}
 
 export const set_content_type_application_json_header = set_header("Content-Type", "application/json")

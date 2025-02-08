@@ -32,6 +32,7 @@ declare global {
 				read: (uid: Ordo.User.ID, fsid: Ordo.Metadata.FSID) => Oath<ReadableStream, Ordo.Rrr<"EIO" | "ENOENT">>
 				update: (uid: Ordo.User.ID, fsid: Ordo.Metadata.FSID, input: ReadableStream) => Oath<number, Ordo.Rrr<"EIO" | "ENOENT">>
 				delete: (uid: Ordo.User.ID, fsid: Ordo.Metadata.FSID) => Oath<void, Ordo.Rrr<"EIO" | "ENOENT">>
+				mtime: (uid: Ordo.User.ID, fsid: Ordo.Metadata.FSID) => Oath<number, Ordo.Rrr<"EIO" | "ENOENT">>
 			}
 		}
 

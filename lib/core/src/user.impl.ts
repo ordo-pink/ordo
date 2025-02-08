@@ -30,7 +30,7 @@ const can_user_add_function = (dto: Ordo.User.Current.DTO) => () => dto.installe
 
 const can_user_create_files = (dto: Ordo.User.Current.DTO) => (files: number) => files < dto.file_limit
 
-const can_user_upload = (dto: Ordo.User.Current.DTO) => (bytes: number) => bytes <= dto.max_upload_size
+const can_user_upload = (dto: Ordo.User.Current.DTO) => (bytes: number) => bytes <= dto.max_upload_size * 1024 * 1024
 
 const get_user_created_at = (dto: Ordo.User.Public.DTO) => () => new Date(dto.created_at)
 

@@ -1,0 +1,24 @@
+meta {
+  name: Delete File Content
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{DT_HOST}}/:uid/:fsid
+  body: none
+  auth: bearer
+}
+
+params:path {
+  uid: {{CURRENT_ID}}
+  fsid: {{CURRENT_ID}}
+}
+
+headers {
+  Origin: {{ORIGIN}}
+}
+
+auth:bearer {
+  token: {{CURRENT_TOKEN}}
+}

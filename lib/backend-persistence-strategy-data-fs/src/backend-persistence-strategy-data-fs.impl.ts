@@ -55,6 +55,12 @@ export const PersistenceStrategyDataFS: TPersistenceStategyDataFS = {
 					.pipe(ops0.chain(validate_file_exists))
 					.pipe(ops0.map(prop("file")))
 					.pipe(ops0.chain(delete_file)),
+
+			mtime: (uid, fsid) =>
+				get_path(uid, fsid)
+					.pipe(ops0.chain(validate_file_exists))
+					.pipe(ops0.map(prop("file")))
+					.pipe(ops0.map(file => file.lastModified)),
 		}
 	},
 }
@@ -77,7 +83,7 @@ const check_file_exists = (path: string) =>
 	)
 
 const write_file = (content: ReadableStream) => (path: BunFile | string) =>
-	Oath.Try(() => new Response(content))
+	Oath.Try(() => Bun.readableStreamToArrayBuffer(content))
 		.pipe(ops0.chain(input => Oath.FromPromise(() => Bun.write(path as BunFile, input))))
 		.pipe(ops0.rejected_map(io_rrr))
 
@@ -101,7 +107,7 @@ const validate_file_does_not_exist = (path: string) =>
 		),
 	)
 
-const get_file_content = (file: BunFile) => Oath.Try(() => file.readable).pipe(ops0.rejected_map(io_rrr))
+const get_file_content = (file: BunFile) => Oath.Try(() => file.stream()).pipe(ops0.rejected_map(io_rrr))
 
 const get_path_from_root = (root: string) => (uid: Ordo.User.ID, fsid: Ordo.Metadata.FSID) =>
 	Oath.Try(() => resolve(root, uid, ...fsid.split("-"))).pipe(ops0.rejected_map(io_rrr))

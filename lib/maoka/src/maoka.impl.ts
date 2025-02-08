@@ -128,7 +128,6 @@ export const dom: T.TMaokaRenderDOMFn = async (root, component) => {
 	// 	const next = refresh_queue.entries().next()
 
 	// 	if (next.value) {
-	// 		console.log(next.value[0])
 	// 		refresh_queue.delete(next.value[0])
 	// 		return void next.value[1]().then(() => request_idle_callback(render_loop))
 	// 	}

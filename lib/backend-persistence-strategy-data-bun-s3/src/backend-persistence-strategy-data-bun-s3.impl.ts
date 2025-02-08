@@ -57,6 +57,12 @@ export const PersistenceStrategyDataS3: TPersistenceStrategyDataS3 = {
 					.pipe(ops0.chain(validate_file_exists(s3)))
 					.pipe(ops0.map(prop("file")))
 					.pipe(ops0.chain(delete_file)),
+
+			mtime: (uid, fsid) =>
+				get_key(uid, fsid)
+					.pipe(ops0.chain(validate_file_exists(s3)))
+					.pipe(ops0.map(prop("file")))
+					.pipe(ops0.chain(get_file_modification_timestamp)),
 		}
 	},
 }
@@ -112,6 +118,13 @@ const write_file = (s3: S3Client, content: ReadableStream) => (path: string) =>
 		.pipe(ops0.rejected_map(io_rrr))
 
 const delete_file = (file: S3File) => Oath.Try(() => file.delete()).pipe(ops0.rejected_map(io_rrr))
+
+const get_file_modification_timestamp = (file: S3File) =>
+	Oath.FromPromise(() => file.stat())
+		.pipe(ops0.map(stat => stat.lastModified.getTime()))
+		.pipe(ops0.map(milliseconds => milliseconds / 1000))
+		.pipe(ops0.map(Math.floor))
+		.pipe(ops0.rejected_map(e => RRR.codes.eio(e.message)))
 
 const get_file_content = (file: S3File) => Oath.Try(() => file.readable).pipe(ops0.rejected_map(io_rrr))
 

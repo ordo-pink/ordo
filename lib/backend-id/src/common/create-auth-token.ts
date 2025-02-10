@@ -27,12 +27,7 @@ import { type TIDContext } from "../backend-id.types"
 
 export const create_auth_token = (intake: TIntake<TIDContext>) => (user: OrdoBackend.User.DTO) =>
 	Oath.FromPromise(() =>
-		intake.wjwt.sign({
-			sub: user.id,
-			lim: user.file_limit,
-			mus: user.max_upload_size,
-			sbs: user.subscription,
-		}),
+		intake.wjwt.sign({ sub: user.id, lim: user.file_limit, mus: user.max_upload_size, sbs: user.subscription }),
 	)
 		.pipe(ops0.map(jwt => ({ jwt, user })))
 		.pipe(ops0.rejected_map(rrr => unknown_error(rrr, intake)))

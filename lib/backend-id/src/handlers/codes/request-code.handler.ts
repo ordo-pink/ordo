@@ -46,7 +46,7 @@ const hash_argon2 = (intake: I) => (code: string) =>
 		.pipe(ops0.map(hash => ({ code, hash })))
 		.pipe(ops0.rejected_map(e => unknown_error(e, intake)))
 
-const create_handle = (email: Ordo.User.Email, id: Ordo.User.ID) =>
+const create_handle = (email: Ordo.User.Email, id: Ordo.User.UID) =>
 	`@${email.split("@")[0].replaceAll(".", "_").replaceAll("/", "")}${id.split("-")[0]}` as Ordo.User.Handle
 
 const check_handle_is_free = (handle: Ordo.User.Handle, intake: I) =>
@@ -91,7 +91,7 @@ const update_user_code = (i: I) => (user: OrdoBackend.User.DTO) =>
 			),
 		)
 
-const create_user = (email: Ordo.User.Email, id: Ordo.User.ID, handle: Ordo.User.Handle) => (i: I) =>
+const create_user = (email: Ordo.User.Email, id: Ordo.User.UID, handle: Ordo.User.Handle) => (i: I) =>
 	i.user_persistence_strategy
 		.create({
 			created_at: Date.now(),

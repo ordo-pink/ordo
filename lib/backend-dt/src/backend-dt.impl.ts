@@ -119,7 +119,7 @@ export const create_backend_dt = (chamber: TDTChamber) =>
 
 		.get("/healthcheck", () => new Response("OK"))
 
-		.use(routary_cors({ allow_origin: chamber.allow_origin, allow_headers: ["Content-Type"] }))
+		.use(routary_cors({ allow_origin: chamber.allow_origin, allow_headers: ["content-type", "authorization"] }))
 
 		.start(intake =>
 			Oath.Resolve<TIntake<TDTContext>>({ ...intake, headers: new Headers(), status: 404, request_ip: null })
@@ -166,9 +166,9 @@ export const check_file_exists =
 			.pipe(ops0.map(() => ({ uid, fsid })))
 			.pipe(ops0.rejected_map(() => RRR.codes.enoent("File not found")))
 
-export type TIDs = { uid: Ordo.User.ID; fsid: Ordo.Metadata.FSID }
+export type TIDs = { uid: Ordo.User.UID; fsid: Ordo.Metadata.FSID }
 export const extract_ids = (intake: TIntake<TDTContext>) => () => ({
-	uid: intake.params.uid as Ordo.User.ID,
+	uid: intake.params.uid as Ordo.User.UID,
 	fsid: intake.params.fsid as Ordo.Metadata.FSID,
 })
 
@@ -206,7 +206,7 @@ export const check_can_create_files = (intake: TIntake<TDTContext>) => (user: Or
 
 const check_total_files_limit_if_file_does_not_exist = (intake: TIntake<TDTContext>) => (user: Ordo.User.Current.DTO) =>
 	intake.data_persistence_strategy
-		.exists(intake.params.uid as Ordo.User.ID, intake.params.fsid as Ordo.Metadata.FSID)
+		.exists(intake.params.uid as Ordo.User.UID, intake.params.fsid as Ordo.Metadata.FSID)
 		.pipe(ops0.chain(exists => (exists ? Oath.Resolve(user) : check_can_create_files(intake)(user))))
 
 const set_last_modified_header =

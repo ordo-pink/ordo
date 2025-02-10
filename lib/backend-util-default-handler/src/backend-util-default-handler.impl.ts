@@ -18,7 +18,7 @@ export const default_handler =
 		custom_handler: (intake: TIntake<$TContext>) => Oath<TIntake<$TContext>, { rrr: Ordo.Rrr; intake: TIntake<$TContext> }>,
 	): TGear<$TContext> =>
 	intake =>
-		Oath.Resolve<TIntake<$TContext>>({ ...intake, status: 200, request_ip: null, headers: new Headers() })
+		Oath.Resolve<TIntake<$TContext>>({ ...intake, status: 200, request_ip: null, headers: intake.headers ?? new Headers() })
 			.pipe(ops0.tap(start_response_timer))
 			.pipe(ops0.tap(extract_request_ip))
 			.pipe(ops0.tap(set_content_type_application_json_header))

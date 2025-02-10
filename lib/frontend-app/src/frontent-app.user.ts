@@ -22,10 +22,8 @@
 import { ConsoleLogger } from "@ordo-pink/logger"
 import { RRR } from "@ordo-pink/core"
 import { Result } from "@ordo-pink/result"
-import { ZAGS } from "@ordo-pink/zags"
 import { call_once } from "@ordo-pink/tau"
 
-import { CurrentUserRepository, PublicUserRepository } from "./data/user/user-repository.impl"
 import { UserQuery } from "./data/user/user-query.impl"
 import { ordo_app_state } from "../app.state"
 
@@ -34,12 +32,7 @@ export const init_user = call_once(() => {
 
 	logger.debug("🟡 Initialising metadata...")
 
-	const current_user_repository = CurrentUserRepository.Of(current_user$)
-	const public_user_repository = PublicUserRepository.Of(public_user$)
-
-	// TODO Auth commands
-
-	const user_query = UserQuery.Of(current_user_repository, public_user_repository, () => Result.Ok(void 0))
+	const user_query = UserQuery.Of(() => Result.Ok(void 0))
 
 	ordo_app_state.zags.update("queries.user", () => user_query)
 
@@ -47,7 +40,7 @@ export const init_user = call_once(() => {
 
 	return {
 		get_user_query: (fid: symbol) =>
-			UserQuery.Of(current_user_repository, public_user_repository, permission =>
+			UserQuery.Of(permission =>
 				Result.If(known_functions.has_permissions(fid, { queries: [permission] }), {
 					F: () => {
 						const rrr = RRR.codes.eperm(
@@ -60,9 +53,3 @@ export const init_user = call_once(() => {
 			),
 	}
 })
-
-// --- Internal ---
-
-// TODO Move to ordo_app_state
-const current_user$ = ZAGS.Of({ user: null as Ordo.User.Current.Instance | null })
-const public_user$ = ZAGS.Of({ known_users: [] as Ordo.User.Public.Instance[] })

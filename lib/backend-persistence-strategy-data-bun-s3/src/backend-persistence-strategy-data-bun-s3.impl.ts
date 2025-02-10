@@ -128,4 +128,4 @@ const get_file_modification_timestamp = (file: S3File) =>
 
 const get_file_content = (file: S3File) => Oath.Try(() => file.readable).pipe(ops0.rejected_map(io_rrr))
 
-const get_key = (uid: Ordo.User.ID, fsid: Ordo.Metadata.FSID) => Oath.Resolve(`${uid}/${fsid}`)
+const get_key = (uid: Ordo.User.UID, fsid: Ordo.Metadata.FSID) => Oath.Resolve(`${uid}/${fsid}`)

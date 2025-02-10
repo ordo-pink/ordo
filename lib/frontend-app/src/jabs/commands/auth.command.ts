@@ -50,12 +50,20 @@ export const auth_commands: TMaokaJab = ({ onunmount, use }) => {
 	const fetch = use(MaokaOrdo.Jabs.get_fetch)
 	const id_host = ordo_app_state.zags.select("hosts.id")
 
-	R.FromNullable(localStorage.getItem("user"))
-		.pipe(R.ops.chain(str => R.Try(() => JSON.parse(str))))
-		.pipe(R.ops.chain(user => R.If(CurrentUser.Validations.is_dto(user), { T: () => user as Ordo.User.Current.DTO })))
-		.pipe(R.ops.chain(user => R.FromNullable(localStorage.getItem("token")).pipe(R.ops.map(token => ({ user, token })))))
-		.pipe(R.ops.map(({ user, token }) => ({ user: CurrentUser.FromDTO(user), token })))
-		.pipe(R.ops.map(auth => ordo_app_state.zags.update("auth", () => auth)))
+	void Oath.FromNullable(localStorage.getItem("user"))
+		.and(str => Oath.Try(() => JSON.parse(str)))
+		.and(user => Oath.If(CurrentUser.Validations.is_dto(user), { T: () => user as Ordo.User.Current.DTO }))
+		.and(user => ordo_app_state.zags.update("auth.user", () => CurrentUser.FromDTO(user)))
+		.and(() => Oath.FromNullable(localStorage.getItem("token")).and(refresh_token))
+		.invoke(invokers0.force_resolve)
+
+	const refresh_token = (token: string) =>
+		Oath.Resolve({ headers: { Authorization: `Bearer ${token}` }, method: "POST" })
+			.and(init => Oath.FromPromise(() => fetch(`${id_host}/tokens/refresh`, init)))
+			.and(res => res.json())
+			.and(res => Oath.If(res.success, { T: () => res.payload as string }))
+			.and(token => ordo_app_state.zags.update("auth.token", () => token))
+			.pipe(ops0.rejected_map(clean_up_auth))
 
 	const handle_sign_out = () =>
 		Oath.Resolve(new Headers())
@@ -68,7 +76,7 @@ export const auth_commands: TMaokaJab = ({ onunmount, use }) => {
 			.and(headers => ({ headers, method: "DELETE" }))
 			.and(init => Oath.Try(() => fetch(`${id_host}/tokens/invalidate`, init)))
 			.invoke(invokers0.force_resolve)
-			.then(clean_up_local_storage)
+			.then(clean_up_auth)
 			.then(() => {
 				const history_length = history.length
 				history.go(-history_length)
@@ -94,18 +102,26 @@ export const auth_commands: TMaokaJab = ({ onunmount, use }) => {
 		render_icon: BsBoxArrowInRight,
 	})
 
+	const divorce_user = ordo_app_state.zags.cheat("auth.user", (user, is_update) => {
+		if (!is_update) return
+		if (!user) return clean_up_auth()
+
+		void Oath.FromNullable(user)
+			.and(u => u.to_dto())
+			.and(d => Oath.Try(() => JSON.stringify(d)))
+			.and(s => Oath.Try(() => localStorage.setItem("user", s)))
+			.invoke(invokers0.force_resolve)
+	})
+
 	// TODO use other means but localStorage for storing user info
-	const divorce_auth = ordo_app_state.zags.cheat("auth", (auth, is_update) => {
+	const divorce_token = ordo_app_state.zags.cheat("auth.token", (token, is_update) => {
 		if (is_update) {
-			R.FromNullable(auth.user)
-				.pipe(R.ops.chain(user => R.Try(() => JSON.stringify(user.to_dto()))))
-				.pipe(R.ops.map(str => localStorage.setItem("user", str)))
-				.pipe(R.ops.chain(() => R.FromNullable(auth.token)))
+			R.FromNullable(token)
 				.pipe(R.ops.map(str => localStorage.setItem("token", str)))
-				.cata(R.catas.or_else(clean_up_local_storage))
+				.cata(R.catas.or_else(clean_up_auth))
 		}
 
-		if (auth.token) {
+		if (token) {
 			if (!is_authenticated) {
 				commands.off("cmd.auth.show_request_code_modal", handle_show_request_code)
 				commands.off("cmd.auth.show_validate_code_modal", handle_show_validate_code)
@@ -135,7 +151,8 @@ export const auth_commands: TMaokaJab = ({ onunmount, use }) => {
 	})
 
 	onunmount(() => {
-		divorce_auth()
+		divorce_token()
+		divorce_user()
 
 		commands.off("cmd.auth.show_request_code_modal", handle_show_request_code)
 		commands.off("cmd.auth.show_validate_code_modal", handle_show_validate_code)
@@ -214,9 +231,11 @@ const RequestCodeModal = Maoka.create("div", ({ use }) => {
 		})
 })
 
-const clean_up_local_storage = () => {
+const clean_up_auth = () => {
 	localStorage.removeItem("user")
 	localStorage.removeItem("token")
+	history.go(-history.length)
+	window.location.replace("/")
 }
 
 const RequestCodeModalCheckboxWrapper = Maoka.styled("div", { class: "px-8" })

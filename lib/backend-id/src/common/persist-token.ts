@@ -25,10 +25,10 @@ import { ops0 } from "@ordo-pink/oath"
 
 import { type TIDContext } from "../backend-id.types"
 
-export const persist_token =
-	(intake: TIntake<TIDContext>) =>
-	({ jwt, user }: { jwt: TWJWTSignResult; user: OrdoBackend.User.DTO }) =>
-		intake.token_persistence_strategy
-			.set_token(jwt.payload.sub, jwt.payload.jti, { exp: jwt.payload.exp + intake.persisted_token_lifetime })
-			.and(() => ({ jwt, user }))
-			.pipe(ops0.rejected_map(rrr => ({ rrr, intake })))
+export const persist_token = (intake: TIntake<TIDContext>) => (params: { jwt: TWJWTSignResult; user: OrdoBackend.User.DTO }) =>
+	intake.token_persistence_strategy
+		.set_token(params.jwt.payload.sub, params.jwt.payload.jti, {
+			exp: params.jwt.payload.exp + intake.persisted_token_lifetime,
+		})
+		.and(() => params)
+		.pipe(ops0.rejected_map(rrr => ({ rrr, intake })))

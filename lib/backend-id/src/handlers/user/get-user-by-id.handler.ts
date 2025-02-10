@@ -43,7 +43,7 @@ type I = TIntake<TIDContext>
 const serialize_to_public_user = PublicUser.Serialize
 
 const validate_user_id = (intake: I) => (id: unknown) =>
-	Oath.If(PublicUser.Validations.is_id(id), { T: () => id as Ordo.User.ID, F: () => invalid_id_rrr(id, intake) })
+	Oath.If(PublicUser.Validations.is_id(id), { T: () => id as Ordo.User.UID, F: () => invalid_id_rrr(id, intake) })
 
-const get_by_id = (intake: I) => (id: Ordo.User.ID) =>
+const get_by_id = (intake: I) => (id: Ordo.User.UID) =>
 	intake.user_persistence_strategy.get_by_id(id).pipe(ops0.rejected_map(rrr => ({ rrr, intake })))

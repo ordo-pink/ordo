@@ -56,7 +56,7 @@ export const create_backend_id = (chamber: TIDChamber) =>
 
 		.get("/healthcheck", () => new Response("OK")) // TODO Extract to lib
 
-		.use(routary_cors({ allow_origin: chamber.allow_origin, allow_headers: ["Content-Type"] }))
+		.use(routary_cors({ allow_origin: chamber.allow_origin, allow_headers: ["content-type", "authorization"] }))
 
 		.start(intake =>
 			// TODO Extract to lib

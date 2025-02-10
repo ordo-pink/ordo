@@ -38,7 +38,7 @@ export const handle_update_user = default_handler<TIDContext>(intake =>
 		.pipe(ops0.chain(valdiate_body(intake)))
 		.pipe(ops0.chain(get_current_user(intake)))
 		.pipe(ops0.map(merge_users))
-		.pipe(ops0.chain(update_user(intake.params.user_id as Ordo.User.ID, intake)))
+		.pipe(ops0.chain(update_user(intake.params.user_id as Ordo.User.UID, intake)))
 		.pipe(ops0.map(() => intake)),
 )
 
@@ -94,11 +94,11 @@ const valdiate_body = (i: I) => (body: Record<string, any>) =>
 
 const get_current_user = (i: I) => (updated_user: Partial<OrdoBackend.User.DTO>) =>
 	i.user_persistence_strategy
-		.get_by_id(i.params.user_id as Ordo.User.ID)
+		.get_by_id(i.params.user_id as Ordo.User.UID)
 		.pipe(ops0.rejected_map(rrr => ({ rrr, intake: i })))
 		.pipe(ops0.map(user => ({ user, updated_user })))
 
-const update_user = (id: Ordo.User.ID, intake: I) => (user: OrdoBackend.User.DTO) =>
+const update_user = (id: Ordo.User.UID, intake: I) => (user: OrdoBackend.User.DTO) =>
 	intake.user_persistence_strategy.update(id, user).pipe(ops0.rejected_map(rrr => ({ rrr, intake })))
 
 const merge_users = (users: {

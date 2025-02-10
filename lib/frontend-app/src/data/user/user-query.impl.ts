@@ -19,49 +19,61 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { Oath, ops0 } from "@ordo-pink/oath"
+import { RRR } from "@ordo-pink/core"
 import { Result } from "@ordo-pink/result"
-import { ops0 } from "@ordo-pink/oath"
-
-import { CurrentUser } from "../../../../core/src/user.impl"
-import { UserSubscription } from "../../../../core/src/constants"
 import { ZAGS } from "@ordo-pink/zags"
 
-const UNKNOWN_USER_ID = "58c0d190-0fe5-4daf-be12-5a1ad0b08edc"
-
-// TODO Move to frontend-app
-const john_doe: Ordo.User.Current.Instance = CurrentUser.FromDTO({
-	created_at: Date.now(),
-	email: "john_doe@ordo.pink",
-	file_limit: -1,
-	handle: "@johndoe",
-	id: UNKNOWN_USER_ID,
-	installed_functions: [],
-	max_functions: 10,
-	max_upload_size: -1,
-	subscription: UserSubscription.FREE,
-	first_name: "John",
-	last_name: "Doe",
-})
+import { CurrentUser } from "../../../../core/src/user.impl"
+import { ordo_app_state } from "../../../app.state"
 
 export const UserQuery: Ordo.User.QueryStatic = {
-	Of: (c_repo, k_repo) => {
+	Of: check_permission => {
 		const version_zags = ZAGS.Of({ version: 0 })
-		c_repo.$.marry((_, is_update) => is_update && version_zags.update("version", i => i + 1))
-		k_repo.$.marry((_, is_update) => is_update && version_zags.update("version", i => i + 1))
+		ordo_app_state.zags.cheat("auth.user", (_, is_update) => is_update && version_zags.update("version", i => i + 1))
+
+		const fetch = ordo_app_state.zags.select("fetch")
+		const id_host = ordo_app_state.zags.select("hosts.id")
+		const token = ordo_app_state.zags.select("auth.token")
 
 		return {
-			get_current: () => c_repo.get().cata({ Ok: Result.Ok, Err: () => Result.Ok(john_doe) }),
+			is_authenticated: () =>
+				check_permission("user.is_authenticated")
+					.pipe(Result.ops.map(() => ordo_app_state.zags.select("auth.user")))
+					.pipe(Result.ops.map(user => !!user))
+					.cata(Result.catas.or_else(() => false)),
+
+			get_current: () =>
+				check_permission("user.get_current").pipe(
+					Result.ops.chain(() => Result.FromNullable(ordo_app_state.zags.select("auth.user"))),
+				),
+
 			get_by_id: id =>
-				k_repo
-					.get()
-					.pipe(ops0.map(users => users.find(u => u.get_id() === id) ?? null))
-					.pipe(
-						ops0.tap(o => {
-							if (!o) {
-								// TODO: Go get remote
-							}
-						}),
-					),
+				check_permission("user.get_by_id")
+					.cata({ Ok: () => Oath.Resolve(void 0), Err: rrr => Oath.Reject<Ordo.Rrr<"EPERM">, void>(rrr) })
+					.and(() =>
+						Oath.If(CurrentUser.Validations.is_id(id))
+							.and(() => id)
+							.pipe(ops0.rejected_map(() => RRR.codes.einval("Invalid user id"))),
+					)
+					.and(id => ({ id, headers: { Authorization: `Bearer ${token}` } }))
+					.and(({ id, headers }) => Oath.FromPromise(() => fetch(`${id_host}/users/${id}`, { headers })))
+					.and(res => res.json())
+					.and(res => Oath.If(res.success, { T: () => res.payload, F: () => RRR.codes.eio(res.payload) })),
+
+			get_by_handle: handle =>
+				check_permission("user.get_by_id")
+					.cata({ Ok: () => Oath.Resolve(void 0), Err: rrr => Oath.Reject<Ordo.Rrr<"EPERM">, void>(rrr) })
+					.and(() =>
+						Oath.If(CurrentUser.Validations.is_handle(handle))
+							.and(() => handle)
+							.pipe(ops0.rejected_map(() => RRR.codes.einval("Invalid user handle"))),
+					)
+					.and(handle => ({ handle, headers: { Authorization: `Bearer ${token}` } }))
+					.and(({ handle, headers }) => Oath.FromPromise(() => fetch(`${id_host}/users/handle/${handle}`, { headers })))
+					.and(res => res.json())
+					.and(res => Oath.If(res.success, { T: () => res.payload, F: () => RRR.codes.eio(res.payload) })),
+
 			get $() {
 				return version_zags
 			},

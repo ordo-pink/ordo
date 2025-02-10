@@ -24,4 +24,7 @@ import { Maoka } from "@ordo-pink/maoka"
 
 const app = document.getElementById("app")!
 
-void Maoka.dom(app, App)
+const id_host = import.meta.env.VITE_ORDO_ID_HOST
+const dt_host = import.meta.env.VITE_ORDO_DT_HOST
+
+void Maoka.dom(app, App({ id_host, dt_host }))

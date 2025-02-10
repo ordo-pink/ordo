@@ -34,7 +34,11 @@ export const verify_auth_token = (intake: TIntake<TIDContext>) => (token: string
 		.and(token =>
 			Oath.Try(() => intake.wjwt.decode(token))
 				.pipe(ops0.rejected_map(error => unknown_error(error, intake)))
-				.and(({ payload }) => intake.token_persistence_strategy.get_token(payload.sub, payload.jti))
+				.and(({ payload }) =>
+					intake.token_persistence_strategy
+						.get_token(payload.sub, payload.jti)
+						.pipe(ops0.rejected_map(() => RRR.codes.enoent("Token not found"))),
+				)
 				.and(({ exp }) => Oath.If(exp * 1000 >= Date.now(), { F: () => invalid_token_rrr(intake) }))
 				.and(() => token),
 		)
@@ -42,6 +46,8 @@ export const verify_auth_token = (intake: TIntake<TIDContext>) => (token: string
 export const verify_persisted_auth_token = (intake: TIntake<TIDContext>) => (token: string) =>
 	Oath.Try(() => intake.wjwt.decode(token))
 		.pipe(ops0.rejected_map(error => unknown_error(error, intake)))
-		.and(({ payload }) => intake.token_persistence_strategy.get_token(payload.sub, payload.jti))
+		.and(({ payload }) =>
+			intake.token_persistence_strategy.get_token(payload.sub, payload.jti).pipe(ops0.rejected_map(rrr => ({ rrr, intake }))),
+		)
 		.and(({ exp }) => Oath.If(exp * 1000 >= Date.now(), { F: () => invalid_token_rrr(intake) }))
 		.and(() => token)

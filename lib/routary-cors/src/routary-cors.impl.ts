@@ -25,7 +25,9 @@ export const routary_cors: TRoutaryCORS =
 					if (typeof allow_origin === "string") allow_origin = [allow_origin]
 					const origin = intake.req.headers.get("origin")
 
-					if (!origin || !allow_origin.includes(origin)) return new Response("", { status: 404 })
+					if (!origin || !allow_origin.includes(origin)) return gear(intake)
+
+					if (!intake.headers) intake.headers = new Headers()
 
 					intake.headers.set("Access-Control-Allow-Origin", origin)
 					intake.headers.set("Access-Control-Allow-Methods", options[gasket].join(", "))

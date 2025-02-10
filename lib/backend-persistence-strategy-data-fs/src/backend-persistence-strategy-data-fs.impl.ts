@@ -109,5 +109,5 @@ const validate_file_does_not_exist = (path: string) =>
 
 const get_file_content = (file: BunFile) => Oath.Try(() => file.stream()).pipe(ops0.rejected_map(io_rrr))
 
-const get_path_from_root = (root: string) => (uid: Ordo.User.ID, fsid: Ordo.Metadata.FSID) =>
+const get_path_from_root = (root: string) => (uid: Ordo.User.UID, fsid: Ordo.Metadata.FSID) =>
 	Oath.Try(() => resolve(root, uid, ...fsid.split("-"))).pipe(ops0.rejected_map(io_rrr))

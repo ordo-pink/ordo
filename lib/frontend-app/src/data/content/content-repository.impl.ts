@@ -29,7 +29,7 @@ const INDEXEDDB_OBJECT_STORE_VERSION = 3
 // TODO Move to frontend-app
 // TODO Persistence strategy support
 export const CacheContentRepository: Ordo.Content.RepositoryStatic = {
-	Of: () => {
+	Of: (a, b) => {
 		const indexed_db = indexedDB.open(INDEXEDDB_NAME, INDEXEDDB_OBJECT_STORE_VERSION)
 
 		const db_promise = new Promise<IDBDatabase>((resolve, reject) => {
@@ -57,6 +57,22 @@ export const CacheContentRepository: Ordo.Content.RepositoryStatic = {
 					.pipe(ops0.map(storage => storage.get(fsid)))
 					.pipe(ops0.chain(dbr => new Oath(res => void (dbr.onsuccess = event => res((event.target as any)?.result ?? null)))))
 					.fix(() => null) as any, // TODO Fix types
+
+			get_all: () =>
+				Oath.FromPromise(() => db_promise)
+					.and(Oath.FromNullable)
+					.and(db => Oath.Try(() => db.transaction(INDEXEDDB_OBJECT_STORE_NAME, "readonly")))
+					.and(transaction => transaction.objectStore(INDEXEDDB_OBJECT_STORE_NAME))
+					.and(storage => Oath.Resolve(storage.getAllKeys()))
+					.and(dbr => new Oath<Ordo.Metadata.FSID[]>(res => void (dbr.onsuccess = event => res((event.target as any).result))))
+					.and(keys =>
+						Oath.Merge(
+							keys.reduce(
+								(acc, key) => ({ ...acc, [key]: CacheContentRepository.Of(a, b).get(key, "unwrapped") }),
+								{} as Record<Ordo.Metadata.FSID, any>,
+							),
+						),
+					),
 
 			put: (fsid, content) =>
 				Oath.FromPromise(() => db_promise)

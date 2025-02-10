@@ -22,11 +22,10 @@ import { type TDTChamber, type TDTContext } from "./backend-dt.types"
 export const create_backend_dt = (chamber: TDTChamber) =>
 	Routary.Of<TDTContext>({ ...chamber, headers: new Headers(), request_ip: null, status: 200 })
 		.head("/:uid/:fsid", intake => {
-			const context = { ...intake, status: 204, request_ip: null, headers: new Headers() }
+			const context = { ...intake, status: 204, request_ip: null, headers: intake.headers ?? new Headers() }
 
 			return Oath.Resolve(context)
 				.pipe(ops0.tap(start_response_timer))
-				.pipe(ops0.tap(() => context.logger.notice(context.response_timer)))
 				.pipe(ops0.tap(extract_request_ip))
 				.pipe(ops0.chain(validate_request_params))
 				.pipe(ops0.chain(authenticate))
@@ -45,7 +44,7 @@ export const create_backend_dt = (chamber: TDTChamber) =>
 		})
 
 		.get("/:uid/:fsid", intake => {
-			const context = { ...intake, status: 200, request_ip: null, headers: new Headers() }
+			const context = { ...intake, status: 200, request_ip: null, headers: intake.headers ?? new Headers() }
 
 			return Oath.Resolve(context)
 				.pipe(ops0.tap(start_response_timer))

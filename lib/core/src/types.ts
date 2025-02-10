@@ -19,7 +19,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { JTI, SUB } from "@ordo-pink/wjwt"
 import type { TMaokaChildren, TMaokaComponent } from "@ordo-pink/maoka"
 import type { Oath } from "@ordo-pink/oath"
 import type { TLogger } from "@ordo-pink/logger"
@@ -689,6 +688,7 @@ declare global {
 					| null,
 					Ordo.Rrr<"EIO" | "EACCES" | "EINVAL" | "ENOENT">
 				>
+				get_all: () => Oath<Record<Ordo.Metadata.FSID, ReadableStream>, Ordo.Rrr<"EIO">>
 				put: (fsid: Ordo.Metadata.FSID, content: Ordo.Content.Instance) => Oath<void, Ordo.Rrr<"EINVAL" | "EACCES" | "EIO">>
 			}
 

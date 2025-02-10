@@ -20,13 +20,17 @@
  */
 
 import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
+import { is_date, keys_of } from "@ordo-pink/tau"
 import { METADATA_CONTENT_FSID } from "@ordo-pink/core"
 import { Result } from "@ordo-pink/result"
 
 import { Metadata } from "../../core/src/metadata.impl"
+import { ordo_app_state } from "../app.state"
 
 export const DataManager = {
 	Of: (metadata_repository: Ordo.Metadata.Repository, content_repository: Ordo.Content.Repository): TMetadataManager => {
+		const dt_host = ordo_app_state.zags.select("hosts.dt")
+
 		const get_metadata_content0 = content_repository
 			.get(METADATA_CONTENT_FSID, "text")
 			.and(Oath.FromNullable)
@@ -80,6 +84,59 @@ export const DataManager = {
 				return Oath.Resolve(on_state_change("get-remote"))
 					.and(() => get_metadata_content0)
 					.pipe(ops0.bitap(mark_get_complete, mark_get_complete))
+					.and(() => {
+						const last_local = metadata_repository
+							.get()
+							.pipe(
+								Result.ops.map(items =>
+									items.reduce(
+										(acc, v) => (acc ? (v.get_updated_at() > acc ? v.get_updated_at() : acc) : v.get_updated_at()),
+										null as Date | null,
+									),
+								),
+							)
+							.pipe(Result.ops.chain(Result.FromNullable))
+							.cata(Result.catas.or_else(() => new Date(1970, 1, 2)))
+
+						const fetch = ordo_app_state.zags.select("fetch")
+						const token = ordo_app_state.zags.select("auth.token")
+						const user = ordo_app_state.zags.select("auth.user")
+
+						if (!user || !token) return
+
+						void Oath.Try(() =>
+							fetch(`${dt_host}/${user?.get_id()}/${METADATA_CONTENT_FSID}`, {
+								headers: { Authorization: `Bearer ${token}` },
+								method: "HEAD",
+							}),
+						)
+							.and(res => Oath.FromNullable(res.headers.get("last-modified")))
+							.and(str => new Date(str))
+							.and(Oath.FromNullable)
+							.and(date => Oath.If(is_date(date)))
+							.fix(() => new Date(1970, 1, 1))
+							.and(last_remote => {
+								if (last_remote! < last_local) {
+									// TODO Put all content
+									return content_repository.get_all().and(items =>
+										Oath.Merge(
+											keys_of(items).map(key =>
+												Oath.Try(() =>
+													fetch(`${dt_host}/${user.get_id()}/${key}`, {
+														method: "PUT",
+														headers: { Authorization: `Bearer ${token}` },
+														body: items[key],
+													}),
+												),
+											),
+										),
+									)
+								} else if (last_remote! > last_local) {
+									// TODO Pull all content
+								}
+							})
+							.invoke(invokers0.force_resolve)
+					})
 					.invoke(invokers0.or_else(console.error)) // TODO handling persistence errors
 			},
 			cancel: () => {
@@ -96,85 +153,3 @@ export type TMetadataManager = {
 	start: (on_state_change: (change: TMetadataManagerStateChange) => void) => Promise<void>
 	cancel: () => void
 }
-
-// export const MetadataManager: TMetadataManagerStatic = {
-// 	of: (l_repo, r_repo /*, auth$ */) => ({
-// 		start: on_state_change => {
-// 			void Oath.Resolve("")
-// 				.pipe(ops0.tap(() => on_state_change("get-remote")))
-// 				.pipe(ops0.chain(r_repo.get))
-// 				.pipe(ops0.tap(() => on_state_change("get-remote-complete")))
-// 				.pipe(ops0.map(metadata => metadata.map(item => Metadata.FromDTO(item))))
-// 				.pipe(ops0.map(metadata => l_repo.put(metadata)))
-// 				.pipe(ops0.chain(res => res.cata({ Ok: Oath.Resolve, Err: Oath.Reject })))
-// 				.invoke(
-// 					invokers0.or_else(() => {
-// 						// TODO: Handle errors
-// 						on_state_change("get-remote-complete")
-// 					}),
-// 				)
-// 			// TODO: Cache/offline repo
-
-// 			l_repo.$.subscribe(i => {
-// 				if (i < 1) return
-
-// 				void Oath.Resolve(l_repo.get())
-// 					.pipe(ops0.chain(res => res.cata({ Ok: Oath.Resolve, Err: Oath.Reject })))
-// 					.pipe(ops0.map(metadata => metadata.map(item => item.to_dto())))
-// 					.pipe(ops0.tap(() => on_state_change("put-remote")))
-// 					.pipe(ops0.chain(metadata => r_repo.put("", metadata)))
-// 					.pipe(ops0.tap(() => on_state_change("put-remote-complete")))
-// 					.invoke(
-// 						invokers0.or_else(() => {
-// 							// TODO: Handle errors
-// 							on_state_change("put-remote-complete")
-// 						}),
-// 					)
-// 			})
-// 		},
-// 	}),
-// 		auth$
-// 			.pipe(map(auth_option => O.FromNullable(auth_option.unwrap()?.token)))
-// 			.pipe(combineLatestWith(l_repo.$))
-// 			.pipe(
-// 				map(([token_option, iteration]) => {
-// 					if (iteration === 0) {
-// 						void Oath.FromNullable(token_option.unwrap())
-// 							.pipe(ops0.tap(() => on_state_change("get-remote")))
-// 							.pipe(ops0.chain(r_repo.get))
-// 							.pipe(ops0.tap(() => on_state_change("get-remote-complete")))
-// 							.pipe(ops0.map(metadata => metadata.map(item => Metadata.FromDTO(item))))
-// 							.pipe(ops0.map(metadata => l_repo.put(metadata)))
-// 							.pipe(ops0.chain(res => res.cata({ Ok: Oath.Resolve, Err: Oath.Reject })))
-// 							.invoke(
-// 								invokers0.or_else(() => {
-// 									// TODO: Handle errors
-// 									on_state_change("get-remote-complete")
-// 								}),
-// 							)
-
-// 						return
-// 					}
-
-// 					// TODO: Patch changes
-// 					token_option.cata({
-// 						Some: token =>
-// 							void Oath.Resolve(l_repo.get())
-// 								.pipe(ops0.chain(res => res.cata({ Ok: Oath.Resolve, Err: Oath.Reject })))
-// 								.pipe(ops0.map(metadata => metadata.map(item => item.to_dto())))
-// 								.pipe(ops0.tap(() => on_state_change("put-remote")))
-// 								.pipe(ops0.chain(metadata => r_repo.put(token, metadata)))
-// 								.pipe(ops0.tap(() => on_state_change("put-remote-complete")))
-// 								.invoke(
-// 									invokers0.or_else(() => {
-// 										// TODO: Handle errors
-// 										on_state_change("put-remote-complete")
-// 									}),
-// 								),
-// 						None: noop,
-// 					})
-// 				}),
-// 			)
-// 			.subscribe(),
-// }),
-// }

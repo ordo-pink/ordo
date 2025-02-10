@@ -77,6 +77,8 @@ export const Metadata: Ordo.Metadata.Static = {
 				)
 		},
 		is_item_of: o => Metadata.Validations.is_metadata_dto(o) && Metadata.FromDTO(o).equals(Metadata.FromDTO(dto)),
+		validate: checksum => Metadata.Validations.is_checksum(checksum) && dto.checksum === checksum,
+		is_deleted: () => !!dto.is_deleted,
 	}),
 	Validations: MetadataValidations,
 }

@@ -745,6 +745,8 @@ declare global {
 				updated_by: Ordo.User.UID
 				size: number
 				props?: $TProps
+				is_deleted?: boolean
+				checksum?: string
 			}>
 
 			type Static = {
@@ -782,24 +784,16 @@ declare global {
 				equals: (other_metadata?: Ordo.Metadata.Instance) => boolean
 				is_item_of: (dto: Ordo.Metadata.DTO) => boolean
 				is_hidden: () => boolean
+				validate: (checksum: string) => boolean
+				is_deleted: () => boolean
 			}
 
-			type Validations = {
+			type Validations = TValidations<Ordo.Metadata.DTO> & {
 				is_metadata: (x: unknown) => x is Ordo.Metadata.Instance
 				is_metadata_dto: (x: unknown) => x is Ordo.Metadata.DTO
-				is_created_at: (x: unknown) => x is Date
-				is_created_by: (x: unknown) => x is Ordo.User.UID
-				is_updated_at: (x: unknown) => x is Date
-				is_updated_by: (x: unknown) => x is Ordo.User.UID
-				is_fsid: (x: unknown) => x is Ordo.Metadata.FSID
 				is_label: (x: unknown) => x is Ordo.Metadata.Label
 				is_link: (x: unknown) => x is Ordo.Metadata.FSID
-				is_name: (x: unknown) => boolean
-				is_parent: (x: unknown) => boolean
 				is_prop_key: (x: unknown) => boolean
-				is_props: (x: unknown) => boolean
-				is_size: (x: unknown) => boolean
-				is_type: (x: unknown) => boolean
 				are_labels: (x: unknown) => boolean
 				are_links: (x: unknown) => boolean
 			}

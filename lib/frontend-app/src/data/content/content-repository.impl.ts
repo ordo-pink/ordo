@@ -28,6 +28,8 @@ const INDEXEDDB_OBJECT_STORE_VERSION = 3
 
 // TODO Move to frontend-app
 // TODO Persistence strategy support
+// TODO Clear
+// TODO Read through
 export const CacheContentRepository: Ordo.Content.RepositoryStatic = {
 	Of: (a, b) => {
 		const indexed_db = indexedDB.open(INDEXEDDB_NAME, INDEXEDDB_OBJECT_STORE_VERSION)

@@ -42,9 +42,9 @@ export const is_created_by = (author: unknown): author is Ordo.User.UID => TAU.i
 
 export const is_updated_by = (author: unknown): author is Ordo.User.UID => TAU.is_uuid(author)
 
-export const is_created_at = (timestamp: unknown): timestamp is Date => TAU.is_finite_non_negative_int(timestamp)
+export const is_created_at = (timestamp: unknown): timestamp is number => TAU.is_finite_non_negative_int(timestamp)
 
-export const is_updated_at = (timestamp: unknown): timestamp is Date => TAU.is_finite_non_negative_int(timestamp)
+export const is_updated_at = (timestamp: unknown): timestamp is number => TAU.is_finite_non_negative_int(timestamp)
 
 export const is_props = <$TProps extends Ordo.Metadata.Props>(props?: $TProps): props is $TProps =>
 	props === undefined || TAU.keys_of(props).reduce((acc, key) => acc && is_prop_key(key), true)
@@ -58,6 +58,10 @@ export const is_label = (label: unknown): label is TAU.Unpack<Ordo.Metadata.Labe
 
 	return TAU.is_object(y) && TAU.is_non_empty_string(y.name) && TAU.lt(LabelColor.length)(y.color)
 }
+
+export const is_is_deleted = (x: unknown): x is boolean | undefined => TAU.is_bool(x) || TAU.is_undefined(x)
+
+export const is_checksum = (x: unknown): x is string | undefined => TAU.is_non_empty_string(x) || TAU.is_undefined(x)
 
 export const is_link = (link: unknown): link is TAU.Unpack<Ordo.Metadata.FSID> => TAU.is_uuid(link)
 
@@ -107,6 +111,8 @@ export const is_metadata_dto = (x: unknown): x is Ordo.Metadata.DTO => {
 		is_props(y.props) &&
 		is_size(y.size) &&
 		is_type(y.type) &&
+		is_is_deleted(y.is_deleted) &&
+		is_checksum(y.checksum) &&
 		is_created_at(y.updated_at) &&
 		is_created_by(y.updated_by)
 	)
@@ -130,4 +136,8 @@ export const MetadataValidations: Ordo.Metadata.Validations = {
 	is_type,
 	are_labels,
 	are_links,
+	is_is_deleted,
+	is_checksum,
+	is_labels: are_labels,
+	is_links: are_links,
 }

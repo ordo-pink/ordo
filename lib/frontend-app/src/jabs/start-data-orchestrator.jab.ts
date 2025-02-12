@@ -24,17 +24,17 @@ import { Switch } from "@ordo-pink/switch"
 import { type TMaokaJab } from "@ordo-pink/maoka"
 import { noop } from "@ordo-pink/tau"
 
-import { DataManager } from "../frontend-app.data-manager"
+import { MetadataManager } from "../frontend-app.metadata-manager"
 
 type P = { metadata: Ordo.Metadata.Repository; content: Ordo.Content.Repository }
-export const start_data_orchestrator =
+export const start_metadata_manager =
 	(repositories: P): TMaokaJab =>
 	async ({ use, onunmount }) => {
 		const commands = use(MaokaOrdo.Jabs.get_commands)
 
-		const data_manager = DataManager.Of(repositories.metadata, repositories.content)
+		const metadata_manager = MetadataManager.Of(repositories.metadata, repositories.content)
 
-		await data_manager.start(state_change =>
+		await metadata_manager.start(state_change =>
 			Switch.Match(state_change)
 				.case("get-remote", () => commands.emit("cmd.application.background_task.start_loading"))
 				.case("put-remote", () => commands.emit("cmd.application.background_task.start_saving"))
@@ -44,6 +44,6 @@ export const start_data_orchestrator =
 		)
 
 		onunmount(() => {
-			data_manager.cancel()
+			metadata_manager.cancel()
 		})
 	}

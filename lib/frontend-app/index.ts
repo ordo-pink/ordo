@@ -43,7 +43,7 @@ import { edit_file_links_command } from "./src/jabs/commands/edit-file-links.com
 import { move_file_command } from "./src/jabs/commands/move-file.command"
 import { remove_file_command } from "./src/jabs/commands/remove-file.command"
 import { rename_file_command } from "./src/jabs/commands/rename-file.command"
-import { start_data_orchestrator } from "./src/jabs/start-data-orchestrator.jab"
+import { start_metadata_manager } from "./src/jabs/start-data-orchestrator.jab"
 
 // TODO Move fonts to assets
 import "./index.css"
@@ -65,7 +65,7 @@ export const App = ({ id_host, dt_host }: TAppOptions) =>
 		const app_state = use(create_function_state(app_fid, source))
 
 		use(MaokaOrdo.Context.provide(app_state))
-		use(start_data_orchestrator(repositories))
+		use(start_metadata_manager(repositories))
 
 		use(MaokaJabs.set_class("app"))
 		use(create_command_palette)

@@ -20,20 +20,18 @@
  */
 
 import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
-import { is_date, keys_of } from "@ordo-pink/tau"
 import { METADATA_CONTENT_FSID } from "@ordo-pink/core"
 import { Result } from "@ordo-pink/result"
+import { is_string } from "@ordo-pink/tau"
 
 import { Metadata } from "../../core/src/metadata.impl"
-import { ordo_app_state } from "../app.state"
 
-export const DataManager = {
+export const MetadataManager = {
 	Of: (metadata_repository: Ordo.Metadata.Repository, content_repository: Ordo.Content.Repository): TMetadataManager => {
-		const dt_host = ordo_app_state.zags.select("hosts.dt")
-
 		const get_metadata_content0 = content_repository
-			.get(METADATA_CONTENT_FSID, "text")
+			.get("" as any, METADATA_CONTENT_FSID)
 			.and(Oath.FromNullable)
+			.and(content => Oath.If(is_string(content), { T: () => content as string }))
 			.and(content => Oath.Try(() => JSON.parse(content) as Ordo.Metadata.DTO[]))
 			.fix(() => [] as Ordo.Metadata.DTO[])
 			.and(dtos => dtos.map(Metadata.FromDTO))
@@ -69,7 +67,7 @@ export const DataManager = {
 
 					previous_save_attempt0 = Oath.Resolve(on_state_change("put-remote"))
 						.and(() => Oath.Try(() => JSON.stringify(dtos)))
-						.and(str => content_repository.put(METADATA_CONTENT_FSID, str))
+						.and(str => content_repository.put("" as any, METADATA_CONTENT_FSID, str))
 
 					void previous_save_attempt0
 						.pipe(ops0.bitap(mark_put_complete, mark_put_complete))
@@ -84,59 +82,6 @@ export const DataManager = {
 				return Oath.Resolve(on_state_change("get-remote"))
 					.and(() => get_metadata_content0)
 					.pipe(ops0.bitap(mark_get_complete, mark_get_complete))
-					.and(() => {
-						const last_local = metadata_repository
-							.get()
-							.pipe(
-								Result.ops.map(items =>
-									items.reduce(
-										(acc, v) => (acc ? (v.get_updated_at() > acc ? v.get_updated_at() : acc) : v.get_updated_at()),
-										null as Date | null,
-									),
-								),
-							)
-							.pipe(Result.ops.chain(Result.FromNullable))
-							.cata(Result.catas.or_else(() => new Date(1970, 1, 2)))
-
-						const fetch = ordo_app_state.zags.select("fetch")
-						const token = ordo_app_state.zags.select("auth.token")
-						const user = ordo_app_state.zags.select("auth.user")
-
-						if (!user || !token) return
-
-						void Oath.Try(() =>
-							fetch(`${dt_host}/${user?.get_id()}/${METADATA_CONTENT_FSID}`, {
-								headers: { Authorization: `Bearer ${token}` },
-								method: "HEAD",
-							}),
-						)
-							.and(res => Oath.FromNullable(res.headers.get("last-modified")))
-							.and(str => new Date(str))
-							.and(Oath.FromNullable)
-							.and(date => Oath.If(is_date(date)))
-							.fix(() => new Date(1970, 1, 1))
-							.and(last_remote => {
-								if (last_remote! < last_local) {
-									// TODO Put all content
-									return content_repository.get_all().and(items =>
-										Oath.Merge(
-											keys_of(items).map(key =>
-												Oath.Try(() =>
-													fetch(`${dt_host}/${user.get_id()}/${key}`, {
-														method: "PUT",
-														headers: { Authorization: `Bearer ${token}` },
-														body: items[key],
-													}),
-												),
-											),
-										),
-									)
-								} else if (last_remote! > last_local) {
-									// TODO Pull all content
-								}
-							})
-							.invoke(invokers0.force_resolve)
-					})
 					.invoke(invokers0.or_else(console.error)) // TODO handling persistence errors
 			},
 			cancel: () => {

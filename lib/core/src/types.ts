@@ -562,7 +562,7 @@ declare global {
 			type RenderParams = {
 				is_editable: boolean
 				is_embedded: boolean
-				content: Ordo.Content.Instance | null
+				content: Ordo.Content.Instance
 				metadata: Ordo.Metadata.Instance
 			}
 		}
@@ -657,39 +657,37 @@ declare global {
 
 		// TODO improve types
 		namespace Content {
-			type Instance = string | ArrayBuffer | Blob | FormData | Uint8Array | Record<string, unknown>
+			type Instance = string | ArrayBuffer | Blob | FormData | Uint8Array | ReadableStream | null
 
-			type Storage = Record<Ordo.Metadata.FSID, Ordo.Content.Instance>
-
-			type RepositoryStatic = {
-				Of: (data_host: string, fetch: Ordo.Fetch) => Repository
+			type PersistenceStrategy = {
+				clear: () => Oath<void, Ordo.Rrr<"EIO">>
+				delete: (uid: Ordo.User.UID, fsid: Ordo.Metadata.FSID) => Oath<void, Ordo.Rrr<"ENOENT" | "EIO">>
+				exists: (uid: Ordo.User.UID, fsid: Ordo.Metadata.FSID) => Oath<boolean, Ordo.Rrr<"EIO">>
+				get: (uid: Ordo.User.UID, fsid: Ordo.Metadata.FSID) => Oath<Ordo.Content.Instance, Ordo.Rrr<"ENOENT" | "EIO">>
+				list: () => Oath<Record<string, any>, Ordo.Rrr<"EIO">>
+				put: (uid: Ordo.User.UID, fsid: Ordo.Metadata.FSID, content: Ordo.Content.Instance) => Oath<void, Ordo.Rrr<"EIO">>
 			}
 
-			type ContentType = "text" | "array_buffer" | "blob" | "form_data" | "json" | "bytes" | "unwrapped"
+			type RepositoryStatic = {
+				Of: (
+					auth$: TZags<{ user: Ordo.User.Current.Instance | null; token: string | null }>,
+					local_strategy: Ordo.Content.PersistenceStrategy,
+					remote_strategy: Ordo.Content.PersistenceStrategy,
+				) => Repository
+			}
 
 			type Repository = {
-				get: <$TContentType extends Ordo.Content.ContentType>(
+				get: (
+					uid: Ordo.User.UID,
 					fsid: Ordo.Metadata.FSID,
-					content_type: $TContentType,
-				) => Oath<
-					| ($TContentType extends "text"
-							? string
-							: $TContentType extends "array_buffer"
-								? ArrayBuffer
-								: $TContentType extends "blob"
-									? Blob
-									: $TContentType extends "form_data"
-										? FormData
-										: $TContentType extends "bytes"
-											? Uint8Array
-											: $TContentType extends "unwrapped"
-												? Response
-												: unknown)
-					| null,
-					Ordo.Rrr<"EIO" | "EACCES" | "EINVAL" | "ENOENT">
-				>
-				get_all: () => Oath<Record<Ordo.Metadata.FSID, ReadableStream>, Ordo.Rrr<"EIO">>
-				put: (fsid: Ordo.Metadata.FSID, content: Ordo.Content.Instance) => Oath<void, Ordo.Rrr<"EINVAL" | "EACCES" | "EIO">>
+				) => Oath<Ordo.Content.Instance, Ordo.Rrr<"EIO" | "EACCES" | "EINVAL">>
+				get_all: () => Oath<Record<string, Ordo.Content.Instance>, Ordo.Rrr<"EIO">>
+				put: (
+					uid: Ordo.User.UID,
+					fsid: Ordo.Metadata.FSID,
+					content: Ordo.Content.Instance,
+				) => Oath<void, Ordo.Rrr<"EINVAL" | "EACCES" | "EIO">>
+				get $(): TZags<{ last_update: Ordo.Metadata.FSID | null }>
 			}
 
 			type QueryStatic = {
@@ -700,26 +698,10 @@ declare global {
 			}
 
 			type Query = {
-				get: <$TContentType extends Ordo.Content.ContentType>(
+				get: (
+					uid: Ordo.User.UID,
 					fsid: Ordo.Metadata.FSID,
-					content_type: $TContentType,
-				) => Oath<
-					| ($TContentType extends "text"
-							? string
-							: $TContentType extends "array_buffer"
-								? ArrayBuffer
-								: $TContentType extends "blob"
-									? Blob
-									: $TContentType extends "form_data"
-										? FormData
-										: $TContentType extends "bytes"
-											? Uint8Array
-											: $TContentType extends "unwrapped"
-												? Response
-												: unknown)
-					| null,
-					Ordo.Rrr<"EPERM" | "EIO" | "EACCES" | "EINVAL" | "ENOENT">
-				>
+				) => Oath<Ordo.Content.Instance, Ordo.Rrr<"EPERM" | "EIO" | "EACCES" | "EINVAL" | "ENOENT">>
 			}
 		}
 

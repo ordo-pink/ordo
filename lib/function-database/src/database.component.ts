@@ -37,7 +37,7 @@ import { show_columns_jab } from "./jabs/show-columns-modal.jab"
 
 import "./database.css"
 
-export const Database = (metadata: Ordo.Metadata.Instance, content: Ordo.Content.Instance | null, state?: TDatabaseState) => {
+export const Database = (metadata: Ordo.Metadata.Instance, content: Ordo.Content.Instance, state?: TDatabaseState) => {
 	const initial_state = state ? state : is_string(content) ? (JSON.parse(content) as TDatabaseState) : {}
 	database$.replace(initial_state)
 

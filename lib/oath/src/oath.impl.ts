@@ -240,7 +240,7 @@ export class Oath<$TResolve, $TReject = never> {
 		 *
 		 * @optional
 		 */
-		on_error = (error: unknown) => (error instanceof Error ? error : (new Error(String(error as any)) as any)),
+		on_error: (error: Error) => $TReject = (error: Error) => error as any,
 
 		/**
 		 * Optional abort controller for cases when Oath was cancelled when it already
@@ -250,12 +250,14 @@ export class Oath<$TResolve, $TReject = never> {
 		 */
 		abort_controller: AbortController = new AbortController(),
 	): Oath<Awaited<$TResolve>, $TReject> => {
+		const to_error = (error: any) => (error instanceof Error ? error : new Error(String(error)))
+
 		return new Oath(async (resolve, reject) => {
 			try {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				resolve(await thunk())
 			} catch (error) {
-				reject(on_error(error))
+				reject(on_error(to_error(error)))
 			}
 		}, abort_controller)
 	}

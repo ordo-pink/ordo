@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
+import { Oath, invokers0 } from "@ordo-pink/oath"
 import { METADATA_CONTENT_FSID } from "@ordo-pink/core"
 import { ZAGS } from "@ordo-pink/zags"
 

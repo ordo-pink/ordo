@@ -71,7 +71,7 @@ export default create_function(
 					description: "t.text.file_association.description",
 				},
 			],
-			render: ({ metadata, content }) => RichText(metadata, content!),
+			render: ({ metadata, content }) => RichText(metadata, content),
 			render_icon: BsFileEarmarkRichText,
 		})
 	},

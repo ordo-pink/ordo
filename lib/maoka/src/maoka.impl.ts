@@ -75,7 +75,8 @@ export const styled =
 
 export const html = (tag: string, html: string): T.TMaokaComponent =>
 	create(tag, ({ element }) => {
-		element.innerHTML = html
+		if (element instanceof Element) return void (element.innerHTML = html)
+		return () => html
 	})
 
 export const dom: T.TMaokaRenderDOMFn = async (root, component) => {
@@ -86,22 +87,27 @@ export const dom: T.TMaokaRenderDOMFn = async (root, component) => {
 	const Component = await component(create_element, root_element, root_id)
 	const refresh_queue = new Map<string, { element: T.TMaokaElement; get_children: () => Promise<T.TMaokaElement> }>()
 
-	root.appendChild(Component as HTMLElement)
+	root.appendChild(Component as unknown as HTMLElement)
 
 	root.addEventListener("refresh", event => {
 		event.stopPropagation()
 
-		const [id, element, get_children] = (event as any).detail as [string, T.TMaokaElement, () => T.TMaokaComponent]
+		const [id, element, get_children] = (event as any).detail as [string, T.TMaokaDOMElement, () => T.TMaokaComponent]
 
-		const refresh_elements = refresh_queue.keys().toArray()
+		const refresh_nodes = refresh_queue.keys().toArray()
 
 		if (refresh_queue.has(id)) return
 
-		for (let i = 0; i < refresh_elements.length; i++) {
-			const e = refresh_queue.get(refresh_elements[i])?.element as HTMLElement
+		for (let i = 0; i < refresh_nodes.length; i++) {
+			const refresh_element = refresh_queue.get(refresh_nodes[i])?.element
 
-			if (e && element.contains?.(e)) {
-				refresh_queue.delete(refresh_elements[i])
+			if (
+				refresh_element &&
+				refresh_element instanceof HTMLElement &&
+				element instanceof HTMLElement &&
+				element.contains?.(refresh_element)
+			) {
+				refresh_queue.delete(refresh_nodes[i])
 				break
 			}
 		}
@@ -124,29 +130,22 @@ export const dom: T.TMaokaRenderDOMFn = async (root, component) => {
 				).then(() => request_idle_callback(() => void render_loop()))
 			: request_idle_callback(() => void render_loop())
 
-	// const render_loop = () => {
-	// 	const next = refresh_queue.entries().next()
-
-	// 	if (next.value) {
-	// 		refresh_queue.delete(next.value[0])
-	// 		return void next.value[1]().then(() => request_idle_callback(render_loop))
-	// 	}
-
-	// 	request_idle_callback(render_loop)
-	// }
-
 	request_idle_callback(() => void render_loop())
 
 	const unmount_element = (element: T.TMaokaElement) => {
 		if (element.onunmount) element.onunmount()
 
-		element.childNodes.forEach(child => unmount_element(child as any))
+		for (let i = 0; i < element.children.length; i++) {
+			unmount_element(element.children[i] as T.TMaokaElement)
+		}
 	}
 
 	const mount_element = (element: T.TMaokaElement) => {
 		if (element.onmount) element.onmount()
 
-		element.childNodes.forEach(child => mount_element(child as any))
+		for (let i = 0; i < element.children.length; i++) {
+			mount_element(element.children[i] as T.TMaokaElement)
+		}
 	}
 
 	mount_element(Component)
@@ -168,11 +167,7 @@ export const dom: T.TMaokaRenderDOMFn = async (root, component) => {
 		}
 	})
 
-	observer.observe(root as HTMLElement, {
-		childList: true,
-		subtree: true,
-		attributeFilter: ["onmount", "onunmount"],
-	})
+	observer.observe(root, { childList: true, subtree: true, attributeFilter: ["onmount", "onunmount"] })
 }
 
 // --- Internal ---
@@ -185,7 +180,7 @@ const render_children = async (
 	element: T.TMaokaElement,
 ) => {
 	if (!get_children) return element
-	element.innerHTML = ""
+	if (element instanceof HTMLElement) element.innerHTML = ""
 	let children = await get_children()
 	if (!children) return element
 

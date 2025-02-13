@@ -172,7 +172,7 @@ const show_cookie_modal = (emit: Ordo.Command.EmitFn) => {
 		message: "t.welcome.landing_page.cookie_banner.message",
 		type: NotificationType.WARN,
 		duration: 15,
-		render_icon: span => span.appendChild(BsCookie("size-5") as SVGSVGElement),
+		render_icon: span => void Maoka.dom(span, BsCookie("size-5")),
 	})
 
 	is_cookie_modal_shown = true

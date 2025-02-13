@@ -19,14 +19,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Oath, invokers0 } from "@ordo-pink/oath"
+import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
 import { METADATA_CONTENT_FSID } from "@ordo-pink/core"
+import { T } from "@ordo-pink/tau"
 import { ZAGS } from "@ordo-pink/zags"
 
 // TODO Sync storages
 export const ContentRepository: Ordo.Content.RepositoryStatic = {
 	Of: (auth$, local_strategy, remote_strategy) => {
-		const $ = ZAGS.Of({ last_update: null as Ordo.Metadata.FSID | null })
+		const $ = ZAGS.Of({ version: 0 })
 
 		const divorce = auth$.marry(({ user, token }) => {
 			if (!token || !user) return
@@ -99,10 +100,16 @@ export const ContentRepository: Ordo.Content.RepositoryStatic = {
 				}))
 				.and(({ local, remote }) =>
 					Oath.Merge({
-						local: local && local_strategy.put("" as any, METADATA_CONTENT_FSID, JSON.stringify(local)),
-						remote: remote && remote_strategy.put(user.get_id(), METADATA_CONTENT_FSID, JSON.stringify(remote)),
+						local: local && local_strategy.put("" as any, METADATA_CONTENT_FSID, JSON.stringify(local)).and(T),
+						remote: remote && remote_strategy.put(user.get_id(), METADATA_CONTENT_FSID, JSON.stringify(remote)).and(T),
 					}),
 				)
+				.and(({ local }) =>
+					Oath.If(local)
+						.pipe(ops0.tap(() => $.update("version", v => v + 1)))
+						.fix(() => void 0),
+				)
+
 				.invoke(invokers0.to_promise)
 
 			divorce()

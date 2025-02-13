@@ -62,8 +62,8 @@ export const init_content: TF = () => {
 	ordo_app_state.zags.cheat("auth.user", user => auth$.update("user", () => user))
 	ordo_app_state.zags.cheat("auth.token", token => auth$.update("token", () => token))
 
-	const ordo_backend_content_strategy = PersistenceStrategyContentOrdoBackend.Of(dt_host, fetch, auth$)
-	const content_repository = ContentRepository.Of(auth$, local_strategy, ordo_backend_content_strategy)
+	const remote_strategy = PersistenceStrategyContentOrdoBackend.Of(dt_host, fetch, auth$)
+	const content_repository = ContentRepository.Of(auth$, local_strategy, remote_strategy)
 
 	// TODO Extract for common error handling
 	const Err = (rrr: Ordo.Rrr) => {

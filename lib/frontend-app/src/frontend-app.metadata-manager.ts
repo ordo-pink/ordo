@@ -19,12 +19,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { METADATA_CONTENT_FSID, Metadata } from "@ordo-pink/core"
 import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
-import { METADATA_CONTENT_FSID } from "@ordo-pink/core"
+import { is_array, is_string } from "@ordo-pink/tau"
 import { Result } from "@ordo-pink/result"
-import { is_string } from "@ordo-pink/tau"
-
-import { Metadata } from "../../core/src/metadata.impl"
 
 export const MetadataManager = {
 	Of: (metadata_repository: Ordo.Metadata.Repository, content_repository: Ordo.Content.Repository): TMetadataManager => {
@@ -37,6 +35,19 @@ export const MetadataManager = {
 			.and(dtos => dtos.map(Metadata.FromDTO))
 			.and(metadata_repository.put)
 			.and(result => result.cata({ Ok: () => Oath.Resolve(void 0), Err: Oath.Reject }))
+
+		content_repository.$.marry(
+			(_, is_update) =>
+				is_update &&
+				void content_repository
+					.get("" as any, METADATA_CONTENT_FSID)
+					.and(stream => new Response(stream))
+					.and(res => res.json())
+					.and(items => Oath.If(is_array(items), { T: () => items }))
+					.and(items => items.map(Metadata.FromDTO))
+					.and(json => metadata_repository.put(json))
+					.invoke(invokers0.to_promise),
+		)
 
 		let divorce_metadata_repository: () => void
 		let cancel_get_content: () => void

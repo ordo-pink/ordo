@@ -687,7 +687,7 @@ declare global {
 					fsid: Ordo.Metadata.FSID,
 					content: Ordo.Content.Instance,
 				) => Oath<void, Ordo.Rrr<"EINVAL" | "EACCES" | "EIO">>
-				get $(): TZags<{ last_update: Ordo.Metadata.FSID | null }>
+				get $(): TZags<{ version: number }>
 			}
 
 			type QueryStatic = {

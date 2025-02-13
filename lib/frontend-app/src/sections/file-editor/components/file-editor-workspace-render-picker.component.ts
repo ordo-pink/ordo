@@ -32,7 +32,7 @@ export const RenderPicker = (metadata: Ordo.Metadata.Instance) =>
 		let fa: Ordo.FileAssociation.Instance | null = null
 
 		const content_query = use(MaokaOrdo.Jabs.get_content_query)
-		const content0 = content_query.get(metadata_fsid, "text")
+		const content0 = content_query.get("" as any, metadata_fsid)
 
 		ordo_app_state.zags.cheat("functions.file_assocs", fas => {
 			if (fa) return

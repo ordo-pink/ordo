@@ -19,6 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { Oath, invokers0 } from "@ordo-pink/oath"
 import { BsFileEarmarkRuled } from "@ordo-pink/frontend-icons"
 import { TwoLetterLocale } from "@ordo-pink/locale"
 import { create_function } from "@ordo-pink/core"
@@ -134,7 +135,12 @@ export default create_function(
 					description: "t.database.file_association.description",
 				},
 			],
-			render: ({ metadata, content }) => Database(metadata, content),
+			render: ({ metadata, content }) =>
+				Oath.FromNullable(content)
+					.fix(() => "{}")
+					.and(content => Oath.Try(() => new Response(content).json()))
+					.and(state => Database(metadata, state))
+					.invoke(invokers0.to_promise),
 			render_icon: BsFileEarmarkRuled,
 		})
 	},

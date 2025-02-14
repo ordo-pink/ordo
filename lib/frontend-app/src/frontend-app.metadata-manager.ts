@@ -19,10 +19,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+// TODO Publish file as a new file
+// TODO Access file by user_handle and prop link (e.g. https://pub.ordo.pink/@ordo-blog/en/release-0.8.0)
+//                                                     ^-----pub host------^ ^----user---^ ^--file_id---^
+
 import { METADATA_CONTENT_FSID, Metadata } from "@ordo-pink/core"
 import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
 import { is_array, is_string } from "@ordo-pink/tau"
 import { Result } from "@ordo-pink/result"
+
+import { ordo_app_state } from "../app.state"
 
 export const MetadataManager = {
 	Of: (metadata_repository: Ordo.Metadata.Repository, content_repository: Ordo.Content.Repository): TMetadataManager => {
@@ -76,9 +82,13 @@ export const MetadataManager = {
 
 					if (!dtos) return // TODO Log error, do stuff
 
-					previous_save_attempt0 = Oath.Resolve(on_state_change("put-remote"))
-						.and(() => Oath.Try(() => JSON.stringify(dtos)))
-						.and(str => content_repository.put("" as any, METADATA_CONTENT_FSID, str))
+					const user = ordo_app_state.zags.select("auth.user")
+
+					if (user) {
+						previous_save_attempt0 = Oath.Resolve(on_state_change("put-remote"))
+							.and(() => Oath.Try(() => JSON.stringify(dtos)))
+							.and(str => content_repository.put(user.get_id(), METADATA_CONTENT_FSID, str))
+					}
 
 					void previous_save_attempt0
 						.pipe(ops0.bitap(mark_put_complete, mark_put_complete))

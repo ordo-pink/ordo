@@ -24,7 +24,7 @@ import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 
 import { Hotkey, THotkeyOptions } from "./hotkey.component"
 
-import "./button.css"
+import "../../maoka-components.css"
 
 export type TButtonProps = {
 	on_click: (event: MouseEvent) => void | Promise<void>

@@ -25,7 +25,7 @@ import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { is_string } from "@ordo-pink/tau"
 
-import "./label.css"
+import "../../maoka-components.css"
 
 export const Label = (label: Ordo.Metadata.Label, emit: Ordo.Command.EmitFn, metadata?: Ordo.Metadata.Instance) =>
 	Maoka.create("div", ({ use }) => {

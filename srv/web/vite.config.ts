@@ -28,7 +28,9 @@ import tsconfigPaths from "vite-tsconfig-paths"
 // https://vitejs.dev/config/
 export default defineConfig({
 	plugins: [
+		// @ts-ignore
 		tsconfigPaths(),
+		// @ts-ignore
 		ViteImageOptimizer({
 			png: { quality: 80 },
 			jpeg: { quality: 75 },

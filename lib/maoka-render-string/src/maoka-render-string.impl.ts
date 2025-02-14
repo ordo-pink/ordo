@@ -40,12 +40,10 @@ export const create_element = (tag: string): TMaokaStrElement => {
 		},
 		dispatchEvent: () => false,
 		str: async (depth = 0) => {
-			const result = "\n"
-				.concat(" ".repeat(depth * 2))
-				.concat("<")
+			const result = "<"
 				.concat(tag)
 				.concat(Object.keys(attributes).length ? " " : "")
-				.concat(Object.keys(attributes).reduce((acc, key) => acc.concat(`${key}="${attributes[key]}"`), ""))
+				.concat(Object.keys(attributes).reduce((acc, key) => acc.concat(`${key}="${attributes[key]}" `), ""))
 				.concat(">")
 
 			const child_strings = [] as string[]
@@ -56,18 +54,13 @@ export const create_element = (tag: string): TMaokaStrElement => {
 				} else if (is_maoka_str_element(child)) {
 					child_strings.push(await child.str(depth + 1))
 				} else if (typeof child === "string") {
-					child_strings.push(" ".concat(child).concat("\n"))
+					child_strings.push(child)
 				} else if (typeof child === "number") {
-					child_strings.push(" ".concat(String(child)).concat("\n"))
+					child_strings.push(String(child))
 				}
 			}
 
-			return result
-				.concat(child_strings.join("\n"))
-				.concat(" ".repeat(depth * 2))
-				.concat("</")
-				.concat(tag)
-				.concat(">\n")
+			return result.concat(child_strings.join("")).concat("</").concat(tag).concat(">")
 		},
 	}
 }

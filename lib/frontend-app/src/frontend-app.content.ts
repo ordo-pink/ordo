@@ -119,7 +119,7 @@ export const init_content: TF = () => {
 		if (!user) return
 
 		void content_repository
-			.put(user?.get_id(), metadata.get_fsid(), content)
+			.put(user.get_id(), metadata.get_fsid(), content)
 			.pipe(ops0.tap(() => commands.emit("cmd.metadata.set_size", { fsid, size })))
 			.invoke(invokers0.or_else(Err))
 	})

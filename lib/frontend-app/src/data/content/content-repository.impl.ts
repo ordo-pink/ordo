@@ -40,7 +40,7 @@ export const ContentRepository: Ordo.Content.RepositoryStatic = {
 					.and(stream => new Response(stream as ReadableStream).json() as Promise<Ordo.Metadata.DTO[]>)
 					.fix(() => []),
 				local: local_strategy
-					.get("" as any, METADATA_CONTENT_FSID)
+					.get(user.get_id(), METADATA_CONTENT_FSID)
 					.and(Oath.FromNullable)
 					.and(content => Oath.Try(() => JSON.parse(content as string) as Ordo.Metadata.DTO[]))
 					.fix(() => []),
@@ -100,7 +100,7 @@ export const ContentRepository: Ordo.Content.RepositoryStatic = {
 				}))
 				.and(({ local, remote }) =>
 					Oath.Merge({
-						local: local && local_strategy.put("" as any, METADATA_CONTENT_FSID, JSON.stringify(local)).and(T),
+						local: local && local_strategy.put(user.get_id(), METADATA_CONTENT_FSID, JSON.stringify(local)).and(T),
 						remote: remote && remote_strategy.put(user.get_id(), METADATA_CONTENT_FSID, JSON.stringify(remote)).and(T),
 					}),
 				)
@@ -118,7 +118,7 @@ export const ContentRepository: Ordo.Content.RepositoryStatic = {
 		return {
 			get: (uid, fsid) => local_strategy.get(uid, fsid).fix(() => null),
 			get_all: () => local_strategy.list(),
-			put: (uid, fsid, content) => local_strategy.put(uid, fsid, content),
+			put: (uid, fsid, content) => local_strategy.put(uid, fsid, content).and(() => remote_strategy.put(uid, fsid, content)),
 			get $() {
 				return $
 			},

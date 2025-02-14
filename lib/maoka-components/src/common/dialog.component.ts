@@ -23,7 +23,7 @@ import { Maoka, type TMaokaChildren } from "@ordo-pink/maoka"
 import { Button } from "@ordo-pink/maoka-components"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 
-import "./dialog.css"
+import "../../maoka-components.css"
 
 type TDialogParams = {
 	title: string

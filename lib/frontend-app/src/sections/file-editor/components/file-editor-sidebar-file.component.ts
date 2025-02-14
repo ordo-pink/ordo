@@ -27,11 +27,14 @@ import { MetadataIcon } from "@ordo-pink/maoka-components"
 // TODO Rewrite with ActionListItem
 export const FileEditorSidebarFile = (metadata: Ordo.Metadata.Instance, depth = 0) =>
 	Maoka.create("div", ({ use }) => {
+		const ctx = use(MaokaOrdo.Context.consume)
 		const fsid = metadata.get_fsid()
 		const { emit } = use(MaokaOrdo.Jabs.get_commands)
 
 		const handle_context_menu = (event: MouseEvent) => {
 			event.preventDefault()
+
+			emit("cmd.metadata.publish", { ctx, fsid: metadata.get_fsid(), name: "ordo-tasks" })
 
 			emit("cmd.application.context_menu.show", { event, payload: metadata })
 		}

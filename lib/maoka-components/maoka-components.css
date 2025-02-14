@@ -1,0 +1,212 @@
+.action-list-item {
+	@apply w-full cursor-pointer select-none rounded-sm px-2 py-1 hover:bg-gradient-to-br hover:from-neutral-100 hover:to-stone-100 md:px-1 md:py-0.5 hover:dark:bg-gradient-to-br hover:dark:from-neutral-600 hover:dark:to-stone-600;
+}
+
+.action-list-item_layout {
+	@apply flex flex-col;
+}
+
+.action-list-item_main {
+	@apply flex items-center space-x-2 px-2;
+}
+
+.action-list-item.active {
+	@apply bg-gradient-to-br from-purple-400/50 to-pink-400/50 dark:from-pink-900 dark:to-rose-900;
+}
+
+.action-list-item.active-hover {
+	@apply hover:!bg-gradient-to-br hover:!from-pink-300 hover:!to-rose-300 hover:dark:!from-pink-900 hover:dark:!to-rose-900;
+}
+
+.action-list-item_title {
+	@apply line-clamp-1 w-full cursor-pointer text-ellipsis;
+}
+
+.button {
+	@apply flex flex-wrap items-center justify-center space-x-2 rounded-md px-4 py-1 text-sm outline-none transition-all duration-300;
+	@apply focus:!opacity-100 focus:ring-2 focus:ring-pink-600 focus:dark:ring-pink-400;
+	@apply active:!opacity-100 active:ring-2 active:ring-pink-600 active:dark:ring-pink-400;
+	@apply target:!opacity-100 target:ring-2 target:ring-pink-600 target:dark:ring-pink-400;
+}
+
+.button:disabled {
+	@apply animate-none cursor-not-allowed !bg-neutral-400 ring-0 hover:!scale-100 hover:!bg-neutral-400 dark:!bg-neutral-600 hover:dark:!bg-neutral-600;
+}
+
+.button.neutral {
+	@apply opacity-50 hover:opacity-100;
+}
+
+.button.success {
+	@apply bg-emerald-300 shadow-md hover:scale-110 hover:shadow-lg dark:bg-emerald-700;
+}
+
+.button.primary {
+	@apply bg-neutral-800 text-neutral-200 shadow-md hover:scale-110 hover:bg-pink-600 hover:shadow-lg dark:bg-neutral-200 dark:text-neutral-900 hover:dark:bg-pink-400;
+}
+
+.checkbox {
+	@apply size-5 shrink-0 cursor-pointer accent-pink-400;
+}
+
+.checkbox-label {
+	@apply flex w-full items-start gap-x-1;
+}
+
+.checkbox-label > .checkbox {
+	@apply mt-1 size-4;
+}
+
+.dialog {
+	@apply flex w-full flex-col gap-y-2 p-4 sm:w-96;
+}
+
+.dialog_header {
+	@apply flex items-center gap-x-2;
+}
+
+.dialog_title {
+	@apply text-lg;
+}
+
+.dialog_footer {
+	@apply flex items-center justify-end gap-x-2;
+}
+
+.hotkey {
+	@apply hidden shrink-0 items-center justify-center space-x-1 rounded-md px-2 py-0.5 text-center text-xs text-current sm:flex;
+}
+
+.hotkey.mobile {
+	@apply flex;
+}
+
+.hotkey.smol {
+	@apply px-1 py-0.5;
+}
+
+.key-container {
+	@apply min-w-8 rounded-md border border-b-2 border-r-2 border-current px-1 py-0.5 text-current;
+}
+
+.input-wrapper {
+	@apply relative w-full;
+}
+
+.input_label {
+	@apply w-full text-sm font-bold;
+}
+
+.input_text {
+	@apply w-full rounded-md border-0 bg-transparent px-2 py-1 shadow-inner outline-none placeholder:text-neutral-500;
+}
+
+.input_text.non-transparent {
+	@apply bg-gradient-to-br from-neutral-100 to-stone-100 hover:from-neutral-100 hover:to-stone-100 dark:from-neutral-600 dark:to-stone-600 hover:dark:from-neutral-600 hover:dark:to-stone-600;
+}
+
+.input_text-error {
+	@apply absolute top-0 w-full text-right text-sm font-bold text-rose-500;
+}
+
+.label {
+	@apply cursor-pointer rounded-sm px-1 py-0.5 text-xs shadow-sm;
+	@apply hover:scale-105 hover:transition-all;
+	@apply flex items-center gap-x-1;
+}
+
+.label_remove {
+	@apply rounded-lg opacity-0 transition-all hover:bg-neutral-500/50 hover:opacity-100;
+}
+
+.label.default {
+	@apply bg-neutral-200 dark:bg-neutral-600/75;
+}
+
+.label.red {
+	@apply bg-red-200 dark:bg-red-600/75;
+}
+
+.label.orange {
+	@apply bg-orange-200 dark:bg-orange-600/75;
+}
+
+.label.amber {
+	@apply bg-amber-200 dark:bg-amber-600/75;
+}
+
+.label.yellow {
+	@apply bg-yellow-200 dark:bg-yellow-600/75;
+}
+
+.label.lime {
+	@apply bg-lime-200 dark:bg-lime-600/75;
+}
+
+.label.green {
+	@apply bg-green-200 dark:bg-green-600/75;
+}
+
+.label.emerald {
+	@apply bg-emerald-200 dark:bg-emerald-600/75;
+}
+
+.label.teal {
+	@apply bg-teal-200 dark:bg-teal-600/75;
+}
+
+.label.cyan {
+	@apply bg-cyan-200 dark:bg-cyan-600/75;
+}
+
+.label.sky {
+	@apply bg-sky-200 dark:bg-sky-600/75;
+}
+
+.label.blue {
+	@apply bg-blue-200 dark:bg-blue-600/75;
+}
+
+.label.indigo {
+	@apply bg-indigo-200 dark:bg-indigo-600/75;
+}
+
+.label.violet {
+	@apply bg-violet-200 dark:bg-violet-600/75;
+}
+
+.label.purple {
+	@apply bg-purple-200 dark:bg-purple-600/75;
+}
+
+.label.fuchsia {
+	@apply bg-fuchsia-200 dark:bg-fuchsia-600/75;
+}
+
+.label.pink {
+	@apply bg-pink-200 dark:bg-pink-600/75;
+}
+
+.label.rose {
+	@apply bg-rose-200 dark:bg-rose-600/75;
+}
+
+.select_color-picker_options-wrapper {
+	@apply absolute left-0 right-0 top-7 max-h-48 overflow-auto rounded-sm bg-neutral-50 shadow-lg backdrop-blur-md dark:bg-neutral-800/90;
+}
+
+.link {
+	@apply cursor-pointer rounded-sm underline decoration-neutral-500/50 decoration-1 underline-offset-2 transition-all hover:text-rose-600 hover:decoration-rose-500/50 dark:hover:text-rose-300;
+}
+
+.link_no-history {
+	@apply text-inherit visited:text-inherit;
+}
+
+.link_wrapper {
+	@apply flex w-fit items-center gap-x-1;
+}
+
+.link_text-wrapper {
+	@apply line-clamp-1 text-ellipsis;
+}

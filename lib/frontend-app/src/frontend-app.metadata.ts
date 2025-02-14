@@ -93,8 +93,6 @@ export const init_metadata: TInitMetadataFn = call_once(() => {
 		metadata_command.update_label(old_label, new_label).cata({ Ok: noop, Err }),
 	)
 
-	logger.debug("🟢 Initialised metadata.")
-
 	const get_metadata_query = (fid: symbol) =>
 		MetadataQuery.Of(metadata_repository, permission =>
 			Result.If(known_functions.has_permissions(fid, { queries: [permission] }), {
@@ -109,6 +107,8 @@ export const init_metadata: TInitMetadataFn = call_once(() => {
 		)
 
 	ordo_app_state.zags.update("queries.metadata", () => app_metadata_query)
+
+	logger.debug("🟢 Initialised metadata.")
 
 	return { metadata_repository, get_metadata_query }
 })

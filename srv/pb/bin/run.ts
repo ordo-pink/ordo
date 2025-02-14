@@ -19,13 +19,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { App } from "@ordo-pink/frontend-app"
-import { Maoka } from "@ordo-pink/maoka"
+import { die, run_async_command } from "@ordo-pink/binutil"
+import { invokers0 } from "@ordo-pink/oath"
 
-const app = document.getElementById("app")!
-
-const id_host = import.meta.env.VITE_ORDO_ID_HOST
-const dt_host = import.meta.env.VITE_ORDO_DT_HOST
-const pb_host = import.meta.env.VITE_ORDO_PB_HOST
-
-void Maoka.dom(app, App({ id_host, dt_host, pb_host }))
+void run_async_command("opt/bun run --watch srv/pb/index.ts", {
+	stdout: "pipe",
+	stderr: "pipe",
+	env: { ...process.env, FORCE_COLOR: "1" },
+}).invoke(invokers0.or_else(die()))

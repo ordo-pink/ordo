@@ -20,12 +20,12 @@
  */
 
 import { Maoka, type TMaokaChildren } from "@ordo-pink/maoka"
+import { BsChevronDown } from "@ordo-pink/frontend-icons"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 
 import { ActionListItem } from "./action-list-item.component"
 
-import "./select.css"
-import { BsChevronDown } from "@ordo-pink/frontend-icons"
+import "../../maoka-components.css"
 
 export type TSelectOption<$TValue> = {
 	title: string

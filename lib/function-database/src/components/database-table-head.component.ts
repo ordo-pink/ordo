@@ -29,8 +29,8 @@ import { noop } from "@ordo-pink/tau"
 import { SortingDirection } from "../database.constants"
 import { database$ } from "../database.state"
 
-export const DatabaseTableHead = (columns: Ordo.I18N.TranslationKey[]) =>
-	TableHead(() => TableHeadRow(() => columns.map(TableHeadCell)))
+export const DatabaseTableHead = (columns: Ordo.I18N.TranslationKey[], is_editable: boolean) =>
+	TableHead(() => TableHeadRow(() => columns.map(c => TableHeadCell(c, is_editable))))
 
 // --- Internal ---
 
@@ -38,12 +38,13 @@ const TableHead = Maoka.styled("thead")
 const TableHeadRow = Maoka.styled("tr", { class: "database_table-head_row" })
 
 // TODO: Add icons
-const TableHeadCell = (column: Ordo.I18N.TranslationKey) =>
+const TableHeadCell = (column: Ordo.I18N.TranslationKey, is_editable: boolean) =>
 	Maoka.create("th", ({ use }) => {
 		const get_db_state = use(MaokaOrdo.Jabs.happy_marriage$(database$))
 
 		use(MaokaJabs.add_class("database_table-head_cell"))
 		use(MaokaJabs.listen("onclick", () => handle_click()))
+		if (is_editable) use(MaokaJabs.add_class("pointable"))
 
 		const { t } = use(MaokaOrdo.Jabs.get_translations$)
 		const commands = use(MaokaOrdo.Jabs.get_commands)

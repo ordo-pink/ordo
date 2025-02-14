@@ -27,14 +27,14 @@ import { R } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
 import { noop } from "@ordo-pink/tau"
 
-export const DatabaseTableRow = (columns: Ordo.I18N.TranslationKey[], child: Ordo.Metadata.Instance) =>
+export const DatabaseTableRow = (columns: Ordo.I18N.TranslationKey[], child: Ordo.Metadata.Instance, is_editable: boolean) =>
 	Maoka.create("tr", ({ use }) => {
 		use(MaokaJabs.set_class("database_table-row"))
 
 		return () =>
 			columns.map(column =>
 				Switch.Match(column)
-					.case("t.database.column_names.name", () => FileNameCell(child))
+					.case("t.database.column_names.name", () => FileNameCell(child, is_editable))
 					.case("t.database.column_names.labels", () => LabelsCell(child.get_fsid()))
 					.case("t.database.column_names.created_at", () => DateCell(child.get_created_at()))
 					.case("t.database.column_names.parent", () => LinksCell(child, "parent"))
@@ -79,13 +79,7 @@ const LinksCell = (metadata: Ordo.Metadata.Instance, type: "parent" | "incoming"
 							const parent = get_parent()
 
 							if (!parent) return
-							else
-								return MetadataLink({
-									metadata: parent,
-									href: `/editor/${parent.get_fsid()}`,
-									children: parent.get_name(),
-									title: parent.get_name(),
-								})
+							else return MetadataLink({ metadata: parent, children: parent.get_name(), title: parent.get_name() })
 						}
 					}),
 				)
@@ -94,11 +88,7 @@ const LinksCell = (metadata: Ordo.Metadata.Instance, type: "parent" | "incoming"
 						use(MaokaJabs.set_class("database_cell-multiple"))
 						const get_links = use(MaokaOrdo.Jabs.Metadata.get_outgoing_links$(fsid))
 						return () =>
-							get_links().map(link =>
-								LinkBlock(() =>
-									MetadataLink({ metadata: link, href: `/editor/${link.get_fsid()}`, children: link.get_name() ?? "/" }),
-								),
-							)
+							get_links().map(link => LinkBlock(() => MetadataLink({ metadata: link, children: link.get_name() ?? "/" })))
 					}),
 				)
 				.case("incoming", () =>
@@ -106,11 +96,7 @@ const LinksCell = (metadata: Ordo.Metadata.Instance, type: "parent" | "incoming"
 						use(MaokaJabs.set_class("database_cell-multiple"))
 						const get_links = use(MaokaOrdo.Jabs.Metadata.get_incoming_links$(metadata.get_fsid()))
 						return () =>
-							get_links().map(link =>
-								LinkBlock(() =>
-									MetadataLink({ metadata: link, href: `/editor/${link.get_fsid()}`, children: link.get_name() ?? "/" }),
-								),
-							)
+							get_links().map(link => LinkBlock(() => MetadataLink({ metadata: link, children: link.get_name() ?? "/" })))
 					}),
 				)
 				.default(noop)
@@ -143,7 +129,7 @@ const DateCell = (date: Date) =>
 		return () => date.toDateString()
 	})
 
-const FileNameCell = (metadata: Ordo.Metadata.Instance) =>
+const FileNameCell = (metadata: Ordo.Metadata.Instance, is_editable: boolean) =>
 	Maoka.create("td", ({ use }) => {
 		const { emit } = use(MaokaOrdo.Jabs.get_commands)
 
@@ -168,12 +154,20 @@ const FileNameCell = (metadata: Ordo.Metadata.Instance) =>
 						.cata(R.catas.if_ok(new_name => commands.emit("cmd.metadata.rename", { fsid, new_name })))
 				}
 
-				return () => [MetadataIcon({ metadata, custom_class: "pt-0.5" }), EditableLink({ fsid, name, on_blur: handle_blur })]
+				return () => [
+					MetadataIcon({ metadata, custom_class: "pt-0.5" }),
+					EditableLink({ fsid, name, on_blur: handle_blur, is_editable }),
+				]
 			})
 	})
 
-type TEditableLinkParams = { name: string; on_blur: (event: FocusEvent) => void; fsid: Ordo.Metadata.FSID }
-const EditableLink = ({ name, on_blur, fsid }: TEditableLinkParams) =>
+type TEditableLinkParams = {
+	name: string
+	is_editable: boolean
+	on_blur: (event: FocusEvent) => void
+	fsid: Ordo.Metadata.FSID
+}
+const EditableLink = ({ name, on_blur, is_editable, fsid }: TEditableLinkParams) =>
 	Maoka.create("div", ({ use, element }) => {
 		const handle_keydown = (event: KeyboardEvent) => {
 			if (event.key !== "Enter" && event.key !== "Escape") return
@@ -182,10 +176,10 @@ const EditableLink = ({ name, on_blur, fsid }: TEditableLinkParams) =>
 			if (element instanceof HTMLElement) element.blur()
 		}
 
-		use(MaokaJabs.set_attribute("contenteditable", "true"))
 		use(MaokaJabs.set_class("database_cell-filename-text"))
 		use(MaokaJabs.listen("onkeydown", handle_keydown))
 		use(MaokaJabs.listen("onblur", on_blur))
+		if (is_editable) use(MaokaJabs.set_attribute("contenteditable", "true"))
 
 		return () => Link({ href: `/editor/${fsid}`, children: name })
 	})

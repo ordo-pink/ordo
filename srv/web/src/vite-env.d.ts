@@ -35,5 +35,5 @@ interface ImportMetaEnv {
 	/**
 	 * Function Store server host.
 	 */
-	readonly VITE_ORDO_FS_HOST: string
+	readonly VITE_ORDO_PB_HOST: string
 }

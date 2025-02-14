@@ -302,6 +302,7 @@ declare global {
 			remove_links: () => { fsid: Ordo.Metadata.FSID; links: Ordo.Metadata.FSID[] }
 			set_property: () => { fsid: Ordo.Metadata.FSID; key: string; value: any }
 			set_size: () => { fsid: Ordo.Metadata.FSID; size: number }
+			publish: () => { ctx: Ordo.CreateFunction.State; fsid: Ordo.Metadata.FSID; name?: string; styles?: string[] }
 		}
 		content: {
 			set: () => { fsid: Ordo.Metadata.FSID; content: Ordo.Content.Instance; content_type: string }
@@ -350,7 +351,7 @@ declare global {
 
 		type Fetch = typeof window.fetch
 
-		type Hosts = { id: string; dt: string; static: string; website: string }
+		type Hosts = { id: string; dt: string; pb: string; web: string }
 
 		/**
 		 * User achievements and whatever else related to using them.

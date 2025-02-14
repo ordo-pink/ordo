@@ -36,11 +36,16 @@ import { show_columns_jab } from "./jabs/show-columns-modal.jab"
 
 import "./database.css"
 
-export const Database = (metadata: Ordo.Metadata.Instance, initial_state: TDatabaseState) => {
-	database$.replace(initial_state)
+export const Database = async (metadata: Ordo.Metadata.Instance, content: Ordo.Content.Instance, is_editable: boolean) => {
+	try {
+		const initial_state = content ? ((await new Response(content).json()) as TDatabaseState) : {}
+		database$.replace(initial_state)
+	} catch (e) {
+		database$.replace({})
+	}
 
 	return Maoka.create("div", ({ use, onunmount }) => {
-		let db_state = Object.assign({ ...initial_state })
+		let db_state = database$.unwrap()
 		const fsid = metadata.get_fsid()
 
 		use(MaokaJabs.set_class("database_view"))
@@ -78,12 +83,12 @@ export const Database = (metadata: Ordo.Metadata.Instance, initial_state: TDatab
 			const sorted_children = to_sorted_children(db_state, children)
 
 			return [
-				DatabaseOptions,
+				is_editable ? DatabaseOptions : void 0,
 				DatabaseTable(() => [
-					DatabaseTableHead(keys),
+					DatabaseTableHead(keys, is_editable),
 					DatabaseTableBody(() => [
-						...sorted_children.map(child => DatabaseTableRow(keys, child)),
-						DatabaseTableActionsRow(metadata),
+						...sorted_children.map(child => DatabaseTableRow(keys, child, is_editable)),
+						is_editable ? DatabaseTableActionsRow(metadata) : void 0,
 					]),
 				]),
 			]

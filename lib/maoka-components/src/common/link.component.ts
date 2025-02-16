@@ -26,7 +26,11 @@ import { is_string } from "@ordo-pink/tau"
 
 import { MetadataIcon } from "../metadata/metadata-icon.component"
 
-type P = { href: `/${string}`; children?: TMaokaChildren; custom_class?: string; show_visited?: boolean; title?: string }
+import "../../maoka-components.css"
+import { MaokaStr } from "@ordo-pink/maoka-render-string"
+import { ordo_app_state } from "@ordo-pink/frontend-app/app.state"
+
+type P = { href: string; children?: TMaokaChildren; custom_class?: string; show_visited?: boolean; title?: string }
 export const Link = ({ href, children, custom_class, show_visited, title }: P) =>
 	Maoka.create("a", ({ use }) => {
 		const { emit } = use(MaokaOrdo.Jabs.get_commands)
@@ -34,48 +38,57 @@ export const Link = ({ href, children, custom_class, show_visited, title }: P) =
 		use(MaokaJabs.listen("onclick", click_listener(emit, href)))
 		use(MaokaJabs.set_attribute("href", href))
 		use(MaokaJabs.set_attribute("title", title))
-		use(MaokaJabs.set_class(default_class))
+		use(MaokaJabs.set_class("link"))
 
 		if (custom_class) use(MaokaJabs.add_class(custom_class))
-		if (!show_visited) use(MaokaJabs.add_class(ignore_history_highlighting_class))
+		if (!show_visited) use(MaokaJabs.add_class("link_no-history"))
 		if (is_string(children)) use(MaokaJabs.set_attribute("title", children))
 
 		return () => children
 	})
 
 export const MetadataLink = ({
-	href,
 	children,
 	custom_class,
 	show_visited,
 	metadata,
 	title,
-}: P & { metadata: Ordo.Metadata.Instance }) =>
-	Link({
-		children: MetadataLinkWrapper(() => [
-			MetadataIcon({ metadata, show_emoji_picker: false }),
-			MetadataLinkTextWrapper(() => children),
-		]),
-		custom_class: `no-underline ${custom_class}`,
-		href,
-		show_visited,
-		title,
+}: Omit<P, "href"> & { metadata: Ordo.Metadata.Instance }) =>
+	Maoka.create("span", ({ element }) => {
+		let href = `/editor/${metadata.get_fsid()}`
+
+		const user_query = ordo_app_state.zags.select("auth.user")
+		const pb_host = ordo_app_state.zags.select("hosts.pb")
+
+		if (user_query && MaokaStr.is_maoka_str_element(element)) {
+			const name = metadata.get_property("public_name")
+			href = `${pb_host}/${user_query.get_handle()}/${name}`
+		}
+
+		return () =>
+			Link({
+				children: MetadataLinkWrapper(() => [
+					MetadataIcon({ metadata, show_emoji_picker: false }),
+					MetadataLinkTextWrapper(() => children),
+				]),
+				custom_class: `no-underline ${custom_class}`,
+				href,
+				show_visited,
+				title,
+			})
 	})
 
 // --- Internal ---
 
-const default_class =
-	"underline transition-all hover:text-rose-600 dark:hover:text-rose-300 rounded-sm cursor-pointer decoration-neutral-500/50 hover:decoration-rose-500/50 decoration-1 underline-offset-2"
+const MetadataLinkWrapper = Maoka.styled("div", { class: "link_wrapper" })
 
-const MetadataLinkWrapper = Maoka.styled("div", { class: "w-fit flex items-center gap-x-1" })
+const MetadataLinkTextWrapper = Maoka.styled("div", { class: "link link_text-wrapper" })
 
-const MetadataLinkTextWrapper = Maoka.styled("div", { class: `${default_class} text-ellipsis line-clamp-1` })
-
-const click_listener = (emit: Ordo.Command.Commands["emit"], url: `/${string}`) => (event: MouseEvent) => {
+const click_listener = (emit: Ordo.Command.Commands["emit"], url: string) => (event: MouseEvent) => {
 	event.preventDefault()
 	event.stopPropagation()
 
-	emit("cmd.application.router.navigate", { url })
+	url.startsWith("/")
+		? emit("cmd.application.router.navigate", { url: url as `/${string}` })
+		: emit("cmd.application.router.open_external", { url, new_tab: true })
 }
-
-const ignore_history_highlighting_class = "text-inherit visited:text-inherit"

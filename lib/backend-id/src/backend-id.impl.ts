@@ -22,13 +22,13 @@
 import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
 import { Routary, type TIntake } from "@ordo-pink/routary"
 import { set_x_response_time_header, start_response_timer, stop_response_timer } from "@ordo-pink/backend-util-response-time"
-import { create_response } from "@ordo-pink/backend-util-create-response"
+import { create_json_response } from "@ordo-pink/backend-util-create-response"
 import { extract_request_ip } from "@ordo-pink/backend-util-extract-request-ip"
 import { log_request } from "@ordo-pink/backend-util-log-request"
 import { routary_cors } from "@ordo-pink/routary-cors"
 import { set_content_type_application_json_header } from "@ordo-pink/backend-util-set-header"
 
-import { type TIDChamber, type TSharedContext } from "./backend-id.types"
+import { type TIDChamber, type TIDContext } from "./backend-id.types"
 import { handle_delete_user } from "./handlers/user/delete-user.handler"
 import { handle_get_user_by_handle } from "./handlers/user/get-user-by-handle.handler"
 import { handle_get_user_by_id } from "./handlers/user/get-user-by-id.handler"
@@ -41,7 +41,7 @@ import { handle_validate_token } from "./handlers/tokens/validate.handler"
 
 // TODO Global stats when API is ready
 export const create_backend_id = (chamber: TIDChamber) =>
-	Routary.Of<TIDChamber>(chamber)
+	Routary.Of<TIDContext>({ ...chamber, request_ip: null, status: 200, headers: new Headers() })
 		.post("/codes/request", handle_request_code)
 		.post("/codes/validate", handle_validate_code)
 
@@ -56,11 +56,11 @@ export const create_backend_id = (chamber: TIDChamber) =>
 
 		.get("/healthcheck", () => new Response("OK")) // TODO Extract to lib
 
-		.use(routary_cors({ allow_origin: chamber.allow_origin, allow_headers: ["Content-Type"] }))
+		.use(routary_cors({ allow_origin: chamber.allow_origin, allow_headers: ["content-type", "authorization"] }))
 
 		.start(intake =>
 			// TODO Extract to lib
-			Oath.Resolve<TIntake<TSharedContext>>({ ...intake, headers: {}, status: 404, request_ip: null })
+			Oath.Resolve<TIntake<TIDContext>>({ ...intake, headers: new Headers(), status: 404, request_ip: null })
 				.pipe(ops0.tap(start_response_timer))
 				.pipe(ops0.tap(extract_request_ip))
 				.pipe(ops0.tap(set_content_type_application_json_header))
@@ -68,6 +68,6 @@ export const create_backend_id = (chamber: TIDChamber) =>
 				.pipe(ops0.tap(set_x_response_time_header))
 				.pipe(ops0.tap(log_request))
 				.pipe(ops0.tap(intake => void (intake.payload = "resource not found")))
-				.pipe(ops0.map(create_response))
+				.pipe(ops0.map(create_json_response))
 				.invoke(invokers0.force_resolve),
 		)

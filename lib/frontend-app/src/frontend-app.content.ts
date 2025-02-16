@@ -25,23 +25,45 @@ import { is_instance_of, is_string } from "@ordo-pink/tau"
 import { ConsoleLogger } from "@ordo-pink/logger"
 import { R } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
+import { ZAGS } from "@ordo-pink/zags"
 
-import { CacheContentRepository } from "./data/content/content-repository.impl"
 import { ContentQuery } from "./data/content/content-query.impl"
+import { ContentRepository } from "./data/content/content-repository.impl"
+import { PersistenceStrategyContentIndexedDB } from "./data/content/content-persistence-strategy-indexed-db"
+import { PersistenceStrategyContentOrdoBackend } from "./data/content/content-persistence-strategy-ordo-backend"
 import { ordo_app_state } from "../app.state"
+
+const INDEXEDDB_NAME = "ordo"
+const INDEXEDDB_OBJECT_STORE_NAME = "ordo_db"
+const INDEXEDDB_OBJECT_STORE_VERSION = 3
 
 type TF = () => { content_repository: Ordo.Content.Repository; get_content_query: (fid: symbol) => Ordo.Content.Query }
 export const init_content: TF = () => {
 	const logger = ordo_app_state.zags.select("logger")
 	const commands = ordo_app_state.zags.select("commands")
-	const fetch = ordo_app_state.zags.select("fetch")
-	const hosts = ordo_app_state.zags.select("hosts")
 	const known_functions = ordo_app_state.zags.select("known_functions")
 	const app_fid = ordo_app_state.zags.select("constants.app_fid")
+	const dt_host = ordo_app_state.zags.select("hosts.dt")
+	const fetch = ordo_app_state.zags.select("fetch")
 
 	logger.debug("🟡 Initialising metadata...")
 
-	const content_repository = CacheContentRepository.Of(hosts.dt, fetch)
+	const local_strategy = PersistenceStrategyContentIndexedDB.Of(
+		INDEXEDDB_NAME,
+		INDEXEDDB_OBJECT_STORE_NAME,
+		INDEXEDDB_OBJECT_STORE_VERSION,
+		indexed_db => () => {
+			const db = indexed_db.result
+			if (!db.objectStoreNames.contains(INDEXEDDB_OBJECT_STORE_NAME)) db.createObjectStore(INDEXEDDB_OBJECT_STORE_NAME)
+		},
+	)
+
+	const auth$ = ZAGS.Of({ token: null as string | null, user: null as Ordo.User.Current.Instance | null })
+	ordo_app_state.zags.cheat("auth.user", user => auth$.update("user", () => user))
+	ordo_app_state.zags.cheat("auth.token", token => auth$.update("token", () => token))
+
+	const remote_strategy = PersistenceStrategyContentOrdoBackend.Of(dt_host, fetch, auth$)
+	const content_repository = ContentRepository.Of(auth$, local_strategy, remote_strategy)
 
 	// TODO Extract for common error handling
 	const Err = (rrr: Ordo.Rrr) => {
@@ -59,13 +81,14 @@ export const init_content: TF = () => {
 	commands.on("cmd.content.set", ({ fsid, content }) => {
 		const metadata_query = ordo_app_state.zags.select("queries.metadata")
 		const size = get_size(content)
+		const user = ordo_app_state.zags.select("auth.user")
 
-		if (size > 0) {
+		if (user && size > 0) {
 			// TODO Check if metadata exists
 			void metadata_query.get_by_fsid(fsid).cata(
 				R.catas.if_ok(() =>
 					content_repository
-						.put(fsid, content)
+						.put(user.get_id(), fsid, content)
 						.pipe(ops0.tap(() => commands.emit("cmd.metadata.set_size", { fsid, size })))
 						.invoke(invokers0.or_else(Err)),
 				),
@@ -91,9 +114,12 @@ export const init_content: TF = () => {
 		}
 
 		const fsid = metadata.get_fsid()
+		const user = ordo_app_state.zags.select("auth.user")
+
+		if (!user) return
 
 		void content_repository
-			.put(metadata?.get_fsid(), content)
+			.put(user.get_id(), metadata.get_fsid(), content)
 			.pipe(ops0.tap(() => commands.emit("cmd.metadata.set_size", { fsid, size })))
 			.invoke(invokers0.or_else(Err))
 	})

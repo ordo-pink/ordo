@@ -24,7 +24,6 @@ import { Oath } from "@ordo-pink/oath"
 // TODO Move to frontend-app
 export const ContentQuery: Ordo.Content.QueryStatic = {
 	Of: (repo: Ordo.Content.Repository, check_query_permission) => ({
-		get: (fsid, content_type) =>
-			check_query_permission("content.get").cata({ Ok: () => repo.get(fsid, content_type), Err: x => Oath.Reject(x) }),
+		get: (uid, fsid) => check_query_permission("content.get").cata({ Ok: () => repo.get(uid, fsid), Err: x => Oath.Reject(x) }),
 	}),
 }

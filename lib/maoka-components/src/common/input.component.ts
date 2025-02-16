@@ -27,7 +27,7 @@ import { ZAGS } from "@ordo-pink/zags"
 
 const is_valid$ = ZAGS.Of({ value: true })
 
-import "./input.css"
+import "../../maoka-components.css"
 
 type TInputProps = {
 	initial_value?: string

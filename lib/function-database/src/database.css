@@ -2,6 +2,10 @@
 	@apply p-4;
 }
 
+.pointable {
+	@apply cursor-pointer;
+}
+
 .database_border-color {
 	@apply border-neutral-300 dark:border-neutral-700;
 }
@@ -55,7 +59,7 @@
 }
 
 .database_table-head_cell {
-	@apply database_border-color cursor-pointer border px-2 py-1 text-sm font-bold text-neutral-500;
+	@apply database_border-color border px-2 py-1 text-sm font-bold text-neutral-500;
 }
 
 .database_table-head_cell-content {

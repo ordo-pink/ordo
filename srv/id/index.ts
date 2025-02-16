@@ -88,6 +88,8 @@ const get_env = () =>
 			.pipe(ops0.rejected_map(env_rrr("ORDO_ID_PERSISTED_TOKEN_LIFETIME"))),
 
 		user_db_path: Oath.FromNullable(Bun.env.ORDO_ID_USER_DB_PATH, env_rrr("ORDO_ID_USER_DB_PATH")),
+		web_host: Oath.FromNullable(Bun.env.ORDO_WEB_HOST, env_rrr("ORDO_WEB_HOST")),
+		dt_host: Oath.FromNullable(Bun.env.ORDO_DT_HOST, env_rrr("ORDO_DT_HOST")),
 
 		token_db_path: Oath.FromNullable(Bun.env.ORDO_ID_TOKEN_DB_PATH, env_rrr("ORDO_ID_TOKEN_DB_PATH")),
 	})
@@ -108,6 +110,7 @@ const main = () =>
 				token_db_path,
 				token_lifetime,
 				user_db_path,
+				web_host,
 			}) =>
 				Oath.Merge({
 					allow_origin,
@@ -118,8 +121,7 @@ const main = () =>
 					token_persistence_strategy: PersistenceStrategyTokenFS.Of(token_db_path), // TODO
 					user_persistence_strategy: PersistenceStategyUserFS.Of(user_db_path),
 					wjwt: WJWT({ aud, alg, private_key, public_key, iss, token_lifetime }),
-					status: 200,
-					headers: {},
+					web_host,
 				} satisfies TIDChamber)
 					.and(create_backend_id)
 					.and(fetch => Bun.serve({ fetch, port })),

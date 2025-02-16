@@ -1,0 +1,28 @@
+meta {
+  name: Update File Content
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{DT_HOST}}/:uid/:fsid
+  body: text
+  auth: bearer
+}
+
+params:path {
+  uid: {{CURRENT_ID}}
+  fsid: {{CURRENT_ID}}
+}
+
+headers {
+  Origin: {{ORIGIN}}
+}
+
+auth:bearer {
+  token: {{CURRENT_TOKEN}}
+}
+
+body:text {
+  Hello world!
+}

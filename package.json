@@ -16,7 +16,7 @@
   },
   "name": "@ordo-pink/ordo",
   "devDependencies": {
-    "@types/bun": "^1.1.11",
+    "@types/bun": "^1.2.2",
     "@types/eslint": "^8.56.2",
     "@types/koa-bodyparser": "^4.3.10",
     "@types/koa-cors": "^0.0.2",

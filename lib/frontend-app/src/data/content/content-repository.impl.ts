@@ -19,61 +19,165 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Oath, ops0 } from "@ordo-pink/oath"
-import { RRR } from "../../../../core/src/rrr"
+import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
+import { METADATA_CONTENT_FSID } from "@ordo-pink/core"
+import { T } from "@ordo-pink/tau"
+import { ZAGS } from "@ordo-pink/zags"
 
-const INDEXEDDB_NAME = "ordo"
-const INDEXEDDB_OBJECT_STORE_NAME = "ordo_db"
-const INDEXEDDB_OBJECT_STORE_VERSION = 3
+// TODO Sync storages
+export const ContentRepository: Ordo.Content.RepositoryStatic = {
+	Of: (auth$, local_strategy, remote_strategy) => {
+		const $ = ZAGS.Of({ version: 0 })
 
-// TODO Move to frontend-app
-// TODO Persistence strategy support
-export const CacheContentRepository: Ordo.Content.RepositoryStatic = {
-	Of: () => {
-		const indexed_db = indexedDB.open(INDEXEDDB_NAME, INDEXEDDB_OBJECT_STORE_VERSION)
+		const divorce = auth$.marry(({ user, token }) => {
+			if (!token || !user) return
 
-		const db_promise = new Promise<IDBDatabase>((resolve, reject) => {
-			indexed_db.onupgradeneeded = () => {
-				const db = indexed_db.result
-				if (!db.objectStoreNames.contains(INDEXEDDB_OBJECT_STORE_NAME)) db.createObjectStore(INDEXEDDB_OBJECT_STORE_NAME)
-			}
+			// Check if remote state and current state are equal
+			void Oath.Merge({
+				remote: remote_strategy
+					.get(user.get_id(), METADATA_CONTENT_FSID)
+					.and(Oath.FromNullable)
+					.and(stream => new Response(stream as ReadableStream).json() as Promise<Ordo.Metadata.DTO[]>)
+					.fix(() => []),
+				local: local_strategy
+					.get(user.get_id(), METADATA_CONTENT_FSID)
+					.and(Oath.FromNullable)
+					.and(content => Oath.Try(() => JSON.parse(content as string) as Ordo.Metadata.DTO[]))
+					.fix(() => []),
+			})
+				// Filter out unchanged items to avoid redundant pending updates
+				.and(({ remote, local }) => ({
+					remote_sorted: remote.toSorted((a, b) => (a.updated_at < b.updated_at ? -1 : a.updated_at > b.updated_at ? 1 : 0)),
+					local_sorted: local.toSorted((a, b) => (a.updated_at < b.updated_at ? -1 : a.updated_at > b.updated_at ? 1 : 0)),
+				}))
+				// Collect diffs
+				.and(({ remote_sorted, local_sorted }) => {
+					const local_update = [] as Ordo.Metadata.DTO[]
+					const remote_update = [] as Ordo.Metadata.DTO[]
+					const intersection = [] as Ordo.Metadata.DTO[]
 
-			indexed_db.onsuccess = (event: any) => {
-				resolve(event.target.result as IDBDatabase)
-			}
+					if (local_sorted.length === 0 && remote_sorted.length > 0) {
+						local_update.push(...remote_sorted)
+					} else if (local_sorted.length > 0 && remote_sorted.length === 0) {
+						remote_update.push(...local_sorted)
+					} else {
+						let li = 0
+						let ri = 0
 
-			indexed_db.onerror = (event: any) => {
-				reject(event.target.error?.message ?? "Something wrong with IndexedDB")
-			}
+						while (li < local_sorted.length && ri < remote_sorted.length) {
+							const current_local_item = local_sorted[li]
+							const current_remote_item = remote_sorted[ri]
+							const remote_item = remote_sorted.find(i => i.fsid === current_local_item.fsid)
+							const local_item = local_sorted.find(i => i.fsid === current_remote_item.fsid)
+
+							if (!remote_item || current_local_item.updated_at > remote_item.updated_at) {
+								remote_update.push(current_local_item)
+								li++
+							} else if (!local_item || current_remote_item.updated_at > local_item.updated_at) {
+								local_update.push(current_remote_item)
+								ri++
+							} else {
+								intersection.push(current_local_item)
+								li++
+								ri++
+							}
+						}
+					}
+
+					return { intersection, local_update, remote_update }
+				})
+				.and(({ intersection, local_update, remote_update }) => ({
+					local:
+						local_update.length > 0 &&
+						intersection
+							.concat(remote_update.filter(remote_item => !local_update.some(i => i.fsid === remote_item.fsid)))
+							.concat(local_update),
+					remote:
+						remote_update.length > 0 &&
+						intersection
+							.concat(local_update.filter(local_item => !remote_update.some(i => i.fsid === local_item.fsid)))
+							.concat(remote_update),
+				}))
+				.and(({ local, remote }) =>
+					Oath.Merge({
+						local: local && local_strategy.put(user.get_id(), METADATA_CONTENT_FSID, JSON.stringify(local)).and(T),
+						remote: remote && remote_strategy.put(user.get_id(), METADATA_CONTENT_FSID, JSON.stringify(remote)).and(T),
+					}),
+				)
+				.and(({ local }) =>
+					Oath.If(local)
+						.pipe(ops0.tap(() => $.update("version", v => v + 1)))
+						.fix(() => void 0),
+				)
+
+				.invoke(invokers0.to_promise)
+
+			divorce()
 		})
 
 		return {
-			get: fsid =>
-				Oath.FromPromise(() => db_promise)
-					.pipe(ops0.chain(db => Oath.FromNullable(db)))
-					.pipe(ops0.rejected_map(rrr => RRR.codes.eio("Failed to access IndexedDB cache", rrr)))
-					.pipe(ops0.chain(db => Oath.Try(() => db.transaction(INDEXEDDB_OBJECT_STORE_NAME, "readonly"))))
-					.pipe(ops0.map(transaction => transaction.objectStore(INDEXEDDB_OBJECT_STORE_NAME)))
-					.pipe(ops0.map(storage => storage.get(fsid)))
-					.pipe(ops0.chain(dbr => new Oath(res => void (dbr.onsuccess = event => res((event.target as any)?.result ?? null)))))
-					.fix(() => null) as any, // TODO Fix types
-
-			put: (fsid, content) =>
-				Oath.FromPromise(() => db_promise)
-					.pipe(ops0.chain(db => Oath.FromNullable(db)))
-					.pipe(ops0.rejected_map(() => RRR.codes.eio("Failed to access cache inside IndexedDB")))
-					.pipe(ops0.map(db => db.transaction(INDEXEDDB_OBJECT_STORE_NAME, "readwrite")))
-					.pipe(ops0.map(transaction => transaction.objectStore(INDEXEDDB_OBJECT_STORE_NAME)))
-					.pipe(ops0.map(storage => storage.put(content, fsid)))
-					.pipe(
-						ops0.chain(
-							result =>
-								new Oath((resolve, reject) => {
-									result.onsuccess = () => resolve(void 0)
-									result.onerror = () => reject(RRR.codes.eio("Failed to access cache inside IndexedDB"))
-								}),
-						),
-					),
+			get: (uid, fsid) => local_strategy.get(uid, fsid).fix(() => null),
+			get_all: () => local_strategy.list(),
+			put: (uid, fsid, content) => local_strategy.put(uid, fsid, content).and(() => remote_strategy.put(uid, fsid, content)),
+			get $() {
+				return $
+			},
 		}
 	},
 }
+
+/*
+.and(() => {
+	const last_local = metadata_repository
+		.get()
+		.pipe(
+			Result.ops.map(items =>
+				items.reduce(
+					(acc, v) => (acc ? (v.get_updated_at() > acc ? v.get_updated_at() : acc) : v.get_updated_at()),
+					null as Date | null,
+				),
+			),
+		)
+		.pipe(Result.ops.chain(Result.FromNullable))
+		.cata(Result.catas.or_else(() => new Date(1970, 1, 2)))
+
+	const fetch = ordo_app_state.zags.select("fetch")
+	const token = ordo_app_state.zags.select("auth.token")
+	const user = ordo_app_state.zags.select("auth.user")
+
+	if (!user || !token) return
+
+	void Oath.Try(() =>
+		fetch(`${dt_host}/${user.get_id()}/${METADATA_CONTENT_FSID}`, {
+			headers: { Authorization: `Bearer ${token}` },
+			method: "HEAD",
+		}),
+	)
+		.and(res => Oath.FromNullable(res.headers.get("last-modified")))
+		.and(str => new Date(str))
+		.and(Oath.FromNullable)
+		.and(date => Oath.If(is_date(date)))
+		.fix(() => new Date(1970, 1, 1))
+		.and(last_remote => {
+			if (last_remote! < last_local) {
+				// TODO Put all content
+				return content_repository.get_all().and(items =>
+					Oath.Merge(
+						keys_of(items).map(key =>
+							Oath.Try(() =>
+								fetch(`${dt_host}/${user.get_id()}/${key}`, {
+									method: "PUT",
+									headers: { Authorization: `Bearer ${token}` },
+									body: items[key],
+								}),
+							),
+						),
+					),
+				)
+			} else if (last_remote! > last_local) {
+				// TODO Pull all content
+			}
+		})
+		.invoke(invokers0.force_resolve)
+})
+*/

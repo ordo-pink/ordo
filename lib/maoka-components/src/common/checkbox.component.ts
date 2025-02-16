@@ -22,7 +22,7 @@
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 
-import "./checkbox.css"
+import "../../maoka-components.css"
 
 export type TCheckboxParams = {
 	on_change: (event: Event) => void

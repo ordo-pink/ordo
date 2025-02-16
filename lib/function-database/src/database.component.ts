@@ -24,7 +24,6 @@ import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { R } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
-import { is_string } from "@ordo-pink/tau"
 
 import { DatabaseOptions } from "./components/database-options.component"
 import { DatabaseTableActionsRow } from "./components/database-table-actions-row.component"
@@ -37,12 +36,16 @@ import { show_columns_jab } from "./jabs/show-columns-modal.jab"
 
 import "./database.css"
 
-export const Database = (metadata: Ordo.Metadata.Instance, content: Ordo.Content.Instance | null, state?: TDatabaseState) => {
-	const initial_state = state ? state : is_string(content) ? (JSON.parse(content) as TDatabaseState) : {}
-	database$.replace(initial_state)
+export const Database = async (metadata: Ordo.Metadata.Instance, content: Ordo.Content.Instance, is_editable: boolean) => {
+	try {
+		const initial_state = content ? ((await new Response(content).json()) as TDatabaseState) : {}
+		database$.replace(initial_state)
+	} catch (e) {
+		database$.replace({})
+	}
 
 	return Maoka.create("div", ({ use, onunmount }) => {
-		let db_state = initial_state
+		let db_state = database$.unwrap()
 		const fsid = metadata.get_fsid()
 
 		use(MaokaJabs.set_class("database_view"))
@@ -53,7 +56,8 @@ export const Database = (metadata: Ordo.Metadata.Instance, content: Ordo.Content
 		const metadata_query = use(MaokaOrdo.Jabs.get_metadata_query)
 		use(MaokaOrdo.Jabs.Metadata.get_children_count$(fsid))
 
-		const divorce_database$ = database$.marry(state => {
+		const divorce_database$ = database$.marry((state, is_update) => {
+			if (!is_update) return
 			db_state = state
 			commands.emit("cmd.content.set", { fsid, content_type: "database/ordo", content: JSON.stringify(state) })
 		})
@@ -79,12 +83,12 @@ export const Database = (metadata: Ordo.Metadata.Instance, content: Ordo.Content
 			const sorted_children = to_sorted_children(db_state, children)
 
 			return [
-				DatabaseOptions,
+				is_editable ? DatabaseOptions : void 0,
 				DatabaseTable(() => [
-					DatabaseTableHead(keys),
+					DatabaseTableHead(keys, is_editable),
 					DatabaseTableBody(() => [
-						...sorted_children.map(child => DatabaseTableRow(keys, child)),
-						DatabaseTableActionsRow(metadata),
+						...sorted_children.map(child => DatabaseTableRow(keys, child, is_editable)),
+						is_editable ? DatabaseTableActionsRow(metadata) : void 0,
 					]),
 				]),
 			]
@@ -159,8 +163,10 @@ const to_sorted_children = (db_state: TDatabaseState, children: Ordo.Metadata.In
 }
 
 const handle_toggle_column_cmd: Ordo.Command.HandlerOf<"cmd.database.toggle_column"> = column =>
-	database$.update_all(({ visible_columns: columns, sorting }) => {
-		if (!columns) columns = ["t.database.column_names.name", "t.database.column_names.labels"]
+	database$.update_all(({ visible_columns, sorting }) => {
+		const columns = visible_columns
+			? [...visible_columns]
+			: (["t.database.column_names.name", "t.database.column_names.labels"] as string[])
 
 		if (columns.includes(column)) {
 			columns.splice(columns.indexOf(column), 1)

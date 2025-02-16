@@ -24,7 +24,7 @@ export const log_request = <
 	const pathname =
 		url_obj.pathname.endsWith("/") && url_obj.pathname.length > 1 ? url_obj.pathname.slice(0, -1) : url_obj.pathname
 
-	const request_address = request_ip ? `${request_ip?.address}:${request_ip?.port}` : "localhost"
+	const request_address = request_ip ? `${request_ip?.address}:${request_ip?.port}` : ""
 	const url = `${pathname}${url_obj.search}`
 
 	logger.info(`${request_address} :: ${status} ${method} ${url} (${response_time}ms)`)

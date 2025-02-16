@@ -22,7 +22,7 @@
 import { Maoka, type TMaokaChildren } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 
-import "./action-list-item.css"
+import "../../maoka-components.css"
 
 export type TActionListItemProps = {
 	title: string

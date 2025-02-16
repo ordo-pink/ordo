@@ -1,13 +1,34 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ *
+ * Ordo.pink is an all-in-one team workspace.
+ * Copyright (C) 2025  谢尔盖 ||↓ and the Ordo.pink contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 import { Oath, ops0 } from "@ordo-pink/oath"
 import { extract_request_body, unknown_error } from "@ordo-pink/backend-util-extract-body"
 import { type TIntake } from "@ordo-pink/routary"
 import { UserSubscription } from "@ordo-pink/core"
+import { default_handler } from "@ordo-pink/backend-util-default-handler"
 
-import { type TSharedContext } from "../../backend-id.types"
-import { default_handler } from "../default.handler"
+import { type TIDContext } from "../../backend-id.types"
 import { extract_body_email } from "../../common/extract-body-email"
 
-export const handle_request_code = default_handler(intake =>
+export const handle_request_code = default_handler<TIDContext>(intake =>
 	extract_request_body(intake)
 		.pipe(ops0.chain(extract_body_email(intake)))
 		.pipe(ops0.chain(get_or_create_user(intake)))
@@ -18,14 +39,14 @@ export const handle_request_code = default_handler(intake =>
 
 // --- Internal ---
 
-type I = TIntake<TSharedContext>
+type I = TIntake<TIDContext>
 
 const hash_argon2 = (intake: I) => (code: string) =>
 	Oath.FromPromise(() => Bun.password.hash(code))
 		.pipe(ops0.map(hash => ({ code, hash })))
 		.pipe(ops0.rejected_map(e => unknown_error(e, intake)))
 
-const create_handle = (email: Ordo.User.Email, id: Ordo.User.ID) =>
+const create_handle = (email: Ordo.User.Email, id: Ordo.User.UID) =>
 	`@${email.split("@")[0].replaceAll(".", "_").replaceAll("/", "")}${id.split("-")[0]}` as Ordo.User.Handle
 
 const check_handle_is_free = (handle: Ordo.User.Handle, intake: I) =>
@@ -70,7 +91,7 @@ const update_user_code = (i: I) => (user: OrdoBackend.User.DTO) =>
 			),
 		)
 
-const create_user = (email: Ordo.User.Email, id: Ordo.User.ID, handle: Ordo.User.Handle) => (i: I) =>
+const create_user = (email: Ordo.User.Email, id: Ordo.User.UID, handle: Ordo.User.Handle) => (i: I) =>
 	i.user_persistence_strategy
 		.create({
 			created_at: Date.now(),
@@ -87,11 +108,11 @@ const create_user = (email: Ordo.User.Email, id: Ordo.User.ID, handle: Ordo.User
 
 type P2 = { codes: { code: string; hash: string }; email: Ordo.User.Email }
 const send_code =
-	(i: I) =>
+	(intake: I) =>
 	({ codes, email }: P2) =>
 		// TODO Create email with Maoka
-		i.notification_strategy.send({
+		intake.notification_strategy.send({
 			to: email,
 			subject: "Sign in code for your ORDO account",
-			content: `Code: ${codes.code}; Link: http://localhost:3004/auth/verify?email=${email}&code=${codes.code}`,
+			content: `Code: ${codes.code} -> Link: ${intake.web_host}/auth/verify?email=${email}&code=${codes.code}`,
 		})

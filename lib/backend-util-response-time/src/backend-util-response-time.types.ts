@@ -5,6 +5,6 @@
 
 export type TBackendUtilResponseTimeExpectedIntake = {
 	response_time?: string
-	response_timer?: [number, number]
-	headers: Record<string, string>
+	response_timer?: number
+	headers: Headers
 }

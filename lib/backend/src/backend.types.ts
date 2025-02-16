@@ -25,6 +25,25 @@ import type { TValidations } from "@ordo-pink/core"
 
 declare global {
 	module OrdoBackend {
+		module Data {
+			type PersistenceStrategy = {
+				exists: (uid: Ordo.User.UID, fsid: Ordo.Metadata.FSID) => Oath<boolean, Ordo.Rrr<"EIO">>
+				create: (
+					uid: Ordo.User.UID,
+					fsid: Ordo.Metadata.FSID,
+					input: ReadableStream,
+				) => Oath<number, Ordo.Rrr<"EIO" | "EEXIST">>
+				read: (uid: Ordo.User.UID, fsid: Ordo.Metadata.FSID) => Oath<ReadableStream, Ordo.Rrr<"EIO" | "ENOENT">>
+				update: (
+					uid: Ordo.User.UID,
+					fsid: Ordo.Metadata.FSID,
+					input: ReadableStream,
+				) => Oath<number, Ordo.Rrr<"EIO" | "ENOENT">>
+				delete: (uid: Ordo.User.UID, fsid: Ordo.Metadata.FSID) => Oath<void, Ordo.Rrr<"EIO" | "ENOENT">>
+				mtime: (uid: Ordo.User.UID, fsid: Ordo.Metadata.FSID) => Oath<number, Ordo.Rrr<"EIO" | "ENOENT">>
+			}
+		}
+
 		module Notification {
 			type EmailStrategy = {
 				send: (params: {
@@ -46,15 +65,15 @@ declare global {
 			}
 
 			type PersistenceStrategy = {
-				exists_by_id: (id: Ordo.User.ID) => Oath<boolean, Ordo.Rrr<"EIO">>
+				exists_by_id: (id: Ordo.User.UID) => Oath<boolean, Ordo.Rrr<"EIO">>
 				exists_by_email: (email: Ordo.User.Email) => Oath<boolean, Ordo.Rrr<"EIO">>
 				exists_by_handle: (handle: Ordo.User.Handle) => Oath<boolean, Ordo.Rrr<"EIO">>
-				get_by_id: (id: Ordo.User.ID) => Oath<DTO, Ordo.Rrr<"EIO" | "ENOENT">>
+				get_by_id: (id: Ordo.User.UID) => Oath<DTO, Ordo.Rrr<"EIO" | "ENOENT">>
 				get_by_email: (email: Ordo.User.Email) => Oath<DTO, Ordo.Rrr<"EIO" | "ENOENT">>
 				get_by_handle: (handle: Ordo.User.Handle) => Oath<DTO, Ordo.Rrr<"EIO" | "ENOENT">>
 				create: (user: DTO) => Oath<DTO, Ordo.Rrr<"EIO" | "EEXIST">>
-				update: (id: Ordo.User.ID, user: DTO) => Oath<DTO, Ordo.Rrr<"EIO" | "ENOENT" | "EINVAL">>
-				remove: (id: Ordo.User.ID) => Oath<void, Ordo.Rrr<"EIO" | "ENOENT">>
+				update: (id: Ordo.User.UID, user: DTO) => Oath<DTO, Ordo.Rrr<"EIO" | "ENOENT" | "EINVAL">>
+				remove: (id: Ordo.User.UID) => Oath<void, Ordo.Rrr<"EIO" | "ENOENT">>
 			}
 
 			export type Validations = TValidations<OrdoBackend.User.DTO>

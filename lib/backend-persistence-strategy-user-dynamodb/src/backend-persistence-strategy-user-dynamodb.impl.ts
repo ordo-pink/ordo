@@ -150,7 +150,7 @@ const _check_not_exists_by_handle0 = (params: T.TDynamoDBConfig, handle: Ordo.Us
 		.exists_by_handle(handle)
 		.pipe(ops0.chain(exists => Oath.If(!exists, { F: () => RRR.codes.eexist(`User already exists: handle ${handle}`) })))
 
-const _check_not_exists_by_id0 = (params: T.TDynamoDBConfig, id: Ordo.User.ID) =>
+const _check_not_exists_by_id0 = (params: T.TDynamoDBConfig, id: Ordo.User.UID) =>
 	PersistenceStrategyUserDynamoDB.Of(params)
 		.exists_by_id(id)
 		.pipe(ops0.chain(exists => Oath.If(!exists, { F: () => RRR.codes.eexist(`User already exists: id ${id}`) })))
@@ -201,7 +201,7 @@ const _deserialize: T.TDeserialiseFn = item => ({
 	// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
 	email_code: item.email_code?.S!,
 	// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
-	id: item.id.S! as Ordo.User.ID,
+	id: item.id.S! as Ordo.User.UID,
 	// eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
 	installed_functions: item.installed_functions.SS!,
 })

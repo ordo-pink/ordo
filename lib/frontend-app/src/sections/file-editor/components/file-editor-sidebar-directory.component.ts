@@ -36,6 +36,7 @@ const is_fsid = Metadata.Validations.is_fsid
 // TODO Rewrite with ActionListItem
 export const FileEditorSidebarDirectory = (metadata: Ordo.Metadata.Instance, depth = 0) =>
 	Maoka.create("div", ({ use, refresh }) => {
+		const ctx = use(MaokaOrdo.Context.consume)
 		const fsid = metadata.get_fsid()
 
 		const commands = use(MaokaOrdo.Jabs.get_commands)
@@ -48,8 +49,13 @@ export const FileEditorSidebarDirectory = (metadata: Ordo.Metadata.Instance, dep
 			refresh()
 		}
 
-		const handle_context_menu = (event: MouseEvent) =>
+		const handle_context_menu = (event: MouseEvent) => {
+			event.preventDefault()
+
+			commands.emit("cmd.metadata.publish", { ctx, fsid: metadata.get_fsid(), name: "/123123" })
+
 			commands.emit("cmd.application.context_menu.show", { event, payload: metadata })
+		}
 
 		use(MaokaJabs.listen("oncontextmenu", event => handle_context_menu(event)))
 

@@ -19,7 +19,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { JTI, SUB } from "@ordo-pink/wjwt"
 import type { TMaokaChildren, TMaokaComponent } from "@ordo-pink/maoka"
 import type { Oath } from "@ordo-pink/oath"
 import type { TLogger } from "@ordo-pink/logger"
@@ -303,6 +302,7 @@ declare global {
 			remove_links: () => { fsid: Ordo.Metadata.FSID; links: Ordo.Metadata.FSID[] }
 			set_property: () => { fsid: Ordo.Metadata.FSID; key: string; value: any }
 			set_size: () => { fsid: Ordo.Metadata.FSID; size: number }
+			publish: () => { ctx: Ordo.CreateFunction.State; fsid: Ordo.Metadata.FSID; name?: string; styles?: string[] }
 		}
 		content: {
 			set: () => { fsid: Ordo.Metadata.FSID; content: Ordo.Content.Instance; content_type: string }
@@ -351,7 +351,7 @@ declare global {
 
 		type Fetch = typeof window.fetch
 
-		type Hosts = { id: string; dt: string; static: string; website: string }
+		type Hosts = { id: string; dt: string; pb: string; web: string }
 
 		/**
 		 * User achievements and whatever else related to using them.
@@ -563,15 +563,15 @@ declare global {
 			type RenderParams = {
 				is_editable: boolean
 				is_embedded: boolean
-				content: Ordo.Content.Instance | null
+				content: Ordo.Content.Instance
 				metadata: Ordo.Metadata.Instance
 			}
 		}
 
 		namespace User {
 			type Handle = `@${string}` // TODO Disallow forbidden chars
-			type ID = `${string}-${string}-${string}-${string}-${string}` // TODO Strict type
-			type Email = `${string}@${string}.${string}` // TODO Strict type
+			type UID = `${string}-${string}-${string}-${string}-${string}`
+			type Email = `${string}@${string}.${string}`
 
 			namespace Current {
 				type DTO = Ordo.User.Public.DTO & {
@@ -603,30 +603,11 @@ declare global {
 					Serialize: <$TDTO extends Ordo.User.Current.DTO>(dto: $TDTO) => Ordo.User.Current.DTO
 					Validations: Ordo.User.Current.Validations
 				}
-
-				type Repository = {
-					get: () => TResult<Ordo.User.Current.Instance, Ordo.Rrr<"EPERM" | "EAGAIN">>
-					put: (user: Ordo.User.Current.Instance) => TResult<void, Ordo.Rrr<"EPERM" | "EINVAL">>
-					get $(): TZags<{ version: number }>
-				}
-
-				type RepositoryStatic = {
-					Of: ($: TZags<{ user: Ordo.User.Current.Instance | null }>) => Ordo.User.Current.Repository
-				}
-
-				type RepositoryAsync = {
-					get: (token: string) => Oath<Ordo.User.Current.Instance, Ordo.Rrr<"EIO" | "EINVAL">>
-					put: (token: string, user: Ordo.User.Current.Instance) => Oath<void, Ordo.Rrr<"EINVAL" | "EIO" | "EPERM">>
-				}
-
-				type RepositoryAsyncStatic = {
-					Of: (id_host: string, fetch: Ordo.Fetch) => RepositoryAsync
-				}
 			}
 
 			namespace Public {
 				type DTO = {
-					id: Ordo.User.ID
+					id: Ordo.User.UID
 					created_at: number
 					subscription: C.UserSubscription
 					handle: Ordo.User.Handle
@@ -645,7 +626,7 @@ declare global {
 				}
 
 				type Instance = {
-					get_id: () => Ordo.User.ID
+					get_id: () => Ordo.User.UID
 					get_created_at: () => Date
 					get_subscription: () => C.UserSubscription
 					get_handle: () => Handle
@@ -658,75 +639,56 @@ declare global {
 					is_paid: () => boolean
 					to_dto: () => Ordo.User.Public.DTO
 				}
-
-				type Repository = {
-					get: () => Oath<Ordo.User.Public.Instance[], Ordo.Rrr<"EPERM" | "EAGAIN">>
-					put: (users: Ordo.User.Public.Instance[]) => Oath<void, Ordo.Rrr<"EINVAL">>
-					get $(): TZags<{ version: number }>
-				}
-
-				type RepositoryStatic = {
-					Of: (known_user_zags: TZags<{ known_users: Ordo.User.Public.Instance[] }>) => Repository
-				}
 			}
 
 			type Query = {
-				get_current: () => TResult<Ordo.User.Current.Instance, Ordo.Rrr<"EPERM" | "EAGAIN">>
-				// get_current_by_id: (
-				// id: Ordo.User.Current.Instance["id"],
-				// ) => Oath<TOption<Ordo.User.Current.Instance>, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "EIO">>
-				get_by_id: (
-					email: Ordo.User.ID,
-				) => Oath<Ordo.User.Public.Instance | null, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "EIO">>
-
-				// get_by_handle: (
-				// handle: Ordo.User.Current.Instance["handle"],
-				// ) => Oath<TOption<Ordo.User.Public.Instance>, Ordo.Rrr<"EPERM" | "EAGAIN" | "EINVAL" | "EIO">>
+				is_authenticated: () => boolean
+				get_current: () => TResult<Ordo.User.Current.Instance, Ordo.Rrr<"EPERM">>
+				get_by_id: (uid: Ordo.User.UID) => Oath<Ordo.User.Public.Instance, Ordo.Rrr<"EPERM" | "EINVAL" | "EIO">>
+				get_by_handle: (handle: Ordo.User.Handle) => Oath<Ordo.User.Public.Instance, Ordo.Rrr<"EPERM" | "EINVAL" | "EIO">>
 				get $(): TZags<{ version: number }>
 			}
 
 			type QueryStatic = {
 				Of: (
-					current_user_repository: Ordo.User.Current.Repository,
-					public_user_repository: Ordo.User.Public.Repository,
-					check_query_permission: (permission: Ordo.CreateFunction.QueryPermission) => TResult<void, Ordo.Rrr<"EPERM">>,
+					check_permission: (permission: Ordo.CreateFunction.QueryPermission) => TResult<void, Ordo.Rrr<"EPERM">>,
 				) => Ordo.User.Query
 			}
 		}
 
+		// TODO improve types
 		namespace Content {
-			type Instance = string | ArrayBuffer | Blob | FormData | Uint8Array | Record<string, unknown>
+			type Instance = string | ArrayBuffer | Blob | FormData | Uint8Array | ReadableStream | null
 
-			type Storage = Record<Ordo.Metadata.FSID, Ordo.Content.Instance>
-
-			type RepositoryStatic = {
-				Of: (data_host: string, fetch: Ordo.Fetch) => Repository
+			type PersistenceStrategy = {
+				clear: () => Oath<void, Ordo.Rrr<"EIO">>
+				delete: (uid: Ordo.User.UID, fsid: Ordo.Metadata.FSID) => Oath<void, Ordo.Rrr<"ENOENT" | "EIO">>
+				exists: (uid: Ordo.User.UID, fsid: Ordo.Metadata.FSID) => Oath<boolean, Ordo.Rrr<"EIO">>
+				get: (uid: Ordo.User.UID, fsid: Ordo.Metadata.FSID) => Oath<Ordo.Content.Instance, Ordo.Rrr<"ENOENT" | "EIO">>
+				list: () => Oath<Record<string, any>, Ordo.Rrr<"EIO">>
+				put: (uid: Ordo.User.UID, fsid: Ordo.Metadata.FSID, content: Ordo.Content.Instance) => Oath<void, Ordo.Rrr<"EIO">>
 			}
 
-			type ContentType = "text" | "array_buffer" | "blob" | "form_data" | "json" | "bytes" | "unwrapped"
+			type RepositoryStatic = {
+				Of: (
+					auth$: TZags<{ user: Ordo.User.Current.Instance | null; token: string | null }>,
+					local_strategy: Ordo.Content.PersistenceStrategy,
+					remote_strategy: Ordo.Content.PersistenceStrategy,
+				) => Repository
+			}
 
 			type Repository = {
-				get: <$TContentType extends Ordo.Content.ContentType>(
+				get: (
+					uid: Ordo.User.UID,
 					fsid: Ordo.Metadata.FSID,
-					content_type: $TContentType,
-				) => Oath<
-					| ($TContentType extends "text"
-							? string
-							: $TContentType extends "array_buffer"
-								? ArrayBuffer
-								: $TContentType extends "blob"
-									? Blob
-									: $TContentType extends "form_data"
-										? FormData
-										: $TContentType extends "bytes"
-											? Uint8Array
-											: $TContentType extends "unwrapped"
-												? Response
-												: unknown)
-					| null,
-					Ordo.Rrr<"EIO" | "EACCES" | "EINVAL" | "ENOENT">
-				>
-				put: (fsid: Ordo.Metadata.FSID, content: Ordo.Content.Instance) => Oath<void, Ordo.Rrr<"EINVAL" | "EACCES" | "EIO">>
+				) => Oath<Ordo.Content.Instance, Ordo.Rrr<"EIO" | "EACCES" | "EINVAL">>
+				get_all: () => Oath<Record<string, Ordo.Content.Instance>, Ordo.Rrr<"EIO">>
+				put: (
+					uid: Ordo.User.UID,
+					fsid: Ordo.Metadata.FSID,
+					content: Ordo.Content.Instance,
+				) => Oath<void, Ordo.Rrr<"EINVAL" | "EACCES" | "EIO">>
+				get $(): TZags<{ version: number }>
 			}
 
 			type QueryStatic = {
@@ -737,26 +699,10 @@ declare global {
 			}
 
 			type Query = {
-				get: <$TContentType extends Ordo.Content.ContentType>(
+				get: (
+					uid: Ordo.User.UID,
 					fsid: Ordo.Metadata.FSID,
-					content_type: $TContentType,
-				) => Oath<
-					| ($TContentType extends "text"
-							? string
-							: $TContentType extends "array_buffer"
-								? ArrayBuffer
-								: $TContentType extends "blob"
-									? Blob
-									: $TContentType extends "form_data"
-										? FormData
-										: $TContentType extends "bytes"
-											? Uint8Array
-											: $TContentType extends "unwrapped"
-												? Response
-												: unknown)
-					| null,
-					Ordo.Rrr<"EPERM" | "EIO" | "EACCES" | "EINVAL" | "ENOENT">
-				>
+				) => Oath<Ordo.Content.Instance, Ordo.Rrr<"EPERM" | "EIO" | "EACCES" | "EINVAL" | "ENOENT">>
 			}
 		}
 
@@ -777,16 +723,18 @@ declare global {
 				labels: Ordo.Metadata.Label[]
 				type: string
 				created_at: number
-				created_by: Ordo.User.ID
+				created_by: Ordo.User.UID
 				updated_at: number
-				updated_by: Ordo.User.ID
+				updated_by: Ordo.User.UID
 				size: number
 				props?: $TProps
+				is_deleted?: boolean
+				checksum?: string
 			}>
 
 			type Static = {
 				Of: <$TProps extends Ordo.Metadata.Props = Ordo.Metadata.Props>(
-					params: Ordo.Metadata.CreateParams<$TProps> & { author_id: Ordo.User.ID },
+					params: Ordo.Metadata.CreateParams<$TProps> & { author_id: Ordo.User.UID },
 				) => Ordo.Metadata.Instance<$TProps>
 				FromDTO: <$TProps extends Ordo.Metadata.Props = Ordo.Metadata.Props>(
 					dto: Ordo.Metadata.DTO<$TProps>,
@@ -809,9 +757,9 @@ declare global {
 				get_label_index: (label: Ordo.Metadata.Label) => number
 				get_type: () => string
 				get_created_at: () => Date
-				get_created_by: () => Ordo.User.ID
+				get_created_by: () => Ordo.User.UID
 				get_updated_at: () => Date
-				get_updated_by: () => Ordo.User.ID
+				get_updated_by: () => Ordo.User.UID
 				get_size: () => number
 				get_readable_size: () => string
 				get_property: <_TKey extends keyof $TProps>(key: _TKey) => NonNullable<$TProps[_TKey]> | null
@@ -819,24 +767,16 @@ declare global {
 				equals: (other_metadata?: Ordo.Metadata.Instance) => boolean
 				is_item_of: (dto: Ordo.Metadata.DTO) => boolean
 				is_hidden: () => boolean
+				validate: (checksum: string) => boolean
+				is_deleted: () => boolean
 			}
 
-			type Validations = {
+			type Validations = TValidations<Ordo.Metadata.DTO> & {
 				is_metadata: (x: unknown) => x is Ordo.Metadata.Instance
 				is_metadata_dto: (x: unknown) => x is Ordo.Metadata.DTO
-				is_created_at: (x: unknown) => x is Date
-				is_created_by: (x: unknown) => x is Ordo.User.ID
-				is_updated_at: (x: unknown) => x is Date
-				is_updated_by: (x: unknown) => x is Ordo.User.ID
-				is_fsid: (x: unknown) => x is Ordo.Metadata.FSID
 				is_label: (x: unknown) => x is Ordo.Metadata.Label
 				is_link: (x: unknown) => x is Ordo.Metadata.FSID
-				is_name: (x: unknown) => boolean
-				is_parent: (x: unknown) => boolean
 				is_prop_key: (x: unknown) => boolean
-				is_props: (x: unknown) => boolean
-				is_size: (x: unknown) => boolean
-				is_type: (x: unknown) => boolean
 				are_labels: (x: unknown) => boolean
 				are_links: (x: unknown) => boolean
 			}
@@ -1294,334 +1234,6 @@ declare global {
 
 				render_custom_footer?: () => TMaokaComponent // TODO Use standard render approach
 				render_custom_info?: () => TMaokaComponent // TODO Use standard render approach
-			}
-		}
-
-		namespace Routes {
-			type TSuccessResponse<T> = { success: true; result: T }
-			type TErrorResponse = { success: false; error: string }
-			type TTokenResult = {
-				sub: SUB
-				jti: JTI
-				expires: Date
-				token: string
-				file_limit: Ordo.User.Current.DTO["file_limit"]
-				subscription: Ordo.User.Current.DTO["subscription"]
-				max_upload_size: Ordo.User.Current.DTO["max_upload_size"]
-				max_functions: Ordo.User.Current.DTO["max_functions"]
-			}
-
-			namespace DT {
-				namespace SyncMetadata {
-					type Path = `/${Ordo.User.Current.DTO["id"]}`
-					type Method = "POST"
-					type Cookies = void
-					type Params = void
-					type RequestBody = Ordo.Metadata.DTO[] // TODO: Replace with array of atomic changes
-					type StatusCode = 200
-					type ResponseBody = string
-				}
-
-				namespace GetContent {
-					type Path = `/${Ordo.User.Current.DTO["id"]}/${Ordo.Metadata.FSID}`
-					type Method = "GET"
-					type Cookies = void
-					type Params = { user_id?: string; fsid?: string }
-					type RequestBody = void
-					type StatusCode = 200
-					type ResponseBody = string | ArrayBuffer
-				}
-
-				namespace SetContent {
-					type Path = `/${Ordo.User.Current.DTO["id"]}/${Ordo.Metadata.FSID}/${Ordo.Metadata.DTO["type"]}`
-					type Method = "PUT"
-					type Cookies = void
-					type Params = { user_id?: string; fsid?: string }
-					type RequestBody = string | ArrayBuffer
-					type StatusCode = 204
-					type ResponseBody = void
-				}
-
-				namespace CreateContent {
-					type Path = `/${Ordo.User.Current.DTO["id"]}`
-					type Url =
-						`${string}${Path}?name=${string}&parent=${Ordo.Metadata.DTO["parent"]}&content_type=${Ordo.Metadata.DTO["type"]}`
-					type Method = "POST"
-					type Cookies = void
-					type Params = { user_id?: string; name?: string; parent?: string }
-					type RequestBody = string | ArrayBuffer
-					type StatusCode = 201
-					type ResponseBody = void
-				}
-			}
-
-			namespace ID {
-				namespace UpdateInfo {
-					type Path = "/account/info"
-					type Method = "PATCH"
-					type Cookies = void
-					type Params = void
-					type RequestBody = { first_name?: string; last_name?: string }
-					type StatusCode = 200
-					type ResponseBody = Ordo.User.Current.DTO
-
-					type Request = {
-						path: Path
-						method: Method
-						cookies: Cookies
-						params: Params
-						body: RequestBody
-					}
-					type Response = { status: StatusCode; body: ResponseBody }
-				}
-
-				namespace UpdateEmail {
-					type Path = "/account/email"
-					type Method = "PATCH"
-					type Cookies = void
-					type Params = void
-					type StatusCode = 200
-					type RequestBody = { email?: string }
-					type ResponseBody = Ordo.User.Current.DTO
-
-					type Request = {
-						path: Path
-						method: Method
-						cookies: Cookies
-						params: Params
-						body: RequestBody
-					}
-					type Response = { status: StatusCode; body: ResponseBody }
-				}
-
-				namespace UpdateHandle {
-					type Path = "/account/handle"
-					type Method = "PATCH"
-					type Cookies = void
-					type Params = void
-					type StatusCode = 200
-					type RequestBody = { handle?: string }
-					type ResponseBody = Ordo.User.Current.DTO
-
-					type Request = {
-						path: Path
-						method: Method
-						cookies: Cookies
-						params: Params
-						body: RequestBody
-					}
-					type Response = { status: StatusCode; body: ResponseBody }
-				}
-
-				namespace UpdatePassword {
-					type Path = "/account/password"
-					type Method = "PATCH"
-					type Cookies = void
-					type Params = void
-					type StatusCode = 200
-					type RequestBody = { old_password?: string; new_password?: string }
-					type ResponseBody = TTokenResult
-
-					type Request = {
-						path: Path
-						method: Method
-						cookies: Cookies
-						params: Params
-						body: RequestBody
-					}
-					type Response = { status: StatusCode; body: ResponseBody }
-				}
-
-				namespace ConfirmEmail {
-					type Path = "/account/confirm-email"
-					type Url = `${string}${Path}?email=${string}&code=${string}` // TODO: Define host
-					type Method = "POST"
-					type Cookies = void
-					type Params = void
-					type StatusCode = 200
-					type RequestBody = { email?: string; code?: string }
-					type ResponseBody = Ordo.User.Current.DTO
-
-					type Request = {
-						path: Path
-						method: Method
-						cookies: Cookies
-						params: Params
-						body: RequestBody
-					}
-					type Response = { status: StatusCode; body: ResponseBody }
-				}
-
-				namespace GetAccount {
-					type Path = "/account"
-					type Method = "GET"
-					type Cookies = void
-					type Params = void
-					type RequestBody = void
-					type StatusCode = 200
-					type ResponseBody = Ordo.User.Current.DTO
-
-					type Request = {
-						path: Path
-						method: Method
-						cookies: Cookies
-						params: Params
-						body: RequestBody
-					}
-					type Response = { status: StatusCode; body: ResponseBody }
-				}
-
-				namespace GetUserByEmail {
-					type Path = `/users/email/${string}`
-					type Method = "GET"
-					type Cookies = void
-					type Params = { email?: string }
-					type RequestBody = void
-					type StatusCode = 200
-					type ResponseBody = Ordo.User.Public.DTO
-
-					type Request = {
-						path: Path
-						method: Method
-						cookies: Cookies
-						params: Params
-						body: RequestBody
-					}
-					type Response = { status: StatusCode; body: ResponseBody }
-				}
-
-				namespace GetUserByHandle {
-					type Path = `/users/handle/${string}`
-					type Method = "GET"
-					type Cookies = void
-					type Params = { handle?: string }
-					type RequestBody = void
-					type StatusCode = 200
-					type ResponseBody = Ordo.User.Public.DTO
-
-					type Request = {
-						path: Path
-						method: Method
-						cookies: Cookies
-						params: Params
-						body: RequestBody
-					}
-					type Response = { status: StatusCode; body: ResponseBody }
-				}
-
-				namespace GetUserByID {
-					type Path = `/users/id/${string}`
-					type Method = "GET"
-					type Cookies = void
-					type Params = { id?: string }
-					type RequestBody = void
-					type StatusCode = 200
-					type ResponseBody = Ordo.User.Public.DTO
-
-					type Request = {
-						path: Path
-						method: Method
-						cookies: Cookies
-						params: Params
-						body: RequestBody
-					}
-					type Response = { status: StatusCode; body: ResponseBody }
-				}
-
-				namespace RefreshToken {
-					type Path = "/account/refresh-token"
-					type Method = "POST"
-					type Cookies = { sub?: string; jti?: string }
-					type Params = void
-					type RequestBody = void
-					type StatusCode = 200
-					type ResponseBody = TTokenResult
-
-					type Request = {
-						path: Path
-						method: Method
-						cookies: Cookies
-						params: Params
-						body: RequestBody
-					}
-					type Response = { status: StatusCode; body: ResponseBody }
-				}
-
-				namespace SignIn {
-					type Path = "/account/sign-in"
-					type Method = "POST"
-					type Cookies = void
-					type Params = void
-					type StatusCode = 200
-					type RequestBody = { email?: string; handle?: string; password?: string }
-					type ResponseBody = TTokenResult
-
-					type Request = {
-						path: Path
-						method: Method
-						cookies: Cookies
-						params: Params
-						body: RequestBody
-					}
-					type Response = { status: StatusCode; body: ResponseBody }
-				}
-
-				namespace SignUp {
-					type Path = "/account/sign-up"
-					type Method = "POST"
-					type Cookies = void
-					type Params = void
-					type RequestBody = { email?: string; handle?: string; password?: string }
-					type StatusCode = 201
-					type ResponseBody = TTokenResult
-
-					type Request = {
-						path: Path
-						method: Method
-						cookies: Cookies
-						params: Params
-						body: RequestBody
-					}
-					type Response = { status: StatusCode; body: ResponseBody }
-				}
-
-				namespace SignOut {
-					type Path = "/account/sign-out"
-					type Method = "POST"
-					type Cookies = { sub?: SUB; jti?: JTI }
-					type Params = void
-					type RequestBody = void
-					type StatusCode = 204
-					type ResponseBody = void
-
-					type Request = {
-						path: Path
-						method: Method
-						cookies: Cookies
-						params: Params
-						body: RequestBody
-					}
-					type Response = { status: StatusCode }
-				}
-
-				namespace VerifyToken {
-					type Path = "/account/verify-token"
-					type Method = "POST"
-					type Cookies = void
-					type Params = void
-					type RequestBody = void
-					type StatusCode = 200
-					type ResponseBody = void
-
-					type Request = {
-						path: Path
-						method: Method
-						cookies: Cookies
-						params: Params
-						body: RequestBody
-					}
-					type Response = { status: StatusCode }
-				}
 			}
 		}
 	}

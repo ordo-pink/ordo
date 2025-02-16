@@ -1,0 +1,24 @@
+meta {
+  name: Get File Modification Time
+  type: http
+  seq: 2
+}
+
+head {
+  url: {{DT_HOST}}/:uid/:fsid
+  body: none
+  auth: bearer
+}
+
+params:path {
+  uid: {{CURRENT_ID}}
+  fsid: "b68678af-6776-47c0-a0b8-4b6535664b8c"
+}
+
+headers {
+  Origin: {{ORIGIN}}
+}
+
+auth:bearer {
+  token: {{CURRENT_TOKEN}}
+}

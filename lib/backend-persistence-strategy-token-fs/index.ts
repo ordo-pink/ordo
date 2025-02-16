@@ -39,7 +39,10 @@ export const PersistenceStrategyTokenFS: TPersistenceStrategyTokenFSStatic = {
 				.pipe(ops0.rejected_map(e => RRR.codes.eio(e.message, e.name, e.cause, e.stack)))
 
 		return {
-			get_token: (sub, jti) => get_tokens0.pipe(ops0.map(storage => storage[sub]?.[jti])),
+			get_token: (sub, jti) =>
+				get_tokens0.pipe(
+					ops0.chain(storage => Oath.FromNullable(storage[sub]?.[jti], () => RRR.codes.enoent("Token not found"))),
+				),
 
 			get_token_dict: sub => get_tokens0.pipe(ops0.map(storage => storage[sub])),
 

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { Maoka, type TMaokaChildren } from "@ordo-pink/maoka"
+import { Maoka, type TMaokaComponent } from "@ordo-pink/maoka"
 
 import {
 	get_commands,
@@ -52,12 +52,12 @@ export const MaokaOrdo = {
 	},
 	Context: ordo_context,
 	Components: {
-		WithState: (ctx: Ordo.CreateFunction.State, children: () => TMaokaChildren) =>
+		WithState: (ctx: Ordo.CreateFunction.State, children: () => TMaokaComponent | Promise<TMaokaComponent>) =>
 			Maoka.create("div", ({ use }) => {
 				use(MaokaOrdo.Context.provide(ctx))
-				return children
+				return async () => children()
 			}),
-		WithStateCurry: (ctx: Ordo.CreateFunction.State) => (children: () => TMaokaChildren) =>
+		WithStateCurry: (ctx: Ordo.CreateFunction.State) => (children: () => TMaokaComponent | Promise<TMaokaComponent>) =>
 			MaokaOrdo.Components.WithState(ctx, children),
 	},
 }

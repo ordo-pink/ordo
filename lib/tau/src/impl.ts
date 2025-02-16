@@ -147,9 +147,9 @@ export const first_matched =
 	(xs: T[]) =>
 		xs.find(i => f(i))
 
-type TProp = <$Key extends PropertyKey>(
-	prop: $Key,
-) => <$Record extends { [_Property in $Key]: unknown }>(obj: $Record) => $Record[$Key]
+type TProp = <$TRecord extends Record<string, unknown> | any[], $TKey extends keyof $TRecord>(
+	prop: $TKey,
+) => (obj: $TRecord) => $TRecord[$TKey]
 export const prop: TProp = key => obj => obj[key]
 
 export const thunk =

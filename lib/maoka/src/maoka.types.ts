@@ -5,28 +5,31 @@
 
 // TODO: Comments
 // TODO: Full types
-export type TMaokaElement = { [$TKey in keyof HTMLElement]: HTMLElement[$TKey] | undefined } & {
-	setAttribute: (qualified_name: string, value: string) => void
-	getAttribute: (qualified_name: string) => string
+export type TMaokaElement = {
+	setAttribute: (qualifiedName: string, value: string) => void
+	getAttribute: (qualifiedName: string) => string
+	removeAttribute: (qualifiedName: string) => void
 	appendChild: (child: TMaokaChild) => TMaokaChild
 	replaceChildren: (...children: TMaokaChild[]) => void
-	childNodes: HTMLElement["childNodes"]
 	dispatchEvent: (event: Event) => void
-	onunmount: (() => void) | undefined
-	onmount: (() => void) | undefined
+	children: TMaokaChild[]
+
+	// TODO Move to render_dom
+	onunmount?: (() => void) | undefined
+	onmount?: (() => void) | undefined
 }
 
 export type TMaokaTextElement = Partial<{ [$TKey in keyof Text]: Text[$TKey] }> | string
 
-export type TMaokaCreateMaokaElementFn<$TElement extends TMaokaElement = TMaokaElement> = (name: string) => $TElement
+export type TMaokaCreateMaokaElementFn = (name: string) => TMaokaElement
 
 export type TMaokaCreateComponentFn = (name: string, callback: TMaokaCallback) => TMaokaComponent
 
-export type TMaokaComponent<$TElement extends TMaokaElement = TMaokaElement> = {
-	(create_element: TMaokaCreateMaokaElementFn<$TElement>, root_element: TMaokaElement, root_id: string): Promise<TMaokaElement>
+export type TMaokaComponent = {
+	(create_element: TMaokaCreateMaokaElementFn, root_element: TMaokaElement, root_id: string): Promise<TMaokaElement>
 	id?: string
 	rid?: string
-	element?: $TElement
+	element?: TMaokaElement
 	refresh?: () => void
 }
 
@@ -51,7 +54,7 @@ export type TMaokaChildren = TMaokaChild | TMaokaChild[]
 /**
  * A record of jabs that are provided by Maoka directly.
  */
-export type TMaokaProps<$TElement extends TMaokaElement = TMaokaElement> = {
+export type TMaokaProps = {
 	/**
 	 * Get UUID of current Maoka component. This would probably only be useful for creating custom
 	 * jabs that accumulate a set of components to apply batch refresh calls. You would hardly ever
@@ -62,7 +65,7 @@ export type TMaokaProps<$TElement extends TMaokaElement = TMaokaElement> = {
 	/**
 	 * Returns reference to the current element.
 	 */
-	get element(): $TElement
+	get element(): TMaokaElement
 
 	/**
 	 * Root id.
@@ -104,7 +107,9 @@ export type TMaokaCallback = (
 	| Promise<(() => TMaokaChildren) | undefined | void>
 	| Promise<(() => Promise<TMaokaChildren>) | undefined | void>
 
-export type TMaokaRenderDOMFn = <$TElement extends HTMLElement = HTMLElement>(
-	root: $TElement,
-	component: TMaokaComponent,
-) => Promise<void>
+export type TMaokaDOMElement = TMaokaElement & {
+	onunmount: (() => void) | undefined
+	onmount: (() => void) | undefined
+}
+
+export type TMaokaRenderDOMFn = (root: HTMLElement, component: TMaokaComponent) => Promise<void>

@@ -41,7 +41,7 @@ export const OrdoCommandPaletteItem = (item: Ordo.CommandPalette.Item, on_click:
 				: void 0
 
 		on_mount(() => {
-			if (is_current && !is_in_view(element as Element, element.parentElement!))
+			if (element instanceof HTMLElement && is_current && !is_in_view(element, element.parentElement!))
 				element.scrollIntoView?.({ behavior: "smooth", inline: "center", block: "center" })
 		})
 

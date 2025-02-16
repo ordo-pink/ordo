@@ -30,7 +30,7 @@ export type TMetadataCommandStatic = { of: TMetadatCommandConstructor }
 
 export type TMetadataCommand = {
 	create: (
-		params: Ordo.Metadata.CreateParams & { author_id: Ordo.User.ID },
+		params: Ordo.Metadata.CreateParams & { author_id: Ordo.User.UID },
 	) => TResult<void, Ordo.Rrr<"EAGAIN" | "EEXIST" | "EINVAL" | "ENOENT">>
 
 	replace: (value: Ordo.Metadata.Instance) => TResult<void, Ordo.Rrr<"EAGAIN" | "ENOENT" | "EINVAL">>

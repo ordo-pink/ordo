@@ -12,6 +12,6 @@ export type TRoutaryCORSParams = {
 	allow_headers?: string[]
 }
 
-export type TRoutaryCORS = <$TChamber extends Record<string, unknown> & { headers: Record<string, string> }>(
+export type TRoutaryCORS = <$TChamber extends Record<string, unknown> & { headers: Headers }>(
 	params: TRoutaryCORSParams,
 ) => Parameters<TRoutary<$TChamber>["use"]>[0]

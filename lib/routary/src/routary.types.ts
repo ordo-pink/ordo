@@ -33,5 +33,5 @@ export type TRoutary<$TChamber> = {
 	head: (gasket: TGasket, gear: TGear<$TChamber>) => TRoutary<$TChamber>
 	options: (gasket: TGasket, gear: TGear<$TChamber>) => TRoutary<$TChamber>
 	each: (gasket: TGasket, bearings: TBearing[], gear: TGear<$TChamber>) => TRoutary<$TChamber>
-	start: (chown_gear: TGear<$TChamber>) => (req: Request, server: Server) => Response | Promise<Response>
+	start: (crown_gear: TGear<$TChamber>) => (req: Request, server: Server) => Response | Promise<Response>
 }

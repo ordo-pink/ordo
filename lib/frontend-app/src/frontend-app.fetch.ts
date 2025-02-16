@@ -36,6 +36,8 @@ export const init_fetch: TF = call_once(() => {
 
 	logger.debug("🟢 Initialised fetch.")
 
+	ordo_app_state.zags.update("fetch", () => fetch)
+
 	return {
 		get_fetch: fid =>
 			R.If(known_functions.has_permissions(fid, { queries: ["application.fetch"] }))

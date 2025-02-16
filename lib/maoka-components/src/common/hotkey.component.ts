@@ -26,7 +26,7 @@ import { Switch } from "@ordo-pink/switch"
 import { create_hotkey_from_event } from "@ordo-pink/hotkey-from-event"
 import { title_case } from "@ordo-pink/tau"
 
-import "./hotkey.css"
+import "../../maoka-components.css"
 
 export type THotkeyOptions = {
 	prevent_in_inputs?: boolean

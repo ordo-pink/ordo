@@ -19,34 +19,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { SocketAddress } from "bun"
-
+import type { TDefaultContext } from "@ordo-pink/backend-util-default-handler"
 import type { TLogger } from "@ordo-pink/logger"
-import { TWJWT } from "@ordo-pink/wjwt"
-
-// TODO Move to lib
+import type { TWJWT } from "@ordo-pink/wjwt"
 
 export type TIDChamber = {
 	allow_origin: string[]
+	defaults: { file_limit: number; max_upload_size: number; max_functions: number }
 	logger: TLogger
-	user_persistence_strategy: OrdoBackend.User.PersistenceStrategy
-	token_persistence_strategy: OrdoBackend.Token.PersistenceStrategy
 	notification_strategy: OrdoBackend.Notification.EmailStrategy
-	wjwt: TWJWT
 	persisted_token_lifetime: number
-	status: number
-	headers: Record<string, string>
-	defaults: {
-		file_limit: number
-		max_upload_size: number
-		max_functions: number
-	}
+	token_persistence_strategy: OrdoBackend.Token.PersistenceStrategy
+	user_persistence_strategy: OrdoBackend.User.PersistenceStrategy
+	wjwt: TWJWT
+	web_host: string
 }
 
-export type TSharedContext<$TPayload = unknown> = TIDChamber & {
-	response_timer?: [number, number]
-	response_time?: string
-	payload?: $TPayload
-
-	request_ip: SocketAddress | null
-}
+export type TIDContext = TDefaultContext & TIDChamber

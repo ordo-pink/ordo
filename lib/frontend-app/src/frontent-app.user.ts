@@ -43,9 +43,7 @@ export const init_user = call_once(() => {
 			UserQuery.Of(permission =>
 				Result.If(known_functions.has_permissions(fid, { queries: [permission] }), {
 					F: () => {
-						const rrr = RRR.codes.eperm(
-							`MetadataQuery permission RRR. Did you forget to request query permission '${permission}'?`,
-						)
+						const rrr = RRR.codes.eperm(`UserQuery permission RRR. Did you forget to request query permission '${permission}'?`)
 						ConsoleLogger.error(rrr.debug?.join(" "))
 						return rrr
 					},

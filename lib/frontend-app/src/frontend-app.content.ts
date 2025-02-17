@@ -20,12 +20,12 @@
  */
 
 import { Metadata, NotificationType, RRR } from "@ordo-pink/core"
-import { invokers0, ops0 } from "@ordo-pink/oath"
 import { is_instance_of, is_string } from "@ordo-pink/tau"
 import { ConsoleLogger } from "@ordo-pink/logger"
 import { R } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
 import { ZAGS } from "@ordo-pink/zags"
+import { invokers0 } from "@ordo-pink/oath"
 
 import { ContentQuery } from "./data/content/content-query.impl"
 import { ContentRepository } from "./data/content/content-repository.impl"
@@ -85,14 +85,9 @@ export const init_content: TF = () => {
 
 		if (user && size > 0) {
 			// TODO Check if metadata exists
-			void metadata_query.get_by_fsid(fsid).cata(
-				R.catas.if_ok(() =>
-					content_repository
-						.put(user.get_id(), fsid, content)
-						.pipe(ops0.tap(() => commands.emit("cmd.metadata.set_size", { fsid, size })))
-						.invoke(invokers0.or_else(Err)),
-				),
-			)
+			void metadata_query
+				.get_by_fsid(fsid)
+				.cata(R.catas.if_ok(() => content_repository.put(user.get_id(), fsid, content).invoke(invokers0.or_else(Err))))
 		}
 	})
 
@@ -100,28 +95,30 @@ export const init_content: TF = () => {
 		const metadata_query = ordo_app_state.zags.select("queries.metadata")
 		const size = get_size(content)
 
-		const metadata = metadata_query
-			.get_by_name(name, parent)
+		let metadata = metadata_query
+			.get_by_name(name, parent, { show_hidden: true })
 			.pipe(R.ops.chain(R.FromNullable))
-			// TODO Check if error is enoent
-			.pipe(R.ops.err_tap(() => commands.emit("cmd.metadata.create", { name, parent, type, size })))
-			.pipe(R.ops.err_chain(() => metadata_query.get_by_name(name, parent)))
-			.cata(R.catas.or_nothing())
+			.cata(R.catas.or_else(() => null))
 
-		if (!Metadata.Validations.is_metadata(metadata)) {
-			Err(RRR.codes.enoent("Metadata creation failed", { type, name, parent }))
-			return
+		if (!metadata) {
+			commands.emit("cmd.metadata.create", { name, parent, type, size })
+
+			metadata = metadata_query
+				.get_by_name(name, parent, { show_hidden: true })
+				.pipe(R.ops.chain(R.FromNullable))
+				.cata(R.catas.or_else(() => null))
+		} else {
+			// commands.emit("cmd.metadata.set_size", { fsid: metadata.get_fsid(), size })
 		}
 
-		const fsid = metadata.get_fsid()
+		if (!Metadata.Validations.is_metadata(metadata))
+			return Err(RRR.codes.enoent("Metadata creation failed", { type, name, parent }))
+
 		const user = ordo_app_state.zags.select("auth.user")
 
 		if (!user) return
 
-		void content_repository
-			.put(user.get_id(), metadata.get_fsid(), content)
-			.pipe(ops0.tap(() => commands.emit("cmd.metadata.set_size", { fsid, size })))
-			.invoke(invokers0.or_else(Err))
+		void content_repository.put(user.get_id(), metadata.get_fsid(), content).invoke(invokers0.or_else(Err))
 	})
 
 	logger.debug("🟢 Initialised metadata.")

@@ -58,7 +58,7 @@ export const MetadataCommand: Ordo.Metadata.CommandStatic = {
 
 		set_size: (fsid, size) =>
 			_check_size_r("set size", size)
-				.pipe(R.ops.map(thunk(fsid)))
+				.pipe(R.ops.map(() => fsid))
 				.pipe(R.ops.chain(_get_metadata_by_fsid_r("set size", m_query)))
 				.pipe(R.ops.map(_metadata_to_dto))
 				.pipe(R.ops.chain(_reset_updated_by_r(u_query)))
@@ -265,8 +265,8 @@ type TGetMetadataByFSIDRFn = (
 ) => (fsid: Ordo.Metadata.FSID) => TResult<Ordo.Metadata.Instance, Ordo.Rrr<"EPERM" | "ENOENT" | "EAGAIN" | "EINVAL">>
 const _get_metadata_by_fsid_r: TGetMetadataByFSIDRFn = (location, query) => fsid =>
 	query
-		.get_by_fsid(fsid)
-		.pipe(R.ops.chain(item => (item ? R.Ok(item) : R.Err(RRR.codes.einval(`${location} -> fsid: ${fsid}`)))))
+		.get_by_fsid(fsid, { show_hidden: true })
+		.pipe(R.ops.chain(item => (item ? R.Ok(item) : R.Err(RRR.codes.enoent(`${location} -> fsid: ${fsid}`)))))
 
 type TResetUpdatedByRFn = (
 	user_query: Ordo.User.Query,
@@ -287,7 +287,7 @@ type TResetUpdatedAtFn = (metadata: Ordo.Metadata.DTO) => Ordo.Metadata.DTO
 const _reset_updated_at: TResetUpdatedAtFn = metadata => ({ ...metadata, updated_at: Date.now() })
 
 type TReplaceMetadataRFn = (
-	newValue: Ordo.Metadata.Instance,
+	new_value: Ordo.Metadata.Instance,
 ) => (items: Ordo.Metadata.Instance[]) => TResult<Ordo.Metadata.Instance[], Ordo.Rrr<"ENOENT">>
 const _replace_metadata_r: TReplaceMetadataRFn = x => xs =>
 	R.Ok(xs.findIndex(item => item.get_fsid() === x.get_fsid()))

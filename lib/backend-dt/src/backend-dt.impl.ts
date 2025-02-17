@@ -196,6 +196,7 @@ export const validate_file_size_limit = (intake: TIntake<TDTContext>) => (user: 
 export const check_can_create_files = (intake: TIntake<TDTContext>) => (user: Ordo.User.Current.DTO) =>
 	intake.data_persistence_strategy
 		.read(user.id, METADATA_CONTENT_FSID)
+		.pipe(ops0.chain(stream => Oath.Try(() => new Response(stream).json())))
 		.pipe(ops0.map(metadata => metadata.length))
 		.fix(() => 0)
 		.pipe(ops0.map(total_files => CurrentUser.FromDTO(user).can_create_files(total_files)))

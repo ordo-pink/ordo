@@ -278,45 +278,40 @@ declare global {
 			achievement: {
 				add: () => Ordo.Achievement.Instance
 			}
+			open_achievements: () => void
 			open_current_user_profile: () => void
 			open_settings: () => void
-			open_achievements: () => void
 		}
 		metadata: {
+			add_labels: () => { fsid: Ordo.Metadata.FSID; labels: Ordo.Metadata.Label[] }
+			add_links: () => { fsid: Ordo.Metadata.FSID; links: Ordo.Metadata.FSID[] }
 			create: () => Ordo.Metadata.CreateParams
-			show_upload_modal: () => Ordo.Metadata.FSID | null
-			show_create_modal: () => Ordo.Metadata.FSID | null
-			show_remove_modal: () => Ordo.Metadata.FSID
-			show_rename_modal: () => Ordo.Metadata.FSID
-			show_edit_label_modal: () => Ordo.Metadata.Label
-			show_move_palette: () => Ordo.Metadata.FSID
-			show_edit_labels_palette: () => Ordo.Metadata.FSID
-			show_edit_links_palette: () => Ordo.Metadata.FSID
+			edit_label: () => { old_label: Ordo.Metadata.Label; new_label: Ordo.Metadata.Label }
+			move: () => { fsid: Ordo.Metadata.FSID; new_parent: Ordo.Metadata.FSID | null }
+			open_published_page: () => Ordo.Metadata.FSID
+			publish: () => Ordo.Metadata.FSID
+			remove_labels: () => { fsid: Ordo.Metadata.FSID; labels: Ordo.Metadata.Label[] }
+			remove_links: () => { fsid: Ordo.Metadata.FSID; links: Ordo.Metadata.FSID[] }
 			remove: () => Ordo.Metadata.FSID
 			rename: () => { fsid: Ordo.Metadata.FSID; new_name: string }
-			move: () => { fsid: Ordo.Metadata.FSID; new_parent: Ordo.Metadata.FSID | null }
-			add_labels: () => { fsid: Ordo.Metadata.FSID; labels: Ordo.Metadata.Label[] }
-			remove_labels: () => { fsid: Ordo.Metadata.FSID; labels: Ordo.Metadata.Label[] }
-			edit_label: () => { old_label: Ordo.Metadata.Label; new_label: Ordo.Metadata.Label }
-			add_links: () => { fsid: Ordo.Metadata.FSID; links: Ordo.Metadata.FSID[] }
-			remove_links: () => { fsid: Ordo.Metadata.FSID; links: Ordo.Metadata.FSID[] }
 			set_property: () => { fsid: Ordo.Metadata.FSID; key: string; value: any }
 			set_size: () => { fsid: Ordo.Metadata.FSID; size: number }
-			publish: () => { ctx: Ordo.CreateFunction.State; fsid: Ordo.Metadata.FSID; name?: string; styles?: string[] }
+			show_create_modal: () => Ordo.Metadata.FSID | null
+			show_edit_label_modal: () => Ordo.Metadata.Label
+			show_edit_labels_palette: () => Ordo.Metadata.FSID
+			show_edit_links_palette: () => Ordo.Metadata.FSID
+			show_move_palette: () => Ordo.Metadata.FSID
+			show_publish_modal: () => Ordo.Metadata.FSID
+			show_remove_modal: () => Ordo.Metadata.FSID
+			show_rename_modal: () => Ordo.Metadata.FSID
+			show_upload_modal: () => Ordo.Metadata.FSID | null
+			unpublish: () => Ordo.Metadata.FSID
 		}
 		content: {
-			set: () => { fsid: Ordo.Metadata.FSID; content: Ordo.Content.Instance; content_type: string }
-			upload: () => {
-				name: string
-				parent: Ordo.Metadata.FSID | null
-				content: Ordo.Content.Instance
-				type: string
-			}
+			set: () => { content_type: string; content: Ordo.Content.Instance; fsid: Ordo.Metadata.FSID }
+			upload: () => { content: Ordo.Content.Instance; name: string; parent: Ordo.Metadata.FSID | null; type: string }
 		}
-		file_editor: {
-			open: () => void
-			open_file: () => Ordo.Metadata.FSID
-		}
+		file_editor: { open_file: () => Ordo.Metadata.FSID; open: () => void }
 		welcome: {
 			go_to_email_support: () => void
 			go_to_messenger_support: () => void
@@ -324,9 +319,9 @@ declare global {
 			open_support_palette: () => void
 		}
 		auth: {
+			request_code: (email: Ordo.User.Email) => void
 			show_request_code_modal: () => void
 			show_validate_code_modal: () => Ordo.User.Email
-			request_code: (email: Ordo.User.Email) => void
 			validate_code: (email: Ordo.User.Email, code: string) => void
 		}
 	}
@@ -545,25 +540,31 @@ declare global {
 		namespace FileAssociation {
 			type RenderFn = (params: Ordo.FileAssociation.RenderParams) => TMaokaChildren | Promise<TMaokaChildren>
 
+			type RenderToStringFn = (params: Ordo.FileAssociation.RenderParams) => string | Promise<string>
+
 			type RenderIconFn = () => TMaokaChildren | Promise<TMaokaChildren>
 
 			type Type = {
+				description: Ordo.I18N.TranslationKey
 				name: string
 				readable_name: Ordo.I18N.TranslationKey
-				description: Ordo.I18N.TranslationKey
 			}
 
 			type Instance = {
 				name: string
-				types: Ordo.FileAssociation.Type[]
-				render: RenderFn
 				render_icon?: Ordo.FileAssociation.RenderIconFn
+				content_to_string?: {
+					render?: Ordo.FileAssociation.RenderToStringFn
+					styles?: string[]
+				}
+				render: RenderFn
+				types: Ordo.FileAssociation.Type[]
 			}
 
 			type RenderParams = {
+				content: Ordo.Content.Instance
 				is_editable: boolean
 				is_embedded: boolean
-				content: Ordo.Content.Instance
 				metadata: Ordo.Metadata.Instance
 			}
 		}

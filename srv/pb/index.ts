@@ -34,7 +34,7 @@ const get_env = () =>
 			.and(n => Oath.If(is_port(n), { T: () => n }))
 			.pipe(ops0.rejected_map(env_rrr("ORDO_PB_PORT"))),
 
-		data_path: Oath.FromNullable(Bun.env.ORDO_PB_DATA_PATH, env_rrr("ORDO_PB_DATA_PATH")),
+		data_path: Oath.FromNullable(Bun.env.ORDO_DT_DATA_PATH, env_rrr("ORDO_DT_DATA_PATH")),
 
 		allow_origin: Oath.FromNullable(Bun.env.ORDO_DT_ALLOW_ORIGIN)
 			.and(s => s.split(", "))

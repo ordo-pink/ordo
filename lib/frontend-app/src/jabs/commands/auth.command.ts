@@ -50,13 +50,6 @@ export const auth_commands: TMaokaJab = ({ onunmount, use }) => {
 	const fetch = use(MaokaOrdo.Jabs.get_fetch)
 	const id_host = ordo_app_state.zags.select("hosts.id")
 
-	void Oath.FromNullable(localStorage.getItem("user"))
-		.and(str => Oath.Try(() => JSON.parse(str)))
-		.and(user => Oath.If(CurrentUser.Validations.is_dto(user), { T: () => user as Ordo.User.Current.DTO }))
-		.and(user => ordo_app_state.zags.update("auth.user", () => CurrentUser.FromDTO(user)))
-		.and(() => Oath.FromNullable(localStorage.getItem("token")).and(refresh_token))
-		.invoke(invokers0.force_resolve)
-
 	const refresh_token = (token: string) =>
 		Oath.Resolve({ headers: { Authorization: `Bearer ${token}` }, method: "POST" })
 			.and(init => Oath.FromPromise(() => fetch(`${id_host}/tokens/refresh`, init)))
@@ -64,6 +57,13 @@ export const auth_commands: TMaokaJab = ({ onunmount, use }) => {
 			.and(res => Oath.If(res.success, { T: () => res.payload as string }))
 			.and(token => ordo_app_state.zags.update("auth.token", () => token))
 			.pipe(ops0.rejected_map(clean_up_auth))
+
+	void R.FromNullable(localStorage.getItem("user"))
+		.pipe(R.ops.chain(str => R.Try(() => JSON.parse(str))))
+		.pipe(R.ops.chain(user => R.If(CurrentUser.Validations.is_dto(user), { T: () => user as Ordo.User.Current.DTO })))
+		.pipe(R.ops.map(user => ordo_app_state.zags.update("auth.user", () => CurrentUser.FromDTO(user))))
+		.pipe(R.ops.chain(() => R.FromNullable(localStorage.getItem("token"))))
+		.pipe(R.ops.map(token => refresh_token(token)))
 
 	const handle_sign_out = () =>
 		Oath.Resolve(new Headers())
@@ -114,13 +114,7 @@ export const auth_commands: TMaokaJab = ({ onunmount, use }) => {
 	})
 
 	// TODO use other means but localStorage for storing user info
-	const divorce_token = ordo_app_state.zags.cheat("auth.token", (token, is_update) => {
-		if (is_update) {
-			R.FromNullable(token)
-				.pipe(R.ops.map(str => localStorage.setItem("token", str)))
-				.cata(R.catas.or_else(clean_up_auth))
-		}
-
+	const divorce_token = ordo_app_state.zags.cheat("auth.token", token => {
 		if (token) {
 			if (!is_authenticated) {
 				commands.off("cmd.auth.show_request_code_modal", handle_show_request_code)
@@ -135,6 +129,10 @@ export const auth_commands: TMaokaJab = ({ onunmount, use }) => {
 
 				is_authenticated = true
 			}
+
+			refresh_timout_id = setTimeout(() => void refresh_token(token).invoke(invokers0.or_nothing), 50000) as any // TODO Take duration from env
+
+			localStorage.setItem("token", token)
 		} else {
 			commands.on("cmd.auth.show_request_code_modal", handle_show_request_code)
 			commands.on("cmd.auth.show_validate_code_modal", handle_show_validate_code)
@@ -146,7 +144,10 @@ export const auth_commands: TMaokaJab = ({ onunmount, use }) => {
 				render_icon: BsBoxArrowInRight,
 			})
 
-			is_authenticated = false
+			if (is_authenticated) {
+				is_authenticated = false
+				clean_up_auth()
+			}
 		}
 	})
 
@@ -232,6 +233,7 @@ const RequestCodeModal = Maoka.create("div", ({ use }) => {
 })
 
 const clean_up_auth = () => {
+	clearTimeout(refresh_timout_id)
 	localStorage.removeItem("user")
 	localStorage.removeItem("token")
 	history.go(-history.length)
@@ -295,3 +297,5 @@ const ValidateCodeModal = (email: Ordo.User.Email) =>
 				],
 			})
 	})
+
+let refresh_timout_id: number

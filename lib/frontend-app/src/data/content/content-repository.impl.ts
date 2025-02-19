@@ -20,8 +20,8 @@
  */
 
 import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
+import { T, noop } from "@ordo-pink/tau"
 import { METADATA_CONTENT_FSID } from "@ordo-pink/core"
-import { T } from "@ordo-pink/tau"
 import { ZAGS } from "@ordo-pink/zags"
 
 // TODO Sync storages
@@ -30,6 +30,7 @@ export const ContentRepository: Ordo.Content.RepositoryStatic = {
 		const $ = ZAGS.Of({ version: 0 })
 
 		const divorce = auth$.marry(({ user, token }) => {
+			// Quit from syncing with remote since the user is not authenticated
 			if (!token || !user) return
 
 			// Check if remote state and current state are equal
@@ -104,6 +105,7 @@ export const ContentRepository: Ordo.Content.RepositoryStatic = {
 						remote: remote && remote_strategy.put(user.get_id(), METADATA_CONTENT_FSID, JSON.stringify(remote)).and(T),
 					}),
 				)
+				// Force update of the components due to the changes in the local repo
 				.and(({ local }) =>
 					Oath.If(local)
 						.pipe(ops0.tap(() => $.update("version", v => v + 1)))
@@ -118,7 +120,8 @@ export const ContentRepository: Ordo.Content.RepositoryStatic = {
 		return {
 			get: (uid, fsid) => local_strategy.get(uid, fsid).fix(() => null),
 			get_all: () => local_strategy.list(),
-			put: (uid, fsid, content) => local_strategy.put(uid, fsid, content).and(() => remote_strategy.put(uid, fsid, content)),
+			put: (uid, fsid, content) =>
+				local_strategy.put(uid, fsid, content).and(() => remote_strategy.put(uid, fsid, content).fix(noop)),
 			get $() {
 				return $
 			},

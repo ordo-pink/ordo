@@ -90,9 +90,10 @@ export const MetadataManager = {
 							.and(str => content_repository.put(user.get_id(), METADATA_CONTENT_FSID, str))
 					}
 
-					void previous_save_attempt0
-						.pipe(ops0.bitap(mark_put_complete, mark_put_complete))
-						.invoke(invokers0.or_else(console.error)) // TODO handling persistence errors
+					previous_save_attempt0 &&
+						void previous_save_attempt0
+							.pipe(ops0.bitap(mark_put_complete, mark_put_complete))
+							.invoke(invokers0.or_else(console.error)) // TODO handling persistence errors
 				})
 
 				cancel_get_content = () => {

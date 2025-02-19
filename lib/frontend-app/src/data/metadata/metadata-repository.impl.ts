@@ -40,8 +40,18 @@ export const MetadataRepository: Ordo.Metadata.RepositoryStatic = {
 			put: metadata =>
 				Result.FromNullable(metadata)
 					.pipe(Result.ops.chain(() => Result.If(Array.isArray(metadata), { T: () => metadata }))) // TODO: Add validations
-					.pipe(Result.ops.chain(() => Result.Try(() => metadata$.update("items", () => metadata))))
-					.pipe(Result.ops.err_map(() => RRR.codes.einval(`.put: ${JSON.stringify(metadata)}`))),
+					.pipe(Result.ops.map(metadata => metadata.map(i => i.to_dto())))
+					.pipe(
+						Result.ops.chain(() =>
+							Result.Try(
+								() => metadata$.update("items", () => metadata),
+								e => {
+									console.log(e)
+								},
+							),
+						),
+					)
+					.pipe(Result.ops.err_map(() => RRR.codes.einval("MetadataRepository could not put metadata", metadata))),
 
 			get $() {
 				return version_zags

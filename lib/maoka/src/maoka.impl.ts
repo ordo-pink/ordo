@@ -135,17 +135,19 @@ export const dom: T.TMaokaRenderDOMFn = async (root, component) => {
 	const unmount_element = (element: T.TMaokaElement) => {
 		if (element.onunmount) element.onunmount()
 
-		for (let i = 0; i < element.children.length; i++) {
-			unmount_element(element.children[i] as T.TMaokaElement)
-		}
+		if (element.children)
+			for (let i = 0; i < element.children.length; i++) {
+				unmount_element(element.children[i] as T.TMaokaElement)
+			}
 	}
 
 	const mount_element = (element: T.TMaokaElement) => {
 		if (element.onmount) element.onmount()
 
-		for (let i = 0; i < element.children.length; i++) {
-			mount_element(element.children[i] as T.TMaokaElement)
-		}
+		if (element.children)
+			for (let i = 0; i < element.children.length; i++) {
+				mount_element(element.children[i] as T.TMaokaElement)
+			}
 	}
 
 	mount_element(Component)

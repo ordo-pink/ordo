@@ -200,7 +200,7 @@
 }
 
 .link_no-history {
-	@apply text-inherit visited:text-inherit;
+	@apply text-inherit visited:text-inherit hover:text-inherit active:text-inherit;
 }
 
 .link_wrapper {

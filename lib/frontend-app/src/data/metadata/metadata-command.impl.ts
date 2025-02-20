@@ -180,7 +180,7 @@ export const MetadataCommand: Ordo.Metadata.CommandStatic = {
 				_check_not_exists_by_name_r("create", m_query, name, parent),
 			])
 				.pipe(R.ops.chain(u_query.get_current))
-				.pipe(R.ops.map(user => user.get_id()))
+				.pipe(R.ops.map(user => (user ? user.get_id() : null)))
 				.pipe(R.ops.map(author_id => M.Of({ name, parent, author_id, type, labels, links, props, size: size ?? 0 })))
 				.pipe(R.ops.chain(item => m_query.get().pipe(R.ops.map(items => items.concat(item)))))
 				.pipe(R.ops.chain(m_repo.put)),
@@ -274,7 +274,7 @@ type TResetUpdatedByRFn = (
 const _reset_updated_by_r: TResetUpdatedByRFn = query => metadata =>
 	query
 		.get_current()
-		.pipe(R.ops.map(user => user.get_id()))
+		.pipe(R.ops.map(user => (user ? user.get_id() : null)))
 		.pipe(R.ops.map(updatedBy => ({ ...metadata, updatedBy })))
 
 type TMetadataDTOToTMetadataFn = (dto: Ordo.Metadata.DTO) => Ordo.Metadata.Instance

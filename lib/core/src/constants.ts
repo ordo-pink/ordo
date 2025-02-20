@@ -109,6 +109,7 @@ export enum ErrorType {
 	EINVAL, // Invalid
 	EFBIG, // File too big
 	ENOSPC, // Out of memory
+	ENOTRECOVERABLE,
 	length,
 }
 

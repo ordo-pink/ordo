@@ -43,10 +43,9 @@ export const UserQuery: Ordo.User.QueryStatic = {
 					.pipe(Result.ops.map(user => !!user))
 					.cata(Result.catas.or_else(() => false)),
 
+			// TODO Allow user null
 			get_current: () =>
-				check_permission("user.get_current").pipe(
-					Result.ops.chain(() => Result.FromNullable(ordo_app_state.zags.select("auth.user"))),
-				),
+				check_permission("user.get_current").pipe(Result.ops.chain(() => Result.Ok(ordo_app_state.zags.select("auth.user")))),
 
 			get_by_id: id =>
 				check_permission("user.get_by_id")

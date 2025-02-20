@@ -1,6 +1,8 @@
 import { Dialog } from "@ordo-pink/maoka-components"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
+import { NotificationType } from "@ordo-pink/core"
+import { invokers0 } from "@ordo-pink/oath"
 // import { Result } from "@ordo-pink/result"
 
 export const PublishMetadataModal = (fsid: Ordo.Metadata.FSID) =>
@@ -10,6 +12,7 @@ export const PublishMetadataModal = (fsid: Ordo.Metadata.FSID) =>
 
 		// const metadata_query = use(MaokaOrdo.Jabs.get_metadata_query)
 		const commands = use(MaokaOrdo.Jabs.get_commands)
+		const logger = use(MaokaOrdo.Jabs.get_logger)
 
 		const action = () => {
 			// if (checked)
@@ -18,7 +21,21 @@ export const PublishMetadataModal = (fsid: Ordo.Metadata.FSID) =>
 			// 		.pipe(Result.ops.map(ds => ds.map(d => d.get_fsid())))
 			// 		.pipe(Result.ops.map(ds => pages_to_publish.push(...ds)))
 
-			pages_to_publish.forEach(fsid => commands.emit("cmd.metadata.publish", fsid))
+			pages_to_publish.forEach(
+				fsid =>
+					void commands.emit("cmd.metadata.publish", fsid).invoke(
+						invokers0.or_else(rrr => {
+							if (rrr.debug && rrr.debug.length) logger.error(...rrr.debug)
+
+							void commands.emit("cmd.application.notification.show", {
+								message: rrr.message as Ordo.I18N.TranslationKey,
+								duration: 15,
+								title: `t.common.error.${rrr.key.toLocaleLowerCase()}` as any,
+								type: NotificationType.RRR,
+							})
+						}),
+					),
+			)
 
 			commands.emit("cmd.application.modal.hide")
 		}

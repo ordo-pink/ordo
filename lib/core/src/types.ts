@@ -644,7 +644,7 @@ declare global {
 
 			type Query = {
 				is_authenticated: () => boolean
-				get_current: () => TResult<Ordo.User.Current.Instance, Ordo.Rrr<"EPERM">>
+				get_current: () => TResult<Ordo.User.Current.Instance | null, Ordo.Rrr<"EPERM">>
 				get_by_id: (uid: Ordo.User.UID) => Oath<Ordo.User.Public.Instance, Ordo.Rrr<"EPERM" | "EINVAL" | "EIO">>
 				get_by_handle: (handle: Ordo.User.Handle) => Oath<Ordo.User.Public.Instance, Ordo.Rrr<"EPERM" | "EINVAL" | "EIO">>
 				get $(): TZags<{ version: number }>
@@ -680,12 +680,12 @@ declare global {
 
 			type Repository = {
 				get: (
-					uid: Ordo.User.UID,
+					uid: Ordo.User.UID | null,
 					fsid: Ordo.Metadata.FSID,
 				) => Oath<Ordo.Content.Instance, Ordo.Rrr<"EIO" | "EACCES" | "EINVAL">>
 				get_all: () => Oath<Record<string, Ordo.Content.Instance>, Ordo.Rrr<"EIO">>
 				put: (
-					uid: Ordo.User.UID,
+					uid: Ordo.User.UID | null,
 					fsid: Ordo.Metadata.FSID,
 					content: Ordo.Content.Instance,
 				) => Oath<void, Ordo.Rrr<"EINVAL" | "EACCES" | "EIO">>
@@ -724,9 +724,9 @@ declare global {
 				labels: Ordo.Metadata.Label[]
 				type: string
 				created_at: number
-				created_by: Ordo.User.UID
+				created_by: Ordo.User.UID | null
 				updated_at: number
-				updated_by: Ordo.User.UID
+				updated_by: Ordo.User.UID | null
 				size: number
 				props?: $TProps
 				is_deleted?: boolean
@@ -735,7 +735,7 @@ declare global {
 
 			type Static = {
 				Of: <$TProps extends Ordo.Metadata.Props = Ordo.Metadata.Props>(
-					params: Ordo.Metadata.CreateParams<$TProps> & { author_id: Ordo.User.UID },
+					params: Ordo.Metadata.CreateParams<$TProps> & { author_id: Ordo.User.UID | null },
 				) => Ordo.Metadata.Instance<$TProps>
 				FromDTO: <$TProps extends Ordo.Metadata.Props = Ordo.Metadata.Props>(
 					dto: Ordo.Metadata.DTO<$TProps>,
@@ -758,9 +758,9 @@ declare global {
 				get_label_index: (label: Ordo.Metadata.Label) => number
 				get_type: () => string
 				get_created_at: () => Date
-				get_created_by: () => Ordo.User.UID
+				get_created_by: () => Ordo.User.UID | null
 				get_updated_at: () => Date
-				get_updated_by: () => Ordo.User.UID
+				get_updated_by: () => Ordo.User.UID | null
 				get_size: () => number
 				get_readable_size: () => string
 				get_property: <_TKey extends keyof $TProps>(key: _TKey) => NonNullable<$TProps[_TKey]> | null
@@ -770,6 +770,7 @@ declare global {
 				is_hidden: () => boolean
 				validate: (checksum: string) => boolean
 				is_deleted: () => boolean
+				is_local_only: () => boolean
 			}
 
 			type Validations = TValidations<Ordo.Metadata.DTO> & {
@@ -1010,7 +1011,7 @@ declare global {
 			/**
 			 * Command handler.
 			 */
-			type CommandHandler<$TPayload> = (payload: $TPayload) => unknown
+			type CommandHandler<$TPayload> = (payload: $TPayload) => void | Promise<void>
 
 			type HandlerOf<$TKey extends Ordo.Command.Name> = CommandHandler<Ordo.Command.Record[$TKey]>
 
@@ -1021,7 +1022,7 @@ declare global {
 			type EmitFn = <$TKey extends Ordo.Command.Name>(
 				name: $TKey,
 				...rest: Ordo.Command.Record[$TKey] extends void ? [key?: string] : [payload: Ordo.Command.Record[$TKey], key?: string]
-			) => void
+			) => Oath<void, Ordo.Rrr>
 
 			type CancelFn = <$TKey extends Ordo.Command.Name>(name: $TKey, payload?: Ordo.Command.Record[$TKey], key?: string) => void
 

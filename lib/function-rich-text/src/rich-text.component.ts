@@ -30,8 +30,10 @@ import { ZAGS } from "@ordo-pink/zags"
 import { type TEditorFocusPosition, type TEditorState } from "../rich-text.types"
 import { editor_context, editor_context_jab } from "../jabs/editor-context.jab"
 import { Line } from "./line.component"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
-export const RichText = (metadata: Ordo.Metadata.Instance, content: Ordo.Content.Instance) => {
+export const RichText = (metadata: Ordo.Metadata.Instance, content: Ordo.Content.Instance, is_editable: boolean) => {
+	const fsid = metadata.get_fsid()
 	const caret_position$ = ZAGS.Of<TEditorFocusPosition>({ block_index: 0, inline_index: 0, anchor_offset: 0, focus_offset: 0 })
 	const state$ = ZAGS.Of<{ value: TEditorState }>({ value: [{ type: "p", children: [{ type: "text", value: "" }] }] })
 
@@ -44,9 +46,15 @@ export const RichText = (metadata: Ordo.Metadata.Instance, content: Ordo.Content
 			Ok: state => state$.update("value", () => state as TEditorState),
 		})
 
-	return Maoka.create("div", ({ use, refresh }) => {
+	return Maoka.create("div", ({ use, onunmount, refresh }) => {
+		const commands = use(MaokaOrdo.Jabs.get_commands)
+
 		use(MaokaJabs.set_class("p-2 size-full outline-none cursor-text"))
-		use(MaokaJabs.set_attribute("contenteditable", "true"))
+		use(MaokaJabs.set_attribute("contenteditable", String(is_editable)))
+
+		const divorce_state = state$.marry(({ value }, is_update) => {
+			if (is_update) commands.emit("cmd.content.set", { content: JSON.stringify(value), content_type: "text/ordo", fsid })
+		})
 
 		use(
 			editor_context.provide({
@@ -156,6 +164,10 @@ export const RichText = (metadata: Ordo.Metadata.Instance, content: Ordo.Content
 				},
 			}),
 		)
+
+		onunmount(() => {
+			divorce_state()
+		})
 
 		return () => {
 			const state = state$.select("value")

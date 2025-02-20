@@ -20,11 +20,12 @@
  */
 
 import { Dialog, Input } from "@ordo-pink/maoka-components"
-import { Maoka, type TMaokaElement } from "@ordo-pink/maoka"
 import { BsFileEarmarkPlus } from "@ordo-pink/frontend-icons"
+import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { Switch } from "@ordo-pink/switch"
+import { invokers0 } from "@ordo-pink/oath"
 
 export const CreateFileModal = (parent: Ordo.Metadata.FSID | null = null) =>
 	Maoka.create("div", ({ use }) => {
@@ -34,6 +35,7 @@ export const CreateFileModal = (parent: Ordo.Metadata.FSID | null = null) =>
 		const commands = use(MaokaOrdo.Jabs.get_commands)
 
 		const t_title = t("t.common.components.modals.create_file.title")
+		const t_ok = t("t.common.ok")
 		const state = { name: "" }
 
 		return () =>
@@ -41,11 +43,13 @@ export const CreateFileModal = (parent: Ordo.Metadata.FSID | null = null) =>
 				title: t_title,
 				render_icon: BsFileEarmarkPlus,
 				action: () => {
-					commands.emit("cmd.application.modal.hide")
-					commands.emit("cmd.metadata.create", { name: state.name, parent, type })
+					void commands
+						.emit("cmd.metadata.create", { name: state.name, parent, type })
+						.and(() => commands.emit("cmd.application.modal.hide"))
+						.invoke(invokers0.or_else(console.error))
 				},
 				action_hotkey: "enter",
-				action_text: "OK", // TODO Translations
+				action_text: t_ok,
 				body: () => [
 					CreateFileModalInput(event => void (state.name = (event.target as any).value)),
 					FileAssociationSelector((fa, selected_type) => {
@@ -145,7 +149,7 @@ const SelectItem = (
 							use(MaokaJabs.set_class("flex gap-x-1 items-center"))
 
 							return () => [
-								Icon as TMaokaElement,
+								Icon,
 								Maoka.create("div", ({ use }) => {
 									const { t } = use(MaokaOrdo.Jabs.get_translations$)
 									return () => t(type.readable_name)

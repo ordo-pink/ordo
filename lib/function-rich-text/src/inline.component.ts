@@ -82,7 +82,7 @@ export const Inline = (
 			)
 
 			const handle_keydown = (event: KeyboardEvent) => {
-				if (document.activeElement !== element) return
+				if (element instanceof HTMLElement && document.activeElement !== element) return
 
 				Switch.Match(event.key)
 					.case("Enter", () => {
@@ -143,7 +143,7 @@ export const Inline = (
 			}
 
 			const handle_keyup = (event: KeyboardEvent) => {
-				if (document.activeElement !== element) return
+				if (element instanceof HTMLElement && document.activeElement !== element) return
 
 				Switch.Match(event.key)
 					.case(["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"], () => {

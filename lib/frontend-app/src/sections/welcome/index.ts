@@ -79,10 +79,10 @@ export default create_function(
 
 		translate.$.marry(() => {
 			const on_email_support = (url: string) => () =>
-				commands.emit("cmd.application.router.open_external", { url: `mailto:${url}`, new_tab: true })
+				void commands.emit("cmd.application.router.open_external", { url: `mailto:${url}`, new_tab: true })
 
 			const on_messenger_support = (url: string) => () =>
-				commands.emit("cmd.application.router.open_external", { url, new_tab: true })
+				void commands.emit("cmd.application.router.open_external", { url, new_tab: true })
 
 			const email_support = translate("t.common.urls.support_email")
 			const messenger_support = translate("t.common.urls.support_messenger")
@@ -94,7 +94,7 @@ export default create_function(
 			commands.on("cmd.welcome.go_to_email_support", on_email_support(email_support))
 		})
 
-		commands.on("cmd.welcome.go_to_welcome_page", () => commands.emit("cmd.application.router.navigate", { url: "/" }))
+		commands.on("cmd.welcome.go_to_welcome_page", () => void commands.emit("cmd.application.router.navigate", { url: "/" }))
 
 		commands.emit("cmd.application.command_palette.add", {
 			readable_name: "t.welcome.go_to_welcome_page",

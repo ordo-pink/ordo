@@ -10,7 +10,7 @@
  * @param $TState Current ZAGS state value.
  * @param boolean Indicates whether the partner call is due to state update.
  */
-export type TPartner<$TState extends Record<string, unknown>> = (value: $TState, is_update: boolean) => void
+export type TPartner<$TState extends Record<string, unknown>> = (value: $TState, is_update: boolean) => void | Promise<void>
 
 /**
  * ZAGS instance.

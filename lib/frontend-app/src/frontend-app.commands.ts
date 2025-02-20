@@ -19,12 +19,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { call_once, deep_equals } from "@ordo-pink/tau"
-import { ZAGS } from "@ordo-pink/zags"
+import { type TZags, ZAGS } from "@ordo-pink/zags"
+import { call_once, deep_equals, noop } from "@ordo-pink/tau"
+import { Oath } from "@ordo-pink/oath"
+import { RRR } from "@ordo-pink/core"
+import { Switch } from "@ordo-pink/switch"
 
 import { ordo_app_state } from "../app.state"
 
-type TCommand = (Ordo.Command.Command | Ordo.Command.PayloadCommand) & { fid: symbol }
+type TCommand = (Ordo.Command.Command | Ordo.Command.PayloadCommand) & {
+	fid: symbol
+}
 type TCmdListener<N extends Ordo.Command.Name = Ordo.Command.Name, P = any> = [N, Ordo.Command.CommandHandler<P>, symbol]
 
 type TF = () => { commands: Ordo.Command.Commands; get_commands: (fid: symbol) => Ordo.Command.Commands }
@@ -46,7 +51,25 @@ export const init_commands: TF = call_once(() => {
 				remove([name, handler, fid])
 			},
 			emit: (name, payload?, key = crypto.randomUUID()) => {
-				enqueue({ name, payload, key, fid })
+				const $ = ZAGS.Of<{ status: "pending" | "resolved" | "rejected"; rrr?: Ordo.Rrr }>({
+					status: "pending",
+				})
+				enqueue({ name, payload, key, fid, $ })
+
+				return new Oath<void, Ordo.Rrr>((resolve, reject) => {
+					const divorce = $.marry(({ status, rrr }) => {
+						if (status === "pending") return
+
+						status === "resolved" ? resolve(void 0) : reject(rrr ?? RRR.codes.enotrecoverable(`Command "${name}" failed`))
+
+						Switch.Match(status)
+							.case("resolved", () => resolve(void 0))
+							.case("rejected", () => reject(rrr))
+							.default(noop)
+
+						divorce()
+					})
+				})
 			},
 			cancel: (name, payload?, key = crypto.randomUUID()) => {
 				logger.debug(`🟣 '${func}' cancelled command '${name}'`)
@@ -55,7 +78,7 @@ export const init_commands: TF = call_once(() => {
 		} satisfies Ordo.Command.Commands
 	}
 
-	command$.marry(({ queue, storage }) => {
+	command$.marry(async ({ queue, storage }) => {
 		for (const command of queue) {
 			const name = command.name
 			const fid = command.fid
@@ -64,7 +87,10 @@ export const init_commands: TF = call_once(() => {
 			const payload = is_payload_command(command) ? (command.payload as unknown) : undefined
 
 			if (!known_functions.has_permissions(fid, { commands: [name] })) {
-				logger.error(`${func} permission RRR. Did you forget to request command permission '${name}'?`)
+				command.$.replace({
+					status: "rejected",
+					rrr: RRR.codes.eperm(`${func} permission RRR. Did you forget to request command permission '${name}'?`),
+				})
 				dequeue({ name, payload, fid })
 
 				return
@@ -77,20 +103,29 @@ export const init_commands: TF = call_once(() => {
 
 				if (payload !== undefined) {
 					logger.debug(
-						`🔵 Command "${name}" invoked by "${func}" for ${listeners.length} ${listeners.length === 1 ? "listener" : "listeners"}. Provided payload: `,
+						`🔵 Command '${name}' invoked by '${func}' for ${listeners.length} ${listeners.length === 1 ? "listener" : "listeners"}. Provided payload: `,
 						payload,
 					)
 				} else {
 					logger.debug(
-						`🔵 Command "${name}" invoked by "${func}" for ${listeners.length} ${listeners.length === 1 ? "listener" : "listeners"}.`,
+						`🔵 Command '${name}' invoked by '${func}' for ${listeners.length} ${listeners.length === 1 ? "listener" : "listeners"}.`,
 					)
 				}
 
-				for (const listener of listeners) listener(payload)
+				// TODO Support for reverting via returned CommandHandler function
+				try {
+					await Promise.all(listeners.map(listener => listener(payload)))
+					command.$.update("status", () => "resolved")
+				} catch (e) {
+					command.$.replace({
+						status: "rejected",
+						rrr: RRR.is_rrr(e) ? e : RRR.codes.enotrecoverable(`Command '${command.name}' failed`, e),
+					})
+				}
 			} else {
 				is_dev &&
 					logger.debug(
-						`🟡 No handler found for the command "${name}". The command will stay pending until handler is registerred.`,
+						`🟡 No handler found for the command '${name}'. The command will stay pending until handler is registerred.`,
 					)
 			}
 		}
@@ -98,7 +133,7 @@ export const init_commands: TF = call_once(() => {
 
 	const app_commands = get_commands(app_fid)
 
-	ordo_app_state.zags.update("commands", () => app_commands)
+	void ordo_app_state.zags.update("commands", () => app_commands)
 
 	logger.debug("🟢 Initialised commands.")
 
@@ -108,8 +143,8 @@ export const init_commands: TF = call_once(() => {
 const is_payload_command = (cmd: Ordo.Command.Command): cmd is Ordo.Command.PayloadCommand =>
 	typeof cmd.name === "string" && (cmd as Ordo.Command.PayloadCommand).payload !== undefined
 
-const enqueue = (new_command: TCommand) =>
-	command$.update("queue", state => (state.some(cmd => cmd.key === new_command.key) ? state : [...state, new_command]))
+const enqueue = (new_command: TCommand & { $: TZags<{ status: "pending" | "resolved" | "rejected"; rrr?: Ordo.Rrr }> }) =>
+	command$.update("queue", state => (state.some(cmd => cmd.key === new_command.key) ? state : [...state, new_command]) as any)
 
 const dequeue = (command: TCommand) =>
 	command$.update("queue", state => {
@@ -142,19 +177,6 @@ const add_before = (new_listener: TCmdListener) =>
 		return state
 	})
 
-// const add_after = (new_listener: TCmdListener) =>
-// 	command$.update("storage", state => {
-// 		const listeners = state[new_listener[0]]
-
-// 		if (!listeners) {
-// 			state[new_listener[0]] = [new_listener[1]]
-// 		} else if (!listeners.some(listener => listener.toString() === new_listener[1].toString())) {
-// 			state[new_listener[0]].push(new_listener[1])
-// 		}
-
-// 		return state
-// 	})
-
 const remove = (listener: TCmdListener) =>
 	command$.update("storage", state => {
 		if (!state[listener[0]]) return state
@@ -165,6 +187,9 @@ const remove = (listener: TCmdListener) =>
 	})
 
 const command$ = ZAGS.Of({
-	queue: [] as ((Ordo.Command.Command | Ordo.Command.PayloadCommand) & { fid: symbol })[],
+	queue: [] as ((Ordo.Command.Command | Ordo.Command.PayloadCommand) & {
+		fid: symbol
+		$: TZags<{ status: "pending" | "resolved" | "rejected"; rrr?: Ordo.Rrr }>
+	})[],
 	storage: {} as Record<string, Ordo.Command.CommandHandler<any>[]>,
 })

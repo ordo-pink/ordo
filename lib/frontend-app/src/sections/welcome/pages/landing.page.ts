@@ -61,7 +61,7 @@ export default Maoka.create("main", ({ use, onunmount }) => {
 		Object.assign(document.documentElement, { style })
 	}
 
-	const handle_sign_up_click = () => commands.emit("cmd.auth.show_request_code_modal")
+	const handle_sign_up_click = () => void commands.emit("cmd.auth.show_request_code_modal")
 
 	const handle_try_click = () => {
 		const has_files = metadata_query.get().cata({ Ok: x => x.length > 0, Err: T })

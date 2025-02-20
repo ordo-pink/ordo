@@ -66,16 +66,17 @@ export const init_content: TF = () => {
 	const content_repository = ContentRepository.Of(auth$, local_strategy, remote_strategy)
 
 	// TODO Extract for common error handling
-	const Err = (rrr: Ordo.Rrr) => {
-		logger.error("ERROR", rrr.debug)
+	const alert_rrr = (rrr: Ordo.Rrr) => {
+		if (rrr.debug && rrr.debug.length) logger.error(...rrr.debug)
 
 		commands.emit("cmd.application.notification.show", {
-			message: (String(rrr.debug) as any) ?? "",
+			message: rrr.message as Ordo.I18N.TranslationKey,
 			duration: 15,
-			// TODO Error titles
 			title: `t.common.error.${rrr.key.toLocaleLowerCase()}` as any,
 			type: NotificationType.RRR,
 		})
+
+		throw rrr
 	}
 
 	commands.on("cmd.content.set", ({ fsid, content }) => {
@@ -87,7 +88,7 @@ export const init_content: TF = () => {
 			// TODO Check if metadata exists
 			void metadata_query
 				.get_by_fsid(fsid)
-				.cata(R.catas.if_ok(() => content_repository.put(user.get_id(), fsid, content).invoke(invokers0.or_else(Err))))
+				.cata(R.catas.if_ok(() => content_repository.put(user.get_id(), fsid, content).invoke(invokers0.or_else(alert_rrr))))
 		}
 	})
 
@@ -112,13 +113,13 @@ export const init_content: TF = () => {
 		}
 
 		if (!Metadata.Validations.is_metadata(metadata))
-			return Err(RRR.codes.enoent("Metadata creation failed", { type, name, parent }))
+			return alert_rrr(RRR.codes.enoent("Metadata creation failed", { type, name, parent }))
 
 		const user = ordo_app_state.zags.select("auth.user")
 
 		if (!user) return
 
-		void content_repository.put(user.get_id(), metadata.get_fsid(), content).invoke(invokers0.or_else(Err))
+		void content_repository.put(user.get_id(), metadata.get_fsid(), content).invoke(invokers0.or_else(alert_rrr))
 	})
 
 	logger.debug("🟢 Initialised metadata.")
@@ -130,7 +131,7 @@ export const init_content: TF = () => {
 					const rrr = RRR.codes.eperm(
 						`ContentQuery permission RRR. Did you forget to request query permission '${permission}'?`,
 					)
-					ConsoleLogger.error(rrr.debug?.join(" "))
+					ConsoleLogger.error(rrr.message)
 					return rrr
 				},
 			}),

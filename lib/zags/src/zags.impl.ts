@@ -12,7 +12,7 @@ export const ZAGS: TZagsStatic = {
 	Of: (state, handlers = []) => ({
 		marry: f => {
 			handlers.push(f)
-			f(state, false)
+			void f(state, false)
 
 			return () => {
 				const index = handlers.indexOf(f)
@@ -66,7 +66,7 @@ export const ZAGS: TZagsStatic = {
 				location[keys[keys.length - 1]] = value
 				state = Object.assign({}, state_copy)
 
-				handlers.forEach(f => f(state, true))
+				handlers.forEach(f => void f(state, true))
 			}
 		},
 		select: path => {
@@ -79,14 +79,14 @@ export const ZAGS: TZagsStatic = {
 			if (state === new_state) return
 
 			state = Object.assign({}, new_state)
-			handlers.forEach(f => f(state, true))
+			handlers.forEach(f => void f(state, true))
 		},
 		update_all: f => {
 			const updated_state = f(Object.assign({}, state))
 
 			if (updated_state !== state) {
 				state = Object.assign({}, updated_state)
-				handlers.forEach(f => f(state, true))
+				handlers.forEach(f => void f(state, true))
 			}
 		},
 		unwrap: () => Object.assign({}, state),

@@ -20,7 +20,7 @@
  */
 
 import { BsBoxArrowUp, BsCloudMinus, BsCloudPlus, BsLayoutTextWindow } from "@ordo-pink/frontend-icons"
-import { CommandPaletteItemType, ContextMenuItemType, Metadata, create_function } from "@ordo-pink/core"
+import { CommandPaletteItemType, ContextMenuItemType, Metadata, RRR, create_function } from "@ordo-pink/core"
 import { Oath, invokers0 } from "@ordo-pink/oath"
 import { Maoka } from "@ordo-pink/maoka"
 import { MetadataIcon } from "@ordo-pink/maoka-components"
@@ -85,8 +85,11 @@ export default create_function(
 		const commands = state.commands
 		const metadata_query = state.metadata_query
 
-		commands.on("cmd.file_editor.open", () => commands.emit("cmd.application.router.navigate", { url: "/editor" }))
-		commands.on("cmd.file_editor.open_file", x => commands.emit("cmd.application.router.navigate", { url: `/editor/${x}` }))
+		commands.on("cmd.file_editor.open", () => void commands.emit("cmd.application.router.navigate", { url: "/editor" }))
+		commands.on(
+			"cmd.file_editor.open_file",
+			x => void commands.emit("cmd.application.router.navigate", { url: `/editor/${x}` }),
+		)
 
 		commands.emit("cmd.application.add_translations", {
 			lang: TwoLetterLocale.ENGLISH,
@@ -104,8 +107,9 @@ export default create_function(
 			render_icon: BsLayoutTextWindow,
 		})
 
-		commands.on("cmd.metadata.show_publish_modal", fsid =>
-			commands.emit("cmd.application.modal.show", { render: () => PublishMetadataModal(fsid) }),
+		commands.on(
+			"cmd.metadata.show_publish_modal",
+			fsid => void commands.emit("cmd.application.modal.show", { render: () => PublishMetadataModal(fsid) }),
 		)
 
 		commands.on("cmd.metadata.unpublish", fsid => {
@@ -164,11 +168,14 @@ export default create_function(
 			const user = state.user_query.get_current().cata(R.catas.or_else(() => null))
 			const fas = state.file_associations$.select("value")
 
-			if (!metadata || !user) return
+			if (!metadata) return
+
+			if (!user) throw RRR.codes.eperm(`Cannot publish '${metadata.get_name()}' because user is not authenticated`)
 
 			const metadata_type = metadata.get_type()
 			const fa = fas.find(fa => fa.types.some(type => type.name === metadata_type))
 
+			// TODO Avoid rendering files if they should not be converted to text
 			if (!fa) return
 
 			void content_query

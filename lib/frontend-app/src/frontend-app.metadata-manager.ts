@@ -32,8 +32,10 @@ import { ordo_app_state } from "../app.state"
 
 export const MetadataManager = {
 	Of: (metadata_repository: Ordo.Metadata.Repository, content_repository: Ordo.Content.Repository): TMetadataManager => {
+		const user = ordo_app_state.zags.select("auth.user")
+
 		const get_metadata_content0 = content_repository
-			.get("" as any, METADATA_CONTENT_FSID)
+			.get(user?.get_id() ?? null, METADATA_CONTENT_FSID)
 			.and(Oath.FromNullable)
 			.and(content => Oath.If(is_string(content), { T: () => content as string }))
 			.and(content => Oath.Try(() => JSON.parse(content) as Ordo.Metadata.DTO[]))
@@ -42,18 +44,20 @@ export const MetadataManager = {
 			.and(metadata_repository.put)
 			.and(result => result.cata({ Ok: () => Oath.Resolve(void 0), Err: Oath.Reject }))
 
-		content_repository.$.marry(
-			(_, is_update) =>
-				is_update &&
-				void content_repository
-					.get("" as any, METADATA_CONTENT_FSID)
-					.and(stream => new Response(stream))
-					.and(res => res.json())
-					.and(items => Oath.If(is_array(items), { T: () => items }))
-					.and(items => items.map(Metadata.FromDTO))
-					.and(json => metadata_repository.put(json))
-					.invoke(invokers0.to_promise),
-		)
+		content_repository.$.marry((_, is_update) => {
+			if (!is_update) return
+
+			const user = ordo_app_state.zags.select("auth.user")
+
+			void content_repository
+				.get(user?.get_id() ?? null, METADATA_CONTENT_FSID)
+				.and(stream => new Response(stream))
+				.and(res => res.json())
+				.and(items => Oath.If(is_array(items), { T: () => items }))
+				.and(items => items.map(Metadata.FromDTO))
+				.and(json => metadata_repository.put(json))
+				.invoke(invokers0.to_promise)
+		})
 
 		let divorce_metadata_repository: () => void
 		let cancel_get_content: () => void
@@ -84,11 +88,23 @@ export const MetadataManager = {
 
 					const user = ordo_app_state.zags.select("auth.user")
 
-					if (user) {
-						previous_save_attempt0 = Oath.Resolve(on_state_change("put-remote"))
-							.and(() => Oath.Try(() => JSON.stringify(dtos)))
-							.and(str => content_repository.put(user.get_id(), METADATA_CONTENT_FSID, str))
-					}
+					previous_save_attempt0 = Oath.Resolve(on_state_change("put-remote"))
+						.and(() => {
+							if (user) {
+								const authenticated_dtos = dtos.map(dto => {
+									if (!dto.created_by) (dto as any).created_by = user.get_id()
+									if (!dto.updated_by) (dto as any).updated_by = user.get_id()
+
+									return dto
+								})
+
+								return authenticated_dtos
+							}
+
+							return dtos
+						})
+						.and(dtos => Oath.Try(() => JSON.stringify(dtos)))
+						.and(str => content_repository.put(user?.get_id() ?? null, METADATA_CONTENT_FSID, str))
 
 					previous_save_attempt0 &&
 						void previous_save_attempt0

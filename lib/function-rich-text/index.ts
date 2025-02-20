@@ -20,6 +20,8 @@
  */
 
 import { BsFileEarmarkRichText } from "@ordo-pink/frontend-icons"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
+import { MaokaStr } from "@ordo-pink/maoka-render-string"
 import { TwoLetterLocale } from "@ordo-pink/locale"
 import { create_function } from "@ordo-pink/core"
 
@@ -63,7 +65,16 @@ export default create_function(
 		})
 
 		commands.emit("cmd.functions.file_associations.register", {
+			content_to_string: {
+				render: ({ metadata, content, is_editable }) =>
+					MaokaStr.render(
+						MaokaStr.create_element("div"),
+						MaokaOrdo.Components.WithState(ctx, () => RichText(metadata, content, is_editable)),
+					),
+			},
 			name: "pink.ordo.rich-text",
+			render_icon: BsFileEarmarkRichText,
+			render: ({ metadata, content, is_editable }) => RichText(metadata, content, is_editable),
 			types: [
 				{
 					name: "text/ordo",
@@ -71,8 +82,6 @@ export default create_function(
 					description: "t.text.file_association.description",
 				},
 			],
-			render: ({ metadata, content }) => RichText(metadata, content),
-			render_icon: BsFileEarmarkRichText,
 		})
 	},
 )

@@ -40,9 +40,10 @@ const SidebarPaddingContractor = (element: TMaokaElement) =>
 		return () => {
 			const sidebar = get_sidebar()
 
-			Switch.OfTrue()
-				.case(sidebar.enabled && sidebar.visible, () => element.classList?.remove("no-sidebar"))
-				.default(() => element.classList?.add("no-sidebar"))
+			if (element instanceof HTMLElement)
+				Switch.OfTrue()
+					.case(sidebar.enabled && sidebar.visible, () => element.classList.remove("no-sidebar"))
+					.default(() => element.classList.add("no-sidebar"))
 		}
 	})
 

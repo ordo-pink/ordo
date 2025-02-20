@@ -20,10 +20,10 @@
  */
 
 import { NotificationType, RRR } from "@ordo-pink/core"
-import { call_once, noop } from "@ordo-pink/tau"
 import { ConsoleLogger } from "@ordo-pink/logger"
 import { Result } from "@ordo-pink/result"
 import { ZAGS } from "@ordo-pink/zags"
+import { call_once } from "@ordo-pink/tau"
 
 import { MetadataCommand } from "./data/metadata/metadata-command.impl"
 import { MetadataQuery } from "./data/metadata/metadata-query.impl"
@@ -45,52 +45,63 @@ export const init_metadata: TInitMetadataFn = call_once(() => {
 	const app_metadata_query = MetadataQuery.Of(metadata_repository, () => Result.Ok(void 0))
 	const metadata_command = MetadataCommand.Of(metadata_repository, app_metadata_query, queries.user)
 
-	const Err = (rrr: Ordo.Rrr) => {
-		console.error(rrr)
+	const alert_rrr = (rrr: Ordo.Rrr) => {
+		if (rrr.debug && rrr.debug.length) logger.error(...rrr.debug)
+
 		commands.emit("cmd.application.notification.show", {
-			message: rrr.debug?.join("\n") ?? "",
+			message: rrr.message as Ordo.I18N.TranslationKey,
 			duration: 15,
 			title: `t.common.error.${rrr.key.toLocaleLowerCase()}` as any,
 			type: NotificationType.RRR,
 		})
+
+		throw rrr
 	}
 
 	commands.on("cmd.metadata.add_labels", ({ fsid, labels }) =>
-		metadata_command.add_labels(fsid, ...labels).cata({ Ok: noop, Err }),
+		metadata_command.add_labels(fsid, ...labels).cata(Result.catas.or_else(alert_rrr)),
 	)
 
 	// TODO Use metadata_commands directly for changing size
-	commands.on("cmd.metadata.set_size", ({ fsid, size }) => metadata_command.set_size(fsid, size).cata({ Ok: noop, Err }))
-
-	commands.on("cmd.metadata.remove_labels", ({ fsid, labels }) =>
-		metadata_command.remove_labels(fsid, ...labels).cata({ Ok: noop, Err }),
+	commands.on("cmd.metadata.set_size", ({ fsid, size }) =>
+		metadata_command.set_size(fsid, size).cata(Result.catas.or_else(alert_rrr)),
 	)
 
-	commands.on("cmd.metadata.set_property", ({ fsid, key, value }) => metadata_command.set_property(fsid, key, value))
+	commands.on("cmd.metadata.remove_labels", ({ fsid, labels }) =>
+		metadata_command.remove_labels(fsid, ...labels).cata(Result.catas.or_else(alert_rrr)),
+	)
+
+	commands.on("cmd.metadata.set_property", ({ fsid, key, value }) =>
+		metadata_command.set_property(fsid, key, value).cata(Result.catas.or_else(alert_rrr)),
+	)
 
 	commands.on("cmd.metadata.create", params => {
-		metadata_command.create(params).cata({ Ok: noop, Err })
+		metadata_command.create(params).cata(Result.catas.or_else(alert_rrr))
 	})
 
 	commands.on("cmd.metadata.move", ({ fsid, new_parent }) =>
-		metadata_command.set_parent(fsid, new_parent).cata({ Ok: noop, Err }),
+		metadata_command.set_parent(fsid, new_parent).cata(Result.catas.or_else(alert_rrr)),
 	)
 
 	commands.on("cmd.metadata.remove", fsid => {
-		metadata_command.remove(fsid).cata({ Ok: noop, Err })
+		metadata_command.remove(fsid).cata(Result.catas.or_else(alert_rrr))
 		// TODO Remove contentOrdo.Metadata.Instance[] | null
 	})
 
-	commands.on("cmd.metadata.add_links", ({ fsid, links }) => metadata_command.add_links(fsid, ...links).cata({ Ok: noop, Err }))
-
-	commands.on("cmd.metadata.remove_links", ({ fsid, links }) =>
-		metadata_command.remove_links(fsid, ...links).cata({ Ok: noop, Err }),
+	commands.on("cmd.metadata.add_links", ({ fsid, links }) =>
+		metadata_command.add_links(fsid, ...links).cata(Result.catas.or_else(alert_rrr)),
 	)
 
-	commands.on("cmd.metadata.rename", ({ fsid, new_name }) => metadata_command.set_name(fsid, new_name).cata({ Ok: noop, Err }))
+	commands.on("cmd.metadata.remove_links", ({ fsid, links }) =>
+		metadata_command.remove_links(fsid, ...links).cata(Result.catas.or_else(alert_rrr)),
+	)
+
+	commands.on("cmd.metadata.rename", ({ fsid, new_name }) =>
+		metadata_command.set_name(fsid, new_name).cata(Result.catas.or_else(alert_rrr)),
+	)
 
 	commands.on("cmd.metadata.edit_label", ({ old_label, new_label }) =>
-		metadata_command.update_label(old_label, new_label).cata({ Ok: noop, Err }),
+		metadata_command.update_label(old_label, new_label).cata(Result.catas.or_else(alert_rrr)),
 	)
 
 	const get_metadata_query = (fid: symbol) =>
@@ -100,7 +111,7 @@ export const init_metadata: TInitMetadataFn = call_once(() => {
 					const rrr = RRR.codes.eperm(
 						`MetadataQuery permission RRR. Did you forget to request query permission '${permission}'?`,
 					)
-					ConsoleLogger.error(rrr.debug?.join(" "))
+					ConsoleLogger.error(rrr.message)
 					return rrr
 				},
 			}),

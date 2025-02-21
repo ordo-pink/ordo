@@ -121,8 +121,8 @@ const Icon = ({ metadata, custom_class, has_children }: P2) =>
 			use(MaokaJabs.set_class(custom_class!))
 
 			return Switch.OfTrue()
-				.case(has_children, () => BsFolderOpen(custom_class))
-				.case(metadata.get_size() === 0, () => BsFileEarmark(custom_class))
+				.case(!fa && has_children, () => BsFolderOpen(custom_class))
+				.case(metadata.get_type() === "text/ordo" && metadata.get_size() === 0, () => BsFileEarmark(custom_class))
 				.case(!!fa && !!fa.render_icon, () => fa!.render_icon!())
 				.default(() => BsFileEarmarkBinary(custom_class))
 		}

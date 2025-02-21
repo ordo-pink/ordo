@@ -79,6 +79,7 @@ export const init_content: TF = () => {
 		throw rrr
 	}
 
+	// TODO Update metadata size
 	commands.on("cmd.content.set", ({ fsid, content }) => {
 		const metadata_query = ordo_app_state.zags.select("queries.metadata")
 		const size = get_size(content)

@@ -67,7 +67,6 @@ export const App = ({ id_host, dt_host, pb_host }: TAppOptions) =>
 		const app_state = use(create_function_state(app_fid, source))
 
 		use(MaokaOrdo.Context.provide(app_state))
-		use(start_metadata_manager(repositories))
 
 		use(MaokaJabs.set_class("app"))
 		use(create_command_palette)
@@ -78,6 +77,8 @@ export const App = ({ id_host, dt_host, pb_host }: TAppOptions) =>
 		use(edit_file_labels_command)
 		use(edit_file_links_command)
 		use(auth_commands)
+
+		use(start_metadata_manager(repositories))
 
 		// TODO Render user defined functions
 		// TODO .catch

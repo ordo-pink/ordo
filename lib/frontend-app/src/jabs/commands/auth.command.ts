@@ -55,8 +55,9 @@ export const auth_commands: TMaokaJab = ({ onunmount, use }) => {
 			.and(init => Oath.FromPromise(() => fetch(`${id_host}/tokens/refresh`, init)))
 			.and(res => res.json())
 			.and(res => Oath.If(res.success, { T: () => res.payload as string }))
+			.pipe(ops0.tap(token => ordo_app_state.zags.update("auth.token", () => token)))
 			.and(token => ordo_app_state.zags.update("auth.token", () => token))
-			.pipe(ops0.rejected_map(clean_up_auth))
+			.invoke(invokers0.or_else(clean_up_auth))
 
 	void R.FromNullable(localStorage.getItem("user"))
 		.pipe(R.ops.chain(str => R.Try(() => JSON.parse(str))))
@@ -84,14 +85,10 @@ export const auth_commands: TMaokaJab = ({ onunmount, use }) => {
 			})
 
 	const handle_show_request_code: Ordo.Command.HandlerOf<"cmd.auth.show_request_code_modal"> = () =>
-		commands.emit("cmd.application.modal.show", {
-			render: () => RequestCodeModal,
-		})
+		void commands.emit("cmd.application.modal.show", { render: () => RequestCodeModal })
 
 	const handle_show_validate_code: Ordo.Command.HandlerOf<"cmd.auth.show_validate_code_modal"> = email =>
-		commands.emit("cmd.application.modal.show", {
-			render: () => ValidateCodeModal(email),
-		})
+		void commands.emit("cmd.application.modal.show", { render: () => ValidateCodeModal(email) })
 
 	commands.on("cmd.auth.show_request_code_modal", handle_show_request_code)
 	commands.on("cmd.auth.show_validate_code_modal", handle_show_validate_code)
@@ -102,16 +99,16 @@ export const auth_commands: TMaokaJab = ({ onunmount, use }) => {
 		render_icon: BsBoxArrowInRight,
 	})
 
-	const divorce_user = ordo_app_state.zags.cheat("auth.user", (user, is_update) => {
-		if (!is_update) return
-		if (!user) return clean_up_auth()
-
-		void Oath.FromNullable(user)
-			.and(u => u.to_dto())
-			.and(d => Oath.Try(() => JSON.stringify(d)))
-			.and(s => Oath.Try(() => localStorage.setItem("user", s)))
-			.invoke(invokers0.force_resolve)
-	})
+	const divorce_user = ordo_app_state.zags.cheat(
+		"auth.user",
+		(user, is_update) =>
+			is_update &&
+			R.FromNullable(user)
+				.pipe(R.ops.chain(user => R.Try(() => user.to_dto())))
+				.pipe(R.ops.chain(dto => R.Try(() => JSON.stringify(dto))))
+				.pipe(R.ops.chain(json => R.Try(() => localStorage.setItem("user", json))))
+				.cata(R.catas.or_else(clean_up_auth)),
+	)
 
 	// TODO use other means but localStorage for storing user info
 	const divorce_token = ordo_app_state.zags.cheat("auth.token", token => {
@@ -130,7 +127,7 @@ export const auth_commands: TMaokaJab = ({ onunmount, use }) => {
 				is_authenticated = true
 			}
 
-			refresh_timout_id = setTimeout(() => void refresh_token(token).invoke(invokers0.or_nothing), 50000) as any // TODO Take duration from env
+			refresh_timout_id = setTimeout(() => void refresh_token(token), 50000) as any // TODO Take duration from env
 
 			localStorage.setItem("token", token)
 		} else {

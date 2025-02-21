@@ -33,6 +33,7 @@ import { ordo_app_state } from "../app.state"
 export const MetadataManager = {
 	Of: (metadata_repository: Ordo.Metadata.Repository, content_repository: Ordo.Content.Repository): TMetadataManager => {
 		const user = ordo_app_state.zags.select("auth.user")
+		const logger = ordo_app_state.zags.select("logger")
 
 		const get_metadata_content0 = content_repository
 			.get(user?.get_id() ?? null, METADATA_CONTENT_FSID)
@@ -107,9 +108,12 @@ export const MetadataManager = {
 						.and(str => content_repository.put(user?.get_id() ?? null, METADATA_CONTENT_FSID, str))
 
 					previous_save_attempt0 &&
-						void previous_save_attempt0
-							.pipe(ops0.bitap(mark_put_complete, mark_put_complete))
-							.invoke(invokers0.or_else(console.error)) // TODO handling persistence errors
+						void previous_save_attempt0.pipe(ops0.bitap(mark_put_complete, mark_put_complete)).invoke(
+							invokers0.or_else(e => {
+								if ((e as any) === "Cancelled") return
+								logger.error(e)
+							}),
+						)
 				})
 
 				cancel_get_content = () => {

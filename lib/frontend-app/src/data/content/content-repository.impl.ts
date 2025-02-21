@@ -20,8 +20,8 @@
  */
 
 import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
-import { T, noop } from "@ordo-pink/tau"
 import { METADATA_CONTENT_FSID } from "@ordo-pink/core"
+import { T } from "@ordo-pink/tau"
 import { ZAGS } from "@ordo-pink/zags"
 
 // TODO Sync storages
@@ -118,10 +118,12 @@ export const ContentRepository: Ordo.Content.RepositoryStatic = {
 		})
 
 		return {
-			get: (uid, fsid) => local_strategy.get(uid, fsid).fix(() => null),
+			get: (uid, fsid) => local_strategy.get(uid as Ordo.User.UID, fsid).fix(() => null),
 			get_all: () => local_strategy.list(),
 			put: (uid, fsid, content) =>
-				local_strategy.put(uid, fsid, content).and(() => remote_strategy.put(uid, fsid, content).fix(noop)),
+				local_strategy
+					.put(uid as Ordo.User.UID, fsid, content)
+					.and(() => (uid ? remote_strategy.put(uid, fsid, content) : void 0)),
 			get $() {
 				return $
 			},

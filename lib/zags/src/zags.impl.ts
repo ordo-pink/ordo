@@ -21,6 +21,7 @@ export const ZAGS: TZagsStatic = {
 			}
 		},
 		cheat: (path, f) => {
+			const state_copy = Object.assign({}, state)
 			let value: any
 
 			const wrapped_f = (state: any, is_update: boolean) => {
@@ -35,7 +36,7 @@ export const ZAGS: TZagsStatic = {
 			}
 
 			handlers.push(wrapped_f)
-			wrapped_f(state, false)
+			wrapped_f(state_copy, false)
 
 			return () => {
 				const index = handlers.indexOf(wrapped_f)

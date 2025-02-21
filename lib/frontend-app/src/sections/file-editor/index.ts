@@ -172,13 +172,14 @@ export default create_function(
 
 			if (!user) throw RRR.codes.eperm(`Cannot publish '${metadata.get_name()}' because user is not authenticated`)
 
+			const name = `.${metadata.get_name()}-pub`
 			const metadata_type = metadata.get_type()
 			const fa = fas.find(fa => fa.types.some(type => type.name === metadata_type))
 
 			// TODO Avoid rendering files if they should not be converted to text
 			if (!fa) return
 
-			void content_query
+			return content_query
 				.get(user.get_id(), fsid)
 				.and(content =>
 					Oath.FromNullable(fa)
@@ -190,15 +191,8 @@ export default create_function(
 						),
 				)
 				.and(({ str, styles }) => create_publishable_page(metadata.get_name(), str, ...(styles ?? [])))
-				.and(content =>
-					commands.emit("cmd.content.upload", {
-						name: `.${metadata.get_name()}-pub`,
-						parent: metadata.get_fsid(),
-						content,
-						type: "text/html",
-					}),
-				)
-				.and(() => metadata_query.get_by_name(`.${metadata.get_name()}-pub`, metadata.get_fsid(), { show_hidden: true }))
+				.and(content => commands.emit("cmd.content.upload", { name, parent: fsid, content, type: "text/html" }))
+				.and(() => metadata_query.get_by_name(name, fsid, { show_hidden: true }))
 				.and(r => r.cata({ Ok: m => Oath.Resolve(m), Err: () => Oath.Reject(null) }))
 				.and(Oath.FromNullable)
 				.and(public_metadata =>
@@ -208,7 +202,11 @@ export default create_function(
 						value: public_metadata.get_fsid(),
 					}),
 				)
-				.invoke(invokers0.to_promise)
+				.invoke(
+					invokers0.or_else(rrr => {
+						throw RRR.codes.eperm(`Could not publish '${metadata.get_name()}'`, rrr)
+					}),
+				)
 		})
 
 		commands.emit("cmd.application.command_palette.add", {

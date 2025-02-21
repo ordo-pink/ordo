@@ -21,13 +21,14 @@
 
 import { CurrentUser } from "@ordo-pink/core"
 import { Maoka } from "@ordo-pink/maoka"
+import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { ZAGS } from "@ordo-pink/zags"
 
-const is_valid$ = ZAGS.Of({ value: true })
-
 import "../../maoka-components.css"
+
+const is_valid$ = ZAGS.Of({ value: true })
 
 type TInputProps = {
 	initial_value?: string
@@ -68,8 +69,9 @@ const Text = ({
 				return () => label
 			}),
 
-			Maoka.create("input", ({ use, element, onmount: on_mount }) => {
+			Maoka.create("input", ({ element, use }) => {
 				const is_mobile = use(MaokaJabs.is_mobile)
+				const is_dom = use(MaokaDOM.Jabs.is_dom)
 
 				use(
 					MaokaJabs.listen("oninput", event => {
@@ -98,7 +100,12 @@ const Text = ({
 				if (autocomplete) use(MaokaJabs.set_attribute("autocomplete", autocomplete))
 				if (initial_value) use(MaokaJabs.set_attribute("value", initial_value))
 				if (placeholder) use(MaokaJabs.set_attribute("placeholder", placeholder))
-				if (autofocus && !is_mobile) on_mount(() => element instanceof HTMLElement && element.focus())
+
+				use(
+					MaokaDOM.Jabs.onmount(() => {
+						if (is_dom && autofocus && !is_mobile && element instanceof HTMLInputElement) element.focus()
+					}),
+				)
 
 				if (required) {
 					use(MaokaJabs.set_attribute("required", "true"))

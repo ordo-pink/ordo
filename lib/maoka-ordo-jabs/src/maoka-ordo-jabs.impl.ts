@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
+import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { R } from "@ordo-pink/result"
 import { type TLogger } from "@ordo-pink/logger"
@@ -64,7 +65,7 @@ export const happy_marriage$ = <$TState extends Record<string, unknown>, $TResul
 	zags: TZags<$TState>,
 	handler: (state: $TState) => $TResult = x => x as unknown as $TResult,
 ): TMaokaJab<() => $TResult> => {
-	return ({ onunmount, refresh }) => {
+	return ({ refresh, use }) => {
 		let value: $TResult
 
 		const divorce = zags.marry(state => {
@@ -76,7 +77,11 @@ export const happy_marriage$ = <$TState extends Record<string, unknown>, $TResul
 			}
 		})
 
-		onunmount(() => divorce())
+		use(
+			MaokaDOM.Jabs.onunmount(() => {
+				divorce()
+			}),
+		)
 
 		return () => value
 	}

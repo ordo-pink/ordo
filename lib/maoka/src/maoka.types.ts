@@ -13,10 +13,6 @@ export type TMaokaElement = {
 	replaceChildren: (...children: TMaokaChild[]) => void
 	dispatchEvent: (event: Event) => void
 	children: TMaokaChild[]
-
-	// TODO Move to render_dom
-	onunmount?: (() => void) | undefined
-	onmount?: (() => void) | undefined
 }
 
 export type TMaokaTextElement = Partial<{ [$TKey in keyof Text]: Text[$TKey] }> | string
@@ -81,16 +77,8 @@ export type TMaokaProps = {
 	 */
 	refresh: () => void
 
-	onunmount: TMaokaOnUnmountFn
-
-	onmount: TMaokaOnMountFn
-
 	use: <_TResult>(jab: TMaokaJab<_TResult>) => _TResult
 }
-
-export type TMaokaOnUnmountFn = (onunmount_workload: () => void) => void
-
-export type TMaokaOnMountFn = (on_mount_workload: () => void) => void
 
 /**
  * A callback function that returns children of the current Maoka component. It accepts a record of
@@ -106,10 +94,3 @@ export type TMaokaCallback = (
 	| ((() => Promise<TMaokaChildren>) | undefined | void)
 	| Promise<(() => TMaokaChildren) | undefined | void>
 	| Promise<(() => Promise<TMaokaChildren>) | undefined | void>
-
-export type TMaokaDOMElement = TMaokaElement & {
-	onunmount: (() => void) | undefined
-	onmount: (() => void) | undefined
-}
-
-export type TMaokaRenderDOMFn = (root: HTMLElement, component: TMaokaComponent) => Promise<void>

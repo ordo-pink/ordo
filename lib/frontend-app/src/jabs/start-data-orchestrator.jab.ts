@@ -19,6 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { Switch } from "@ordo-pink/switch"
 import { type TMaokaJab } from "@ordo-pink/maoka"
@@ -29,7 +30,7 @@ import { MetadataManager } from "../frontend-app.metadata-manager"
 type P = { metadata: Ordo.Metadata.Repository; content: Ordo.Content.Repository }
 export const start_metadata_manager =
 	(repositories: P): TMaokaJab =>
-	async ({ use, onunmount }) => {
+	async ({ use }) => {
 		const commands = use(MaokaOrdo.Jabs.get_commands)
 
 		const metadata_manager = MetadataManager.Of(repositories.metadata, repositories.content)
@@ -43,7 +44,9 @@ export const start_metadata_manager =
 				.default(noop),
 		)
 
-		onunmount(() => {
-			metadata_manager.cancel()
-		})
+		use(
+			MaokaDOM.Jabs.onunmount(() => {
+				metadata_manager.cancel()
+			}),
+		)
 	}

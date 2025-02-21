@@ -4,6 +4,7 @@
  */
 
 import { type TDotPath, type TZags, ZAGS } from "@ordo-pink/zags"
+import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 
 import { type TMaokaZags } from "./maoka-zags.types"
 
@@ -29,7 +30,7 @@ export const MaokaZAGS = {
 			 */
 			select_jab$:
 				<K extends TDotPath<$TState>>(path: K) =>
-				({ refresh, onunmount, id }) => {
+				({ id, refresh, use }) => {
 					let is_initial_render = true
 
 					const divorce = $.marry(() => {
@@ -50,10 +51,12 @@ export const MaokaZAGS = {
 						}
 					})
 
-					onunmount(() => {
-						divorce()
-						delete selection_results[id]
-					})
+					use(
+						MaokaDOM.Jabs.onunmount(() => {
+							divorce()
+							delete selection_results[id]
+						}),
+					)
 
 					return () => selection_results[id][path]!
 				},

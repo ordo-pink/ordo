@@ -20,6 +20,7 @@
  */
 
 import { Maoka } from "@ordo-pink/maoka"
+import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 
 import { get_readable_type } from "./utils/common"
@@ -30,21 +31,27 @@ type P = Pick<Ordo.Notification.Instance, "id" | "type" | "duration">
 export const OrdoNotificationProgress = ({ id, type, duration }: P) => {
 	if (!duration) return
 
-	return Maoka.create("div", ({ use, onunmount }) => {
+	return Maoka.create("div", ({ use }) => {
 		const get_progress = use(ordo_notifications_state.select_jab$(`progress_bars.${id}`))
 		const commands = ordo_app_state.zags.select("commands")
 
-		const update_progress_bar = () => {
-			ordo_notifications_state.zags.update("progress_bars", progress_bars => ({
-				...progress_bars,
-				[id]: progress_bars[id] === 0 ? 0 : !progress_bars[id] ? 100 : progress_bars[id] > 0 ? progress_bars[id] - 1 : 0,
-			}))
-		}
+		use(
+			MaokaDOM.Jabs.onmount(() => {
+				const update_progress_bar = () => {
+					ordo_notifications_state.zags.update("progress_bars", progress_bars => ({
+						...progress_bars,
+						[id]: progress_bars[id] === 0 ? 0 : !progress_bars[id] ? 100 : progress_bars[id] > 0 ? progress_bars[id] - 1 : 0,
+					}))
+				}
 
-		update_progress_bar()
-		const interval = setInterval(update_progress_bar, duration * 10)
+				update_progress_bar()
+				const interval = setInterval(update_progress_bar, duration * 10)
 
-		onunmount(() => clearInterval(interval))
+				return () => {
+					clearInterval(interval)
+				}
+			}),
+		)
 
 		use(MaokaJabs.set_class("notification-card_progress"))
 

@@ -21,6 +21,7 @@
 
 import { BsFileEarmark, BsFileEarmarkBinary, BsFolderOpen } from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/maoka"
+import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { R } from "@ordo-pink/result"
@@ -30,7 +31,7 @@ import { ordo_app_state } from "@ordo-pink/frontend-app/app.state"
 
 type P = { metadata: Ordo.Metadata.Instance; custom_class?: string; show_emoji_picker?: boolean }
 export const MetadataIcon = ({ metadata, custom_class = "", show_emoji_picker = true }: P) =>
-	Maoka.create("div", ({ use, refresh, onunmount }) => {
+	Maoka.create("div", ({ use, refresh }) => {
 		const icon_class = get_icon_class(custom_class)
 
 		let emoji = metadata.get_property("emoji_icon")
@@ -51,7 +52,7 @@ export const MetadataIcon = ({ metadata, custom_class = "", show_emoji_picker = 
 				)
 		})
 
-		onunmount(() => divorce_metadata_query())
+		use(MaokaDOM.Jabs.onunmount(() => divorce_metadata_query()))
 
 		use(MaokaJabs.set_class("cursor-pointer"))
 

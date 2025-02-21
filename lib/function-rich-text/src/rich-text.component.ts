@@ -23,14 +23,15 @@
 
 import { is_array, is_string } from "@ordo-pink/tau"
 import { Maoka } from "@ordo-pink/maoka"
+import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { R } from "@ordo-pink/result"
 import { ZAGS } from "@ordo-pink/zags"
 
 import { type TEditorFocusPosition, type TEditorState } from "../rich-text.types"
 import { editor_context, editor_context_jab } from "../jabs/editor-context.jab"
 import { Line } from "./line.component"
-import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
 export const RichText = (metadata: Ordo.Metadata.Instance, content: Ordo.Content.Instance, is_editable: boolean) => {
 	const fsid = metadata.get_fsid()
@@ -46,7 +47,7 @@ export const RichText = (metadata: Ordo.Metadata.Instance, content: Ordo.Content
 			Ok: state => state$.update("value", () => state as TEditorState),
 		})
 
-	return Maoka.create("div", ({ use, onunmount, refresh }) => {
+	return Maoka.create("div", ({ use, refresh }) => {
 		const commands = use(MaokaOrdo.Jabs.get_commands)
 
 		use(MaokaJabs.set_class("p-2 size-full outline-none cursor-text"))
@@ -165,9 +166,11 @@ export const RichText = (metadata: Ordo.Metadata.Instance, content: Ordo.Content
 			}),
 		)
 
-		onunmount(() => {
-			divorce_state()
-		})
+		use(
+			MaokaDOM.Jabs.onunmount(() => {
+				divorce_state()
+			}),
+		)
 
 		return () => {
 			const state = state$.select("value")

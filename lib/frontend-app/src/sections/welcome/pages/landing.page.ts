@@ -23,6 +23,7 @@ import { LabelColor, NotificationType } from "@ordo-pink/core"
 import { BsCookie } from "@ordo-pink/frontend-icons"
 import { Button } from "@ordo-pink/maoka-components"
 import { Maoka } from "@ordo-pink/maoka"
+import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { Result } from "@ordo-pink/result"
@@ -37,21 +38,23 @@ import "./landing.page.css"
 let is_cookie_modal_shown = false
 
 // TODO Translations
-export default Maoka.create("main", ({ use, onunmount }) => {
+export default Maoka.create("main", ({ use }) => {
 	const commands = use(MaokaOrdo.Jabs.get_commands)
 	const { t } = use(MaokaOrdo.Jabs.get_translations$)
 	const metadata_query = use(MaokaOrdo.Jabs.get_metadata_query)
 
-	commands.emit("cmd.application.set_title", "t.welcome.landing_page.title")
+	use(
+		MaokaDOM.Jabs.onmount(() => {
+			commands.emit("cmd.application.set_title", "t.welcome.landing_page.title")
+			document.addEventListener("mousemove", event => handle_mouse_move(event))
+			if (!is_cookie_modal_shown) show_cookie_modal(commands.emit)
 
-	if (!is_cookie_modal_shown) show_cookie_modal(commands.emit)
-
-	document.addEventListener("mousemove", event => handle_mouse_move(event))
-
-	onunmount(() => {
-		document.removeEventListener("mousemove", event => handle_mouse_move(event))
-		Object.assign(document.documentElement, { style: "" })
-	})
+			return () => {
+				document.removeEventListener("mousemove", event => handle_mouse_move(event))
+				Object.assign(document.documentElement, { style: "" })
+			}
+		}),
+	)
 
 	const handle_mouse_move = (event: MouseEvent) => {
 		const dx = (event.clientX - window.innerWidth / 2) * -0.005
@@ -172,7 +175,7 @@ const show_cookie_modal = (emit: Ordo.Command.EmitFn) => {
 		message: "t.welcome.landing_page.cookie_banner.message",
 		type: NotificationType.WARN,
 		duration: 15,
-		render_icon: span => void Maoka.dom(span, BsCookie("size-5")),
+		render_icon: span => void MaokaDOM.render(span, BsCookie("size-5")),
 	})
 
 	is_cookie_modal_shown = true

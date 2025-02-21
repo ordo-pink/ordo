@@ -24,6 +24,7 @@ import { CheckboxInput, Dialog, Input } from "@ordo-pink/maoka-components"
 import { CommandPaletteItemType, CurrentUser } from "@ordo-pink/core"
 import { Maoka, TMaokaJab } from "@ordo-pink/maoka"
 import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
+import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { R } from "@ordo-pink/result"
 import { ordo_app_state } from "@ordo-pink/frontend-app/app.state"
@@ -43,7 +44,7 @@ import { ordo_app_state } from "@ordo-pink/frontend-app/app.state"
  * TODO Persist user info in browser
  * TODO Trigger merging remote and local user content after authentication (ContentManager)
  */
-export const auth_commands: TMaokaJab = ({ onunmount, use }) => {
+export const auth_commands: TMaokaJab = ({ use }) => {
 	let is_authenticated = false
 
 	const commands = use(MaokaOrdo.Jabs.get_commands)
@@ -148,13 +149,15 @@ export const auth_commands: TMaokaJab = ({ onunmount, use }) => {
 		}
 	})
 
-	onunmount(() => {
-		divorce_token()
-		divorce_user()
+	use(
+		MaokaDOM.Jabs.onunmount(() => {
+			divorce_token()
+			divorce_user()
 
-		commands.off("cmd.auth.show_request_code_modal", handle_show_request_code)
-		commands.off("cmd.auth.show_validate_code_modal", handle_show_validate_code)
-	})
+			commands.off("cmd.auth.show_request_code_modal", handle_show_request_code)
+			commands.off("cmd.auth.show_validate_code_modal", handle_show_validate_code)
+		}),
+	)
 }
 
 const RequestCodeModal = Maoka.create("div", ({ use }) => {

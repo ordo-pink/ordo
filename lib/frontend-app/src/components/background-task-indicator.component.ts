@@ -27,6 +27,7 @@
 import { BS_CLOUD_DOWNLOAD, BS_CLOUD_UPLOAD } from "@ordo-pink/frontend-icons"
 import { BackgroundTaskStatus } from "@ordo-pink/core"
 import { Maoka } from "@ordo-pink/maoka"
+import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaZAGS } from "@ordo-pink/maoka-zags"
 import { Switch } from "@ordo-pink/switch"
@@ -41,23 +42,27 @@ const handle_start_loading = () => background_task_status_state.zags.update("sta
 const handle_start_saving = () => background_task_status_state.zags.update("status", () => BackgroundTaskStatus.SAVING)
 const handle_reset_status = () => background_task_status_state.zags.update("status", () => BackgroundTaskStatus.NONE)
 
-export const OrdoBackgroundTaskIndicator = Maoka.create("div", ({ use, onunmount }) => {
+export const OrdoBackgroundTaskIndicator = Maoka.create("div", ({ use }) => {
 	const get_status = use(background_task_status_state.select_jab$("status"))
 	const commands = ordo_app_state.zags.select("commands")
 
 	use(MaokaJabs.set_class("background-task-indicator"))
 
-	commands.on("cmd.application.background_task.set_status", handle_set_status)
-	commands.on("cmd.application.background_task.start_loading", handle_start_loading)
-	commands.on("cmd.application.background_task.start_saving", handle_start_saving)
-	commands.on("cmd.application.background_task.reset_status", handle_reset_status)
+	use(
+		MaokaDOM.Jabs.onmount(() => {
+			commands.on("cmd.application.background_task.set_status", handle_set_status)
+			commands.on("cmd.application.background_task.start_loading", handle_start_loading)
+			commands.on("cmd.application.background_task.start_saving", handle_start_saving)
+			commands.on("cmd.application.background_task.reset_status", handle_reset_status)
 
-	onunmount(() => {
-		commands.off("cmd.application.background_task.set_status", handle_set_status)
-		commands.off("cmd.application.background_task.start_loading", handle_start_loading)
-		commands.off("cmd.application.background_task.start_saving", handle_start_saving)
-		commands.off("cmd.application.background_task.reset_status", handle_reset_status)
-	})
+			return () => {
+				commands.off("cmd.application.background_task.set_status", handle_set_status)
+				commands.off("cmd.application.background_task.start_loading", handle_start_loading)
+				commands.off("cmd.application.background_task.start_saving", handle_start_saving)
+				commands.off("cmd.application.background_task.reset_status", handle_reset_status)
+			}
+		}),
+	)
 
 	return () => {
 		const status = get_status()

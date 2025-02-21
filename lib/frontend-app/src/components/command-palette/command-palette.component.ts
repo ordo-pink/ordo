@@ -23,6 +23,7 @@ import { fuzzy_check, noop } from "@ordo-pink/tau"
 import { Hotkey } from "@ordo-pink/maoka-components"
 import { Input } from "@ordo-pink/maoka-components"
 import { Maoka } from "@ordo-pink/maoka"
+import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { Switch } from "@ordo-pink/switch"
@@ -31,7 +32,7 @@ import { type TOrdoState, ordo_app_state } from "../../../app.state"
 import { CommandPaletteLocation } from "./constants"
 import { OrdoCommandPaletteItems } from "./command-palette-items.component"
 
-export const OrdoCommandPalette = Maoka.create("div", ({ use, refresh, onunmount, onmount: on_mount }) => {
+export const OrdoCommandPalette = Maoka.create("div", ({ use, refresh }) => {
 	use(MaokaJabs.set_class("command-palette"))
 
 	let input = ""
@@ -75,14 +76,6 @@ export const OrdoCommandPalette = Maoka.create("div", ({ use, refresh, onunmount
 	}
 
 	const get_state = use(MaokaOrdo.Jabs.happy_marriage$(ordo_app_state.zags, handle_marry_ordo_state))
-
-	const handle_keydown = (event: KeyboardEvent) =>
-		Switch.Match(event.key)
-			.case("ArrowUp", handle_arrow_up)
-			.case("ArrowDown", handle_arrow_down)
-			.case("Tab", () => handle_tab(event))
-			.case("Enter", handle_enter)
-			.default(noop)
 
 	const handle_enter = () => {
 		const state = get_state()
@@ -213,8 +206,23 @@ export const OrdoCommandPalette = Maoka.create("div", ({ use, refresh, onunmount
 		}))
 	}
 
-	on_mount(() => document.addEventListener("keydown", handle_keydown))
-	onunmount(() => document.removeEventListener("keydown", handle_keydown))
+	use(
+		MaokaDOM.Jabs.onmount(() => {
+			const handle_keydown = (event: KeyboardEvent) =>
+				Switch.Match(event.key)
+					.case("ArrowUp", handle_arrow_up)
+					.case("ArrowDown", handle_arrow_down)
+					.case("Tab", () => handle_tab(event))
+					.case("Enter", handle_enter)
+					.default(noop)
+
+			document.addEventListener("keydown", handle_keydown)
+
+			return () => {
+				document.removeEventListener("keydown", handle_keydown)
+			}
+		}),
+	)
 
 	return () => {
 		const state = get_state()

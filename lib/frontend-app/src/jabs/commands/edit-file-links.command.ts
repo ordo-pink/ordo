@@ -21,11 +21,12 @@
 
 import { ContextMenuItemType, Metadata } from "@ordo-pink/core"
 import { BsLink } from "@ordo-pink/frontend-icons"
+import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { R } from "@ordo-pink/result"
 import { type TMaokaJab } from "@ordo-pink/maoka"
 
-export const edit_file_links_command: TMaokaJab = ({ onunmount, use }) => {
+export const edit_file_links_command: TMaokaJab = ({ use }) => {
 	const state = use(MaokaOrdo.Context.consume)
 
 	const handle_show_edit_links_palette: Ordo.Command.HandlerOf<"cmd.metadata.show_edit_links_palette"> = fsid => {
@@ -72,8 +73,10 @@ export const edit_file_links_command: TMaokaJab = ({ onunmount, use }) => {
 		type: ContextMenuItemType.UPDATE,
 	})
 
-	onunmount(() => {
-		state.commands.off("cmd.metadata.show_edit_links_palette", handle_show_edit_links_palette)
-		state.commands.emit("cmd.application.context_menu.remove", "cmd.metadata.show_edit_links_palette")
-	})
+	use(
+		MaokaDOM.Jabs.onunmount(() => {
+			state.commands.off("cmd.metadata.show_edit_links_palette", handle_show_edit_links_palette)
+			state.commands.emit("cmd.application.context_menu.remove", "cmd.metadata.show_edit_links_palette")
+		}),
+	)
 }

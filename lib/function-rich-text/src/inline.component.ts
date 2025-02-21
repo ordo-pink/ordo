@@ -21,6 +21,7 @@
 
 import { is_0, noop } from "@ordo-pink/tau"
 import { Maoka } from "@ordo-pink/maoka"
+import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { Switch } from "@ordo-pink/switch"
@@ -36,7 +37,7 @@ export const Inline = (
 	inline_index: number,
 ) =>
 	Switch.Match(node.type).default(() =>
-		Maoka.create("span", ({ use, element, onmount: after_mount, onunmount }) => {
+		Maoka.create("span", ({ use, element }) => {
 			use(MaokaJabs.set_class("outline-none inline-block"))
 			use(MaokaJabs.set_attribute("contenteditable", "true"))
 
@@ -46,27 +47,33 @@ export const Inline = (
 			const commands = use(MaokaOrdo.Jabs.get_commands)
 			const { caret_position$, state$, add_new_line, set_caret_position, remove_block } = use(editor_context_jab)
 
-			after_mount(() => {
-				const current_position = caret_position$.unwrap()
+			use(
+				MaokaDOM.Jabs.onmount(() => {
+					const pos = caret_position$.unwrap()
 
-				if (current_position.block_index === block_index && current_position.inline_index === inline_index) {
-					const el = element as unknown as HTMLInputElement
-					// set_position({ block_index, inline_index, anchor_offset: 0, focus_offset: 0 })
-					// el.focus()
+					if (element instanceof HTMLInputElement && pos.block_index === block_index && pos.inline_index === inline_index) {
+						// set_position({ block_index, inline_index, anchor_offset: 0, focus_offset: 0 })
+						// el.focus()
 
-					const selection = window.getSelection()
-					const range = document.createRange()
+						const sel = window.getSelection()
+						const rng = document.createRange()
 
-					if (!selection) return
+						if (!sel) return
 
-					if (!el.childNodes[0]) return el.focus()
+						if (!element.childNodes[0]) return element.focus()
 
-					range.setStart(el.childNodes[0], current_position.anchor_offset)
+						rng.setStart(element.childNodes[0], pos.anchor_offset)
 
-					selection.removeAllRanges()
-					selection.addRange(range)
-				}
-			})
+						sel.removeAllRanges()
+						sel.addRange(rng)
+					}
+
+					return () => {
+						document.removeEventListener("keydown", handle_keydown)
+						document.removeEventListener("keyup", handle_keyup)
+					}
+				}),
+			)
 
 			use(
 				MaokaJabs.listen("onmouseup", event => {
@@ -143,7 +150,7 @@ export const Inline = (
 			}
 
 			const handle_keyup = (event: KeyboardEvent) => {
-				if (element instanceof HTMLElement && document.activeElement !== element) return
+				if (MaokaDOM.is_maoka_dom_element(element) && document.activeElement !== element) return
 
 				Switch.Match(event.key)
 					.case(["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"], () => {
@@ -156,11 +163,6 @@ export const Inline = (
 
 			document.addEventListener("keydown", handle_keydown)
 			document.addEventListener("keyup", handle_keyup)
-
-			onunmount(() => {
-				document.removeEventListener("keydown", handle_keydown)
-				document.removeEventListener("keyup", handle_keyup)
-			})
 
 			use(
 				MaokaJabs.listen("oninput", event => {

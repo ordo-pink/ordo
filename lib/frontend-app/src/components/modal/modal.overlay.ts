@@ -27,8 +27,9 @@ import { ModalCloseButton } from "./close-button.component"
 import { ordo_app_state } from "../../../app.state"
 
 import "./modal.css"
+import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 
-export const OrdoModal = Maoka.create("div", ({ use, onunmount }) => {
+export const OrdoModal = Maoka.create("div", ({ use }) => {
 	const get_modal_state = use(ordo_app_state.select_jab$("sections.modal"))
 
 	const commands = ordo_app_state.zags.select("commands")
@@ -48,14 +49,20 @@ export const OrdoModal = Maoka.create("div", ({ use, onunmount }) => {
 		commands.emit("cmd.application.modal.hide")
 	}
 
-	const handle_close = (event: KeyboardEvent) => {
-		if (event.key !== "Escape") return
-		handle_click(event)
-	}
+	use(
+		MaokaDOM.Jabs.onmount(() => {
+			const handle_close = (event: KeyboardEvent) => {
+				if (event.key !== "Escape") return
+				handle_click(event)
+			}
 
-	document.addEventListener("keydown", handle_close)
+			document.addEventListener("keydown", handle_close)
 
-	onunmount(() => document.removeEventListener("keydown", handle_close))
+			return () => {
+				document.removeEventListener("keydown", handle_close)
+			}
+		}),
+	)
 
 	return () => {
 		if (get_modal_state()) {

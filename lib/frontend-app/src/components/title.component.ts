@@ -20,22 +20,29 @@
  */
 
 import { Maoka } from "@ordo-pink/maoka"
+import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { ZAGS } from "@ordo-pink/zags"
 
-export const OrdoTitleDisplay = Maoka.create("div", ({ use, onunmount }) => {
+export const OrdoTitleDisplay = Maoka.create("div", ({ use }) => {
 	const commands = use(MaokaOrdo.Jabs.get_commands)
 	const { t } = use(MaokaOrdo.Jabs.get_translations$)
 	const get_title = use(MaokaOrdo.Jabs.happy_marriage$(title$, s => s.title))
 	const title_element = document.querySelector("title") as HTMLTitleElement
 
-	const handle_set_title = (title: Ordo.I18N.TranslationKey) => title$.update("title", () => title)
+	use(
+		MaokaDOM.Jabs.onmount(() => {
+			const handle_set_title = (title: Ordo.I18N.TranslationKey) => {
+				title$.update("title", () => title)
+			}
 
-	commands.on("cmd.application.set_title", handle_set_title)
+			commands.on("cmd.application.set_title", handle_set_title)
 
-	onunmount(() => {
-		commands.off("cmd.application.set_title", handle_set_title)
-	})
+			return () => {
+				commands.off("cmd.application.set_title", handle_set_title)
+			}
+		}),
+	)
 
 	return () => {
 		const title = get_title()

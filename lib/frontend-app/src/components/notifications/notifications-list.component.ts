@@ -28,20 +28,25 @@ import { ordo_app_state } from "../../../app.state"
 import { ordo_notifications_state } from "./notifications.state"
 
 import "./notifications.css"
+import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 
 // BUG Notification duration gets reset when rerendering
 // TODO Notification stack when there are more than 5 notifications
-export const OrdoNotifications = Maoka.create("div", ({ use, onunmount }) => {
+export const OrdoNotifications = Maoka.create("div", ({ use }) => {
 	const commands = ordo_app_state.zags.select("commands")
 	const translate = ordo_app_state.zags.select("translate")
 
-	commands.on("cmd.application.notification.hide", handle_notification_hide)
-	commands.on("cmd.application.notification.show", handle_notification_show)
+	use(
+		MaokaDOM.Jabs.onmount(() => {
+			commands.on("cmd.application.notification.hide", handle_notification_hide)
+			commands.on("cmd.application.notification.show", handle_notification_show)
 
-	onunmount(() => {
-		commands.off("cmd.application.notification.hide", handle_notification_hide)
-		commands.off("cmd.application.notification.show", handle_notification_show)
-	})
+			return () => {
+				commands.off("cmd.application.notification.hide", handle_notification_hide)
+				commands.off("cmd.application.notification.show", handle_notification_show)
+			}
+		}),
+	)
 
 	use(MaokaJabs.set_class("notification-list"))
 

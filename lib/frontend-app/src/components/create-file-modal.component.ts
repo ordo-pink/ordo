@@ -22,6 +22,7 @@
 import { Dialog, Input } from "@ordo-pink/maoka-components"
 import { BsFileEarmarkPlus } from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/maoka"
+import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { Switch } from "@ordo-pink/switch"
@@ -62,7 +63,7 @@ export const CreateFileModal = (parent: Ordo.Metadata.FSID | null = null) =>
 // TODO Extract select
 // TODO Add caret showing expanded-contracted status
 const FileAssociationSelector = (on_select_type: (file_association: Ordo.FileAssociation.Instance, type: string) => void) =>
-	Maoka.create("div", ({ use, refresh, onunmount }) => {
+	Maoka.create("div", ({ use, refresh }) => {
 		const select_class =
 			"relative bg-gradient-to-br from-neutral-100 to-stone-100 dark:from-neutral-600 dark:to-stone-600 shadow-inner rounded-md mt-2 cursor-pointer"
 
@@ -82,22 +83,26 @@ const FileAssociationSelector = (on_select_type: (file_association: Ordo.FileAss
 			refresh()
 		}
 
-		const handle_escape_press = (event: KeyboardEvent) => {
-			if (is_expanded && event.key === "Escape") {
-				event.preventDefault()
-				event.stopPropagation()
+		use(
+			MaokaDOM.Jabs.onmount(() => {
+				const handle_escape_press = (event: KeyboardEvent) => {
+					if (is_expanded && event.key === "Escape") {
+						event.preventDefault()
+						event.stopPropagation()
 
-				is_expanded = false
+						is_expanded = false
 
-				refresh()
-			}
-		}
+						refresh()
+					}
+				}
 
-		document.addEventListener("keydown", handle_escape_press)
+				document.addEventListener("keydown", handle_escape_press)
 
-		onunmount(() => {
-			document.removeEventListener("keydown", handle_escape_press)
-		})
+				return () => {
+					document.removeEventListener("keydown", handle_escape_press)
+				}
+			}),
+		)
 
 		return () => {
 			const file_associations = get_file_associations()

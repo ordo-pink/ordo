@@ -20,7 +20,7 @@
  */
 
 import { BsArrowLeft, BsLayoutSidebarInsetReverse } from "@ordo-pink/frontend-icons"
-import { CommandPaletteItemType } from "@ordo-pink/core"
+import { CommandPaletteItemType, ContextMenuItemType } from "@ordo-pink/core"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
@@ -90,12 +90,21 @@ export const OrdoSidebarButton = Maoka.create("button", ({ use }) => {
 		if (enabled) {
 			use(MaokaJabs.add_class("activity-bar_link", "activity-bar_icon"))
 			use(MaokaJabs.remove_class("size-6", "invisible"))
+
 			commands.emit("cmd.application.command_palette.add", {
 				value: () => commands.emit("cmd.application.sidebar.toggle"),
 				hotkey: "mod+b",
 				type: CommandPaletteItemType.COMMON_ACTION,
 				readable_name,
 				render_icon: BsLayoutSidebarInsetReverse,
+			})
+
+			commands.emit("cmd.application.context_menu.add", {
+				command: "cmd.application.sidebar.hide",
+				readable_name: "t.common.components.sidebar.hide",
+				type: ContextMenuItemType.UPDATE,
+				should_show: ({ event }) => MaokaDOM.is_maoka_dom_element(event.target) && !!event.target.closest(".sidebar"),
+				render_icon: () => BsArrowLeft("rotate-180"),
 			})
 		} else {
 			use(MaokaJabs.remove_class("activity-bar_link", "activity-bar_icon"))

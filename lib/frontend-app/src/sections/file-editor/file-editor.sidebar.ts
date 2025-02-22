@@ -27,8 +27,13 @@ import { FileEditorSidebarItem } from "./components/file-editor-sidebar-item.com
 
 export const FileEditorSidebar = Maoka.create("div", ({ use }) => {
 	use(MaokaJabs.set_class("flex flex-col p-2 h-full overflow-y-auto", "file_editor_sidebar"))
+	use(MaokaJabs.listen("oncontextmenu", event => handle_context_menu(event)))
 
 	const get_metadata = use(MaokaOrdo.Jabs.Metadata.get$())
+	const commands = use(MaokaOrdo.Jabs.get_commands)
+
+	const handle_context_menu = (event: MouseEvent) =>
+		void commands.emit("cmd.application.context_menu.show", { event, payload: "root" })
 
 	return () =>
 		get_metadata()

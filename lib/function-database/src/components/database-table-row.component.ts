@@ -23,6 +23,7 @@ import { Label, Link, MetadataIcon, MetadataLink } from "@ordo-pink/maoka-compon
 import { Maoka, type TMaokaChildren } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
+import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { R } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
 import { noop } from "@ordo-pink/tau"
@@ -88,7 +89,7 @@ const LinksCell = (metadata: Ordo.Metadata.Instance, type: "parent" | "incoming"
 						use(MaokaJabs.set_class("database_cell-multiple"))
 						const get_links = use(MaokaOrdo.Jabs.Metadata.get_outgoing_links$(fsid))
 						return () =>
-							get_links().map(link => LinkBlock(() => MetadataLink({ metadata: link, children: link.get_name() ?? "/" })))
+							get_links().map(link => LinkBlock(() => () => MetadataLink({ metadata: link, children: link.get_name() ?? "/" })))
 					}),
 				)
 				.case("incoming", () =>
@@ -96,13 +97,13 @@ const LinksCell = (metadata: Ordo.Metadata.Instance, type: "parent" | "incoming"
 						use(MaokaJabs.set_class("database_cell-multiple"))
 						const get_links = use(MaokaOrdo.Jabs.Metadata.get_incoming_links$(metadata.get_fsid()))
 						return () =>
-							get_links().map(link => LinkBlock(() => MetadataLink({ metadata: link, children: link.get_name() ?? "/" })))
+							get_links().map(link => LinkBlock(() => () => MetadataLink({ metadata: link, children: link.get_name() ?? "/" })))
 					}),
 				)
 				.default(noop)
 	})
 
-const LinkBlock = Maoka.styled("span")
+const LinkBlock = MaokaStyled.Tags.span()
 
 const LabelsCell = (fsid: Ordo.Metadata.FSID) =>
 	Maoka.create("td", ({ use }) => {

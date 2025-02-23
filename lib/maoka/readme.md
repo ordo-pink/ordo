@@ -84,38 +84,6 @@ const my_component = my_params =>
 	})
 ```
 
-## Maoka.styled
-
-Maoka is shipped with a helper function that creates styled components. Styled components cannot be rerendered, and they are
-only updated when their parents refresh (do your parents refresh?). Since they are built that way, they have a slightly
-different API to make their reuse easier - they accept a tag string and an optional `Record<string, string>` of HTML attributes,
-and return a function that accepts a thunk of children:
-
-```javascript
-import { Maoka } from "@ordo-pink/maoka"
-
-const StyledCard = Maoka.styled("div", { class: "card" })
-const StyledCardTitle = Maoka.styled("h1", { class: "card-title" })
-const StyledCardText = Maoka.styled("p", { class: "card-text" })
-const StyledCardFooter = Maoka.styled("div", { class: "card-footer" })
-
-const UndeadScourgeButton = Maoka.create("button", ({ element }) => {
-	element.onclick = () => alert("Right click for hot undead action!")
-
-	return () => "This better be good"
-})
-
-// Maoka children can be Maoka components, strings, numbers, undefined,
-// null, or arrays of any combinations of those
-const UndeadScourgeCard = StyledCard(() => [
-	StyledCardTitle(() => "Necromancers say"),
-	StyledCardText(() => "The shadows beacon."),
-	StyledCardFooter(() => UndeadScourgeButton),
-])
-```
-
-Now that you know what Necromancers say, let's take a look at the internals:
-
 ## Maoka Component
 
 People always ask me - what a perfect component is? And here is a pro tip - make sure you hit the like button and subscribe to

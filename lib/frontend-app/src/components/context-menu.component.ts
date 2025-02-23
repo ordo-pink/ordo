@@ -25,6 +25,7 @@ import { Maoka } from "@ordo-pink/maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
+import { MaokaStyled } from "@ordo-pink/maoka-styled"
 
 import { ordo_app_state } from "../../app.state"
 
@@ -166,7 +167,7 @@ const OrdoContextMenuDynamic = Maoka.create("div", ({ use }) => {
 	}
 })
 
-const HR = Maoka.styled("hr", { class: "context-menu_divider" })(() => void 0)
+const HR = MaokaStyled.Tags.hr("context-menu_divider")(() => void 0)
 
 const ContextMenuItem = (item: Ordo.ContextMenu.Item, payload: any, event: MouseEvent) =>
 	Maoka.create("div", () => {

@@ -24,7 +24,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { BS_CLOUD_DOWNLOAD, BS_CLOUD_UPLOAD } from "@ordo-pink/frontend-icons"
+import { BsCloudDownload, BsCloudUpload } from "@ordo-pink/frontend-icons"
 import { BackgroundTaskStatus } from "@ordo-pink/core"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
@@ -68,14 +68,12 @@ export const OrdoBackgroundTaskIndicator = Maoka.create("div", ({ use }) => {
 		const status = get_status()
 
 		return Switch.Match(status)
-			.case(BackgroundTaskStatus.LOADING, () => LoadingIcon)
-			.case(BackgroundTaskStatus.SAVING, () => SavingIcon)
+			.case(BackgroundTaskStatus.LOADING, () => BsCloudDownload())
+			.case(BackgroundTaskStatus.SAVING, () => BsCloudUpload())
 			.default(() => NoIcon)
 	}
 })
 
 // --- Internal ---
 
-const LoadingIcon = Maoka.html("span", BS_CLOUD_DOWNLOAD)
-const SavingIcon = Maoka.html("span", BS_CLOUD_UPLOAD)
 const NoIcon = Maoka.create("span", noop)

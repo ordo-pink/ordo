@@ -74,6 +74,7 @@ export const OrdoNotificationProgress = ({ id, type, duration }: P) => {
 type P1 = Pick<Ordo.Notification.Instance, "type"> & { progress: number }
 const ProgressBarForeground = ({ progress, type }: P1) =>
 	Maoka.create("div", ({ use }) => {
+		if (!progress) return
 		use(MaokaJabs.set_class("notification-card_progress_foreground", get_readable_type(type)))
 		use(MaokaJabs.set_style({ width: progress.toFixed(0).concat("%") }))
 	})

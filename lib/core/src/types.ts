@@ -550,6 +550,7 @@ declare global {
 				readable_name: Ordo.I18N.TranslationKey
 			}
 
+			// TODO Support for marking files as remote-only
 			type Instance = {
 				name: string
 				render_icon?: Ordo.FileAssociation.RenderIconFn

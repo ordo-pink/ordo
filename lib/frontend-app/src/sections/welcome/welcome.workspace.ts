@@ -29,6 +29,8 @@ export const WelcomeWorkspace = Maoka.create("div", ({ use }) => {
 	return () => {
 		const user = get_user()
 
-		return user ? Maoka.lazy(() => import("./pages/welcome.page")) : Maoka.lazy(() => import("./pages/landing.page"))
+		return user
+			? import("./pages/welcome.page").then(module => module.default)
+			: import("./pages/landing.page").then(module => module.default)
 	}
 })

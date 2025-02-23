@@ -146,8 +146,8 @@ export default create_function(
 			content_to_string: {
 				render: ({ metadata, content, is_editable }) =>
 					MaokaStr.render(
-						MaokaStr.create_element("div"),
 						MaokaOrdo.Components.WithState(ctx, () => Database(metadata, content, is_editable)),
+						() => crypto.randomUUID(),
 					),
 				styles: [db_styles],
 			},

@@ -24,6 +24,7 @@ import { Maoka } from "@ordo-pink/maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
+import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { R } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
 import { emojis } from "@ordo-pink/emojis"
@@ -86,7 +87,7 @@ export const MetadataIcon = ({ metadata, custom_class = "", show_emoji_picker = 
 									({
 										value: emoji.icon,
 										readable_name: emoji.description as Ordo.I18N.TranslationKey,
-										render_icon: () => Maoka.html("div", emoji.icon),
+										render_icon: () => MaokaStyled.Just.div(() => () => emoji.icon),
 									}) satisfies Ordo.CommandPalette.Item,
 							),
 						],

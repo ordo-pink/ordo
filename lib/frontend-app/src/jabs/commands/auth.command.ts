@@ -26,6 +26,7 @@ import { Maoka, TMaokaJab } from "@ordo-pink/maoka"
 import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
+import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { R } from "@ordo-pink/result"
 import { ordo_app_state } from "@ordo-pink/frontend-app/app.state"
 
@@ -224,8 +225,8 @@ const RequestCodeModal = Maoka.create("div", ({ use }) => {
 				const checkbox_params = { on_change, checked: consent, label }
 
 				return [
-					CodeModalInputWrapper(() => Input.Email(input_params)),
-					RequestCodeModalCheckboxWrapper(() => CheckboxInput(checkbox_params)),
+					CodeModalInputWrapper(() => () => Input.Email(input_params)),
+					RequestCodeModalCheckboxWrapper(() => () => CheckboxInput(checkbox_params)),
 				]
 			},
 			title: t_title,
@@ -240,9 +241,9 @@ const clean_up_auth = () => {
 	window.location.replace("/")
 }
 
-const RequestCodeModalCheckboxWrapper = Maoka.styled("div", { class: "px-8" })
+const RequestCodeModalCheckboxWrapper = MaokaStyled.Tags.div("px-8")
 
-const CodeModalInputWrapper = Maoka.styled("div", { class: "py-4" })
+const CodeModalInputWrapper = MaokaStyled.Tags.div("py-4")
 
 const ValidateCodeModal = (email: Ordo.User.Email) =>
 	Maoka.create("div", ({ use }) => {
@@ -283,16 +284,17 @@ const ValidateCodeModal = (email: Ordo.User.Email) =>
 				action_hotkey: "enter",
 				// TODO render_icon
 				body: () => [
-					CodeModalInputWrapper(() =>
-						Input.Text({
-							autofocus: true,
-							label: "Email Code", // TODO i18n
-							placeholder: "123456",
-							initial_value: code,
-							on_input,
-							validate,
-							validation_error_message: t_email_code_validation_error,
-						}),
+					CodeModalInputWrapper(
+						() => () =>
+							Input.Text({
+								autofocus: true,
+								label: "Email Code", // TODO i18n
+								placeholder: "123456",
+								initial_value: code,
+								on_input,
+								validate,
+								validation_error_message: t_email_code_validation_error,
+							}),
 					),
 				],
 			})

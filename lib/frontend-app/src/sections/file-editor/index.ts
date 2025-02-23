@@ -22,7 +22,7 @@
 import { BsBoxArrowUp, BsCloudMinus, BsCloudPlus, BsLayoutTextWindow } from "@ordo-pink/frontend-icons"
 import { CommandPaletteItemType, ContextMenuItemType, Metadata, RRR, create_function } from "@ordo-pink/core"
 import { Oath, invokers0 } from "@ordo-pink/oath"
-import { Maoka } from "@ordo-pink/maoka"
+import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { MetadataIcon } from "@ordo-pink/maoka-components"
 import { R } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
@@ -176,13 +176,14 @@ export default create_function(
 			const metadata_type = metadata.get_type()
 			const fa = fas.find(fa => fa.types.some(type => type.name === metadata_type))
 
-			// TODO Avoid rendering files if they should not be converted to text
+			// TODO Render file as is
 			if (!fa) return
 
 			return content_query
 				.get(user.get_id(), fsid)
 				.and(content =>
 					Oath.FromNullable(fa)
+						// TODO Render file as is if there is no content_to_string
 						.and(fa => Oath.FromNullable(fa.content_to_string).fix(() => ({ render: () => "", styles: [] })))
 						.and(({ render, styles }) =>
 							Oath.FromNullable(render)
@@ -250,14 +251,12 @@ const metadata_to_command_palette_item =
 		return {
 			value: metadata.get_fsid(),
 			readable_name: metadata.get_name() as Ordo.I18N.TranslationKey,
-			render_custom_info: () => FilePath(() => path),
+			render_custom_info: () => FilePath(() => () => path),
 			render_icon: () => MetadataIcon({ metadata }),
 		}
 	}
 
-const FilePath = Maoka.styled("div", {
-	class: "text-xs text-neutral-600 dark:text-neutral-400 w-fit whitespace-nowrap",
-})
+const FilePath = MaokaStyled.Tags.div("text-xs text-neutral-600 dark:text-neutral-400 w-fit whitespace-nowrap")
 
 // TODO Move to utils
 const get_path = (ancestors: Ordo.Metadata.Instance[]) =>

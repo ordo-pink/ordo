@@ -20,14 +20,15 @@
  */
 
 import { ContextMenuItemType, LabelColor, Metadata } from "@ordo-pink/core"
-import { Maoka, type TMaokaJab } from "@ordo-pink/maoka"
 import { BsTags } from "@ordo-pink/frontend-icons"
+import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
+import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { R } from "@ordo-pink/result"
+import { type TMaokaJab } from "@ordo-pink/maoka"
 import { color_class } from "@ordo-pink/maoka-components"
 
 import { EditLabelModal } from "../../components/edit-label-modal.component"
-import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 
 export const edit_file_labels_command: TMaokaJab = ({ use }) => {
 	const state = use(MaokaOrdo.Context.consume)
@@ -104,5 +105,4 @@ export const edit_file_labels_command: TMaokaJab = ({ use }) => {
 	)
 }
 
-const LabelCircle = (color: LabelColor) =>
-	Maoka.styled("div", { class: `label ${color_class[color]} size-3 !rounded-full` })(() => {})
+const LabelCircle = (color: LabelColor) => MaokaStyled.Tags.div(`label ${color_class[color]} size-3 !rounded-full`)(() => {})

@@ -22,6 +22,7 @@
 import { BsMenuButtonWideFill } from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { ordo_app_state } from "@ordo-pink/frontend-app/app.state"
 
 import { OrdoActivityBarIcon } from "./activity-bar-icon.component"
@@ -63,11 +64,12 @@ export const OrdoActivityBar = Maoka.create("div", ({ use }) => {
 				return () => OrdoActivityBarIcon({ name: "Command Palette", render_icon: BsMenuButtonWideFill })
 			}),
 
-			ActivityBarActivities(() =>
-				activities.map(
-					({ name, routes, default_route, render_icon }) =>
-						render_icon && OrdoActivityBarLink({ current_activity_name, default_route, name, render_icon, routes }),
-				),
+			ActivityBarActivities(
+				() => () =>
+					activities.map(
+						({ name, routes, default_route, render_icon }) =>
+							render_icon && OrdoActivityBarLink({ current_activity_name, default_route, name, render_icon, routes }),
+					),
 			),
 
 			OrdoSidebarButton,
@@ -75,4 +77,4 @@ export const OrdoActivityBar = Maoka.create("div", ({ use }) => {
 	}
 })
 
-const ActivityBarActivities = Maoka.styled("div", { class: "activity-bar_activities" })
+const ActivityBarActivities = MaokaStyled.Tags.div("activity-bar_activities")

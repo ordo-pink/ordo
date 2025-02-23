@@ -23,6 +23,7 @@ import { Checkbox } from "@ordo-pink/maoka-components"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
+import { MaokaStyled } from "@ordo-pink/maoka-styled"
 
 import { type TColumnName } from "../database.types"
 import { database$ } from "../database.state"
@@ -44,10 +45,10 @@ export const DatabaseColumnModalItem = (column: TColumnName) =>
 			const t_column_name = t(column as Ordo.I18N.TranslationKey)
 
 			return [
-				DatabaseColumnsModalSubtitle(() => t_column_name),
+				DatabaseColumnsModalSubtitle(() => () => t_column_name),
 				Checkbox({ checked: is_checkbox_checked, on_change: handle_checkbox_change }),
 			]
 		}
 	})
 
-const DatabaseColumnsModalSubtitle = Maoka.styled("div")
+const DatabaseColumnsModalSubtitle = MaokaStyled.Tags.div()

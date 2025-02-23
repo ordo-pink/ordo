@@ -22,6 +22,7 @@
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { Result } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
 import { create_hotkey_from_event } from "@ordo-pink/hotkey-from-event"
@@ -105,20 +106,19 @@ export const Hotkey = (
 
 const IGNORED_KEYS = ["Control", "Shift", "Alt", "Meta"]
 
-const KeyContainer = Maoka.styled("span", {
-	class: "key-container",
-})
+const KeyContainer = MaokaStyled.Tags.span("key-container")
 
 const Key = (key: string) =>
-	KeyContainer(() =>
-		Switch.Match(key)
-			.case("backspace", () => "⌫")
-			.case("enter", () => "⏎")
-			.case("escape", () => "Esc")
-			.case("tab", () => "⇥")
-			.case("arrowleft", () => "←")
-			.case("arrowright", () => "→")
-			.case("arrowup", () => "↑")
-			.case("arrowdown", () => "↓")
-			.default(() => title_case(key)),
+	KeyContainer(
+		() => () =>
+			Switch.Match(key)
+				.case("backspace", () => "⌫")
+				.case("enter", () => "⏎")
+				.case("escape", () => "Esc")
+				.case("tab", () => "⇥")
+				.case("arrowleft", () => "←")
+				.case("arrowright", () => "→")
+				.case("arrowup", () => "↑")
+				.case("arrowdown", () => "↓")
+				.default(() => title_case(key)),
 	)

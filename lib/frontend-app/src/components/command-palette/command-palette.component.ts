@@ -26,6 +26,7 @@ import { Maoka } from "@ordo-pink/maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
+import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { Switch } from "@ordo-pink/switch"
 
 import { type TOrdoState, ordo_app_state } from "../../../app.state"
@@ -131,7 +132,6 @@ export const OrdoCommandPalette = Maoka.create("div", ({ use, refresh }) => {
 					return {
 						...cp,
 						index: visible_items.length ? cp.index : 0,
-						location: visible_items.length ? cp.location : CommandPaletteLocation.PINNED,
 						visible_items,
 						current: {
 							...cp.current,
@@ -229,7 +229,7 @@ export const OrdoCommandPalette = Maoka.create("div", ({ use, refresh }) => {
 
 		return [
 			SearchInput,
-			ItemsWrapper(() => [state.is_multiple ? PinnedItems : void 0, VisibleItems]),
+			ItemsWrapper(() => () => [state.is_multiple ? PinnedItems : void 0, VisibleItems]),
 			state.is_multiple ? WithPinnedItemsHint : NoPinnedItemsHint,
 		]
 	}
@@ -237,13 +237,13 @@ export const OrdoCommandPalette = Maoka.create("div", ({ use, refresh }) => {
 
 // --- Internal ---
 
-const Hint = Maoka.styled("div", { class: "command-palette_hint" })
+const Hint = MaokaStyled.Tags.div("command-palette_hint")
 
-const ItemsWrapper = Maoka.styled("div", { class: "grow overflow-auto" })
+const ItemsWrapper = MaokaStyled.Tags.div("grow overflow-auto")
 
 const DisplayHotkey = (key: string) => Hotkey(key, { smol: true, decoration_only: true })
 
-const WithPinnedItemsHint = Hint(() => [
+const WithPinnedItemsHint = Hint(() => () => [
 	DisplayHotkey("arrowup"),
 	DisplayHotkey("arrowdown"),
 	DisplayHotkey("tab"),
@@ -251,7 +251,7 @@ const WithPinnedItemsHint = Hint(() => [
 	DisplayHotkey("escape"),
 ])
 
-const NoPinnedItemsHint = Hint(() => [
+const NoPinnedItemsHint = Hint(() => () => [
 	DisplayHotkey("arrowup"),
 	DisplayHotkey("arrowdown"),
 	DisplayHotkey("enter"),

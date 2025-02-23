@@ -21,6 +21,7 @@
 
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { MaokaStyled } from "@ordo-pink/maoka-styled"
 
 import "../../maoka-components.css"
 
@@ -46,7 +47,7 @@ export const CheckboxInput = ({ on_change, checked, label }: TCheckboxInputParam
 	Maoka.create("label", ({ use }) => {
 		use(MaokaJabs.set_class("checkbox-label"))
 
-		return () => [Checkbox({ on_change, checked }), LabelText(() => label)]
+		return () => [Checkbox({ on_change, checked }), LabelText(() => () => label)]
 	})
 
-const LabelText = Maoka.styled("span", { class: "block" })
+const LabelText = MaokaStyled.Tags.span("block")

@@ -25,6 +25,7 @@ import { LabelColor } from "@ordo-pink/core"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
+import { MaokaStyled } from "@ordo-pink/maoka-styled"
 
 export const EditLabelModal = (label: Ordo.Metadata.Label) =>
 	Maoka.create("div", ({ use }) => {
@@ -87,5 +88,4 @@ export const EditLabelModal = (label: Ordo.Metadata.Label) =>
 			})
 	})
 
-const LabelCircle = (color: LabelColor) =>
-	Maoka.styled("div", { class: `label ${color_class[color]} size-3 !rounded-full` })(() => {})
+const LabelCircle = (color: LabelColor) => MaokaStyled.Tags.div(`label ${color_class[color]} size-3 !rounded-full`)(() => {})

@@ -20,8 +20,10 @@
  */
 
 import { Maoka } from "@ordo-pink/maoka"
+import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
+import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { R } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
 
@@ -35,7 +37,6 @@ import { database$ } from "./database.state"
 import { show_columns_jab } from "./jabs/show-columns-modal.jab"
 
 import "./database.css"
-import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 
 export const Database = async (metadata: Ordo.Metadata.Instance, content: Ordo.Content.Instance, is_editable: boolean) => {
 	try {
@@ -89,9 +90,9 @@ export const Database = async (metadata: Ordo.Metadata.Instance, content: Ordo.C
 
 			return [
 				is_editable ? DatabaseOptions : void 0,
-				DatabaseTable(() => [
+				DatabaseTable(() => () => [
 					DatabaseTableHead(keys, is_editable),
-					DatabaseTableBody(() => [
+					DatabaseTableBody(() => () => [
 						...sorted_children.map(child => DatabaseTableRow(keys, child, is_editable)),
 						is_editable ? DatabaseTableActionsRow(metadata) : void 0,
 					]),
@@ -103,9 +104,9 @@ export const Database = async (metadata: Ordo.Metadata.Instance, content: Ordo.C
 
 // --- Internal ---
 
-const DatabaseTableBody = Maoka.styled("tbody")
+const DatabaseTableBody = MaokaStyled.Tags.tbody()
 
-const DatabaseTable = Maoka.styled("table", { class: "w-full border database_border-color h-full" })
+const DatabaseTable = MaokaStyled.Tags.table("w-full border database_border-color h-full")
 
 const to_sorted_children = (db_state: TDatabaseState, children: Ordo.Metadata.Instance[]) => {
 	let items = children

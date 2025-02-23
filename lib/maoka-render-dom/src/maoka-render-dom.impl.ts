@@ -3,12 +3,13 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { Maoka, type TMaokaComponent, type TMaokaElement, type TMaokaJab } from "@ordo-pink/maoka"
+import { Maoka, type TMaokaElement, type TMaokaJab } from "@ordo-pink/maoka"
+
 import { type TMaokaDOMElement, type TMaokaRenderDOMFn } from "./maoka-render-dom.types"
 
-export const is_maoka_dom_element = (x: unknown): x is TMaokaDOMElement & Element => {
+export const is_maoka_dom_element = (x: unknown): x is TMaokaDOMElement & HTMLElement => {
 	try {
-		return x instanceof Element
+		return x instanceof HTMLElement
 	} catch (_) {
 		return false
 	}
@@ -26,58 +27,16 @@ export const onunmount_jab =
 
 export const is_dom_jab: TMaokaJab<boolean> = ({ element }) => is_maoka_dom_element(element)
 
-export const render: TMaokaRenderDOMFn = async (root, component) => {
-	const root_id: string = crypto.randomUUID()
-	const root_element = root as unknown as TMaokaElement
-
+export const render: TMaokaRenderDOMFn = async (root_element, component, create_id) => {
 	const create_element = document.createElement.bind(document)
-	const Component = await component(create_element, root_element, root_id)
-	const refresh_queue = new Map<string, { element: TMaokaElement; get_children: () => Promise<TMaokaElement> }>()
+	const root = Maoka.create_root(root_element, create_id, create_element)
+	const Component = await component(root)
 
-	root.appendChild(Component as unknown as Element)
+	if (!is_maoka_dom_element(Component)) {
+		throw new TypeError("Could not create a DOM element from provided component")
+	}
 
-	root.addEventListener("refresh", event => {
-		event.stopPropagation()
-
-		const [id, element, get_children] = (event as any).detail as [string, TMaokaDOMElement, () => TMaokaComponent]
-
-		const refresh_nodes = refresh_queue.keys().toArray()
-
-		if (refresh_queue.has(id)) return
-
-		for (let i = 0; i < refresh_nodes.length; i++) {
-			const refresh_element = refresh_queue.get(refresh_nodes[i])?.element
-
-			if (
-				refresh_element &&
-				refresh_element instanceof Element &&
-				element instanceof Element &&
-				element.contains?.(refresh_element)
-			) {
-				refresh_queue.delete(refresh_nodes[i])
-				break
-			}
-		}
-
-		refresh_queue.set(id, {
-			element,
-			get_children: () => Maoka.render_children(create_element, root_element, root_id, get_children, element),
-		})
-	})
-
-	const request_idle_callback = requestIdleCallback ?? setTimeout
-
-	const render_loop = () =>
-		refresh_queue.size
-			? Promise.all(
-					refresh_queue.entries().map(([key, data]) => {
-						refresh_queue.delete(key)
-						return data.get_children()
-					}),
-				).then(() => request_idle_callback(() => void render_loop()))
-			: request_idle_callback(() => void render_loop())
-
-	request_idle_callback(() => void render_loop())
+	root.element.appendChild(Component)
 
 	const unmount_element = (element: TMaokaDOMElement) => {
 		if (element.onunmount) element.onunmount()
@@ -119,5 +78,5 @@ export const render: TMaokaRenderDOMFn = async (root, component) => {
 		}
 	})
 
-	observer.observe(root, { childList: true, subtree: true, attributeFilter: ["onmount", "onunmount"] })
+	observer.observe(root.element, { childList: true, subtree: true, attributeFilter: ["onmount", "onunmount"] })
 }

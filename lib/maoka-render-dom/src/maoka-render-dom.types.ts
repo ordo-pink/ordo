@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { TMaokaComponent, TMaokaElement } from "@ordo-pink/maoka"
+import type { TCreateIDFn, TMaokaComponent, TMaokaElement } from "@ordo-pink/maoka"
 
 export type TMaokaDOMElement = TMaokaElement & {
-	onunmount?: (() => () => void) | (() => void)
+	onunmount?: () => void
 	onmount?: (() => () => void) | (() => void)
 }
 
-export type TMaokaRenderDOMFn = (root: HTMLElement, component: TMaokaComponent) => Promise<void>
+export type TMaokaRenderDOMFn = (root: HTMLElement, component: TMaokaComponent, create_id: TCreateIDFn) => Promise<void>

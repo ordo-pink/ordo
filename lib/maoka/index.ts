@@ -5,6 +5,6 @@
 
 export type * from "./src/maoka.types.ts"
 
-import { create, html, lazy, render_children, styled } from "./src/maoka.impl.ts"
+import { create, create_root } from "./src/maoka.impl.ts"
 
-export const Maoka = { create, html, lazy, render_children, styled }
+export const Maoka = { create, create_root }

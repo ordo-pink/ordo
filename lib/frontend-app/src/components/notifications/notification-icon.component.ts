@@ -19,24 +19,29 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import * as Icons from "@ordo-pink/frontend-icons"
+import {
+	BsCheckCircle,
+	BsCircle,
+	BsErrorCircle,
+	BsExclamationCircle,
+	BsInfoCircle,
+	BsQuestionCircle,
+} from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/maoka"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { NotificationType } from "@ordo-pink/core"
 import { Switch } from "@ordo-pink/switch"
 
 type P = Pick<Ordo.Notification.Instance, "render_icon" | "type">
 export const OrdoNotificationIcon = ({ render_icon, type }: P) =>
-	Maoka.create("div", ({ use, element: current_element }) => {
-		if (render_icon) render_icon(current_element as unknown as HTMLDivElement)
-		else use(MaokaJabs.set_inner_html(get_default_icon(type)))
+	Maoka.create("div", ({ element }) => {
+		if (render_icon) render_icon(element as unknown as HTMLDivElement)
+		else
+			return () =>
+				Switch.Match(type)
+					.case(NotificationType.INFO, () => BsInfoCircle("text-sky-500"))
+					.case(NotificationType.QUESTION, () => BsQuestionCircle("text-violet-500"))
+					.case(NotificationType.RRR, () => BsErrorCircle("text-rose-500"))
+					.case(NotificationType.SUCCESS, () => BsCheckCircle("text-emerald-500"))
+					.case(NotificationType.WARN, () => BsExclamationCircle("text-amber-500"))
+					.default(() => BsCircle("text-neutral-500"))
 	})
-
-const get_default_icon = (type: Ordo.Notification.Instance["type"]) =>
-	Switch.Match(type)
-		.case(NotificationType.INFO, () => Icons.BS_INFO_CIRCLE)
-		.case(NotificationType.QUESTION, () => Icons.BS_QUESTION_CIRCLE)
-		.case(NotificationType.RRR, () => Icons.BS_ERROR_CIRCLE)
-		.case(NotificationType.SUCCESS, () => Icons.BS_CHECK_CIRCLE)
-		.case(NotificationType.WARN, () => Icons.BS_EXCLAMATION_CIRCLE)
-		.default(() => Icons.BS_CIRCLE)

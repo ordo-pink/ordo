@@ -28,4 +28,4 @@ const id_host = import.meta.env.VITE_ORDO_ID_HOST
 const dt_host = import.meta.env.VITE_ORDO_DT_HOST
 const pb_host = import.meta.env.VITE_ORDO_PB_HOST
 
-void MaokaDOM.render(app, App({ id_host, dt_host, pb_host }))
+void MaokaDOM.render(app, App({ id_host, dt_host, pb_host }), () => crypto.randomUUID())

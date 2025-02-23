@@ -23,6 +23,7 @@ import { BsX } from "@ordo-pink/frontend-icons"
 import { LabelColor } from "@ordo-pink/core"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { is_string } from "@ordo-pink/tau"
 
 import "../../maoka-components.css"
@@ -46,13 +47,13 @@ export const Label = (label: Ordo.Metadata.Label, emit: Ordo.Command.EmitFn, met
 
 		return () =>
 			metadata
-				? [TextWrapper(() => readable_name), RemoveLabel(metadata.get_fsid(), label, emit)]
-				: TextWrapper(() => readable_name)
+				? [TextWrapper(() => () => readable_name), RemoveLabel(metadata.get_fsid(), label, emit)]
+				: TextWrapper(() => () => readable_name)
 	})
 
 // --- Internal ---
 
-const TextWrapper = Maoka.styled("div")
+const TextWrapper = MaokaStyled.Just.div
 
 const RemoveLabel = (fsid: Ordo.Metadata.FSID, label: Ordo.Metadata.Label, emit: Ordo.Command.EmitFn) =>
 	Maoka.create("div", ({ use }) => {

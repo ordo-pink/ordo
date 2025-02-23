@@ -21,6 +21,7 @@
 
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { MaokaStyled } from "@ordo-pink/maoka-styled"
 
 import { Inline } from "./inline.component"
 import { type TOrdoRichTextEditorBlockNode } from "../rich-text.types"
@@ -30,12 +31,12 @@ export const Line = (node: TOrdoRichTextEditorBlockNode, metadata: Ordo.Metadata
 		use(MaokaJabs.set_class("flex items-center space-x-2"))
 		use(MaokaJabs.set_attribute("contenteditable", "false"))
 
-		return () => [LineNumber(() => String(block_index + 1)), Block(node, metadata, block_index)]
+		return () => [LineNumber(() => () => String(block_index + 1)), Block(node, metadata, block_index)]
 	})
 
 // --- Internal ---
 
-const LineNumber = Maoka.styled("div", { class: "w-12 text-right font-mono text-neutral-500" })
+const LineNumber = MaokaStyled.Tags.div("w-12 text-right font-mono text-neutral-500")
 
 const Block = (node: TOrdoRichTextEditorBlockNode, metadata: Ordo.Metadata.Instance, block_index: number) =>
 	Maoka.create("div", ({ use, element }) => {

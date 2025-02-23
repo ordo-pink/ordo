@@ -1,6 +1,7 @@
 import { Dialog } from "@ordo-pink/maoka-components"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
+import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { NotificationType } from "@ordo-pink/core"
 import { invokers0 } from "@ordo-pink/oath"
 // import { Result } from "@ordo-pink/result"
@@ -46,9 +47,9 @@ export const PublishMetadataModal = (fsid: Ordo.Metadata.FSID) =>
 				action_text: "Publish page",
 				action,
 				body: () =>
-					BodyWrapper(() => [
+					BodyWrapper(() => () => [
 						Info(
-							() =>
+							() => () =>
 								"Publishing a page will provide read only access to this page publicly. Even non-authenticated users will be able to see it.", // TODO i18n
 						),
 						// CheckboxInput({
@@ -63,6 +64,6 @@ export const PublishMetadataModal = (fsid: Ordo.Metadata.FSID) =>
 			})
 	})
 
-const Info = Maoka.styled("p", { class: "text-sm text-neutral-500" })
+const Info = MaokaStyled.Tags.p("text-sm text-neutral-500")
 
-const BodyWrapper = Maoka.styled("div", { class: "flex flex-col gap-2" })
+const BodyWrapper = MaokaStyled.Tags.div("flex flex-col gap-2")

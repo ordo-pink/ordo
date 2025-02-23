@@ -26,6 +26,7 @@ import { Maoka } from "@ordo-pink/maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
+import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { Result } from "@ordo-pink/result"
 import { T } from "@ordo-pink/tau"
 
@@ -83,47 +84,50 @@ export default Maoka.create("main", ({ use }) => {
 		const t_try_now = t("t.welcome.landing_page.sections.hero.try_now_button")
 		const t_sign_up = t("t.welcome.landing_page.sections.hero.sign_up")
 
-		return HeroSection(() => [
-			HeroSectionLayers(() => [
+		return HeroSection(() => () => [
+			HeroSectionLayers(() => () => [
 				// Floating hero section images
 				HeroSectionImageLayer(hero_layer_0, 0),
 				HeroSectionImageLayer(hero_layer_1, 1),
 				HeroSectionImageLayer(hero_layer_2, 2),
 			]),
-			HeroCard(() =>
-				HeroCardContent(() => [
-					HeroCardLogoSection(() => [
-						HeroCardLogoWrapper(() => [t_bring_your_thoughts_to, HeroCardLogoText(() => t_ordo)]),
-						HeroCardLogoAction(() =>
-							Button.Neutral({
-								text: t_more,
-								on_click: handle_more_click,
-								hotkey: "m",
-								hotkey_options: { prevent_in_inputs: true },
-							}),
+			HeroCard(
+				() => () =>
+					HeroCardContent(() => () => [
+						HeroCardLogoSection(() => () => [
+							HeroCardLogoWrapper(() => () => [t_bring_your_thoughts_to, HeroCardLogoText(() => () => t_ordo)]),
+							HeroCardLogoAction(
+								() => () =>
+									Button.Neutral({
+										text: t_more,
+										on_click: handle_more_click,
+										hotkey: "m",
+										hotkey_options: { prevent_in_inputs: true },
+									}),
+							),
+						]),
+
+						CallToActionSection(
+							() => () =>
+								CallToActionCard(() => () => [
+									CallToActionBetaLogo(`"${t_beta_started}"`),
+									ActionsContainer(() => () => [
+										Button.Primary({
+											text: t_try_now,
+											hotkey: "mod+enter",
+											on_click: handle_try_click,
+											hotkey_options: { prevent_in_inputs: true },
+										}),
+										Button.Neutral({
+											text: t_sign_up,
+											hotkey: "mod+u",
+											on_click: handle_sign_up_click,
+											hotkey_options: { prevent_in_inputs: true },
+										}),
+									]),
+								]),
 						),
 					]),
-
-					CallToActionSection(() =>
-						CallToActionCard(() => [
-							CallToActionBetaLogo(`"${t_beta_started}"`),
-							ActionsContainer(() => [
-								Button.Primary({
-									text: t_try_now,
-									hotkey: "mod+enter",
-									on_click: handle_try_click,
-									hotkey_options: { prevent_in_inputs: true },
-								}),
-								Button.Neutral({
-									text: t_sign_up,
-									hotkey: "mod+u",
-									on_click: handle_sign_up_click,
-									hotkey_options: { prevent_in_inputs: true },
-								}),
-							]),
-						]),
-					),
-				]),
 			),
 		])
 	}
@@ -139,35 +143,35 @@ const HeroSectionImageLayer = (image_path: string, index: number) =>
 		use(MaokaJabs.set_style({ backgroundImage: background_image }))
 	})
 
-const HeroSection = Maoka.styled("section", { class: "hero-section" })
-const HeroCard = Maoka.styled("div", { class: "card-container" })
-const HeroCardContent = Maoka.styled("div", { class: "card" })
-const HeroCardLogoText = Maoka.styled("span", { class: "logo_ordo-text" })
-const HeroSectionLayers = Maoka.styled("div", { class: "hero-layers" })
-const HeroCardLogoWrapper = Maoka.styled("h1", { class: "logo" })
-const HeroCardLogoSection = Maoka.styled("div", { class: "logo-section" })
-const HeroCardLogoAction = Maoka.styled("div", { class: "logo_action" })
+const HeroSection = MaokaStyled.Tags.section("hero-section")
+const HeroCard = MaokaStyled.Tags.div("card-container")
+const HeroCardContent = MaokaStyled.Tags.div("card")
+const HeroCardLogoText = MaokaStyled.Tags.span("logo_ordo-text")
+const HeroSectionLayers = MaokaStyled.Tags.div("hero-layers")
+const HeroCardLogoWrapper = MaokaStyled.Tags.h1("logo")
+const HeroCardLogoSection = MaokaStyled.Tags.div("logo-section")
+const HeroCardLogoAction = MaokaStyled.Tags.div("logo_action")
 
-const ActionsContainer = Maoka.styled("div", { class: "actions-container" })
+const ActionsContainer = MaokaStyled.Tags.div("actions-container")
 
-const CallToActionSection = Maoka.styled("div", { class: "cta" })
-const CallToActionCard = Maoka.styled("div", { class: "cta_card" })
-const CallToActionLogoWraper = Maoka.styled("div")
-const CallToActionBetaText = Maoka.styled("h3", { class: "cta_beta" })
-const BetaStartedMessage = Maoka.styled("p", { class: "cta_beta_started" })
+const CallToActionSection = MaokaStyled.Tags.div("cta")
+const CallToActionCard = MaokaStyled.Tags.div("cta_card")
+const CallToActionLogoWraper = MaokaStyled.Tags.div()
+const CallToActionBetaText = MaokaStyled.Tags.h3("cta_beta")
+const BetaStartedMessage = MaokaStyled.Tags.p("cta_beta_started")
 const CallToActionBetaLogo = (t_beta_started: string) =>
-	CallToActionLogoWraper(() => [
-		CallToActionBetaText(() => [
+	CallToActionLogoWraper(() => () => [
+		CallToActionBetaText(() => () => [
 			Token("token_keyword", "const "),
 			Token("token_variable", "teβt "),
 			Token("token_keyword", "= "),
 			Token("token_scope", "() "),
 			Token("token_keyword", "⇒"),
-			BetaStartedMessage(() => t_beta_started),
+			BetaStartedMessage(() => () => t_beta_started),
 		]),
 	])
 
-const Token = (cls: string, text: string) => Maoka.styled("span", { class: cls })(() => text)
+const Token = (cls: string, text: string) => MaokaStyled.Tags.span(cls)(() => () => text)
 
 const show_cookie_modal = (emit: Ordo.Command.EmitFn) => {
 	emit("cmd.application.notification.show", {
@@ -175,7 +179,7 @@ const show_cookie_modal = (emit: Ordo.Command.EmitFn) => {
 		message: "t.welcome.landing_page.cookie_banner.message",
 		type: NotificationType.WARN,
 		duration: 15,
-		render_icon: span => void MaokaDOM.render(span, BsCookie("size-5")),
+		render_icon: span => void MaokaDOM.render(span, BsCookie("size-5"), () => crypto.randomUUID()),
 	})
 
 	is_cookie_modal_shown = true

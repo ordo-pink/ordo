@@ -24,7 +24,7 @@ import { METADATA_CONTENT_FSID } from "@ordo-pink/core"
 import { T } from "@ordo-pink/tau"
 import { ZAGS } from "@ordo-pink/zags"
 
-// TODO Sync storages
+// TODO !!! Sync storages
 export const ContentRepository: Ordo.Content.RepositoryStatic = {
 	Of: (auth$, local_strategy, remote_strategy) => {
 		const $ = ZAGS.Of({ version: 0 })

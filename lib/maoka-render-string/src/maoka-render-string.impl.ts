@@ -3,20 +3,22 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { type TMaokaChild } from "@ordo-pink/maoka"
+import { Maoka, type TMaokaChild } from "@ordo-pink/maoka"
 
-import { type TMaokaRenderStringFn, type TMaokaStrElement } from "./maoka-render-string.types"
+import { type TMaokaRenderStringFn, type TMaokaStringElement } from "./maoka-render-string.types"
 
-export const render: TMaokaRenderStringFn = async (root, component) => {
-	const root_id = crypto.randomUUID()
-	const Component = await component(create_element, root, root_id)
+export const render: TMaokaRenderStringFn = async (component, create_id) => {
+	const root = Maoka.create_root(create_element("div"), create_id, create_element)
+	const Component = await component(root)
 
-	root.appendChild(Component)
+	root.element.appendChild(Component as any)
 
-	return root.str()
+	return Promise.all((root.element.children as any).map((child: TMaokaStringElement) => child.str())).then(strs =>
+		strs.join("\n"),
+	)
 }
 
-export const create_element = (tag: string): TMaokaStrElement => {
+export const create_element = (tag: string): TMaokaStringElement => {
 	const attributes = {} as Record<string, string>
 	let children = [] as TMaokaChild[]
 
@@ -24,22 +26,20 @@ export const create_element = (tag: string): TMaokaStrElement => {
 		setAttribute: (qualified_name: string, value: string) => {
 			attributes[qualified_name] = value
 		},
+		addEventListener: () => void 0,
 		getAttribute: (qualified_name: string) => qualified_name,
-		removeAttribute: (qualified_name: string) => {
-			delete attributes[qualified_name]
-		},
 		appendChild: child => {
-			children.push(child)
+			children.push(child as any)
 			return child
 		},
 		replaceChildren: (...new_children) => {
-			children = new_children
+			children = new_children as any
 		},
 		get children() {
-			return children
+			return children as any
 		},
 		dispatchEvent: () => false,
-		str: async (depth = 0) => {
+		str: async () => {
 			const result = "<"
 				.concat(tag)
 				.concat(Object.keys(attributes).length ? " " : "")
@@ -48,11 +48,14 @@ export const create_element = (tag: string): TMaokaStrElement => {
 
 			const child_strings = [] as string[]
 
+			let need_to_push_closing_tag_to_next_line = false
+
 			for (const child of children) {
 				if (!child) {
 					continue
 				} else if (is_maoka_str_element(child)) {
-					child_strings.push(await child.str(depth + 1))
+					need_to_push_closing_tag_to_next_line = true
+					child_strings.push("\n" + (await child.str()))
 				} else if (typeof child === "string") {
 					child_strings.push(child)
 				} else if (typeof child === "number") {
@@ -60,10 +63,15 @@ export const create_element = (tag: string): TMaokaStrElement => {
 				}
 			}
 
-			return result.concat(child_strings.join("")).concat("</").concat(tag).concat(">")
+			return result
+				.concat(child_strings.join(""))
+				.concat(need_to_push_closing_tag_to_next_line ? "\n" : "")
+				.concat("</")
+				.concat(tag)
+				.concat(">")
 		},
 	}
 }
 
-export const is_maoka_str_element = (x: any): x is TMaokaStrElement =>
+export const is_maoka_str_element = (x: any): x is TMaokaStringElement =>
 	!!x && typeof x === "object" && x.str && typeof x.str === "function"

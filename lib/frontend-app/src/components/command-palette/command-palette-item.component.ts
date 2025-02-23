@@ -22,6 +22,7 @@
 import { ActionListItem, Hotkey } from "@ordo-pink/maoka-components"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
+import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { ordo_app_state } from "@ordo-pink/frontend-app/app.state"
 
 export const OrdoCommandPaletteItem = (item: Ordo.CommandPalette.Item, on_click: () => void, is_current: boolean) =>
@@ -38,7 +39,7 @@ export const OrdoCommandPaletteItem = (item: Ordo.CommandPalette.Item, on_click:
 		const render_footer = item.render_custom_footer
 			? item.render_custom_footer
 			: item.description
-				? () => Description(() => t(item.description!))
+				? () => Description(() => () => t(item.description!))
 				: void 0
 
 		use(
@@ -51,7 +52,7 @@ export const OrdoCommandPaletteItem = (item: Ordo.CommandPalette.Item, on_click:
 		return () => ActionListItem({ title, is_current, render_info, render_icon: item.render_icon, on_click, render_footer })
 	})
 
-const Description = Maoka.styled("div", { class: "text-xs text-neutral-600 dark:text-neutral-400" })
+const Description = MaokaStyled.Tags.div("text-xs text-neutral-600 dark:text-neutral-400")
 
 // TODO Move to tau/client
 const is_in_view = (element: Element, wrapper: Element) => {

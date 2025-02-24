@@ -29,7 +29,7 @@ import { RRR } from "../../../../core/src/rrr"
 export const MetadataRepository: Ordo.Metadata.RepositoryStatic = {
 	Of: metadata$ => {
 		const version_zags = ZAGS.Of({ version: 0 })
-		metadata$.marry((_, is_update) => is_update && version_zags.update("version", i => i + 1))
+		metadata$.marry((_, is_update) => void (is_update && version_zags.update("version", i => i + 1)))
 
 		return {
 			get: () =>
@@ -59,8 +59,6 @@ export const MetadataRepository: Ordo.Metadata.RepositoryStatic = {
 		}
 	},
 }
-
-export const MR = MetadataRepository
 
 // TODO: Add types
 // TODO: Add hash and last update

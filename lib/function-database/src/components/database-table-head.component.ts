@@ -45,7 +45,7 @@ const TableHeadCell = (column: Ordo.I18N.TranslationKey, is_editable: boolean) =
 
 		use(MaokaJabs.add_class("database_table-head_cell"))
 		use(MaokaJabs.listen("onclick", () => handle_click()))
-		if (is_editable) use(MaokaJabs.add_class("pointable"))
+		if (is_editable) use(MaokaJabs.add_class("clickable"))
 
 		const { t } = use(MaokaOrdo.Jabs.get_translations$)
 		const commands = use(MaokaOrdo.Jabs.get_commands)

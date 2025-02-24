@@ -21,6 +21,7 @@
 
 import { Label, Link, MetadataIcon, MetadataLink, UserReference } from "@ordo-pink/maoka-components"
 import { Maoka, type TMaokaChildren } from "@ordo-pink/maoka"
+import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
@@ -82,7 +83,7 @@ const LinksCell = (metadata: Ordo.Metadata.Instance, type: "parent" | "incoming"
 			const commands = use(MaokaOrdo.Jabs.get_commands)
 			const handle_click = () => commands.emit("cmd.metadata.show_edit_links_palette", fsid)
 
-			use(MaokaJabs.add_class("clickable"))
+			if (use(MaokaDOM.Jabs.is_dom)) use(MaokaJabs.add_class("clickable"))
 			use(MaokaJabs.listen("onclick", () => handle_click()))
 		}
 
@@ -124,8 +125,9 @@ const LinkBlock = MaokaStyled.Tags.span()
 
 const LabelsCell = (fsid: Ordo.Metadata.FSID) =>
 	Maoka.create("td", ({ use }) => {
-		use(MaokaJabs.set_class("database_cell-labels"))
+		use(MaokaJabs.set_class("database_cell-multiple database_cell-labels"))
 		use(MaokaJabs.listen("onclick", () => handle_click()))
+		if (use(MaokaDOM.Jabs.is_dom)) use(MaokaJabs.add_class("clickable"))
 
 		const commands = use(MaokaOrdo.Jabs.get_commands)
 		const get_metadata = use(MaokaOrdo.Jabs.Metadata.get_by_fsid$(fsid))

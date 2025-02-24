@@ -24,7 +24,7 @@ export const PublishMetadataModal = (fsid: Ordo.Metadata.FSID) =>
 
 			pages_to_publish.forEach(
 				fsid =>
-					void commands.emit("cmd.metadata.publish", fsid).invoke(
+					void commands.naga("cmd.metadata.publish", fsid).invoke(
 						invokers0.or_else(rrr => {
 							if (rrr.debug && rrr.debug.length) logger.error(...rrr.debug)
 

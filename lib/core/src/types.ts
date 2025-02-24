@@ -1023,6 +1023,11 @@ declare global {
 			type EmitFn = <$TKey extends Ordo.Command.Name>(
 				name: $TKey,
 				...rest: Ordo.Command.Record[$TKey] extends void ? [key?: string] : [payload: Ordo.Command.Record[$TKey], key?: string]
+			) => void
+
+			type EmitNagaFn = <$TKey extends Ordo.Command.Name>(
+				name: $TKey,
+				...rest: Ordo.Command.Record[$TKey] extends void ? [key?: string] : [payload: Ordo.Command.Record[$TKey], key?: string]
 			) => Oath<void, Ordo.Rrr>
 
 			type CancelFn = <$TKey extends Ordo.Command.Name>(name: $TKey, payload?: Ordo.Command.Record[$TKey], key?: string) => void
@@ -1045,6 +1050,15 @@ declare global {
 				 * is a command with given key already.
 				 */
 				emit: Ordo.Command.EmitFn
+
+				/**
+				 * Emit given command with given payload. You can provide an optional key that you can use
+				 * later to apply targeted cancellation for the command. Emission does not happen if there
+				 * is a command with given key already. The command returns an Oath that will be resolved
+				 * when the command succeeds or rejected when it fails. As with every other Oath, you need
+				 * to invoke it to get the result.
+				 */
+				naga: Ordo.Command.EmitNagaFn
 
 				/**
 				 * Cancel a command with given payload. If you provided a key when emitting the command,

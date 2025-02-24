@@ -19,11 +19,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { type TZags, ZAGS } from "@ordo-pink/zags"
-import { call_once, deep_equals, noop } from "@ordo-pink/tau"
+import { call_once, deep_equals } from "@ordo-pink/tau"
 import { Oath } from "@ordo-pink/oath"
 import { RRR } from "@ordo-pink/core"
-import { Switch } from "@ordo-pink/switch"
+import { ZAGS } from "@ordo-pink/zags"
 
 import { ordo_app_state } from "../app.state"
 
@@ -51,24 +50,12 @@ export const init_commands: TF = call_once(() => {
 				remove([name, handler, fid])
 			},
 			emit: (name, payload?, key = crypto.randomUUID()) => {
-				const $ = ZAGS.Of<{ status: "pending" | "resolved" | "rejected"; rrr?: Ordo.Rrr }>({
-					status: "pending",
-				})
-				enqueue({ name, payload, key, fid, $ })
-
+				enqueue({ name, payload, key, fid, callback: () => void 0 })
+			},
+			naga: (name, payload?, key = crypto.randomUUID()) => {
 				return new Oath<void, Ordo.Rrr>((resolve, reject) => {
-					const divorce = $.marry(({ status, rrr }) => {
-						if (status === "pending") return
-
-						status === "resolved" ? resolve(void 0) : reject(rrr ?? RRR.codes.enotrecoverable(`Command "${name}" failed`))
-
-						Switch.Match(status)
-							.case("resolved", () => resolve(void 0))
-							.case("rejected", () => reject(rrr))
-							.default(noop)
-
-						divorce()
-					})
+					const callback = (rrr?: Ordo.Rrr) => (rrr ? reject(rrr) : resolve(void 0))
+					enqueue({ name, payload, key, fid, callback })
 				})
 			},
 			cancel: (name, payload?, key = crypto.randomUUID()) => {
@@ -78,7 +65,7 @@ export const init_commands: TF = call_once(() => {
 		} satisfies Ordo.Command.Commands
 	}
 
-	command$.marry(async ({ queue, storage }) => {
+	command$.marry(({ queue, storage }) => {
 		for (const command of queue) {
 			const name = command.name
 			const fid = command.fid
@@ -87,11 +74,8 @@ export const init_commands: TF = call_once(() => {
 			const payload = is_payload_command(command) ? (command.payload as unknown) : undefined
 
 			if (!known_functions.has_permissions(fid, { commands: [name] })) {
-				command.$.replace({
-					status: "rejected",
-					rrr: RRR.codes.eperm(`${func} permission RRR. Did you forget to request command permission '${name}'?`),
-				})
 				dequeue({ name, payload, fid })
+				command.callback(RRR.codes.eperm(`${func} permission RRR. Did you forget to request command permission '${name}'?`))
 
 				return
 			}
@@ -112,16 +96,9 @@ export const init_commands: TF = call_once(() => {
 					)
 				}
 
-				// TODO Support for reverting via returned CommandHandler function
-				try {
-					await Promise.all(listeners.map(listener => listener(payload)))
-					command.$.update("status", () => "resolved")
-				} catch (e) {
-					command.$.replace({
-						status: "rejected",
-						rrr: RRR.is_rrr(e) ? e : RRR.codes.enotrecoverable(`Command '${command.name}' failed`, e),
-					})
-				}
+				Promise.all(listeners.map(listener => listener(payload)))
+					.then(() => command.callback())
+					.catch(e => command.callback(e))
 			} else {
 				is_dev &&
 					logger.debug(
@@ -143,7 +120,7 @@ export const init_commands: TF = call_once(() => {
 const is_payload_command = (cmd: Ordo.Command.Command): cmd is Ordo.Command.PayloadCommand =>
 	typeof cmd.name === "string" && (cmd as Ordo.Command.PayloadCommand).payload !== undefined
 
-const enqueue = (new_command: TCommand & { $: TZags<{ status: "pending" | "resolved" | "rejected"; rrr?: Ordo.Rrr }> }) =>
+const enqueue = (new_command: TCommand & { callback: (rrr?: Ordo.Rrr) => void }) =>
 	command$.update("queue", state => (state.some(cmd => cmd.key === new_command.key) ? state : [...state, new_command]) as any)
 
 const dequeue = (command: TCommand) =>
@@ -189,7 +166,7 @@ const remove = (listener: TCmdListener) =>
 const command$ = ZAGS.Of({
 	queue: [] as ((Ordo.Command.Command | Ordo.Command.PayloadCommand) & {
 		fid: symbol
-		$: TZags<{ status: "pending" | "resolved" | "rejected"; rrr?: Ordo.Rrr }>
+		callback: (rrr?: Ordo.Rrr) => void
 	})[],
 	storage: {} as Record<string, Ordo.Command.CommandHandler<any>[]>,
 })

@@ -80,7 +80,7 @@ const handle_add: Ordo.Command.HandlerOf<"cmd.application.context_menu.add"> = n
 const handle_remove: Ordo.Command.HandlerOf<"cmd.application.context_menu.remove"> = command =>
 	ordo_app_state.zags.update("sections.context_menu.items", items => items.filter(item => item.command === command))
 
-const OrdoContextMenuDynamic = Maoka.create("div", ({ use }) => {
+const OrdoContextMenuDynamic = Maoka.create("div", ({ element, use }) => {
 	use(MaokaJabs.set_class("context-menu"))
 	const is_mobile = use(MaokaJabs.is_mobile)
 
@@ -102,7 +102,10 @@ const OrdoContextMenuDynamic = Maoka.create("div", ({ use }) => {
 	return () => {
 		const state = get_state()
 
-		if (!state) return
+		if (!state) {
+			if (MaokaDOM.is_maoka_dom_element(element)) element.innerHTML = ""
+			return
+		}
 
 		const all_items = state.structure.filter(
 			item =>

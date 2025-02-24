@@ -45,7 +45,7 @@ export const CreateFileModal = (parent: Ordo.Metadata.FSID | null = null) =>
 				render_icon: BsFileEarmarkPlus,
 				action: () => {
 					void commands
-						.emit("cmd.metadata.create", { name: state.name, parent, type })
+						.naga("cmd.metadata.create", { name: state.name, parent, type })
 						.and(() => commands.emit("cmd.application.modal.hide"))
 						.invoke(invokers0.or_else(console.error))
 				},

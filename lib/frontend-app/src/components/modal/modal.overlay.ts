@@ -29,7 +29,7 @@ import { ordo_app_state } from "../../../app.state"
 import "./modal.css"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 
-export const OrdoModal = Maoka.create("div", ({ use }) => {
+export const OrdoModal = Maoka.create("div", ({ element, use }) => {
 	const get_modal_state = use(ordo_app_state.select_jab$("sections.modal"))
 
 	const commands = ordo_app_state.zags.select("commands")
@@ -68,7 +68,7 @@ export const OrdoModal = Maoka.create("div", ({ use }) => {
 		if (get_modal_state()) {
 			use(MaokaJabs.add_class("active"))
 			return [Modal, ModalCloseButton]
-		}
+		} else if (MaokaDOM.is_maoka_dom_element(element)) element.innerHTML = ""
 
 		use(MaokaJabs.remove_class("active"))
 	}

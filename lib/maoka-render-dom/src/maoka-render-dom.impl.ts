@@ -32,6 +32,56 @@ export const render: TMaokaRenderDOMFn = async (root_element, component, create_
 	const root = Maoka.create_root(root_element, create_id, create_element)
 	const Component = await component(root)
 
+	let request_idle_callback
+
+	try {
+		request_idle_callback = requestIdleCallback
+		if (!request_idle_callback) throw ""
+	} catch (_) {
+		request_idle_callback = setTimeout
+	}
+
+	const render_loop = () =>
+		root.refresh_queue.size
+			? Promise.all(
+					root.refresh_queue.entries().map(([key, data]) => {
+						root.refresh_queue.delete(key)
+						return data.render()
+					}),
+				).then(() => request_idle_callback(() => void render_loop()))
+			: request_idle_callback(() => void render_loop())
+
+	request_idle_callback(() => void render_loop())
+
+	root.element.addEventListener("refresh", event => {
+		event.stopPropagation()
+
+		const [id, element, render] = (event as any).detail as [string, TMaokaElement, () => Promise<TMaokaElement>]
+
+		const refresh_nodes = root.refresh_queue.keys().toArray()
+
+		if (root.refresh_queue.has(id)) return
+
+		for (let i = 0; i < refresh_nodes.length; i++) {
+			const refresh_element = root.refresh_queue.get(refresh_nodes[i])?.element
+
+			if (
+				refresh_element &&
+				refresh_element instanceof Element &&
+				element instanceof Element &&
+				element.contains?.(refresh_element)
+			) {
+				root.refresh_queue.delete(refresh_nodes[i])
+				break
+			}
+		}
+
+		root.refresh_queue.set(id, {
+			element,
+			render: render,
+		})
+	})
+
 	if (!is_maoka_dom_element(Component)) {
 		throw new TypeError("Could not create a DOM element from provided component")
 	}

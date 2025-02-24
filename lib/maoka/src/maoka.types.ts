@@ -15,6 +15,8 @@ export type TCreateIDFn = () => string
 export type TMaokaRootElement<$TElement = TMaokaElement> = {
 	create_id: TCreateIDFn
 	create_element: TMaokaCreateMaokaElementFn
+	refresh_queue: Map<string, { element: TMaokaElement; render: () => Promise<TMaokaElement> }>
+
 	get id(): string
 	get element(): $TElement
 }

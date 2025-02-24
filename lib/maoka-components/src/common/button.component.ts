@@ -53,6 +53,7 @@ const Default = ({
 		use(MaokaJabs.listen("onclick", event => handle_click(event)))
 
 		const handle_click = (event: MouseEvent) => {
+			event.preventDefault()
 			if (element instanceof HTMLButtonElement) element.focus()
 			return on_click(event)
 		}

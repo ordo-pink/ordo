@@ -24,8 +24,10 @@ import { RRR } from "@ordo-pink/core"
 import { Result } from "@ordo-pink/result"
 import { ZAGS } from "@ordo-pink/zags"
 
-import { CurrentUser } from "../../../../core/src/user.impl"
+import { CurrentUser, PublicUser } from "../../../../core/src/user.impl"
 import { ordo_app_state } from "../../../app.state"
+
+const user_cache: Record<string, Ordo.User.Public.DTO> = {}
 
 export const UserQuery: Ordo.User.QueryStatic = {
 	Of: check_permission => {
@@ -55,11 +57,17 @@ export const UserQuery: Ordo.User.QueryStatic = {
 							.and(() => id)
 							.pipe(ops0.rejected_map(() => RRR.codes.einval("Invalid user id"))),
 					)
-					.and(id => ({ id, headers: { Authorization: `Bearer ${token}` } }))
-					.and(({ id, headers }) => Oath.FromPromise(() => fetch(`${id_host}/users/${id}`, { headers })))
-					.and(res => res.json())
-					.and(res => Oath.If(res.success, { T: () => res.payload, F: () => RRR.codes.eio(res.payload) })),
-
+					.and(
+						id =>
+							user_cache[id] ??
+							Oath.Resolve(id)
+								.and(id => ({ id, headers: { Authorization: `Bearer ${token}` } }))
+								.and(({ id, headers }) => Oath.FromPromise(() => fetch(`${id_host}/users/${id}`, { headers })))
+								.and(res => res.json())
+								.and(res => Oath.If(res.success, { T: () => res.payload, F: () => RRR.codes.eio(res.payload) }))
+								.pipe(ops0.tap(dto => void (user_cache[dto.id] = dto))),
+					)
+					.and(PublicUser.FromDTO),
 			get_by_handle: handle =>
 				check_permission("user.get_by_id")
 					.cata({ Ok: () => Oath.Resolve(void 0), Err: rrr => Oath.Reject<Ordo.Rrr<"EPERM">, void>(rrr) })
@@ -68,10 +76,17 @@ export const UserQuery: Ordo.User.QueryStatic = {
 							.and(() => handle)
 							.pipe(ops0.rejected_map(() => RRR.codes.einval("Invalid user handle"))),
 					)
-					.and(handle => ({ handle, headers: { Authorization: `Bearer ${token}` } }))
-					.and(({ handle, headers }) => Oath.FromPromise(() => fetch(`${id_host}/users/handle/${handle}`, { headers })))
-					.and(res => res.json())
-					.and(res => Oath.If(res.success, { T: () => res.payload, F: () => RRR.codes.eio(res.payload) })),
+					.and(
+						handle =>
+							user_cache[handle] ??
+							Oath.Resolve(handle)
+								.and(handle => ({ handle, headers: { Authorization: `Bearer ${token}` } }))
+								.and(({ handle, headers }) => Oath.FromPromise(() => fetch(`${id_host}/users/handle/${handle}`, { headers })))
+								.and(res => res.json())
+								.and(res => Oath.If(res.success, { T: () => res.payload, F: () => RRR.codes.eio(res.payload) }))
+								.pipe(ops0.tap(dto => void (user_cache[dto.handle] = dto))),
+					)
+					.and(PublicUser.FromDTO),
 
 			get $() {
 				return version_zags

@@ -112,7 +112,7 @@
 .label {
 	@apply cursor-pointer rounded-sm px-1 py-0.5 text-xs shadow-sm;
 	@apply hover:scale-105 hover:transition-all;
-	@apply flex items-center gap-x-1;
+	@apply flex flex-nowrap items-center gap-x-1 text-nowrap;
 }
 
 .label_remove {

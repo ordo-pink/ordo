@@ -23,7 +23,7 @@
 }
 
 .database_cell-multiple {
-	@apply database_border-color flex w-fit gap-x-2 gap-y-1 text-sm;
+	@apply database_border-color flex w-fit flex-wrap gap-x-2 gap-y-1 text-sm;
 }
 
 .database_cell-labels {

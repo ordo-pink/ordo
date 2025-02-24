@@ -32,7 +32,7 @@ import { ordo_app_state } from "../../../app.state"
 import { sidebar$ } from "./sidebar.state"
 
 // TODO Automatically close sidebar in mobile if something was clicked
-export const OrdoSidebar = Maoka.create("aside", ({ use }) => {
+export const OrdoSidebar = Maoka.create("aside", ({ use, element }) => {
 	const commands = ordo_app_state.zags.select("commands")
 	const get_sidebar = use(MaokaOrdo.Jabs.happy_marriage$(sidebar$))
 	const is_mobile = use(MaokaJabs.is_mobile)
@@ -63,6 +63,8 @@ export const OrdoSidebar = Maoka.create("aside", ({ use }) => {
 
 	return () => {
 		const { visible, enabled } = get_sidebar()
+
+		if ((!visible || !enabled) && MaokaDOM.is_maoka_dom_element(element) && element.parentElement) element.innerHTML = ""
 
 		return Switch.OfTrue()
 			.case(visible && enabled, () => SidebarRenderer)
@@ -126,7 +128,7 @@ export const OrdoSidebarButton = Maoka.create("button", ({ use }) => {
 
 // --- Internal ---
 
-const SidebarRenderer = Maoka.create("div", ({ use, element }) => {
+const SidebarRenderer = Maoka.create("div", ({ use }) => {
 	use(MaokaJabs.set_class("sidebar"))
 
 	const get_current_activity = use(ordo_app_state.select_jab$("functions.current_activity"))
@@ -137,9 +139,7 @@ const SidebarRenderer = Maoka.create("div", ({ use, element }) => {
 		const activities = get_activities()
 		const current_activity = activities.find(activity => activity.name === current_activity_name)
 
-		if (current_activity && current_activity.render_sidebar)
-			return current_activity.render_sidebar() // TODO 404
-		else if (MaokaDOM.is_maoka_dom_element(element)) element.innerHTML = ""
+		if (current_activity && current_activity.render_sidebar) return current_activity.render_sidebar() // TODO 404
 	}
 })
 

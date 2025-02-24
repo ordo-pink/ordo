@@ -12,7 +12,7 @@ export const ZAGS: TZagsStatic = {
 	Of: (state, handlers = []) => ({
 		marry: f => {
 			handlers.push(f)
-			void f(state, false)
+			f(state, false)
 
 			return () => {
 				const index = handlers.indexOf(f)
@@ -21,7 +21,6 @@ export const ZAGS: TZagsStatic = {
 			}
 		},
 		cheat: (path, f) => {
-			const state_copy = Object.assign({}, state)
 			let value: any
 
 			const wrapped_f = (state: any, is_update: boolean) => {
@@ -36,7 +35,7 @@ export const ZAGS: TZagsStatic = {
 			}
 
 			handlers.push(wrapped_f)
-			wrapped_f(state_copy, false)
+			wrapped_f(Object.assign({}, state), false)
 
 			return () => {
 				const index = handlers.indexOf(wrapped_f)
@@ -65,9 +64,9 @@ export const ZAGS: TZagsStatic = {
 
 			if (value !== current_value) {
 				location[keys[keys.length - 1]] = value
-				state = Object.assign({}, state_copy)
+				state = state_copy
 
-				handlers.forEach(f => void f(state, true))
+				handlers.forEach(f => f(state, true))
 			}
 		},
 		select: path => {
@@ -80,14 +79,14 @@ export const ZAGS: TZagsStatic = {
 			if (state === new_state) return
 
 			state = Object.assign({}, new_state)
-			handlers.forEach(f => void f(state, true))
+			handlers.forEach(f => f(state, true))
 		},
 		update_all: f => {
 			const updated_state = f(Object.assign({}, state))
 
 			if (updated_state !== state) {
-				state = Object.assign({}, updated_state)
-				handlers.forEach(f => void f(state, true))
+				state = updated_state
+				handlers.forEach(f => f(state, true))
 			}
 		},
 		unwrap: () => Object.assign({}, state),

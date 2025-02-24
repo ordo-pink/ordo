@@ -19,9 +19,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { METADATA_CONTENT_FSID, RRR } from "@ordo-pink/core"
 import { Oath, ops0 } from "@ordo-pink/oath"
 import { IndexedDBStorePromise } from "@ordo-pink/oath-indexeddb"
+import { RRR } from "@ordo-pink/core"
 import { noop } from "@ordo-pink/tau"
 
 export const PersistenceStrategyContentIndexedDB = {
@@ -62,19 +62,15 @@ export const PersistenceStrategyContentIndexedDB = {
 					.and(s => s.count(get_path(uid, fsid)))
 					.and(count => count > 0)
 					.pipe(ops0.rejected_map(eio)),
-			get: (uid, fsid) =>
-				store0
-					.and(s => s.get(get_path(uid, fsid)))
-					.and(content => (fsid === METADATA_CONTENT_FSID ? JSON.stringify(content) : content))
-					.pipe(ops0.rejected_map(eio)),
+			get: (uid, fsid) => store0.and(s => s.get(get_path(uid, fsid))).pipe(ops0.rejected_map(eio)),
 			list: () =>
 				store0
 					.and(s => s.get_all_keys())
 					.and(keys => Oath.Merge(keys.reduce((acc, key) => ({ ...acc, [key as string]: store0.and(s => s.get(key)) }), {})))
 					.pipe(ops0.rejected_map(eio)),
 			put: (uid, fsid, content) =>
-				(fsid === METADATA_CONTENT_FSID ? Oath.Try(() => new Response(content).json()) : Oath.Resolve(content))
-					.and(content => store0.and(s => s.put(content, get_path(uid, fsid))))
+				store0
+					.and(s => s.put(content, get_path(uid, fsid)))
 					.and(noop)
 					.pipe(ops0.rejected_map(eio)),
 		}

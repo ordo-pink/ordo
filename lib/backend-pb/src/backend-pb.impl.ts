@@ -17,7 +17,7 @@ import { type TPBChamber, type TPBContext } from "./backend-pb.types"
 
 export const create_backend_pb = (chamber: TPBChamber) =>
 	Routary.Of<TPBContext>({ ...chamber, headers: new Headers(), request_ip: null, status: 200 })
-		.get("/:uid/:fsid", intake => {
+		.get("/:handle/:fsid", intake => {
 			const context = { ...intake, status: 200, request_ip: null, headers: intake.headers ?? new Headers() }
 
 			return (
@@ -26,6 +26,15 @@ export const create_backend_pb = (chamber: TPBChamber) =>
 					.pipe(ops0.tap(extract_request_ip))
 					.pipe(ops0.chain(validate_request_params))
 					.pipe(ops0.map(extract_ids(context)))
+					.pipe(
+						ops0.chain(({ handle, fsid }) =>
+							Oath.FromPromise(() => fetch(`${intake.id_host}/users/handle/${handle}`))
+								.and(res => res.json())
+								.and(res => Oath.If(res.success, { T: () => res.payload as Ordo.User.Public.DTO }))
+								.and(user => ({ uid: user.id, fsid }))
+								.pipe(ops0.rejected_map(() => RRR.codes.enoent("User not found"))),
+						),
+					)
 					.pipe(ops0.chain(check_file_exists(context)))
 					.pipe(
 						ops0.chain(({ uid, fsid }) =>
@@ -79,7 +88,9 @@ export const create_backend_pb = (chamber: TPBChamber) =>
 const validate_request_params = (intake: TIntake<TPBContext>) =>
 	Oath.Merge([
 		Oath.If(Metadata.Validations.is_fsid(intake.params.fsid)).pipe(ops0.rejected_map(() => RRR.codes.einval("Invalid FSID"))),
-		Oath.If(CurrentUser.Validations.is_id(intake.params.uid)).pipe(ops0.rejected_map(() => RRR.codes.einval("Invalid UID"))),
+		Oath.If(CurrentUser.Validations.is_handle(intake.params.handle)).pipe(
+			ops0.rejected_map(() => RRR.codes.einval("Invalid handle")),
+		),
 	]).pipe(ops0.map(() => intake))
 
 const check_file_exists =
@@ -93,6 +104,6 @@ const check_file_exists =
 
 type TIDs = { uid: Ordo.User.UID; fsid: Ordo.Metadata.FSID }
 const extract_ids = (intake: TIntake<TPBContext>) => () => ({
-	uid: intake.params.uid as Ordo.User.UID,
+	handle: intake.params.handle as Ordo.User.Handle,
 	fsid: intake.params.fsid as Ordo.Metadata.FSID,
 })

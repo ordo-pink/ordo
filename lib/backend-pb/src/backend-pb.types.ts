@@ -7,6 +7,7 @@ import type { TDefaultContext } from "@ordo-pink/backend-util-default-handler"
 import type { TLogger } from "@ordo-pink/logger"
 
 export type TPBChamber = {
+	id_host: string
 	allow_origin: string[]
 	data_persistence_strategy: OrdoBackend.Data.PersistenceStrategy
 	logger: TLogger

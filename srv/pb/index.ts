@@ -39,12 +39,14 @@ const get_env = () =>
 		allow_origin: Oath.FromNullable(Bun.env.ORDO_DT_ALLOW_ORIGIN)
 			.and(s => s.split(", "))
 			.pipe(ops0.rejected_map(env_rrr("ORDO_DT_ALLOW_ORIGIN"))),
+
+		id_host: Oath.FromNullable(Bun.env.ORDO_ID_HOST, env_rrr("ORDO_ID_HOST")),
 	})
 
 const main = () =>
 	get_env()
-		.and(({ port, data_path, allow_origin }) =>
-			Oath.Merge({ logger, data_persistence_strategy: PersistenceStrategyDataFS.Of(data_path), allow_origin })
+		.and(({ port, data_path, allow_origin, id_host }) =>
+			Oath.Merge({ logger, data_persistence_strategy: PersistenceStrategyDataFS.Of(data_path), allow_origin, id_host })
 				.and(create_backend_pb)
 				.and(fetch => Bun.serve({ fetch, port })),
 		)

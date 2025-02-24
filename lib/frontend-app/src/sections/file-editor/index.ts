@@ -131,7 +131,10 @@ export default create_function(
 			const pb_host = ordo_app_state.zags.select("hosts.pb")
 
 			user &&
-				commands.emit("cmd.application.router.open_external", { url: `${pb_host}/${user.get_id()}/${fsid}`, new_tab: true })
+				commands.emit("cmd.application.router.open_external", {
+					url: `${pb_host}/${user.get_handle()}/${fsid}`,
+					new_tab: true,
+				})
 		})
 
 		commands.emit("cmd.application.context_menu.add", {

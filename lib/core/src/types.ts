@@ -310,6 +310,7 @@ declare global {
 		content: {
 			set: () => { content_type: string; content: Ordo.Content.Instance; fsid: Ordo.Metadata.FSID }
 			upload: () => { content: Ordo.Content.Instance; name: string; parent: Ordo.Metadata.FSID | null; type: string }
+			remove: () => Ordo.Metadata.FSID
 		}
 		file_editor: { open_file: () => Ordo.Metadata.FSID; open: () => void }
 		welcome: {
@@ -690,6 +691,10 @@ declare global {
 					fsid: Ordo.Metadata.FSID,
 					content: Ordo.Content.Instance,
 				) => Oath<void, Ordo.Rrr<"EINVAL" | "EACCES" | "EIO">>
+				remove: (
+					uid: Ordo.User.UID | null,
+					fsid: Ordo.Metadata.FSID,
+				) => Oath<void, Ordo.Rrr<"EINVAL" | "ENOENT" | "EACCES" | "EIO">>
 				get $(): TZags<{ version: number }>
 			}
 

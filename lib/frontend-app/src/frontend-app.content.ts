@@ -93,6 +93,15 @@ export const init_content: TF = () => {
 		}
 	})
 
+	commands.on("cmd.content.remove", fsid => {
+		const user = ordo_app_state.zags.select("auth.user")
+
+		content_repository
+			.remove(user?.get_id() ?? null, fsid)
+			.invoke(invokers0.to_promise)
+			.catch(console.error)
+	})
+
 	commands.on("cmd.content.upload", async ({ content, type, name, parent }) => {
 		const metadata_query = ordo_app_state.zags.select("queries.metadata")
 		const size = get_size(content)
@@ -103,14 +112,17 @@ export const init_content: TF = () => {
 			.cata(R.catas.or_else(() => null))
 
 		if (!metadata) {
-			await commands.emit("cmd.metadata.create", { name, parent, type, size }).invoke(invokers0.to_promise)
-
-			metadata = metadata_query
-				.get_by_name(name, parent, { show_hidden: true })
-				.pipe(R.ops.chain(R.FromNullable))
-				.cata(R.catas.or_else(() => null))
+			metadata = await commands
+				.naga("cmd.metadata.create", { name, parent, type, size })
+				.and(() =>
+					metadata_query
+						.get_by_name(name, parent, { show_hidden: true })
+						.pipe(R.ops.chain(R.FromNullable))
+						.cata(R.catas.or_else(() => null)),
+				)
+				.invoke(invokers0.to_promise)
 		} else {
-			// commands.emit("cmd.metadata.set_size", { fsid: metadata.get_fsid(), size })
+			commands.emit("cmd.metadata.set_size", { fsid: metadata.get_fsid(), size })
 		}
 
 		if (!Metadata.Validations.is_metadata(metadata))

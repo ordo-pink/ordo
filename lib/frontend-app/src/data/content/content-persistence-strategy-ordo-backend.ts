@@ -31,7 +31,7 @@ export const PersistenceStrategyContentOrdoBackend = {
 	): Ordo.Content.PersistenceStrategy => {
 		return {
 			clear: () => Oath.Reject(RRR.codes.eio("NOT IMPLEMENTED")),
-			delete: () => Oath.Reject(RRR.codes.eio("NOT IMPLEMENTED")),
+			delete: () => Oath.Reject(RRR.codes.eio("NOT IMPLEMENTED")), // TODO
 			exists: () => Oath.Reject(RRR.codes.eio("NOT IMPLEMENTED")),
 			list: () => Oath.Reject(RRR.codes.eio("NOT IMPLEMENTED")),
 			get: (uid, fsid) =>

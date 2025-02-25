@@ -45,7 +45,9 @@ export const MetadataManager = {
 			.and(metadata_repository.put)
 			.and(result => result.cata({ Ok: () => Oath.Resolve(void 0), Err: Oath.Reject }))
 
+		// Wait for content changes to arrive in case the state needs to be refreshed after sync with remote
 		content_repository.$.marry((_, is_update) => {
+			// TODO Avoid updates if metadata file was not updated
 			if (!is_update) return
 
 			const user = ordo_app_state.zags.select("auth.user")

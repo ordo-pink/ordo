@@ -28,7 +28,7 @@ export const PublishMetadataModal = (fsid: Ordo.Metadata.FSID) =>
 						invokers0.or_else(rrr => {
 							if (rrr.debug && rrr.debug.length) logger.error(...rrr.debug)
 
-							void commands.emit("cmd.application.notification.show", {
+							commands.emit("cmd.application.notification.show", {
 								message: rrr.message as Ordo.I18N.TranslationKey,
 								duration: 15,
 								title: `t.common.error.${rrr.key.toLocaleLowerCase()}` as any,

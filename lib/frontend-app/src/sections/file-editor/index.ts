@@ -35,6 +35,7 @@ import { ordo_app_state } from "../../../app.state"
 
 import core_styles from "@ordo-pink/frontend-app/index.css?inline"
 import maoka_components from "@ordo-pink/maoka-components/maoka-components.css?inline"
+import { noop } from "@ordo-pink/tau"
 
 export default create_function(
 	"pink.ordo.editor",
@@ -82,16 +83,13 @@ export default create_function(
 		],
 	},
 	state => {
-		const commands = state.commands
+		const cmd = state.commands
 		const metadata_query = state.metadata_query
 
-		commands.on("cmd.file_editor.open", () => void commands.emit("cmd.application.router.navigate", { url: "/editor" }))
-		commands.on(
-			"cmd.file_editor.open_file",
-			x => void commands.emit("cmd.application.router.navigate", { url: `/editor/${x}` }),
-		)
+		cmd.on("cmd.file_editor.open", () => void cmd.emit("cmd.application.router.navigate", { url: "/editor" }))
+		cmd.on("cmd.file_editor.open_file", x => void cmd.emit("cmd.application.router.navigate", { url: `/editor/${x}` }))
 
-		commands.emit("cmd.application.add_translations", {
+		cmd.emit("cmd.application.add_translations", {
 			lang: TwoLetterLocale.ENGLISH,
 			translations: {
 				"t.file_editor.command_palette.open": "Open File Editor",
@@ -99,20 +97,20 @@ export default create_function(
 			},
 		})
 
-		commands.emit("cmd.application.command_palette.add", {
-			value: () => commands.emit("cmd.file_editor.open"),
+		cmd.emit("cmd.application.command_palette.add", {
+			value: () => cmd.emit("cmd.file_editor.open"),
 			readable_name: "t.file_editor.command_palette.open",
 			type: CommandPaletteItemType.PAGE_OPENER,
 			hotkey: "mod+e",
 			render_icon: BsLayoutTextWindow,
 		})
 
-		commands.on(
+		cmd.on(
 			"cmd.metadata.show_publish_modal",
-			fsid => void commands.emit("cmd.application.modal.show", { render: () => PublishMetadataModal(fsid) }),
+			fsid => void cmd.emit("cmd.application.modal.show", { render: () => PublishMetadataModal(fsid) }),
 		)
 
-		commands.on("cmd.metadata.unpublish", fsid => {
+		cmd.on("cmd.metadata.unpublish", fsid => {
 			metadata_query
 				.get_by_fsid(fsid)
 				.pipe(R.ops.chain(R.FromNullable))
@@ -120,24 +118,31 @@ export default create_function(
 					R.ops.chain(metadata =>
 						R.FromNullable(metadata.get_property("public_id"))
 							.pipe(R.ops.chain(x => R.If(Metadata.Validations.is_fsid(x), { T: () => x as Ordo.Metadata.FSID })))
-							.pipe(R.ops.map(pub_fsid => commands.emit("cmd.metadata.remove", pub_fsid)))
-							.pipe(R.ops.map(() => commands.emit("cmd.metadata.set_property", { fsid, key: "public_id", value: void 0 }))),
+							.pipe(
+								R.ops.chain(
+									pub_fsid =>
+										R.Try(() => void cmd.emit("cmd.metadata.remove", pub_fsid), noop)
+											.pipe(R.ops.err_map(value => cmd.emit("cmd.metadata.set_property", { fsid, key: "public_id", value })))
+											.pipe(R.ops.map(value => cmd.emit("cmd.metadata.set_property", { fsid, key: "public_id", value })))
+											.pipe(R.ops.map(() => cmd.emit("cmd.content.remove", fsid))), // TODO
+								),
+							),
 					),
 				)
 		})
 
-		commands.on("cmd.metadata.open_published_page", fsid => {
+		cmd.on("cmd.metadata.open_published_page", fsid => {
 			const user = ordo_app_state.zags.select("auth.user")
 			const pb_host = ordo_app_state.zags.select("hosts.pb")
 
 			user &&
-				commands.emit("cmd.application.router.open_external", {
+				cmd.emit("cmd.application.router.open_external", {
 					url: `${pb_host}/${user.get_handle()}/${fsid}`,
 					new_tab: true,
 				})
 		})
 
-		commands.emit("cmd.application.context_menu.add", {
+		cmd.emit("cmd.application.context_menu.add", {
 			command: "cmd.metadata.show_publish_modal",
 			payload_creator: ({ payload }) => (payload as Ordo.Metadata.Instance).get_fsid(),
 			readable_name: "Publish..." as any, // TODO i18n
@@ -146,7 +151,7 @@ export default create_function(
 			type: ContextMenuItemType.CREATE,
 		})
 
-		commands.emit("cmd.application.context_menu.add", {
+		cmd.emit("cmd.application.context_menu.add", {
 			command: "cmd.metadata.open_published_page",
 			payload_creator: ({ payload }) => (payload as Ordo.Metadata.Instance).get_fsid(),
 			readable_name: "Open published page" as any, // TODO i18n
@@ -155,7 +160,7 @@ export default create_function(
 			type: ContextMenuItemType.READ,
 		})
 
-		commands.emit("cmd.application.context_menu.add", {
+		cmd.emit("cmd.application.context_menu.add", {
 			command: "cmd.metadata.unpublish",
 			payload_creator: ({ payload }) => (payload as Ordo.Metadata.Instance).get_fsid(),
 			readable_name: "Unpublish" as any, // TODO i18n
@@ -164,7 +169,7 @@ export default create_function(
 			type: ContextMenuItemType.DELETE,
 		})
 
-		commands.on("cmd.metadata.publish", fsid => {
+		cmd.on("cmd.metadata.publish", fsid => {
 			const content_query = state.content_query
 			const metadata_query = state.metadata_query
 			const metadata = metadata_query.get_by_fsid(fsid).cata(R.catas.or_else(() => null))
@@ -195,12 +200,12 @@ export default create_function(
 						),
 				)
 				.and(({ str, styles }) => create_publishable_page(metadata.get_name(), str, ...(styles ?? [])))
-				.and(content => commands.emit("cmd.content.upload", { name, parent: fsid, content, type: "text/html" }))
+				.and(content => cmd.naga("cmd.content.upload", { name, parent: fsid, content, type: "text/html" }))
 				.and(() => metadata_query.get_by_name(name, fsid, { show_hidden: true }))
 				.and(r => r.cata({ Ok: m => Oath.Resolve(m), Err: () => Oath.Reject(null) }))
 				.and(Oath.FromNullable)
 				.and(public_metadata =>
-					commands.emit("cmd.metadata.set_property", {
+					cmd.naga("cmd.metadata.set_property", {
 						fsid: metadata.get_fsid(),
 						key: "public_id",
 						value: public_metadata.get_fsid(),
@@ -213,14 +218,14 @@ export default create_function(
 				)
 		})
 
-		commands.emit("cmd.application.command_palette.add", {
+		cmd.emit("cmd.application.command_palette.add", {
 			value: () =>
 				metadata_query.get().cata(
 					R.catas.if_ok(metadata =>
-						commands.emit("cmd.application.command_palette.show", {
+						cmd.emit("cmd.application.command_palette.show", {
 							items: metadata.map(metadata_to_command_palette_item(state)),
 							max_items: 50,
-							on_select: item => commands.emit("cmd.file_editor.open_file", item.value),
+							on_select: item => cmd.emit("cmd.file_editor.open_file", item.value),
 						}),
 					),
 				),
@@ -230,7 +235,7 @@ export default create_function(
 			render_icon: BsLayoutTextWindow,
 		})
 
-		commands.emit("cmd.functions.activities.register", {
+		cmd.emit("cmd.functions.activities.register", {
 			name: "pink.ordo.editor.activity",
 			routes: ["/editor", "/editor/:fsid"],
 			render_icon: BsLayoutTextWindow,

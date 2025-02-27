@@ -38,15 +38,8 @@ import { show_columns_jab } from "./jabs/show-columns-modal.jab"
 
 import "./database.css"
 
-export const Database = async (metadata: Ordo.Metadata.Instance, content: Ordo.Content.Instance, is_editable: boolean) => {
-	try {
-		const initial_state = content ? ((await new Response(content).json()) as TDatabaseState) : {}
-		database$.replace(initial_state)
-	} catch (e) {
-		database$.replace({})
-	}
-
-	return Maoka.create("div", ({ use }) => {
+export const Database = (metadata: Ordo.Metadata.Instance, content: Ordo.Content.Instance, is_editable: boolean) =>
+	Maoka.create("div", ({ use }) => {
 		let db_state = database$.unwrap()
 		const fsid = metadata.get_fsid()
 
@@ -61,11 +54,19 @@ export const Database = async (metadata: Ordo.Metadata.Instance, content: Ordo.C
 		const divorce_database$ = database$.marry((state, is_update) => {
 			if (!is_update) return
 			db_state = state
+
 			commands.emit("cmd.content.set", { fsid, content_type: "database/ordo", content: JSON.stringify(state) })
 		})
 
 		use(
 			MaokaDOM.Jabs.onmount(() => {
+				try {
+					const initial_state = content ? (JSON.parse(content as string) as TDatabaseState) : {}
+					database$.replace(initial_state)
+				} catch (e) {
+					database$.replace({})
+				}
+
 				commands.on("cmd.database.toggle_column", handle_toggle_column_cmd)
 				commands.on("cmd.database.toggle_sorting", handle_toggle_sorting_cmd)
 
@@ -100,7 +101,6 @@ export const Database = async (metadata: Ordo.Metadata.Instance, content: Ordo.C
 			]
 		}
 	})
-}
 
 // --- Internal ---
 
@@ -182,7 +182,7 @@ const handle_toggle_column_cmd: Ordo.Command.HandlerOf<"cmd.database.toggle_colu
 
 		if (!columns.includes("t.database.column_names.name")) columns.unshift("t.database.column_names.name")
 
-		return { visible_columns: columns, sorting }
+		return { visible_columns: [...columns], sorting }
 	})
 
 const handle_toggle_sorting_cmd: Ordo.Command.HandlerOf<"cmd.database.toggle_sorting"> = column => {

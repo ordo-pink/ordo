@@ -85,11 +85,15 @@ export const init_content: TF = () => {
 		const size = get_size(content)
 		const user = ordo_app_state.zags.select("auth.user")
 
-		if (user && size > 0) {
+		if (size > 0) {
 			// TODO Check if metadata exists
 			void metadata_query
 				.get_by_fsid(fsid)
-				.cata(R.catas.if_ok(() => content_repository.put(user.get_id(), fsid, content).invoke(invokers0.or_else(alert_rrr))))
+				.cata(
+					R.catas.if_ok(() =>
+						content_repository.put(user?.get_id() ?? null, fsid, content).invoke(invokers0.or_else(alert_rrr)),
+					),
+				)
 		}
 	})
 

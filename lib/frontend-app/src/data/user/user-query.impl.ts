@@ -53,7 +53,7 @@ export const UserQuery: Ordo.User.QueryStatic = {
 				check_permission("user.get_by_id")
 					.cata({ Ok: () => Oath.Resolve(void 0), Err: rrr => Oath.Reject<Ordo.Rrr<"EPERM">, void>(rrr) })
 					.and(() =>
-						Oath.If(CurrentUser.Validations.is_id(id))
+						Oath.If(CurrentUser.Validations.is_uid(id))
 							.and(() => id)
 							.pipe(ops0.rejected_map(() => RRR.codes.einval("Invalid user id"))),
 					)

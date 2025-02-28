@@ -56,7 +56,7 @@ const check_email_is_not_taken_if_present = (body: Record<string, any>, i: I) =>
 				.pipe(ops0.chain(email => i.user_persistence_strategy.get_by_email(email).fix(() => null)))
 				.pipe(
 					ops0.chain(user =>
-						Oath.If(!user || user[BackendUserKeys.UID] === i.params.user_id, { F: () => exists_by_email_rrr(body.email, i) }),
+						Oath.If(!user || user.get_uid() === i.params.user_id, { F: () => exists_by_email_rrr(body.email, i) }),
 					),
 				)
 		: Oath.Resolve(void 0)
@@ -68,7 +68,7 @@ const check_handle_is_not_taken_if_present = (body: Record<string, any>, i: I) =
 				.pipe(ops0.chain(handle => i.user_persistence_strategy.get_by_handle(handle).fix(() => null)))
 				.pipe(
 					ops0.chain(user =>
-						Oath.If(!user || user[BackendUserKeys.UID] === i.params.user_id, { F: () => exists_by_handle(body.handle, i) }),
+						Oath.If(!user || user.get_uid() === i.params.user_id, { F: () => exists_by_handle(body.handle, i) }),
 					),
 				)
 		: Oath.Resolve(void 0)
@@ -109,22 +109,21 @@ const update_user = (id: Ordo.User.UID, intake: I) => (user: OrdoBackend.User.DT
 	intake.user_persistence_strategy.update(id, user).pipe(ops0.rejected_map(rrr => ({ rrr, intake })))
 
 const merge_users = (users: {
-	user: OrdoBackend.User.DTO
+	user: OrdoBackend.User.Instance
 	updated_user: Partial<OrdoBackend.User.DTO>
-}): OrdoBackend.User.DTO => ({
-	[BackendUserKeys.CREATED_AT]: users.user[BackendUserKeys.CREATED_AT],
-	[BackendUserKeys.EMAIL_CODE]: users.user[BackendUserKeys.EMAIL_CODE],
-	[BackendUserKeys.FILE_LIMIT]: users.user[BackendUserKeys.FILE_LIMIT],
-	[BackendUserKeys.UID]: users.user[BackendUserKeys.UID],
-	[BackendUserKeys.MAX_FUNCTIONS]: users.user[BackendUserKeys.MAX_FUNCTIONS],
-	[BackendUserKeys.MAX_UPLOAD_SIZE]: users.user[BackendUserKeys.MAX_UPLOAD_SIZE],
-	[BackendUserKeys.PASSWORD]: users.user[BackendUserKeys.PASSWORD],
-	[BackendUserKeys.SUBSCRIPTION]: users.user[BackendUserKeys.SUBSCRIPTION],
-	[BackendUserKeys.EMAIL]: users.updated_user[BackendUserKeys.EMAIL] ?? users.user[BackendUserKeys.EMAIL],
-	[BackendUserKeys.FIRST_NAME]: users.updated_user[BackendUserKeys.FIRST_NAME] ?? users.user[BackendUserKeys.FIRST_NAME],
-	[BackendUserKeys.HANDLE]: users.updated_user[BackendUserKeys.HANDLE] ?? users.user[BackendUserKeys.HANDLE],
-	[BackendUserKeys.INSTALLED_FUNCTIONS]:
-		users.updated_user[BackendUserKeys.INSTALLED_FUNCTIONS] ?? users.user[BackendUserKeys.INSTALLED_FUNCTIONS],
-	[BackendUserKeys.LAST_NAME]: users.updated_user[BackendUserKeys.LAST_NAME] ?? users.user[BackendUserKeys.LAST_NAME],
-	[BackendUserKeys.SESSIONS]: users.user[BackendUserKeys.SESSIONS],
-})
+}): OrdoBackend.User.DTO => [
+	users.user.to_dto()[BackendUserKeys.UID],
+	users.updated_user[BackendUserKeys.HANDLE] ?? users.user.to_dto()[BackendUserKeys.HANDLE],
+	users.user.to_dto()[BackendUserKeys.CREATED_AT],
+	users.user.to_dto()[BackendUserKeys.SUBSCRIPTION],
+	users.updated_user[BackendUserKeys.FIRST_NAME] ?? users.user.to_dto()[BackendUserKeys.FIRST_NAME],
+	users.updated_user[BackendUserKeys.LAST_NAME] ?? users.user.to_dto()[BackendUserKeys.LAST_NAME],
+	users.updated_user[BackendUserKeys.EMAIL] ?? users.user.to_dto()[BackendUserKeys.EMAIL],
+	users.user.to_dto()[BackendUserKeys.FILE_LIMIT],
+	users.updated_user[BackendUserKeys.INSTALLED_FUNCTIONS] ?? users.user.to_dto()[BackendUserKeys.INSTALLED_FUNCTIONS],
+	users.user.to_dto()[BackendUserKeys.MAX_FUNCTIONS],
+	users.user.to_dto()[BackendUserKeys.MAX_UPLOAD_SIZE],
+	users.user.to_dto()[BackendUserKeys.SESSIONS],
+	users.user.to_dto()[BackendUserKeys.EMAIL_CODE],
+	users.user.to_dto()[BackendUserKeys.PASSWORD],
+]

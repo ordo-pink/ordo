@@ -8,7 +8,7 @@ import { Routary, type TBearing, type TGasket, type TGear, type TIntake } from "
 import { type TRoutaryCORS } from "./routary-cors.types"
 
 export const routary_cors: TRoutaryCORS =
-	({ allow_origin, allow_headers = [], max_age = 0, success_status = 204 }) =>
+	({ allow_origin, allow_headers = [], max_age = 0, success_status = 204, allow_credentials = false }) =>
 	(chamber, shaft) => {
 		const options = {} as Record<string, string[]>
 
@@ -32,6 +32,7 @@ export const routary_cors: TRoutaryCORS =
 					intake.headers.set("Access-Control-Allow-Origin", origin)
 					intake.headers.set("Access-Control-Allow-Methods", options[gasket].join(", "))
 
+					if (allow_credentials) intake.headers.set("Access-Control-Allow-Credentials", "true")
 					if (max_age) intake.headers.set("Access-Control-Max-Age", String(max_age))
 					if (allow_headers.length) intake.headers.set("Access-Control-Allow-Headers", allow_headers.join(", "))
 
@@ -54,6 +55,7 @@ export const routary_cors: TRoutaryCORS =
 				headers.set("Access-Control-Allow-Origin", origin)
 				headers.set("Access-Control-Allow-Methods", options[gasket].join(", "))
 
+				if (allow_credentials) headers.set("Access-Control-Allow-Credentials", "true")
 				if (max_age) headers.set("Access-Control-Max-Age", String(max_age))
 				if (allow_headers.length) headers.set("Access-Control-Allow-Headers", allow_headers.join(", "))
 

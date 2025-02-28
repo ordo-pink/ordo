@@ -188,7 +188,7 @@ export default create_function(
 			if (!fa) return
 
 			return content_query
-				.get(user.get_id(), fsid)
+				.get(user.get_uid(), fsid)
 				.and(content =>
 					Oath.FromNullable(fa)
 						// TODO Render file as is if there is no content_to_string

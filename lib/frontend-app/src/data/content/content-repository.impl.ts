@@ -36,12 +36,12 @@ export const ContentRepository: Ordo.Content.RepositoryStatic = {
 			// Check if remote state and current state are equal
 			void Oath.Merge({
 				remote: remote_strategy
-					.get(user.get_id(), METADATA_CONTENT_FSID)
+					.get(user.get_uid(), METADATA_CONTENT_FSID)
 					.and(Oath.FromNullable)
 					.and(stream => new Response(stream as ReadableStream).json() as Promise<Ordo.Metadata.DTO[]>)
 					.fix(() => []),
 				local: local_strategy
-					.get(user.get_id(), METADATA_CONTENT_FSID)
+					.get(user.get_uid(), METADATA_CONTENT_FSID)
 					.and(Oath.FromNullable)
 					.and(content => Oath.Try(() => JSON.parse(content as string) as Ordo.Metadata.DTO[]))
 					.fix(() => []),
@@ -101,8 +101,8 @@ export const ContentRepository: Ordo.Content.RepositoryStatic = {
 				}))
 				.and(({ local, remote }) =>
 					Oath.Merge({
-						local: local && local_strategy.put(user.get_id(), METADATA_CONTENT_FSID, JSON.stringify(local)).and(T),
-						remote: remote && remote_strategy.put(user.get_id(), METADATA_CONTENT_FSID, JSON.stringify(remote)).and(T),
+						local: local && local_strategy.put(user.get_uid(), METADATA_CONTENT_FSID, JSON.stringify(local)).and(T),
+						remote: remote && remote_strategy.put(user.get_uid(), METADATA_CONTENT_FSID, JSON.stringify(remote)).and(T),
 					}),
 				)
 				// Force update of the components due to the changes in the local repo

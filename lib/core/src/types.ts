@@ -354,6 +354,8 @@ declare global {
 
 		type Hosts = { id: string; dt: string; pb: string; web: string }
 
+		type DTOLike<$TDTO extends any[]> = [...$TDTO, ...any]
+
 		/**
 		 * User achievements and whatever else related to using them.
 		 *
@@ -581,19 +583,12 @@ declare global {
 			type UID = `${string}-${string}-${string}-${string}-${string}`
 			type Email = `${string}@${string}.${string}`
 			type SessionID = `${string}-${string}-${string}-${string}-${string}`
-			type Session = { created_at: number; description: string }
+			type Session = [SessionID, number, string?]
 
 			namespace Current {
-				type DTO = Ordo.User.Public.DTO & {
-					[C.CurrentUserKeys.EMAIL]: Ordo.User.Email
-					[C.CurrentUserKeys.FILE_LIMIT]: number
-					[C.CurrentUserKeys.INSTALLED_FUNCTIONS]: string[]
-					[C.CurrentUserKeys.MAX_FUNCTIONS]: number
-					[C.CurrentUserKeys.MAX_UPLOAD_SIZE]: number
-					[C.CurrentUserKeys.SESSIONS]: Record<SessionID, Session>
-				}
+				type DTO = [...Ordo.User.Public.DTO, Ordo.User.Email, number, string[], number, number, Session[]]
 
-				type Instance = Ordo.User.Public.Instance & {
+				type Instance = Omit<Ordo.User.Public.Instance, "to_dto"> & {
 					can_add_function: () => boolean
 					can_create_files: (number: number) => boolean
 					can_upload: (bytes: number) => boolean
@@ -611,21 +606,14 @@ declare global {
 				}
 
 				type Static = {
-					FromDTO: (dto: Ordo.User.Current.DTO) => Ordo.User.Current.Instance
-					Serialize: <$TDTO extends Ordo.User.Current.DTO>(dto: $TDTO) => Ordo.User.Current.DTO
+					FromDTO: (dto: Ordo.DTOLike<Ordo.User.Current.DTO>) => Ordo.User.Current.Instance
+					Serialize: (dto: Ordo.DTOLike<Ordo.User.Current.DTO>) => Ordo.User.Current.DTO
 					Validations: Ordo.User.Current.Validations
 				}
 			}
 
 			namespace Public {
-				type DTO = {
-					[C.PublicUserKeys.UID]: Ordo.User.UID
-					[C.PublicUserKeys.HANDLE]: Ordo.User.Handle
-					[C.PublicUserKeys.CREATED_AT]: number
-					[C.PublicUserKeys.SUBSCRIPTION]: C.UserSubscription
-					[C.PublicUserKeys.FIRST_NAME]?: string
-					[C.PublicUserKeys.LAST_NAME]?: string
-				}
+				type DTO = [Ordo.User.UID, Ordo.User.Handle, number, C.UserSubscription, string?, string?]
 
 				type Validations = TEnumValidations<typeof C.PublicUserKeys> & {
 					is_dto: (x: unknown) => x is Ordo.User.Public.DTO
@@ -633,12 +621,12 @@ declare global {
 
 				type Static = {
 					FromDTO: (dto: Ordo.User.Public.DTO) => Ordo.User.Public.Instance
-					Serialize: <$TDTO extends Ordo.User.Public.DTO>(dto: $TDTO) => Ordo.User.Public.DTO
+					Serialize: <$TDTO extends [...Ordo.User.Public.DTO, ...any]>(dto: $TDTO) => Ordo.User.Public.DTO
 					Validations: Ordo.User.Public.Validations
 				}
 
 				type Instance = {
-					get_id: () => Ordo.User.UID
+					get_uid: () => Ordo.User.UID
 					get_created_at: () => Date
 					get_subscription: () => C.UserSubscription
 					get_handle: () => Handle

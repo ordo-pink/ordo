@@ -19,12 +19,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { RRR } from "@ordo-pink/core"
+import { Oath, ops0 } from "@ordo-pink/oath"
+import { BackendUserKeys } from "@ordo-pink/backend"
 import { type TIntake } from "@ordo-pink/routary"
 
 import { type TIDContext } from "../backend-id.types"
 
-export const invalid_token_rrr = (intake: TIntake<TIDContext>) => ({
-	rrr: RRR.codes.eacces("Provided token is invalid"),
-	intake,
-})
+const { SESSIONS } = BackendUserKeys
+
+export const persist_session_id =
+	(i: TIntake<TIDContext>) => (params: { sid: Ordo.User.Session; user: OrdoBackend.User.Instance }) =>
+		Oath.Resolve(params.user.to_dto())
+			.and(d => i.user_persistence_strategy.update(params.user.get_uid(), { ...d, [SESSIONS]: [...d[SESSIONS], params.sid] }))
+			.and(() => params)
+			.pipe(ops0.rejected_map(rrr => ({ rrr, intake: i })))

@@ -20,12 +20,23 @@
  */
 
 import { Oath, ops0 } from "@ordo-pink/oath"
+import { BackendUser } from "@ordo-pink/backend/src/backend.impl"
 import { RRR } from "@ordo-pink/core"
 import { type TIntake } from "@ordo-pink/routary"
 
 import { type TIDContext } from "../backend-id.types"
 
-export const get_token_from_authorization_header = (intake: TIntake<TIDContext>) =>
-	Oath.FromNullable(intake.req.headers.get("authorization"))
-		.pipe(ops0.rejected_map(() => ({ rrr: RRR.codes.eacces("Missing Authorization header"), intake })))
-		.pipe(ops0.map(header => header.replace("Bearer ", "")))
+export const get_user_from_cookie = (intake: TIntake<TIDContext>) =>
+	Oath.FromNullable(intake.req.headers.get("Cookie"))
+		.and(cookie => cookie.split("/"))
+		.and(([uid, sid]) =>
+			Oath.If(BackendUser.Validations.is_uid(uid), { T: () => uid as Ordo.User.UID })
+				.and(uid => intake.user_persistence_strategy.get_by_id(uid))
+				.and(user =>
+					Oath.If(
+						user.get_sessions().some(session => session[0] === sid),
+						{ T: () => user },
+					),
+				),
+		)
+		.pipe(ops0.rejected_map(() => ({ rrr: RRR.codes.enoent("User not found"), intake })))

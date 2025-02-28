@@ -31,6 +31,7 @@ export const handle_get_user_by_handle = default_handler<TIDContext>(intake =>
 	Oath.Resolve(intake.params.user_handle)
 		.pipe(ops0.chain(validate_user_handle(intake)))
 		.pipe(ops0.chain(get_user_by_handle(intake)))
+		.pipe(ops0.map(u => u.to_dto()))
 		.pipe(ops0.map(serialize_to_public_user))
 		.pipe(ops0.map(user => void (intake.payload = user)))
 		.pipe(ops0.map(() => intake)),

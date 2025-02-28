@@ -52,22 +52,7 @@ export const auth_commands: TMaokaJab = ({ use }) => {
 	const fetch = use(MaokaOrdo.Jabs.get_fetch)
 	const id_host = ordo_app_state.zags.select("hosts.id")
 
-	const refresh_token = (token: string) =>
-		Oath.Resolve({ headers: { Authorization: `Bearer ${token}` }, method: "POST" })
-			.and(init => Oath.FromPromise(() => fetch(`${id_host}/tokens/refresh`, init)))
-			.and(res => res.json())
-			.and(res => Oath.If(res.success, { T: () => res.payload as string }))
-			.pipe(ops0.tap(token => ordo_app_state.zags.update("auth.token", () => token)))
-			.and(token => ordo_app_state.zags.update("auth.token", () => token))
-			.invoke(invokers0.or_else(clean_up_auth))
-
-	void R.FromNullable(localStorage.getItem("user"))
-		.pipe(R.ops.chain(str => R.Try(() => JSON.parse(str))))
-		.pipe(R.ops.chain(user => R.If(CurrentUser.Validations.is_dto(user), { T: () => user as Ordo.User.Current.DTO })))
-		.pipe(R.ops.map(user => ordo_app_state.zags.update("auth.user", () => CurrentUser.FromDTO(user))))
-		.pipe(R.ops.chain(() => R.FromNullable(localStorage.getItem("token"))))
-		.pipe(R.ops.map(token => refresh_token(token)))
-
+	// TODO Invalidate cookie instead of token
 	const handle_sign_out = () =>
 		Oath.Resolve(new Headers())
 			.and(headers =>
@@ -128,10 +113,6 @@ export const auth_commands: TMaokaJab = ({ use }) => {
 
 				is_authenticated = true
 			}
-
-			refresh_timout_id = setTimeout(() => void refresh_token(token), 50000) as any // TODO Take duration from env
-
-			localStorage.setItem("token", token)
 		} else {
 			commands.on("cmd.auth.show_request_code_modal", handle_show_request_code)
 			commands.on("cmd.auth.show_validate_code_modal", handle_show_validate_code)
@@ -234,9 +215,6 @@ const RequestCodeModal = Maoka.create("div", ({ use }) => {
 })
 
 const clean_up_auth = () => {
-	clearTimeout(refresh_timout_id)
-	localStorage.removeItem("user")
-	localStorage.removeItem("token")
 	history.go(-history.length)
 	window.location.replace("/")
 }
@@ -271,7 +249,7 @@ const ValidateCodeModal = (email: Ordo.User.Email) =>
 						.and(() => new Headers())
 						.pipe(ops0.tap(headers => headers.append("content-type", "application/json")))
 						.and(headers => ({ headers, method: "POST" }))
-						.and(init => ({ ...init, body: JSON.stringify({ email, code }) }))
+						.and(init => ({ ...init, body: JSON.stringify({ email, code }), credentials: "include" as const }))
 						// TODO Get input from env
 						.and(init => Oath.FromPromise(() => fetch(`${id_host}/codes/validate`, init)))
 						.and(res => res.json())
@@ -299,5 +277,3 @@ const ValidateCodeModal = (email: Ordo.User.Email) =>
 				],
 			})
 	})
-
-let refresh_timout_id: number

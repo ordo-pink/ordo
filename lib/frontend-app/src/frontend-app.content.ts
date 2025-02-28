@@ -91,7 +91,7 @@ export const init_content: TF = () => {
 				.get_by_fsid(fsid)
 				.cata(
 					R.catas.if_ok(() =>
-						content_repository.put(user?.get_id() ?? null, fsid, content).invoke(invokers0.or_else(alert_rrr)),
+						content_repository.put(user?.get_uid() ?? null, fsid, content).invoke(invokers0.or_else(alert_rrr)),
 					),
 				)
 		}
@@ -101,7 +101,7 @@ export const init_content: TF = () => {
 		const user = ordo_app_state.zags.select("auth.user")
 
 		content_repository
-			.remove(user?.get_id() ?? null, fsid)
+			.remove(user?.get_uid() ?? null, fsid)
 			.invoke(invokers0.to_promise)
 			.catch(console.error)
 	})
@@ -136,7 +136,7 @@ export const init_content: TF = () => {
 
 		if (!user) return
 
-		void content_repository.put(user.get_id(), metadata.get_fsid(), content).invoke(invokers0.or_else(alert_rrr))
+		void content_repository.put(user.get_uid(), metadata.get_fsid(), content).invoke(invokers0.or_else(alert_rrr))
 	})
 
 	logger.debug("🟢 Initialised metadata.")

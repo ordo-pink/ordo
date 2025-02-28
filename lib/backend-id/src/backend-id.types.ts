@@ -21,17 +21,14 @@
 
 import type { TDefaultContext } from "@ordo-pink/backend-util-default-handler"
 import type { TLogger } from "@ordo-pink/logger"
-import type { TWJWT } from "@ordo-pink/wjwt"
 
 export type TIDChamber = {
 	allow_origin: string[]
 	defaults: { file_limit: number; max_upload_size: number; max_functions: number }
 	logger: TLogger
 	notification_strategy: OrdoBackend.Notification.EmailStrategy
-	persisted_token_lifetime: number
-	token_persistence_strategy: OrdoBackend.Token.PersistenceStrategy
+	session_lifetime: number
 	user_persistence_strategy: OrdoBackend.User.PersistenceStrategy
-	wjwt: TWJWT
 	web_host: string
 }
 

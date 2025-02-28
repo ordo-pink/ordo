@@ -36,7 +36,7 @@ export const MetadataManager = {
 		const logger = ordo_app_state.zags.select("logger")
 
 		const get_metadata_content0 = content_repository
-			.get(user?.get_id() ?? null, METADATA_CONTENT_FSID)
+			.get(user?.get_uid() ?? null, METADATA_CONTENT_FSID)
 			.and(Oath.FromNullable)
 			.and(content => Oath.If(is_string(content), { T: () => content as string }))
 			.and(content => Oath.Try(() => JSON.parse(content) as Ordo.Metadata.DTO[]))
@@ -53,7 +53,7 @@ export const MetadataManager = {
 			const user = ordo_app_state.zags.select("auth.user")
 
 			void content_repository
-				.get(user?.get_id() ?? null, METADATA_CONTENT_FSID)
+				.get(user?.get_uid() ?? null, METADATA_CONTENT_FSID)
 				.and(stream => new Response(stream))
 				.and(res => res.json())
 				.and(items => Oath.If(is_array(items), { T: () => items }))
@@ -95,8 +95,8 @@ export const MetadataManager = {
 						.and(() => {
 							if (user) {
 								const authenticated_dtos = dtos.map(dto => {
-									if (!dto.created_by) (dto as any).created_by = user.get_id()
-									if (!dto.updated_by) (dto as any).updated_by = user.get_id()
+									if (!dto.created_by) (dto as any).created_by = user.get_uid()
+									if (!dto.updated_by) (dto as any).updated_by = user.get_uid()
 
 									return dto
 								})
@@ -107,7 +107,7 @@ export const MetadataManager = {
 							return dtos
 						})
 						.and(dtos => Oath.Try(() => JSON.stringify(dtos)))
-						.and(str => content_repository.put(user?.get_id() ?? null, METADATA_CONTENT_FSID, str))
+						.and(str => content_repository.put(user?.get_uid() ?? null, METADATA_CONTENT_FSID, str))
 
 					previous_save_attempt0 &&
 						void previous_save_attempt0.pipe(ops0.bitap(mark_put_complete, mark_put_complete)).invoke(
@@ -124,7 +124,7 @@ export const MetadataManager = {
 				}
 
 				return Oath.Resolve(on_state_change("get-remote"))
-					.and(() => get_metadata_content0)
+					.pipe(() => get_metadata_content0)
 					.pipe(ops0.bitap(mark_get_complete, mark_get_complete))
 					.invoke(invokers0.or_else(console.error)) // TODO handling persistence errors
 			},

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { CurrentUser, METADATA_CONTENT_FSID, Metadata, RRR } from "@ordo-pink/core"
+import { CurrentUser, CurrentUserKeys, METADATA_CONTENT_FSID, Metadata, RRR } from "@ordo-pink/core"
 import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
 import { Routary, TIntake } from "@ordo-pink/routary"
 import { create_json_response, create_response, status_from_rrr } from "@ordo-pink/backend-util-create-response"
@@ -136,7 +136,7 @@ export const create_backend_dt = (chamber: TDTChamber) =>
 export const validate_request_params = (intake: TIntake<TDTContext>) =>
 	Oath.Merge([
 		Oath.If(Metadata.Validations.is_fsid(intake.params.fsid)).pipe(ops0.rejected_map(() => RRR.codes.einval("Invalid FSID"))),
-		Oath.If(CurrentUser.Validations.is_id(intake.params.uid)).pipe(ops0.rejected_map(() => RRR.codes.einval("Invalid UID"))),
+		Oath.If(CurrentUser.Validations.is_uid(intake.params.uid)).pipe(ops0.rejected_map(() => RRR.codes.einval("Invalid UID"))),
 	]).pipe(ops0.map(() => intake))
 
 export const authenticate = (intake: TIntake<TDTContext>) =>
@@ -152,7 +152,7 @@ export const authenticate = (intake: TIntake<TDTContext>) =>
 
 // TODO checking permissions for editing files of other users
 export const check_authorization = (intake: TIntake<TDTContext>) => (user: Ordo.User.Current.DTO) =>
-	Oath.If(user.id === intake.params.uid)
+	Oath.If(user[CurrentUserKeys.UID] === intake.params.uid)
 		.pipe(ops0.map(() => user))
 		.pipe(ops0.rejected_map(() => RRR.codes.eperm("Permission denied")))
 
@@ -195,7 +195,7 @@ export const validate_file_size_limit = (intake: TIntake<TDTContext>) => (user: 
 // TODO check if attemted to create a file in other user's space
 export const check_can_create_files = (intake: TIntake<TDTContext>) => (user: Ordo.User.Current.DTO) =>
 	intake.data_persistence_strategy
-		.read(user.id, METADATA_CONTENT_FSID)
+		.read(user[CurrentUserKeys.UID], METADATA_CONTENT_FSID)
 		.pipe(ops0.chain(stream => Oath.Try(() => new Response(stream).json())))
 		.pipe(ops0.map(metadata => metadata.length))
 		.fix(() => 0)

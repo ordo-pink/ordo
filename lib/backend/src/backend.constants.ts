@@ -1,4 +1,4 @@
-export const enum BackendUserKeys {
+export enum BackendUserKeys {
 	UID,
 	HANDLE,
 	CREATED_AT,

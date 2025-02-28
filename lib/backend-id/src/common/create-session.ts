@@ -19,12 +19,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { RRR } from "@ordo-pink/core"
+import { Oath, ops0 } from "@ordo-pink/oath"
 import { type TIntake } from "@ordo-pink/routary"
+import { unknown_error } from "@ordo-pink/backend-util-extract-body"
 
 import { type TIDContext } from "../backend-id.types"
 
-export const redundant_auth_rrr = (email: Ordo.User.Email, intake: TIntake<TIDContext>) => ({
-	rrr: RRR.codes.eperm("Authentication was not requested", email),
-	intake,
-})
+export const create_session_id = (intake: TIntake<TIDContext>) => (user: OrdoBackend.User.Instance) =>
+	Oath.Try(() => [crypto.randomUUID(), Date.now(), intake.req.headers.get("User-Agent") ?? undefined] as Ordo.User.Session)
+		.pipe(ops0.map(sid => ({ sid, user })))
+		.pipe(ops0.rejected_map(rrr => unknown_error(rrr, intake)))

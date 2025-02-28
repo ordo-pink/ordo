@@ -19,10 +19,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { CurrentUserKeys, PublicUserKeys, UserSubscription } from "@ordo-pink/core"
 import { Oath, ops0 } from "@ordo-pink/oath"
 import { extract_request_body, unknown_error } from "@ordo-pink/backend-util-extract-body"
+import { BackendUserKeys } from "@ordo-pink/backend"
 import { type TIntake } from "@ordo-pink/routary"
-import { UserSubscription } from "@ordo-pink/core"
 import { default_handler } from "@ordo-pink/backend-util-default-handler"
 
 import { type TIDContext } from "../../backend-id.types"
@@ -85,24 +86,25 @@ const update_user_code = (i: I) => (user: OrdoBackend.User.DTO) =>
 		.pipe(
 			ops0.chain(({ codes, user }) =>
 				i.user_persistence_strategy
-					.update(user.id, { ...user, email_code: codes.hash })
+					.update(user[PublicUserKeys.UID], { ...user, [BackendUserKeys.EMAIL_CODE]: codes.hash })
 					.pipe(ops0.rejected_map(rrr => ({ rrr, intake: i })))
-					.pipe(ops0.map(() => ({ codes, email: user.email }))),
+					.pipe(ops0.map(() => ({ codes, email: user[CurrentUserKeys.EMAIL] }))),
 			),
 		)
 
 const create_user = (email: Ordo.User.Email, id: Ordo.User.UID, handle: Ordo.User.Handle) => (i: I) =>
 	i.user_persistence_strategy
 		.create({
-			created_at: Date.now(),
-			email,
-			id,
-			subscription: UserSubscription.FREE,
-			file_limit: i.defaults.file_limit,
-			installed_functions: [],
-			max_functions: i.defaults.max_functions,
-			max_upload_size: i.defaults.max_upload_size,
-			handle,
+			[BackendUserKeys.CREATED_AT]: Date.now(),
+			[BackendUserKeys.EMAIL]: email,
+			[BackendUserKeys.UID]: id,
+			[BackendUserKeys.SUBSCRIPTION]: UserSubscription.FREE,
+			[BackendUserKeys.FILE_LIMIT]: i.defaults.file_limit,
+			[BackendUserKeys.INSTALLED_FUNCTIONS]: [],
+			[BackendUserKeys.MAX_FUNCTIONS]: i.defaults.max_functions,
+			[BackendUserKeys.MAX_UPLOAD_SIZE]: i.defaults.max_upload_size,
+			[BackendUserKeys.HANDLE]: handle,
+			[BackendUserKeys.SESSIONS]: {},
 		})
 		.pipe(ops0.rejected_map(rrr => ({ rrr, intake: i })))
 

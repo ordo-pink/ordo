@@ -35,8 +35,13 @@ export type TValidation<$TEntity extends Record<string, unknown>, $TKey extends 
 ) => x is $TEntity[$TKey]
 
 export type TValidations<$TEntity extends Record<string, unknown>> = {
-	[$TKey in keyof $TEntity extends string ? `is_${keyof $TEntity}` : never]: TValidation<$TEntity, TDropIsPrefix<$TKey>>
+	[$TKey in keyof $TEntity extends string ? `is_${Lowercase<keyof $TEntity>}` : never]: TValidation<
+		$TEntity,
+		TDropIsPrefix<$TKey>
+	>
 }
+
+export type TEnumValidations<$TEnum> = TValidations<Record<keyof $TEnum, any>>
 
 export type TFlattenRecord<T extends { key: string; value: any }> = {
 	[K in T["key"]]: Extract<T, { key: K }>["value"]
@@ -575,29 +580,33 @@ declare global {
 			type Handle = `@${string}` // TODO Disallow forbidden chars
 			type UID = `${string}-${string}-${string}-${string}-${string}`
 			type Email = `${string}@${string}.${string}`
+			type SessionID = `${string}-${string}-${string}-${string}-${string}`
+			type Session = { created_at: number; description: string }
 
 			namespace Current {
 				type DTO = Ordo.User.Public.DTO & {
-					email: Ordo.User.Email
-					file_limit: number
-					max_upload_size: number
-					max_functions: number
-					installed_functions: string[]
+					[C.CurrentUserKeys.EMAIL]: Ordo.User.Email
+					[C.CurrentUserKeys.FILE_LIMIT]: number
+					[C.CurrentUserKeys.INSTALLED_FUNCTIONS]: string[]
+					[C.CurrentUserKeys.MAX_FUNCTIONS]: number
+					[C.CurrentUserKeys.MAX_UPLOAD_SIZE]: number
+					[C.CurrentUserKeys.SESSIONS]: Record<SessionID, Session>
 				}
 
 				type Instance = Ordo.User.Public.Instance & {
-					get_email: () => Ordo.User.Email
-					get_file_limit: () => number
-					get_max_upload_size: () => number
-					get_max_functions: () => number
-					get_installed_functions: () => string[]
+					can_add_function: () => boolean
 					can_create_files: (number: number) => boolean
 					can_upload: (bytes: number) => boolean
-					can_add_function: () => boolean
+					get_email: () => Ordo.User.Email
+					get_file_limit: () => number
+					get_installed_functions: () => string[]
+					get_max_functions: () => number
+					get_max_upload_size: () => number
+					get_sessions: () => Session[]
 					to_dto: () => Ordo.User.Current.DTO
 				}
 
-				type Validations = TValidations<Ordo.User.Current.DTO> & {
+				type Validations = TEnumValidations<typeof C.CurrentUserKeys> & {
 					is_dto: (x: unknown) => x is Ordo.User.Current.DTO
 				}
 
@@ -610,15 +619,15 @@ declare global {
 
 			namespace Public {
 				type DTO = {
-					id: Ordo.User.UID
-					created_at: number
-					subscription: C.UserSubscription
-					handle: Ordo.User.Handle
-					first_name?: string
-					last_name?: string
+					[C.PublicUserKeys.UID]: Ordo.User.UID
+					[C.PublicUserKeys.HANDLE]: Ordo.User.Handle
+					[C.PublicUserKeys.CREATED_AT]: number
+					[C.PublicUserKeys.SUBSCRIPTION]: C.UserSubscription
+					[C.PublicUserKeys.FIRST_NAME]?: string
+					[C.PublicUserKeys.LAST_NAME]?: string
 				}
 
-				type Validations = TValidations<Ordo.User.Public.DTO> & {
+				type Validations = TEnumValidations<typeof C.PublicUserKeys> & {
 					is_dto: (x: unknown) => x is Ordo.User.Public.DTO
 				}
 

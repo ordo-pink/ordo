@@ -21,6 +21,7 @@
 
 import { CurrentUser, RRR } from "@ordo-pink/core"
 import { Oath, ops0 } from "@ordo-pink/oath"
+import { BackendUserKeys } from "@ordo-pink/backend"
 import { type TIntake } from "@ordo-pink/routary"
 import { default_handler } from "@ordo-pink/backend-util-default-handler"
 import { extract_request_body } from "@ordo-pink/backend-util-extract-body"
@@ -55,7 +56,7 @@ const validate_request_body = (intake: I) => (body: any) =>
 	})
 
 const verify_password = (code: string, intake: I) => (user: OrdoBackend.User.DTO) =>
-	Oath.FromPromise(() => Bun.password.verify(code, user.email_code!))
+	Oath.FromPromise(() => Bun.password.verify(code, user[BackendUserKeys.EMAIL_CODE]!))
 		.pipe(ops0.chain(is_valid => Oath.If(is_valid, { T: () => user })))
 		.pipe(ops0.rejected_map(() => invalid_code_error(code, intake)))
 
@@ -65,19 +66,23 @@ const validate_user_code =
 		intake.user_persistence_strategy
 			.get_by_email(email)
 			.pipe(ops0.rejected_map(rrr => ({ rrr, intake })))
-			.pipe(ops0.chain(u => Oath.FromNullable(u.email_code, () => redundant_auth_rrr(email, intake)).pipe(ops0.map(() => u))))
+			.pipe(
+				ops0.chain(u =>
+					Oath.FromNullable(u[BackendUserKeys.EMAIL_CODE], () => redundant_auth_rrr(email, intake)).pipe(ops0.map(() => u)),
+				),
+			)
 			.pipe(ops0.chain(verify_password(code, intake)))
 
 const drop_user_code = (intake: I) => (user: OrdoBackend.User.DTO) =>
 	intake.user_persistence_strategy
-		.update(user.id, { ...user, email_code: void 0 })
+		.update(user[BackendUserKeys.UID], { ...user, [BackendUserKeys.EMAIL_CODE]: void 0 })
 		.pipe(ops0.rejected_map(rrr => ({ rrr, intake })))
 		.pipe(ops0.map(() => user))
 
 // TODO Create email with Maoka
 const send_sign_in_notification = (intake: I) => (user: OrdoBackend.User.DTO) =>
 	intake.notification_strategy.send({
-		to: user.email,
+		to: user[BackendUserKeys.EMAIL],
 		subject: "Account login",
 		content: `Someone logged in (IP ${intake.request_ip?.address ?? "not detected"})`,
 	})

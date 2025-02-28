@@ -85,8 +85,8 @@ export const keys_of: Types._KeysOfFn = o => {
 	return Object.keys(o) as any
 }
 
-export const for_each_key = <T extends Record<string, unknown>>(obj: T, f: (key: keyof T) => void) =>
-	keys_of(obj).forEach(key => f(key))
+export const for_each_key = <T extends Record<string, unknown>>(obj: T, f: (key: keyof T, obj: T) => void) =>
+	keys_of(obj).forEach(key => f(key, obj))
 
 export const extend =
 	<T extends Record<string, unknown>, N extends Record<string, unknown>>(f: (obj: T) => N) =>

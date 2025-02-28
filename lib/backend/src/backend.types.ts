@@ -21,7 +21,9 @@
 
 import type { EXP, JTI, SUB } from "@ordo-pink/wjwt"
 import type { Oath } from "@ordo-pink/oath"
-import type { TValidations } from "@ordo-pink/core"
+import type { TEnumValidations } from "@ordo-pink/core"
+
+import type { BackendUserKeys } from "./backend.constants"
 
 declare global {
 	module OrdoBackend {
@@ -60,8 +62,8 @@ declare global {
 
 		module User {
 			export type DTO = Ordo.User.Current.DTO & {
-				email_code?: string
-				password?: string
+				[BackendUserKeys.EMAIL_CODE]?: string
+				[BackendUserKeys.PASSWORD]?: string
 			}
 
 			type PersistenceStrategy = {
@@ -76,17 +78,16 @@ declare global {
 				remove: (id: Ordo.User.UID) => Oath<void, Ordo.Rrr<"EIO" | "ENOENT">>
 			}
 
-			export type Validations = TValidations<OrdoBackend.User.DTO>
+			export type Validations = TEnumValidations<typeof BackendUserKeys>
 
 			export type Static = {
 				Validations: OrdoBackend.User.Validations
-				Of: (dto: OrdoBackend.User.DTO) => OrdoBackend.User.Instance
-				New: (email: Ordo.User.Email) => OrdoBackend.User.Instance
+				FromDTO: (dto: OrdoBackend.User.DTO) => OrdoBackend.User.Instance
 			}
 
 			export type Instance = Ordo.User.Current.Instance & {
-				validate_code: (code: string) => Oath<boolean, Ordo.Rrr<"EINVAL" | "ENOENT">>
-				validate_password: (password: string) => Oath<boolean, Ordo.Rrr<"EINVAL" | "ENOENT">>
+				validate_code: (code: string) => Oath<boolean>
+				validate_password: (password: string) => Oath<boolean>
 			}
 		}
 

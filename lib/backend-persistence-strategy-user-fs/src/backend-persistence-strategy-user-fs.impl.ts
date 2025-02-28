@@ -19,8 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { CurrentUserKeys, PublicUserKeys, RRR } from "@ordo-pink/core"
 import { Oath, ops0 } from "@ordo-pink/oath"
-import { RRR } from "@ordo-pink/core"
 import { noop } from "@ordo-pink/tau"
 
 export const PersistenceStategyUserFS = {
@@ -40,49 +40,67 @@ export const PersistenceStategyUserFS = {
 					.pipe(
 						ops0.chain(users =>
 							Oath.Merge([
-								Oath.If(!exists(users, "id", user.id), { F: () => user_already_exists("id", user.id) }),
-								Oath.If(!exists(users, "email", user.email), { F: () => user_already_exists("email", user.email) }),
+								Oath.If(!exists(users, PublicUserKeys.UID, user[PublicUserKeys.UID]), {
+									F: () => user_already_exists(PublicUserKeys.UID, user[PublicUserKeys.UID]),
+								}),
+								Oath.If(!exists(users, CurrentUserKeys.EMAIL, user[CurrentUserKeys.EMAIL]), {
+									F: () => user_already_exists(CurrentUserKeys.EMAIL, user[CurrentUserKeys.EMAIL]),
+								}),
 							]).pipe(ops0.map(() => users)),
 						),
 					)
 					.pipe(ops0.chain(users => save_users([...users, user])))
 					.pipe(ops0.map(() => user)),
 
-			exists_by_email: email => users0.pipe(ops0.map(users => exists(users, "email", email))),
+			exists_by_email: email => users0.pipe(ops0.map(users => exists(users, CurrentUserKeys.EMAIL, email))),
 
-			exists_by_handle: handle => users0.pipe(ops0.map(users => exists(users, "handle", handle))),
+			exists_by_handle: handle => users0.pipe(ops0.map(users => exists(users, PublicUserKeys.HANDLE, handle))),
 
-			exists_by_id: id => users0.pipe(ops0.map(users => exists(users, "id", id))),
+			exists_by_id: id => users0.pipe(ops0.map(users => exists(users, PublicUserKeys.UID, id))),
 
 			get_by_email: email =>
 				users0
-					.pipe(ops0.map(users => users.find(u => u.email === email)))
-					.pipe(ops0.chain(user => Oath.FromNullable(user, () => user_not_found("email", email)))),
+					.pipe(ops0.map(users => users.find(u => u[CurrentUserKeys.EMAIL] === email)))
+					.pipe(ops0.chain(user => Oath.FromNullable(user, () => user_not_found(CurrentUserKeys.EMAIL, email)))),
 
 			get_by_handle: handle =>
 				users0
-					.pipe(ops0.map(users => users.find(u => u.handle === handle)))
-					.pipe(ops0.chain(user => Oath.FromNullable(user, () => user_not_found("handle", handle)))),
+					.pipe(ops0.map(users => users.find(u => u[PublicUserKeys.HANDLE] === handle)))
+					.pipe(ops0.chain(user => Oath.FromNullable(user, () => user_not_found(PublicUserKeys.HANDLE, handle)))),
 
 			get_by_id: id =>
 				users0
-					.pipe(ops0.map(users => users.find(u => u.id === id)))
-					.pipe(ops0.chain(user => Oath.FromNullable(user, () => user_not_found("id", id)))),
+					.pipe(ops0.map(users => users.find(u => u[PublicUserKeys.UID] === id)))
+					.pipe(ops0.chain(user => Oath.FromNullable(user, () => user_not_found(PublicUserKeys.UID, id)))),
 
 			remove: id =>
 				users0
-					.pipe(ops0.chain(users => Oath.If(exists(users, "id", id), { T: () => users, F: () => user_not_found("id", id) })))
-					.pipe(ops0.map(users => users.filter(user => user.id !== id)))
+					.pipe(
+						ops0.chain(users =>
+							Oath.If(exists(users, PublicUserKeys.UID, id), {
+								T: () => users,
+								F: () => user_not_found(PublicUserKeys.UID, id),
+							}),
+						),
+					)
+					.pipe(ops0.map(users => users.filter(user => user[PublicUserKeys.UID] !== id)))
 					.pipe(ops0.chain(save_users))
 					.pipe(ops0.map(noop)),
 
 			update: (id, user) =>
 				users0
-					.pipe(ops0.chain(users => Oath.If(exists(users, "id", id), { T: () => users, F: () => user_not_found("id", id) })))
+					.pipe(
+						ops0.chain(users =>
+							Oath.If(exists(users, PublicUserKeys.UID, id), {
+								T: () => users,
+								F: () => user_not_found(PublicUserKeys.UID, id),
+							}),
+						),
+					)
 					.pipe(
 						ops0.map(users =>
 							users.toSpliced(
-								users.findIndex(u => u.id === id),
+								users.findIndex(u => u[PublicUserKeys.UID] === id),
 								1,
 								user,
 							),

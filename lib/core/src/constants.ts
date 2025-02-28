@@ -34,6 +34,31 @@ export enum BackgroundTaskStatus {
 	length,
 }
 
+export enum PublicUserKeys {
+	// Public User
+	UID,
+	HANDLE,
+	CREATED_AT,
+	SUBSCRIPTION,
+	FIRST_NAME,
+	LAST_NAME,
+}
+
+export enum CurrentUserKeys {
+	UID,
+	HANDLE,
+	CREATED_AT,
+	SUBSCRIPTION,
+	FIRST_NAME,
+	LAST_NAME,
+	EMAIL,
+	FILE_LIMIT,
+	INSTALLED_FUNCTIONS,
+	MAX_FUNCTIONS,
+	MAX_UPLOAD_SIZE,
+	SESSIONS,
+}
+
 export enum LabelColor {
 	DEFAULT,
 	RED,

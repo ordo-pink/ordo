@@ -20,6 +20,7 @@
  */
 
 import { Oath, ops0 } from "@ordo-pink/oath"
+import { BackendUserKeys } from "@ordo-pink/backend"
 import { type TIntake } from "@ordo-pink/routary"
 import { unknown_error } from "@ordo-pink/backend-util-extract-body"
 
@@ -27,7 +28,13 @@ import { type TIDContext } from "../backend-id.types"
 
 export const create_auth_token = (intake: TIntake<TIDContext>) => (user: OrdoBackend.User.DTO) =>
 	Oath.FromPromise(() =>
-		intake.wjwt.sign({ sub: user.id, lim: user.file_limit, mus: user.max_upload_size, sbs: user.subscription }),
+		intake.wjwt.sign({
+			sub: user[BackendUserKeys.UID],
+			lim: user[BackendUserKeys.FILE_LIMIT],
+			mus: user[BackendUserKeys.MAX_UPLOAD_SIZE],
+			sbs: user[BackendUserKeys.SUBSCRIPTION],
+			mlf: user[BackendUserKeys.MAX_FUNCTIONS],
+		}),
 	)
 		.pipe(ops0.map(jwt => ({ jwt, user })))
 		.pipe(ops0.rejected_map(rrr => unknown_error(rrr, intake)))

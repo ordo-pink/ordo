@@ -33,7 +33,6 @@ import { OrdoTitleDisplay } from "./src/components/title.component"
 import { OrdoWorkspace } from "./src/components/workspace.component"
 import { ordo_app_state } from "./app.state"
 
-import { auth_commands } from "./src/jabs/commands/auth.command"
 import { create_command_palette } from "./src/jabs/create-command-palette.jab"
 import { create_file_command } from "./src/jabs/commands/create-file.command"
 import { create_function_state } from "./src/jabs/create-function-state.jab"
@@ -76,7 +75,6 @@ export const App = ({ id_host, dt_host, pb_host }: TAppOptions) =>
 		use(rename_file_command)
 		use(edit_file_labels_command)
 		use(edit_file_links_command)
-		use(auth_commands)
 
 		use(start_metadata_manager(repositories))
 

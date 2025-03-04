@@ -19,18 +19,80 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { BsBoxArrowInRight, BsBoxArrowRight } from "@ordo-pink/frontend-icons"
+import { CheckboxInput, Dialog, Input } from "@ordo-pink/maoka-components"
+import { CommandPaletteItemType, CurrentUser, RRR } from "@ordo-pink/core"
+import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
+import { call_once, noop } from "@ordo-pink/tau"
 import { ConsoleLogger } from "@ordo-pink/logger"
-import { RRR } from "@ordo-pink/core"
+import { Maoka } from "@ordo-pink/maoka"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
+import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { Result } from "@ordo-pink/result"
-import { call_once } from "@ordo-pink/tau"
 
 import { UserQuery } from "./data/user/user-query.impl"
 import { ordo_app_state } from "../app.state"
 
 export const init_user = call_once(() => {
-	const { known_functions, logger } = ordo_app_state.zags.unwrap()
+	const { known_functions, fetch, logger, hosts, commands } = ordo_app_state.zags.unwrap()
+
+	const handle_show_request_code: Ordo.Command.HandlerOf<"cmd.auth.show_request_code_modal"> = () =>
+		void commands.emit("cmd.application.modal.show", { render: () => RequestCodeModal })
+
+	const handle_show_validate_code: Ordo.Command.HandlerOf<"cmd.auth.show_validate_code_modal"> = email =>
+		void commands.emit("cmd.application.modal.show", { render: () => ValidateCodeModal(email) })
+
+	// TODO Invalidate cookie instead of token
+	const handle_sign_out = () =>
+		Oath.Resolve(new Headers())
+			.and(headers =>
+				Oath.FromNullable(localStorage.getItem("token"))
+					.and(token => `Bearer ${token}`)
+					.and(authorization_header => headers.append("Authorization", authorization_header))
+					.and(() => headers),
+			)
+			.and(headers => ({ headers, method: "DELETE" }))
+			.and(init => Oath.Try(() => fetch(`${hosts.id}/session`, init)))
+			.invoke(invokers0.force_resolve)
+			.then(clean_up_auth)
+			.then(() => {
+				const history_length = history.length
+				history.go(-history_length)
+				window.location.replace("/")
+			})
 
 	logger.debug("🟡 Initialising metadata...")
+
+	Oath.FromPromise(() => fetch(`${hosts.id}/session`, { credentials: "include" }))
+		.and(res => res.json())
+		.and(res => Oath.If(res.success, { T: () => res.payload as Ordo.User.Current.DTO }))
+		.and(dto => CurrentUser.FromDTO(dto))
+		.and(user => ordo_app_state.zags.update("user", () => user))
+		.invoke(invokers0.to_promise)
+		.catch(noop)
+
+	ordo_app_state.zags.cheat("user", user => {
+		if (user) {
+			commands.off("cmd.auth.show_request_code_modal", handle_show_request_code)
+			commands.off("cmd.auth.show_validate_code_modal", handle_show_validate_code)
+			commands.emit("cmd.application.command_palette.remove", "t.auth.join")
+			commands.emit("cmd.application.command_palette.add", {
+				readable_name: "t.auth.leave",
+				value: handle_sign_out,
+				type: CommandPaletteItemType.DESTRUCTIVE_ACTION,
+				render_icon: BsBoxArrowRight,
+			})
+		} else {
+			commands.on("cmd.auth.show_request_code_modal", handle_show_request_code)
+			commands.on("cmd.auth.show_validate_code_modal", handle_show_validate_code)
+			commands.emit("cmd.application.command_palette.add", {
+				readable_name: "t.auth.join",
+				type: CommandPaletteItemType.MODAL_OPENER,
+				value: handle_show_request_code,
+				render_icon: BsBoxArrowInRight,
+			})
+		}
+	})
 
 	const user_query = UserQuery.Of(() => Result.Ok(void 0))
 
@@ -51,3 +113,139 @@ export const init_user = call_once(() => {
 			),
 	}
 })
+
+const clean_up_auth = () => {
+	history.go(-history.length)
+	window.location.replace("/")
+}
+
+const RequestCodeModal = Maoka.create("div", ({ use }) => {
+	let email = ""
+	let consent = false
+	let is_valid = false
+
+	const commands = use(MaokaOrdo.Jabs.get_commands)
+	const fetch = use(MaokaOrdo.Jabs.get_fetch)
+	const id_host = ordo_app_state.zags.select("hosts.id")
+
+	// TODO Show hint
+	// const t_hint = "We'll send you a magic link that will let you in." // TODO i18n
+	const t_title = "Enter email" // TODO i18n
+	const t_email_validation_error = "Put valid email" // TODO i18n
+	const t_input_label = "Email" // TODO i18n
+	const t_input_placeholder = "jacques@villeneuve.ca" // TODO i18n
+	const t_next = "Next" // TODO i18n
+	const t_checkbox_label =
+		"I consent to the fact that you'll store stuff on my computer, and I don't mind as long as you don't share it." // TODO i18n
+
+	const validate = CurrentUser.Validations.is_email
+
+	const handle_input = (event: Event) => {
+		const target = event.target as HTMLInputElement
+		email = target.value
+		is_valid = validate(email)
+	}
+
+	const handle_checkbox_change = () => {
+		consent = !consent
+	}
+
+	return () =>
+		// TODO render_icon
+		Dialog({
+			action: () =>
+				Oath.If(is_valid && consent)
+					.and(() => new Headers())
+					.pipe(ops0.tap(headers => headers.append("content-type", "application/json")))
+					.and(headers => ({ headers, method: "POST" }))
+					.and(init => ({ ...init, body: JSON.stringify({ email }) }))
+					// TODO Get input from env
+					.and(init => Oath.FromPromise(() => fetch(`${id_host}/codes/request`, init)))
+					.and(res => res.json())
+					.and(res => Oath.If(res.success))
+					.and(() => commands.emit("cmd.auth.show_validate_code_modal", email as Ordo.User.Email))
+					.invoke(invokers0.or_nothing),
+			action_hotkey: "shift+enter",
+			action_text: t_next,
+			body: () => {
+				const autofocus = true
+				const placeholder = t_input_placeholder
+				const initial_value = email
+				const on_input = handle_input
+				const validation_error_message = t_email_validation_error
+				let label = t_input_label
+
+				const input_params = { autofocus, label, placeholder, initial_value, on_input, validate, validation_error_message }
+
+				const on_change = handle_checkbox_change
+				label = t_checkbox_label
+
+				const checkbox_params = { on_change, checked: consent, label }
+
+				return [
+					CodeModalInputWrapper(() => () => Input.Email(input_params)),
+					RequestCodeModalCheckboxWrapper(() => () => CheckboxInput(checkbox_params)),
+				]
+			},
+			title: t_title,
+		})
+})
+
+const RequestCodeModalCheckboxWrapper = MaokaStyled.Tags.div("px-8")
+
+const CodeModalInputWrapper = MaokaStyled.Tags.div("py-4")
+
+const ValidateCodeModal = (email: Ordo.User.Email) =>
+	Maoka.create("div", ({ use }) => {
+		let code = ""
+		let is_valid = false
+
+		const commands = use(MaokaOrdo.Jabs.get_commands)
+		const fetch = use(MaokaOrdo.Jabs.get_fetch)
+		const id_host = ordo_app_state.zags.select("hosts.id")
+
+		const validate = (x: string) => /^\d{6}$/.test(x)
+
+		const on_input = (event: Event) => {
+			const target = event.target as HTMLInputElement
+			code = target.value
+			is_valid = validate(code)
+		}
+
+		const t_email_code_validation_error = "Put valid email code" // TODO i18n
+
+		return () =>
+			Dialog({
+				action: () =>
+					Oath.If(is_valid)
+						.and(() => new Headers())
+						.pipe(ops0.tap(headers => headers.append("content-type", "application/json")))
+						.and(headers => ({ headers, method: "POST" }))
+						.and(init => ({ ...init, body: JSON.stringify({ email, code }), credentials: "include" as const }))
+						// TODO Get input from env
+						.and(init => Oath.FromPromise(() => fetch(`${id_host}/codes/validate`, init)))
+						.and(res => res.json())
+						.and(res => Oath.If(res.success, { T: () => res.payload }))
+						.and(user => ordo_app_state.zags.update("user", () => CurrentUser.FromDTO(user)))
+						.and(() => commands.emit("cmd.application.modal.hide"))
+						.invoke(invokers0.or_nothing),
+				action_text: "Join",
+				title: "Enter code",
+				action_hotkey: "enter",
+				// TODO render_icon
+				body: () => [
+					CodeModalInputWrapper(
+						() => () =>
+							Input.Text({
+								autofocus: true,
+								label: "Email Code", // TODO i18n
+								placeholder: "123456",
+								initial_value: code,
+								on_input,
+								validate,
+								validation_error_message: t_email_code_validation_error,
+							}),
+					),
+				],
+			})
+	})

@@ -29,9 +29,9 @@ export const ContentRepository: Ordo.Content.RepositoryStatic = {
 	Of: (auth$, local_strategy, remote_strategy) => {
 		const $ = ZAGS.Of({ version: 0 })
 
-		const divorce = auth$.marry(({ user, token }) => {
+		const divorce = auth$.marry(({ user }) => {
 			// Quit from syncing with remote since the user is not authenticated
-			if (!token || !user) return
+			if (!user) return
 
 			// Check if remote state and current state are equal
 			void Oath.Merge({
@@ -132,59 +132,3 @@ export const ContentRepository: Ordo.Content.RepositoryStatic = {
 		}
 	},
 }
-
-/*
-.and(() => {
-	const last_local = metadata_repository
-		.get()
-		.pipe(
-			Result.ops.map(items =>
-				items.reduce(
-					(acc, v) => (acc ? (v.get_updated_at() > acc ? v.get_updated_at() : acc) : v.get_updated_at()),
-					null as Date | null,
-				),
-			),
-		)
-		.pipe(Result.ops.chain(Result.FromNullable))
-		.cata(Result.catas.or_else(() => new Date(1970, 1, 2)))
-
-	const fetch = ordo_app_state.zags.select("fetch")
-	const token = ordo_app_state.zags.select("auth.token")
-	const user = ordo_app_state.zags.select("auth.user")
-
-	if (!user || !token) return
-
-	void Oath.Try(() =>
-		fetch(`${dt_host}/${user.get_id()}/${METADATA_CONTENT_FSID}`, {
-			headers: { Authorization: `Bearer ${token}` },
-			method: "HEAD",
-		}),
-	)
-		.and(res => Oath.FromNullable(res.headers.get("last-modified")))
-		.and(str => new Date(str))
-		.and(Oath.FromNullable)
-		.and(date => Oath.If(is_date(date)))
-		.fix(() => new Date(1970, 1, 1))
-		.and(last_remote => {
-			if (last_remote! < last_local) {
-				// TODO Put all content
-				return content_repository.get_all().and(items =>
-					Oath.Merge(
-						keys_of(items).map(key =>
-							Oath.Try(() =>
-								fetch(`${dt_host}/${user.get_id()}/${key}`, {
-									method: "PUT",
-									headers: { Authorization: `Bearer ${token}` },
-									body: items[key],
-								}),
-							),
-						),
-					),
-				)
-			} else if (last_remote! > last_local) {
-				// TODO Pull all content
-			}
-		})
-		.invoke(invokers0.force_resolve)
-})
-*/

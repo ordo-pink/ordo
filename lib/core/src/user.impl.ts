@@ -109,7 +109,7 @@ export const CurrentUserValidations: Ordo.User.Current.Validations = {
 		const y = x as Ordo.User.Current.DTO
 
 		return (
-			TAU.is_object(y) &&
+			TAU.is_array(y) &&
 			CurrentUser.Validations.is_created_at(y[PublicUserKeys.CREATED_AT]) &&
 			CurrentUser.Validations.is_first_name(y[PublicUserKeys.FIRST_NAME]) &&
 			CurrentUser.Validations.is_handle(y[PublicUserKeys.HANDLE]) &&
@@ -182,7 +182,7 @@ export const PublicUserValidations: Ordo.User.Public.Validations = {
 		const y = x as Ordo.User.Public.DTO
 
 		return (
-			TAU.is_object(y) &&
+			TAU.is_array(y) &&
 			PublicUser.Validations.is_created_at(y[PublicUserKeys.CREATED_AT]) &&
 			PublicUser.Validations.is_first_name(y[PublicUserKeys.FIRST_NAME]) &&
 			PublicUser.Validations.is_handle(y[PublicUserKeys.HANDLE]) &&

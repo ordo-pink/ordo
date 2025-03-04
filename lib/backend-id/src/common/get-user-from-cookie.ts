@@ -28,15 +28,18 @@ import { type TIDContext } from "../backend-id.types"
 
 export const get_user_from_cookie = (intake: TIntake<TIDContext>) =>
 	Oath.FromNullable(intake.req.headers.get("Cookie"))
-		.and(cookie => cookie.split("/"))
+		.and(cookie => cookie.split("="))
 		.and(([uid, sid]) =>
-			Oath.If(BackendUser.Validations.is_uid(uid), { T: () => uid as Ordo.User.UID })
-				.and(uid => intake.user_persistence_strategy.get_by_id(uid))
-				.and(user =>
+			Oath.Merge({
+				uid: Oath.If(BackendUser.Validations.is_uid(uid), { T: () => uid as Ordo.User.UID }),
+				sid: Oath.If(BackendUser.Validations.is_uid(sid), { T: () => sid as Ordo.User.SessionID }),
+			}).and(({ uid, sid }) =>
+				intake.user_persistence_strategy.get_by_id(uid).and(user =>
 					Oath.If(
 						user.get_sessions().some(session => session[0] === sid),
-						{ T: () => user },
+						{ T: () => ({ user, uid, sid }) },
 					),
 				),
+			),
 		)
 		.pipe(ops0.rejected_map(() => ({ rrr: RRR.codes.enoent("User not found"), intake })))

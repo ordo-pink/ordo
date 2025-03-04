@@ -41,8 +41,6 @@ export type TValidations<$TEntity extends Record<string, unknown>> = {
 	>
 }
 
-export type TEnumValidations<$TEnum> = TValidations<Record<keyof $TEnum, any>>
-
 export type TFlattenRecord<T extends { key: string; value: any }> = {
 	[K in T["key"]]: Extract<T, { key: K }>["value"]
 }
@@ -601,7 +599,11 @@ declare global {
 					to_dto: () => Ordo.User.Current.DTO
 				}
 
-				type Validations = TEnumValidations<typeof C.CurrentUserKeys> & {
+				type Validations = TValidations<{
+					[$TKey in keyof typeof C.CurrentUserKeys]: (
+						x: unknown,
+					) => x is Ordo.User.Current.DTO[(typeof C.CurrentUserKeys)[$TKey]]
+				}> & {
 					is_dto: (x: unknown) => x is Ordo.User.Current.DTO
 				}
 
@@ -615,7 +617,9 @@ declare global {
 			namespace Public {
 				type DTO = [Ordo.User.UID, Ordo.User.Handle, number, C.UserSubscription, string?, string?]
 
-				type Validations = TEnumValidations<typeof C.PublicUserKeys> & {
+				type Validations = TValidations<{
+					[$TKey in keyof typeof C.PublicUserKeys]: Ordo.User.Current.DTO[(typeof C.PublicUserKeys)[$TKey]]
+				}> & {
 					is_dto: (x: unknown) => x is Ordo.User.Public.DTO
 				}
 
@@ -671,7 +675,7 @@ declare global {
 
 			type RepositoryStatic = {
 				Of: (
-					auth$: TZags<{ user: Ordo.User.Current.Instance | null; token: string | null }>,
+					auth$: TZags<{ user: Ordo.User.Current.Instance | null }>,
 					local_strategy: Ordo.Content.PersistenceStrategy,
 					remote_strategy: Ordo.Content.PersistenceStrategy,
 				) => Repository
@@ -803,8 +807,8 @@ declare global {
 			}
 
 			type RepositoryAsync = {
-				get: (token: string) => Oath<Ordo.Metadata.DTO[], Ordo.Rrr<"EIO">>
-				put: (token: string, metadata: Ordo.Metadata.DTO[]) => Oath<void, Ordo.Rrr<"EINVAL" | "EIO">>
+				get: () => Oath<Ordo.Metadata.DTO[], Ordo.Rrr<"EIO">>
+				put: (metadata: Ordo.Metadata.DTO[]) => Oath<void, Ordo.Rrr<"EINVAL" | "EIO">>
 			}
 
 			type QueryOptions = { show_hidden?: boolean }

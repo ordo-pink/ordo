@@ -85,7 +85,7 @@ export const CacheMetadataRepository: Ordo.Metadata.RepositoryAsyncStatic = {
 								}),
 						),
 					),
-			put: (_, metadata) =>
+			put: metadata =>
 				Oath.Try(() => indexed_db.result)
 					.pipe(ops0.chain(db => Oath.FromNullable(db)))
 					.pipe(ops0.rejected_map(() => RRR.codes.eio("Failed to access cache inside IndexedDB")))
@@ -107,8 +107,8 @@ export const CacheMetadataRepository: Ordo.Metadata.RepositoryAsyncStatic = {
 
 export const RemoteMetadataRepository: Ordo.Metadata.RepositoryAsyncStatic = {
 	Of: (data_host, fetch) => ({
-		get: token =>
-			Oath.Try(() => fetch(`${data_host}`, { headers: { Authorization: `Bearer ${token}` } }))
+		get: () =>
+			Oath.Try(() => fetch(`${data_host}`, { credentials: "include" }))
 				.pipe(ops0.chain(response => Oath.FromPromise(() => response.json())))
 				.pipe(ops0.chain(r => Oath.If(r.success, { T: () => r.result, F: () => r.error })))
 				.pipe(ops0.rejected_map(error => RRR.codes.eio(error))),

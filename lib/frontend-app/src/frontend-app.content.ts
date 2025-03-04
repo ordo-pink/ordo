@@ -58,11 +58,10 @@ export const init_content: TF = () => {
 		},
 	)
 
-	const auth$ = ZAGS.Of({ token: null as string | null, user: null as Ordo.User.Current.Instance | null })
-	ordo_app_state.zags.cheat("auth.user", user => auth$.update("user", () => user))
-	ordo_app_state.zags.cheat("auth.token", token => auth$.update("token", () => token))
+	const auth$ = ZAGS.Of({ user: null as Ordo.User.Current.Instance | null })
+	ordo_app_state.zags.cheat("user", user => auth$.update("user", () => user))
 
-	const remote_strategy = PersistenceStrategyContentOrdoBackend.Of(dt_host, fetch, auth$)
+	const remote_strategy = PersistenceStrategyContentOrdoBackend.Of(dt_host, fetch)
 	const content_repository = ContentRepository.Of(auth$, local_strategy, remote_strategy)
 
 	// TODO Extract for common error handling
@@ -83,7 +82,7 @@ export const init_content: TF = () => {
 	commands.on("cmd.content.set", ({ fsid, content }) => {
 		const metadata_query = ordo_app_state.zags.select("queries.metadata")
 		const size = get_size(content)
-		const user = ordo_app_state.zags.select("auth.user")
+		const user = ordo_app_state.zags.select("user")
 
 		if (size > 0) {
 			// TODO Check if metadata exists
@@ -98,7 +97,7 @@ export const init_content: TF = () => {
 	})
 
 	commands.on("cmd.content.remove", fsid => {
-		const user = ordo_app_state.zags.select("auth.user")
+		const user = ordo_app_state.zags.select("user")
 
 		content_repository
 			.remove(user?.get_uid() ?? null, fsid)
@@ -132,7 +131,7 @@ export const init_content: TF = () => {
 		if (!Metadata.Validations.is_metadata(metadata))
 			return alert_rrr(RRR.codes.enoent("Metadata creation failed", { type, name, parent }))
 
-		const user = ordo_app_state.zags.select("auth.user")
+		const user = ordo_app_state.zags.select("user")
 
 		if (!user) return
 

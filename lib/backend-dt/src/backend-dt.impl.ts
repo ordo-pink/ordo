@@ -118,7 +118,13 @@ export const create_backend_dt = (chamber: TDTChamber) =>
 
 		.get("/healthcheck", () => new Response("OK"))
 
-		.use(routary_cors({ allow_origin: chamber.allow_origin, allow_headers: ["content-type", "authorization"] }))
+		.use(
+			routary_cors({
+				allow_origin: chamber.allow_origin,
+				allow_headers: ["content-type", "authorization"],
+				allow_credentials: true,
+			}),
+		)
 
 		.start(intake =>
 			Oath.Resolve<TIntake<TDTContext>>({ ...intake, headers: new Headers(), status: 404, request_ip: null })
@@ -140,11 +146,9 @@ export const validate_request_params = (intake: TIntake<TDTContext>) =>
 	]).pipe(ops0.map(() => intake))
 
 export const authenticate = (intake: TIntake<TDTContext>) =>
-	Oath.FromNullable(intake.req.headers.get("Authorization"))
-		.pipe(ops0.map(Authorization => ({ Authorization })))
-		.pipe(ops0.map(headers => ({ ...headers, Origin: intake.dt_host }))) // TODO Move to env
-		.pipe(ops0.map(headers => ({ headers, method: "POST" })))
-		.pipe(ops0.chain(init => Oath.FromPromise(() => fetch(`${intake.id_host}/tokens/validate`, init)))) // TODO Move to env
+	Oath.Resolve(intake.req.headers)
+		.pipe(ops0.map(headers => ({ headers, method: "GET", credentials: "include" as const })))
+		.pipe(ops0.chain(init => Oath.FromPromise(() => fetch(`${intake.id_host}/session`, init))))
 		.pipe(ops0.chain(res => Oath.FromPromise(() => res.json())))
 		.pipe(ops0.chain(body => Oath.If(body?.success, { T: () => body.payload })))
 		.pipe(ops0.chain(x => Oath.If(CurrentUser.Validations.is_dto(x), { T: () => x as Ordo.User.Current.DTO })))

@@ -24,7 +24,7 @@ import { Maoka } from "@ordo-pink/maoka"
 import { ordo_app_state } from "../../../app.state"
 
 export const WelcomeWorkspace = Maoka.create("div", ({ use }) => {
-	const get_user = use(ordo_app_state.select_jab$("auth.user"))
+	const get_user = use(ordo_app_state.select_jab$("user"))
 
 	return () => {
 		const user = get_user()

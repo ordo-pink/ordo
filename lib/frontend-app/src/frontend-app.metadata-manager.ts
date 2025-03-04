@@ -32,7 +32,7 @@ import { ordo_app_state } from "../app.state"
 
 export const MetadataManager = {
 	Of: (metadata_repository: Ordo.Metadata.Repository, content_repository: Ordo.Content.Repository): TMetadataManager => {
-		const user = ordo_app_state.zags.select("auth.user")
+		const user = ordo_app_state.zags.select("user")
 		const logger = ordo_app_state.zags.select("logger")
 
 		const get_metadata_content0 = content_repository
@@ -50,7 +50,7 @@ export const MetadataManager = {
 			// TODO Avoid updates if metadata file was not updated
 			if (!is_update) return
 
-			const user = ordo_app_state.zags.select("auth.user")
+			const user = ordo_app_state.zags.select("user")
 
 			void content_repository
 				.get(user?.get_uid() ?? null, METADATA_CONTENT_FSID)
@@ -89,7 +89,7 @@ export const MetadataManager = {
 
 					if (!dtos) return // TODO Log error, do stuff
 
-					const user = ordo_app_state.zags.select("auth.user")
+					const user = ordo_app_state.zags.select("user")
 
 					previous_save_attempt0 = Oath.Resolve(on_state_change("put-remote"))
 						.and(() => {

@@ -59,7 +59,7 @@ export const MetadataLink = ({
 	Maoka.create("span", ({ element }) => {
 		let href = `/editor/${metadata.get_fsid()}`
 
-		const user_query = ordo_app_state.zags.select("auth.user")
+		const user_query = ordo_app_state.zags.select("user")
 		const pb_host = ordo_app_state.zags.select("hosts.pb")
 
 		if (user_query && MaokaStr.is_maoka_str_element(element)) {

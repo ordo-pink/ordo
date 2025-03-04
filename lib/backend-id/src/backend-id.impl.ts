@@ -30,8 +30,10 @@ import { set_content_type_application_json_header } from "@ordo-pink/backend-uti
 
 import { type TIDChamber, type TIDContext } from "./backend-id.types"
 import { handle_delete_user } from "./handlers/user/delete-user.handler"
+import { handle_get_session } from "./handlers/session/get-session.hanlder"
 import { handle_get_user_by_handle } from "./handlers/user/get-user-by-handle.handler"
 import { handle_get_user_by_id } from "./handlers/user/get-user-by-id.handler"
+import { handle_invalidate_session } from "./handlers/session/invalidate.handler"
 import { handle_request_code } from "./handlers/codes/request-code.handler"
 import { handle_update_user } from "./handlers/user/update-user.handler"
 import { handle_validate_code } from "./handlers/codes/validate-code.handler"
@@ -41,6 +43,9 @@ export const create_backend_id = (chamber: TIDChamber) =>
 	Routary.Of<TIDContext>({ ...chamber, request_ip: null, status: 200, headers: new Headers() })
 		.post("/codes/request", handle_request_code)
 		.post("/codes/validate", handle_validate_code)
+
+		.get("/session", handle_get_session)
+		.delete("/session", handle_invalidate_session)
 
 		.get("/users/:user_id", handle_get_user_by_id)
 		.get("/users/handle/:user_handle", handle_get_user_by_handle)

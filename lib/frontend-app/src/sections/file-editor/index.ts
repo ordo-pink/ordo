@@ -132,7 +132,7 @@ export default create_function(
 		})
 
 		cmd.on("cmd.metadata.open_published_page", fsid => {
-			const user = ordo_app_state.zags.select("auth.user")
+			const user = ordo_app_state.zags.select("user")
 			const pb_host = ordo_app_state.zags.select("hosts.pb")
 
 			user &&

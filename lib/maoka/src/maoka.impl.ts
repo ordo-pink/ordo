@@ -68,9 +68,6 @@ export const create: T.TMaokaCreateComponentFn = (name, callback) => {
 	return result
 }
 
-export const lazy = (callback: () => Promise<{ default: T.TMaokaComponent }>): Promise<T.TMaokaComponent> =>
-	callback().then(result => result.default)
-
 const render_children = async (
 	root: T.TMaokaRootElement,
 	get_children: Awaited<ReturnType<T.TMaokaCallback>>,

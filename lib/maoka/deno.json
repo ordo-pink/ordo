@@ -1,8 +1,8 @@
 {
 	"name": "@ordo-pink/maoka",
-	"version": "0.1.1",
+	"version": "0.2.0",
 	"exports": "./index.ts",
-	"exclude": ["**/*.test.ts"],
+	"exclude": ["**/*.test.ts", "examples"],
 	"compilerOptions": {
 		"lib": ["deno.window", "dom"]
 	}

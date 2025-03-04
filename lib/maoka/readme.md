@@ -2,7 +2,7 @@
 
 [![License: Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg)](http://unlicense.org/)
 
-Maoka is a 2.3 KB library for rendering user interfaces (and annoying JavaScript devs).
+Maoka is a <1KB library for rendering user interfaces (and annoying JavaScript devs).
 
 ## Quick start
 
@@ -10,6 +10,7 @@ Here's a canonical counter example but it actually discounts:
 
 ```javascript
 import { Maoka } from "@ordo-pink/maoka"
+import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 
 const Discounter = Maoka.create("button", ({ refresh, element }) => {
 	let counter_state = 0
@@ -24,7 +25,7 @@ const Discounter = Maoka.create("button", ({ refresh, element }) => {
 
 const app = document.getElementById("app")
 
-if (app) Maoka.render_dom(app, Discounter)
+if (app) MaokaDOM.render(app, Discounter, () => crypto.randomUUID())
 ```
 
 ### Quick Start Explained
@@ -45,7 +46,8 @@ the component.
 At the end of the component declaration we return a thunk of a string representation of the `counter_state`. This thunk thing is
 very important, we'll discuss it in a second.
 
-Finally, we go get a div with an id of **app** and `Maoka.render_dom` our component there. And that's it - if you create an HTML
+Finally, we go get a div with an id of **app** and `MaokaDOM.render` our component there. `MaokaDOM` also requires a third
+argument that will create unique identifiers for Maoka components inside the current root. And that's it - if you create an HTML
 page with this `<div id="app"></div>` and refer to this script there, it will count af.
 
 Capital letters in component names are completely optional, btw. It's not react. 😏
@@ -55,20 +57,32 @@ Now, regarding the `refresh` and the thunk... Let's talk about
 ## Component Lifecycle
 
 ```javascript
-// NOTE: onunmount is available via parameters of the component callback
-const MyComponent = Maoka.create("div", ({ on_mount, onunmount }) => {
+import { Maoka } from "@ordo-pink/maoka"
+import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
+
+const MyComponent = Maoka.create("div", ({ use }) => {
 	// ON_CREATE: this part is executed ONCE the component is created
 
-	on_mount(() => {
-		// ON_MOUNT: this part is executed ONCE the component is mounted into the DOM
-	})
+	use(
+		MaokaDOM.Jabs.onmount(() => {
+			// ON_MOUNT: this part is executed ONCE the component is mounted into the DOM
+			// This will never run if you are not rendering the component with `MaokaDOM.render`
+			// OPTIONAL: use it if you need to
+		}),
+	)
 
-	onunmount(() => {
-		// ON_UNMOUNT: this part is executed ONCE the component is removed from the DOM
-	})
+	use(
+		MaokaDOM.Jabs.onunmount(() => {
+			// ON_UNMOUNT: this part is executed ONCE the component is removed from the DOM
+			// This will never run if you are not rendering the component with `MaokaDOM.render`
+			// OPTIONAL: use it if you need to
+		}),
+	)
 
+	// OPTIONAL: use it if you need to
 	return () => {
 		// ON_REFRESH: this part is executed on EVERY `refresh`
+		// Whatever is returned here will become the element children
 	}
 })
 ```
@@ -78,6 +92,8 @@ const MyComponent = Maoka.create("div", ({ on_mount, onunmount }) => {
 If you want to pass additional parameters to a component, you can wrap it into a function:
 
 ```javascript
+import { Maoka } from "@ordo-pink/maoka"
+
 const my_component = my_params =>
 	Maoka.create("div", () => {
 		return () => my_params.dont_touch_them.they_are_not_yours
@@ -87,54 +103,52 @@ const my_component = my_params =>
 ## Maoka Component
 
 People always ask me - what a perfect component is? And here is a pro tip - make sure you hit the like button and subscribe to
-the channel - a perfect component is a function. When you call `Maoka.create`, it actually returns a function that accepts the
-following arguments:
+the channel - a perfect component is a function. When you call `Maoka.create`, it actually returns a function that expects the
+`root` - the top level element in the Maoka rendering hierarchy. The root element is created by the renderer of your choice - be
+it `@ordo-pink/maoka-render-dom`, `@ordo-pink/maoka-render-string` or a renderer of your own!
 
-- `create_element: TMaokaCreateMaokaElementFn<$TElement>` - a function that creates actual elements. With `render_dom` bundled
-  with Maoka, it is the `document.createElement`. Yes, it doesn't work with SVGs. Dirty hacks to the resque!
-- `root_element: TMaokaElement` - a root element of the tree where current element belongs. You usually provide it via render
-  functions like `render_dom`.
-- `root_id: string`, - a unique string identifier of the root element. It is safer to use this identifier than the
-  `root_element` itself because, unlike the element, this identifier is unreachable outside the scope of the component tree.
-  Might be useful for separating scopes in scenarios where you have multiple roots reusing the same components (e.g.
-  microfrontends, routing, and other wars of nutrition).
+This function then waits until you pass it to a render function that creates first creates the root for you and passes it to
+your top level component, to then pass them to their children which in turn pass them to their children, and the circle of life
+continues until they reach you and me sitting here and reading this document. A good example of such render function is
 
-This function then waits until you pass it to a render function that passes those parameters, and then pass them to their
-children which in turn pass them to their children, and the circle of life continues until they reach you and me sitting here
-and reading this document. A good example of such render function is
-
-## Maoka.render_dom
+## MaokaDOM.render
 
 ```javascript
 import { Maoka } from "@ordo-pink/maoka"
+import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 
 import { App } from "./app"
 
 const root = document.querySelector("#root")
-if (root) Maoka.render_dom(root, App)
+if (root) MaokaDOM.render(root, App, () => crypto.randomUUID())
 ```
 
-As the name suggests, it renders a Maoka component to the DOM. The element itself remains untouched, the function does two
+As the name suggests, it renders a Maoka component to the DOM. The element itself remains untouched, the function does three
 things:
 
 1. It creates DOM structure of your component
-2. It appends a `MutationObserver` to the root element that keeps track of unmounted nodes and calls their `onunmount` callbacks
-   if they are present
+2. It appends a `MutationObserver` to the root element that keeps track of mounted and unmounted nodes and executes their
+   `onmount` and `onunmount` jab callbacks if they are present
+3. It listens for the `refresh` calls in components and rerenders them. Yes, the gotcha moment! Maoka does not refresh
+   components by itself, it only notifies the root that they intend to do so. It is in the area of responsibility of the root to
+   do the rerendering (or avoid rerendering if it is nested inside rerendering of a higher order)
 
-If you don't want a `MutationObserver` in your code, you can reimplement `render_dom` manually from scratch - but you'll need to
-track and call `onunmount`s or not use them at all.
+If you don't want a `MutationObserver` in your code, you can reimplement `MaokaDOM.render` manually from scratch - but you'll
+need to consider those three steps described above yourself.
 
 In fact, you can render your root Maoka component as simply as:
 
 ```javascript
 import { App } from "./app"
 
+const root_element = document.querySelector("#root")
+const create_id = () => crypto.randomUUID()
 const create_element = document.createElement.bind(document)
-const root = document.querySelector("#root")
-const root_id = "what a root id!"
 
-if (root) App(create_element, root, root_id)
+if (root) App(create_root(root_element, create_id, create_element))
 ```
+
+Keep in mind that in this scenario Maoka components will not rerender when you call `refresh`.
 
 ## What Else
 
@@ -192,31 +206,7 @@ const MyComponent = Maoka.create("div", ({ use }) => {
 
 ### Browser Compatibility
 
-Maoka only works in modern browsers, but there are a few tricks you can use to extend compat with older browsers.
-
-#### Adding Support for IE11, Chrome < 92, Edge < 92, Safari < 15.4, Firefox < 95, Opera < 78
-
-Since Maoka uses `crypto.randomUUID()` for generating root and element IDs, browsers from 2021 don't know how to work that out.
-
-To fix that, you can polyfill `crypto.randomUUID()` globally:
-
-```javascript
-// Replace `window` with `self` or `global` depending on your needs
-if (!window.crypto) window.crypto = {}
-if (!window.crypto.randomUUID) {
-	var i = 0
-	window.crypto.randomUUID = function () {
-		return String(i++) // It ain't much but it's honest work
-	}
-}
-```
-
-#### Adding Support for Mesozoic Era
-
-If you fancy letting dinosaurs see your website, simply do not use `Maoka.render_dom` (see the
-[Maoka.render_dom](#maokarender_dom) section of the readme for reference). If IE9+ is ok for you, you can listen for mutation
-events like `DOMNodeRemoved` and `DOMNodeInserted` to handle `on_mount` and `onunmount` events. Alternatively, you can omit
-using `on_mount` and `onunmount` whatsoever - then Maoka will work evvvriwhere.
+Maoka only works in modern browsers (like, IE11+ modern).
 
 ### License
 
@@ -234,10 +224,17 @@ The Unlicense
   - _A_: What about performance?
 - - _Q_: Cheers?
   - _A_: Cheers 🍻
-- - _Q_: Is it 2.3 KB really?
-  - _A_: Here's the whole minified Maoka code in 2279 chars:
+- - _Q_: Is it 0.84KB unzipped really?
+  - _A_: Here's the whole minified Maoka code in 840 chars:
 
 ```
-var E=(P,F)=>{let z=async(j,L,M)=>{let U=crypto.randomUUID(),D=j(P),O,B={get id(){return U},get element(){return D},get root_id(){return M},get root_element(){return L},use:(w)=>w(B),refresh:()=>{if(!F||!O)return;let w=new CustomEvent("refresh",{detail:{get_children:O,element:D},bubbles:!0});D.dispatchEvent(w)},onunmount:(w)=>{if(!D.onunmount)D.onunmount=[];D.onunmount.push(w)},on_mount:(w)=>{if(!D.onmount)D.onmount=[];D.onmount.push(w)}};if(z.element=D,z.id=U,z.root_id=M,z.refresh=B.refresh,!F)return D;if(O=await F(B),!O)return D;return await I(j,L,M,O,D)};return z},N=(P)=>P().then((F)=>F.default),Q=(P,F={})=>(z)=>E(P,({element:j})=>{return Object.keys(F).forEach((L)=>j.setAttribute(L,F[L])),z}),R=(P,F)=>E(P,({element:z})=>{z.innerHTML=F}),V=async(P,F)=>{let z=crypto.randomUUID(),j=P,L=document.createElement.bind(document),M=await F(L,j,z);P.appendChild(M);let U=new Map;P.addEventListener("refresh",(S)=>{S.stopPropagation();let{get_children:X,element:A}=S.detail,C=U.keys().toArray();if(~C.indexOf(A))return;for(let T=0;T<C.length;T++){if(C[T].contains(A))return;if(A.contains(C[T])){U.delete(C[T]),U.set(A,()=>I(L,j,z,X,A));return}continue}U.set(A,()=>I(L,j,z,X,A))});let D=requestIdleCallback?{timeout:1000}:void 0,O=requestIdleCallback??setTimeout,B=()=>Promise.all(U.entries().map(([S,X])=>X().then(()=>S))).then((S)=>S.map((X)=>U.delete(X))).then(()=>O(()=>void B(),D));O(()=>void B(),D);let G=(S)=>{if(J(S.onunmount)&&S.onunmount.length>0)S.onunmount.forEach((X)=>X());S.childNodes.forEach((X)=>G(X))},w=(S)=>{if(J(S.onmount)&&S.onmount.length>0)S.onmount.forEach((X)=>X());S.childNodes.forEach((X)=>w(X))};w(M),new MutationObserver((S)=>{for(let X of S){let{removedNodes:A,addedNodes:C}=X;for(let T=0;T<A.length;T++){let H=A[T];G(H)}for(let T=0;T<C.length;T++){let H=C[T];w(H)}}}).observe(P,{childList:!0,subtree:!0,attributeFilter:["onmount","onunmount"]})},I=async(P,F,z,j,L)=>{if(!j)return L;L.innerHTML="";let M=await j();if(!M)return L;if(!J(M))M=[K(M)?await M(P,F,z):M];let U=[];for(let D=0;D<M.length;D++){let O=M[D],B=K(O)?await O(P,F,z):W(O)?String(O):O;if(B)U.push(B)}return L.replaceChildren(...U),L},K=(P)=>typeof P==="function",W=(P)=>typeof P==="number",J=Array.isArray;var y={create:E,html:R,lazy:N,styled:Q,render_dom:V};export{y as Maoka};
+var u=(r,o,n)=>{let e=o();return{create_id:o,create_element:n,refresh_queue:new Map,get element(){return r},get id(){return e}}},p=(r,o)=>{let n=async(e)=>{let i=e.create_id(),t=e.create_element(r),a,s={get id(){return i},get element(){return t},get root(){return e},use:(l)=>l(s),refresh:()=>t.dispatchEvent(new CustomEvent("refresh",{detail:[i,t,()=>c(e,a,t)],bubbles:!0}))};if(n.element=t,n.id=i,n.refresh=s.refresh,!o)return t;if(a=await o(s),!a)return t;return await c(e,a,t)};return n},c=async(r,o,n)=>{if(!o)return n;let e=await o();if(!e)return n;if(!d(e))e=[T(e)?await e(r):e];let i=[];for(let t=0;t<e.length;t++){let a=e[t],s=T(a)?await a(r):m(a)?String(a):a;if(s)i.push(s)}return n.replaceChildren(...i),n},T=(r)=>typeof r==="function",m=(r)=>typeof r==="number",d=Array.isArray;var y={create:p,create_root:u};export{y as Maoka};
+```
+
+    - _A_: And here's the whole minified Maoka + MaokaDOM code in 2467 chars:
 
 ```
+var y=(e,a,m)=>{let r=a();return{create_id:a,create_element:m,refresh_queue:new Map,get element(){return e},get id(){return r}}},b=(e,a)=>{let m=async(r)=>{let n=r.create_id(),s=r.create_element(e),i,d={get id(){return n},get element(){return s},get root(){return r},use:(T)=>T(d),refresh:()=>s.dispatchEvent(new CustomEvent("refresh",{detail:[n,s,()=>M(r,i,s)],bubbles:!0}))};if(m.element=s,m.id=n,m.refresh=d.refresh,!a)return s;if(i=await a(d),!i)return s;return await M(r,i,s)};return m},M=async(e,a,m)=>{if(!a)return m;let r=await a();if(!r)return m;if(!w(r))r=[_(r)?await r(e):r];let n=[];for(let s=0;s<r.length;s++){let i=r[s],d=_(i)?await i(e):x(i)?String(i):i;if(d)n.push(d)}return m.replaceChildren(...n),m},_=(e)=>typeof e==="function",x=(e)=>typeof e==="number",w=Array.isArray;var E={create:b,create_root:y};var p=(e)=>{try{return e instanceof HTMLElement}catch(a){return!1}},C=(e)=>({element:a})=>p(a)?void(a.onmount=e):void 0,g=(e)=>({element:a})=>p(a)?void(a.onunmount=e):void 0,D=({element:e})=>p(e),v=async(e,a,m)=>{let r=document.createElement.bind(document),n=E.create_root(e,m,r),s=await a(n),i;try{if(i=requestIdleCallback,!i)throw""}catch(t){i=setTimeout}let d=()=>n.refresh_queue.size?Promise.all(n.refresh_queue.entries().map(([t,o])=>{return n.refresh_queue.delete(t),o.render()})).then(()=>i(()=>void d())):i(()=>void d());if(i(()=>void d()),n.element.addEventListener("refresh",(t)=>{t.stopPropagation();let[o,l,f]=t.detail,u=n.refresh_queue.keys().toArray();if(n.refresh_queue.has(o))return;for(let c=0;c<u.length;c++){let h=n.refresh_queue.get(u[c])?.element;if(h&&h instanceof Element&&l instanceof Element&&l.contains?.(h)){n.refresh_queue.delete(u[c]);break}}n.refresh_queue.set(o,{element:l,render:f})}),!p(s))throw new TypeError("Could not create a DOM element from provided component");n.element.appendChild(s);let T=(t)=>{if(t.onunmount)t.onunmount();if(t.children)for(let o=0;o<t.children.length;o++)T(t.children[o])},k=(t)=>{if(t.onmount){let o=t.onmount();if(o&&typeof o==="function")t.onunmount=o}if(t.children)for(let o=0;o<t.children.length;o++)k(t.children[o])};k(s),new MutationObserver((t)=>{for(let o of t){let{removedNodes:l,addedNodes:f}=o;for(let u=0;u<l.length;u++){let c=l[u];T(c)}for(let u=0;u<f.length;u++){let c=f[u];k(c)}}}).observe(n.element,{childList:!0,subtree:!0,attributeFilter:["onmount","onunmount"]})};var I={Jabs:{onmount:C,onunmount:g,is_dom:D},is_maoka_dom_element:p,render:v};export{I as MaokaDOM};
+```
+
+    - _A_: Yes, I did the marketing. It's not <1KB, it's actually 2.5KB unzipped. Cheers 🍻

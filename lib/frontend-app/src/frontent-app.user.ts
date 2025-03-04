@@ -44,14 +44,7 @@ export const init_user = call_once(() => {
 
 	// TODO Invalidate cookie instead of token
 	const handle_sign_out = () =>
-		Oath.Resolve(new Headers())
-			.and(headers =>
-				Oath.FromNullable(localStorage.getItem("token"))
-					.and(token => `Bearer ${token}`)
-					.and(authorization_header => headers.append("Authorization", authorization_header))
-					.and(() => headers),
-			)
-			.and(headers => ({ headers, method: "DELETE" }))
+		Oath.Resolve({ method: "DELETE", credentials: "include" as const })
 			.and(init => Oath.Try(() => fetch(`${hosts.id}/session`, init)))
 			.invoke(invokers0.force_resolve)
 			.then(clean_up_auth)

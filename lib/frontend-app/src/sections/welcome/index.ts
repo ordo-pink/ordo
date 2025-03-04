@@ -73,7 +73,7 @@ export default create_function(
 				"t.welcome.command_palette.support.open_support_palette": "Support...",
 				"t.welcome.landing_page.sections.hero.learn_more": "Learn More",
 				"t.welcome.landing_page.sections.hero.try_now_button": "Try Now",
-				"t.welcome.landing_page.sections.hero.sign_up": "Sign Up",
+				"t.welcome.landing_page.sections.hero.sign_up": "Join",
 			},
 		})
 

@@ -63,7 +63,7 @@ export default create_function(
 			translations: {
 				"t.welcome.go_to_welcome_page": "Open welcome page",
 				"t.welcome.landing_page.cookie_banner.message": "Wait, what?!",
-				"t.welcome.landing_page.cookie_banner.title": "We don't use cookies",
+				"t.welcome.landing_page.cookie_banner.title": "We use one cookie",
 				"t.welcome.landing_page.sections.hero.beta_started_announcement": "public beta is live!",
 				"t.welcome.landing_page.title": "One space for docs, files and projects",
 				"t.welcome.start_page.news_widget.title": "News",

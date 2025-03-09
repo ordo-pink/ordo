@@ -53,7 +53,7 @@ export const Label = (label: Ordo.Metadata.Label, emit: Ordo.Command.EmitFn, met
 
 // --- Internal ---
 
-const TextWrapper = MaokaStyled.Just.div
+const TextWrapper = MaokaStyled.Tags.div()
 
 const RemoveLabel = (fsid: Ordo.Metadata.FSID, label: Ordo.Metadata.Label, emit: Ordo.Command.EmitFn) =>
 	Maoka.create("div", ({ use }) => {

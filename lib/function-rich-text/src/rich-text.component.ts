@@ -19,163 +19,113 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-// import { is_array, is_object, is_string } from "@ordo-pink/tau"
-
 import { is_array, is_string } from "@ordo-pink/tau"
-import { Maoka } from "@ordo-pink/maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
+import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { R } from "@ordo-pink/result"
-import { ZAGS } from "@ordo-pink/zags"
 
-import { type TEditorFocusPosition, type TEditorState } from "../rich-text.types"
-import { editor_context, editor_context_jab } from "../jabs/editor-context.jab"
 import { Line } from "./line.component"
+import { RTE } from "."
+import { type TEditorContent } from "../rich-text.types"
 
-export const RichText = (metadata: Ordo.Metadata.Instance, content: Ordo.Content.Instance, is_editable: boolean) => {
-	const fsid = metadata.get_fsid()
-	const caret_position$ = ZAGS.Of<TEditorFocusPosition>({ block_index: 0, inline_index: 0, anchor_offset: 0, focus_offset: 0 })
-	const state$ = ZAGS.Of<{ value: TEditorState }>({ value: [{ type: "p", children: [{ type: "text", value: "" }] }] })
+export const RichText = (
+	metadata: Ordo.Metadata.Instance,
+	content: Ordo.Content.Instance,
+	is_editable: boolean,
+	is_embedded: boolean,
+) =>
+	MaokaRichText(({ refresh, use }) => {
+		let length = 0
 
-	R.FromNullable(content)
-		.pipe(R.ops.chain(x => R.If(is_string(x), { T: () => x as string })))
-		.pipe(R.ops.chain(x => R.Try(() => JSON.parse(x))))
-		.pipe(R.ops.chain(x => R.If(is_array(x) && x.length > 0, { T: () => x })))
-		.cata({
-			Err: () => state$.update("value", () => [{ type: "p", children: [{ type: "text", value: "" }] }]),
-			Ok: state => state$.update("value", () => state as TEditorState),
-		})
-
-	return Maoka.create("div", ({ use, refresh }) => {
+		const fsid = metadata.get_fsid()
 		const commands = use(MaokaOrdo.Jabs.get_commands)
 
-		use(MaokaJabs.set_class("p-2 size-full outline-none cursor-text"))
-		use(MaokaJabs.set_attribute("contenteditable", String(is_editable)))
-
-		const divorce_state = state$.marry(({ value }, is_update) => {
-			if (is_update) commands.emit("cmd.content.set", { content: JSON.stringify(value), content_type: "text/ordo", fsid })
-		})
-
-		use(
-			editor_context.provide({
-				caret_position$,
-				state$,
-				set_caret_position: position => {
-					caret_position$.replace(position)
-				},
-				// TODO Remove inline
-				add_block: (block, refocus = true) => {
-					const { caret_position$, set_caret_position } = use(editor_context.consume)
-					const caret_position = caret_position$.unwrap()
-					const state = state$.select("value")
-
-					const { block_index, inline_index, anchor_offset, focus_offset } = caret_position
-
-					// TODO Move chars from previous line
-
-					const content = state[block_index]?.children[inline_index]
-
-					if (content) {
-						if (anchor_offset < content.value.length && focus_offset < content.value.length) {
-							const closest = anchor_offset > focus_offset ? focus_offset : anchor_offset
-							const furthest = anchor_offset < focus_offset ? focus_offset : anchor_offset
-
-							block.children[0].value = content.value.slice(furthest)
-							content.value = content.value.slice(0, closest)
-						}
-					}
-
-					const updated_state = state.toSpliced(block_index + 1, 0, block)
-
-					state$.update("value", () => updated_state)
-
-					if (refocus)
-						set_caret_position({
-							block_index: block_index + 1,
-							inline_index: 0,
-							anchor_offset: 0,
-							focus_offset: 0,
-						})
-
-					refresh()
-				},
-				add_new_line: (refocus = true) => {
-					const { add_block } = use(editor_context.consume)
-
-					add_block({ type: "p", children: [{ type: "text", value: "" }] }, refocus)
-				},
-				add_inline: inline => {
-					const { caret_position$: caret_position$ } = use(editor_context.consume)
-					const { block_index } = caret_position$.unwrap()
-					const state = state$.select("value")
-
-					state[block_index].children.splice(block_index, 0, inline)
-
-					state$.update("value", () => state)
-				},
-				remove_block: (block_index, refocus = true) => {
-					const state = state$.select("value")
-
-					const prev_line_last_inline_index = state[block_index - 1].children.length - 1
-					const prev_line_offset = state[block_index - 1].children[prev_line_last_inline_index].value.length
-
-					// If we drop the first element and there is only one element, put
-					// a paragraph instead
-					if (block_index === 0) {
-						// Set focus to next to preserve caret position on the same line
-						refocus = true
-
-						if (state.length === 1) {
-							state[0] = { type: "p", children: [{ type: "text", value: "" }] }
-						}
-					} else {
-						state.splice(block_index, 1)
-					}
-
-					if (refocus === true) {
-						const { set_caret_position } = use(editor_context_jab)
-
-						const state = state$.select("value")
-						const new_block_index = block_index - 1
-						const inline_index = state[new_block_index].children.length - 1
-						const offset = state[new_block_index].children[inline_index].value.length
-
-						set_caret_position({
-							block_index: new_block_index,
-							inline_index,
-							anchor_offset: offset,
-							focus_offset: offset,
-						})
-					} else {
-						const { set_caret_position } = use(editor_context_jab)
-
-						const new_block_index = block_index - 1
-
-						set_caret_position({
-							block_index: new_block_index,
-							inline_index: prev_line_last_inline_index,
-							anchor_offset: prev_line_offset,
-							focus_offset: prev_line_offset,
-						})
-					}
-
-					state$.update("value", () => state)
-					refresh()
-				},
-			}),
-		)
+		commands.on("cmd.rich_text.add_block", handle_add_block)
+		commands.on("cmd.rich_text.remove_block", handle_remove_block)
 
 		use(
 			MaokaDOM.Jabs.onunmount(() => {
-				divorce_state()
+				commands.off("cmd.rich_text.add_block", handle_add_block)
+				commands.off("cmd.rich_text.remove_block", handle_remove_block)
 			}),
 		)
 
-		return () => {
-			const state = state$.select("value")
+		RTE.$.update("is_editable", () => is_editable)
+		RTE.$.update("is_embedded", () => is_embedded)
 
-			return [...state.map((node, block_index) => Line(node, metadata, block_index))]
+		R.FromNullable(content)
+			.pipe(R.ops.chain(x => R.If(is_string(x), { T: () => x as string })))
+			.pipe(R.ops.chain(x => R.Try(() => JSON.parse(x))))
+			.pipe(R.ops.chain(x => R.If(is_array(x) && x.length > 0, { T: () => x })))
+			.cata({
+				Err: () => RTE.$.update("content", () => RTE.Utils.create_content()),
+				Ok: state => RTE.$.update("content", () => state as TEditorContent),
+			})
+
+		const subscribe_to_editor_state = () => {
+			const divorce_state = RTE.$.marry(({ content }, is_update) => {
+				if (!is_update) {
+					length = content.length
+					return
+				}
+
+				commands.emit("cmd.content.set", { content: JSON.stringify(content), content_type: "text/ordo", fsid })
+
+				if (length !== content.length) {
+					length = content.length
+					refresh()
+				}
+			})
+
+			return () => divorce_state()
+		}
+
+		use(MaokaDOM.Jabs.onmount(subscribe_to_editor_state))
+
+		return () => {
+			const state = RTE.$.select("content")
+
+			return state.map((_, line_index) => Line(line_index))
 		}
 	})
+
+// --- Internal ---
+
+const MaokaRichText = MaokaStyled.Tags.div("p-2 size-full outline-none cursor-text")
+
+const handle_add_block: Ordo.Command.HandlerOf<"cmd.rich_text.add_block"> = ({ block, block_index }) => {
+	RTE.$.update("content", content => content.slice(0, block_index).concat(block).concat(content.slice(block_index)))
+	RTE.$.update("selection", () => ({ anchor: 0, block: block_index, focus: 0, inline: 0 }))
+}
+
+const handle_remove_block: Ordo.Command.HandlerOf<"cmd.rich_text.remove_block"> = block_index => {
+	RTE.$.update("content", content => {
+		return content.toSpliced(block_index, 1)
+	})
+
+	if (block_index > 0) {
+		RTE.$.update("selection", selection => {
+			const content = RTE.$.select("content")
+
+			const prev_block = content[block_index - 1]
+
+			if (!prev_block) return selection
+
+			if (RTE.Guards.is_ordo_rte_parent(prev_block)) {
+				const last_index = prev_block.children.length - 1
+				const last_inline = prev_block.children[last_index]
+
+				if (RTE.Guards.is_ordo_rte_text_node(last_inline)) {
+					const offset = last_inline.value.length
+					return { anchor: offset, focus: offset, block: block_index - 1, inline: last_index }
+				}
+
+				// FIXME Stay in the same line since I don't want to think any deeper rn
+				return selection
+			}
+
+			return RTE.Utils.create_selection()
+		})
+	}
 }

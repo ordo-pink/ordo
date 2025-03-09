@@ -87,7 +87,7 @@ export const MetadataIcon = ({ metadata, custom_class = "", show_emoji_picker = 
 									({
 										value: emoji.icon,
 										readable_name: emoji.description as Ordo.I18N.TranslationKey,
-										render_icon: () => MaokaStyled.Just.div(() => () => emoji.icon),
+										render_icon: () => MaokaRenderIconWrapper(() => () => emoji.icon),
 									}) satisfies Ordo.CommandPalette.Item,
 							),
 						],
@@ -108,6 +108,8 @@ export const MetadataIcon = ({ metadata, custom_class = "", show_emoji_picker = 
 			})
 		}
 	})
+
+const MaokaRenderIconWrapper = MaokaStyled.Tags.div()
 
 type P2 = P & { has_children: boolean }
 const Icon = ({ metadata, custom_class, has_children }: P2) =>

@@ -66,7 +66,7 @@ const Default = ({
 		}
 	})
 
-const TextContainer = MaokaStyled.Just.div
+const TextContainer = MaokaStyled.Tags.div()
 
 const Success = (params: TButtonProps) => Default({ ...params, custom_class: add_button_spec("success", params.custom_class) })
 const Neutral = (params: TButtonProps) => Default({ ...params, custom_class: add_button_spec("neutral", params.custom_class) })

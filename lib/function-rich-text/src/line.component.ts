@@ -19,45 +19,37 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Maoka } from "@ordo-pink/maoka"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
+import { Switch } from "@ordo-pink/switch"
 
 import { Inline } from "./inline.component"
-import { type TOrdoRichTextEditorBlockNode } from "../rich-text.types"
+import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
-export const Line = (node: TOrdoRichTextEditorBlockNode, metadata: Ordo.Metadata.Instance, block_index: number) =>
-	Maoka.create("div", ({ use }) => {
-		use(MaokaJabs.set_class("flex items-center space-x-2"))
-		use(MaokaJabs.set_attribute("contenteditable", "false"))
-
-		return () => [LineNumber(() => () => String(block_index + 1)), Block(node, metadata, block_index)]
-	})
+import { RTE } from "."
+import { type TOrdoRTEParagraphNode } from "../rich-text.types"
 
 // --- Internal ---
 
-const LineNumber = MaokaStyled.Tags.div("w-12 text-right font-mono text-neutral-500")
+const StyledTextBlock = MaokaStyled.Tags.div("cursor-text w-full px-1 my-2")
+const StyledLine = MaokaStyled.Tags.div()
 
-const Block = (node: TOrdoRichTextEditorBlockNode, metadata: Ordo.Metadata.Instance, block_index: number) =>
-	Maoka.create("div", ({ use, element }) => {
-		use(MaokaJabs.set_class("outline-none cursor-text w-full"))
-		use(MaokaJabs.set_attribute("contenteditable", "false"))
-
-		use(
-			MaokaJabs.listen("onclick", event => {
-				event.stopPropagation()
-
-				if (!element.children) return
-
-				const last_child = element.children[element.children.length - 1]
-
-				if (!last_child || !(last_child instanceof HTMLElement)) return
-
-				last_child.focus()
-			}),
-		)
+export const Line = (block_index: number) =>
+	StyledLine(({ use }) => {
+		const get_node = use(MaokaOrdo.Jabs.happy_marriage$(RTE.$, ({ content }) => content[block_index]))
 
 		return () => {
-			return node.children.map((child, child_index) => Inline(child, metadata, block_index, child_index))
+			const node = get_node()
+
+			if (!node) return
+
+			return Switch.Match(node.type)
+				.case("embed", () => "HEY")
+				.case("p", () => TextBlock(node as TOrdoRTEParagraphNode, block_index))
+				.default(() => "")
 		}
+	})
+
+const TextBlock = (node: TOrdoRTEParagraphNode, index: number) =>
+	StyledTextBlock(() => {
+		return () => node.children.map((child, inline_index) => Inline(child, index, inline_index))
 	})

@@ -6,10 +6,12 @@
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 
+const MaokaIcon = MaokaStyled.Tags.div()
+
 const Icon =
 	(children: string) =>
 	(cls: string = "") =>
-		MaokaStyled.Just.div(({ element }) => {
+		MaokaIcon(({ element }) => {
 			if (MaokaDOM.is_maoka_dom_element(element))
 				element.innerHTML = `<svg stroke="currentColor" class="${cls}" fill="currentColor" stroke-width="0" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">${children}</svg>`
 			else

@@ -149,12 +149,4 @@ export const MaokaStyled = {
 			(class_or_style?: string | Partial<CSSStyleDeclaration>) => (callback: TMaokaCallback) => ReturnType<typeof Maoka.create>
 		>,
 	),
-
-	Just: HTML_TAGS.reduce(
-		(acc, tag) => ({
-			...acc,
-			[tag]: (callback: TMaokaCallback) => Maoka.create(tag, callback),
-		}),
-		{} as Record<(typeof HTML_TAGS)[number], (callback: TMaokaCallback) => ReturnType<typeof Maoka.create>>,
-	),
 }

@@ -19,34 +19,42 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { TZags } from "@ordo-pink/zags"
+import type { TextNodeStyles } from "./src/rich-text.constants"
 
-export type TOrdoRichTextEditorNode = { type: string }
+export type TOrdoRTENode<
+	$TType extends string = string,
+	$TParams extends Record<string, unknown> = Record<string, unknown>,
+> = $TParams & { type: $TType }
 
-export type TOrdoRichTextEditorInlineNode<$TValue = any> = TOrdoRichTextEditorNode & {
-	value: $TValue
-}
+export type TOrdoRTEParent<
+	$TType extends string = string,
+	$TParams extends Record<string, unknown> = Record<string, unknown>,
+	$TChildren extends any[] = any[],
+> = TOrdoRTENode<$TType, $TParams & { children: $TChildren }>
 
-export type TOrdoRichTextEditorBlockNode = TOrdoRichTextEditorNode & {
-	children: TOrdoRichTextEditorInlineNode<any>[]
-}
+type ZeroToN<$TNumber extends number, $TAccumulator extends number[] = []> = $TAccumulator["length"] extends $TNumber
+	? $TAccumulator[number]
+	: ZeroToN<$TNumber, [...$TAccumulator, $TAccumulator["length"]]>
 
-export type TSetCaretPositionFn = (position: TEditorFocusPosition) => void
+type Range<$TStart extends number, $TEnd extends number> = Exclude<ZeroToN<$TEnd>, ZeroToN<$TStart>>
 
-export type TEditorState = TOrdoRichTextEditorBlockNode[]
-export type TEditorFocusPosition = {
-	block_index: number
-	inline_index: number
-	anchor_offset: number
-	focus_offset: number
-}
-export type TEditorContext = {
-	caret_position$: TZags<TEditorFocusPosition>
-	state$: TZags<{ value: TEditorState }>
-	add_block: (block: TOrdoRichTextEditorBlockNode, refocus?: boolean) => void
-	add_inline: (inline: TOrdoRichTextEditorInlineNode, refocus?: boolean) => void
-	remove_block: (block_index: number, refocus?: boolean) => void
-	// remove_inline: (block_index: number, inline_index: number, focus?: "next" | "previous") => void
-	add_new_line: (refocus?: boolean) => void
-	set_caret_position: TSetCaretPositionFn
+export type TOrdoRTETextNode = TOrdoRTENode<"text", { value: string; styles: TextNodeStyles[] }>
+
+export type TOrdoRTECodeNode = TOrdoRTENode<"code", { value: string }>
+
+export type TOrdoRTEParagraphNode = TOrdoRTENode<"p", { children: (TOrdoRTETextNode | TOrdoRTECodeNode)[] }>
+
+export type TOrdoRTEEmbedNode = TOrdoRTENode<"embed", { internal: boolean; target: string }>
+
+export type TOrdoRTEHeaderNode = TOrdoRTENode<"h", { level: Range<1, 7>; children: TextNodeStyles[] }>
+
+export type TEditorSelection = { block: number; inline: number; anchor: number; focus: number }
+
+export type TEditorContent = TOrdoRTENode[]
+
+export type TEditorState = {
+	content: TEditorContent
+	selection: TEditorSelection
+	is_editable: boolean
+	is_embedded: boolean
 }

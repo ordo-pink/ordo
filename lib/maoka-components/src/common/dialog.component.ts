@@ -69,5 +69,5 @@ export const Dialog = ({
 
 const Header = MaokaStyled.Tags.div("dialog_header")
 const Title = MaokaStyled.Tags.h2("dialog_title")
-const Body = MaokaStyled.Just.div
+const Body = MaokaStyled.Tags.div()
 const Footer = MaokaStyled.Tags.div("dialog_footer")

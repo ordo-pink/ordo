@@ -26,6 +26,7 @@ import { TwoLetterLocale } from "@ordo-pink/locale"
 import { create_function } from "@ordo-pink/core"
 
 import { RichText } from "./src/rich-text.component"
+import { TOrdoRTENode } from "./rich-text.types"
 
 declare global {
 	interface t {
@@ -34,6 +35,23 @@ declare global {
 				readable_name: () => string
 				description: () => string
 			}
+		}
+	}
+
+	interface cmd {
+		rich_text: {
+			add_block: () => { block: TOrdoRTENode; block_index: number }
+			add_block_after_selection: () => { block: TOrdoRTENode }
+			add_inline: () => { inline: TOrdoRTENode; block_index: number; inline_index: number }
+			add_inline_after_selection: () => TOrdoRTENode
+			replace_block: () => { block: TOrdoRTENode; block_index: number }
+			replace_inline: () => { inline: TOrdoRTENode; block_index: number; inline_index: number }
+			wrap_selection: () => TOrdoRTENode
+			remove_block: () => number
+			remove_inline: () => { block_index: number; inline_index: number }
+			enable_interactive_mode: () => void
+			disable_interactive_mode: () => void
+			toggle_interactive_mode: () => void
 		}
 	}
 }
@@ -66,15 +84,15 @@ export default create_function(
 
 		commands.emit("cmd.functions.file_associations.register", {
 			content_to_string: {
-				render: ({ metadata, content, is_editable }) =>
+				render: ({ metadata, content, is_editable, is_embedded }) =>
 					MaokaStr.render(
-						MaokaOrdo.Components.WithState(ctx, () => RichText(metadata, content, is_editable)),
+						MaokaOrdo.Components.WithState(ctx, () => RichText(metadata, content, is_editable, is_embedded)),
 						() => crypto.randomUUID(),
 					),
 			},
 			name: "pink.ordo.rich-text",
 			render_icon: BsFileEarmarkRichText,
-			render: ({ metadata, content, is_editable }) => RichText(metadata, content, is_editable),
+			render: ({ metadata, content, is_editable, is_embedded }) => RichText(metadata, content, is_editable, is_embedded),
 			types: [
 				{
 					name: "text/ordo",

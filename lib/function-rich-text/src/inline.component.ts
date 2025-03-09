@@ -19,167 +19,141 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { is_0, noop } from "@ordo-pink/tau"
-import { Maoka } from "@ordo-pink/maoka"
-import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
+import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { Switch } from "@ordo-pink/switch"
+import { noop } from "@ordo-pink/tau"
 
-import { type TOrdoRichTextEditorInlineNode } from "../rich-text.types"
-import { editor_context_jab } from "../jabs/editor-context.jab"
-import { get_window_selection_offsets } from "../utils/selection.utils"
+import { type TOrdoRTECodeNode, type TOrdoRTETextNode } from "../rich-text.types"
+import { RTE } from "."
 
-export const Inline = (
-	node: TOrdoRichTextEditorInlineNode,
-	metadata: Ordo.Metadata.Instance,
-	block_index: number,
-	inline_index: number,
-) =>
-	Switch.Match(node.type).default(() =>
-		Maoka.create("span", ({ use, element }) => {
-			use(MaokaJabs.set_class("outline-none inline-block"))
-			use(MaokaJabs.set_attribute("contenteditable", "true"))
+export const Inline = (node: TOrdoRTETextNode | TOrdoRTECodeNode, block_index: number, inline_index: number) =>
+	Switch.Match(node.type)
+		.case("code", () => StyledCode(() => () => node.value))
+		.case("text", () =>
+			StyledText(({ use }) => {
+				const commands = use(MaokaOrdo.Jabs.get_commands)
 
-			const fsid = metadata.get_fsid()
-			const content_type = metadata.get_type()
+				use(MaokaJabs.set_attribute("data-block_index", String(block_index)))
+				use(MaokaJabs.set_attribute("data-inline_index", String(inline_index)))
+				use(MaokaJabs.set_attribute("contenteditable", "true"))
+				use(MaokaJabs.listen("onkeydown", event => handle_keydown(event)))
+				use(MaokaJabs.listen("oninput", event => handle_input(event)))
+				use(RTE.Jabs.listen_for_selection_change(block_index, inline_index))
 
-			const commands = use(MaokaOrdo.Jabs.get_commands)
-			const { caret_position$, state$, add_new_line, set_caret_position, remove_block } = use(editor_context_jab)
+				const styles = (node as TOrdoRTETextNode).styles
 
-			use(
-				MaokaDOM.Jabs.onmount(() => {
-					const pos = caret_position$.unwrap()
+				if (styles.includes(RTE.Constants.TextNodeStyles.BOLD)) use(MaokaJabs.add_class("text-bold"))
+				if (styles.includes(RTE.Constants.TextNodeStyles.ITALIC)) use(MaokaJabs.add_class("italic"))
+				if (styles.includes(RTE.Constants.TextNodeStyles.STRIKETHROUGH)) use(MaokaJabs.add_class("line-through"))
+				if (styles.includes(RTE.Constants.TextNodeStyles.UNDERLINE)) use(MaokaJabs.add_class("underline"))
 
-					if (element instanceof HTMLInputElement && pos.block_index === block_index && pos.inline_index === inline_index) {
-						// set_position({ block_index, inline_index, anchor_offset: 0, focus_offset: 0 })
-						// el.focus()
+				const handle_input = (event: Event) =>
+					RTE.$.update("content", content => {
+						const content_copy = [...content]
+						const current_block = content_copy[block_index]
 
-						const sel = window.getSelection()
-						const rng = document.createRange()
+						if (RTE.Guards.is_ordo_rte_parent(current_block)) {
+							const current_node = { ...current_block.children[inline_index] }
 
-						if (!sel) return
-
-						if (!element.childNodes[0]) return element.focus()
-
-						rng.setStart(element.childNodes[0], pos.anchor_offset)
-
-						sel.removeAllRanges()
-						sel.addRange(rng)
-					}
-
-					return () => {
-						document.removeEventListener("keydown", handle_keydown)
-						document.removeEventListener("keyup", handle_keyup)
-					}
-				}),
-			)
-
-			use(
-				MaokaJabs.listen("onmouseup", event => {
-					event.stopPropagation()
-
-					const selection = window.getSelection()
-
-					const anchor_offset = selection?.anchorOffset ?? 0
-					const focus_offset = selection?.focusOffset ?? 0
-
-					set_caret_position({ block_index, inline_index, anchor_offset, focus_offset })
-				}),
-			)
-
-			const handle_keydown = (event: KeyboardEvent) => {
-				if (element instanceof HTMLElement && document.activeElement !== element) return
-
-				Switch.Match(event.key)
-					.case("Enter", () => {
-						event.preventDefault()
-						event.stopPropagation()
-
-						add_new_line()
-					})
-					.case("Backspace", () => {
-						const { anchor_offset, focus_offset } = caret_position$.unwrap()
-
-						const is_first_block = is_0(block_index)
-						const is_first_inline = is_0(inline_index)
-						const is_selection_start = is_0(anchor_offset)
-
-						// Skip since `oninput` will take care of removing the selection
-						if (anchor_offset !== focus_offset) return
-
-						if (is_first_inline) {
-							// We don't need to do anything here since it's either the beginning
-							// of the line and it can't be backspaced, or there are characters
-							// that `oninput` will take care of
-							if (is_first_block) return
-
-							if (is_selection_start) {
-								event.preventDefault()
-								event.stopPropagation()
-
-								let refocus = true
-
-								if (node.value.length > 0) {
-									const state = state$.select("value")
-
-									if (inline_index > 0) {
-										state[block_index].children[inline_index - 1].value += node.value
-									} else {
-										const prev_block_last_inline_index = state[block_index - 1].children.length - 1
-										state[block_index - 1].children[prev_block_last_inline_index].value += node.value
-
-										refocus = false
-									}
-
-									state[block_index].children[inline_index].value = ""
-									state$.update("value", () => state)
-								}
-
-								// Safely remove the block since it does not contain any content
-								if (node.value.length === 0) return remove_block(block_index, refocus)
+							if (RTE.Guards.is_ordo_rte_text_node(current_node)) {
+								const current_node_copy = { ...current_node }
+								const target = event.target as HTMLElement
+								current_node_copy.value = target.innerText
+								current_block.children[inline_index] = current_node_copy
 							}
 						}
 
-						// Skip since `oninput` will take care of removing the character(s)
-						if (!is_selection_start) return
-
-						// TODO Remove inline
+						return content_copy
 					})
-					.default(noop)
-			}
 
-			const handle_keyup = (event: KeyboardEvent) => {
-				if (MaokaDOM.is_maoka_dom_element(element) && document.activeElement !== element) return
+				const handle_keydown = (event: KeyboardEvent) =>
+					Switch.Match(event.code)
+						.case("Enter", () => {
+							event.preventDefault()
+							commands.emit("cmd.rich_text.add_block", { block: RTE.Utils.create_paragraph(), block_index: block_index + 1 })
+						})
+						.case("ArrowUp", () => {
+							if (block_index !== 0) {
+								event.preventDefault()
 
-				Switch.Match(event.key)
-					.case(["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"], () => {
-						const { anchor_offset, focus_offset } = get_window_selection_offsets()
+								RTE.$.update("selection", s => {
+									const content = RTE.$.select("content")
 
-						set_caret_position({ block_index, inline_index, anchor_offset, focus_offset })
-					})
-					.default(noop)
-			}
+									const prev_block = content[block_index - 1]
 
-			document.addEventListener("keydown", handle_keydown)
-			document.addEventListener("keyup", handle_keyup)
+									if (!RTE.Guards.is_ordo_rte_parent(prev_block)) return s
 
-			use(
-				MaokaJabs.listen("oninput", event => {
-					const state = state$.select("value")
-					const target = event.target as HTMLDivElement
+									const last_index = prev_block.children.length - 1
+									const last_inline = prev_block.children[last_index]
 
-					const { anchor_offset, focus_offset } = get_window_selection_offsets()
+									if (RTE.Guards.is_ordo_rte_text_node(last_inline)) {
+										const offset = last_inline.value.length
+										return { anchor: offset, focus: offset, block: block_index - 1, inline: last_index }
+									}
 
-					set_caret_position({ block_index, inline_index, anchor_offset, focus_offset })
+									// FIXME Stay in the same line since I don't want to think any deeper rn
+									return s
+								})
+							}
+						})
+						.case("ArrowDown", () => {
+							const content = RTE.$.select("content")
 
-					state[block_index].children[inline_index].value = target.innerText
-					state$.update("value", () => state)
+							if (block_index < content.length - 1) {
+								event.preventDefault()
 
-					commands.emit("cmd.content.set", { fsid, content_type, content: JSON.stringify(state) })
-				}),
-			)
+								RTE.$.update("selection", s => {
+									const prev_block = content[block_index + 1]
 
-			return () => node.value
-		}),
-	)
+									if (!RTE.Guards.is_ordo_rte_parent(prev_block)) return s
+
+									const last_index = prev_block.children.length - 1
+									const last_inline = prev_block.children[last_index]
+
+									if (RTE.Guards.is_ordo_rte_text_node(last_inline)) {
+										const offset = last_inline.value.length
+										return { anchor: offset, focus: offset, block: block_index + 1, inline: last_index }
+									}
+
+									// FIXME Stay in the same line since I don't want to think any deeper rn
+									return s
+								})
+							}
+						})
+						.case("Backspace", () => {
+							const selection = window.getSelection()
+							if (selection && selection.focusOffset === 0 && selection.anchorOffset === 0) {
+								event.preventDefault()
+
+								if (block_index === 0 && inline_index === 0) return
+
+								const content = RTE.$.select("content")
+
+								const block = content[block_index]
+
+								if (RTE.Guards.is_ordo_rte_parent(block)) {
+									const inline = block.children[inline_index]
+
+									if (RTE.Guards.is_ordo_rte_text_node(inline) && inline.value.length === 0) {
+										if (inline_index === 0) commands.emit("cmd.rich_text.remove_block", block_index)
+										else commands.emit("cmd.rich_text.remove_inline", { block_index, inline_index })
+									}
+
+									// TODO Move content to previous block
+									return
+								}
+							}
+						})
+						.default(noop)
+
+				return () => node.value
+			}),
+		)
+		.default(() => "UNSUPPORTED NODE") // TODO Visuals for unsupported nodes
+
+// --- Internal ---
+
+const StyledText = MaokaStyled.Tags.span("inline-block outline-none px-1")
+const StyledCode = MaokaStyled.Tags.code("inline-block")

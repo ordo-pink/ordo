@@ -25,8 +25,8 @@ import { Switch } from "@ordo-pink/switch"
 import { Inline } from "./inline.component"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
-import { RTE } from "."
-import { type TOrdoRTEParagraphNode } from "../rich-text.types"
+import { RTE } from ".."
+import { type TOrdoRTEParagraphNode } from "../../rich-text.types"
 
 // --- Internal ---
 

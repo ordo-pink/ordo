@@ -25,7 +25,7 @@ import { MaokaStr } from "@ordo-pink/maoka-render-string"
 import { TwoLetterLocale } from "@ordo-pink/locale"
 import { create_function } from "@ordo-pink/core"
 
-import { RichText } from "./src/rich-text.component"
+import { RichText } from "./src/components/rich-text.component"
 import { TOrdoRTENode } from "./rich-text.types"
 
 declare global {

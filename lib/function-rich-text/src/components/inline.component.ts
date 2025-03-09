@@ -25,8 +25,8 @@ import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { Switch } from "@ordo-pink/switch"
 import { noop } from "@ordo-pink/tau"
 
-import { type TOrdoRTECodeNode, type TOrdoRTETextNode } from "../rich-text.types"
-import { RTE } from "."
+import { type TOrdoRTECodeNode, type TOrdoRTETextNode } from "../../rich-text.types"
+import { RTE } from ".."
 
 export const Inline = (node: TOrdoRTETextNode | TOrdoRTECodeNode, block_index: number, inline_index: number) =>
 	Switch.Match(node.type)

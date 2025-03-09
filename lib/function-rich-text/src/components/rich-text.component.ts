@@ -26,8 +26,8 @@ import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { R } from "@ordo-pink/result"
 
 import { Line } from "./line.component"
-import { RTE } from "."
-import { type TEditorContent } from "../rich-text.types"
+import { RTE } from ".."
+import { type TEditorContent } from "../../rich-text.types"
 
 export const RichText = (
 	metadata: Ordo.Metadata.Instance,

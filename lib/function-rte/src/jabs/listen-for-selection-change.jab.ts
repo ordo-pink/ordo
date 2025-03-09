@@ -1,13 +1,13 @@
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { type TMaokaJab } from "@ordo-pink/maoka"
 
-import { RTE } from ".."
-import { type TEditorSelection } from "../../rich-text.types"
+import { RTE } from "../rte"
+import { type TRTESelection } from "../rte.types"
 
 export const listen_for_selection_change_jab =
 	(block_index: number, inline_index: number): TMaokaJab =>
 	({ element, use }) => {
-		const cheat_on_selection = (s: TEditorSelection) => {
+		const cheat_on_selection = (s: TRTESelection) => {
 			const window_selection = window.getSelection()
 
 			if (!window_selection || !MaokaDOM.is_maoka_dom_element(element) || s.block !== block_index || s.inline !== inline_index)

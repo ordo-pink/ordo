@@ -83,7 +83,7 @@ export const App = ({ id_host, dt_host, pb_host }: TAppOptions) =>
 		void Promise.any([
 			import("./src/sections/welcome").then(({ default: f }) => f(source)),
 			import("./src/sections/file-editor").then(({ default: f }) => f(source)),
-			import("@ordo-pink/function-rich-text")
+			import("@ordo-pink/function-rte")
 				.then(({ default: f }) => f(source))
 				.then(() => import("@ordo-pink/function-database"))
 				.then(({ default: f }) => f(source)),

@@ -19,15 +19,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { BsType, BsTypeH1 } from "@ordo-pink/frontend-icons"
 import { is_array, is_string } from "@ordo-pink/tau"
+import { ContextMenuItemType } from "@ordo-pink/core"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { R } from "@ordo-pink/result"
 
-import { Line } from "./line.component"
-import { RTE } from ".."
-import { type TEditorContent } from "../../rich-text.types"
+import { Block } from "./block.component"
+import { RTE } from "../rte"
+import { type TRTEContent } from "../rte.types"
 
 export const RichText = (
 	metadata: Ordo.Metadata.Instance,
@@ -41,13 +43,37 @@ export const RichText = (
 		const fsid = metadata.get_fsid()
 		const commands = use(MaokaOrdo.Jabs.get_commands)
 
-		commands.on("cmd.rich_text.add_block", handle_add_block)
-		commands.on("cmd.rich_text.remove_block", handle_remove_block)
+		commands.on("cmd.rte.add_block", handle_add_block)
+		commands.on("cmd.rte.remove_block", handle_remove_block)
+		commands.on("cmd.rte.replace_block", handle_replace_block)
+
+		// TODO Other blocks
+
+		commands.emit("cmd.application.context_menu.add", {
+			command: "cmd.rte.replace_block",
+			readable_name: "t.rte.commands.turn_to_h1",
+			should_show: RTE.Guards.is_rte_context_menu_payload,
+			render_icon: BsTypeH1,
+			type: ContextMenuItemType.UPDATE,
+			payload_creator: ({ payload }) => ({ block_index: payload.block_index, block: { type: "h", level: 1 } }),
+		})
+
+		commands.emit("cmd.application.context_menu.add", {
+			command: "cmd.rte.replace_block",
+			readable_name: "t.rte.commands.turn_to_paragraph",
+			should_show: RTE.Guards.is_rte_context_menu_payload,
+			render_icon: BsType,
+			type: ContextMenuItemType.UPDATE,
+			payload_creator: ({ payload }) => ({ block_index: payload.block_index, block: { type: "p" } }),
+		})
 
 		use(
 			MaokaDOM.Jabs.onunmount(() => {
-				commands.off("cmd.rich_text.add_block", handle_add_block)
-				commands.off("cmd.rich_text.remove_block", handle_remove_block)
+				commands.off("cmd.rte.add_block", handle_add_block)
+				commands.off("cmd.rte.remove_block", handle_remove_block)
+				commands.off("cmd.rte.replace_block", handle_replace_block)
+				commands.emit("cmd.application.context_menu.remove", "t.rte.commands.turn_to_h1")
+				commands.emit("cmd.application.context_menu.remove", "t.rte.commands.turn_to_paragraph")
 			}),
 		)
 
@@ -60,7 +86,7 @@ export const RichText = (
 			.pipe(R.ops.chain(x => R.If(is_array(x) && x.length > 0, { T: () => x })))
 			.cata({
 				Err: () => RTE.$.update("content", () => RTE.Utils.create_content()),
-				Ok: state => RTE.$.update("content", () => state as TEditorContent),
+				Ok: state => RTE.$.update("content", () => state as TRTEContent),
 			})
 
 		const subscribe_to_editor_state = () => {
@@ -86,7 +112,7 @@ export const RichText = (
 		return () => {
 			const state = RTE.$.select("content")
 
-			return state.map((_, line_index) => Line(line_index))
+			return state.map((_, line_index) => Block(line_index))
 		}
 	})
 
@@ -94,12 +120,24 @@ export const RichText = (
 
 const MaokaRichText = MaokaStyled.Tags.div("p-2 size-full outline-none cursor-text")
 
-const handle_add_block: Ordo.Command.HandlerOf<"cmd.rich_text.add_block"> = ({ block, block_index }) => {
+const handle_add_block: Ordo.Command.HandlerOf<"cmd.rte.add_block"> = ({ block, block_index }) => {
 	RTE.$.update("content", content => content.slice(0, block_index).concat(block).concat(content.slice(block_index)))
 	RTE.$.update("selection", () => ({ anchor: 0, block: block_index, focus: 0, inline: 0 }))
 }
 
-const handle_remove_block: Ordo.Command.HandlerOf<"cmd.rich_text.remove_block"> = block_index => {
+const handle_replace_block: Ordo.Command.HandlerOf<"cmd.rte.replace_block"> = ({ block, block_index }) => {
+	RTE.$.update("content", content => {
+		const content_copy = [...content]
+
+		if (!content_copy[block_index]) return content
+
+		content_copy[block_index] = { ...content_copy[block_index], ...block }
+
+		return content_copy
+	})
+}
+
+const handle_remove_block: Ordo.Command.HandlerOf<"cmd.rte.remove_block"> = block_index => {
 	RTE.$.update("content", content => {
 		return content.toSpliced(block_index, 1)
 	})
@@ -112,11 +150,11 @@ const handle_remove_block: Ordo.Command.HandlerOf<"cmd.rich_text.remove_block"> 
 
 			if (!prev_block) return selection
 
-			if (RTE.Guards.is_ordo_rte_parent(prev_block)) {
+			if (RTE.Guards.is_rte_parent(prev_block)) {
 				const last_index = prev_block.children.length - 1
 				const last_inline = prev_block.children[last_index]
 
-				if (RTE.Guards.is_ordo_rte_text_node(last_inline)) {
+				if (RTE.Guards.is_rte_text_node(last_inline)) {
 					const offset = last_inline.value.length
 					return { anchor: offset, focus: offset, block: block_index - 1, inline: last_index }
 				}

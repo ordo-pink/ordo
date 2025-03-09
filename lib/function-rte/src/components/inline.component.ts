@@ -25,10 +25,10 @@ import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { Switch } from "@ordo-pink/switch"
 import { noop } from "@ordo-pink/tau"
 
-import { type TOrdoRTECodeNode, type TOrdoRTETextNode } from "../../rich-text.types"
-import { RTE } from ".."
+import { type TRTECodeNode, type TRTETextNode } from "../rte.types"
+import { RTE } from "../rte"
 
-export const Inline = (node: TOrdoRTETextNode | TOrdoRTECodeNode, block_index: number, inline_index: number) =>
+export const Inline = (node: TRTETextNode | TRTECodeNode, block_index: number, inline_index: number) =>
 	Switch.Match(node.type)
 		.case("code", () => StyledCode(() => () => node.value))
 		.case("text", () =>
@@ -40,24 +40,40 @@ export const Inline = (node: TOrdoRTETextNode | TOrdoRTECodeNode, block_index: n
 				use(MaokaJabs.set_attribute("contenteditable", "true"))
 				use(MaokaJabs.listen("onkeydown", event => handle_keydown(event)))
 				use(MaokaJabs.listen("oninput", event => handle_input(event)))
+				use(MaokaJabs.listen("onclick", event => handle_click(event)))
 				use(RTE.Jabs.listen_for_selection_change(block_index, inline_index))
 
-				const styles = (node as TOrdoRTETextNode).styles
+				const styles = (node as TRTETextNode).styles
 
-				if (styles.includes(RTE.Constants.TextNodeStyles.BOLD)) use(MaokaJabs.add_class("text-bold"))
-				if (styles.includes(RTE.Constants.TextNodeStyles.ITALIC)) use(MaokaJabs.add_class("italic"))
-				if (styles.includes(RTE.Constants.TextNodeStyles.STRIKETHROUGH)) use(MaokaJabs.add_class("line-through"))
-				if (styles.includes(RTE.Constants.TextNodeStyles.UNDERLINE)) use(MaokaJabs.add_class("underline"))
+				if (styles.includes(RTE.Constants.TextNodeStyle.BOLD)) use(MaokaJabs.add_class("text-bold"))
+				if (styles.includes(RTE.Constants.TextNodeStyle.ITALIC)) use(MaokaJabs.add_class("italic"))
+				if (styles.includes(RTE.Constants.TextNodeStyle.STRIKETHROUGH)) use(MaokaJabs.add_class("line-through"))
+				if (styles.includes(RTE.Constants.TextNodeStyle.UNDERLINE)) use(MaokaJabs.add_class("underline"))
+
+				const handle_click = (event: MouseEvent) => {
+					const selection = window.getSelection()
+
+					if (selection) {
+						event.stopPropagation()
+
+						RTE.$.update("selection", () => ({
+							anchor: selection?.anchorOffset,
+							block: block_index,
+							focus: selection?.focusOffset,
+							inline: inline_index,
+						}))
+					}
+				}
 
 				const handle_input = (event: Event) =>
 					RTE.$.update("content", content => {
 						const content_copy = [...content]
 						const current_block = content_copy[block_index]
 
-						if (RTE.Guards.is_ordo_rte_parent(current_block)) {
+						if (RTE.Guards.is_rte_parent(current_block)) {
 							const current_node = { ...current_block.children[inline_index] }
 
-							if (RTE.Guards.is_ordo_rte_text_node(current_node)) {
+							if (RTE.Guards.is_rte_text_node(current_node)) {
 								const current_node_copy = { ...current_node }
 								const target = event.target as HTMLElement
 								current_node_copy.value = target.innerText
@@ -72,7 +88,7 @@ export const Inline = (node: TOrdoRTETextNode | TOrdoRTECodeNode, block_index: n
 					Switch.Match(event.code)
 						.case("Enter", () => {
 							event.preventDefault()
-							commands.emit("cmd.rich_text.add_block", { block: RTE.Utils.create_paragraph(), block_index: block_index + 1 })
+							commands.emit("cmd.rte.add_block", { block: RTE.Utils.create_paragraph(), block_index: block_index + 1 })
 						})
 						.case("ArrowUp", () => {
 							if (block_index !== 0) {
@@ -83,12 +99,12 @@ export const Inline = (node: TOrdoRTETextNode | TOrdoRTECodeNode, block_index: n
 
 									const prev_block = content[block_index - 1]
 
-									if (!RTE.Guards.is_ordo_rte_parent(prev_block)) return s
+									if (!RTE.Guards.is_rte_parent(prev_block)) return s
 
 									const last_index = prev_block.children.length - 1
 									const last_inline = prev_block.children[last_index]
 
-									if (RTE.Guards.is_ordo_rte_text_node(last_inline)) {
+									if (RTE.Guards.is_rte_text_node(last_inline)) {
 										const offset = last_inline.value.length
 										return { anchor: offset, focus: offset, block: block_index - 1, inline: last_index }
 									}
@@ -107,12 +123,12 @@ export const Inline = (node: TOrdoRTETextNode | TOrdoRTECodeNode, block_index: n
 								RTE.$.update("selection", s => {
 									const prev_block = content[block_index + 1]
 
-									if (!RTE.Guards.is_ordo_rte_parent(prev_block)) return s
+									if (!RTE.Guards.is_rte_parent(prev_block)) return s
 
 									const last_index = prev_block.children.length - 1
 									const last_inline = prev_block.children[last_index]
 
-									if (RTE.Guards.is_ordo_rte_text_node(last_inline)) {
+									if (RTE.Guards.is_rte_text_node(last_inline)) {
 										const offset = last_inline.value.length
 										return { anchor: offset, focus: offset, block: block_index + 1, inline: last_index }
 									}
@@ -133,12 +149,12 @@ export const Inline = (node: TOrdoRTETextNode | TOrdoRTECodeNode, block_index: n
 
 								const block = content[block_index]
 
-								if (RTE.Guards.is_ordo_rte_parent(block)) {
+								if (RTE.Guards.is_rte_parent(block)) {
 									const inline = block.children[inline_index]
 
-									if (RTE.Guards.is_ordo_rte_text_node(inline) && inline.value.length === 0) {
-										if (inline_index === 0) commands.emit("cmd.rich_text.remove_block", block_index)
-										else commands.emit("cmd.rich_text.remove_inline", { block_index, inline_index })
+									if (RTE.Guards.is_rte_text_node(inline) && inline.value.length === 0) {
+										if (inline_index === 0) commands.emit("cmd.rte.remove_block", block_index)
+										else commands.emit("cmd.rte.remove_inline", { block_index, inline_index })
 									}
 
 									// TODO Move content to previous block

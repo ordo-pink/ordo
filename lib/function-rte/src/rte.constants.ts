@@ -1,4 +1,4 @@
-export enum TextNodeStyles {
+export enum TextNodeStyle {
 	BOLD,
 	ITALIC,
 	UNDERLINE,

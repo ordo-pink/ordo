@@ -74,11 +74,11 @@ const handle_hide: Ordo.Command.HandlerOf<"cmd.application.context_menu.hide"> =
 
 const handle_add: Ordo.Command.HandlerOf<"cmd.application.context_menu.add"> = new_item =>
 	ordo_app_state.zags.update("sections.context_menu.items", items =>
-		items.some(item => item.command === new_item.command) ? items : items.concat(new_item),
+		items.some(item => item.readable_name === new_item.readable_name) ? items : items.concat(new_item),
 	)
 
-const handle_remove: Ordo.Command.HandlerOf<"cmd.application.context_menu.remove"> = command =>
-	ordo_app_state.zags.update("sections.context_menu.items", items => items.filter(item => item.command === command))
+const handle_remove: Ordo.Command.HandlerOf<"cmd.application.context_menu.remove"> = readable_name =>
+	ordo_app_state.zags.update("sections.context_menu.items", items => items.filter(item => item.readable_name === readable_name))
 
 const OrdoContextMenuDynamic = Maoka.create("div", ({ element, use }) => {
 	use(MaokaJabs.set_class("context-menu"))

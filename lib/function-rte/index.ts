@@ -26,32 +26,38 @@ import { TwoLetterLocale } from "@ordo-pink/locale"
 import { create_function } from "@ordo-pink/core"
 
 import { RichText } from "./src/components/rich-text.component"
-import { TOrdoRTENode } from "./rich-text.types"
+import { TRTENode } from "./src/rte.types"
 
 declare global {
 	interface t {
-		text: {
+		rte: {
 			file_association: {
 				readable_name: () => string
 				description: () => string
+			}
+			commands: {
+				turn_to_h1: () => string
+				turn_to_h2: () => string
+				turn_to_h3: () => string
+				turn_to_h4: () => string
+				turn_to_h5: () => string
+				turn_to_h6: () => string
+				turn_to_paragraph: () => string
 			}
 		}
 	}
 
 	interface cmd {
-		rich_text: {
-			add_block: () => { block: TOrdoRTENode; block_index: number }
-			add_block_after_selection: () => { block: TOrdoRTENode }
-			add_inline: () => { inline: TOrdoRTENode; block_index: number; inline_index: number }
-			add_inline_after_selection: () => TOrdoRTENode
-			replace_block: () => { block: TOrdoRTENode; block_index: number }
-			replace_inline: () => { inline: TOrdoRTENode; block_index: number; inline_index: number }
-			wrap_selection: () => TOrdoRTENode
+		rte: {
+			add_block: () => { block: TRTENode; block_index: number }
+			add_block_after_selection: () => { block: TRTENode }
+			add_inline: () => { inline: TRTENode; block_index: number; inline_index: number }
+			add_inline_after_selection: () => TRTENode
+			replace_block: () => { block: TRTENode; block_index: number }
+			replace_inline: () => { inline: TRTENode; block_index: number; inline_index: number }
+			wrap_selection: () => TRTENode
 			remove_block: () => number
 			remove_inline: () => { block_index: number; inline_index: number }
-			enable_interactive_mode: () => void
-			disable_interactive_mode: () => void
-			toggle_interactive_mode: () => void
 		}
 	}
 }
@@ -76,9 +82,11 @@ export default create_function(
 		commands.emit("cmd.application.add_translations", {
 			lang: TwoLetterLocale.ENGLISH,
 			translations: {
-				"t.text.file_association.readable_name": "Rich Text",
-				"t.text.file_association.description":
+				"t.rte.file_association.readable_name": "Rich Text",
+				"t.rte.file_association.description":
 					"This is a rich text file that allows custom user input and embedding other files in read-only mode.",
+				"t.rte.commands.turn_to_h1": "Turn to Heading 1",
+				"t.rte.commands.turn_to_paragraph": "Turn to Paragraph",
 			},
 		})
 
@@ -96,8 +104,8 @@ export default create_function(
 			types: [
 				{
 					name: "text/ordo",
-					readable_name: "t.text.file_association.readable_name",
-					description: "t.text.file_association.description",
+					readable_name: "t.rte.file_association.readable_name",
+					description: "t.rte.file_association.description",
 				},
 			],
 		})

@@ -43,13 +43,6 @@ export type NonNegativeInt<T extends number> = number extends T
 		? never
 		: T
 
-// @see https://stackoverflow.com/a/70307091
-export type Enumerate<N extends number, Acc extends number[] = []> = Acc["length"] extends N
-	? Acc[number]
-	: Enumerate<N, [...Acc, Acc["length"]]>
-
-export type Range<F extends number, T extends number> = Exclude<Enumerate<T>, Enumerate<F>>
-
 export type Curry<T extends (...args: any) => any> = (x: CurryFirst<T>) => CurryRest<T>
 
 export type Identity<T> = (x: T) => T
@@ -110,3 +103,10 @@ export type ForbidCharacters<Chars extends string, Str extends string> = Str ext
 export type TSnakeToPascal<S extends string> = S extends `${infer A}_${infer B}`
 	? `${Capitalize<A>}${TSnakeToPascal<B>}`
 	: Capitalize<S>
+
+// @see https://stackoverflow.com/a/70307091
+export type ZeroToN<$TNumber extends number, $TAccumulator extends number[] = []> = $TAccumulator["length"] extends $TNumber
+	? $TAccumulator[number]
+	: ZeroToN<$TNumber, [...$TAccumulator, $TAccumulator["length"]]>
+
+export type Range<$TStart extends number, $TEnd extends number> = Exclude<ZeroToN<$TEnd>, ZeroToN<$TStart>>

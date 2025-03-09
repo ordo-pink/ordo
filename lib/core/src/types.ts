@@ -1165,13 +1165,13 @@ declare global {
 				 * @optional
 				 * @default () => payload
 				 */
-				payload_creator?: (params: Ordo.ContextMenu.Params) => unknown
+				payload_creator?: (params: Ordo.ContextMenu.Params<any>) => unknown
 			}
 
 			/**
 			 * Context menu item method parameters.
 			 */
-			type Params = { event: MouseEvent; payload?: unknown }
+			type Params<$TPayload = unknown> = { event: MouseEvent; payload?: $TPayload }
 
 			/**
 			 * Context menu.

@@ -1,8 +1,8 @@
 import { ZAGS } from "@ordo-pink/zags"
 
-import { type TEditorState } from "../rich-text.types"
+import { type TRTEState } from "./rte.types"
 
-export const rich_text_editor$ = ZAGS.Of<TEditorState>({
+export const rich_text_editor$ = ZAGS.Of<TRTEState>({
 	content: [{ type: "p", children: [{ type: "text", value: "" }] }],
 	is_editable: false,
 	is_embedded: false,

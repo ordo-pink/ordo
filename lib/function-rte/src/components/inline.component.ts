@@ -19,6 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
@@ -32,8 +33,9 @@ export const Inline = (node: TRTETextNode | TRTECodeNode, block_index: number, i
 	Switch.Match(node.type)
 		.case("code", () => StyledCode(() => () => node.value))
 		.case("text", () =>
-			StyledText(({ use }) => {
+			StyledText(({ element, use }) => {
 				const commands = use(MaokaOrdo.Jabs.get_commands)
+				const is_darwin = use(MaokaJabs.is_darwin)
 
 				use(MaokaJabs.set_attribute("data-block_index", String(block_index)))
 				use(MaokaJabs.set_attribute("data-inline_index", String(inline_index)))
@@ -160,6 +162,14 @@ export const Inline = (node: TRTETextNode | TRTECodeNode, block_index: number, i
 									// TODO Move content to previous block
 									return
 								}
+							}
+						})
+						.case("Slash", () => {
+							const should_call_menu = is_darwin ? event.metaKey : event.ctrlKey
+
+							if (should_call_menu && MaokaDOM.is_maoka_dom_element(element)) {
+								event.preventDefault()
+								commands.emit("cmd.rte.show_quick_menu")
 							}
 						})
 						.default(noop)

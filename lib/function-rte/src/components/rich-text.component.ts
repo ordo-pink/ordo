@@ -28,8 +28,11 @@ import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { R } from "@ordo-pink/result"
 
 import { Block } from "./block.component"
+import { QuickMenu } from "./quick-menu.component"
 import { RTE } from "../rte"
 import { type TRTEContent } from "../rte.types"
+
+import "../rte.css"
 
 export const RichText = (
 	metadata: Ordo.Metadata.Instance,
@@ -46,6 +49,7 @@ export const RichText = (
 		commands.on("cmd.rte.add_block", handle_add_block)
 		commands.on("cmd.rte.remove_block", handle_remove_block)
 		commands.on("cmd.rte.replace_block", handle_replace_block)
+		commands.on("cmd.rte.show_quick_menu", handle_show_quick_menu)
 
 		// TODO Other blocks
 
@@ -126,6 +130,8 @@ export const RichText = (
 				commands.off("cmd.rte.add_block", handle_add_block)
 				commands.off("cmd.rte.remove_block", handle_remove_block)
 				commands.off("cmd.rte.replace_block", handle_replace_block)
+				commands.off("cmd.rte.show_quick_menu", handle_show_quick_menu)
+
 				commands.emit("cmd.application.context_menu.remove", "t.rte.commands.turn_to_h1")
 				commands.emit("cmd.application.context_menu.remove", "t.rte.commands.turn_to_h2")
 				commands.emit("cmd.application.context_menu.remove", "t.rte.commands.turn_to_h3")
@@ -171,7 +177,7 @@ export const RichText = (
 		return () => {
 			const state = RTE.$.select("content")
 
-			return state.map((_, line_index) => Block(line_index))
+			return [QuickMenu(), ...state.map((_, line_index) => Block(line_index))]
 		}
 	})
 
@@ -194,6 +200,15 @@ const handle_replace_block: Ordo.Command.HandlerOf<"cmd.rte.replace_block"> = ({
 
 		return content_copy
 	})
+}
+
+const handle_show_quick_menu: Ordo.Command.HandlerOf<"cmd.rte.show_quick_menu"> = () => {
+	const selection = window.getSelection()
+
+	if (MaokaDOM.is_maoka_dom_element(selection?.focusNode)) {
+		const { x, y } = selection.focusNode.getBoundingClientRect()
+		RTE.$.update("quick_menu", () => ({ x, y }))
+	}
 }
 
 const handle_remove_block: Ordo.Command.HandlerOf<"cmd.rte.remove_block"> = block_index => {

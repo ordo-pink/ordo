@@ -101,4 +101,5 @@ export type TRTEState = {
 	selection: TRTESelection
 	is_editable: boolean
 	is_embedded: boolean
+	quick_menu: { x: number; y: number } | null
 }

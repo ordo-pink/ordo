@@ -59,6 +59,7 @@ declare global {
 			wrap_selection: () => TRTENode
 			remove_block: () => number
 			remove_inline: () => { block_index: number; inline_index: number }
+			show_quick_menu: () => void
 		}
 	}
 }

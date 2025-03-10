@@ -112,18 +112,18 @@ export default Maoka.create("main", ({ use }) => {
 								CallToActionCard(() => () => [
 									CallToActionBetaLogo(`"${t_beta_started}"`),
 									ActionsContainer(() => () => [
-										Button.Neutral({
+										Button.Primary({
 											text: t_try_now,
 											hotkey: "mod+enter",
 											on_click: handle_try_click,
 											hotkey_options: { prevent_in_inputs: true },
 										}),
-										Button.Primary({
-											text: t_sign_up,
-											hotkey: "mod+j",
-											on_click: handle_sign_up_click,
-											hotkey_options: { prevent_in_inputs: true },
-										}),
+										// Button.Primary({
+										// 	text: t_sign_up,
+										// 	hotkey: "mod+j",
+										// 	on_click: handle_sign_up_click,
+										// 	hotkey_options: { prevent_in_inputs: true },
+										// }),
 									]),
 								]),
 						),

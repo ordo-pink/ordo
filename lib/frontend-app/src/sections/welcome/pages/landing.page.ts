@@ -65,7 +65,7 @@ export default Maoka.create("main", ({ use }) => {
 		Object.assign(document.documentElement, { style })
 	}
 
-	const handle_sign_up_click = () => void commands.emit("cmd.auth.show_request_code_modal")
+	// const handle_sign_up_click = () => void commands.emit("cmd.auth.show_request_code_modal")
 
 	const handle_try_click = () => {
 		const has_files = metadata_query.get().cata({ Ok: x => x.length > 0, Err: T })
@@ -82,7 +82,7 @@ export default Maoka.create("main", ({ use }) => {
 		const t_more = t("t.welcome.landing_page.sections.hero.learn_more")
 		const t_beta_started = t("t.welcome.landing_page.sections.hero.beta_started_announcement")
 		const t_try_now = t("t.welcome.landing_page.sections.hero.try_now_button")
-		const t_sign_up = t("t.welcome.landing_page.sections.hero.sign_up")
+		// const t_sign_up = t("t.welcome.landing_page.sections.hero.sign_up")
 
 		return HeroSection(() => () => [
 			HeroSectionLayers(() => () => [

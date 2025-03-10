@@ -115,6 +115,8 @@ export type TOrElseCataFn = <_TOk, _TErr, _TNewErr>(
 
 export type TExpectFn = <_TOk, _TErr>(on_err: (err: _TErr) => void) => { Ok: (on_ok: _TOk) => _TOk; Err: (err: _TErr) => never }
 
+export type TThrowFn = <$TOk, $TErr>() => { Ok: (ok: $TOk) => $TOk; Err: (err: $TErr) => never }
+
 export type TIfOkCataFn = <_TOk, _TNewOk>(on_ok: (ok: _TOk) => _TNewOk) => { Ok: (on_ok: _TOk) => _TNewOk; Err: () => void }
 
 export type TOrNothingCata = <_TOk>() => { Ok: (ok: _TOk) => _TOk; Err: () => undefined }
@@ -138,6 +140,7 @@ export type TResultStatic = {
 		or_else: TOrElseCataFn
 		if_ok: TIfOkCataFn
 		expect: TExpectFn
+		throw: TThrowFn
 	}
 	ops: {
 		map: TMapResultOperatorFn

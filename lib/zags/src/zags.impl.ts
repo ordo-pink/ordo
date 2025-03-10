@@ -35,7 +35,7 @@ export const ZAGS: TZagsStatic = {
 			}
 
 			handlers.push(wrapped_f)
-			wrapped_f(state, false)
+			wrapped_f(Object.assign({}, state), false)
 
 			return () => {
 				const index = handlers.indexOf(wrapped_f)
@@ -64,7 +64,7 @@ export const ZAGS: TZagsStatic = {
 
 			if (value !== current_value) {
 				location[keys[keys.length - 1]] = value
-				state = Object.assign({}, state_copy)
+				state = state_copy
 
 				handlers.forEach(f => f(state, true))
 			}
@@ -85,7 +85,7 @@ export const ZAGS: TZagsStatic = {
 			const updated_state = f(Object.assign({}, state))
 
 			if (updated_state !== state) {
-				state = Object.assign({}, updated_state)
+				state = updated_state
 				handlers.forEach(f => f(state, true))
 			}
 		},

@@ -64,6 +64,7 @@ export const is_empty_array = (x: unknown): boolean => is_array(x) && is_0(x.len
 // TODO: Properly assign guard type
 // eslint-disable-next-line @typescript-eslint/ban-types
 export const is_instance_of = <T extends Function>(type: T, x: unknown): x is T => x instanceof type
+export const is_null = (x: unknown): x is null => x === null
 
 export const gt = (min: number) => (val: number) => val > min
 export const lt = (max: number) => (val: number) => val < max
@@ -84,8 +85,8 @@ export const keys_of: Types._KeysOfFn = o => {
 	return Object.keys(o) as any
 }
 
-export const for_each_key = <T extends Record<string, unknown>>(obj: T, f: (key: keyof T) => void) =>
-	keys_of(obj).forEach(key => f(key))
+export const for_each_key = <T extends Record<string, unknown>>(obj: T, f: (key: keyof T, obj: T) => void) =>
+	keys_of(obj).forEach(key => f(key, obj))
 
 export const extend =
 	<T extends Record<string, unknown>, N extends Record<string, unknown>>(f: (obj: T) => N) =>

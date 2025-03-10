@@ -31,6 +31,7 @@ export const handle_get_user_by_id = default_handler<TIDContext>(intake =>
 	Oath.Resolve(intake.params.user_id)
 		.pipe(ops0.chain(validate_user_id(intake)))
 		.pipe(ops0.chain(get_by_id(intake)))
+		.pipe(ops0.map(u => u.to_dto()))
 		.pipe(ops0.map(serialize_to_public_user))
 		.pipe(ops0.map(user => void (intake.payload = user)))
 		.pipe(ops0.map(() => intake)),
@@ -43,7 +44,7 @@ type I = TIntake<TIDContext>
 const serialize_to_public_user = PublicUser.Serialize
 
 const validate_user_id = (intake: I) => (id: unknown) =>
-	Oath.If(PublicUser.Validations.is_id(id), { T: () => id as Ordo.User.UID, F: () => invalid_id_rrr(id, intake) })
+	Oath.If(PublicUser.Validations.is_uid(id), { T: () => id as Ordo.User.UID, F: () => invalid_id_rrr(id, intake) })
 
 const get_by_id = (intake: I) => (id: Ordo.User.UID) =>
 	intake.user_persistence_strategy.get_by_id(id).pipe(ops0.rejected_map(rrr => ({ rrr, intake })))

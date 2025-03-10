@@ -26,22 +26,14 @@ import { Metadata as M, Metadata, RRR, get_wrong_label, get_wrong_link } from "@
 
 // TODO Move to frontend-app
 export const MetadataCommand: Ordo.Metadata.CommandStatic = {
-	Of: (m_repo, m_query, u_query) => ({
-		set_name: (fsid, name) =>
-			_check_name_r("set name", name)
-				.pipe(R.ops.map(thunk(fsid)))
-				.pipe(R.ops.chain(_get_metadata_by_fsid_r("set name", m_query)))
-				.pipe(
-					R.ops.chain(m => _check_not_exists_by_name_r("set name", m_query, name, m.get_parent()).pipe(R.ops.map(thunk(m)))),
-				)
-				.pipe(R.ops.map(_metadata_to_dto))
-				.pipe(R.ops.chain(_reset_updated_by_r(u_query)))
-				.pipe(R.ops.map(override({ name })))
-				.pipe(R.ops.map(_reset_updated_at))
-				.pipe(R.ops.map(_dto_to_metadata))
-				.pipe(R.ops.chain(MC.Of(m_repo, m_query, u_query).replace)),
+	Of: (m_repo, m_query, u_query) => {
+		const replace = (value: Ordo.Metadata.Instance) =>
+			m_query
+				.get({ show_hidden: true })
+				.pipe(R.ops.chain(_replace_metadata_r(value)))
+				.pipe(R.ops.chain(m_repo.put))
 
-		set_parent: (fsid, parent) =>
+		const set_parent = (fsid: Ordo.Metadata.FSID, parent: Ordo.Metadata.FSID | null) =>
 			(parent === null ? R.Ok<any, any>(null) : _get_metadata_by_fsid_r("set parent", m_query)(parent))
 				.pipe(R.ops.map(thunk(fsid)))
 				.pipe(R.ops.chain(_get_metadata_by_fsid_r("set parent", m_query)))
@@ -54,57 +46,9 @@ export const MetadataCommand: Ordo.Metadata.CommandStatic = {
 				.pipe(R.ops.map(override({ parent })))
 				.pipe(R.ops.map(_reset_updated_at))
 				.pipe(R.ops.map(_dto_to_metadata))
-				.pipe(R.ops.chain(MC.Of(m_repo, m_query, u_query).replace)),
+				.pipe(R.ops.chain(replace))
 
-		set_size: (fsid, size) =>
-			_check_size_r("set size", size)
-				.pipe(R.ops.map(thunk(fsid)))
-				.pipe(R.ops.chain(_get_metadata_by_fsid_r("set size", m_query)))
-				.pipe(R.ops.map(_metadata_to_dto))
-				.pipe(R.ops.chain(_reset_updated_by_r(u_query)))
-				.pipe(R.ops.map(override({ size })))
-				.pipe(R.ops.map(_reset_updated_at))
-				.pipe(R.ops.map(_dto_to_metadata))
-				.pipe(R.ops.chain(MC.Of(m_repo, m_query, u_query).replace)),
-
-		add_labels: (fsid, ...labels) =>
-			_get_metadata_by_fsid_r(
-				"add labels",
-				m_query,
-			)(fsid)
-				.pipe(R.ops.map(item => item.get_labels()))
-				.pipe(R.ops.map(lbls => concat(lbls, labels).sort((a, b) => alpha_sort("ASC")(a.name, b.name))))
-				.pipe(R.ops.chain(lbls => MC.Of(m_repo, m_query, u_query).replace_labels(fsid, lbls))),
-
-		update_label: (old_label, new_label) =>
-			m_query
-				.get()
-				.pipe(
-					R.ops.map(metadata_collection =>
-						metadata_collection.map(metadata => {
-							if (!metadata.has_label(old_label)) return metadata
-
-							const dto = metadata.to_dto() as any
-							const index = metadata.get_label_index(old_label)
-							dto.labels = dto.labels.toSpliced(index, 1, new_label)
-
-							return Metadata.FromDTO(dto)
-						}),
-					),
-				)
-				.pipe(R.ops.chain(m_repo.put)),
-
-		remove_labels: (fsid, ...labels) =>
-			_get_metadata_by_fsid_r(
-				"remove labels",
-				m_query,
-			)(fsid)
-				.pipe(R.ops.map(item => item.get_labels()))
-				// TODO Fix removing labels
-				.pipe(R.ops.map(lbls => lbls.filter(label => !labels.includes(label))))
-				.pipe(R.ops.chain(lbls => MC.Of(m_repo, m_query, u_query).replace_labels(fsid, lbls))),
-
-		replace_labels: (fsid, labels) =>
+		const replace_labels = (fsid: Ordo.Metadata.FSID, labels: Ordo.Metadata.Label[]) =>
 			_check_labels_r("replace labels", labels)
 				.pipe(R.ops.map(thunk(fsid)))
 				.pipe(R.ops.chain(_get_metadata_by_fsid_r("replace labels", m_query)))
@@ -113,27 +57,9 @@ export const MetadataCommand: Ordo.Metadata.CommandStatic = {
 				.pipe(R.ops.map(override({ labels })))
 				.pipe(R.ops.map(_reset_updated_at))
 				.pipe(R.ops.map(_dto_to_metadata))
-				.pipe(R.ops.chain(MC.Of(m_repo, m_query, u_query).replace)),
+				.pipe(R.ops.chain(replace))
 
-		add_links: (fsid, ...links) =>
-			_get_metadata_by_fsid_r(
-				"add links",
-				m_query,
-			)(fsid)
-				.pipe(R.ops.map(item => item.get_links()))
-				.pipe(R.ops.map(lnks => concat(lnks, links).sort(alpha_sort())))
-				.pipe(R.ops.chain(links => MC.Of(m_repo, m_query, u_query).replace_links(fsid, links))),
-
-		remove_links: (fsid, ...links) =>
-			_get_metadata_by_fsid_r(
-				"remove links",
-				m_query,
-			)(fsid)
-				.pipe(R.ops.map(item => item.get_links()))
-				.pipe(R.ops.map(lnks => lnks.filter(link => !links.includes(link))))
-				.pipe(R.ops.chain(links => MC.Of(m_repo, m_query, u_query).replace_links(fsid, links))),
-
-		replace_links: (fsid, links) =>
+		const replace_links = (fsid: Ordo.Metadata.FSID, links: Ordo.Metadata.FSID[]) =>
 			_check_links_r("replace links", links)
 				.pipe(R.ops.map(thunk(fsid)))
 				.pipe(R.ops.chain(_get_metadata_by_fsid_r("replace links", m_query)))
@@ -142,69 +68,153 @@ export const MetadataCommand: Ordo.Metadata.CommandStatic = {
 				.pipe(R.ops.map(override({ links })))
 				.pipe(R.ops.map(_reset_updated_at))
 				.pipe(R.ops.map(_dto_to_metadata))
-				.pipe(R.ops.chain(MC.Of(m_repo, m_query, u_query).replace)),
+				.pipe(R.ops.chain(replace))
 
-		append_child: (fsid, child) => MC.Of(m_repo, m_query, u_query).set_parent(child, fsid),
+		return {
+			set_name: (fsid, name) =>
+				_check_name_r("set name", name)
+					.pipe(R.ops.map(thunk(fsid)))
+					.pipe(R.ops.chain(_get_metadata_by_fsid_r("set name", m_query)))
+					.pipe(
+						R.ops.chain(m => _check_not_exists_by_name_r("set name", m_query, name, m.get_parent()).pipe(R.ops.map(thunk(m)))),
+					)
+					.pipe(R.ops.map(_metadata_to_dto))
+					.pipe(R.ops.chain(_reset_updated_by_r(u_query)))
+					.pipe(R.ops.map(override({ name })))
+					.pipe(R.ops.map(_reset_updated_at))
+					.pipe(R.ops.map(_dto_to_metadata))
+					.pipe(R.ops.chain(replace)),
 
-		set_property: (fsid, key, value) =>
-			_check_prop_key_r("set property", key)
-				.pipe(R.ops.map(thunk(fsid)))
-				.pipe(R.ops.chain(_get_metadata_by_fsid_r("set property", m_query)))
-				.pipe(R.ops.map(_metadata_to_dto))
-				.pipe(R.ops.chain(_reset_updated_by_r(u_query)))
-				.pipe(R.ops.map(item => ({ ...item, props: { ...(item.props ?? {}), [key]: value } })))
-				.pipe(R.ops.map(_reset_updated_at))
-				.pipe(R.ops.map(_dto_to_metadata))
-				.pipe(R.ops.chain(MC.Of(m_repo, m_query, u_query).replace)),
+			set_parent,
 
-		remove_property: (fsid, key) =>
-			_check_prop_key_r("remove property", key)
-				.pipe(R.ops.map(thunk(fsid)))
-				.pipe(R.ops.chain(_get_metadata_by_fsid_r("remove property", m_query)))
-				.pipe(R.ops.map(_metadata_to_dto))
-				.pipe(R.ops.chain(_reset_updated_by_r(u_query)))
-				.pipe(R.ops.map(item => ({ ...item, props: { ...(item.props ?? {}), [key]: undefined } })))
-				.pipe(R.ops.map(_reset_updated_at))
-				.pipe(R.ops.map(_dto_to_metadata))
-				.pipe(R.ops.chain(MC.Of(m_repo, m_query, u_query).replace)),
+			set_size: (fsid, size) =>
+				_check_size_r("set size", size)
+					.pipe(R.ops.map(() => fsid))
+					.pipe(R.ops.chain(_get_metadata_by_fsid_r("set size", m_query)))
+					.pipe(R.ops.map(_metadata_to_dto))
+					.pipe(R.ops.chain(_reset_updated_by_r(u_query)))
+					.pipe(R.ops.map(override({ size })))
+					.pipe(R.ops.map(_reset_updated_at))
+					.pipe(R.ops.map(_dto_to_metadata))
+					.pipe(R.ops.chain(replace)),
 
-		create: ({ name, parent, size, type = "text/ordo", labels = [], links = [], props = {} }) =>
-			R.Merge([
-				_check_name_r("create", name),
-				_check_parent_r("create", parent),
-				_check_labels_r("create", labels),
-				_check_links_r("create", links),
-				_check_type_r("create", type),
-				_check_props_r("create", props),
-				_check_size_r("create", size ?? 0),
-				_check_not_exists_by_name_r("create", m_query, name, parent),
-			])
-				.pipe(R.ops.chain(u_query.get_current))
-				.pipe(R.ops.map(user => user.get_id()))
-				.pipe(R.ops.map(author_id => M.Of({ name, parent, author_id, type, labels, links, props, size: size ?? 0 })))
-				.pipe(R.ops.chain(item => m_query.get().pipe(R.ops.map(items => items.concat(item)))))
-				.pipe(R.ops.chain(m_repo.put)),
+			add_labels: (fsid, ...labels) =>
+				_get_metadata_by_fsid_r(
+					"add labels",
+					m_query,
+				)(fsid)
+					.pipe(R.ops.map(item => item.get_labels()))
+					.pipe(R.ops.map(lbls => concat(lbls, labels).sort((a, b) => alpha_sort("ASC")(a.name, b.name))))
+					.pipe(R.ops.chain(lbls => replace_labels(fsid, lbls))),
 
-		remove: fsid =>
-			_check_fsid_r("remove", fsid)
-				.pipe(R.ops.map(thunk(fsid)))
-				.pipe(R.ops.chain(_get_metadata_by_fsid_r("remove", m_query)))
-				.pipe(R.ops.map(thunk(void 0)))
-				.pipe(R.ops.chain(() => m_query.get_descendents(fsid, { show_hidden: true })))
-				.pipe(R.ops.chain(descendents => m_query.get({ show_hidden: true }).pipe(R.ops.map(all => ({ all, descendents })))))
-				.pipe(
-					R.ops.map(({ all, descendents }) =>
-						all.filter(item => item.get_fsid() !== fsid && !descendents.some(d => d.get_fsid() === item.get_fsid())),
-					),
-				)
-				.pipe(R.ops.chain(m_repo.put)),
+			update_label: (old_label, new_label) =>
+				m_query
+					.get()
+					.pipe(
+						R.ops.map(metadata_collection =>
+							metadata_collection.map(metadata => {
+								if (!metadata.has_label(old_label)) return metadata
 
-		replace: value =>
-			m_query
-				.get()
-				.pipe(R.ops.chain(_replace_metadata_r(value)))
-				.pipe(R.ops.chain(m_repo.put)),
-	}),
+								const dto = metadata.to_dto() as any
+								const index = metadata.get_label_index(old_label)
+								dto.labels = dto.labels.toSpliced(index, 1, new_label)
+
+								return Metadata.FromDTO(dto)
+							}),
+						),
+					)
+					.pipe(R.ops.chain(m_repo.put)),
+
+			remove_labels: (fsid, ...labels) =>
+				_get_metadata_by_fsid_r(
+					"remove labels",
+					m_query,
+				)(fsid)
+					.pipe(R.ops.map(item => item.get_labels()))
+					// TODO Fix removing labels
+					.pipe(R.ops.map(lbls => lbls.filter(label => !labels.includes(label))))
+					.pipe(R.ops.chain(lbls => replace_labels(fsid, lbls))),
+
+			replace_labels,
+
+			add_links: (fsid, ...links) =>
+				_get_metadata_by_fsid_r(
+					"add links",
+					m_query,
+				)(fsid)
+					.pipe(R.ops.map(item => item.get_links()))
+					.pipe(R.ops.map(lnks => concat(lnks, links).sort(alpha_sort())))
+					.pipe(R.ops.chain(links => replace_links(fsid, links))),
+
+			remove_links: (fsid, ...links) =>
+				_get_metadata_by_fsid_r(
+					"remove links",
+					m_query,
+				)(fsid)
+					.pipe(R.ops.map(item => item.get_links()))
+					.pipe(R.ops.map(lnks => lnks.filter(link => !links.includes(link))))
+					.pipe(R.ops.chain(links => replace_links(fsid, links))),
+
+			replace_links,
+
+			append_child: (fsid, child) => set_parent(child, fsid),
+
+			set_property: (fsid, key, value) =>
+				_check_prop_key_r("set property", key)
+					.pipe(R.ops.map(() => fsid))
+					.pipe(R.ops.chain(_get_metadata_by_fsid_r("set property", m_query)))
+					.pipe(R.ops.map(_metadata_to_dto))
+					.pipe(R.ops.chain(_reset_updated_by_r(u_query)))
+					.pipe(R.ops.map(item => ({ ...item, props: { ...(item.props ?? {}), [key]: value } })))
+					.pipe(R.ops.map(_reset_updated_at))
+					.pipe(R.ops.map(_dto_to_metadata))
+					.pipe(R.ops.chain(replace)),
+
+			remove_property: (fsid, key) =>
+				_check_prop_key_r("remove property", key)
+					.pipe(R.ops.map(thunk(fsid)))
+					.pipe(R.ops.chain(_get_metadata_by_fsid_r("remove property", m_query)))
+					.pipe(R.ops.map(_metadata_to_dto))
+					.pipe(R.ops.chain(_reset_updated_by_r(u_query)))
+					.pipe(R.ops.map(item => ({ ...item, props: { ...(item.props ?? {}), [key]: undefined } })))
+					.pipe(R.ops.map(_reset_updated_at))
+					.pipe(R.ops.map(_dto_to_metadata))
+					.pipe(R.ops.chain(replace)),
+
+			create: ({ name, parent, size, type = "text/ordo", labels = [], links = [], props = {} }) =>
+				R.Merge([
+					_check_name_r("create", name),
+					_check_parent_r("create", parent),
+					_check_labels_r("create", labels),
+					_check_links_r("create", links),
+					_check_type_r("create", type),
+					_check_props_r("create", props),
+					_check_size_r("create", size ?? 0),
+					_check_not_exists_by_name_r("create", m_query, name, parent),
+				])
+					.pipe(R.ops.chain(u_query.get_current))
+					.pipe(R.ops.map(user => (user ? user.get_uid() : null)))
+					.pipe(R.ops.map(author_id => M.Of({ name, parent, author_id, type, labels, links, props, size: size ?? 0 })))
+					.pipe(R.ops.chain(item => m_query.get().pipe(R.ops.map(items => items.concat(item)))))
+					.pipe(R.ops.chain(m_repo.put)),
+
+			remove: fsid =>
+				_check_fsid_r("remove", fsid)
+					.pipe(R.ops.map(thunk(fsid)))
+					.pipe(R.ops.chain(_get_metadata_by_fsid_r("remove", m_query)))
+					.pipe(R.ops.map(thunk(void 0)))
+					.pipe(R.ops.chain(() => m_query.get_descendents(fsid, { show_hidden: true })))
+					.pipe(R.ops.chain(descendents => m_query.get({ show_hidden: true }).pipe(R.ops.map(all => ({ all, descendents })))))
+					.pipe(
+						R.ops.map(({ all, descendents }) =>
+							all.filter(item => item.get_fsid() !== fsid && !descendents.some(d => d.get_fsid() === item.get_fsid())),
+						),
+					)
+					.pipe(R.ops.chain(m_repo.put)),
+
+			replace,
+		}
+	},
 }
 
 export const MC = MetadataCommand
@@ -214,37 +224,37 @@ export const MC = MetadataCommand
 type TInputValidatorFn<$TInput> = (location: string, input: $TInput) => TResult<boolean, Ordo.Rrr<"EINVAL">>
 
 const _check_fsid_r: TInputValidatorFn<Ordo.Metadata.FSID> = (location, fsid) =>
-	R.If(M.Validations.is_fsid(fsid), { F: () => RRR.codes.einval(`${location} -> fsid: ${fsid}`) })
+	R.If(M.Validations.is_fsid(fsid), { F: () => RRR.codes.einval(`Invalid FSID: ${fsid}`) })
 
 const _check_size_r: TInputValidatorFn<number> = (location, size) =>
-	R.If(M.Validations.is_size(size), { F: () => RRR.codes.einval(`${location} -> size: ${size}`) })
+	R.If(M.Validations.is_size(size), { F: () => RRR.codes.einval(`Invalid size: ${size}`) })
 
 const _check_parent_r: TInputValidatorFn<Ordo.Metadata.FSID | null> = (location, parent) =>
-	R.If(M.Validations.is_parent(parent), { F: () => RRR.codes.einval(`${location} -> parent: ${parent}`) })
+	R.If(M.Validations.is_parent(parent), { F: () => RRR.codes.einval(`Invalid parent: ${parent}`) })
 
 const _check_labels_r: TInputValidatorFn<Ordo.Metadata.Label[]> = (location, labels) =>
 	R.If(M.Validations.are_labels(labels), {
-		F: () => RRR.codes.einval(`${location} -> label`, get_wrong_label(labels)),
+		F: () => RRR.codes.einval(`Invalid label: ${get_wrong_label(labels)?.name}`),
 	})
 
 const _check_name_r: TInputValidatorFn<string> = (location, name) =>
-	R.If(M.Validations.is_name(name), { F: () => RRR.codes.einval(`${location} -> name: ${name}`) })
+	R.If(M.Validations.is_name(name), { F: () => RRR.codes.einval(`Invalid name: ${name}`) })
 
 const _check_links_r: TInputValidatorFn<Ordo.Metadata.FSID[]> = (location, links) =>
 	R.If(M.Validations.are_links(links), {
-		F: () => RRR.codes.einval(`${location} -> link: ${get_wrong_link(links)}`),
+		F: () => RRR.codes.einval(`Invalid link: ${get_wrong_link(links)}`),
 	})
 
 const _check_type_r: TInputValidatorFn<any> = (location, type) =>
-	R.If(M.Validations.is_type(type), { F: () => RRR.codes.einval(`${location} -> type: ${type}`) })
+	R.If(M.Validations.is_type(type), { F: () => RRR.codes.einval(`Invalid type: ${type}`) })
 
 const _check_props_r: TInputValidatorFn<Ordo.Metadata.Props> = (location, props) =>
 	R.If(M.Validations.is_props(props), {
-		F: () => RRR.codes.einval(`${location} -> props: ${JSON.stringify(props)}`),
+		F: () => RRR.codes.einval(`Invalid props: ${JSON.stringify(props)}`),
 	})
 
 const _check_prop_key_r: TInputValidatorFn<string | number | symbol> = (location, key) =>
-	R.If(M.Validations.is_prop_key(key), { F: () => RRR.codes.einval(`${location} -> key: ${String(key)}`) })
+	R.If(M.Validations.is_prop_key(key), { F: () => RRR.codes.einval(`Invalid key: ${String(key)}`) })
 
 type TCheckExistsByNameAndParentRFn = (
 	location: string,
@@ -255,9 +265,7 @@ type TCheckExistsByNameAndParentRFn = (
 const _check_not_exists_by_name_r: TCheckExistsByNameAndParentRFn = (location, query, name, parent) =>
 	query
 		.get_by_name(name, parent)
-		.pipe(
-			R.ops.chain(option => (option ? R.Err(RRR.codes.eexist(`${location} -> ${parent}/${name} exists`)) : R.Ok(undefined))),
-		)
+		.pipe(R.ops.chain(option => (option ? R.Err(RRR.codes.eexist(`File ${name} already exists`)) : R.Ok(undefined))))
 
 type TGetMetadataByFSIDRFn = (
 	location: string,
@@ -265,8 +273,8 @@ type TGetMetadataByFSIDRFn = (
 ) => (fsid: Ordo.Metadata.FSID) => TResult<Ordo.Metadata.Instance, Ordo.Rrr<"EPERM" | "ENOENT" | "EAGAIN" | "EINVAL">>
 const _get_metadata_by_fsid_r: TGetMetadataByFSIDRFn = (location, query) => fsid =>
 	query
-		.get_by_fsid(fsid)
-		.pipe(R.ops.chain(item => (item ? R.Ok(item) : R.Err(RRR.codes.einval(`${location} -> fsid: ${fsid}`)))))
+		.get_by_fsid(fsid, { show_hidden: true })
+		.pipe(R.ops.chain(item => (item ? R.Ok(item) : R.Err(RRR.codes.enoent(`Not found: ${fsid}`)))))
 
 type TResetUpdatedByRFn = (
 	user_query: Ordo.User.Query,
@@ -274,7 +282,7 @@ type TResetUpdatedByRFn = (
 const _reset_updated_by_r: TResetUpdatedByRFn = query => metadata =>
 	query
 		.get_current()
-		.pipe(R.ops.map(user => user.get_id()))
+		.pipe(R.ops.map(user => (user ? user.get_uid() : null)))
 		.pipe(R.ops.map(updatedBy => ({ ...metadata, updatedBy })))
 
 type TMetadataDTOToTMetadataFn = (dto: Ordo.Metadata.DTO) => Ordo.Metadata.Instance
@@ -287,7 +295,7 @@ type TResetUpdatedAtFn = (metadata: Ordo.Metadata.DTO) => Ordo.Metadata.DTO
 const _reset_updated_at: TResetUpdatedAtFn = metadata => ({ ...metadata, updated_at: Date.now() })
 
 type TReplaceMetadataRFn = (
-	newValue: Ordo.Metadata.Instance,
+	new_value: Ordo.Metadata.Instance,
 ) => (items: Ordo.Metadata.Instance[]) => TResult<Ordo.Metadata.Instance[], Ordo.Rrr<"ENOENT">>
 const _replace_metadata_r: TReplaceMetadataRFn = x => xs =>
 	R.Ok(xs.findIndex(item => item.get_fsid() === x.get_fsid()))
@@ -295,7 +303,7 @@ const _replace_metadata_r: TReplaceMetadataRFn = x => xs =>
 			R.ops.chain(index =>
 				R.If(index >= 0, {
 					T: () => ({ items: xs, index: index }),
-					F: () => RRR.codes.enoent(`replace: ${x.get_fsid()} not found`),
+					F: () => RRR.codes.enoent(`Not found: ${x.get_fsid()}`),
 				}),
 			),
 		)

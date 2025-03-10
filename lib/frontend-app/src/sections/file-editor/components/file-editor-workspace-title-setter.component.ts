@@ -30,7 +30,7 @@ export const TitleSetter = (metadata: Ordo.Metadata.Instance | null) =>
 		const { emit } = use(MaokaOrdo.Jabs.get_commands)
 
 		return () =>
-			get_metadata_with_ancestors(metadata, metadata_query)
+			void get_metadata_with_ancestors(metadata, metadata_query)
 				.pipe(R.ops.map(({ metadata, ancestors }) => get_path(ancestors, metadata)))
 				.cata({
 					Ok: p => set_title(emit, p),

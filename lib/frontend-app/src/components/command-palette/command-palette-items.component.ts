@@ -22,10 +22,12 @@
 import { Hotkey } from "@ordo-pink/maoka-components"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { MaokaStyled } from "@ordo-pink/maoka-styled"
+// TODO Drop dependency on app state
+import { ordo_app_state } from "@ordo-pink/frontend-app/app.state"
 
 import { CommandPaletteLocation } from "./constants"
 import { OrdoCommandPaletteItem } from "./command-palette-item.component"
-import { ordo_app_state } from "@ordo-pink/frontend-app/app.state"
 
 // TODO A way to create an item that is a subset of found suggestion (e.g. "catalog" -> "cat")
 export const OrdoCommandPaletteItems = (
@@ -56,12 +58,12 @@ export const OrdoCommandPaletteItems = (
 			if ((!items || !items.length) && assigned_location === CommandPaletteLocation.SUGGESTED) {
 				if (has_new_item_handler)
 					// TODO Show item to be created
-					return CreateNewItemHint(() => [
+					return CreateNewItemHint(() => () => [
 						"press",
 						Hotkey("Enter", { smol: true, decoration_only: true, show_in_mobile: true }),
 						"to create",
 					])
-				else return CreateNewItemHint(() => ["Nothing found :("])
+				else return CreateNewItemHint(() => () => ["Nothing found :("])
 			}
 
 			return (
@@ -86,6 +88,4 @@ export const OrdoCommandPaletteItems = (
 		}
 	})
 
-const CreateNewItemHint = Maoka.styled("div", {
-	class: "command-palette_create-new-item-hint",
-})
+const CreateNewItemHint = MaokaStyled.Tags.div("command-palette_create-new-item-hint")

@@ -21,13 +21,15 @@
 
 import { BsCaretRight } from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/maoka"
+import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
-import { Result } from "@ordo-pink/result"
+import { MaokaStyled } from "@ordo-pink/maoka-styled"
+import { R } from "@ordo-pink/result"
 
 // TODO: Lead to user page
 // TODO: Get actual user (id: string) =>
-export const CurrentUserReference = Maoka.create("div", ({ use, refresh, onunmount }) => {
+export const CurrentUserReference = Maoka.create("div", ({ use, refresh }) => {
 	let name = ""
 
 	use(MaokaJabs.set_class("flex gap-x-2 items-center text-sm"))
@@ -37,21 +39,28 @@ export const CurrentUserReference = Maoka.create("div", ({ use, refresh, onunmou
 	const divorce_user_query_version = user_query.$.marry(() =>
 		user_query
 			.get_current()
-			.pipe(Result.ops.map(user => void (name = user.get_readable_name())))
-			.cata(Result.catas.if_ok(() => refresh())),
+			.pipe(R.ops.chain(R.FromNullable))
+			.pipe(R.ops.map(user => void (name = user.get_readable_name())))
+			.cata(R.catas.if_ok(refresh)),
 	)
 
-	onunmount(() => divorce_user_query_version())
+	use(MaokaDOM.Jabs.onunmount(() => divorce_user_query_version()))
 
 	return () => [UserAvatar, UserName(name)]
 })
+
+const StyledUserReference = MaokaStyled.Tags.div("flex gap-x-2 items-center text-sm")
+export const UserReference = (user: Ordo.User.Public.Instance | null) =>
+	user
+		? StyledUserReference(() => () => [UserAvatar, UserName(user.get_readable_name())])
+		: StyledUserReference(() => () => [UserAvatar, UserName("John Doe")])
 
 const user_avatar_class = [
 	"flex shrink-0 cursor-pointer items-center justify-center rounded-full p-0.5 shadow-lg",
 	"bg-gradient-to-tr from-sky-400 via-purple-400 to-rose-400",
 ]
 
-const UserAvatar = Maoka.create("div", ({ use }) => {
+export const UserAvatar = Maoka.create("div", ({ use }) => {
 	use(MaokaJabs.set_class(...user_avatar_class))
 
 	return () =>
@@ -79,4 +88,4 @@ export const UserName = (name: string) =>
 // --- Internal ---
 
 const highlight_first_letter_class =
-	"first-letter:bg-gradient-to-tr first-letter:from-pink-500 first-letter:to-purple-500 first-letter:bg-clip-text first-letter:text-transparent"
+	"first-letter:bg-gradient-to-tr first-letter:from-pink-500 first-letter:to-purple-500 first-letter:bg-clip-text first-letter:text-transparent text-nowrap"

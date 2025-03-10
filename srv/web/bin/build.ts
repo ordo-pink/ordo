@@ -24,8 +24,8 @@ import { die, run_command } from "@ordo-pink/binutil"
 
 const main = () =>
 	run_command(clean_up_cmd, { stdout: "inherit", stderr: "inherit" })
-		.and(bundle_client_code)
-		.and(setup_netlify_redirects)
+		.pipe(bundle_client_code)
+		.pipe(setup_netlify_redirects)
 		.invoke(invokers0.or_else(die()))
 
 // --- Internal ---

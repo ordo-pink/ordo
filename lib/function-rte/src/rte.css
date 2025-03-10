@@ -1,0 +1,7 @@
+.rte_quick-menu {
+	@apply absolute hidden w-full max-w-md flex-col space-y-2 rounded-md bg-neutral-300 p-1 shadow-lg dark:bg-neutral-700;
+}
+
+.rte_quick-menu.active {
+	@apply flex;
+}

@@ -21,12 +21,13 @@
 
 import { ContextMenuItemType, Metadata } from "@ordo-pink/core"
 import { BsFileEarmarkMinus } from "@ordo-pink/frontend-icons"
+import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { type TMaokaJab } from "@ordo-pink/maoka"
 
 import { RemoveFileModal } from "../../components/remove-file-modal.component"
 
-export const remove_file_command: TMaokaJab = ({ onunmount, use }) => {
+export const remove_file_command: TMaokaJab = ({ use }) => {
 	const state = use(MaokaOrdo.Context.consume)
 
 	const handle_show_remove_modal: Ordo.Command.HandlerOf<"cmd.metadata.show_remove_modal"> = fsid => {
@@ -48,8 +49,10 @@ export const remove_file_command: TMaokaJab = ({ onunmount, use }) => {
 
 	// TODO Command palette item if there is currently selected metadata
 
-	onunmount(() => {
-		state.commands.off("cmd.metadata.show_remove_modal", handle_show_remove_modal)
-		state.commands.emit("cmd.application.context_menu.remove", "cmd.metadata.show_remove_modal")
-	})
+	use(
+		MaokaDOM.Jabs.onunmount(() => {
+			state.commands.off("cmd.metadata.show_remove_modal", handle_show_remove_modal)
+			state.commands.emit("cmd.application.context_menu.remove", "cmd.metadata.show_remove_modal")
+		}),
+	)
 }

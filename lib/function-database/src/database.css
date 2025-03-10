@@ -2,10 +2,6 @@
 	@apply p-4;
 }
 
-.pointable {
-	@apply cursor-pointer;
-}
-
 .database_border-color {
 	@apply border-neutral-300 dark:border-neutral-700;
 }
@@ -18,16 +14,16 @@
 	@apply database_border-color border p-1;
 }
 
-.database_cell-links.clickable {
+.clickable {
 	@apply cursor-pointer transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-700;
 }
 
 .database_cell-multiple {
-	@apply database_border-color flex w-fit text-sm;
+	@apply database_border-color flex w-fit flex-wrap gap-1 text-sm;
 }
 
 .database_cell-labels {
-	@apply database_border-color flex size-full cursor-pointer flex-wrap items-start gap-1 p-1;
+	@apply database_border-color flex size-full flex-wrap items-center p-1;
 }
 
 .database_cell-date {

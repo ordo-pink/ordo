@@ -21,6 +21,7 @@
 
 import { BsMenuButtonWideFill } from "@ordo-pink/frontend-icons"
 import { CommandPaletteItemType } from "@ordo-pink/core"
+import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { type TMaokaJab } from "@ordo-pink/maoka"
 import { create_hotkey_from_event } from "@ordo-pink/hotkey-from-event"
@@ -29,54 +30,56 @@ import { ordo_app_state } from "@ordo-pink/frontend-app/app.state"
 import { CommandPaletteLocation, EMPTY_COMMAND_PALETTE } from "../components/command-palette/constants"
 import { OrdoCommandPalette } from "../components/command-palette/command-palette.component"
 
-export const create_command_palette: TMaokaJab = ({ onmount: on_mount, onunmount, use }) => {
+export const create_command_palette: TMaokaJab = ({ use }) => {
 	const commands = use(MaokaOrdo.Jabs.get_commands)
 
-	const handle_keydown = (event: KeyboardEvent) => {
-		if (IGNORED_KEYS.includes(event.key)) return
+	commands.on("cmd.application.command_palette.show", handle_show)
+	commands.on("cmd.application.command_palette.hide", handle_hide)
+	commands.on("cmd.application.command_palette.add", handle_add)
+	commands.on("cmd.application.command_palette.remove", handle_remove)
+	commands.on("cmd.application.command_palette.toggle", handle_toggle)
 
-		const hotkey = create_hotkey_from_event(event, false)
-		const current = ordo_app_state.zags.select("sections.command_palette.global_items")
-
-		const command = current.find(item => item.hotkey && item.hotkey === hotkey)
-
-		if (command) {
-			event.preventDefault()
-			event.stopPropagation()
-
-			command.value()
-		}
-	}
-
-	on_mount(() => {
-		document.addEventListener("keydown", handle_keydown)
-
-		commands.on("cmd.application.command_palette.show", handle_show)
-		commands.on("cmd.application.command_palette.hide", handle_hide)
-		commands.on("cmd.application.command_palette.add", handle_add)
-		commands.on("cmd.application.command_palette.remove", handle_remove)
-		commands.on("cmd.application.command_palette.toggle", handle_toggle)
-
-		commands.emit("cmd.application.command_palette.add", {
-			value: () => commands.emit("cmd.application.command_palette.toggle"),
-			readable_name: "t.common.components.command_palette.reset",
-			type: CommandPaletteItemType.COMMON_ACTION,
-			hotkey: "mod+shift+p",
-			render_icon: BsMenuButtonWideFill,
-		})
+	commands.emit("cmd.application.command_palette.add", {
+		value: () => commands.emit("cmd.application.command_palette.toggle"),
+		readable_name: "t.common.components.command_palette.reset",
+		type: CommandPaletteItemType.COMMON_ACTION,
+		hotkey: "mod+shift+p",
+		render_icon: BsMenuButtonWideFill,
 	})
 
-	onunmount(() => {
-		document.removeEventListener("keydown", handle_keydown)
+	use(
+		MaokaDOM.Jabs.onmount(() => {
+			const handle_keydown = (event: KeyboardEvent) => {
+				if (IGNORED_KEYS.includes(event.key)) return
 
-		commands.off("cmd.application.command_palette.show", handle_show)
-		commands.off("cmd.application.command_palette.hide", handle_hide)
-		commands.off("cmd.application.command_palette.add", handle_add)
-		commands.off("cmd.application.command_palette.remove", handle_remove)
-		commands.off("cmd.application.command_palette.toggle", handle_toggle)
+				const hotkey = create_hotkey_from_event(event, false)
+				const current = ordo_app_state.zags.select("sections.command_palette.global_items")
 
-		commands.emit("cmd.application.command_palette.remove", "t.common.components.command_palette.reset")
-	})
+				const command = current.find(item => item.hotkey && item.hotkey === hotkey)
+
+				if (command) {
+					event.preventDefault()
+					event.stopPropagation()
+
+					command.value()
+				}
+			}
+
+			document.addEventListener("keydown", handle_keydown)
+
+			return () => {
+				document.removeEventListener("keydown", handle_keydown)
+
+				commands.off("cmd.application.command_palette.show", handle_show)
+				commands.off("cmd.application.command_palette.hide", handle_hide)
+				commands.off("cmd.application.command_palette.add", handle_add)
+				commands.off("cmd.application.command_palette.remove", handle_remove)
+				commands.off("cmd.application.command_palette.toggle", handle_toggle)
+
+				commands.emit("cmd.application.command_palette.remove", "t.common.components.command_palette.reset")
+			}
+		}),
+	)
 }
 
 // --- Internal ---

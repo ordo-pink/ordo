@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { CurrentUser, Metadata, RRR } from "@ordo-pink/core"
+import { CurrentUser, METADATA_CONTENT_FSID, Metadata, RRR } from "@ordo-pink/core"
 import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
 import { Routary, TIntake } from "@ordo-pink/routary"
 import { create_json_response, create_response, status_from_rrr } from "@ordo-pink/backend-util-create-response"
@@ -15,51 +15,57 @@ import { set_content_type_application_json_header } from "@ordo-pink/backend-uti
 
 import { type TPBChamber, type TPBContext } from "./backend-pb.types"
 
-// TODO Extract colonoscope from Routary
-// TODO WebSocket for dt-dt and dt-web notifications
 export const create_backend_pb = (chamber: TPBChamber) =>
 	Routary.Of<TPBContext>({ ...chamber, headers: new Headers(), request_ip: null, status: 200 })
-		.head("/:uid/:fsid", intake => {
-			const context = { ...intake, status: 204, request_ip: null, headers: intake.headers ?? new Headers() }
-
-			return Oath.Resolve(context)
-				.pipe(ops0.tap(start_response_timer))
-				.pipe(ops0.tap(extract_request_ip))
-				.pipe(ops0.chain(validate_request_params))
-				.pipe(ops0.map(extract_ids(context)))
-				.pipe(ops0.chain(check_file_exists(context)))
-				.pipe(ops0.chain(set_last_modified_header(context)))
-				.pipe(ops0.map(() => context))
-				.pipe(ops0.rejected_map(rrr => ({ rrr, intake: context })))
-				.fix(status_from_rrr)
-				.pipe(ops0.tap(stop_response_timer))
-				.pipe(ops0.tap(set_x_response_time_header))
-				.pipe(ops0.tap(log_request))
-				.pipe(ops0.map(create_response))
-				.invoke(invokers0.force_resolve)
-		})
-
-		.get("/:uid/:fsid", intake => {
+		.get("/:handle/:fsid", intake => {
 			const context = { ...intake, status: 200, request_ip: null, headers: intake.headers ?? new Headers() }
 
-			return Oath.Resolve(context)
-				.pipe(ops0.tap(start_response_timer))
-				.pipe(ops0.tap(extract_request_ip))
-				.pipe(ops0.chain(validate_request_params))
-				.pipe(ops0.map(extract_ids(context)))
-				.pipe(ops0.chain(check_file_exists(context)))
-				.pipe(ops0.chain(set_last_modified_header(context)))
-				.pipe(ops0.chain(({ uid, fsid }) => context.data_persistence_strategy.read(uid, fsid)))
-				.pipe(ops0.tap(file => void (context.payload = file)))
-				.pipe(ops0.map(() => context))
-				.pipe(ops0.tap(context => context.headers.set("Content-Type", "application/octet-stream")))
-				.pipe(ops0.rejected_map(rrr => ({ rrr, intake: context })))
-				.fix(status_from_rrr)
-				.pipe(ops0.tap(stop_response_timer))
-				.pipe(ops0.tap(set_x_response_time_header))
-				.pipe(ops0.tap(log_request))
-				.pipe(ops0.map(create_response))
-				.invoke(invokers0.force_resolve)
+			return (
+				Oath.Resolve(context)
+					.pipe(ops0.tap(start_response_timer))
+					.pipe(ops0.tap(extract_request_ip))
+					.pipe(ops0.chain(validate_request_params))
+					.pipe(ops0.map(extract_ids(context)))
+					.pipe(
+						ops0.chain(({ handle, fsid }) =>
+							Oath.FromPromise(() => fetch(`${intake.id_host}/users/handle/${handle}`))
+								.and(res => res.json())
+								.and(res => Oath.If(res.success, { T: () => res.payload as Ordo.User.Public.DTO }))
+								.and(user => ({ uid: user.id, fsid }))
+								.pipe(ops0.rejected_map(() => RRR.codes.enoent("User not found"))),
+						),
+					)
+					.pipe(ops0.chain(check_file_exists(context)))
+					.pipe(
+						ops0.chain(({ uid, fsid }) =>
+							intake.data_persistence_strategy
+								.read(uid, METADATA_CONTENT_FSID)
+								.pipe(ops0.chain(stream => Oath.FromPromise(() => new Response(stream).json() as Promise<Ordo.Metadata.DTO[]>)))
+								.pipe(ops0.chain(metadata => Oath.FromNullable(metadata.find(item => item.fsid === fsid))))
+								.pipe(ops0.rejected_map(() => RRR.codes.enoent("User metadata not found")))
+								.pipe(
+									ops0.chain(m =>
+										Oath.If(m.props && m.props.public_id, { T: () => m })
+											.pipe(ops0.tap(m => intake.headers.set("Last-Modified", new Date(m.updated_at).toUTCString())))
+											.pipe(ops0.tap(() => intake.headers.set("Content-Type", "text/html")))
+											.pipe(ops0.map(m => ({ uid, fsid: m.props!.public_id })))
+											.pipe(ops0.rejected_map(() => RRR.codes.enoent("File not found"))),
+									),
+								),
+						),
+					)
+					// TODO Check file is public
+					.pipe(ops0.chain(({ uid, fsid }) => context.data_persistence_strategy.read(uid, fsid)))
+					.pipe(ops0.tap(file => void (context.payload = file)))
+					.pipe(ops0.map(() => context))
+					.pipe(ops0.rejected_map(rrr => ({ rrr, intake: context })))
+					.fix(status_from_rrr)
+					.pipe(ops0.tap(stop_response_timer))
+					.pipe(ops0.tap(set_x_response_time_header))
+					.pipe(ops0.tap(log_request))
+					.pipe(ops0.map(create_response))
+					.invoke(invokers0.force_resolve)
+			)
 		})
 
 		.get("/healthcheck", () => new Response("OK"))
@@ -82,7 +88,9 @@ export const create_backend_pb = (chamber: TPBChamber) =>
 const validate_request_params = (intake: TIntake<TPBContext>) =>
 	Oath.Merge([
 		Oath.If(Metadata.Validations.is_fsid(intake.params.fsid)).pipe(ops0.rejected_map(() => RRR.codes.einval("Invalid FSID"))),
-		Oath.If(CurrentUser.Validations.is_id(intake.params.uid)).pipe(ops0.rejected_map(() => RRR.codes.einval("Invalid UID"))),
+		Oath.If(CurrentUser.Validations.is_handle(intake.params.handle)).pipe(
+			ops0.rejected_map(() => RRR.codes.einval("Invalid handle")),
+		),
 	]).pipe(ops0.map(() => intake))
 
 const check_file_exists =
@@ -96,16 +104,6 @@ const check_file_exists =
 
 type TIDs = { uid: Ordo.User.UID; fsid: Ordo.Metadata.FSID }
 const extract_ids = (intake: TIntake<TPBContext>) => () => ({
-	uid: intake.params.uid as Ordo.User.UID,
+	handle: intake.params.handle as Ordo.User.Handle,
 	fsid: intake.params.fsid as Ordo.Metadata.FSID,
 })
-
-const set_last_modified_header =
-	(intake: TIntake<TPBContext>) =>
-	({ uid, fsid }: TIDs) =>
-		intake.data_persistence_strategy
-			.mtime(uid, fsid)
-			.pipe(ops0.map(mtime => new Date(mtime)))
-			.pipe(ops0.map(date => date.toUTCString()))
-			.pipe(ops0.tap(last_modified => intake.headers.set("Last-Modified", last_modified)))
-			.pipe(ops0.map(() => ({ uid, fsid })))

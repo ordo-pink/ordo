@@ -24,23 +24,24 @@ import { METADATA_CONTENT_FSID } from "@ordo-pink/core"
 import { T } from "@ordo-pink/tau"
 import { ZAGS } from "@ordo-pink/zags"
 
-// TODO Sync storages
+// TODO !!! Sync storages
 export const ContentRepository: Ordo.Content.RepositoryStatic = {
 	Of: (auth$, local_strategy, remote_strategy) => {
 		const $ = ZAGS.Of({ version: 0 })
 
-		const divorce = auth$.marry(({ user, token }) => {
-			if (!token || !user) return
+		const divorce = auth$.marry(({ user }) => {
+			// Quit from syncing with remote since the user is not authenticated
+			if (!user) return
 
 			// Check if remote state and current state are equal
 			void Oath.Merge({
 				remote: remote_strategy
-					.get(user.get_id(), METADATA_CONTENT_FSID)
+					.get(user.get_uid(), METADATA_CONTENT_FSID)
 					.and(Oath.FromNullable)
 					.and(stream => new Response(stream as ReadableStream).json() as Promise<Ordo.Metadata.DTO[]>)
 					.fix(() => []),
 				local: local_strategy
-					.get(user.get_id(), METADATA_CONTENT_FSID)
+					.get(user.get_uid(), METADATA_CONTENT_FSID)
 					.and(Oath.FromNullable)
 					.and(content => Oath.Try(() => JSON.parse(content as string) as Ordo.Metadata.DTO[]))
 					.fix(() => []),
@@ -100,10 +101,11 @@ export const ContentRepository: Ordo.Content.RepositoryStatic = {
 				}))
 				.and(({ local, remote }) =>
 					Oath.Merge({
-						local: local && local_strategy.put(user.get_id(), METADATA_CONTENT_FSID, JSON.stringify(local)).and(T),
-						remote: remote && remote_strategy.put(user.get_id(), METADATA_CONTENT_FSID, JSON.stringify(remote)).and(T),
+						local: local && local_strategy.put(user.get_uid(), METADATA_CONTENT_FSID, JSON.stringify(local)).and(T),
+						remote: remote && remote_strategy.put(user.get_uid(), METADATA_CONTENT_FSID, JSON.stringify(remote)).and(T),
 					}),
 				)
+				// Force update of the components due to the changes in the local repo
 				.and(({ local }) =>
 					Oath.If(local)
 						.pipe(ops0.tap(() => $.update("version", v => v + 1)))
@@ -116,68 +118,17 @@ export const ContentRepository: Ordo.Content.RepositoryStatic = {
 		})
 
 		return {
-			get: (uid, fsid) => local_strategy.get(uid, fsid).fix(() => null),
+			get: (uid, fsid) => local_strategy.get(uid as Ordo.User.UID, fsid).fix(() => null),
 			get_all: () => local_strategy.list(),
-			put: (uid, fsid, content) => local_strategy.put(uid, fsid, content).and(() => remote_strategy.put(uid, fsid, content)),
+			put: (uid, fsid, content) =>
+				local_strategy
+					.put(uid as Ordo.User.UID, fsid, content)
+					.and(() => (uid ? remote_strategy.put(uid, fsid, content) : void 0)),
+			remove: (uid, fsid) =>
+				local_strategy.delete(uid as Ordo.User.UID, fsid).and(() => (uid ? remote_strategy.delete(uid, fsid) : void 0)),
 			get $() {
 				return $
 			},
 		}
 	},
 }
-
-/*
-.and(() => {
-	const last_local = metadata_repository
-		.get()
-		.pipe(
-			Result.ops.map(items =>
-				items.reduce(
-					(acc, v) => (acc ? (v.get_updated_at() > acc ? v.get_updated_at() : acc) : v.get_updated_at()),
-					null as Date | null,
-				),
-			),
-		)
-		.pipe(Result.ops.chain(Result.FromNullable))
-		.cata(Result.catas.or_else(() => new Date(1970, 1, 2)))
-
-	const fetch = ordo_app_state.zags.select("fetch")
-	const token = ordo_app_state.zags.select("auth.token")
-	const user = ordo_app_state.zags.select("auth.user")
-
-	if (!user || !token) return
-
-	void Oath.Try(() =>
-		fetch(`${dt_host}/${user.get_id()}/${METADATA_CONTENT_FSID}`, {
-			headers: { Authorization: `Bearer ${token}` },
-			method: "HEAD",
-		}),
-	)
-		.and(res => Oath.FromNullable(res.headers.get("last-modified")))
-		.and(str => new Date(str))
-		.and(Oath.FromNullable)
-		.and(date => Oath.If(is_date(date)))
-		.fix(() => new Date(1970, 1, 1))
-		.and(last_remote => {
-			if (last_remote! < last_local) {
-				// TODO Put all content
-				return content_repository.get_all().and(items =>
-					Oath.Merge(
-						keys_of(items).map(key =>
-							Oath.Try(() =>
-								fetch(`${dt_host}/${user.get_id()}/${key}`, {
-									method: "PUT",
-									headers: { Authorization: `Bearer ${token}` },
-									body: items[key],
-								}),
-							),
-						),
-					),
-				)
-			} else if (last_remote! > last_local) {
-				// TODO Pull all content
-			}
-		})
-		.invoke(invokers0.force_resolve)
-})
-*/

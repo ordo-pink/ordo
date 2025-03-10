@@ -19,10 +19,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Label, Link, MetadataIcon, MetadataLink } from "@ordo-pink/maoka-components"
+import { Label, Link, MetadataIcon, MetadataLink, UserReference } from "@ordo-pink/maoka-components"
 import { Maoka, type TMaokaChildren } from "@ordo-pink/maoka"
+import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
+import { MaokaStyled } from "@ordo-pink/maoka-styled"
+import { Oath } from "@ordo-pink/oath"
 import { R } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
 import { noop } from "@ordo-pink/tau"
@@ -40,11 +43,27 @@ export const DatabaseTableRow = (columns: Ordo.I18N.TranslationKey[], child: Ord
 					.case("t.database.column_names.parent", () => LinksCell(child, "parent"))
 					.case("t.database.column_names.outgoing_links", () => LinksCell(child, "outgoing"))
 					.case("t.database.column_names.incoming_links", () => LinksCell(child, "incoming"))
+					.case("t.database.column_names.created_by", () => UserCell(child))
 					.default(() => Cell("TODO")),
 			)
 	})
 
 // --- Internal ---
+
+const UserCellWrapper = MaokaStyled.Tags.td("database_cell")
+const UserCell = (metadata: Ordo.Metadata.Instance) =>
+	UserCellWrapper(({ use }) => {
+		const user_query = use(MaokaOrdo.Jabs.get_user_query)
+
+		use(MaokaOrdo.Jabs.happy_marriage$(user_query.$))
+
+		return () =>
+			Oath.FromNullable(metadata.get_created_by())
+				.and(id => user_query.get_by_id(id))
+				.and(Oath.FromNullable)
+				.and(user => UserReference(user))
+				.fork(noop, x => x)
+	})
 
 const Cell = (value: TMaokaChildren, on_click?: (event: MouseEvent) => void) =>
 	Maoka.create("td", ({ use }) => {
@@ -64,7 +83,7 @@ const LinksCell = (metadata: Ordo.Metadata.Instance, type: "parent" | "incoming"
 			const commands = use(MaokaOrdo.Jabs.get_commands)
 			const handle_click = () => commands.emit("cmd.metadata.show_edit_links_palette", fsid)
 
-			use(MaokaJabs.add_class("clickable"))
+			if (use(MaokaDOM.Jabs.is_dom)) use(MaokaJabs.add_class("clickable"))
 			use(MaokaJabs.listen("onclick", () => handle_click()))
 		}
 
@@ -88,7 +107,7 @@ const LinksCell = (metadata: Ordo.Metadata.Instance, type: "parent" | "incoming"
 						use(MaokaJabs.set_class("database_cell-multiple"))
 						const get_links = use(MaokaOrdo.Jabs.Metadata.get_outgoing_links$(fsid))
 						return () =>
-							get_links().map(link => LinkBlock(() => MetadataLink({ metadata: link, children: link.get_name() ?? "/" })))
+							get_links().map(link => LinkBlock(() => () => MetadataLink({ metadata: link, children: link.get_name() ?? "/" })))
 					}),
 				)
 				.case("incoming", () =>
@@ -96,18 +115,19 @@ const LinksCell = (metadata: Ordo.Metadata.Instance, type: "parent" | "incoming"
 						use(MaokaJabs.set_class("database_cell-multiple"))
 						const get_links = use(MaokaOrdo.Jabs.Metadata.get_incoming_links$(metadata.get_fsid()))
 						return () =>
-							get_links().map(link => LinkBlock(() => MetadataLink({ metadata: link, children: link.get_name() ?? "/" })))
+							get_links().map(link => LinkBlock(() => () => MetadataLink({ metadata: link, children: link.get_name() ?? "/" })))
 					}),
 				)
 				.default(noop)
 	})
 
-const LinkBlock = Maoka.styled("span")
+const LinkBlock = MaokaStyled.Tags.span()
 
 const LabelsCell = (fsid: Ordo.Metadata.FSID) =>
 	Maoka.create("td", ({ use }) => {
-		use(MaokaJabs.set_class("database_cell-labels"))
+		use(MaokaJabs.set_class("database_cell-multiple database_cell-labels"))
 		use(MaokaJabs.listen("onclick", () => handle_click()))
+		if (use(MaokaDOM.Jabs.is_dom)) use(MaokaJabs.add_class("clickable"))
 
 		const commands = use(MaokaOrdo.Jabs.get_commands)
 		const get_metadata = use(MaokaOrdo.Jabs.Metadata.get_by_fsid$(fsid))
@@ -126,7 +146,7 @@ const DateCell = (date: Date) =>
 		use(MaokaJabs.set_class("database_cell-date"))
 		use(MaokaJabs.set_attribute("title", date.toLocaleString()))
 
-		return () => date.toDateString()
+		return () => date.toLocaleDateString()
 	})
 
 const FileNameCell = (metadata: Ordo.Metadata.Instance, is_editable: boolean) =>

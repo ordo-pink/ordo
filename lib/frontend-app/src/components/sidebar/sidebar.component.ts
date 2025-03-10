@@ -20,8 +20,9 @@
  */
 
 import { BsArrowLeft, BsLayoutSidebarInsetReverse } from "@ordo-pink/frontend-icons"
-import { CommandPaletteItemType } from "@ordo-pink/core"
+import { CommandPaletteItemType, ContextMenuItemType } from "@ordo-pink/core"
 import { Maoka } from "@ordo-pink/maoka"
+import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { Switch } from "@ordo-pink/switch"
@@ -31,24 +32,28 @@ import { ordo_app_state } from "../../../app.state"
 import { sidebar$ } from "./sidebar.state"
 
 // TODO Automatically close sidebar in mobile if something was clicked
-export const OrdoSidebar = Maoka.create("aside", ({ use, onunmount }) => {
+export const OrdoSidebar = Maoka.create("aside", ({ use, element }) => {
 	const commands = ordo_app_state.zags.select("commands")
 	const get_sidebar = use(MaokaOrdo.Jabs.happy_marriage$(sidebar$))
 	const is_mobile = use(MaokaJabs.is_mobile)
 
-	commands.on("cmd.application.sidebar.disable", handle_disable_sidebar)
-	commands.on("cmd.application.sidebar.enable", handle_enable_sidebar)
-	commands.on("cmd.application.sidebar.hide", handle_hide_sidebar)
-	commands.on("cmd.application.sidebar.show", handle_show_sidebar)
-	commands.on("cmd.application.sidebar.toggle", handle_toggle_sidebar)
+	use(
+		MaokaDOM.Jabs.onmount(() => {
+			commands.on("cmd.application.sidebar.disable", handle_disable_sidebar)
+			commands.on("cmd.application.sidebar.enable", handle_enable_sidebar)
+			commands.on("cmd.application.sidebar.hide", handle_hide_sidebar)
+			commands.on("cmd.application.sidebar.show", handle_show_sidebar)
+			commands.on("cmd.application.sidebar.toggle", handle_toggle_sidebar)
 
-	onunmount(() => {
-		commands.off("cmd.application.sidebar.disable", handle_disable_sidebar)
-		commands.off("cmd.application.sidebar.enable", handle_enable_sidebar)
-		commands.off("cmd.application.sidebar.hide", handle_hide_sidebar)
-		commands.off("cmd.application.sidebar.show", handle_show_sidebar)
-		commands.off("cmd.application.sidebar.toggle", handle_toggle_sidebar)
-	})
+			return () => {
+				commands.off("cmd.application.sidebar.disable", handle_disable_sidebar)
+				commands.off("cmd.application.sidebar.enable", handle_enable_sidebar)
+				commands.off("cmd.application.sidebar.hide", handle_hide_sidebar)
+				commands.off("cmd.application.sidebar.show", handle_show_sidebar)
+				commands.off("cmd.application.sidebar.toggle", handle_toggle_sidebar)
+			}
+		}),
+	)
 
 	use(MaokaJabs.listen("onclick", () => handle_click()))
 
@@ -58,6 +63,8 @@ export const OrdoSidebar = Maoka.create("aside", ({ use, onunmount }) => {
 
 	return () => {
 		const { visible, enabled } = get_sidebar()
+
+		if ((!visible || !enabled) && MaokaDOM.is_maoka_dom_element(element) && element.parentElement) element.innerHTML = ""
 
 		return Switch.OfTrue()
 			.case(visible && enabled, () => SidebarRenderer)
@@ -85,12 +92,21 @@ export const OrdoSidebarButton = Maoka.create("button", ({ use }) => {
 		if (enabled) {
 			use(MaokaJabs.add_class("activity-bar_link", "activity-bar_icon"))
 			use(MaokaJabs.remove_class("size-6", "invisible"))
+
 			commands.emit("cmd.application.command_palette.add", {
 				value: () => commands.emit("cmd.application.sidebar.toggle"),
 				hotkey: "mod+b",
 				type: CommandPaletteItemType.COMMON_ACTION,
 				readable_name,
 				render_icon: BsLayoutSidebarInsetReverse,
+			})
+
+			commands.emit("cmd.application.context_menu.add", {
+				command: "cmd.application.sidebar.hide",
+				readable_name: "t.common.components.sidebar.hide",
+				type: ContextMenuItemType.UPDATE,
+				should_show: ({ event }) => MaokaDOM.is_maoka_dom_element(event.target) && !!event.target.closest(".sidebar"),
+				render_icon: () => BsArrowLeft("rotate-180"),
 			})
 		} else {
 			use(MaokaJabs.remove_class("activity-bar_link", "activity-bar_icon"))
@@ -112,7 +128,7 @@ export const OrdoSidebarButton = Maoka.create("button", ({ use }) => {
 
 // --- Internal ---
 
-const SidebarRenderer = Maoka.create("div", ({ use, element }) => {
+const SidebarRenderer = Maoka.create("div", ({ use }) => {
 	use(MaokaJabs.set_class("sidebar"))
 
 	const get_current_activity = use(ordo_app_state.select_jab$("functions.current_activity"))
@@ -123,9 +139,7 @@ const SidebarRenderer = Maoka.create("div", ({ use, element }) => {
 		const activities = get_activities()
 		const current_activity = activities.find(activity => activity.name === current_activity_name)
 
-		if (current_activity && current_activity.render_sidebar)
-			return current_activity.render_sidebar() // TODO 404
-		else element.innerHTML = ""
+		if (current_activity && current_activity.render_sidebar) return current_activity.render_sidebar() // TODO 404
 	}
 })
 
@@ -133,4 +147,4 @@ const handle_disable_sidebar = () => sidebar$.update("enabled", () => false)
 const handle_enable_sidebar = () => sidebar$.update("enabled", () => true)
 const handle_hide_sidebar = () => sidebar$.update("visible", () => false)
 const handle_show_sidebar = () => sidebar$.update("visible", () => true)
-const handle_toggle_sidebar = () => sidebar$.select("enabled") && sidebar$.update("visible", prev => !prev)
+const handle_toggle_sidebar = () => void (sidebar$.select("enabled") && sidebar$.update("visible", prev => !prev))

@@ -20,15 +20,17 @@
  */
 
 import { ContextMenuItemType, LabelColor, Metadata } from "@ordo-pink/core"
-import { Maoka, type TMaokaJab } from "@ordo-pink/maoka"
 import { BsTags } from "@ordo-pink/frontend-icons"
+import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
+import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { R } from "@ordo-pink/result"
+import { type TMaokaJab } from "@ordo-pink/maoka"
 import { color_class } from "@ordo-pink/maoka-components"
 
 import { EditLabelModal } from "../../components/edit-label-modal.component"
 
-export const edit_file_labels_command: TMaokaJab = ({ onunmount, use }) => {
+export const edit_file_labels_command: TMaokaJab = ({ use }) => {
 	const state = use(MaokaOrdo.Context.consume)
 
 	const handle_show_edit_label_modal: Ordo.Command.HandlerOf<"cmd.metadata.show_edit_label_modal"> = label => {
@@ -94,12 +96,13 @@ export const edit_file_labels_command: TMaokaJab = ({ onunmount, use }) => {
 		type: ContextMenuItemType.UPDATE,
 	})
 
-	onunmount(() => {
-		state.commands.off("cmd.metadata.show_edit_label_modal", handle_show_edit_label_modal)
-		state.commands.off("cmd.metadata.show_edit_labels_palette", handle_show_edit_labels_palette)
-		state.commands.emit("cmd.application.context_menu.remove", "cmd.metadata.show_edit_labels_palette")
-	})
+	use(
+		MaokaDOM.Jabs.onunmount(() => {
+			state.commands.off("cmd.metadata.show_edit_label_modal", handle_show_edit_label_modal)
+			state.commands.off("cmd.metadata.show_edit_labels_palette", handle_show_edit_labels_palette)
+			state.commands.emit("cmd.application.context_menu.remove", "cmd.metadata.show_edit_labels_palette")
+		}),
+	)
 }
 
-const LabelCircle = (color: LabelColor) =>
-	Maoka.styled("div", { class: `label ${color_class[color]} size-3 !rounded-full` })(() => {})
+const LabelCircle = (color: LabelColor) => MaokaStyled.Tags.div(`label ${color_class[color]} size-3 !rounded-full`)(() => {})

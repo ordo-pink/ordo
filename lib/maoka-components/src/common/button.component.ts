@@ -20,7 +20,9 @@
  */
 
 import { Maoka } from "@ordo-pink/maoka"
+import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { MaokaStyled } from "@ordo-pink/maoka-styled"
 
 import { Hotkey, THotkeyOptions } from "./hotkey.component"
 
@@ -51,24 +53,23 @@ const Default = ({
 		use(MaokaJabs.listen("onclick", event => handle_click(event)))
 
 		const handle_click = (event: MouseEvent) => {
+			event.preventDefault()
 			if (element instanceof HTMLButtonElement) element.focus()
 			return on_click(event)
 		}
 
 		return () => {
 			if (disabled()) use(MaokaJabs.set_attribute("disabled"))
-			else element?.removeAttribute?.("disabled") // TODO: Add jab
+			else if (MaokaDOM.is_maoka_dom_element(element)) element.removeAttribute("disabled") // TODO: Add jab
 
-			return [TextContainer(() => text), hotkey ? Hotkey(hotkey, hotkey_options) : void 0]
+			return [TextContainer(() => () => text), hotkey ? Hotkey(hotkey, hotkey_options) : void 0]
 		}
 	})
 
-const TextContainer = Maoka.styled("div")
+const TextContainer = MaokaStyled.Tags.div()
 
 const Success = (params: TButtonProps) => Default({ ...params, custom_class: add_button_spec("success", params.custom_class) })
-
 const Neutral = (params: TButtonProps) => Default({ ...params, custom_class: add_button_spec("neutral", params.custom_class) })
-
 const Primary = (params: TButtonProps) => Default({ ...params, custom_class: add_button_spec("primary", params.custom_class) })
 
 export const Button = {

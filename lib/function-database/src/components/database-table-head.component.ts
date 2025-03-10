@@ -23,6 +23,7 @@ import { BsCaretDown } from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
+import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { Switch } from "@ordo-pink/switch"
 import { noop } from "@ordo-pink/tau"
 
@@ -30,12 +31,12 @@ import { SortingDirection } from "../database.constants"
 import { database$ } from "../database.state"
 
 export const DatabaseTableHead = (columns: Ordo.I18N.TranslationKey[], is_editable: boolean) =>
-	TableHead(() => TableHeadRow(() => columns.map(c => TableHeadCell(c, is_editable))))
+	TableHead(() => () => TableHeadRow(() => () => columns.map(c => TableHeadCell(c, is_editable))))
 
 // --- Internal ---
 
-const TableHead = Maoka.styled("thead")
-const TableHeadRow = Maoka.styled("tr", { class: "database_table-head_row" })
+const TableHead = MaokaStyled.Tags.thead()
+const TableHeadRow = MaokaStyled.Tags.tr("database_table-head_row")
 
 // TODO: Add icons
 const TableHeadCell = (column: Ordo.I18N.TranslationKey, is_editable: boolean) =>
@@ -44,7 +45,7 @@ const TableHeadCell = (column: Ordo.I18N.TranslationKey, is_editable: boolean) =
 
 		use(MaokaJabs.add_class("database_table-head_cell"))
 		use(MaokaJabs.listen("onclick", () => handle_click()))
-		if (is_editable) use(MaokaJabs.add_class("pointable"))
+		if (is_editable) use(MaokaJabs.add_class("clickable"))
 
 		const { t } = use(MaokaOrdo.Jabs.get_translations$)
 		const commands = use(MaokaOrdo.Jabs.get_commands)
@@ -56,7 +57,7 @@ const TableHeadCell = (column: Ordo.I18N.TranslationKey, is_editable: boolean) =
 		const t_column = t(column)
 
 		return () =>
-			DatabaseTableCellContent(() => {
+			DatabaseTableCellContent(() => () => {
 				const state = get_db_state()
 				const caret = Switch.Match(state.sorting?.[column])
 					.case(SortingDirection.ASC, () => BsCaretDown())
@@ -67,4 +68,4 @@ const TableHeadCell = (column: Ordo.I18N.TranslationKey, is_editable: boolean) =
 			})
 	})
 
-const DatabaseTableCellContent = Maoka.styled("div", { class: "database_table-head_cell-content" })
+const DatabaseTableCellContent = MaokaStyled.Tags.div("database_table-head_cell-content")

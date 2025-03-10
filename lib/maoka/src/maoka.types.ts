@@ -5,30 +5,29 @@
 
 // TODO: Comments
 // TODO: Full types
-export type TMaokaElement = {
-	setAttribute: (qualifiedName: string, value: string) => void
-	getAttribute: (qualifiedName: string) => string
-	removeAttribute: (qualifiedName: string) => void
-	appendChild: (child: TMaokaChild) => TMaokaChild
-	replaceChildren: (...children: TMaokaChild[]) => void
-	dispatchEvent: (event: Event) => void
-	children: TMaokaChild[]
+export type TMaokaElement = Pick<
+	Element,
+	"setAttribute" | "getAttribute" | "appendChild" | "replaceChildren" | "dispatchEvent" | "addEventListener" | "children"
+>
 
-	// TODO Move to render_dom
-	onunmount?: (() => void) | undefined
-	onmount?: (() => void) | undefined
+export type TCreateIDFn = () => string
+
+export type TMaokaRootElement<$TElement = TMaokaElement> = {
+	create_id: TCreateIDFn
+	create_element: TMaokaCreateMaokaElementFn
+	refresh_queue: Map<string, { element: TMaokaElement; render: () => Promise<TMaokaElement> }>
+
+	get id(): string
+	get element(): $TElement
 }
-
-export type TMaokaTextElement = Partial<{ [$TKey in keyof Text]: Text[$TKey] }> | string
 
 export type TMaokaCreateMaokaElementFn = (name: string) => TMaokaElement
 
 export type TMaokaCreateComponentFn = (name: string, callback: TMaokaCallback) => TMaokaComponent
 
 export type TMaokaComponent = {
-	(create_element: TMaokaCreateMaokaElementFn, root_element: TMaokaElement, root_id: string): Promise<TMaokaElement>
+	(root: TMaokaRootElement): Promise<TMaokaElement>
 	id?: string
-	rid?: string
 	element?: TMaokaElement
 	refresh?: () => void
 }
@@ -67,12 +66,7 @@ export type TMaokaProps = {
 	 */
 	get element(): TMaokaElement
 
-	/**
-	 * Root id.
-	 */
-	get rid(): string
-
-	get root(): TMaokaElement
+	get root(): TMaokaRootElement
 
 	/**
 	 * Trigger refreshing current Maoka component. Technically, calling refresh is basically calling
@@ -81,16 +75,8 @@ export type TMaokaProps = {
 	 */
 	refresh: () => void
 
-	onunmount: TMaokaOnUnmountFn
-
-	onmount: TMaokaOnMountFn
-
 	use: <_TResult>(jab: TMaokaJab<_TResult>) => _TResult
 }
-
-export type TMaokaOnUnmountFn = (onunmount_workload: () => void) => void
-
-export type TMaokaOnMountFn = (on_mount_workload: () => void) => void
 
 /**
  * A callback function that returns children of the current Maoka component. It accepts a record of
@@ -102,14 +88,10 @@ export type TMaokaOnMountFn = (on_mount_workload: () => void) => void
 export type TMaokaCallback = (
 	props: TMaokaProps,
 ) =>
-	| ((() => TMaokaChildren) | undefined | void)
-	| ((() => Promise<TMaokaChildren>) | undefined | void)
-	| Promise<(() => TMaokaChildren) | undefined | void>
-	| Promise<(() => Promise<TMaokaChildren>) | undefined | void>
-
-export type TMaokaDOMElement = TMaokaElement & {
-	onunmount: (() => void) | undefined
-	onmount: (() => void) | undefined
-}
-
-export type TMaokaRenderDOMFn = (root: HTMLElement, component: TMaokaComponent) => Promise<void>
+	| void
+	| undefined
+	| null
+	| (() => TMaokaChildren)
+	| (() => Promise<TMaokaChildren>)
+	| Promise<() => TMaokaChildren>
+	| Promise<() => Promise<TMaokaChildren>>

@@ -10,6 +10,7 @@ export type TRoutaryCORSParams = {
 	max_age?: number
 	success_status?: number
 	allow_headers?: string[]
+	allow_credentials?: boolean
 }
 
 export type TRoutaryCORS = <$TChamber extends Record<string, unknown> & { headers: Headers }>(

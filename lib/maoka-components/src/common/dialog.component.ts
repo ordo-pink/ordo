@@ -22,6 +22,7 @@
 import { Maoka, type TMaokaChildren } from "@ordo-pink/maoka"
 import { Button } from "@ordo-pink/maoka-components"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { MaokaStyled } from "@ordo-pink/maoka-styled"
 
 import "../../maoka-components.css"
 
@@ -52,20 +53,21 @@ export const Dialog = ({
 		const Icon = render_icon ? Maoka.create("div", () => render_icon) : void 0
 
 		return () => [
-			Header(() => [Icon, Title(() => title)]),
-			Body(body),
-			Footer(() =>
-				Button.Success({
-					on_click: action,
-					text: action_text,
-					hotkey: action_hotkey,
-					disabled: action_disabled,
-				}),
+			Header(() => () => [Icon, Title(() => () => title)]),
+			Body(() => body),
+			Footer(
+				() => () =>
+					Button.Success({
+						on_click: action,
+						text: action_text,
+						hotkey: action_hotkey,
+						disabled: action_disabled,
+					}),
 			),
 		]
 	})
 
-const Header = Maoka.styled("div", { class: "dialog_header" })
-const Title = Maoka.styled("h2", { class: "dialog_title" })
-const Body = Maoka.styled("div")
-const Footer = Maoka.styled("div", { class: "dialog_footer" })
+const Header = MaokaStyled.Tags.div("dialog_header")
+const Title = MaokaStyled.Tags.h2("dialog_title")
+const Body = MaokaStyled.Tags.div()
+const Footer = MaokaStyled.Tags.div("dialog_footer")

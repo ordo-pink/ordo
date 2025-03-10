@@ -23,15 +23,17 @@ import { fuzzy_check, noop } from "@ordo-pink/tau"
 import { Hotkey } from "@ordo-pink/maoka-components"
 import { Input } from "@ordo-pink/maoka-components"
 import { Maoka } from "@ordo-pink/maoka"
+import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
+import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { Switch } from "@ordo-pink/switch"
 
 import { type TOrdoState, ordo_app_state } from "../../../app.state"
 import { CommandPaletteLocation } from "./constants"
 import { OrdoCommandPaletteItems } from "./command-palette-items.component"
 
-export const OrdoCommandPalette = Maoka.create("div", ({ use, refresh, onunmount, onmount: on_mount }) => {
+export const OrdoCommandPalette = Maoka.create("div", ({ use, refresh }) => {
 	use(MaokaJabs.set_class("command-palette"))
 
 	let input = ""
@@ -75,14 +77,6 @@ export const OrdoCommandPalette = Maoka.create("div", ({ use, refresh, onunmount
 	}
 
 	const get_state = use(MaokaOrdo.Jabs.happy_marriage$(ordo_app_state.zags, handle_marry_ordo_state))
-
-	const handle_keydown = (event: KeyboardEvent) =>
-		Switch.Match(event.key)
-			.case("ArrowUp", handle_arrow_up)
-			.case("ArrowDown", handle_arrow_down)
-			.case("Tab", () => handle_tab(event))
-			.case("Enter", handle_enter)
-			.default(noop)
 
 	const handle_enter = () => {
 		const state = get_state()
@@ -138,7 +132,6 @@ export const OrdoCommandPalette = Maoka.create("div", ({ use, refresh, onunmount
 					return {
 						...cp,
 						index: visible_items.length ? cp.index : 0,
-						location: visible_items.length ? cp.location : CommandPaletteLocation.PINNED,
 						visible_items,
 						current: {
 							...cp.current,
@@ -213,15 +206,30 @@ export const OrdoCommandPalette = Maoka.create("div", ({ use, refresh, onunmount
 		}))
 	}
 
-	on_mount(() => document.addEventListener("keydown", handle_keydown))
-	onunmount(() => document.removeEventListener("keydown", handle_keydown))
+	use(
+		MaokaDOM.Jabs.onmount(() => {
+			const handle_keydown = (event: KeyboardEvent) =>
+				Switch.Match(event.key)
+					.case("ArrowUp", handle_arrow_up)
+					.case("ArrowDown", handle_arrow_down)
+					.case("Tab", () => handle_tab(event))
+					.case("Enter", handle_enter)
+					.default(noop)
+
+			document.addEventListener("keydown", handle_keydown)
+
+			return () => {
+				document.removeEventListener("keydown", handle_keydown)
+			}
+		}),
+	)
 
 	return () => {
 		const state = get_state()
 
 		return [
 			SearchInput,
-			ItemsWrapper(() => [state.is_multiple ? PinnedItems : void 0, VisibleItems]),
+			ItemsWrapper(() => () => [state.is_multiple ? PinnedItems : void 0, VisibleItems]),
 			state.is_multiple ? WithPinnedItemsHint : NoPinnedItemsHint,
 		]
 	}
@@ -229,13 +237,13 @@ export const OrdoCommandPalette = Maoka.create("div", ({ use, refresh, onunmount
 
 // --- Internal ---
 
-const Hint = Maoka.styled("div", { class: "command-palette_hint" })
+const Hint = MaokaStyled.Tags.div("command-palette_hint")
 
-const ItemsWrapper = Maoka.styled("div", { class: "grow overflow-auto" })
+const ItemsWrapper = MaokaStyled.Tags.div("grow overflow-auto")
 
 const DisplayHotkey = (key: string) => Hotkey(key, { smol: true, decoration_only: true })
 
-const WithPinnedItemsHint = Hint(() => [
+const WithPinnedItemsHint = Hint(() => () => [
 	DisplayHotkey("arrowup"),
 	DisplayHotkey("arrowdown"),
 	DisplayHotkey("tab"),
@@ -243,7 +251,7 @@ const WithPinnedItemsHint = Hint(() => [
 	DisplayHotkey("escape"),
 ])
 
-const NoPinnedItemsHint = Hint(() => [
+const NoPinnedItemsHint = Hint(() => () => [
 	DisplayHotkey("arrowup"),
 	DisplayHotkey("arrowdown"),
 	DisplayHotkey("enter"),

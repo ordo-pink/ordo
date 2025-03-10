@@ -22,27 +22,31 @@
 import { ActionListItem } from "@ordo-pink/maoka-components"
 import { ContextMenuItemType } from "@ordo-pink/core"
 import { Maoka } from "@ordo-pink/maoka"
+import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
+import { MaokaStyled } from "@ordo-pink/maoka-styled"
 
 import { ordo_app_state } from "../../app.state"
 
-export const OrdoContextMenu = Maoka.create("div", ({ onmount: on_mount, onunmount, use }) => {
+export const OrdoContextMenu = Maoka.create("div", ({ use }) => {
 	const commands = use(MaokaOrdo.Jabs.get_commands)
 
-	on_mount(() => {
-		commands.on("cmd.application.context_menu.show", handle_show)
-		commands.on("cmd.application.context_menu.hide", handle_hide)
-		commands.on("cmd.application.context_menu.add", handle_add)
-		commands.on("cmd.application.context_menu.remove", handle_remove)
-	})
+	use(
+		MaokaDOM.Jabs.onmount(() => {
+			commands.on("cmd.application.context_menu.show", handle_show)
+			commands.on("cmd.application.context_menu.hide", handle_hide)
+			commands.on("cmd.application.context_menu.add", handle_add)
+			commands.on("cmd.application.context_menu.remove", handle_remove)
 
-	onunmount(() => {
-		commands.off("cmd.application.context_menu.show", handle_show)
-		commands.off("cmd.application.context_menu.hide", handle_hide)
-		commands.off("cmd.application.context_menu.add", handle_add)
-		commands.off("cmd.application.context_menu.remove", handle_remove)
-	})
+			return () => {
+				commands.off("cmd.application.context_menu.show", handle_show)
+				commands.off("cmd.application.context_menu.hide", handle_hide)
+				commands.off("cmd.application.context_menu.add", handle_add)
+				commands.off("cmd.application.context_menu.remove", handle_remove)
+			}
+		}),
+	)
 
 	return () => OrdoContextMenuDynamic
 })
@@ -70,28 +74,38 @@ const handle_hide: Ordo.Command.HandlerOf<"cmd.application.context_menu.hide"> =
 
 const handle_add: Ordo.Command.HandlerOf<"cmd.application.context_menu.add"> = new_item =>
 	ordo_app_state.zags.update("sections.context_menu.items", items =>
-		items.some(item => item.command === new_item.command) ? items : items.concat(new_item),
+		items.some(item => item.readable_name === new_item.readable_name) ? items : items.concat(new_item),
 	)
 
-const handle_remove: Ordo.Command.HandlerOf<"cmd.application.context_menu.remove"> = command =>
-	ordo_app_state.zags.update("sections.context_menu.items", items => items.filter(item => item.command === command))
+const handle_remove: Ordo.Command.HandlerOf<"cmd.application.context_menu.remove"> = readable_name =>
+	ordo_app_state.zags.update("sections.context_menu.items", items => items.filter(item => item.readable_name === readable_name))
 
-const OrdoContextMenuDynamic = Maoka.create("div", ({ use, onunmount }) => {
+const OrdoContextMenuDynamic = Maoka.create("div", ({ element, use }) => {
 	use(MaokaJabs.set_class("context-menu"))
 	const is_mobile = use(MaokaJabs.is_mobile)
 
 	const commands = ordo_app_state.zags.select("commands")
 	const get_state = use(ordo_app_state.select_jab$("sections.context_menu.state"))
 
-	const handle_click_outside = () => commands.emit("cmd.application.context_menu.hide")
+	use(
+		MaokaDOM.Jabs.onmount(() => {
+			const handle_click_outside = () => commands.emit("cmd.application.context_menu.hide")
 
-	document.addEventListener("click", handle_click_outside)
-	onunmount(() => document.removeEventListener("click", handle_click_outside))
+			document.addEventListener("click", handle_click_outside)
+
+			return () => {
+				document.removeEventListener("click", handle_click_outside)
+			}
+		}),
+	)
 
 	return () => {
 		const state = get_state()
 
-		if (!state) return
+		if (!state) {
+			if (MaokaDOM.is_maoka_dom_element(element)) element.innerHTML = ""
+			return
+		}
 
 		const all_items = state.structure.filter(
 			item =>
@@ -156,7 +170,7 @@ const OrdoContextMenuDynamic = Maoka.create("div", ({ use, onunmount }) => {
 	}
 })
 
-const HR = Maoka.styled("hr", { class: "context-menu_divider" })(() => void 0)
+const HR = MaokaStyled.Tags.hr("context-menu_divider")(() => void 0)
 
 const ContextMenuItem = (item: Ordo.ContextMenu.Item, payload: any, event: MouseEvent) =>
 	Maoka.create("div", () => {

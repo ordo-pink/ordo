@@ -21,12 +21,13 @@
 
 import { CommandPaletteItemType, ContextMenuItemType, Metadata } from "@ordo-pink/core"
 import { BsFileEarmarkPlus } from "@ordo-pink/frontend-icons"
+import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { type TMaokaJab } from "@ordo-pink/maoka"
 
 import { CreateFileModal } from "../../components/create-file-modal.component"
 
-export const create_file_command: TMaokaJab = ({ onunmount, use }) => {
+export const create_file_command: TMaokaJab = ({ use }) => {
 	const state = use(MaokaOrdo.Context.consume)
 
 	const handle_show_create_modal: Ordo.Command.HandlerOf<"cmd.metadata.show_create_modal"> = fsid => {
@@ -53,9 +54,11 @@ export const create_file_command: TMaokaJab = ({ onunmount, use }) => {
 		render_icon: BsFileEarmarkPlus,
 	})
 
-	onunmount(() => {
-		state.commands.off("cmd.metadata.show_create_modal", handle_show_create_modal)
-		state.commands.emit("cmd.application.context_menu.remove", "cmd.metadata.show_create_modal")
-		state.commands.emit("cmd.application.command_palette.remove", "t.common.components.modals.create_file.title")
-	})
+	use(
+		MaokaDOM.Jabs.onunmount(() => {
+			state.commands.off("cmd.metadata.show_create_modal", handle_show_create_modal)
+			state.commands.emit("cmd.application.context_menu.remove", "cmd.metadata.show_create_modal")
+			state.commands.emit("cmd.application.command_palette.remove", "t.common.components.modals.create_file.title")
+		}),
+	)
 }

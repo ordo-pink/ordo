@@ -24,12 +24,11 @@ import { RRR } from "@ordo-pink/core"
 import { type TIntake } from "@ordo-pink/routary"
 
 import { type TIDContext } from "../backend-id.types"
-import { get_token_from_authorization_header } from "./get-auth-token-from-authorization-header"
-import { get_user_from_token } from "./get-user-from-token"
-import { verify_auth_token } from "./verify-auth-token"
+import { get_user_from_cookie } from "./get-user-from-cookie"
 
-export const check_if_edited_user_is_current_user = (i: TIntake<TIDContext>) =>
-	get_token_from_authorization_header(i)
-		.and(verify_auth_token(i))
-		.and(get_user_from_token(i))
-		.and(u => Oath.If(u.id === i.params.user_id, { F: () => ({ rrr: RRR.codes.eperm("Cannot edit other user"), intake: i }) }))
+export const check_if_edited_user_is_current_user = (intake: TIntake<TIDContext>) =>
+	get_user_from_cookie(intake).and(u =>
+		Oath.If(u.get_uid() === intake.params.user_id, {
+			F: () => ({ rrr: RRR.codes.eperm("Cannot edit other user"), intake: intake }),
+		}),
+	)

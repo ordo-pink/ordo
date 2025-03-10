@@ -5,49 +5,56 @@
 
 import type * as T from "./maoka.types.ts"
 
+export const create_root = <$TElement = T.TMaokaElement>(
+	element: $TElement,
+	create_id: T.TCreateIDFn,
+	create_element: T.TMaokaCreateMaokaElementFn,
+): T.TMaokaRootElement<$TElement> => {
+	const id = create_id()
+
+	return {
+		create_id,
+		create_element,
+		refresh_queue: new Map(),
+		get element() {
+			return element
+		},
+		get id() {
+			return id
+		},
+	}
+}
+
 export const create: T.TMaokaCreateComponentFn = (name, callback) => {
-	const result: T.TMaokaComponent = async (create_element, root_element, root_id) => {
-		const internal_id = crypto.randomUUID()
-		const element = create_element(name)
+	const result: T.TMaokaComponent = async root => {
+		const id = root.create_id()
+		const element = root.create_element(name)
 
 		// eslint-disable-next-line
 		let get_children: Awaited<ReturnType<T.TMaokaCallback>>
 
 		const props: T.TMaokaProps = {
 			get id() {
-				return internal_id
+				return id
 			},
 			get element() {
 				return element
 			},
-			get rid() {
-				return root_id
-			},
 			get root() {
-				return root_element
+				return root
 			},
 			use: f => f(props),
-			refresh: () => {
-				if (!callback || !get_children) return
-
-				const event = new CustomEvent("refresh", {
-					detail: [internal_id, element, () => get_children && get_children()],
-					bubbles: true,
-				})
-
-				element.dispatchEvent(event)
-			},
-			onunmount: f => {
-				element.onunmount = f
-			},
-			onmount: f => {
-				element.onmount = f
-			},
-		} as T.TMaokaProps
+			refresh: () =>
+				element.dispatchEvent(
+					new CustomEvent("refresh", {
+						detail: [id, element, () => render_children(root, get_children, element)],
+						bubbles: true,
+					}),
+				),
+		} satisfies T.TMaokaProps
 
 		result.element = element
-		result.id = internal_id
-		result.rid = root_id
+		result.id = id
 		result.refresh = props.refresh
 
 		if (!callback) return element
@@ -55,147 +62,34 @@ export const create: T.TMaokaCreateComponentFn = (name, callback) => {
 		get_children = await callback(props)
 		if (!get_children) return element
 
-		return await render_children(create_element, root_element, root_id, get_children, element)
+		return await render_children(root, get_children, element)
 	}
 
 	return result
 }
 
-export const lazy = (callback: () => Promise<{ default: T.TMaokaComponent }>): Promise<T.TMaokaComponent> =>
-	callback().then(result => result.default)
-
-export const styled =
-	(tag: string, attributes: Record<string, string> = {}) =>
-	(children_thunk: ReturnType<T.TMaokaCallback>): T.TMaokaComponent =>
-		create(tag, ({ element: current_element }) => {
-			Object.keys(attributes).forEach(key => current_element.setAttribute(key, attributes[key]))
-
-			return children_thunk
-		})
-
-export const html = (tag: string, html: string): T.TMaokaComponent =>
-	create(tag, ({ element }) => {
-		if (element instanceof Element) return void (element.innerHTML = html)
-		return () => html
-	})
-
-export const dom: T.TMaokaRenderDOMFn = async (root, component) => {
-	const root_id: string = crypto.randomUUID()
-	const root_element = root as unknown as T.TMaokaElement
-
-	const create_element = document.createElement.bind(document)
-	const Component = await component(create_element, root_element, root_id)
-	const refresh_queue = new Map<string, { element: T.TMaokaElement; get_children: () => Promise<T.TMaokaElement> }>()
-
-	root.appendChild(Component as unknown as HTMLElement)
-
-	root.addEventListener("refresh", event => {
-		event.stopPropagation()
-
-		const [id, element, get_children] = (event as any).detail as [string, T.TMaokaDOMElement, () => T.TMaokaComponent]
-
-		const refresh_nodes = refresh_queue.keys().toArray()
-
-		if (refresh_queue.has(id)) return
-
-		for (let i = 0; i < refresh_nodes.length; i++) {
-			const refresh_element = refresh_queue.get(refresh_nodes[i])?.element
-
-			if (
-				refresh_element &&
-				refresh_element instanceof HTMLElement &&
-				element instanceof HTMLElement &&
-				element.contains?.(refresh_element)
-			) {
-				refresh_queue.delete(refresh_nodes[i])
-				break
-			}
-		}
-
-		refresh_queue.set(id, {
-			element,
-			get_children: () => render_children(create_element, root_element, root_id, get_children, element),
-		})
-	})
-
-	const request_idle_callback = requestIdleCallback ?? setTimeout
-
-	const render_loop = () =>
-		refresh_queue.size
-			? Promise.all(
-					refresh_queue.entries().map(([key, data]) => {
-						refresh_queue.delete(key)
-						return data.get_children()
-					}),
-				).then(() => request_idle_callback(() => void render_loop()))
-			: request_idle_callback(() => void render_loop())
-
-	request_idle_callback(() => void render_loop())
-
-	const unmount_element = (element: T.TMaokaElement) => {
-		if (element.onunmount) element.onunmount()
-
-		for (let i = 0; i < element.children.length; i++) {
-			unmount_element(element.children[i] as T.TMaokaElement)
-		}
-	}
-
-	const mount_element = (element: T.TMaokaElement) => {
-		if (element.onmount) element.onmount()
-
-		for (let i = 0; i < element.children.length; i++) {
-			mount_element(element.children[i] as T.TMaokaElement)
-		}
-	}
-
-	mount_element(Component)
-
-	const observer = new MutationObserver(records => {
-		for (const record of records) {
-			const removed_nodes = record.removedNodes as unknown as T.TMaokaElement[]
-			const mounted_nodes = record.addedNodes as unknown as T.TMaokaElement[]
-
-			for (let i = 0; i < removed_nodes.length; i++) {
-				const element = removed_nodes[i]
-				unmount_element(element)
-			}
-
-			for (let i = 0; i < mounted_nodes.length; i++) {
-				const element = mounted_nodes[i]
-				mount_element(element)
-			}
-		}
-	})
-
-	observer.observe(root, { childList: true, subtree: true, attributeFilter: ["onmount", "onunmount"] })
-}
-
-// --- Internal ---
-
 const render_children = async (
-	create_element: T.TMaokaCreateMaokaElementFn,
-	root_element: T.TMaokaElement,
-	root_id: string,
+	root: T.TMaokaRootElement,
 	get_children: Awaited<ReturnType<T.TMaokaCallback>>,
 	element: T.TMaokaElement,
 ) => {
 	if (!get_children) return element
-	if (element instanceof HTMLElement) element.innerHTML = ""
+
 	let children = await get_children()
 	if (!children) return element
 
-	if (!is_arr(children)) children = [is_fun(children) ? await children(create_element, root_element, root_id) : children]
+	if (!is_arr(children)) children = [is_fun(children) ? await children(root) : children]
 
 	const nodes: T.TMaokaChild[] = []
 
 	for (let i = 0; i < children.length; i++) {
 		const x = children[i]
-		const node = is_fun(x) ? await x(create_element, root_element, root_id) : is_num(x) ? String(x) : x
+		const node = is_fun(x) ? await x(root) : is_num(x) ? String(x) : x
 
 		if (node) nodes.push(node)
 	}
 
-	element.replaceChildren(...nodes)
+	element.replaceChildren(...(nodes as any[]))
 
 	return element
 }

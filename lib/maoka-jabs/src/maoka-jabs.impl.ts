@@ -19,31 +19,32 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { TMaokaJab, type TMaokaProps } from "@ordo-pink/maoka"
+import { TMaokaJab, TMaokaProps } from "@ordo-pink/maoka"
+import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { SM_SCREEN_BREAKPOINT } from "@ordo-pink/core"
 import { lt } from "@ordo-pink/tau"
 
 import { TNoSpace } from "./maoka-jabs.types"
 
 export const set_attribute =
-	(key: string, value = "") =>
-	(ctx: TMaokaProps) =>
-		void ctx.element.setAttribute(key, value)
+	(key: string, value = ""): TMaokaJab =>
+	({ element }) =>
+		void element.setAttribute(key, value)
 
 export const set_class =
-	(...classes: string[]) =>
-	(ctx: TMaokaProps) =>
-		void ctx.element.setAttribute("class", classes.join(" "))
+	(...classes: string[]): TMaokaJab =>
+	({ element }) =>
+		void element.setAttribute("class", classes.join(" "))
 
 export const add_class =
-	(...classes: string[]) =>
-	(ctx: TMaokaProps) => {
-		if (ctx.element.classList) {
-			ctx.element.classList.add(...classes.flatMap(cls => cls.split(" ")))
+	(...classes: string[]): TMaokaJab =>
+	({ element }) => {
+		if (MaokaDOM.is_maoka_dom_element(element)) {
+			element.classList.add(...classes.flatMap(cls => cls.split(" ")))
 		} else {
-			const current_classes = ctx.element.getAttribute("class") ?? ""
+			const current_classes = element.getAttribute("class") ?? ""
 
-			ctx.element.setAttribute(
+			element.setAttribute(
 				"class",
 				current_classes
 					.split(" ")
@@ -54,14 +55,14 @@ export const add_class =
 	}
 
 export const remove_class =
-	<$TClass extends string>(...classes: TNoSpace<$TClass>[]) =>
-	(ctx: TMaokaProps) => {
-		if (ctx.element.classList) {
-			ctx.element.classList.remove(...classes.flatMap(cls => cls.split(" ")))
+	<$TClass extends string>(...classes: TNoSpace<$TClass>[]): TMaokaJab =>
+	({ element }) => {
+		if (MaokaDOM.is_maoka_dom_element(element)) {
+			element.classList.remove(...classes.flatMap(cls => cls.split(" ")))
 		} else {
-			const current_classes = ctx.element.getAttribute("class") ?? ""
+			const current_classes = element.getAttribute("class") ?? ""
 
-			ctx.element.setAttribute(
+			element.setAttribute(
 				"class",
 				current_classes
 					.split(" ")
@@ -72,30 +73,40 @@ export const remove_class =
 	}
 
 export const replace_class =
-	<$TPrev extends string, $TNext extends string>(prev: TNoSpace<$TPrev>, next: TNoSpace<$TNext>) =>
-	(ctx: TMaokaProps) => {
-		const current_classes = ctx.element.getAttribute("class") ?? ""
+	<$TPrev extends string, $TNext extends string>(prev: TNoSpace<$TPrev>, next: TNoSpace<$TNext>): TMaokaJab =>
+	({ element }) => {
+		const current_classes = element.getAttribute("class") ?? ""
 
-		ctx.element.setAttribute("class", current_classes.replace(prev, next))
+		element.setAttribute("class", current_classes.replace(prev, next))
 	}
 
-export const set_style = (str: Partial<Omit<CSSStyleDeclaration, "length" | "parentRule">>) => (ctx: TMaokaProps) =>
-	void Object.keys(str).forEach(k => ((ctx.element.style as any)[k] = (str as any)[k]))
+export const set_style =
+	(str: Partial<Omit<CSSStyleDeclaration, "length" | "parentRule">>): TMaokaJab =>
+	({ element }) => {
+		if (MaokaDOM.is_maoka_dom_element(element) && element instanceof HTMLElement)
+			Object.keys(str).forEach(k => ((element.style as any)[k] = (str as any)[k]))
+	}
 
 export const listen =
-	<K extends keyof HTMLElement>(event: K extends `on${string}` ? K : never, f: HTMLElement[K]) =>
-	(ctx: TMaokaProps) =>
-		void ((ctx.element as unknown as any)[event] = f)
+	<K extends keyof HTMLElement>(event: K extends `on${string}` ? K : never, f: HTMLElement[K]): TMaokaJab =>
+	({ element }) =>
+		void ((element as unknown as any)[event] = f)
 
-export const set_inner_html = (html: string) => (ctx: TMaokaProps) => void (ctx.element.innerHTML = html)
+export const set_inner_html =
+	(html: string): TMaokaJab =>
+	({ element }) => {
+		if (MaokaDOM.is_maoka_dom_element(element)) element.innerHTML = html
+	}
 
 export const create_context = <$TValue>() => {
 	const state = {} as Record<string, $TValue>
 
 	return {
-		provide: (value: $TValue) => (props: TMaokaProps) => {
-			if (!state[props.rid]) state[props.rid] = value
-		},
+		provide:
+			(value: $TValue): TMaokaJab =>
+			props => {
+				if (!state[props.rid]) state[props.rid] = value
+			},
 
 		consume: (props: TMaokaProps) => {
 			return state[props.rid] ?? ({} as $TValue)
@@ -105,21 +116,25 @@ export const create_context = <$TValue>() => {
 
 const is_sm = lt(SM_SCREEN_BREAKPOINT)
 
-export const is_sm_screen$: TMaokaJab<() => boolean> = ({ refresh, onunmount }) => {
+export const is_sm_screen$: TMaokaJab<() => boolean> = ({ use, refresh }) => {
 	let value: boolean = is_sm(window.innerWidth)
 
-	const handle_resize = () => {
-		const is_sm_screen = is_sm(window.innerWidth)
+	use(
+		MaokaDOM.Jabs.onmount(() => {
+			const handle_resize = () => {
+				const is_sm_screen = is_sm(window.innerWidth)
 
-		if (value !== is_sm_screen) {
-			value = is_sm_screen
-			refresh()
-		}
-	}
+				if (value !== is_sm_screen) {
+					value = is_sm_screen
+					refresh()
+				}
+			}
 
-	window.addEventListener("resize", handle_resize)
+			window.addEventListener("resize", handle_resize)
 
-	onunmount(() => window.removeEventListener("resize", handle_resize))
+			return () => window.removeEventListener("resize", handle_resize)
+		}),
+	)
 
 	return () => value
 }

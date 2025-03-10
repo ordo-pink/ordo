@@ -58,7 +58,7 @@ export const ordo_app_state = MaokaZAGS.Of<TOrdoState>({
 			visible_items: null,
 		},
 	},
-	auth: { token: null, user: null },
+	user: null,
 })
 
 export type TOrdoState = {
@@ -73,10 +73,8 @@ export type TOrdoState = {
 	queries: TQueries
 	functions: TFunctions
 	sections: TSections
-	auth: TAuth
+	user: Ordo.User.Current.Instance | null
 }
-
-type TAuth = { token: string | null; user: Ordo.User.Current.Instance | null }
 
 type TRouter = { current_route: Ordo.Router.Route; routes: Record<string, string> }
 

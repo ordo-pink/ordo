@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import type { TMaokaComponent, TMaokaElement } from "@ordo-pink/maoka"
+import type { TCreateIDFn, TMaokaComponent, TMaokaElement } from "@ordo-pink/maoka"
 
-export type TMaokaRenderStringFn = (root: TMaokaStrElement, component: TMaokaComponent) => Promise<string>
-export type TMaokaStrElement = TMaokaElement & { str: (depth?: number) => Promise<string> }
+export type TMaokaRenderStringFn = (component: TMaokaComponent, create_id: TCreateIDFn) => Promise<string>
+export type TMaokaStringElement = TMaokaElement & { str: () => Promise<string> }

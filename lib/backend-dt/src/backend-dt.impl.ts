@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { CurrentUser, METADATA_CONTENT_FSID, Metadata, RRR } from "@ordo-pink/core"
+import { CurrentUser, CurrentUserKeys, METADATA_CONTENT_FSID, Metadata, RRR } from "@ordo-pink/core"
 import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
 import { Routary, TIntake } from "@ordo-pink/routary"
 import { create_json_response, create_response, status_from_rrr } from "@ordo-pink/backend-util-create-response"
@@ -118,7 +118,13 @@ export const create_backend_dt = (chamber: TDTChamber) =>
 
 		.get("/healthcheck", () => new Response("OK"))
 
-		.use(routary_cors({ allow_origin: chamber.allow_origin, allow_headers: ["content-type", "authorization"] }))
+		.use(
+			routary_cors({
+				allow_origin: chamber.allow_origin,
+				allow_headers: ["content-type", "authorization"],
+				allow_credentials: true,
+			}),
+		)
 
 		.start(intake =>
 			Oath.Resolve<TIntake<TDTContext>>({ ...intake, headers: new Headers(), status: 404, request_ip: null })
@@ -136,15 +142,13 @@ export const create_backend_dt = (chamber: TDTChamber) =>
 export const validate_request_params = (intake: TIntake<TDTContext>) =>
 	Oath.Merge([
 		Oath.If(Metadata.Validations.is_fsid(intake.params.fsid)).pipe(ops0.rejected_map(() => RRR.codes.einval("Invalid FSID"))),
-		Oath.If(CurrentUser.Validations.is_id(intake.params.uid)).pipe(ops0.rejected_map(() => RRR.codes.einval("Invalid UID"))),
+		Oath.If(CurrentUser.Validations.is_uid(intake.params.uid)).pipe(ops0.rejected_map(() => RRR.codes.einval("Invalid UID"))),
 	]).pipe(ops0.map(() => intake))
 
 export const authenticate = (intake: TIntake<TDTContext>) =>
-	Oath.FromNullable(intake.req.headers.get("Authorization"))
-		.pipe(ops0.map(Authorization => ({ Authorization })))
-		.pipe(ops0.map(headers => ({ ...headers, Origin: intake.dt_host }))) // TODO Move to env
-		.pipe(ops0.map(headers => ({ headers, method: "POST" })))
-		.pipe(ops0.chain(init => Oath.FromPromise(() => fetch(`${intake.id_host}/tokens/validate`, init)))) // TODO Move to env
+	Oath.Resolve(intake.req.headers)
+		.pipe(ops0.map(headers => ({ headers, method: "GET", credentials: "include" as const })))
+		.pipe(ops0.chain(init => Oath.FromPromise(() => fetch(`${intake.id_host}/session`, init))))
 		.pipe(ops0.chain(res => Oath.FromPromise(() => res.json())))
 		.pipe(ops0.chain(body => Oath.If(body?.success, { T: () => body.payload })))
 		.pipe(ops0.chain(x => Oath.If(CurrentUser.Validations.is_dto(x), { T: () => x as Ordo.User.Current.DTO })))
@@ -152,7 +156,7 @@ export const authenticate = (intake: TIntake<TDTContext>) =>
 
 // TODO checking permissions for editing files of other users
 export const check_authorization = (intake: TIntake<TDTContext>) => (user: Ordo.User.Current.DTO) =>
-	Oath.If(user.id === intake.params.uid)
+	Oath.If(user[CurrentUserKeys.UID] === intake.params.uid)
 		.pipe(ops0.map(() => user))
 		.pipe(ops0.rejected_map(() => RRR.codes.eperm("Permission denied")))
 
@@ -195,7 +199,8 @@ export const validate_file_size_limit = (intake: TIntake<TDTContext>) => (user: 
 // TODO check if attemted to create a file in other user's space
 export const check_can_create_files = (intake: TIntake<TDTContext>) => (user: Ordo.User.Current.DTO) =>
 	intake.data_persistence_strategy
-		.read(user.id, METADATA_CONTENT_FSID)
+		.read(user[CurrentUserKeys.UID], METADATA_CONTENT_FSID)
+		.pipe(ops0.chain(stream => Oath.Try(() => new Response(stream).json())))
 		.pipe(ops0.map(metadata => metadata.length))
 		.fix(() => 0)
 		.pipe(ops0.map(total_files => CurrentUser.FromDTO(user).can_create_files(total_files)))

@@ -29,7 +29,7 @@ import { RRR } from "../../../../core/src/rrr"
 export const MetadataRepository: Ordo.Metadata.RepositoryStatic = {
 	Of: metadata$ => {
 		const version_zags = ZAGS.Of({ version: 0 })
-		metadata$.marry((_, is_update) => is_update && version_zags.update("version", i => i + 1))
+		metadata$.marry((_, is_update) => void (is_update && version_zags.update("version", i => i + 1)))
 
 		return {
 			get: () =>
@@ -40,8 +40,9 @@ export const MetadataRepository: Ordo.Metadata.RepositoryStatic = {
 			put: metadata =>
 				Result.FromNullable(metadata)
 					.pipe(Result.ops.chain(() => Result.If(Array.isArray(metadata), { T: () => metadata }))) // TODO: Add validations
-					.pipe(Result.ops.chain(() => Result.Try(() => metadata$.update("items", () => metadata))))
-					.pipe(Result.ops.err_map(() => RRR.codes.einval(`.put: ${JSON.stringify(metadata)}`))),
+					.pipe(Result.ops.map(metadata => metadata.map(i => i.to_dto())))
+					.pipe(Result.ops.chain(() => Result.Try(() => metadata$.update("items", () => metadata), console.error)))
+					.pipe(Result.ops.err_map(() => RRR.codes.einval("MetadataRepository could not put metadata", metadata))),
 
 			get $() {
 				return version_zags
@@ -49,8 +50,6 @@ export const MetadataRepository: Ordo.Metadata.RepositoryStatic = {
 		}
 	},
 }
-
-export const MR = MetadataRepository
 
 // TODO: Add types
 // TODO: Add hash and last update
@@ -86,7 +85,7 @@ export const CacheMetadataRepository: Ordo.Metadata.RepositoryAsyncStatic = {
 								}),
 						),
 					),
-			put: (_, metadata) =>
+			put: metadata =>
 				Oath.Try(() => indexed_db.result)
 					.pipe(ops0.chain(db => Oath.FromNullable(db)))
 					.pipe(ops0.rejected_map(() => RRR.codes.eio("Failed to access cache inside IndexedDB")))
@@ -108,8 +107,8 @@ export const CacheMetadataRepository: Ordo.Metadata.RepositoryAsyncStatic = {
 
 export const RemoteMetadataRepository: Ordo.Metadata.RepositoryAsyncStatic = {
 	Of: (data_host, fetch) => ({
-		get: token =>
-			Oath.Try(() => fetch(`${data_host}`, { headers: { Authorization: `Bearer ${token}` } }))
+		get: () =>
+			Oath.Try(() => fetch(`${data_host}`, { credentials: "include" }))
 				.pipe(ops0.chain(response => Oath.FromPromise(() => response.json())))
 				.pipe(ops0.chain(r => Oath.If(r.success, { T: () => r.result, F: () => r.error })))
 				.pipe(ops0.rejected_map(error => RRR.codes.eio(error))),

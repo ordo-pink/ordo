@@ -22,6 +22,7 @@
 import { BsFilesAlt, BsSlash } from "@ordo-pink/frontend-icons"
 import { ContextMenuItemType, Metadata } from "@ordo-pink/core"
 import { R, type TResult } from "@ordo-pink/result"
+import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MetadataIcon } from "@ordo-pink/maoka-components"
 import { type TMaokaJab } from "@ordo-pink/maoka"
@@ -31,11 +32,11 @@ import { type TMaokaJab } from "@ordo-pink/maoka"
  * {@link Ordo.Metadata.Instance}. The `Move...` command is essentially a setter for
  * the metadata parent value.
  */
-export const move_file_command: TMaokaJab = ({ use, onunmount }) => {
+export const move_file_command: TMaokaJab = ({ use }) => {
 	const ctx = use(MaokaOrdo.Context.consume)
 
 	const handle_show_move_palette = (fsid: Ordo.Metadata.FSID) =>
-		ctx.metadata_query
+		void ctx.metadata_query
 			.get()
 			.pipe(R.ops.chain(get_descendents(fsid, ctx.metadata_query)))
 			.pipe(R.ops.map(filter_destinations(fsid, ctx.metadata_query)))
@@ -57,10 +58,12 @@ export const move_file_command: TMaokaJab = ({ use, onunmount }) => {
 
 	// TODO Command palette item if there is currently selected metadata
 
-	onunmount(() => {
-		ctx.commands.off("cmd.metadata.show_move_palette", handle_show_move_palette)
-		ctx.commands.emit("cmd.application.context_menu.remove", "cmd.metadata.show_move_palette")
-	})
+	use(
+		MaokaDOM.Jabs.onunmount(() => {
+			ctx.commands.off("cmd.metadata.show_move_palette", handle_show_move_palette)
+			ctx.commands.emit("cmd.application.context_menu.remove", "cmd.metadata.show_move_palette")
+		}),
+	)
 }
 
 // --- Internal ---

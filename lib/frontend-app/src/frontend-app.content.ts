@@ -20,12 +20,12 @@
  */
 
 import { Metadata, NotificationType, RRR } from "@ordo-pink/core"
-import { invokers0, ops0 } from "@ordo-pink/oath"
 import { is_instance_of, is_string } from "@ordo-pink/tau"
 import { ConsoleLogger } from "@ordo-pink/logger"
 import { R } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
 import { ZAGS } from "@ordo-pink/zags"
+import { invokers0 } from "@ordo-pink/oath"
 
 import { ContentQuery } from "./data/content/content-query.impl"
 import { ContentRepository } from "./data/content/content-repository.impl"
@@ -58,70 +58,84 @@ export const init_content: TF = () => {
 		},
 	)
 
-	const auth$ = ZAGS.Of({ token: null as string | null, user: null as Ordo.User.Current.Instance | null })
-	ordo_app_state.zags.cheat("auth.user", user => auth$.update("user", () => user))
-	ordo_app_state.zags.cheat("auth.token", token => auth$.update("token", () => token))
+	const auth$ = ZAGS.Of({ user: null as Ordo.User.Current.Instance | null })
+	ordo_app_state.zags.cheat("user", user => auth$.update("user", () => user))
 
-	const remote_strategy = PersistenceStrategyContentOrdoBackend.Of(dt_host, fetch, auth$)
+	const remote_strategy = PersistenceStrategyContentOrdoBackend.Of(dt_host, fetch)
 	const content_repository = ContentRepository.Of(auth$, local_strategy, remote_strategy)
 
 	// TODO Extract for common error handling
-	const Err = (rrr: Ordo.Rrr) => {
-		logger.error("ERROR", rrr.debug)
+	const alert_rrr = (rrr: Ordo.Rrr) => {
+		if (rrr.debug && rrr.debug.length) logger.error(...rrr.debug)
 
 		commands.emit("cmd.application.notification.show", {
-			message: (String(rrr.debug) as any) ?? "",
+			message: rrr.message as Ordo.I18N.TranslationKey,
 			duration: 15,
-			// TODO Error titles
 			title: `t.common.error.${rrr.key.toLocaleLowerCase()}` as any,
 			type: NotificationType.RRR,
 		})
+
+		throw rrr
 	}
 
+	// TODO Update metadata size
 	commands.on("cmd.content.set", ({ fsid, content }) => {
 		const metadata_query = ordo_app_state.zags.select("queries.metadata")
 		const size = get_size(content)
-		const user = ordo_app_state.zags.select("auth.user")
+		const user = ordo_app_state.zags.select("user")
 
-		if (user && size > 0) {
+		if (size > 0) {
 			// TODO Check if metadata exists
-			void metadata_query.get_by_fsid(fsid).cata(
-				R.catas.if_ok(() =>
-					content_repository
-						.put(user.get_id(), fsid, content)
-						.pipe(ops0.tap(() => commands.emit("cmd.metadata.set_size", { fsid, size })))
-						.invoke(invokers0.or_else(Err)),
-				),
-			)
+			void metadata_query
+				.get_by_fsid(fsid)
+				.cata(
+					R.catas.if_ok(() =>
+						content_repository.put(user?.get_uid() ?? null, fsid, content).invoke(invokers0.or_else(alert_rrr)),
+					),
+				)
 		}
 	})
 
-	commands.on("cmd.content.upload", ({ content, type, name, parent }) => {
+	commands.on("cmd.content.remove", fsid => {
+		const user = ordo_app_state.zags.select("user")
+
+		content_repository
+			.remove(user?.get_uid() ?? null, fsid)
+			.invoke(invokers0.to_promise)
+			.catch(console.error)
+	})
+
+	commands.on("cmd.content.upload", async ({ content, type, name, parent }) => {
 		const metadata_query = ordo_app_state.zags.select("queries.metadata")
 		const size = get_size(content)
 
-		const metadata = metadata_query
-			.get_by_name(name, parent)
+		let metadata = metadata_query
+			.get_by_name(name, parent, { show_hidden: true })
 			.pipe(R.ops.chain(R.FromNullable))
-			// TODO Check if error is enoent
-			.pipe(R.ops.err_tap(() => commands.emit("cmd.metadata.create", { name, parent, type, size })))
-			.pipe(R.ops.err_chain(() => metadata_query.get_by_name(name, parent)))
-			.cata(R.catas.or_nothing())
+			.cata(R.catas.or_else(() => null))
 
-		if (!Metadata.Validations.is_metadata(metadata)) {
-			Err(RRR.codes.enoent("Metadata creation failed", { type, name, parent }))
-			return
+		if (!metadata) {
+			metadata = await commands
+				.naga("cmd.metadata.create", { name, parent, type, size })
+				.and(() =>
+					metadata_query
+						.get_by_name(name, parent, { show_hidden: true })
+						.pipe(R.ops.chain(R.FromNullable))
+						.cata(R.catas.or_else(() => null)),
+				)
+				.invoke(invokers0.to_promise)
+		} else {
+			commands.emit("cmd.metadata.set_size", { fsid: metadata.get_fsid(), size })
 		}
 
-		const fsid = metadata.get_fsid()
-		const user = ordo_app_state.zags.select("auth.user")
+		if (!Metadata.Validations.is_metadata(metadata))
+			return alert_rrr(RRR.codes.enoent("Metadata creation failed", { type, name, parent }))
+
+		const user = ordo_app_state.zags.select("user")
 
 		if (!user) return
 
-		void content_repository
-			.put(user.get_id(), metadata.get_fsid(), content)
-			.pipe(ops0.tap(() => commands.emit("cmd.metadata.set_size", { fsid, size })))
-			.invoke(invokers0.or_else(Err))
+		void content_repository.put(user.get_uid(), metadata.get_fsid(), content).invoke(invokers0.or_else(alert_rrr))
 	})
 
 	logger.debug("🟢 Initialised metadata.")
@@ -133,7 +147,7 @@ export const init_content: TF = () => {
 					const rrr = RRR.codes.eperm(
 						`ContentQuery permission RRR. Did you forget to request query permission '${permission}'?`,
 					)
-					ConsoleLogger.error(rrr.debug?.join(" "))
+					ConsoleLogger.error(rrr.message)
 					return rrr
 				},
 			}),

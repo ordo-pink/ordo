@@ -29,7 +29,11 @@ import { type TIDContext } from "../backend-id.types"
 export const extract_body_email = (intake: TIntake<TIDContext>) => (request_body: any) =>
 	Oath.FromNullable(request_body.email)
 		.pipe(ops0.rejected_map(() => email_missing_rrr(intake)))
-		.pipe(ops0.chain(email => Oath.If(is_email(email), { T: () => email, F: () => invalid_email_rrr(email, intake) })))
+		.pipe(
+			ops0.chain(email =>
+				Oath.If(is_email(email), { T: () => email as Ordo.User.Email, F: () => invalid_email_rrr(email, intake) }),
+			),
+		)
 
 // --- Internal ---
 

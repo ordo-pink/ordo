@@ -21,6 +21,7 @@
 
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { noop } from "@ordo-pink/tau"
 
 import { OrdoNotificationHideButton } from "./notification-hide-button.component"
@@ -48,9 +49,12 @@ export const OrdoNotification = ({ on_click, id, message, duration, render_icon,
 		const NotificationCard = create_notification_card(card_type)
 
 		return () =>
-			NotificationCard(() => [
+			NotificationCard(() => () => [
 				OrdoNotificationIcon({ render_icon, type }),
-				NotificationCardBody(() => [title ? NotificationTitle(() => t(title)) : void 0, NotificationMessage(() => t(message))]),
+				NotificationCardBody(() => () => [
+					title ? NotificationTitle(() => () => t(title)) : void 0,
+					NotificationMessage(() => () => t(message)),
+				]),
 				OrdoNotificationProgress({ id, duration, type }),
 				OrdoNotificationHideButton({ id, type }),
 			])
@@ -58,10 +62,10 @@ export const OrdoNotification = ({ on_click, id, message, duration, render_icon,
 
 // --- Internal ---
 
-const create_notification_card = (card_type: string) => Maoka.styled("div", { class: `notification-card ${card_type}` })
+const create_notification_card = (card_type: string) => MaokaStyled.Tags.div(`notification-card ${card_type}`)
 
-const NotificationCardBody = Maoka.styled("div", { class: "notification-card_body" })
+const NotificationCardBody = MaokaStyled.Tags.div("notification-card_body")
 
-const NotificationMessage = Maoka.styled("p")
+const NotificationMessage = MaokaStyled.Tags.p()
 
-const NotificationTitle = Maoka.styled("h2", { class: "notification-card_title" })
+const NotificationTitle = MaokaStyled.Tags.h2("notification-card_title")

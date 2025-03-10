@@ -23,6 +23,7 @@ import { Input, Label, Link, MetadataIcon } from "@ordo-pink/maoka-components"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
+import { MaokaStyled } from "@ordo-pink/maoka-styled"
 
 // TODO Refresh if metadata was changed from the outside
 export const FileMetadata = (metadata: Ordo.Metadata.Instance) =>
@@ -35,7 +36,7 @@ export const FileMetadata = (metadata: Ordo.Metadata.Instance) =>
 		use(MaokaJabs.add_class("p-2 flex flex-col gap-y-1"))
 
 		return () => [
-			TitleSection(() => [
+			TitleSection(() => () => [
 				MetadataIcon({ metadata }),
 
 				Input.Text({
@@ -75,12 +76,12 @@ const LabelsSection = (fsid: Ordo.Metadata.FSID) =>
 
 			return labels.length > 0
 				? metadata?.get_labels().map(label => Label(label, commands.emit, metadata))
-				: ActionPlaceholder(() => "Add labels...") // TODO Translations
+				: ActionPlaceholder(() => () => "Add labels...") // TODO Translations
 		}
 	})
 
-const ActionPlaceholder = Maoka.styled("div", { class: "text-sm text-neutral-400 dark:text-neutral-600" })
-const TitleSection = Maoka.styled("div", { class: "flex w-full space-x-2 items-center text-2xl" })
+const ActionPlaceholder = MaokaStyled.Tags.div("text-sm text-neutral-400 dark:text-neutral-600")
+const TitleSection = MaokaStyled.Tags.div("flex w-full space-x-2 items-center text-2xl")
 
 const OutgoingLinksSection = (fsid: Ordo.Metadata.FSID) =>
 	Maoka.create("div", ({ use }) => {
@@ -100,7 +101,7 @@ const OutgoingLinksSection = (fsid: Ordo.Metadata.FSID) =>
 
 			return links.length > 0
 				? links.map(metadata => Link({ href: `/editor/${metadata.get_fsid()}`, children: metadata.get_name() }))
-				: ActionPlaceholder(() => "Add outgoing links...") // TODO Translations
+				: ActionPlaceholder(() => () => "Add outgoing links...") // TODO Translations
 		}
 	})
 
@@ -117,6 +118,6 @@ const IncomingLinksSection = (fsid: Ordo.Metadata.FSID) =>
 
 			return links.length > 0
 				? links.map(metadata => Link({ href: `/editor/${metadata.get_fsid()}`, children: metadata.get_name() }))
-				: ActionPlaceholder(() => "No incoming links.") // TODO Translations
+				: ActionPlaceholder(() => () => "No incoming links.") // TODO Translations
 		}
 	})

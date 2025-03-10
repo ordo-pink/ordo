@@ -21,27 +21,35 @@
 
 import { CurrentUser, RRR } from "@ordo-pink/core"
 import { Oath, ops0 } from "@ordo-pink/oath"
+import { BackendUserKeys } from "@ordo-pink/backend"
 import { type TIntake } from "@ordo-pink/routary"
 import { default_handler } from "@ordo-pink/backend-util-default-handler"
 import { extract_request_body } from "@ordo-pink/backend-util-extract-body"
 import { is_non_empty_string } from "@ordo-pink/tau"
 
 import { type TIDContext } from "../../backend-id.types"
-import { create_auth_token } from "../../common/create-auth-token"
+import { create_session_id } from "../../common/create-session"
 import { extract_body_email } from "../../common/extract-body-email"
-import { persist_token } from "../../common/persist-token"
-import { redundant_auth_rrr } from "../../rrrs/redundant-auth.rrr"
+import { persist_session_id } from "../../common/persist-session"
 
 export const handle_validate_code = default_handler<TIDContext>(intake =>
 	extract_request_body(intake)
-		.and(validate_request_body(intake))
-		.and(validate_user_code(intake))
-		.and(drop_user_code(intake))
+		.pipe(ops0.chain(validate_request_body(intake)))
+		.pipe(ops0.chain(validate_user_code(intake)))
+		.pipe(ops0.chain(drop_user_code(intake)))
 		.pipe(ops0.tap(send_sign_in_notification(intake)))
-		.and(create_auth_token(intake))
-		.and(persist_token(intake))
-		.pipe(ops0.tap(({ jwt, user }) => void (intake.payload = { token: jwt.token, user: CurrentUser.Serialize(user) })))
-		.and(() => intake),
+		.pipe(ops0.chain(create_session_id(intake)))
+		.pipe(ops0.chain(persist_session_id(intake)))
+		.pipe(
+			ops0.tap(({ sid, user }) =>
+				intake.headers.set(
+					"Set-Cookie",
+					`${user.get_uid()}=${sid[0]}; Secure; HttpOnly; SameSite=Strict; Path=/; Max-Age=${intake.session_lifetime}`,
+				),
+			),
+		)
+		.pipe(ops0.tap(({ user }) => void (intake.payload = CurrentUser.Serialize(user.to_dto()))))
+		.pipe(ops0.map(() => intake)),
 )
 
 // --- Internal ---
@@ -54,30 +62,31 @@ const validate_request_body = (intake: I) => (body: any) =>
 		code: extract_body_email_code(intake)(body),
 	})
 
-const verify_password = (code: string, intake: I) => (user: OrdoBackend.User.DTO) =>
-	Oath.FromPromise(() => Bun.password.verify(code, user.email_code!))
-		.pipe(ops0.chain(is_valid => Oath.If(is_valid, { T: () => user })))
-		.pipe(ops0.rejected_map(() => invalid_code_error(code, intake)))
-
 const validate_user_code =
 	(intake: I) =>
 	({ email, code }: { email: Ordo.User.Email; code: string }) =>
 		intake.user_persistence_strategy
 			.get_by_email(email)
 			.pipe(ops0.rejected_map(rrr => ({ rrr, intake })))
-			.pipe(ops0.chain(u => Oath.FromNullable(u.email_code, () => redundant_auth_rrr(email, intake)).pipe(ops0.map(() => u))))
-			.pipe(ops0.chain(verify_password(code, intake)))
+			.pipe(
+				ops0.chain(user =>
+					user
+						.validate_code(code)
+						.pipe(ops0.chain(is_valid => Oath.If(is_valid, { T: () => user })))
+						.pipe(ops0.rejected_map(() => invalid_code_error(code, intake))),
+				),
+			)
 
-const drop_user_code = (intake: I) => (user: OrdoBackend.User.DTO) =>
+const drop_user_code = (intake: I) => (user: OrdoBackend.User.Instance) =>
 	intake.user_persistence_strategy
-		.update(user.id, { ...user, email_code: void 0 })
+		.update(user.get_uid(), { ...user.to_dto(), [BackendUserKeys.EMAIL_CODE]: void 0 })
 		.pipe(ops0.rejected_map(rrr => ({ rrr, intake })))
 		.pipe(ops0.map(() => user))
 
 // TODO Create email with Maoka
-const send_sign_in_notification = (intake: I) => (user: OrdoBackend.User.DTO) =>
+const send_sign_in_notification = (intake: I) => (user: OrdoBackend.User.Instance) =>
 	intake.notification_strategy.send({
-		to: user.email,
+		to: user.get_email(),
 		subject: "Account login",
 		content: `Someone logged in (IP ${intake.request_ip?.address ?? "not detected"})`,
 	})
@@ -91,7 +100,7 @@ export const extract_body_email_code = (intake: I) => (request_body: any) =>
 	Oath.FromNullable(request_body.code, () => email_code_not_provided_error(intake)).pipe(
 		ops0.chain(code =>
 			Oath.If(is_non_empty_string(code) && code.length === 6, {
-				T: () => code,
+				T: () => code as string,
 				F: () => invalid_email_code_error(code, intake),
 			}),
 		),

@@ -35,7 +35,10 @@ export type TValidation<$TEntity extends Record<string, unknown>, $TKey extends 
 ) => x is $TEntity[$TKey]
 
 export type TValidations<$TEntity extends Record<string, unknown>> = {
-	[$TKey in keyof $TEntity extends string ? `is_${keyof $TEntity}` : never]: TValidation<$TEntity, TDropIsPrefix<$TKey>>
+	[$TKey in keyof $TEntity extends string ? `is_${Lowercase<keyof $TEntity>}` : never]: TValidation<
+		$TEntity,
+		TDropIsPrefix<$TKey>
+	>
 }
 
 export type TFlattenRecord<T extends { key: string; value: any }> = {
@@ -278,45 +281,41 @@ declare global {
 			achievement: {
 				add: () => Ordo.Achievement.Instance
 			}
+			open_achievements: () => void
 			open_current_user_profile: () => void
 			open_settings: () => void
-			open_achievements: () => void
 		}
 		metadata: {
+			add_labels: () => { fsid: Ordo.Metadata.FSID; labels: Ordo.Metadata.Label[] }
+			add_links: () => { fsid: Ordo.Metadata.FSID; links: Ordo.Metadata.FSID[] }
 			create: () => Ordo.Metadata.CreateParams
-			show_upload_modal: () => Ordo.Metadata.FSID | null
-			show_create_modal: () => Ordo.Metadata.FSID | null
-			show_remove_modal: () => Ordo.Metadata.FSID
-			show_rename_modal: () => Ordo.Metadata.FSID
-			show_edit_label_modal: () => Ordo.Metadata.Label
-			show_move_palette: () => Ordo.Metadata.FSID
-			show_edit_labels_palette: () => Ordo.Metadata.FSID
-			show_edit_links_palette: () => Ordo.Metadata.FSID
+			edit_label: () => { old_label: Ordo.Metadata.Label; new_label: Ordo.Metadata.Label }
+			move: () => { fsid: Ordo.Metadata.FSID; new_parent: Ordo.Metadata.FSID | null }
+			open_published_page: () => Ordo.Metadata.FSID
+			publish: () => Ordo.Metadata.FSID
+			remove_labels: () => { fsid: Ordo.Metadata.FSID; labels: Ordo.Metadata.Label[] }
+			remove_links: () => { fsid: Ordo.Metadata.FSID; links: Ordo.Metadata.FSID[] }
 			remove: () => Ordo.Metadata.FSID
 			rename: () => { fsid: Ordo.Metadata.FSID; new_name: string }
-			move: () => { fsid: Ordo.Metadata.FSID; new_parent: Ordo.Metadata.FSID | null }
-			add_labels: () => { fsid: Ordo.Metadata.FSID; labels: Ordo.Metadata.Label[] }
-			remove_labels: () => { fsid: Ordo.Metadata.FSID; labels: Ordo.Metadata.Label[] }
-			edit_label: () => { old_label: Ordo.Metadata.Label; new_label: Ordo.Metadata.Label }
-			add_links: () => { fsid: Ordo.Metadata.FSID; links: Ordo.Metadata.FSID[] }
-			remove_links: () => { fsid: Ordo.Metadata.FSID; links: Ordo.Metadata.FSID[] }
 			set_property: () => { fsid: Ordo.Metadata.FSID; key: string; value: any }
 			set_size: () => { fsid: Ordo.Metadata.FSID; size: number }
-			publish: () => { ctx: Ordo.CreateFunction.State; fsid: Ordo.Metadata.FSID; name?: string; styles?: string[] }
+			show_create_modal: () => Ordo.Metadata.FSID | null
+			show_edit_label_modal: () => Ordo.Metadata.Label
+			show_edit_labels_palette: () => Ordo.Metadata.FSID
+			show_edit_links_palette: () => Ordo.Metadata.FSID
+			show_move_palette: () => Ordo.Metadata.FSID
+			show_publish_modal: () => Ordo.Metadata.FSID
+			show_remove_modal: () => Ordo.Metadata.FSID
+			show_rename_modal: () => Ordo.Metadata.FSID
+			show_upload_modal: () => Ordo.Metadata.FSID | null
+			unpublish: () => Ordo.Metadata.FSID
 		}
 		content: {
-			set: () => { fsid: Ordo.Metadata.FSID; content: Ordo.Content.Instance; content_type: string }
-			upload: () => {
-				name: string
-				parent: Ordo.Metadata.FSID | null
-				content: Ordo.Content.Instance
-				type: string
-			}
+			set: () => { content_type: string; content: Ordo.Content.Instance; fsid: Ordo.Metadata.FSID }
+			upload: () => { content: Ordo.Content.Instance; name: string; parent: Ordo.Metadata.FSID | null; type: string }
+			remove: () => Ordo.Metadata.FSID
 		}
-		file_editor: {
-			open: () => void
-			open_file: () => Ordo.Metadata.FSID
-		}
+		file_editor: { open_file: () => Ordo.Metadata.FSID; open: () => void }
 		welcome: {
 			go_to_email_support: () => void
 			go_to_messenger_support: () => void
@@ -324,9 +323,9 @@ declare global {
 			open_support_palette: () => void
 		}
 		auth: {
+			request_code: (email: Ordo.User.Email) => void
 			show_request_code_modal: () => void
 			show_validate_code_modal: () => Ordo.User.Email
-			request_code: (email: Ordo.User.Email) => void
 			validate_code: (email: Ordo.User.Email, code: string) => void
 		}
 	}
@@ -352,6 +351,8 @@ declare global {
 		type Fetch = typeof window.fetch
 
 		type Hosts = { id: string; dt: string; pb: string; web: string }
+
+		type DTOLike<$TDTO extends any[]> = [...$TDTO, ...any]
 
 		/**
 		 * User achievements and whatever else related to using them.
@@ -545,25 +546,32 @@ declare global {
 		namespace FileAssociation {
 			type RenderFn = (params: Ordo.FileAssociation.RenderParams) => TMaokaChildren | Promise<TMaokaChildren>
 
+			type RenderToStringFn = (params: Ordo.FileAssociation.RenderParams) => string | Promise<string>
+
 			type RenderIconFn = () => TMaokaChildren | Promise<TMaokaChildren>
 
 			type Type = {
+				description: Ordo.I18N.TranslationKey
 				name: string
 				readable_name: Ordo.I18N.TranslationKey
-				description: Ordo.I18N.TranslationKey
 			}
 
+			// TODO Support for marking files as remote-only
 			type Instance = {
 				name: string
-				types: Ordo.FileAssociation.Type[]
-				render: RenderFn
 				render_icon?: Ordo.FileAssociation.RenderIconFn
+				content_to_string?: {
+					render?: Ordo.FileAssociation.RenderToStringFn
+					styles?: string[]
+				}
+				render: RenderFn
+				types: Ordo.FileAssociation.Type[]
 			}
 
 			type RenderParams = {
+				content: Ordo.Content.Instance
 				is_editable: boolean
 				is_embedded: boolean
-				content: Ordo.Content.Instance
 				metadata: Ordo.Metadata.Instance
 			}
 		}
@@ -572,61 +580,57 @@ declare global {
 			type Handle = `@${string}` // TODO Disallow forbidden chars
 			type UID = `${string}-${string}-${string}-${string}-${string}`
 			type Email = `${string}@${string}.${string}`
+			type SessionID = `${string}-${string}-${string}-${string}-${string}`
+			type Session = [SessionID, number, string?]
 
 			namespace Current {
-				type DTO = Ordo.User.Public.DTO & {
-					email: Ordo.User.Email
-					file_limit: number
-					max_upload_size: number
-					max_functions: number
-					installed_functions: string[]
-				}
+				type DTO = [...Ordo.User.Public.DTO, Ordo.User.Email, number, string[], number, number, Session[]]
 
-				type Instance = Ordo.User.Public.Instance & {
-					get_email: () => Ordo.User.Email
-					get_file_limit: () => number
-					get_max_upload_size: () => number
-					get_max_functions: () => number
-					get_installed_functions: () => string[]
+				type Instance = Omit<Ordo.User.Public.Instance, "to_dto"> & {
+					can_add_function: () => boolean
 					can_create_files: (number: number) => boolean
 					can_upload: (bytes: number) => boolean
-					can_add_function: () => boolean
+					get_email: () => Ordo.User.Email
+					get_file_limit: () => number
+					get_installed_functions: () => string[]
+					get_max_functions: () => number
+					get_max_upload_size: () => number
+					get_sessions: () => Session[]
 					to_dto: () => Ordo.User.Current.DTO
 				}
 
-				type Validations = TValidations<Ordo.User.Current.DTO> & {
+				type Validations = TValidations<{
+					[$TKey in keyof typeof C.CurrentUserKeys]: (
+						x: unknown,
+					) => x is Ordo.User.Current.DTO[(typeof C.CurrentUserKeys)[$TKey]]
+				}> & {
 					is_dto: (x: unknown) => x is Ordo.User.Current.DTO
 				}
 
 				type Static = {
-					FromDTO: (dto: Ordo.User.Current.DTO) => Ordo.User.Current.Instance
-					Serialize: <$TDTO extends Ordo.User.Current.DTO>(dto: $TDTO) => Ordo.User.Current.DTO
+					FromDTO: (dto: Ordo.DTOLike<Ordo.User.Current.DTO>) => Ordo.User.Current.Instance
+					Serialize: (dto: Ordo.DTOLike<Ordo.User.Current.DTO>) => Ordo.User.Current.DTO
 					Validations: Ordo.User.Current.Validations
 				}
 			}
 
 			namespace Public {
-				type DTO = {
-					id: Ordo.User.UID
-					created_at: number
-					subscription: C.UserSubscription
-					handle: Ordo.User.Handle
-					first_name?: string
-					last_name?: string
-				}
+				type DTO = [Ordo.User.UID, Ordo.User.Handle, number, C.UserSubscription, string?, string?]
 
-				type Validations = TValidations<Ordo.User.Public.DTO> & {
+				type Validations = TValidations<{
+					[$TKey in keyof typeof C.PublicUserKeys]: Ordo.User.Current.DTO[(typeof C.PublicUserKeys)[$TKey]]
+				}> & {
 					is_dto: (x: unknown) => x is Ordo.User.Public.DTO
 				}
 
 				type Static = {
 					FromDTO: (dto: Ordo.User.Public.DTO) => Ordo.User.Public.Instance
-					Serialize: <$TDTO extends Ordo.User.Public.DTO>(dto: $TDTO) => Ordo.User.Public.DTO
+					Serialize: <$TDTO extends [...Ordo.User.Public.DTO, ...any]>(dto: $TDTO) => Ordo.User.Public.DTO
 					Validations: Ordo.User.Public.Validations
 				}
 
 				type Instance = {
-					get_id: () => Ordo.User.UID
+					get_uid: () => Ordo.User.UID
 					get_created_at: () => Date
 					get_subscription: () => C.UserSubscription
 					get_handle: () => Handle
@@ -643,7 +647,7 @@ declare global {
 
 			type Query = {
 				is_authenticated: () => boolean
-				get_current: () => TResult<Ordo.User.Current.Instance, Ordo.Rrr<"EPERM">>
+				get_current: () => TResult<Ordo.User.Current.Instance | null, Ordo.Rrr<"EPERM">>
 				get_by_id: (uid: Ordo.User.UID) => Oath<Ordo.User.Public.Instance, Ordo.Rrr<"EPERM" | "EINVAL" | "EIO">>
 				get_by_handle: (handle: Ordo.User.Handle) => Oath<Ordo.User.Public.Instance, Ordo.Rrr<"EPERM" | "EINVAL" | "EIO">>
 				get $(): TZags<{ version: number }>
@@ -671,7 +675,7 @@ declare global {
 
 			type RepositoryStatic = {
 				Of: (
-					auth$: TZags<{ user: Ordo.User.Current.Instance | null; token: string | null }>,
+					auth$: TZags<{ user: Ordo.User.Current.Instance | null }>,
 					local_strategy: Ordo.Content.PersistenceStrategy,
 					remote_strategy: Ordo.Content.PersistenceStrategy,
 				) => Repository
@@ -679,15 +683,19 @@ declare global {
 
 			type Repository = {
 				get: (
-					uid: Ordo.User.UID,
+					uid: Ordo.User.UID | null,
 					fsid: Ordo.Metadata.FSID,
 				) => Oath<Ordo.Content.Instance, Ordo.Rrr<"EIO" | "EACCES" | "EINVAL">>
 				get_all: () => Oath<Record<string, Ordo.Content.Instance>, Ordo.Rrr<"EIO">>
 				put: (
-					uid: Ordo.User.UID,
+					uid: Ordo.User.UID | null,
 					fsid: Ordo.Metadata.FSID,
 					content: Ordo.Content.Instance,
 				) => Oath<void, Ordo.Rrr<"EINVAL" | "EACCES" | "EIO">>
+				remove: (
+					uid: Ordo.User.UID | null,
+					fsid: Ordo.Metadata.FSID,
+				) => Oath<void, Ordo.Rrr<"EINVAL" | "ENOENT" | "EACCES" | "EIO">>
 				get $(): TZags<{ version: number }>
 			}
 
@@ -723,9 +731,9 @@ declare global {
 				labels: Ordo.Metadata.Label[]
 				type: string
 				created_at: number
-				created_by: Ordo.User.UID
+				created_by: Ordo.User.UID | null
 				updated_at: number
-				updated_by: Ordo.User.UID
+				updated_by: Ordo.User.UID | null
 				size: number
 				props?: $TProps
 				is_deleted?: boolean
@@ -734,7 +742,7 @@ declare global {
 
 			type Static = {
 				Of: <$TProps extends Ordo.Metadata.Props = Ordo.Metadata.Props>(
-					params: Ordo.Metadata.CreateParams<$TProps> & { author_id: Ordo.User.UID },
+					params: Ordo.Metadata.CreateParams<$TProps> & { author_id: Ordo.User.UID | null },
 				) => Ordo.Metadata.Instance<$TProps>
 				FromDTO: <$TProps extends Ordo.Metadata.Props = Ordo.Metadata.Props>(
 					dto: Ordo.Metadata.DTO<$TProps>,
@@ -757,9 +765,9 @@ declare global {
 				get_label_index: (label: Ordo.Metadata.Label) => number
 				get_type: () => string
 				get_created_at: () => Date
-				get_created_by: () => Ordo.User.UID
+				get_created_by: () => Ordo.User.UID | null
 				get_updated_at: () => Date
-				get_updated_by: () => Ordo.User.UID
+				get_updated_by: () => Ordo.User.UID | null
 				get_size: () => number
 				get_readable_size: () => string
 				get_property: <_TKey extends keyof $TProps>(key: _TKey) => NonNullable<$TProps[_TKey]> | null
@@ -769,6 +777,7 @@ declare global {
 				is_hidden: () => boolean
 				validate: (checksum: string) => boolean
 				is_deleted: () => boolean
+				is_local_only: () => boolean
 			}
 
 			type Validations = TValidations<Ordo.Metadata.DTO> & {
@@ -798,8 +807,8 @@ declare global {
 			}
 
 			type RepositoryAsync = {
-				get: (token: string) => Oath<Ordo.Metadata.DTO[], Ordo.Rrr<"EIO">>
-				put: (token: string, metadata: Ordo.Metadata.DTO[]) => Oath<void, Ordo.Rrr<"EINVAL" | "EIO">>
+				get: () => Oath<Ordo.Metadata.DTO[], Ordo.Rrr<"EIO">>
+				put: (metadata: Ordo.Metadata.DTO[]) => Oath<void, Ordo.Rrr<"EINVAL" | "EIO">>
 			}
 
 			type QueryOptions = { show_hidden?: boolean }
@@ -1009,7 +1018,7 @@ declare global {
 			/**
 			 * Command handler.
 			 */
-			type CommandHandler<$TPayload> = (payload: $TPayload) => unknown
+			type CommandHandler<$TPayload> = (payload: $TPayload) => void | Promise<void>
 
 			type HandlerOf<$TKey extends Ordo.Command.Name> = CommandHandler<Ordo.Command.Record[$TKey]>
 
@@ -1021,6 +1030,11 @@ declare global {
 				name: $TKey,
 				...rest: Ordo.Command.Record[$TKey] extends void ? [key?: string] : [payload: Ordo.Command.Record[$TKey], key?: string]
 			) => void
+
+			type EmitNagaFn = <$TKey extends Ordo.Command.Name>(
+				name: $TKey,
+				...rest: Ordo.Command.Record[$TKey] extends void ? [key?: string] : [payload: Ordo.Command.Record[$TKey], key?: string]
+			) => Oath<void, Ordo.Rrr>
 
 			type CancelFn = <$TKey extends Ordo.Command.Name>(name: $TKey, payload?: Ordo.Command.Record[$TKey], key?: string) => void
 
@@ -1042,6 +1056,15 @@ declare global {
 				 * is a command with given key already.
 				 */
 				emit: Ordo.Command.EmitFn
+
+				/**
+				 * Emit given command with given payload. You can provide an optional key that you can use
+				 * later to apply targeted cancellation for the command. Emission does not happen if there
+				 * is a command with given key already. The command returns an Oath that will be resolved
+				 * when the command succeeds or rejected when it fails. As with every other Oath, you need
+				 * to invoke it to get the result.
+				 */
+				naga: Ordo.Command.EmitNagaFn
 
 				/**
 				 * Cancel a command with given payload. If you provided a key when emitting the command,
@@ -1142,13 +1165,13 @@ declare global {
 				 * @optional
 				 * @default () => payload
 				 */
-				payload_creator?: (params: Ordo.ContextMenu.Params) => unknown
+				payload_creator?: (params: Ordo.ContextMenu.Params<any>) => unknown
 			}
 
 			/**
 			 * Context menu item method parameters.
 			 */
-			type Params = { event: MouseEvent; payload?: unknown }
+			type Params<$TPayload = unknown> = { event: MouseEvent; payload?: $TPayload }
 
 			/**
 			 * Context menu.

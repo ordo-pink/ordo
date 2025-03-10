@@ -20,7 +20,9 @@
  */
 
 import { Maoka } from "@ordo-pink/maoka"
+import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { Result } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
 import { create_hotkey_from_event } from "@ordo-pink/hotkey-from-event"
@@ -46,7 +48,7 @@ export const Hotkey = (
 		show_in_mobile: false,
 	},
 ) =>
-	Maoka.create("div", ({ use, onunmount, element, onmount: after_mount }) => {
+	Maoka.create("div", ({ element, use }) => {
 		use(MaokaJabs.set_class("hotkey"))
 		if (options.smol) use(MaokaJabs.add_class("smol"))
 		if (options.show_in_mobile) use(MaokaJabs.add_class("mobile"))
@@ -62,27 +64,34 @@ export const Hotkey = (
 
 		const symbol = split[split.length - 1].toLowerCase()
 
-		const handle_keydown = (event: KeyboardEvent) => {
-			if (IGNORED_KEYS.includes(event.key) || options.decoration_only) return
+		use(
+			MaokaDOM.Jabs.onmount(() => {
+				const handle_keydown = (event: KeyboardEvent) => {
+					if (IGNORED_KEYS.includes(event.key) || options.decoration_only) return
 
-			if (options.prevent_in_inputs) {
-				const target = event.target as HTMLElement
+					if (options.prevent_in_inputs) {
+						const target = event.target as HTMLElement
 
-				// TODO Add textarea and div contenteditable
-				if (target.tagName === "INPUT") return
-			}
+						// TODO Add textarea and div contenteditable
+						if (target.tagName === "INPUT") return
+					}
 
-			const parsed_hotkey = create_hotkey_from_event(event, is_darwin)
+					const parsed_hotkey = create_hotkey_from_event(event, is_darwin)
 
-			if (parsed_hotkey === hotkey) {
-				event.preventDefault()
+					if (parsed_hotkey === hotkey) {
+						event.preventDefault()
 
-				if (element instanceof HTMLElement) element.click()
-			}
-		}
+						if (element instanceof HTMLElement) element.click()
+					}
+				}
 
-		after_mount(() => document.addEventListener("keydown", handle_keydown))
-		onunmount(() => document.removeEventListener("keydown", handle_keydown))
+				document.addEventListener("keydown", handle_keydown)
+
+				return () => {
+					document.removeEventListener("keydown", handle_keydown)
+				}
+			}),
+		)
 
 		return () => [
 			Result.If(split.includes("ctrl")).cata(Result.catas.if_ok(() => ctrl)),
@@ -97,20 +106,19 @@ export const Hotkey = (
 
 const IGNORED_KEYS = ["Control", "Shift", "Alt", "Meta"]
 
-const KeyContainer = Maoka.styled("span", {
-	class: "key-container",
-})
+const KeyContainer = MaokaStyled.Tags.span("key-container")
 
 const Key = (key: string) =>
-	KeyContainer(() =>
-		Switch.Match(key)
-			.case("backspace", () => "⌫")
-			.case("enter", () => "⏎")
-			.case("escape", () => "Esc")
-			.case("tab", () => "⇥")
-			.case("arrowleft", () => "←")
-			.case("arrowright", () => "→")
-			.case("arrowup", () => "↑")
-			.case("arrowdown", () => "↓")
-			.default(() => title_case(key)),
+	KeyContainer(
+		() => () =>
+			Switch.Match(key)
+				.case("backspace", () => "⌫")
+				.case("enter", () => "⏎")
+				.case("escape", () => "Esc")
+				.case("tab", () => "⇥")
+				.case("arrowleft", () => "←")
+				.case("arrowright", () => "→")
+				.case("arrowup", () => "↑")
+				.case("arrowdown", () => "↓")
+				.default(() => title_case(key)),
 	)

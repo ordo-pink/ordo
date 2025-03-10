@@ -22,13 +22,15 @@
 import { Maoka, TMaokaChildren } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
+import { MaokaStr } from "@ordo-pink/maoka-render-string"
+import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { is_string } from "@ordo-pink/tau"
+// TODO Drop state dependency
+import { ordo_app_state } from "@ordo-pink/frontend-app/app.state"
 
 import { MetadataIcon } from "../metadata/metadata-icon.component"
 
 import "../../maoka-components.css"
-import { MaokaStr } from "@ordo-pink/maoka-render-string"
-import { ordo_app_state } from "@ordo-pink/frontend-app/app.state"
 
 type P = { href: string; children?: TMaokaChildren; custom_class?: string; show_visited?: boolean; title?: string }
 export const Link = ({ href, children, custom_class, show_visited, title }: P) =>
@@ -57,7 +59,7 @@ export const MetadataLink = ({
 	Maoka.create("span", ({ element }) => {
 		let href = `/editor/${metadata.get_fsid()}`
 
-		const user_query = ordo_app_state.zags.select("auth.user")
+		const user_query = ordo_app_state.zags.select("user")
 		const pb_host = ordo_app_state.zags.select("hosts.pb")
 
 		if (user_query && MaokaStr.is_maoka_str_element(element)) {
@@ -67,9 +69,9 @@ export const MetadataLink = ({
 
 		return () =>
 			Link({
-				children: MetadataLinkWrapper(() => [
+				children: MetadataLinkWrapper(() => () => [
 					MetadataIcon({ metadata, show_emoji_picker: false }),
-					MetadataLinkTextWrapper(() => children),
+					MetadataLinkTextWrapper(() => () => children),
 				]),
 				custom_class: `no-underline ${custom_class}`,
 				href,
@@ -80,9 +82,9 @@ export const MetadataLink = ({
 
 // --- Internal ---
 
-const MetadataLinkWrapper = Maoka.styled("div", { class: "link_wrapper" })
+const MetadataLinkWrapper = MaokaStyled.Tags.div("link_wrapper")
 
-const MetadataLinkTextWrapper = Maoka.styled("div", { class: "link link_text-wrapper" })
+const MetadataLinkTextWrapper = MaokaStyled.Tags.div("link link_text-wrapper")
 
 const click_listener = (emit: Ordo.Command.Commands["emit"], url: string) => (event: MouseEvent) => {
 	event.preventDefault()

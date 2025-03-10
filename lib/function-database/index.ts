@@ -22,17 +22,13 @@
 import { BsFileEarmarkRuled } from "@ordo-pink/frontend-icons"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStr } from "@ordo-pink/maoka-render-string"
-import { Result } from "@ordo-pink/result"
 import { TwoLetterLocale } from "@ordo-pink/locale"
 import { create_function } from "@ordo-pink/core"
-import { invokers0 } from "@ordo-pink/oath"
 
 import { Database } from "./src/database.component"
 import { type TColumnName } from "./src/database.types"
 
-import core_styles from "@ordo-pink/frontend-app/index.css?inline"
 import db_styles from "./src/database.css?inline"
-import maoka_components from "@ordo-pink/maoka-components/maoka-components.css?inline"
 
 declare global {
 	interface t {
@@ -147,45 +143,14 @@ export default create_function(
 			],
 			render: ({ metadata, content, is_editable }) => Database(metadata, content, is_editable),
 			render_icon: BsFileEarmarkRuled,
-		})
-
-		commands.on("cmd.metadata.publish", ({ fsid }) => {
-			const content_query = ctx.content_query
-			const metadata_query = ctx.metadata_query
-			const metadata = metadata_query.get_by_fsid(fsid).cata(Result.catas.or_else(() => null))
-			const user = ctx.user_query.get_current().cata(Result.catas.or_else(() => null))
-
-			if (!user || !metadata || metadata.get_type() !== "database/ordo") return // Log cannot publish if unauthed error
-
-			void content_query
-				.get(user.get_id(), fsid)
-				.and(content => MaokaOrdo.Components.WithState(ctx, () => Database(metadata, content, false)))
-				.and(cmp => MaokaOrdo.Components.WithState(ctx, () => cmp))
-				.and(cmp => MaokaStr.render(MaokaStr.create_element("div"), cmp))
-				.and(
-					str => `<html>
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>${metadata.get_name()}</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="icon" href="/favicon.ico" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet"
-/>
-<style>
-${core_styles}
-${maoka_components}
-${db_styles}
-</style>
-</head>
-<body>
-${str}
-</body>
-</html>`,
-				)
-				.and(console.log)
-				.invoke(invokers0.to_promise)
+			content_to_string: {
+				render: ({ metadata, content, is_editable }) =>
+					MaokaStr.render(
+						MaokaOrdo.Components.WithState(ctx, () => Database(metadata, content, is_editable)),
+						() => crypto.randomUUID(),
+					),
+				styles: [db_styles],
+			},
 		})
 	},
 )

@@ -20,7 +20,9 @@
  */
 
 import { Maoka } from "@ordo-pink/maoka"
+import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { NotificationType } from "@ordo-pink/core"
 
 import { OrdoNotification } from "./notification.component"
@@ -31,17 +33,21 @@ import "./notifications.css"
 
 // BUG Notification duration gets reset when rerendering
 // TODO Notification stack when there are more than 5 notifications
-export const OrdoNotifications = Maoka.create("div", ({ use, onunmount }) => {
+export const OrdoNotifications = Maoka.create("div", ({ use }) => {
 	const commands = ordo_app_state.zags.select("commands")
 	const translate = ordo_app_state.zags.select("translate")
 
-	commands.on("cmd.application.notification.hide", handle_notification_hide)
-	commands.on("cmd.application.notification.show", handle_notification_show)
+	use(
+		MaokaDOM.Jabs.onmount(() => {
+			commands.on("cmd.application.notification.hide", handle_notification_hide)
+			commands.on("cmd.application.notification.show", handle_notification_show)
 
-	onunmount(() => {
-		commands.off("cmd.application.notification.hide", handle_notification_hide)
-		commands.off("cmd.application.notification.show", handle_notification_show)
-	})
+			return () => {
+				commands.off("cmd.application.notification.hide", handle_notification_hide)
+				commands.off("cmd.application.notification.show", handle_notification_show)
+			}
+		}),
+	)
 
 	use(MaokaJabs.set_class("notification-list"))
 
@@ -57,12 +63,13 @@ export const OrdoNotifications = Maoka.create("div", ({ use, onunmount }) => {
 				.map(item => OrdoNotification(item)),
 
 			has_pending_notifications
-				? MoreNotifications(() =>
-						MoreNotificationsBody(() => [
-							translate("t.common.components.notifications.pending_notifications"),
-							" ",
-							notifications.length - 5,
-						]),
+				? MoreNotifications(
+						() => () =>
+							MoreNotificationsBody(() => () => [
+								translate("t.common.components.notifications.pending_notifications"),
+								" ",
+								notifications.length - 5,
+							]),
 					)
 				: void 0,
 		]
@@ -71,9 +78,9 @@ export const OrdoNotifications = Maoka.create("div", ({ use, onunmount }) => {
 
 // --- Internal ---
 
-const MoreNotifications = Maoka.styled("div", { class: "more-notifications_card" })
+const MoreNotifications = MaokaStyled.Tags.div("more-notifications_card")
 
-const MoreNotificationsBody = Maoka.styled("div", { class: "more-notifications_body" })
+const MoreNotificationsBody = MaokaStyled.Tags.div("more-notifications_body")
 
 const handle_notification_hide: Ordo.Command.HandlerOf<"cmd.application.notification.hide"> = payload =>
 	ordo_notifications_state.zags.update("notifications", prev_state =>

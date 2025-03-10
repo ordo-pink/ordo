@@ -20,7 +20,7 @@
  */
 
 import { App } from "@ordo-pink/frontend-app"
-import { Maoka } from "@ordo-pink/maoka"
+import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 
 const app = document.getElementById("app")!
 
@@ -28,4 +28,4 @@ const id_host = import.meta.env.VITE_ORDO_ID_HOST
 const dt_host = import.meta.env.VITE_ORDO_DT_HOST
 const pb_host = import.meta.env.VITE_ORDO_PB_HOST
 
-void Maoka.dom(app, App({ id_host, dt_host, pb_host }))
+void MaokaDOM.render(app, App({ id_host, dt_host, pb_host }), () => crypto.randomUUID())

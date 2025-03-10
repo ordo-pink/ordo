@@ -20,6 +20,7 @@
  */
 
 import { Maoka, TMaokaElement } from "@ordo-pink/maoka"
+import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { Switch } from "@ordo-pink/switch"
@@ -40,9 +41,10 @@ const SidebarPaddingContractor = (element: TMaokaElement) =>
 		return () => {
 			const sidebar = get_sidebar()
 
-			Switch.OfTrue()
-				.case(sidebar.enabled && sidebar.visible, () => element.classList?.remove("no-sidebar"))
-				.default(() => element.classList?.add("no-sidebar"))
+			if (MaokaDOM.is_maoka_dom_element(element))
+				Switch.OfTrue()
+					.case(sidebar.enabled && sidebar.visible, () => element.classList.remove("no-sidebar"))
+					.default(() => element.classList.add("no-sidebar"))
 		}
 	})
 

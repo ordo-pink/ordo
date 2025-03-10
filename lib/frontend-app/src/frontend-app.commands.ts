@@ -20,11 +20,15 @@
  */
 
 import { call_once, deep_equals } from "@ordo-pink/tau"
+import { Oath } from "@ordo-pink/oath"
+import { RRR } from "@ordo-pink/core"
 import { ZAGS } from "@ordo-pink/zags"
 
 import { ordo_app_state } from "../app.state"
 
-type TCommand = (Ordo.Command.Command | Ordo.Command.PayloadCommand) & { fid: symbol }
+type TCommand = (Ordo.Command.Command | Ordo.Command.PayloadCommand) & {
+	fid: symbol
+}
 type TCmdListener<N extends Ordo.Command.Name = Ordo.Command.Name, P = any> = [N, Ordo.Command.CommandHandler<P>, symbol]
 
 type TF = () => { commands: Ordo.Command.Commands; get_commands: (fid: symbol) => Ordo.Command.Commands }
@@ -46,7 +50,13 @@ export const init_commands: TF = call_once(() => {
 				remove([name, handler, fid])
 			},
 			emit: (name, payload?, key = crypto.randomUUID()) => {
-				enqueue({ name, payload, key, fid })
+				enqueue({ name, payload, key, fid, callback: () => void 0 })
+			},
+			naga: (name, payload?, key = crypto.randomUUID()) => {
+				return new Oath<void, Ordo.Rrr>((resolve, reject) => {
+					const callback = (rrr?: Ordo.Rrr) => (rrr ? reject(rrr) : resolve(void 0))
+					enqueue({ name, payload, key, fid, callback })
+				})
 			},
 			cancel: (name, payload?, key = crypto.randomUUID()) => {
 				logger.debug(`🟣 '${func}' cancelled command '${name}'`)
@@ -64,8 +74,8 @@ export const init_commands: TF = call_once(() => {
 			const payload = is_payload_command(command) ? (command.payload as unknown) : undefined
 
 			if (!known_functions.has_permissions(fid, { commands: [name] })) {
-				logger.error(`${func} permission RRR. Did you forget to request command permission '${name}'?`)
 				dequeue({ name, payload, fid })
+				command.callback(RRR.codes.eperm(`${func} permission RRR. Did you forget to request command permission '${name}'?`))
 
 				return
 			}
@@ -77,20 +87,22 @@ export const init_commands: TF = call_once(() => {
 
 				if (payload !== undefined) {
 					logger.debug(
-						`🔵 Command "${name}" invoked by "${func}" for ${listeners.length} ${listeners.length === 1 ? "listener" : "listeners"}. Provided payload: `,
+						`🔵 Command '${name}' invoked by '${func}' for ${listeners.length} ${listeners.length === 1 ? "listener" : "listeners"}. Provided payload: `,
 						payload,
 					)
 				} else {
 					logger.debug(
-						`🔵 Command "${name}" invoked by "${func}" for ${listeners.length} ${listeners.length === 1 ? "listener" : "listeners"}.`,
+						`🔵 Command '${name}' invoked by '${func}' for ${listeners.length} ${listeners.length === 1 ? "listener" : "listeners"}.`,
 					)
 				}
 
-				for (const listener of listeners) listener(payload)
+				Promise.all(listeners.map(listener => listener(payload)))
+					.then(() => command.callback())
+					.catch(e => command.callback(e))
 			} else {
 				is_dev &&
 					logger.debug(
-						`🟡 No handler found for the command "${name}". The command will stay pending until handler is registerred.`,
+						`🟡 No handler found for the command '${name}'. The command will stay pending until handler is registerred.`,
 					)
 			}
 		}
@@ -98,7 +110,7 @@ export const init_commands: TF = call_once(() => {
 
 	const app_commands = get_commands(app_fid)
 
-	ordo_app_state.zags.update("commands", () => app_commands)
+	void ordo_app_state.zags.update("commands", () => app_commands)
 
 	logger.debug("🟢 Initialised commands.")
 
@@ -108,8 +120,8 @@ export const init_commands: TF = call_once(() => {
 const is_payload_command = (cmd: Ordo.Command.Command): cmd is Ordo.Command.PayloadCommand =>
 	typeof cmd.name === "string" && (cmd as Ordo.Command.PayloadCommand).payload !== undefined
 
-const enqueue = (new_command: TCommand) =>
-	command$.update("queue", state => (state.some(cmd => cmd.key === new_command.key) ? state : [...state, new_command]))
+const enqueue = (new_command: TCommand & { callback: (rrr?: Ordo.Rrr) => void }) =>
+	command$.update("queue", state => (state.some(cmd => cmd.key === new_command.key) ? state : [...state, new_command]) as any)
 
 const dequeue = (command: TCommand) =>
 	command$.update("queue", state => {
@@ -142,19 +154,6 @@ const add_before = (new_listener: TCmdListener) =>
 		return state
 	})
 
-// const add_after = (new_listener: TCmdListener) =>
-// 	command$.update("storage", state => {
-// 		const listeners = state[new_listener[0]]
-
-// 		if (!listeners) {
-// 			state[new_listener[0]] = [new_listener[1]]
-// 		} else if (!listeners.some(listener => listener.toString() === new_listener[1].toString())) {
-// 			state[new_listener[0]].push(new_listener[1])
-// 		}
-
-// 		return state
-// 	})
-
 const remove = (listener: TCmdListener) =>
 	command$.update("storage", state => {
 		if (!state[listener[0]]) return state
@@ -165,6 +164,9 @@ const remove = (listener: TCmdListener) =>
 	})
 
 const command$ = ZAGS.Of({
-	queue: [] as ((Ordo.Command.Command | Ordo.Command.PayloadCommand) & { fid: symbol })[],
+	queue: [] as ((Ordo.Command.Command | Ordo.Command.PayloadCommand) & {
+		fid: symbol
+		callback: (rrr?: Ordo.Rrr) => void
+	})[],
 	storage: {} as Record<string, Ordo.Command.CommandHandler<any>[]>,
 })

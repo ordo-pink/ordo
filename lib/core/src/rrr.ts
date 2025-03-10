@@ -19,6 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { is_finite_non_negative_int, is_object, lt } from "@ordo-pink/tau"
 import { ErrorType } from "@ordo-pink/core"
 
 export const eperm = (message: string, ...debug: any[]) => compose_rrr(message)("EPERM", debug)
@@ -30,7 +31,7 @@ export const eagain = (message: string, ...debug: any[]) => compose_rrr(message)
 export const eacces = (message: string, ...debug: any[]) => compose_rrr(message)("EACCES", debug)
 export const eexist = (message: string, ...debug: any[]) => compose_rrr(message)("EEXIST", debug)
 export const einval = (message: string, ...debug: any[]) => compose_rrr(message)("EINVAL", debug)
-export const emfile = (message: string, ...debug: any[]) => compose_rrr(message)("EMFILE", debug)
+export const enotrecoverable = (message: string, ...debug: any[]) => compose_rrr(message)("ENOTRECOVERABLE", debug)
 export const efbig = (message: string, ...debug: any[]) => compose_rrr(message)("EFBIG", debug)
 export const enospc = (message: string, ...debug: any[]) => compose_rrr(message)("ENOSPC", debug)
 
@@ -56,6 +57,10 @@ export const compose_rrr_thunk =
 export const RRR = {
 	enum: ErrorType,
 	compose: compose_rrr,
+	is_rrr: (e: unknown): e is Ordo.Rrr => {
+		const x = e as Ordo.Rrr
+		return is_object(x) && is_finite_non_negative_int(x.code) && lt(RRR.enum.length)(x.code)
+	},
 	compose_thunk: compose_rrr_thunk,
 	codes: {
 		eperm,
@@ -67,7 +72,7 @@ export const RRR = {
 		eacces,
 		eexist,
 		einval,
-		emfile,
+		enotrecoverable,
 		efbig,
 		enospc,
 	},

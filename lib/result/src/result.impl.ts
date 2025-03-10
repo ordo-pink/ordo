@@ -91,6 +91,13 @@ export const cata_result_or_nothing: Types.TOrNothingCata = () => ({ Ok: x => x,
 
 export const cata_result_expect: Types.TExpectFn = f => ({ Ok: x => x, Err: x => f(x) as never })
 
+export const cata_result_throw: Types.TThrowFn = () => ({
+	Ok: x => x,
+	Err: e => {
+		throw e
+	},
+})
+
 export const cata_result_or_else: Types.TOrElseCataFn = f => ({ Ok: x => x, Err: x => f(x) })
 
 export const cata_result_if_ok: Types.TIfOkCataFn = f => ({ Ok: x => f(x), Err: noop })
@@ -163,6 +170,7 @@ export const R: Types.TResultStatic = {
 		or_else: cata_result_or_else,
 		or_nothing: cata_result_or_nothing,
 		expect: cata_result_expect,
+		throw: cata_result_throw,
 	},
 	guards: {
 		is_result: is_result_guard,

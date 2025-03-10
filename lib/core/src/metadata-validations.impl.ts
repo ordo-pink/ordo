@@ -38,9 +38,9 @@ export const is_size = (size: unknown): size is number => TAU.is_finite_non_nega
 
 export const is_type = (type: unknown): type is string => TAU.is_non_empty_string(type) // TODO: MIME-TYPE
 
-export const is_created_by = (author: unknown): author is Ordo.User.UID => TAU.is_uuid(author)
+export const is_created_by = (author: unknown): author is Ordo.User.UID | null => TAU.is_null(author) || TAU.is_uuid(author)
 
-export const is_updated_by = (author: unknown): author is Ordo.User.UID => TAU.is_uuid(author)
+export const is_updated_by = (author: unknown): author is Ordo.User.UID | null => TAU.is_null(author) || TAU.is_uuid(author)
 
 export const is_created_at = (timestamp: unknown): timestamp is number => TAU.is_finite_non_negative_int(timestamp)
 

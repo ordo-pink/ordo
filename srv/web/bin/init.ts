@@ -21,10 +21,9 @@
 
 import { die, run_command } from "@ordo-pink/binutil"
 import { invokers0 } from "@ordo-pink/oath"
+import { noop } from "@ordo-pink/tau"
 
 // TODO Move dependencies to root
-void run_command("../../opt/bun i", {
-	cwd: "./srv/web",
-	stdin: "inherit",
-	stderr: "inherit",
-}).invoke(invokers0.or_else(die()))
+run_command("../../opt/bun i", { cwd: "./srv/web", stdin: "inherit", stderr: "inherit" })
+	.invoke(invokers0.or_else(die()))
+	.catch(noop)

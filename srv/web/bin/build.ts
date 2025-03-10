@@ -24,8 +24,8 @@ import { die, run_command } from "@ordo-pink/binutil"
 
 const main = () =>
 	run_command(clean_up_cmd, { stdout: "inherit", stderr: "inherit" })
-		.pipe(bundle_client_code)
-		.pipe(setup_netlify_redirects)
+		.and(bundle_client_code)
+		.and(setup_netlify_redirects)
 		.invoke(invokers0.or_else(die()))
 
 // --- Internal ---
@@ -52,4 +52,4 @@ const setup_netlify_redirects = () => Oath.FromPromise(() => Bun.write(redirects
 
 // --- Invoke ---
 
-void main()
+main().catch(console.error)

@@ -16,9 +16,11 @@ export const run_bin_for_each_srv = async (bin_name: string): Promise<void> => {
 	return Oath.Merge(
 		srvs.map(srv => {
 			const path = node_path.join("srv", srv, "bin", `${bin_name}.ts`)
+
 			return Oath.FromPromise(() => node_fs.promises.exists(path))
+				.and(exists => Oath.If(exists))
+				.and(() => run_async_command(`opt/bun ${path}`, { stderr: "pipe", stdout: "pipe" }))
 				.fix(() => null)
-				.pipe(() => run_async_command(`opt/bun ${path}`, { stderr: "pipe", stdout: "pipe" }))
 		}),
 	).fork(console.error, noop)
 }

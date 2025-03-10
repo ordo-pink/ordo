@@ -63,6 +63,14 @@ export type TRTEParagraphNode = TRTENode<
 	}
 >
 
+export type TRTEBlockquoteNode = TRTENode<
+	"bq",
+	{
+		children: (TRTETextNode | TRTECodeNode)[]
+		cite?: string
+	}
+>
+
 export type TRTEEmbedNode = TRTENode<
 	"embed",
 	{

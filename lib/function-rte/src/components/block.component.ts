@@ -26,7 +26,8 @@ import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { R } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
 
-import { type TRTEHeaderNode, type TRTEParagraphNode } from "../rte.types"
+import { TRTEBlockquoteNode, type TRTEHeaderNode, type TRTEParagraphNode } from "../rte.types"
+import { Blockquote } from "./blocks/blockquote.component"
 import { Header } from "./blocks/header.component"
 import { LineNumber } from "./line-number.component"
 import { Paragraph } from "./blocks/paragraph.component"
@@ -93,6 +94,7 @@ export const Block = (block_index: number) =>
 				Switch.Match(node.type)
 					.case("h", () => Header(node as TRTEHeaderNode, block_index))
 					.case("p", () => Paragraph(node as TRTEParagraphNode, block_index))
+					.case("bq", () => Blockquote(node as TRTEBlockquoteNode, block_index))
 					.default(() => ""),
 			]
 		}

@@ -98,11 +98,11 @@
 }
 
 .input_text {
-	@apply w-full rounded-md border-0 bg-transparent px-2 py-1 shadow-inner outline-none placeholder:text-neutral-500;
+	@apply w-full rounded-md border-0 bg-transparent px-2 py-1 outline-none placeholder:text-neutral-500;
 }
 
 .input_text.non-transparent {
-	@apply bg-gradient-to-br from-neutral-100 to-stone-100 hover:from-neutral-100 hover:to-stone-100 dark:from-neutral-600 dark:to-stone-600 hover:dark:from-neutral-600 hover:dark:to-stone-600;
+	@apply bg-gradient-to-br from-neutral-100 to-stone-100 shadow-inner hover:from-neutral-100 hover:to-stone-100 dark:from-neutral-600 dark:to-stone-600 hover:dark:from-neutral-600 hover:dark:to-stone-600;
 }
 
 .input_text-error {

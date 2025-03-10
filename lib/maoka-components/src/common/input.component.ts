@@ -33,6 +33,8 @@ const is_valid$ = ZAGS.Of({ value: true })
 type TInputProps = {
 	initial_value?: string
 	on_input?: (event: Event) => void
+	on_focus?: (event: FocusEvent) => void
+	on_blur?: (event: FocusEvent) => void
 	placeholder?: string
 	type?: "text" | "email"
 	label?: string
@@ -56,10 +58,13 @@ const Text = ({
 	autocomplete,
 	required = false,
 	validate = () => true,
+	on_blur,
+	on_focus,
 	validation_error_message = "",
 }: TInputProps) =>
 	Maoka.create("label", ({ use }) => {
 		use(MaokaJabs.set_class("input-wrapper"))
+		use(MaokaJabs.listen("onclick", event => event.stopPropagation()))
 		const id = crypto.randomUUID().replaceAll("-", "")
 
 		return () => [
@@ -100,6 +105,9 @@ const Text = ({
 				if (autocomplete) use(MaokaJabs.set_attribute("autocomplete", autocomplete))
 				if (initial_value) use(MaokaJabs.set_attribute("value", initial_value))
 				if (placeholder) use(MaokaJabs.set_attribute("placeholder", placeholder))
+
+				if (on_focus) use(MaokaJabs.listen("onfocus", on_focus))
+				if (on_blur) use(MaokaJabs.listen("onblur", on_blur))
 
 				use(
 					MaokaDOM.Jabs.onmount(() => {

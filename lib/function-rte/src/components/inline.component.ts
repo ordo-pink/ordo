@@ -43,7 +43,7 @@ export const Inline = (node: TRTETextNode | TRTECodeNode, block_index: number, i
 				use(MaokaJabs.listen("onclick", event => handle_click(event)))
 				use(RTE.Jabs.listen_for_selection_change(block_index, inline_index))
 
-				const styles = (node as TRTETextNode).styles
+				const styles = (node as TRTETextNode).styles ?? []
 
 				if (styles.includes(RTE.Constants.TextNodeStyle.BOLD)) use(MaokaJabs.add_class("text-bold"))
 				if (styles.includes(RTE.Constants.TextNodeStyle.ITALIC)) use(MaokaJabs.add_class("italic"))
@@ -57,9 +57,9 @@ export const Inline = (node: TRTETextNode | TRTECodeNode, block_index: number, i
 						event.stopPropagation()
 
 						RTE.$.update("selection", () => ({
-							anchor: selection?.anchorOffset,
+							anchor: selection.anchorOffset,
 							block: block_index,
-							focus: selection?.focusOffset,
+							focus: selection.focusOffset,
 							inline: inline_index,
 						}))
 					}

@@ -43,6 +43,7 @@ declare global {
 				turn_to_h5: () => string
 				turn_to_h6: () => string
 				turn_to_paragraph: () => string
+				turn_to_blockquote: () => string
 			}
 		}
 	}
@@ -85,7 +86,13 @@ export default create_function(
 				"t.rte.file_association.readable_name": "Rich Text",
 				"t.rte.file_association.description":
 					"This is a rich text file that allows custom user input and embedding other files in read-only mode.",
-				"t.rte.commands.turn_to_h1": "Turn to Heading 1",
+				"t.rte.commands.turn_to_h1": "Turn to Header 1",
+				"t.rte.commands.turn_to_h2": "Turn to Header 2",
+				"t.rte.commands.turn_to_h3": "Turn to Header 3",
+				"t.rte.commands.turn_to_h4": "Turn to Header 4",
+				"t.rte.commands.turn_to_h5": "Turn to Header 5",
+				"t.rte.commands.turn_to_h6": "Turn to Header 6",
+				"t.rte.commands.turn_to_blockquote": "Turn to Blockquote",
 				"t.rte.commands.turn_to_paragraph": "Turn to Paragraph",
 			},
 		})

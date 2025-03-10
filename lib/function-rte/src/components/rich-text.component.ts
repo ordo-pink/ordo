@@ -60,6 +60,60 @@ export const RichText = (
 
 		commands.emit("cmd.application.context_menu.add", {
 			command: "cmd.rte.replace_block",
+			readable_name: "t.rte.commands.turn_to_h2",
+			should_show: RTE.Guards.is_rte_context_menu_payload,
+			render_icon: BsType,
+			type: ContextMenuItemType.UPDATE,
+			payload_creator: ({ payload }) => ({ block_index: payload.block_index, block: { type: "h", level: 2 } }),
+		})
+
+		commands.emit("cmd.application.context_menu.add", {
+			command: "cmd.rte.replace_block",
+			readable_name: "t.rte.commands.turn_to_h3",
+			should_show: RTE.Guards.is_rte_context_menu_payload,
+			render_icon: BsType,
+			type: ContextMenuItemType.UPDATE,
+			payload_creator: ({ payload }) => ({ block_index: payload.block_index, block: { type: "h", level: 3 } }),
+		})
+
+		commands.emit("cmd.application.context_menu.add", {
+			command: "cmd.rte.replace_block",
+			readable_name: "t.rte.commands.turn_to_h4",
+			should_show: RTE.Guards.is_rte_context_menu_payload,
+			render_icon: BsType,
+			type: ContextMenuItemType.UPDATE,
+			payload_creator: ({ payload }) => ({ block_index: payload.block_index, block: { type: "h", level: 4 } }),
+		})
+
+		commands.emit("cmd.application.context_menu.add", {
+			command: "cmd.rte.replace_block",
+			readable_name: "t.rte.commands.turn_to_h5",
+			should_show: RTE.Guards.is_rte_context_menu_payload,
+			render_icon: BsType,
+			type: ContextMenuItemType.UPDATE,
+			payload_creator: ({ payload }) => ({ block_index: payload.block_index, block: { type: "h", level: 5 } }),
+		})
+
+		commands.emit("cmd.application.context_menu.add", {
+			command: "cmd.rte.replace_block",
+			readable_name: "t.rte.commands.turn_to_h6",
+			should_show: RTE.Guards.is_rte_context_menu_payload,
+			render_icon: BsType,
+			type: ContextMenuItemType.UPDATE,
+			payload_creator: ({ payload }) => ({ block_index: payload.block_index, block: { type: "h", level: 6 } }),
+		})
+
+		commands.emit("cmd.application.context_menu.add", {
+			command: "cmd.rte.replace_block",
+			readable_name: "t.rte.commands.turn_to_blockquote",
+			should_show: RTE.Guards.is_rte_context_menu_payload,
+			render_icon: BsType,
+			type: ContextMenuItemType.UPDATE,
+			payload_creator: ({ payload }) => ({ block_index: payload.block_index, block: { type: "bq" } }),
+		})
+
+		commands.emit("cmd.application.context_menu.add", {
+			command: "cmd.rte.replace_block",
 			readable_name: "t.rte.commands.turn_to_paragraph",
 			should_show: RTE.Guards.is_rte_context_menu_payload,
 			render_icon: BsType,
@@ -73,6 +127,11 @@ export const RichText = (
 				commands.off("cmd.rte.remove_block", handle_remove_block)
 				commands.off("cmd.rte.replace_block", handle_replace_block)
 				commands.emit("cmd.application.context_menu.remove", "t.rte.commands.turn_to_h1")
+				commands.emit("cmd.application.context_menu.remove", "t.rte.commands.turn_to_h2")
+				commands.emit("cmd.application.context_menu.remove", "t.rte.commands.turn_to_h3")
+				commands.emit("cmd.application.context_menu.remove", "t.rte.commands.turn_to_h4")
+				commands.emit("cmd.application.context_menu.remove", "t.rte.commands.turn_to_h5")
+				commands.emit("cmd.application.context_menu.remove", "t.rte.commands.turn_to_h6")
 				commands.emit("cmd.application.context_menu.remove", "t.rte.commands.turn_to_paragraph")
 			}),
 		)

@@ -22,6 +22,7 @@
 import { is_array, is_bool, is_finite_non_negative_int, is_non_empty_string, is_object, is_string } from "@ordo-pink/tau"
 
 import {
+	type TRTEBlockquoteNode,
 	type TRTECodeNode,
 	type TRTEEmbedNode,
 	type TRTEHeaderNode,
@@ -41,6 +42,8 @@ export const is_rte_text_node = (x: any): x is TRTETextNode =>
 export const is_rte_code_node = (x: any): x is TRTECodeNode => is_rte_node(x) && x.type === "code" && is_string(x.value)
 
 export const is_rte_paragraph_node = (x: any): x is TRTEParagraphNode => is_rte_parent(x) && x.type === "p"
+
+export const is_rte_blockquote_node = (x: any): x is TRTEBlockquoteNode => is_rte_parent(x) && x.type === "bq"
 
 export const is_rte_embed_node = (x: any): x is TRTEEmbedNode =>
 	is_rte_node(x) && x.type === "embed" && is_bool(x.internal) && is_string(x.target)

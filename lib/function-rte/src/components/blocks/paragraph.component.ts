@@ -31,4 +31,4 @@ export const Paragraph = (node: TRTEParagraphNode, index: number) =>
 
 // --- Internal ---
 
-const StyledParagraph = MaokaStyled.Tags.div("cursor-text w-full px-1")
+const StyledParagraph = MaokaStyled.Tags.div("cursor-text w-full px-1 break-words")

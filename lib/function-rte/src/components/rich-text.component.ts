@@ -19,7 +19,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { BsType, BsTypeH1 } from "@ordo-pink/frontend-icons"
+import {
+	BsBoxArrowInUpLeft,
+	BsQuote,
+	BsType,
+	BsTypeH1,
+	BsTypeH2,
+	BsTypeH3,
+	BsTypeH4,
+	BsTypeH5,
+	BsTypeH6,
+} from "@ordo-pink/frontend-icons"
 import { is_array, is_string } from "@ordo-pink/tau"
 import { ContextMenuItemType } from "@ordo-pink/core"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
@@ -66,7 +76,7 @@ export const RichText = (
 			command: "cmd.rte.replace_block",
 			readable_name: "t.rte.commands.turn_to_h2",
 			should_show: RTE.Guards.is_rte_context_menu_payload,
-			render_icon: BsType,
+			render_icon: BsTypeH2,
 			type: ContextMenuItemType.UPDATE,
 			payload_creator: ({ payload }) => ({ block_index: payload.block_index, block: { type: "h", level: 2 } }),
 		})
@@ -75,7 +85,7 @@ export const RichText = (
 			command: "cmd.rte.replace_block",
 			readable_name: "t.rte.commands.turn_to_h3",
 			should_show: RTE.Guards.is_rte_context_menu_payload,
-			render_icon: BsType,
+			render_icon: BsTypeH3,
 			type: ContextMenuItemType.UPDATE,
 			payload_creator: ({ payload }) => ({ block_index: payload.block_index, block: { type: "h", level: 3 } }),
 		})
@@ -84,7 +94,7 @@ export const RichText = (
 			command: "cmd.rte.replace_block",
 			readable_name: "t.rte.commands.turn_to_h4",
 			should_show: RTE.Guards.is_rte_context_menu_payload,
-			render_icon: BsType,
+			render_icon: BsTypeH4,
 			type: ContextMenuItemType.UPDATE,
 			payload_creator: ({ payload }) => ({ block_index: payload.block_index, block: { type: "h", level: 4 } }),
 		})
@@ -93,7 +103,7 @@ export const RichText = (
 			command: "cmd.rte.replace_block",
 			readable_name: "t.rte.commands.turn_to_h5",
 			should_show: RTE.Guards.is_rte_context_menu_payload,
-			render_icon: BsType,
+			render_icon: BsTypeH5,
 			type: ContextMenuItemType.UPDATE,
 			payload_creator: ({ payload }) => ({ block_index: payload.block_index, block: { type: "h", level: 5 } }),
 		})
@@ -102,7 +112,7 @@ export const RichText = (
 			command: "cmd.rte.replace_block",
 			readable_name: "t.rte.commands.turn_to_h6",
 			should_show: RTE.Guards.is_rte_context_menu_payload,
-			render_icon: BsType,
+			render_icon: BsTypeH6,
 			type: ContextMenuItemType.UPDATE,
 			payload_creator: ({ payload }) => ({ block_index: payload.block_index, block: { type: "h", level: 6 } }),
 		})
@@ -111,7 +121,7 @@ export const RichText = (
 			command: "cmd.rte.replace_block",
 			readable_name: "t.rte.commands.turn_to_blockquote",
 			should_show: RTE.Guards.is_rte_context_menu_payload,
-			render_icon: BsType,
+			render_icon: BsQuote,
 			type: ContextMenuItemType.UPDATE,
 			payload_creator: ({ payload }) => ({ block_index: payload.block_index, block: { type: "bq" } }),
 		})
@@ -127,18 +137,9 @@ export const RichText = (
 
 		commands.emit("cmd.application.context_menu.add", {
 			command: "cmd.rte.replace_block",
-			readable_name: "t.rte.commands.turn_to_paragraph",
-			should_show: RTE.Guards.is_rte_context_menu_payload,
-			render_icon: BsType,
-			type: ContextMenuItemType.UPDATE,
-			payload_creator: ({ payload }) => ({ block_index: payload.block_index, block: { type: "p" } }),
-		})
-
-		commands.emit("cmd.application.context_menu.add", {
-			command: "cmd.rte.replace_block",
 			readable_name: "t.rte.commands.turn_to_incoming_links",
 			should_show: RTE.Guards.is_rte_context_menu_payload,
-			render_icon: BsType,
+			render_icon: BsBoxArrowInUpLeft,
 			type: ContextMenuItemType.UPDATE,
 			payload_creator: ({ payload }) => ({ block_index: payload.block_index, block: { type: "incoming_links" } }),
 		})

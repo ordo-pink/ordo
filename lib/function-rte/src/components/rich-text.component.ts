@@ -56,10 +56,10 @@ export const RichText = (
 		const fsid = metadata.get_fsid()
 		const commands = use(MaokaOrdo.Jabs.get_commands)
 
-		commands.on("cmd.rte.add_block", handle_add_block)
-		commands.on("cmd.rte.remove_block", handle_remove_block)
-		commands.on("cmd.rte.replace_block", handle_replace_block)
-		commands.on("cmd.rte.show_quick_menu", handle_show_quick_menu)
+		commands.on("cmd.rte.add_block", params => void handle_add_block(params))
+		commands.on("cmd.rte.remove_block", params => void handle_remove_block(params))
+		commands.on("cmd.rte.replace_block", params => void handle_replace_block(params))
+		commands.on("cmd.rte.show_quick_menu", params => void handle_show_quick_menu(params))
 
 		// TODO Other blocks
 
@@ -144,25 +144,8 @@ export const RichText = (
 			payload_creator: ({ payload }) => ({ block_index: payload.block_index, block: { type: "incoming_links" } }),
 		})
 
-		RTE.$.update("is_editable", () => is_editable)
-		RTE.$.update("is_embedded", () => is_embedded)
-
 		const handle_mount = () => {
-			R.FromNullable(content)
-				.pipe(R.ops.chain(x => R.If(is_string(x), { T: () => x as string })))
-				.pipe(R.ops.chain(x => R.Try(() => JSON.parse(x))))
-				.pipe(R.ops.chain(x => R.If(is_array(x) && x.length > 0, { T: () => x })))
-				.cata({
-					Err: () => RTE.$.update("content", () => RTE.Utils.create_content()),
-					Ok: state => RTE.$.update("content", () => state as TRTEContent),
-				})
-
-			const divorce_state = RTE.$.marry(({ content }, is_update) => {
-				if (!is_update) {
-					length = content.length
-					return
-				}
-
+			const divorce_state = RTE.$.marry(({ content }) => {
 				commands.emit("cmd.content.set", { content: JSON.stringify(content), content_type: "text/ordo", fsid })
 
 				if (length !== content.length) {
@@ -170,6 +153,25 @@ export const RichText = (
 					refresh()
 				}
 			})
+
+			R.FromNullable(content)
+				.pipe(R.ops.chain(x => R.If(is_string(x), { T: () => x as string })))
+				.pipe(R.ops.chain(x => R.Try(() => JSON.parse(x))))
+				.pipe(R.ops.chain(x => R.If(is_array(x) && x.length > 0, { T: () => x })))
+				.cata({
+					Err: () => {
+						length = 0
+						RTE.$.update("content", () => RTE.Utils.create_content())
+					},
+					Ok: state => {
+						length = state.length
+						RTE.$.update("content", () => state as TRTEContent)
+					},
+				})
+
+			RTE.$.update("is_editable", () => is_editable)
+			RTE.$.update("is_embedded", () => is_embedded)
+			RTE.$.update("selection", () => RTE.Utils.create_selection())
 
 			return () => {
 				divorce_state()

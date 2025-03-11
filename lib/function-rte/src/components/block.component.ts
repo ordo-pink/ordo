@@ -97,7 +97,7 @@ export const Block = (block_index: number, metadata: Ordo.Metadata.Instance) =>
 					.case("p", () => Paragraph(node as TRTEParagraphNode, block_index))
 					.case("bq", () => Blockquote(node as TRTEBlockquoteNode, block_index))
 					.case("incoming_links", () => IncomingLinks(node as TRTEIncomingLinksNode, metadata))
-					.default(() => ""),
+					.default(() => "UNIMPLEMENTED"),
 			]
 		}
 	})

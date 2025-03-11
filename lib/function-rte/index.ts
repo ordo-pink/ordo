@@ -44,6 +44,7 @@ declare global {
 				turn_to_h6: () => string
 				turn_to_paragraph: () => string
 				turn_to_blockquote: () => string
+				turn_to_incoming_links: () => string
 			}
 		}
 	}
@@ -95,6 +96,7 @@ export default create_function(
 				"t.rte.commands.turn_to_h6": "Turn to Header 6",
 				"t.rte.commands.turn_to_blockquote": "Turn to Blockquote",
 				"t.rte.commands.turn_to_paragraph": "Turn to Paragraph",
+				"t.rte.commands.turn_to_incoming_links": "Turn to Incoming Links",
 			},
 		})
 

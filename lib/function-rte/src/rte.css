@@ -5,3 +5,15 @@
 .rte_quick-menu.active {
 	@apply flex;
 }
+
+.rte_blocks_incoming-links {
+	@apply mx-2 w-full max-w-screen-sm cursor-default break-words rounded-md bg-neutral-300 px-2 py-1 dark:bg-neutral-700;
+}
+
+.rte_blocks_incoming-links_title {
+	@apply text-lg;
+}
+
+.rte_blocks_incoming-links_list {
+	@apply list-inside list-none;
+}

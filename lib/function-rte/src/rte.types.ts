@@ -63,6 +63,8 @@ export type TRTEParagraphNode = TRTENode<
 	}
 >
 
+export type TRTEIncomingLinksNode = TRTENode<"incoming_links">
+
 export type TRTEBlockquoteNode = TRTENode<
 	"bq",
 	{

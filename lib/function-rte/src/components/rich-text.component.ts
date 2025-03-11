@@ -125,36 +125,37 @@ export const RichText = (
 			payload_creator: ({ payload }) => ({ block_index: payload.block_index, block: { type: "p" } }),
 		})
 
-		use(
-			MaokaDOM.Jabs.onunmount(() => {
-				commands.off("cmd.rte.add_block", handle_add_block)
-				commands.off("cmd.rte.remove_block", handle_remove_block)
-				commands.off("cmd.rte.replace_block", handle_replace_block)
-				commands.off("cmd.rte.show_quick_menu", handle_show_quick_menu)
+		commands.emit("cmd.application.context_menu.add", {
+			command: "cmd.rte.replace_block",
+			readable_name: "t.rte.commands.turn_to_paragraph",
+			should_show: RTE.Guards.is_rte_context_menu_payload,
+			render_icon: BsType,
+			type: ContextMenuItemType.UPDATE,
+			payload_creator: ({ payload }) => ({ block_index: payload.block_index, block: { type: "p" } }),
+		})
 
-				commands.emit("cmd.application.context_menu.remove", "t.rte.commands.turn_to_h1")
-				commands.emit("cmd.application.context_menu.remove", "t.rte.commands.turn_to_h2")
-				commands.emit("cmd.application.context_menu.remove", "t.rte.commands.turn_to_h3")
-				commands.emit("cmd.application.context_menu.remove", "t.rte.commands.turn_to_h4")
-				commands.emit("cmd.application.context_menu.remove", "t.rte.commands.turn_to_h5")
-				commands.emit("cmd.application.context_menu.remove", "t.rte.commands.turn_to_h6")
-				commands.emit("cmd.application.context_menu.remove", "t.rte.commands.turn_to_paragraph")
-			}),
-		)
+		commands.emit("cmd.application.context_menu.add", {
+			command: "cmd.rte.replace_block",
+			readable_name: "t.rte.commands.turn_to_incoming_links",
+			should_show: RTE.Guards.is_rte_context_menu_payload,
+			render_icon: BsType,
+			type: ContextMenuItemType.UPDATE,
+			payload_creator: ({ payload }) => ({ block_index: payload.block_index, block: { type: "incoming_links" } }),
+		})
 
 		RTE.$.update("is_editable", () => is_editable)
 		RTE.$.update("is_embedded", () => is_embedded)
 
-		R.FromNullable(content)
-			.pipe(R.ops.chain(x => R.If(is_string(x), { T: () => x as string })))
-			.pipe(R.ops.chain(x => R.Try(() => JSON.parse(x))))
-			.pipe(R.ops.chain(x => R.If(is_array(x) && x.length > 0, { T: () => x })))
-			.cata({
-				Err: () => RTE.$.update("content", () => RTE.Utils.create_content()),
-				Ok: state => RTE.$.update("content", () => state as TRTEContent),
-			})
+		const handle_mount = () => {
+			R.FromNullable(content)
+				.pipe(R.ops.chain(x => R.If(is_string(x), { T: () => x as string })))
+				.pipe(R.ops.chain(x => R.Try(() => JSON.parse(x))))
+				.pipe(R.ops.chain(x => R.If(is_array(x) && x.length > 0, { T: () => x })))
+				.cata({
+					Err: () => RTE.$.update("content", () => RTE.Utils.create_content()),
+					Ok: state => RTE.$.update("content", () => state as TRTEContent),
+				})
 
-		const subscribe_to_editor_state = () => {
 			const divorce_state = RTE.$.marry(({ content }, is_update) => {
 				if (!is_update) {
 					length = content.length
@@ -169,15 +170,32 @@ export const RichText = (
 				}
 			})
 
-			return () => divorce_state()
+			return () => {
+				divorce_state()
+
+				commands.off("cmd.rte.add_block", handle_add_block)
+				commands.off("cmd.rte.remove_block", handle_remove_block)
+				commands.off("cmd.rte.replace_block", handle_replace_block)
+				commands.off("cmd.rte.show_quick_menu", handle_show_quick_menu)
+
+				commands.emit("cmd.application.context_menu.remove", "t.rte.commands.turn_to_h1")
+				commands.emit("cmd.application.context_menu.remove", "t.rte.commands.turn_to_h2")
+				commands.emit("cmd.application.context_menu.remove", "t.rte.commands.turn_to_h3")
+				commands.emit("cmd.application.context_menu.remove", "t.rte.commands.turn_to_h4")
+				commands.emit("cmd.application.context_menu.remove", "t.rte.commands.turn_to_h5")
+				commands.emit("cmd.application.context_menu.remove", "t.rte.commands.turn_to_h6")
+				commands.emit("cmd.application.context_menu.remove", "t.rte.commands.turn_to_paragraph")
+				commands.emit("cmd.application.context_menu.remove", "t.rte.commands.turn_to_blockquote")
+				commands.emit("cmd.application.context_menu.remove", "t.rte.commands.turn_to_incoming_links")
+			}
 		}
 
-		use(MaokaDOM.Jabs.onmount(subscribe_to_editor_state))
+		use(MaokaDOM.Jabs.onmount(handle_mount))
 
 		return () => {
 			const state = RTE.$.select("content")
 
-			return [QuickMenu(), ...state.map((_, line_index) => Block(line_index))]
+			return [QuickMenu(), ...state.map((_, line_index) => Block(line_index, metadata))]
 		}
 	})
 

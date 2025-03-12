@@ -58,7 +58,7 @@ export const render: TMaokaRenderDOMFn = async (root_element, component, create_
 
 		const [id, element, render] = (event as any).detail as [string, TMaokaElement, () => Promise<TMaokaElement>]
 
-		const refresh_nodes = root.refresh_queue.keys().toArray()
+		const refresh_nodes = Array.from(root.refresh_queue.keys())
 
 		if (root.refresh_queue.has(id)) return
 

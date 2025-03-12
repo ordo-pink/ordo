@@ -52,7 +52,6 @@ export const FileMetadata = (metadata: Ordo.Metadata.Instance) =>
 			]),
 			LabelsSection(fsid),
 			OutgoingLinksSection(fsid),
-			IncomingLinksSection(fsid),
 		]
 	})
 
@@ -102,22 +101,5 @@ const OutgoingLinksSection = (fsid: Ordo.Metadata.FSID) =>
 			return links.length > 0
 				? links.map(metadata => Link({ href: `/editor/${metadata.get_fsid()}`, children: metadata.get_name() }))
 				: ActionPlaceholder(() => () => "Add outgoing links...") // TODO Translations
-		}
-	})
-
-const IncomingLinksSection = (fsid: Ordo.Metadata.FSID) =>
-	Maoka.create("div", ({ use }) => {
-		const links_section = "flex px-1 flex-wrap gap-2 rounded-sm py-1 min-h-7"
-
-		use(MaokaJabs.set_class(links_section))
-
-		const get_links = use(MaokaOrdo.Jabs.Metadata.get_incoming_links$(fsid))
-
-		return () => {
-			const links = get_links()
-
-			return links.length > 0
-				? links.map(metadata => Link({ href: `/editor/${metadata.get_fsid()}`, children: metadata.get_name() }))
-				: ActionPlaceholder(() => () => "No incoming links.") // TODO Translations
 		}
 	})

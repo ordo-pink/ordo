@@ -125,7 +125,7 @@ export const init_content: TF = () => {
 				)
 				.invoke(invokers0.to_promise)
 		} else {
-			commands.emit("cmd.metadata.set_size", { fsid: metadata.get_fsid(), size })
+			await commands.naga("cmd.metadata.set_size", { fsid: metadata.get_fsid(), size }).invoke(invokers0.to_promise)
 		}
 
 		if (!Metadata.Validations.is_metadata(metadata))
@@ -133,9 +133,7 @@ export const init_content: TF = () => {
 
 		const user = ordo_app_state.zags.select("user")
 
-		if (!user) return
-
-		void content_repository.put(user.get_uid(), metadata.get_fsid(), content).invoke(invokers0.or_else(alert_rrr))
+		return content_repository.put(user?.get_uid() || null, metadata.get_fsid(), content).invoke(invokers0.or_else(alert_rrr))
 	})
 
 	logger.debug("🟢 Initialised metadata.")

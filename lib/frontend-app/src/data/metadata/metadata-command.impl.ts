@@ -109,7 +109,7 @@ export const MetadataCommand: Ordo.Metadata.CommandStatic = {
 
 			update_label: (old_label, new_label) =>
 				m_query
-					.get()
+					.get({ show_hidden: true })
 					.pipe(
 						R.ops.map(metadata_collection =>
 							metadata_collection.map(metadata => {
@@ -195,14 +195,13 @@ export const MetadataCommand: Ordo.Metadata.CommandStatic = {
 					.pipe(R.ops.chain(u_query.get_current))
 					.pipe(R.ops.map(user => (user ? user.get_uid() : null)))
 					.pipe(R.ops.map(author_id => M.Of({ name, parent, author_id, type, labels, links, props, size: size ?? 0 })))
-					.pipe(R.ops.chain(item => m_query.get().pipe(R.ops.map(items => items.concat(item)))))
+					.pipe(R.ops.chain(item => m_query.get({ show_hidden: true }).pipe(R.ops.map(items => items.concat(item)))))
 					.pipe(R.ops.chain(m_repo.put)),
 
 			remove: fsid =>
 				_check_fsid_r("remove", fsid)
-					.pipe(R.ops.map(thunk(fsid)))
+					.pipe(R.ops.map(() => fsid))
 					.pipe(R.ops.chain(_get_metadata_by_fsid_r("remove", m_query)))
-					.pipe(R.ops.map(thunk(void 0)))
 					.pipe(R.ops.chain(() => m_query.get_descendents(fsid, { show_hidden: true })))
 					.pipe(R.ops.chain(descendents => m_query.get({ show_hidden: true }).pipe(R.ops.map(all => ({ all, descendents })))))
 					.pipe(

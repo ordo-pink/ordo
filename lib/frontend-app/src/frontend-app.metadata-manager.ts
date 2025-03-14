@@ -75,7 +75,7 @@ export const MetadataManager = {
 				divorce_metadata_repository = metadata_repository.$.marry(({ version }) => {
 					// Version 0 means the metadata was not yet initialized
 					// Version 1 means the metadata was just initialized from remote so there are no updates to persist
-					if (version < 1) return
+					if (version <= 1) return
 
 					if (previous_save_attempt0) {
 						on_state_change("put-remote-complete")

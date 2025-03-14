@@ -120,10 +120,7 @@ export const ContentRepository: Ordo.Content.RepositoryStatic = {
 		return {
 			get: (uid, fsid) => local_strategy.get(uid as Ordo.User.UID, fsid).fix(() => null),
 			get_all: () => local_strategy.list(),
-			put: (uid, fsid, content) =>
-				local_strategy
-					.put(uid as Ordo.User.UID, fsid, content)
-					.and(() => (uid ? remote_strategy.put(uid, fsid, content) : void 0)),
+			put: (uid, fsid, content) => local_strategy.put(uid as Ordo.User.UID, fsid, content),
 			remove: (uid, fsid) =>
 				local_strategy.delete(uid as Ordo.User.UID, fsid).and(() => (uid ? remote_strategy.delete(uid, fsid) : void 0)),
 			get $() {

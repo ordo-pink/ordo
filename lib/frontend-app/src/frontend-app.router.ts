@@ -34,7 +34,7 @@ export const init_router = call_once(() => {
 	window.addEventListener("popstate", event => commands.emit("cmd.application.router.navigate", { url: event.state }))
 
 	commands.on("cmd.application.router.navigate", ({ url, new_tab = false }) => {
-		if (new_tab) return window.open(url, "_blank")
+		if (new_tab) return void window.open(url, "_blank")
 
 		const routes = ordo_app_state.zags.select("router.routes")
 
@@ -66,11 +66,13 @@ export const init_router = call_once(() => {
 
 		ordo_app_state.zags.update("functions.current_activity", () => void 0)
 		ordo_app_state.zags.update("router.current_route", () => new_route)
+
 		router$.update("current_route", () => new_route)
 	})
 
-	commands.on("cmd.application.router.open_external", ({ url, new_tab = true }) =>
-		window.open(url, new_tab ? "_blank" : "_self"),
+	commands.on(
+		"cmd.application.router.open_external",
+		({ url, new_tab = true }) => void window.open(url, new_tab ? "_blank" : "_self"),
 	)
 
 	const divorce_router = ordo_app_state.zags.cheat("router.current_route", (current_route, is_update) => {

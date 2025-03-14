@@ -23,16 +23,21 @@ import { Maoka, TMaokaElement } from "@ordo-pink/maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
+import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { Switch } from "@ordo-pink/switch"
 
 import { ordo_app_state } from "../../app.state"
 import { sidebar$ } from "./sidebar/sidebar.state"
 
-export const OrdoWorkspace = Maoka.create("main", ({ use, element }) => {
+const StyledWorkspace = MaokaStyled.Tags.main("workspace")
+
+export const OrdoWorkspace = StyledWorkspace(({ use, element }) => {
 	use(MaokaJabs.set_class("workspace"))
 
 	return () => [WorkspaceRenderer, SidebarPaddingContractor(element)]
 })
+
+// --- Internal ---
 
 const SidebarPaddingContractor = (element: TMaokaElement) =>
 	Maoka.create("div", ({ use }) => {

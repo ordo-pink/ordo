@@ -30,6 +30,10 @@
 	@apply relative inset-x-0 mx-2 size-full;
 }
 
+.rte_blocks_callout_type {
+	@apply size-3 !rounded-full;
+}
+
 .rte_blocks_callout-card {
 	@apply pointer-events-auto relative mx-auto flex min-h-10 w-full max-w-2xl items-center gap-x-4 rounded-lg p-4 shadow-sm md:mx-0;
 }
@@ -50,26 +54,32 @@
 	@apply w-full text-sm;
 }
 
+.rte_blocks_callout_type.info,
 .rte_blocks_callout-card.info {
-	@apply bg-sky-100 dark:bg-sky-800;
+	@apply bg-sky-100 dark:bg-sky-700;
 }
 
+.rte_blocks_callout_type.question,
 .rte_blocks_callout-card.question {
-	@apply bg-violet-100 dark:bg-violet-800;
+	@apply bg-violet-100 dark:bg-violet-700;
 }
 
+.rte_blocks_callout_type.rrr,
 .rte_blocks_callout-card.rrr {
-	@apply bg-rose-100 dark:bg-rose-800;
+	@apply bg-rose-100 dark:bg-rose-700;
 }
 
+.rte_blocks_callout_type.success,
 .rte_blocks_callout-card.success {
-	@apply bg-emerald-100 dark:bg-emerald-800;
+	@apply bg-emerald-100 dark:bg-emerald-700;
 }
 
+.rte_blocks_callout_type.warn,
 .rte_blocks_callout-card.warn {
-	@apply bg-amber-100 dark:bg-amber-800;
+	@apply bg-amber-100 dark:bg-amber-700;
 }
 
+.rte_blocks_callout_type.default,
 .rte_blocks_callout-card.default {
 	@apply bg-neutral-200 dark:bg-neutral-600;
 }

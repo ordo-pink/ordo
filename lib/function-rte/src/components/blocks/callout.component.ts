@@ -39,6 +39,7 @@ import { Inline } from "../inline.component"
 import { RTE } from "../../rte"
 import { type TRTECalloutNode } from "../../rte.types"
 import { emojis } from "@ordo-pink/emojis"
+import { noop } from "@ordo-pink/tau"
 
 // TODO Copy CSS
 export const Callout = (node: TRTECalloutNode, index: number) =>
@@ -138,9 +139,18 @@ export const Callout = (node: TRTECalloutNode, index: number) =>
 
 								const items = [] as Ordo.CommandPalette.Item[]
 
-								for (let i = 0; i < Number(CalloutType.length); i++)
-									// TODO Icon, color label custom info, readable_name
-									items.push({ readable_name: get_readable_type(i) as Ordo.I18N.TranslationKey, value: i })
+								for (
+									let value = 0;
+									value < Number(CalloutType.length);
+									value++ // TODO Icon, color label custom info, readable_name
+								) {
+									const readable_type = get_readable_type(value)
+									const readable_name = `t.rte.callout.${readable_type}` as Ordo.I18N.TranslationKey
+									const render_icon = () => get_callout_icon(value, "!text-inherit")
+									const render_custom_info = () => StyledCalloutCircle(readable_type)
+
+									items.push({ readable_name, value, render_icon, render_custom_info })
+								}
 
 								commands.emit("cmd.application.command_palette.show", { items, on_select })
 							}
@@ -165,6 +175,7 @@ const StyledCalloutMessage = MaokaStyled.Tags.p()
 const StyledCalloutOptions = MaokaStyled.Tags.div()
 const StyledCalloutIcon = MaokaStyled.Tags.div("rte_blocks_callout-card_icon")
 const StyledCalloutEmojiIcon = MaokaStyled.Tags.span("rte_blocks_callout-card_icon_emoji")
+const StyledCalloutCircle = (color_class: string) => MaokaStyled.Tags.div(`rte_blocks_callout_type ${color_class}`)(noop)
 const create_callout_card = (card_type: string) => MaokaStyled.Tags.div(`rte_blocks_callout-card ${card_type}`)
 
 const get_callout_icon = (type: CalloutType, custom_class?: string) =>

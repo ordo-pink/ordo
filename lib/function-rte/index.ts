@@ -47,6 +47,14 @@ declare global {
 				turn_to_incoming_links: () => string
 				turn_to_callout: () => string
 			}
+			callout: {
+				rrr: () => string
+				question: () => string
+				info: () => string
+				success: () => string
+				default: () => string
+				warn: () => string
+			}
 		}
 	}
 
@@ -99,6 +107,12 @@ export default create_function(
 				"t.rte.commands.turn_to_paragraph": "Turn to Paragraph",
 				"t.rte.commands.turn_to_incoming_links": "Turn to Incoming Links",
 				"t.rte.commands.turn_to_callout": "Turn to Callout",
+				"t.rte.callout.default": "Default",
+				"t.rte.callout.info": "Info",
+				"t.rte.callout.question": "Question",
+				"t.rte.callout.rrr": "RRR",
+				"t.rte.callout.success": "Success",
+				"t.rte.callout.warn": "Warning",
 			},
 		})
 

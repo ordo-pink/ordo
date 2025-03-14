@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Input, Label, Link, MetadataIcon } from "@ordo-pink/maoka-components"
+import { Input, Label, MetadataIcon, MetadataLink } from "@ordo-pink/maoka-components"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
@@ -99,7 +99,7 @@ const OutgoingLinksSection = (fsid: Ordo.Metadata.FSID) =>
 			const links = get_links()
 
 			return links.length > 0
-				? links.map(metadata => Link({ href: `/editor/${metadata.get_fsid()}`, children: metadata.get_name() }))
+				? links.map(metadata => MetadataLink({ metadata, children: metadata.get_name() }))
 				: ActionPlaceholder(() => () => "Add outgoing links...") // TODO Translations
 		}
 	})

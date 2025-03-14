@@ -26,8 +26,15 @@ import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { R } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
 
-import { type TRTEBlockquoteNode, type TRTEHeaderNode, type TRTEIncomingLinksNode, type TRTEParagraphNode } from "../rte.types"
+import {
+	type TRTEBlockquoteNode,
+	type TRTECalloutNode,
+	type TRTEHeaderNode,
+	type TRTEIncomingLinksNode,
+	type TRTEParagraphNode,
+} from "../rte.types"
 import { Blockquote } from "./blocks/blockquote.component"
+import { Callout } from "./blocks/callout.component"
 import { Header } from "./blocks/header.component"
 import { IncomingLinks } from "./blocks/incoming-links.component"
 import { LineNumber } from "./line-number.component"
@@ -97,6 +104,7 @@ export const Block = (block_index: number, metadata: Ordo.Metadata.Instance) =>
 					.case("p", () => Paragraph(node as TRTEParagraphNode, block_index))
 					.case("bq", () => Blockquote(node as TRTEBlockquoteNode, block_index))
 					.case("incoming_links", () => IncomingLinks(node as TRTEIncomingLinksNode, metadata))
+					.case("callout", () => Callout(node as TRTECalloutNode, block_index))
 					.default(() => "UNIMPLEMENTED"),
 			]
 		}

@@ -23,6 +23,7 @@ import { is_array, is_bool, is_finite_non_negative_int, is_non_empty_string, is_
 
 import {
 	type TRTEBlockquoteNode,
+	type TRTECalloutNode,
 	type TRTECodeNode,
 	type TRTEEmbedNode,
 	type TRTEHeaderNode,
@@ -44,6 +45,8 @@ export const is_rte_code_node = (x: any): x is TRTECodeNode => is_rte_node(x) &&
 export const is_rte_paragraph_node = (x: any): x is TRTEParagraphNode => is_rte_parent(x) && x.type === "p"
 
 export const is_rte_blockquote_node = (x: any): x is TRTEBlockquoteNode => is_rte_parent(x) && x.type === "bq"
+
+export const is_rte_callout_node = (x: any): x is TRTECalloutNode => is_rte_parent(x) && x.type === "callout"
 
 export const is_rte_embed_node = (x: any): x is TRTEEmbedNode =>
 	is_rte_node(x) && x.type === "embed" && is_bool(x.internal) && is_string(x.target)

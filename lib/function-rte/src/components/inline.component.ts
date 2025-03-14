@@ -181,5 +181,5 @@ export const Inline = (node: TRTETextNode | TRTECodeNode, block_index: number, i
 
 // --- Internal ---
 
-const StyledText = MaokaStyled.Tags.span("inline-block outline-none px-1 selection:bg-pink-400 selection:dark:bg-pink-800")
+const StyledText = MaokaStyled.Tags.span("inline-block outline-none px-1 selection:bg-pink-400/50 selection:dark:bg-pink-800")
 const StyledCode = MaokaStyled.Tags.code("inline-block")

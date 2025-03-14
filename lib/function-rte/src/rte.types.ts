@@ -21,7 +21,7 @@
 
 import type { Range } from "@ordo-pink/tau"
 
-import type { TextNodeStyle } from "./rte.constants"
+import type { CalloutType, TextNodeStyle } from "./rte.constants"
 
 export type TRTENode<
 	$TType extends string = string,
@@ -44,8 +44,8 @@ export type TRTEParent<
 export type TRTETextNode = TRTENode<
 	"text",
 	{
-		value: string
 		styles: TextNodeStyle[]
+		value: string
 	}
 >
 
@@ -73,6 +73,16 @@ export type TRTEBlockquoteNode = TRTENode<
 	}
 >
 
+export type TRTECalloutNode = TRTENode<
+	"callout",
+	{
+		callout_type: CalloutType
+		children: (TRTETextNode | TRTECodeNode)[]
+		title?: string
+		emoji?: string
+	}
+>
+
 export type TRTEEmbedNode = TRTENode<
 	"embed",
 	{
@@ -84,24 +94,24 @@ export type TRTEEmbedNode = TRTENode<
 export type TRTEHeaderNode = TRTENode<
 	"h",
 	{
-		level: Range<1, 7>
 		children: (TRTETextNode | TRTECodeNode)[]
+		level: Range<1, 7>
 	}
 >
 
 export type TRTESelection = {
-	block: number
-	inline: number
 	anchor: number
+	block: number
 	focus: number
+	inline: number
 }
 
 export type TRTEContent = TRTENode[]
 
 export type TRTEState = {
 	content: TRTEContent
-	selection: TRTESelection
 	is_editable: boolean
 	is_embedded: boolean
 	quick_menu: { x: number; y: number } | null
+	selection: TRTESelection
 }

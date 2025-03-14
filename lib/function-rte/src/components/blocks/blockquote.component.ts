@@ -22,6 +22,7 @@
 import { Input } from "@ordo-pink/maoka-components"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
+import { noop } from "@ordo-pink/tau"
 
 import { Inline } from "../inline.component"
 import { RTE } from "../../rte"
@@ -35,7 +36,7 @@ export const Blockquote = (node: TRTEBlockquoteNode, index: number) =>
 
 		return () => [
 			...node.children.map((child, inline_index) => Inline(child, index, inline_index)),
-			StyledInputSectionStub(() => () => void 0),
+			InputOffset(() => noop),
 			Input.Text({
 				initial_value: value,
 				on_input: event => {
@@ -53,7 +54,7 @@ export const Blockquote = (node: TRTEBlockquoteNode, index: number) =>
 					})
 				},
 				placeholder: "Enter cite source",
-				custom_class: "text-xs text-neutral-500 text-right",
+				custom_class: "rte_blocks_blockquote_cite",
 				transparent: true,
 			}),
 		]
@@ -61,8 +62,6 @@ export const Blockquote = (node: TRTEBlockquoteNode, index: number) =>
 
 // --- Internal ---
 
-const StyledBlockquote = MaokaStyled.Tags.blockquote(
-	"cursor-text w-full italic rounded-md p-3 bg-neutral-400 dark:bg-neutral-700",
-)
+const StyledBlockquote = MaokaStyled.Tags.blockquote("rte_blocks_blockquote")
 
-const StyledInputSectionStub = MaokaStyled.Tags.div("w-full")
+const InputOffset = MaokaStyled.Tags.div()

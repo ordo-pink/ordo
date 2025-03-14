@@ -17,3 +17,51 @@
 .rte_blocks_incoming-links_list {
 	@apply list-inside list-none;
 }
+
+.rte_blocks_blockquote {
+	@apply mx-2 w-full cursor-text rounded-md bg-neutral-200 p-3 italic shadow-inner dark:bg-neutral-700;
+}
+
+.rte_blocks_blockquote_cite {
+	@apply text-right text-xs text-neutral-500;
+}
+
+.rte_blocks_callout {
+	@apply relative inset-x-0 mx-2 size-full;
+}
+
+.rte_blocks_callout-card {
+	@apply pointer-events-auto relative mx-auto flex min-h-10 w-full max-w-2xl items-center gap-x-4 rounded-lg p-4 shadow-sm md:mx-0;
+}
+
+.rte_blocks_callout-card_title {
+	@apply px-1 font-bold;
+}
+
+.rte_blocks_callout-card_body {
+	@apply w-full text-sm;
+}
+
+.rte_blocks_callout-card.info {
+	@apply bg-sky-100 dark:bg-sky-800;
+}
+
+.rte_blocks_callout-card.question {
+	@apply bg-violet-100 dark:bg-violet-800;
+}
+
+.rte_blocks_callout-card.rrr {
+	@apply bg-rose-100 dark:bg-rose-800;
+}
+
+.rte_blocks_callout-card.success {
+	@apply bg-emerald-100 dark:bg-emerald-800;
+}
+
+.rte_blocks_callout-card.warn {
+	@apply bg-amber-100 dark:bg-amber-800;
+}
+
+.rte_blocks_callout-card.default {
+	@apply bg-neutral-200 dark:bg-neutral-600;
+}

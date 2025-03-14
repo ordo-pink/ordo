@@ -78,7 +78,9 @@ export const OrdoCommandPalette = Maoka.create("div", ({ use, refresh }) => {
 
 	const get_state = use(MaokaOrdo.Jabs.happy_marriage$(ordo_app_state.zags, handle_marry_ordo_state))
 
-	const handle_enter = () => {
+	const handle_enter = (event?: KeyboardEvent) => {
+		if (event) event.stopPropagation()
+
 		const state = get_state()
 		const current_item_location = ordo_app_state.zags.select("sections.command_palette.location")
 		const index = ordo_app_state.zags.select("sections.command_palette.index")
@@ -213,7 +215,7 @@ export const OrdoCommandPalette = Maoka.create("div", ({ use, refresh }) => {
 					.case("ArrowUp", handle_arrow_up)
 					.case("ArrowDown", handle_arrow_down)
 					.case("Tab", () => handle_tab(event))
-					.case("Enter", handle_enter)
+					.case("Enter", () => handle_enter(event))
 					.default(noop)
 
 			document.addEventListener("keydown", handle_keydown)

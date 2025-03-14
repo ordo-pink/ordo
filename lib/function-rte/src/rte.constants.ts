@@ -25,3 +25,13 @@ export enum TextNodeStyle {
 	UNDERLINE,
 	STRIKETHROUGH,
 }
+
+export enum CalloutType {
+	DEFAULT,
+	SUCCESS,
+	INFO,
+	WARN,
+	QUESTION,
+	RRR,
+	length,
+}

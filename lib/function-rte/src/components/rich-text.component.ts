@@ -21,6 +21,7 @@
 
 import {
 	BsBoxArrowInUpLeft,
+	BsInfoCircle,
 	BsQuote,
 	BsType,
 	BsTypeH1,
@@ -43,6 +44,7 @@ import { RTE } from "../rte"
 import { type TRTEContent } from "../rte.types"
 
 import "../rte.css"
+import { CalloutType } from "../rte.constants"
 
 export const RichText = (
 	metadata: Ordo.Metadata.Instance,
@@ -142,6 +144,18 @@ export const RichText = (
 			render_icon: BsBoxArrowInUpLeft,
 			type: ContextMenuItemType.UPDATE,
 			payload_creator: ({ payload }) => ({ block_index: payload.block_index, block: { type: "incoming_links" } }),
+		})
+
+		commands.emit("cmd.application.context_menu.add", {
+			command: "cmd.rte.replace_block",
+			readable_name: "t.rte.commands.turn_to_callout",
+			should_show: RTE.Guards.is_rte_context_menu_payload,
+			render_icon: BsInfoCircle,
+			type: ContextMenuItemType.UPDATE,
+			payload_creator: ({ payload }) => ({
+				block_index: payload.block_index,
+				block: { type: "callout", callout_type: CalloutType.DEFAULT },
+			}),
 		})
 
 		const handle_mount = () => {

@@ -45,6 +45,7 @@ declare global {
 				turn_to_paragraph: () => string
 				turn_to_blockquote: () => string
 				turn_to_incoming_links: () => string
+				turn_to_callout: () => string
 			}
 		}
 	}
@@ -97,6 +98,7 @@ export default create_function(
 				"t.rte.commands.turn_to_blockquote": "Turn to Blockquote",
 				"t.rte.commands.turn_to_paragraph": "Turn to Paragraph",
 				"t.rte.commands.turn_to_incoming_links": "Turn to Incoming Links",
+				"t.rte.commands.turn_to_callout": "Turn to Callout",
 			},
 		})
 

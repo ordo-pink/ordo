@@ -19,39 +19,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { is_array, is_bool, is_finite_non_negative_int, is_non_empty_string, is_object, is_string } from "@ordo-pink/tau"
+import { is_array, is_finite_non_negative_int, is_non_empty_string, is_object, is_string, is_undefined } from "@ordo-pink/tau"
+import { Metadata } from "@ordo-pink/core"
 
-import {
-	type TRTEBlockquoteNode,
-	type TRTECalloutNode,
-	type TRTECodeNode,
-	type TRTEEmbedNode,
-	type TRTEHeaderNode,
-	type TRTENode,
-	type TRTEParagraphNode,
-	type TRTEParent,
-	type TRTETextNode,
-} from "./rte.types"
+import type * as T from "./rte.types"
 
-export const is_rte_node = (x: any): x is TRTENode => is_object(x) && is_non_empty_string(x.type)
+export const is_rte_node = (x: any): x is T.TRTENode => is_object(x) && is_non_empty_string(x.type)
 
-export const is_rte_parent = (x: any): x is TRTEParent => is_rte_node(x) && is_array(x.children)
+export const is_rte_parent = (x: any): x is T.TRTEParent => is_rte_node(x) && is_array(x.children)
 
-export const is_rte_text_node = (x: any): x is TRTETextNode =>
+export const is_rte_text_node = (x: any): x is T.TRTETextNode =>
 	is_rte_node(x) && x.type === "text" && is_string(x.value) && is_array(x.styles)
 
-export const is_rte_code_node = (x: any): x is TRTECodeNode => is_rte_node(x) && x.type === "code" && is_string(x.value)
+export const is_rte_code_node = (x: any): x is T.TRTECodeNode => is_rte_node(x) && x.type === "code" && is_string(x.value)
 
-export const is_rte_paragraph_node = (x: any): x is TRTEParagraphNode => is_rte_parent(x) && x.type === "p"
+export const is_rte_paragraph_node = (x: any): x is T.TRTEParagraphNode => is_rte_parent(x) && x.type === "p"
 
-export const is_rte_blockquote_node = (x: any): x is TRTEBlockquoteNode => is_rte_parent(x) && x.type === "bq"
+export const is_rte_blockquote_node = (x: any): x is T.TRTEBlockquoteNode => is_rte_parent(x) && x.type === "bq"
 
-export const is_rte_callout_node = (x: any): x is TRTECalloutNode => is_rte_parent(x) && x.type === "callout"
+export const is_rte_callout_node = (x: any): x is T.TRTECalloutNode => is_rte_parent(x) && x.type === "callout"
 
-export const is_rte_embed_node = (x: any): x is TRTEEmbedNode =>
-	is_rte_node(x) && x.type === "embed" && is_bool(x.internal) && is_string(x.target)
-
-export const is_rte_header_node = (x: any): x is TRTEHeaderNode =>
+export const is_rte_header_node = (x: any): x is T.TRTEHeaderNode =>
 	is_rte_parent(x) && x.type === "h" && [1, 2, 3, 4, 5, 6].includes(x.level as any)
 
 export const is_rte_context_menu_payload = (
@@ -61,3 +49,6 @@ export const is_rte_context_menu_payload = (
 
 	return x.payload.location === "rte" && is_finite_non_negative_int(x.payload.block_index)
 }
+
+export const is_rte_embed_node = (x: any): x is T.TRTEEmbedNode =>
+	is_rte_node(x) && x.type === "embed" && (is_undefined(x.fsid) || Metadata.Validations.is_fsid(x.fsid))

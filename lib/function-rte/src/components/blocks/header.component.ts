@@ -22,17 +22,29 @@
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { Switch } from "@ordo-pink/switch"
 
+import { type TBlockNodeParams, type TRTEHeaderNode } from "../../rte.types"
 import { Inline } from "../inline.component"
-import { type TRTEHeaderNode } from "../../rte.types"
 
-export const Header = (node: TRTEHeaderNode, index: number) =>
+export const Header = ({ block_index, metadata, node }: TBlockNodeParams<TRTEHeaderNode>) =>
 	Switch.Match(node.level)
-		.case(1, () => StyledH1(() => () => node.children.map((child, inline_index) => Inline(child, index, inline_index))))
-		.case(2, () => StyledH2(() => () => node.children.map((child, inline_index) => Inline(child, index, inline_index))))
-		.case(3, () => StyledH3(() => () => node.children.map((child, inline_index) => Inline(child, index, inline_index))))
-		.case(4, () => StyledH4(() => () => node.children.map((child, inline_index) => Inline(child, index, inline_index))))
-		.case(5, () => StyledH5(() => () => node.children.map((child, inline_index) => Inline(child, index, inline_index))))
-		.case(6, () => StyledH6(() => () => node.children.map((child, inline_index) => Inline(child, index, inline_index))))
+		.case(1, () =>
+			StyledH1(() => () => node.children.map((node, inline_index) => Inline({ node, block_index, inline_index, metadata }))),
+		)
+		.case(2, () =>
+			StyledH2(() => () => node.children.map((node, inline_index) => Inline({ node, block_index, inline_index, metadata }))),
+		)
+		.case(3, () =>
+			StyledH3(() => () => node.children.map((node, inline_index) => Inline({ node, block_index, inline_index, metadata }))),
+		)
+		.case(4, () =>
+			StyledH4(() => () => node.children.map((node, inline_index) => Inline({ node, block_index, inline_index, metadata }))),
+		)
+		.case(5, () =>
+			StyledH5(() => () => node.children.map((node, inline_index) => Inline({ node, block_index, inline_index, metadata }))),
+		)
+		.case(6, () =>
+			StyledH6(() => () => node.children.map((node, inline_index) => Inline({ node, block_index, inline_index, metadata }))),
+		)
 		.default(() => "INVALID HEADER")
 
 // --- Internal ---

@@ -26,14 +26,15 @@ import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { Switch } from "@ordo-pink/switch"
 import { noop } from "@ordo-pink/tau"
 
-import { type TRTECodeNode, type TRTETextNode } from "../rte.types"
+import { type TInlineNodeParams, type TRTECodeNode, type TRTETextNode } from "../rte.types"
 import { RTE } from "../rte"
 
-export const Inline = (node: TRTETextNode | TRTECodeNode, block_index: number, inline_index: number) =>
+export const Inline = ({ block_index, inline_index, metadata, node }: TInlineNodeParams<TRTETextNode | TRTECodeNode>) =>
 	Switch.Match(node.type)
 		.case("code", () => StyledCode(() => () => node.value))
 		.case("text", () =>
 			StyledText(({ element, use }) => {
+				const fsid = metadata.get_fsid()
 				const commands = use(MaokaOrdo.Jabs.get_commands)
 				const is_darwin = use(MaokaJabs.is_darwin)
 
@@ -43,7 +44,7 @@ export const Inline = (node: TRTETextNode | TRTECodeNode, block_index: number, i
 				use(MaokaJabs.listen("onkeydown", event => handle_keydown(event)))
 				use(MaokaJabs.listen("oninput", event => handle_input(event)))
 				use(MaokaJabs.listen("onclick", event => handle_click(event)))
-				use(RTE.Jabs.listen_for_selection_change(block_index, inline_index))
+				use(RTE.Jabs.listen_for_selection_change(fsid, block_index, inline_index))
 
 				const styles = (node as TRTETextNode).styles ?? []
 
@@ -58,19 +59,27 @@ export const Inline = (node: TRTETextNode | TRTECodeNode, block_index: number, i
 					if (selection) {
 						event.stopPropagation()
 
-						RTE.$.update("selection", () => ({
-							anchor: selection.anchorOffset,
-							block: block_index,
-							focus: selection.focusOffset,
-							inline: inline_index,
-						}))
+						RTE.$.update("focus", () => fsid)
+
+						RTE.$.update(`state.${fsid}`, state => {
+							const state_copy = { ...state }
+							state_copy.selection = {
+								anchor: selection.anchorOffset,
+								block: block_index,
+								focus: selection.focusOffset,
+								inline: inline_index,
+							}
+
+							return state_copy
+						})
 					}
 				}
 
 				const handle_input = (event: Event) =>
-					RTE.$.update("content", content => {
-						const content_copy = [...content]
-						const current_block = content_copy[block_index]
+					RTE.$.update(`state.${fsid}`, state => {
+						const state_copy = { ...state }
+
+						const current_block = state_copy.content[block_index]
 
 						if (RTE.Guards.is_rte_parent(current_block)) {
 							const current_node = { ...current_block.children[inline_index] }
@@ -80,63 +89,78 @@ export const Inline = (node: TRTETextNode | TRTECodeNode, block_index: number, i
 								const target = event.target as HTMLElement
 								current_node_copy.value = target.innerText
 								current_block.children[inline_index] = current_node_copy
+
+								const selection = window.getSelection()
+
+								if (selection) {
+									state_copy.selection = {
+										anchor: selection.anchorOffset,
+										block: block_index,
+										focus: selection.focusOffset,
+										inline: inline_index,
+									}
+								}
+
+								return state_copy
 							}
 						}
 
-						return content_copy
+						return state
 					})
 
 				const handle_keydown = (event: KeyboardEvent) =>
 					Switch.Match(event.code)
 						.case("Enter", () => {
 							event.preventDefault()
-							commands.emit("cmd.rte.add_block", { block: RTE.Utils.create_paragraph(), block_index: block_index + 1 })
+							commands.emit("cmd.rte.add_block", { block: RTE.Utils.create_paragraph(), block_index: block_index + 1, fsid })
 						})
 						.case("ArrowUp", () => {
 							if (block_index !== 0) {
 								event.preventDefault()
 
-								RTE.$.update("selection", s => {
-									const content = RTE.$.select("content")
+								RTE.$.update(`state.${fsid}`, state => {
+									const state_copy = { ...state }
 
-									const prev_block = content[block_index - 1]
+									const prev_block = state_copy.content[block_index - 1]
 
-									if (!RTE.Guards.is_rte_parent(prev_block)) return s
+									if (!RTE.Guards.is_rte_parent(prev_block)) return state
 
 									const last_index = prev_block.children.length - 1
 									const last_inline = prev_block.children[last_index]
 
 									if (RTE.Guards.is_rte_text_node(last_inline)) {
 										const offset = last_inline.value.length
-										return { anchor: offset, focus: offset, block: block_index - 1, inline: last_index }
+										state_copy.selection = { anchor: offset, focus: offset, block: block_index - 1, inline: last_index }
 									}
 
 									// FIXME Stay in the same line since I don't want to think any deeper rn
-									return s
+									return state_copy
 								})
 							}
 						})
 						.case("ArrowDown", () => {
-							const content = RTE.$.select("content")
+							const state = RTE.$.select(`state.${fsid}`)
 
-							if (block_index < content.length - 1) {
+							if (state && block_index < state.content.length - 1) {
 								event.preventDefault()
 
-								RTE.$.update("selection", s => {
-									const prev_block = content[block_index + 1]
+								RTE.$.update(`state.${fsid}`, state => {
+									const state_copy = { ...state }
 
-									if (!RTE.Guards.is_rte_parent(prev_block)) return s
+									const prev_block = state_copy.content[block_index + 1]
+
+									if (!RTE.Guards.is_rte_parent(prev_block)) return state
 
 									const last_index = prev_block.children.length - 1
 									const last_inline = prev_block.children[last_index]
 
 									if (RTE.Guards.is_rte_text_node(last_inline)) {
 										const offset = last_inline.value.length
-										return { anchor: offset, focus: offset, block: block_index + 1, inline: last_index }
+										state_copy.selection = { anchor: offset, focus: offset, block: block_index + 1, inline: last_index }
 									}
 
 									// FIXME Stay in the same line since I don't want to think any deeper rn
-									return s
+									return state_copy
 								})
 							}
 						})
@@ -147,16 +171,16 @@ export const Inline = (node: TRTETextNode | TRTECodeNode, block_index: number, i
 
 								if (block_index === 0 && inline_index === 0) return
 
-								const content = RTE.$.select("content")
+								const state = RTE.$.select(`state.${fsid}`)
 
-								const block = content[block_index]
+								const block = state.content[block_index]
 
 								if (RTE.Guards.is_rte_parent(block)) {
 									const inline = block.children[inline_index]
 
 									if (RTE.Guards.is_rte_text_node(inline) && inline.value.length === 0) {
-										if (inline_index === 0) commands.emit("cmd.rte.remove_block", block_index)
-										else commands.emit("cmd.rte.remove_inline", { block_index, inline_index })
+										if (inline_index === 0) commands.emit("cmd.rte.remove_block", { block_index, fsid })
+										else commands.emit("cmd.rte.remove_inline", { fsid, block_index, inline_index })
 									}
 
 									// TODO Move content to previous block

@@ -21,12 +21,12 @@
 
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 
+import { type TBlockNodeParams, type TRTEParagraphNode } from "../../rte.types"
 import { Inline } from "../inline.component"
-import { type TRTEParagraphNode } from "../../rte.types"
 
-export const Paragraph = (node: TRTEParagraphNode, index: number) =>
+export const Paragraph = ({ block_index, metadata, node }: TBlockNodeParams<TRTEParagraphNode>) =>
 	StyledParagraph(() => {
-		return () => node.children.map((child, inline_index) => Inline(child, index, inline_index))
+		return () => node.children.map((node, inline_index) => Inline({ node, block_index, inline_index, metadata }))
 	})
 
 // --- Internal ---

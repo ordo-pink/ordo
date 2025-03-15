@@ -86,8 +86,7 @@ export type TRTECalloutNode = TRTENode<
 export type TRTEEmbedNode = TRTENode<
 	"embed",
 	{
-		internal: boolean
-		target: string
+		fsid?: Ordo.Metadata.FSID
 	}
 >
 
@@ -108,10 +107,25 @@ export type TRTESelection = {
 
 export type TRTEContent = TRTENode[]
 
-export type TRTEState = {
+export type TRTEEditorState = {
 	content: TRTEContent
 	is_editable: boolean
 	is_embedded: boolean
 	quick_menu: { x: number; y: number } | null
 	selection: TRTESelection
+}
+
+export type TRTEState = {
+	focus?: Ordo.Metadata.FSID
+	state: Record<Ordo.Metadata.FSID, TRTEEditorState>
+}
+
+export type TBlockNodeParams<$TNode> = {
+	metadata: Ordo.Metadata.Instance
+	block_index: number
+	node: $TNode
+}
+
+export type TInlineNodeParams<$TNode> = TBlockNodeParams<$TNode> & {
+	inline_index: number
 }

@@ -22,10 +22,10 @@
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { MetadataLink } from "@ordo-pink/maoka-components"
 
+import { type TBlockNodeParams, type TRTEIncomingLinksNode } from "../../rte.types"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
-import { TRTEIncomingLinksNode } from "../../rte.types"
 
-export const IncomingLinks = (node: TRTEIncomingLinksNode, metadata: Ordo.Metadata.Instance) =>
+export const IncomingLinks = ({ metadata }: TBlockNodeParams<TRTEIncomingLinksNode>) =>
 	StyledIncomingLinks(({ use }) => {
 		const get_incoming_links = use(MaokaOrdo.Jabs.Metadata.get_incoming_links$(metadata.get_fsid()))
 

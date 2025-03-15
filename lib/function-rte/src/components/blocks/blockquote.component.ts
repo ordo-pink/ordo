@@ -24,18 +24,19 @@ import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { noop } from "@ordo-pink/tau"
 
+import { TBlockNodeParams, type TRTEBlockquoteNode } from "../../rte.types"
 import { Inline } from "../inline.component"
 import { RTE } from "../../rte"
-import { type TRTEBlockquoteNode } from "../../rte.types"
 
-export const Blockquote = (node: TRTEBlockquoteNode, index: number) =>
+export const Blockquote = ({ block_index, metadata, node }: TBlockNodeParams<TRTEBlockquoteNode>) =>
 	StyledBlockquote(({ use }) => {
+		const fsid = metadata.get_fsid()
 		if (node.cite) use(MaokaJabs.set_attribute("cite", node.cite))
 
 		let value = node.cite
 
 		return () => [
-			...node.children.map((child, inline_index) => Inline(child, index, inline_index)),
+			...node.children.map((node, inline_index) => Inline({ node, block_index, inline_index, metadata })),
 			InputOffset(() => noop),
 			Input.Text({
 				initial_value: value,
@@ -43,14 +44,14 @@ export const Blockquote = (node: TRTEBlockquoteNode, index: number) =>
 					value = (event.target as HTMLInputElement).value
 				},
 				on_blur: () => {
-					RTE.$.update("content", content => {
-						if (RTE.Guards.is_rte_blockquote_node(content[index])) {
-							const content_copy = [...content]
-							content_copy[index].cite = value
-							return content_copy
+					RTE.$.update(`state.${fsid}`, state => {
+						if (RTE.Guards.is_rte_blockquote_node(state.content[block_index])) {
+							const state_copy = { ...state }
+							state_copy.content[block_index].cite = value
+							return state_copy
 						}
 
-						return content
+						return state
 					})
 				},
 				placeholder: "Enter cite source",

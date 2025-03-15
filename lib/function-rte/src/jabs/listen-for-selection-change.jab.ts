@@ -23,25 +23,32 @@ import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { type TMaokaJab } from "@ordo-pink/maoka"
 
 import { RTE } from "../rte"
-import { type TRTESelection } from "../rte.types"
+import { type TRTEEditorState } from "../rte.types"
 
 export const listen_for_selection_change_jab =
-	(block_index: number, inline_index: number): TMaokaJab =>
+	(fsid: Ordo.Metadata.FSID, block_index: number, inline_index: number): TMaokaJab =>
 	({ element, use }) => {
-		const cheat_on_selection = (s: TRTESelection) => {
+		const cheat_on_selection = (s: TRTEEditorState) => {
+			const focus = RTE.$.select("focus")
 			const window_selection = window.getSelection()
 
-			if (!window_selection || !MaokaDOM.is_maoka_dom_element(element) || s.block !== block_index || s.inline !== inline_index)
+			if (
+				focus !== fsid ||
+				!window_selection ||
+				!MaokaDOM.is_maoka_dom_element(element) ||
+				s.selection.block !== block_index ||
+				s.selection.inline !== inline_index
+			)
 				return
 
 			const range = new Range()
 			const node = element.childNodes[0] ?? element
-			const is_reverse_selection = s.anchor > s.focus
+			const is_reverse_selection = s.selection.anchor > s.selection.focus
 
-			range.setStart(node, is_reverse_selection ? s.focus : s.anchor)
+			range.setStart(node, is_reverse_selection ? s.selection.focus : s.selection.anchor)
 
-			if (s.anchor !== s.focus) {
-				range.setEnd(element.childNodes[0] ?? element, is_reverse_selection ? s.anchor : s.focus)
+			if (s.selection.anchor !== s.selection.focus) {
+				range.setEnd(element.childNodes[0] ?? element, is_reverse_selection ? s.selection.anchor : s.selection.focus)
 			}
 
 			window_selection.removeAllRanges()
@@ -49,5 +56,5 @@ export const listen_for_selection_change_jab =
 			element.scrollIntoView({ behavior: "smooth", block: "center" })
 		}
 
-		use(MaokaDOM.Jabs.onmount(() => RTE.$.cheat("selection", cheat_on_selection)))
+		use(MaokaDOM.Jabs.onmount(() => RTE.$.cheat(`state.${fsid}`, cheat_on_selection)))
 	}

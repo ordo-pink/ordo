@@ -33,21 +33,22 @@ import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { Switch } from "@ordo-pink/switch"
-
-import { CalloutType } from "../../rte.constants"
-import { Inline } from "../inline.component"
-import { RTE } from "../../rte"
-import { type TRTECalloutNode } from "../../rte.types"
 import { emojis } from "@ordo-pink/emojis"
 import { noop } from "@ordo-pink/tau"
 
+import { type TBlockNodeParams, type TRTECalloutNode } from "../../rte.types"
+import { CalloutType } from "../../rte.constants"
+import { Inline } from "../inline.component"
+import { RTE } from "../../rte"
+
 // TODO Copy CSS
-export const Callout = (node: TRTECalloutNode, index: number) =>
+export const Callout = ({ node, block_index, metadata }: TBlockNodeParams<TRTECalloutNode>) =>
 	StyledCallout(({ refresh }) => {
 		let node_type = node.callout_type
 		let title = node.title
 
 		return () => {
+			const fsid = metadata.get_fsid()
 			const card_type = get_readable_type(node_type)
 			const CalloutCard = create_callout_card(card_type)
 
@@ -55,6 +56,7 @@ export const Callout = (node: TRTECalloutNode, index: number) =>
 				// TODO Clickable emoji icon
 				StyledCalloutIcon(({ use }) => {
 					const commands = use(MaokaOrdo.Jabs.get_commands)
+
 					use(
 						MaokaJabs.listen("onclick", event => {
 							event.stopPropagation()
@@ -62,14 +64,14 @@ export const Callout = (node: TRTECalloutNode, index: number) =>
 							commands.emit("cmd.application.command_palette.show", {
 								max_items: 100,
 								on_select: item => {
-									RTE.$.update("content", content => {
-										if (RTE.Guards.is_rte_callout_node(content[index])) {
-											const content_copy = [...content]
-											content_copy[index].emoji = item.value
-											return content_copy
+									RTE.$.update(`state.${fsid}`, state => {
+										if (RTE.Guards.is_rte_callout_node(state.content[block_index])) {
+											const state_copy = { ...state }
+											state_copy.content[block_index].emoji = item.value
+											return state_copy
 										}
 
-										return content
+										return state
 									})
 
 									refresh()
@@ -100,14 +102,14 @@ export const Callout = (node: TRTECalloutNode, index: number) =>
 								title = (event.target as HTMLInputElement).value
 							},
 							on_blur: () => {
-								RTE.$.update("content", content => {
-									if (RTE.Guards.is_rte_callout_node(content[index])) {
-										const content_copy = [...content]
-										content_copy[index].title = title
-										return content_copy
+								RTE.$.update(`state.${fsid}`, state => {
+									if (RTE.Guards.is_rte_callout_node(state.content[block_index])) {
+										const state_copy = { ...state }
+										state_copy.content[block_index].title = title
+										return state_copy
 									}
 
-									return content
+									return state
 								})
 							},
 							placeholder: "Enter title",
@@ -123,14 +125,14 @@ export const Callout = (node: TRTECalloutNode, index: number) =>
 								event.stopPropagation()
 
 								const on_select = (item: Ordo.CommandPalette.Item<CalloutType>) => {
-									RTE.$.update("content", content => {
-										const content_copy = [...content]
-										if (RTE.Guards.is_rte_callout_node(content_copy[index])) {
-											content_copy[index].callout_type = item.value
-											return content_copy
+									RTE.$.update(`state.${fsid}`, state => {
+										if (RTE.Guards.is_rte_callout_node(state.content[block_index])) {
+											const state_copy = { ...state }
+											state_copy.content[block_index].callout_type = item.value
+											return state_copy
 										}
 
-										return content
+										return state
 									})
 
 									node_type = item.value
@@ -158,7 +160,9 @@ export const Callout = (node: TRTECalloutNode, index: number) =>
 							return () => BsThreeDotsVertical("cursor-pointer")
 						}),
 					]),
-					StyledCalloutMessage(() => () => node.children.map((child, inline_index) => Inline(child, index, inline_index))),
+					StyledCalloutMessage(
+						() => () => node.children.map((node, inline_index) => Inline({ node, block_index, inline_index, metadata })),
+					),
 				]),
 
 				// OrdoNotificationHideButton({ id, type }),

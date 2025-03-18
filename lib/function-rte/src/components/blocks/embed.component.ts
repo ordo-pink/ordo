@@ -106,4 +106,4 @@ export const Embed = ({ node, block_index, metadata }: TBlockNodeParams<TRTEEmbe
 const StyledEmbedTitleWrapper = MaokaStyled.Tags.div("flex p-2 justify-end text-neutral-500 text-sm")
 const StyledNoFSIDEmbed = MaokaStyled.Tags.div("w-full flex justify-center py-2")
 const StyledEmbedWithFSID = MaokaStyled.Tags.div("")
-const StyledEmbed = MaokaStyled.Tags.div("ml-2 w-full bg-neutral-200 dark:bg-neutral-900/20 rounded-md")
+const StyledEmbed = MaokaStyled.Tags.div("ml-2 w-full bg-neutral-200/40 dark:bg-neutral-900/20 rounded-md")

@@ -29,28 +29,46 @@ import { type TMaokaJab } from "@ordo-pink/maoka"
 export const edit_file_links_command: TMaokaJab = ({ use }) => {
 	const state = use(MaokaOrdo.Context.consume)
 
-	const handle_show_edit_links_palette: Ordo.Command.HandlerOf<"cmd.metadata.show_edit_links_palette"> = fsid => {
-		const current_links = state.metadata_query
-			.get_by_fsid(fsid)
-			.pipe(R.ops.chain(R.FromNullable))
-			.pipe(R.ops.map(metadata => metadata.get_links()))
-			.pipe(R.ops.chain(links => R.Merge(links.flatMap(link => state.metadata_query.get_by_fsid(link)))))
-			.cata(R.catas.or_else(() => [] as Ordo.Metadata.Instance[]))
+	const handle_show_edit_links_palette: Ordo.Command.HandlerOf<"cmd.metadata.show_edit_links_palette"> = ({ fsid, type }) => {
+		const current_links =
+			type === "outgoing"
+				? state.metadata_query
+						.get_by_fsid(fsid)
+						.pipe(R.ops.chain(R.FromNullable))
+						.pipe(R.ops.map(metadata => metadata.get_links()))
+						.pipe(R.ops.chain(links => R.Merge(links.flatMap(link => state.metadata_query.get_by_fsid(link)))))
+						.cata(R.catas.or_else(() => [] as Ordo.Metadata.Instance[]))
+				: state.metadata_query
+						.get()
+						.pipe(R.ops.map(metadata => metadata.filter(item => item.has_link_to(fsid))))
+						.cata(R.catas.or_else(() => [] as Ordo.Metadata.Instance[]))
 
-		const available_links = state.metadata_query
-			.get()
-			.pipe(
-				R.ops.map(ls =>
-					ls.filter(l => l.get_fsid() !== fsid && !current_links.some(link => l.get_fsid() === link?.get_fsid())),
-				),
-			)
-			.cata(R.catas.or_else(() => [] as Ordo.Metadata.Instance[]))
+		const available_links =
+			type === "outgoing"
+				? state.metadata_query
+						.get()
+						.pipe(
+							R.ops.map(ls =>
+								ls.filter(l => l.get_fsid() !== fsid && !current_links.some(link => l.get_fsid() === link?.get_fsid())),
+							),
+						)
+						.cata(R.catas.or_else(() => [] as Ordo.Metadata.Instance[]))
+				: state.metadata_query
+						.get()
+						.pipe(R.ops.map(metadata => metadata.filter(item => !item.has_link_to(fsid))))
+						.cata(R.catas.or_else(() => [] as Ordo.Metadata.Instance[]))
 
 		state.commands.emit("cmd.application.command_palette.show", {
 			max_items: 200,
 			is_multiple: true,
-			on_select: item => state.commands.emit("cmd.metadata.add_links", { fsid, links: [item.value.get_fsid()] }),
-			on_deselect: item => state.commands.emit("cmd.metadata.remove_links", { fsid, links: [item.value.get_fsid()] }),
+			on_select: item =>
+				type === "outgoing"
+					? state.commands.emit("cmd.metadata.add_links", { fsid, links: [item.value.get_fsid()] })
+					: state.commands.emit("cmd.metadata.add_links", { fsid: item.value.get_fsid(), links: [fsid] }),
+			on_deselect: item =>
+				type === "outgoing"
+					? state.commands.emit("cmd.metadata.remove_links", { fsid, links: [item.value.get_fsid()] })
+					: state.commands.emit("cmd.metadata.remove_links", { fsid: item.value.get_fsid(), links: [fsid] }),
 			items: available_links.map(link => ({
 				value: link,
 				readable_name: link.get_name() as Ordo.I18N.TranslationKey,

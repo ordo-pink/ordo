@@ -81,7 +81,13 @@ const LinksCell = (metadata: Ordo.Metadata.Instance, type: "parent" | "incoming"
 
 		if (type === "outgoing") {
 			const commands = use(MaokaOrdo.Jabs.get_commands)
-			const handle_click = () => commands.emit("cmd.metadata.show_edit_links_palette", fsid)
+			const handle_click = () => commands.emit("cmd.metadata.show_edit_links_palette", { fsid, type })
+
+			if (use(MaokaDOM.Jabs.is_dom)) use(MaokaJabs.add_class("clickable"))
+			use(MaokaJabs.listen("onclick", () => handle_click()))
+		} else if (type === "incoming") {
+			const commands = use(MaokaOrdo.Jabs.get_commands)
+			const handle_click = () => commands.emit("cmd.metadata.show_edit_links_palette", { fsid, type })
 
 			if (use(MaokaDOM.Jabs.is_dom)) use(MaokaJabs.add_class("clickable"))
 			use(MaokaJabs.listen("onclick", () => handle_click()))

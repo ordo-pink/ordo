@@ -198,7 +198,7 @@ const OutgoingLinksSection = (fsid: Ordo.Metadata.FSID) =>
 		const commands = use(MaokaOrdo.Jabs.get_commands)
 		const get_links = use(MaokaOrdo.Jabs.Metadata.get_outgoing_links$(fsid))
 
-		const handle_click = () => commands.emit("cmd.metadata.show_edit_links_palette", fsid)
+		const handle_click = () => commands.emit("cmd.metadata.show_edit_links_palette", { fsid, type: "outgoing" })
 
 		return () => {
 			const links = get_links()

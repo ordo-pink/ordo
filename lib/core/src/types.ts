@@ -302,7 +302,7 @@ declare global {
 			show_create_modal: () => Ordo.Metadata.FSID | null
 			show_edit_label_modal: () => Ordo.Metadata.Label
 			show_edit_labels_palette: () => Ordo.Metadata.FSID
-			show_edit_links_palette: () => Ordo.Metadata.FSID
+			show_edit_links_palette: () => { fsid: Ordo.Metadata.FSID; type: "incoming" | "outgoing" }
 			show_move_palette: () => Ordo.Metadata.FSID
 			show_publish_modal: () => Ordo.Metadata.FSID
 			show_remove_modal: () => Ordo.Metadata.FSID

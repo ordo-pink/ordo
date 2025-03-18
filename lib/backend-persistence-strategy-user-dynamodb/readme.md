@@ -1,1 +1,0 @@
-# User Persistence Strategy DynamoDB

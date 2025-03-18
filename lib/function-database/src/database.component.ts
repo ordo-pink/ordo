@@ -87,7 +87,7 @@ export const Database = (metadata: Ordo.Metadata.Instance, content: Ordo.Content
 			if (!keys.includes("t.database.column_names.name")) keys.unshift("t.database.column_names.name")
 
 			const children = metadata_query.get_children(fsid).cata(R.catas.or_else(() => []))
-			const sorted_children = to_sorted_children(db_state, children)
+			const sorted_children = to_sorted_children(db_state, children, metadata_query)
 
 			return [
 				is_editable ? DatabaseOptions : void 0,
@@ -108,7 +108,11 @@ const DatabaseTableBody = MaokaStyled.Tags.tbody()
 
 const DatabaseTable = MaokaStyled.Tags.table("w-full border database_border-color h-full")
 
-const to_sorted_children = (db_state: TDatabaseState, children: Ordo.Metadata.Instance[]) => {
+const to_sorted_children = (
+	db_state: TDatabaseState,
+	children: Ordo.Metadata.Instance[],
+	metadata_query: Ordo.Metadata.Query,
+) => {
 	let items = children
 
 	Object.keys(db_state.sorting ?? {}).forEach(column => {
@@ -125,8 +129,8 @@ const to_sorted_children = (db_state: TDatabaseState, children: Ordo.Metadata.In
 				.case("t.database.column_names.name", () => x.get_name().localeCompare(y.get_name()))
 				.case("t.database.column_names.created_at", () => (x.get_created_at() > y.get_created_at() ? -1 : 1))
 				.case("t.database.column_names.outgoing_links", () => {
-					const x_links = x.get_links()
-					const y_links = y.get_links()
+					const x_links = metadata_query.get_outgoing_links(x.get_fsid()).cata(R.catas.or_else(() => []))
+					const y_links = metadata_query.get_outgoing_links(y.get_fsid()).cata(R.catas.or_else(() => []))
 
 					for (let i = 0; i < x_links.length; i++) {
 						const x_link = x_links[i]
@@ -137,7 +141,25 @@ const to_sorted_children = (db_state: TDatabaseState, children: Ordo.Metadata.In
 
 						if (x_link === y_link) continue
 
-						return x_link.localeCompare(y_link)
+						return x_link.get_name().localeCompare(y_link.get_name())
+					}
+
+					return 0
+				})
+				.case("t.database.column_names.incoming_links", () => {
+					const x_links = metadata_query.get_incoming_links(x.get_fsid()).cata(R.catas.or_else(() => []))
+					const y_links = metadata_query.get_incoming_links(y.get_fsid()).cata(R.catas.or_else(() => []))
+
+					for (let i = 0; i < x_links.length; i++) {
+						const x_link = x_links[i]
+						const y_link = y_links[i]
+
+						if (!x_link) return 1
+						if (!y_link) return -1
+
+						if (x_link === y_link) continue
+
+						return x_link.get_name().localeCompare(y_link.get_name())
 					}
 
 					return 0

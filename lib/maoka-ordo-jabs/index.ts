@@ -6,9 +6,11 @@
 import { Maoka, type TMaokaComponent } from "@ordo-pink/maoka"
 
 import {
+	count_metadata$,
 	get_commands,
 	get_content_query,
 	get_current_route$,
+	get_current_user$,
 	get_fetch,
 	get_file_associations$,
 	get_logger,
@@ -30,6 +32,7 @@ import {
 export const MaokaOrdo = {
 	Jabs: {
 		Metadata: {
+			count$: count_metadata$,
 			get$: get_metadata$,
 			get_by_fsid$: get_metadata_by_fsid$,
 			has_children$: get_metadata_has_children$,
@@ -37,6 +40,9 @@ export const MaokaOrdo = {
 			get_children_count$: get_metadata_children_count$,
 			get_incoming_links$: get_metadata_incoming_links$,
 			get_outgoing_links$: get_metadata_outgoing_links$,
+		},
+		User: {
+			get_current$: get_current_user$,
 		},
 		happy_marriage$,
 		get_commands,

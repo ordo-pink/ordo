@@ -56,16 +56,22 @@ export const MetadataLink = ({
 	metadata,
 	title,
 }: Omit<P, "href"> & { metadata: Ordo.Metadata.Instance }) =>
-	Maoka.create("span", ({ element }) => {
+	Maoka.create("span", ({ element, use }) => {
 		let href = `/editor/${metadata.get_fsid()}`
 
+		const commands = ordo_app_state.zags.select("commands")
 		const user_query = ordo_app_state.zags.select("user")
 		const pb_host = ordo_app_state.zags.select("hosts.pb")
+
+		use(MaokaJabs.listen("oncontextmenu", event => handle_context_menu(event)))
 
 		if (user_query && MaokaStr.is_maoka_str_element(element)) {
 			const name = metadata.get_property("public_name")
 			href = `${pb_host}/${user_query.get_handle()}/${name}`
 		}
+
+		const handle_context_menu = (event: MouseEvent) =>
+			commands.emit("cmd.application.context_menu.show", { event, payload: metadata })
 
 		return () =>
 			Link({

@@ -101,6 +101,25 @@ export const get_translations$: TMaokaJab<{ t: Ordo.I18N.TranslateFn }> = ({ use
 // --- Metadata ---
 // TODO Add error logging
 
+export const count_metadata$: TMaokaJab<() => number> = ({ use }) => {
+	const metadata_query = use(get_metadata_query)
+
+	return use(
+		happy_marriage$(metadata_query.$, () =>
+			metadata_query
+				.get({ show_hidden: true })
+				.pipe(R.ops.map(items => items.length))
+				.cata(R.catas.or_else(() => 0)),
+		),
+	)
+}
+
+export const get_current_user$: TMaokaJab<() => Ordo.User.Current.Instance | null> = ({ use }) => {
+	const user_query = use(get_user_query)
+
+	return use(happy_marriage$(user_query.$, () => user_query.get_current().cata(R.catas.or_else(() => null))))
+}
+
 export const get_metadata$ =
 	(options?: Ordo.Metadata.QueryOptions): TMaokaJab<() => Ordo.Metadata.Instance[]> =>
 	({ use }) => {

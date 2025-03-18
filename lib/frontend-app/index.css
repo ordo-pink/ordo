@@ -175,3 +175,19 @@ a {
 .command-palette_create-new-item-hint {
 	@apply flex w-full items-center justify-center space-x-1 text-center text-sm text-neutral-600 dark:text-neutral-400;
 }
+
+.file-editor_empty {
+	@apply flex h-full w-full flex-col items-center justify-center gap-4;
+}
+
+.file-editor_empty_section_title {
+	@apply text-xl font-bold;
+}
+
+.file-editor_empty_buttons-section {
+	@apply flex flex-col;
+}
+
+.file-editor_empty_logo {
+	@apply h-48 w-48 opacity-50 grayscale;
+}

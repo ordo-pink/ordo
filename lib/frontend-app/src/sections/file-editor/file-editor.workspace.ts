@@ -19,22 +19,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Maoka } from "@ordo-pink/maoka"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
+import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { Metadata } from "@ordo-pink/core"
 import { R } from "@ordo-pink/result"
 
+import { EmptyEditor } from "./components/empty-editor.component"
 import { FileMetadata } from "./components/file-editor-workspace-file-metadata.component"
 import { RenderPicker } from "./components/file-editor-workspace-render-picker.component"
 import { TitleSetter } from "./components/file-editor-workspace-title-setter.component"
 
-const FileEditor = {
-	FileMetadata,
-	RenderPicker,
-	TitleSetter,
-}
+const StyledFileEditorWorkspace = MaokaStyled.Tags.div("h-full")
 
-export const FileEditorWorkspace = Maoka.create("div", ({ use }) => {
+export const FileEditorWorkspace = StyledFileEditorWorkspace(({ use }) => {
 	const get_route_params = use(MaokaOrdo.Jabs.get_route_params$)
 	const metadata_query = use(MaokaOrdo.Jabs.get_metadata_query)
 
@@ -45,12 +42,8 @@ export const FileEditorWorkspace = Maoka.create("div", ({ use }) => {
 			.pipe(R.ops.chain(metadata_query.get_by_fsid))
 			.pipe(R.ops.chain(R.FromNullable))
 			.cata({
-				Ok: metadata => [
-					FileEditor.TitleSetter(metadata),
-					FileEditor.FileMetadata(metadata),
-					FileEditor.RenderPicker(metadata),
-				],
-				Err: () => FileEditor.TitleSetter(null), // TODO No selected file component
+				Ok: metadata => [TitleSetter(metadata), FileMetadata(metadata), RenderPicker(metadata)],
+				Err: () => [TitleSetter(null), EmptyEditor], // TODO No selected file component
 			})
 	}
 })

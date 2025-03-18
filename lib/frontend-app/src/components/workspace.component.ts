@@ -54,6 +54,7 @@ const SidebarPaddingContractor = (element: TMaokaElement) =>
 	})
 
 const WorkspaceRenderer = Maoka.create("div", ({ use }) => {
+	use(MaokaJabs.set_class("h-full"))
 	const get_current_activity = use(ordo_app_state.select_jab$("functions.current_activity"))
 	const get_activities = use(ordo_app_state.select_jab$("functions.activities"))
 

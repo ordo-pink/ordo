@@ -23,6 +23,7 @@ import { ContextMenuItemType, Metadata } from "@ordo-pink/core"
 import { BsLink } from "@ordo-pink/frontend-icons"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
+import { MetadataIcon } from "@ordo-pink/maoka-components"
 import { R } from "@ordo-pink/result"
 import { type TMaokaJab } from "@ordo-pink/maoka"
 
@@ -34,7 +35,7 @@ export const edit_file_links_command: TMaokaJab = ({ use }) => {
 			type === "outgoing"
 				? state.metadata_query
 						.get_by_fsid(fsid)
-						.pipe(R.ops.chain(R.FromNullable))
+						.pipe(R.ops.chain(metadata => R.FromNullable(metadata)))
 						.pipe(R.ops.map(metadata => metadata.get_links()))
 						.pipe(R.ops.chain(links => R.Merge(links.flatMap(link => state.metadata_query.get_by_fsid(link)))))
 						.cata(R.catas.or_else(() => [] as Ordo.Metadata.Instance[]))
@@ -71,10 +72,12 @@ export const edit_file_links_command: TMaokaJab = ({ use }) => {
 					: state.commands.emit("cmd.metadata.remove_links", { fsid: item.value.get_fsid(), links: [fsid] }),
 			items: available_links.map(link => ({
 				value: link,
+				render_icon: () => MetadataIcon({ metadata: link, show_emoji_picker: false }),
 				readable_name: link.get_name() as Ordo.I18N.TranslationKey,
 			})),
 			pinned_items: current_links.map(link => ({
 				value: link,
+				render_icon: () => MetadataIcon({ metadata: link!, show_emoji_picker: false }),
 				readable_name: link?.get_name() as Ordo.I18N.TranslationKey,
 			})),
 		})

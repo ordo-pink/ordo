@@ -200,7 +200,14 @@ export default create_function(
 						),
 				)
 				.and(({ str, styles }) => create_publishable_page(metadata.get_name(), str, ...(styles ?? [])))
-				.and(content => cmd.naga("cmd.content.upload", { name, parent: fsid, content, type: "text/html" }))
+				.and(content =>
+					cmd.naga("cmd.content.upload", {
+						name,
+						parent: fsid,
+						content: new TextEncoder().encode(content).buffer,
+						type: "text/html",
+					}),
+				)
 				.and(() => metadata_query.get_by_name(name, fsid, { show_hidden: true }))
 				.and(r => r.cata({ Ok: m => Oath.Resolve(m), Err: () => Oath.Reject(null) }))
 				.and(Oath.FromNullable)

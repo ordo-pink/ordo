@@ -14,6 +14,7 @@ import { routary_cors } from "@ordo-pink/routary-cors"
 import { set_content_type_application_json_header } from "@ordo-pink/backend-util-set-header"
 
 import { type TPBChamber, type TPBContext } from "./backend-pb.types"
+import { BackendUserKeys } from "@ordo-pink/backend/src/backend.constants"
 
 export const create_backend_pb = (chamber: TPBChamber) =>
 	Routary.Of<TPBContext>({ ...chamber, headers: new Headers(), request_ip: null, status: 200 })
@@ -31,7 +32,7 @@ export const create_backend_pb = (chamber: TPBChamber) =>
 							Oath.FromPromise(() => fetch(`${intake.id_host}/users/handle/${handle}`))
 								.and(res => res.json())
 								.and(res => Oath.If(res.success, { T: () => res.payload as Ordo.User.Public.DTO }))
-								.and(user => ({ uid: user.id, fsid }))
+								.and(user => ({ uid: user[BackendUserKeys.UID], fsid }))
 								.pipe(ops0.rejected_map(() => RRR.codes.enoent("User not found"))),
 						),
 					)

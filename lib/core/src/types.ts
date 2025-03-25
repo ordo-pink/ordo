@@ -662,7 +662,7 @@ declare global {
 
 		// TODO improve types
 		namespace Content {
-			type Instance = string | ArrayBuffer | Blob | FormData | Uint8Array | ReadableStream | null
+			type Instance = ArrayBuffer | ArrayBufferLike | ReadableStream | null
 
 			type PersistenceStrategy = {
 				clear: () => Oath<void, Ordo.Rrr<"EIO">>
@@ -723,7 +723,7 @@ declare global {
 			> &
 				Pick<Ordo.Metadata.DTO<$TProps>, "name" | "parent">
 
-			type DTO<$TProps extends Ordo.Metadata.Props = Ordo.Metadata.Props> = Readonly<{
+			type DTO<$TProps extends Ordo.Metadata.Props = Ordo.Metadata.Props> = {
 				fsid: Ordo.Metadata.FSID
 				name: string
 				parent: Ordo.Metadata.FSID | null
@@ -738,7 +738,7 @@ declare global {
 				props?: $TProps
 				is_deleted?: boolean
 				checksum?: string
-			}>
+			}
 
 			type Static = {
 				Of: <$TProps extends Ordo.Metadata.Props = Ordo.Metadata.Props>(

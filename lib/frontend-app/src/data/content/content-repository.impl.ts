@@ -38,12 +38,16 @@ export const ContentRepository: Ordo.Content.RepositoryStatic = {
 				remote: remote_strategy
 					.get(user.get_uid(), METADATA_CONTENT_FSID)
 					.and(Oath.FromNullable)
-					.and(stream => new Response(stream as ReadableStream).json() as Promise<Ordo.Metadata.DTO[]>)
+					.and(stream => new Response(stream as ReadableStream).arrayBuffer())
+					.and(x => new TextDecoder().decode(x))
+					.and(x => Oath.Try(() => JSON.parse(x) as Ordo.Metadata.DTO[]))
 					.fix(() => []),
 				local: local_strategy
 					.get(user.get_uid(), METADATA_CONTENT_FSID)
 					.and(Oath.FromNullable)
-					.and(content => Oath.Try(() => JSON.parse(content as string) as Ordo.Metadata.DTO[]))
+					.and(content => new Response(content as ReadableStream).arrayBuffer())
+					.and(x => new TextDecoder().decode(x))
+					.and(content => Oath.Try(() => JSON.parse(content) as Ordo.Metadata.DTO[]))
 					.fix(() => []),
 			})
 				// Filter out unchanged items to avoid redundant pending updates
@@ -87,6 +91,32 @@ export const ContentRepository: Ordo.Content.RepositoryStatic = {
 
 					return { intersection, local_update, remote_update }
 				})
+
+				.and(({ intersection, local_update, remote_update }) => {
+					Oath.Merge(
+						local_update.map(metadata =>
+							remote_strategy
+								.get(metadata.created_by ?? user.get_uid(), metadata.fsid)
+								.and(content => new Response(content as ReadableStream).arrayBuffer())
+								.and(content => local_strategy.put(metadata.created_by ?? user.get_uid(), metadata.fsid, content)),
+						),
+					)
+						.invoke(invokers0.to_promise)
+						.catch(console.error)
+
+					Oath.Merge(
+						remote_update.map(metadata =>
+							local_strategy
+								.get(metadata.created_by ?? user.get_uid(), metadata.fsid)
+								.and(content => remote_strategy.put(metadata.created_by ?? user.get_uid(), metadata.fsid, content)),
+						),
+					)
+						.invoke(invokers0.to_promise)
+						.catch(console.error)
+
+					return { intersection, local_update, remote_update }
+				})
+
 				.and(({ intersection, local_update, remote_update }) => ({
 					local:
 						local_update.length > 0 &&
@@ -101,8 +131,16 @@ export const ContentRepository: Ordo.Content.RepositoryStatic = {
 				}))
 				.and(({ local, remote }) =>
 					Oath.Merge({
-						local: local && local_strategy.put(user.get_uid(), METADATA_CONTENT_FSID, JSON.stringify(local)).and(T),
-						remote: remote && remote_strategy.put(user.get_uid(), METADATA_CONTENT_FSID, JSON.stringify(remote)).and(T),
+						local:
+							local &&
+							local_strategy
+								.put(user.get_uid(), METADATA_CONTENT_FSID, new TextEncoder().encode(JSON.stringify(local)).buffer)
+								.and(T),
+						remote:
+							remote &&
+							remote_strategy
+								.put(user.get_uid(), METADATA_CONTENT_FSID, new TextEncoder().encode(JSON.stringify(remote)).buffer)
+								.and(T),
 					}),
 				)
 				// Force update of the components due to the changes in the local repo
@@ -120,7 +158,10 @@ export const ContentRepository: Ordo.Content.RepositoryStatic = {
 		return {
 			get: (uid, fsid) => local_strategy.get(uid as Ordo.User.UID, fsid).fix(() => null),
 			get_all: () => local_strategy.list(),
-			put: (uid, fsid, content) => local_strategy.put(uid as Ordo.User.UID, fsid, content),
+			put: (uid, fsid, content) =>
+				local_strategy
+					.put(uid as Ordo.User.UID, fsid, content)
+					.and(() => (uid ? remote_strategy.put(uid, fsid, content) : void 0)),
 			remove: (uid, fsid) =>
 				local_strategy.delete(uid as Ordo.User.UID, fsid).and(() => (uid ? remote_strategy.delete(uid, fsid) : void 0)),
 			get $() {

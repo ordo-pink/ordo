@@ -25,11 +25,12 @@
 
 import { METADATA_CONTENT_FSID, Metadata } from "@ordo-pink/core"
 import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
-import { is_array, is_string } from "@ordo-pink/tau"
 import { Result } from "@ordo-pink/result"
+import { is_array } from "@ordo-pink/tau"
 
 import { ordo_app_state } from "../app.state"
 
+// TODO Merge with content repository
 export const MetadataManager = {
 	Of: (metadata_repository: Ordo.Metadata.Repository, content_repository: Ordo.Content.Repository): TMetadataManager => {
 		const user = ordo_app_state.zags.select("user")
@@ -38,7 +39,7 @@ export const MetadataManager = {
 		const get_metadata_content0 = content_repository
 			.get(user?.get_uid() ?? null, METADATA_CONTENT_FSID)
 			.and(Oath.FromNullable)
-			.and(content => Oath.If(is_string(content), { T: () => content as string }))
+			.and(content => new TextDecoder().decode(content as ArrayBuffer))
 			.and(content => Oath.Try(() => JSON.parse(content) as Ordo.Metadata.DTO[]))
 			.fix(() => [] as Ordo.Metadata.DTO[])
 			.and(dtos => dtos.map(Metadata.FromDTO))
@@ -54,7 +55,7 @@ export const MetadataManager = {
 
 			void content_repository
 				.get(user?.get_uid() ?? null, METADATA_CONTENT_FSID)
-				.and(stream => new Response(stream))
+				.and(stream => new Response(stream as ArrayBuffer))
 				.and(res => res.json())
 				.and(items => Oath.If(is_array(items), { T: () => items }))
 				.and(items => items.map(Metadata.FromDTO))
@@ -95,8 +96,8 @@ export const MetadataManager = {
 						.and(() => {
 							if (user) {
 								const authenticated_dtos = dtos.map(dto => {
-									if (!dto.created_by) (dto as any).created_by = user.get_uid()
-									if (!dto.updated_by) (dto as any).updated_by = user.get_uid()
+									if (!dto.created_by) dto.created_by = user.get_uid()
+									if (!dto.updated_by) dto.updated_by = user.get_uid()
 
 									return dto
 								})
@@ -107,7 +108,9 @@ export const MetadataManager = {
 							return dtos
 						})
 						.and(dtos => Oath.Try(() => JSON.stringify(dtos)))
-						.and(str => content_repository.put(user?.get_uid() ?? null, METADATA_CONTENT_FSID, str))
+						.and(str =>
+							content_repository.put(user?.get_uid() ?? null, METADATA_CONTENT_FSID, new TextEncoder().encode(str).buffer),
+						)
 
 					previous_save_attempt0 &&
 						void previous_save_attempt0.pipe(ops0.bitap(mark_put_complete, mark_put_complete)).invoke(

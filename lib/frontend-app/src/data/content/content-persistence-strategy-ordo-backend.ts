@@ -35,7 +35,9 @@ export const PersistenceStrategyContentOrdoBackend = {
 					.and(res => res.body)
 					.pipe(ops0.rejected_map((e: Error) => RRR.codes.eio(e?.message, e))),
 			put: (uid, fsid, body) =>
-				Oath.FromPromise(() => fetch(`${dt_host}/${uid}/${fsid}`, { credentials: "include", method: "PUT", body }))
+				Oath.FromPromise(() =>
+					fetch(`${dt_host}/${uid}/${fsid}`, { credentials: "include", method: "PUT", body: body as ArrayBuffer }),
+				)
 					.and(res => res.json())
 					.and(res => Oath.If(res.success))
 					.pipe(ops0.rejected_map((e: Error) => RRR.codes.eio(e?.message, e))),

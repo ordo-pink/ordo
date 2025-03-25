@@ -39,7 +39,7 @@ import { show_columns_jab } from "./jabs/show-columns-modal.jab"
 import "./database.css"
 
 export const Database = (metadata: Ordo.Metadata.Instance, content: Ordo.Content.Instance, is_editable: boolean) =>
-	Maoka.create("div", ({ use }) => {
+	Maoka.create("div", ({ refresh, use }) => {
 		let db_state = database$.unwrap()
 		const fsid = metadata.get_fsid()
 
@@ -51,21 +51,27 @@ export const Database = (metadata: Ordo.Metadata.Instance, content: Ordo.Content
 		const metadata_query = use(MaokaOrdo.Jabs.get_metadata_query)
 		use(MaokaOrdo.Jabs.Metadata.get_children_count$(fsid))
 
-		const divorce_database$ = database$.marry((state, is_update) => {
-			if (!is_update) return
-			db_state = state
-
-			commands.emit("cmd.content.set", { fsid, content_type: "database/ordo", content: JSON.stringify(state) })
-		})
-
 		use(
 			MaokaDOM.Jabs.onmount(() => {
 				try {
-					const initial_state = content ? (JSON.parse(content as string) as TDatabaseState) : {}
+					const initial_state = content ? JSON.parse(new TextDecoder().decode(content as ArrayBuffer)) : {}
 					database$.replace(initial_state)
+					refresh()
 				} catch (e) {
 					database$.replace({})
 				}
+
+				const divorce_database$ = database$.marry((state, is_update) => {
+					db_state = state
+
+					if (!is_update) return
+
+					commands.emit("cmd.content.set", {
+						fsid,
+						content_type: "database/ordo",
+						content: new TextEncoder().encode(JSON.stringify(state)).buffer,
+					})
+				})
 
 				commands.on("cmd.database.toggle_column", handle_toggle_column_cmd)
 				commands.on("cmd.database.toggle_sorting", handle_toggle_sorting_cmd)

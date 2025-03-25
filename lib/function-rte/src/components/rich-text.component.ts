@@ -19,11 +19,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { is_array, is_string } from "@ordo-pink/tau"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { R } from "@ordo-pink/result"
+import { is_array } from "@ordo-pink/tau"
 
 import { Block } from "./block.component"
 import { RTE } from "../rte"
@@ -44,19 +44,15 @@ export const RichText = (
 		const commands = use(MaokaOrdo.Jabs.get_commands)
 
 		const handle_mount = () => {
-			const divorce_state = RTE.$.cheat(`state.${fsid}`, ({ content }) => {
-				commands.emit("cmd.content.set", { content: JSON.stringify(content), content_type: "text/ordo", fsid })
-
-				if (length !== content.length) {
-					length = content.length
-					refresh()
-				}
-			})
-
 			RTE.$.update("focus", prev => (is_embedded ? prev : fsid))
 
 			R.FromNullable(content)
-				.pipe(R.ops.chain(x => R.If(is_string(x), { T: () => x as string })))
+				.pipe(
+					R.ops.chain(x => {
+						if (x instanceof ArrayBuffer) return R.Ok(new TextDecoder().decode(x))
+						return R.Err("Unexpected content type")
+					}),
+				)
 				.pipe(R.ops.chain(x => R.Try(() => JSON.parse(x))))
 				.pipe(R.ops.chain(x => R.If(is_array(x) && x.length > 0, { T: () => x })))
 				.cata({
@@ -84,6 +80,20 @@ export const RichText = (
 						refresh()
 					},
 				})
+
+			const divorce_state = RTE.$.cheat(`state.${fsid}`, ({ content }, is_update) => {
+				if (is_update)
+					commands.emit("cmd.content.set", {
+						content: new TextEncoder().encode(JSON.stringify(content)).buffer,
+						content_type: "text/ordo",
+						fsid,
+					})
+
+				if (length !== content.length) {
+					length = content.length
+					refresh()
+				}
+			})
 
 			return () => {
 				divorce_state()

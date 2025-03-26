@@ -128,9 +128,9 @@ const BackgroundImage = (metadata: Ordo.Metadata.Instance) =>
 				const fetch_background0 = metadata_query
 					.get_by_fsid(hero_image_fsid, { show_hidden: true })
 					.pipe(R.ops.chain(R.FromNullable))
-					.pipe(R.ops.map(m => ({ fsid: m.get_fsid(), uid: m.get_created_by() })))
+					.pipe(R.ops.map(m => ({ fsid: m.get_fsid(), uid: m.get_created_by(), type: m.get_type() })))
 					.cata({ Ok: ctx => Oath.Resolve(ctx), Err: () => Oath.Reject() })
-					.and(({ uid, fsid }) => content_query.get(uid!, fsid).and(ab => Oath.FromPromise(() => new Response(ab).blob())))
+					.and(({ uid, fsid, type }) => content_query.get(uid!, fsid).and(ab => new Blob([ab as ArrayBuffer], { type })))
 					.and(blob => URL.createObjectURL(blob))
 					.and(url => {
 						src = url

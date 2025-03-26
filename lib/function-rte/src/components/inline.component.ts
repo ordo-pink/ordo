@@ -209,12 +209,39 @@ export const Inline = ({ block_index, inline_index, metadata, node }: TInlineNod
 								if (RTE.Guards.is_rte_parent(block)) {
 									const inline = block.children[inline_index]
 
-									if (RTE.Guards.is_rte_text_node(inline) && inline.value.length === 0) {
-										if (inline_index === 0) commands.emit("cmd.rte.remove_block", { block_index, fsid })
-										else commands.emit("cmd.rte.remove_inline", { fsid, block_index, inline_index })
+									if (!RTE.Guards.is_rte_text_node(inline)) return state
+
+									if (inline_index === 0) {
+										const value = inline.value
+
+										RTE.$.update(`state.${fsid}`, state => {
+											const state_copy = { ...state }
+
+											const prev_block = state_copy.content[block_index - 1]
+
+											if (RTE.Guards.is_rte_parent(prev_block)) {
+												const prev_block_last_inline = prev_block.children[prev_block.children.length - 1]
+
+												if (RTE.Guards.is_rte_text_node(prev_block_last_inline)) {
+													state_copy.selection.block = block_index - 1
+													state_copy.selection.inline = prev_block.children.length - 1
+													state_copy.selection.anchor = prev_block_last_inline.value.length
+													state_copy.selection.focus = prev_block_last_inline.value.length
+
+													prev_block_last_inline.value += value
+												}
+											}
+
+											return state_copy
+										})
+
+										commands.emit("cmd.rte.remove_block", { block_index, fsid, preserve_caret_position: true })
+									} else {
+										// TODO Drop current inline
+
+										commands.emit("cmd.rte.remove_block", { block_index, fsid })
 									}
 
-									// TODO Move content to previous block
 									return
 								}
 							}

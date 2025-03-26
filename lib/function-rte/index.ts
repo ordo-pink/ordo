@@ -78,14 +78,14 @@ declare global {
 
 	interface cmd {
 		rte: {
-			add_block: () => { fsid: Ordo.Metadata.FSID; block: TRTENode; block_index: number }
+			add_block: () => { fsid: Ordo.Metadata.FSID; block: TRTENode; block_index: number; preserve_caret_position?: boolean }
 			add_block_after_selection: () => { fsid: Ordo.Metadata.FSID; block: TRTENode }
 			add_inline: () => { fsid: Ordo.Metadata.FSID; inline: TRTENode; block_index: number; inline_index: number }
 			add_inline_after_selection: () => { inline: TRTENode; fsid: Ordo.Metadata.FSID }
 			replace_block: () => { fsid: Ordo.Metadata.FSID; block: TRTENode; block_index: number }
 			replace_inline: () => { fsid: Ordo.Metadata.FSID; inline: TRTENode; block_index: number; inline_index: number }
 			wrap_selection: () => { fsid: Ordo.Metadata.FSID; node: TRTENode }
-			remove_block: () => { fsid: Ordo.Metadata.FSID; block_index: number }
+			remove_block: () => { fsid: Ordo.Metadata.FSID; block_index: number; preserve_caret_position?: boolean }
 			remove_inline: () => { fsid: Ordo.Metadata.FSID; block_index: number; inline_index: number }
 			show_quick_menu: () => void
 		}
@@ -330,7 +330,11 @@ const handle_replace_block: Ordo.Command.HandlerOf<"cmd.rte.replace_block"> = ({
 	})
 }
 
-const handle_remove_block: Ordo.Command.HandlerOf<"cmd.rte.remove_block"> = ({ fsid, block_index }) => {
+const handle_remove_block: Ordo.Command.HandlerOf<"cmd.rte.remove_block"> = ({
+	fsid,
+	block_index,
+	preserve_caret_position,
+}) => {
 	RTE.$.update(`state.${fsid}`, state => {
 		if (!state) return state
 
@@ -347,10 +351,11 @@ const handle_remove_block: Ordo.Command.HandlerOf<"cmd.rte.remove_block"> = ({ f
 
 				if (RTE.Guards.is_rte_text_node(last_inline)) {
 					const offset = last_inline.value.length
-					state_copy.selection = { anchor: offset, focus: offset, block: block_index - 1, inline: last_index }
+					if (!preserve_caret_position)
+						state_copy.selection = { anchor: offset, focus: offset, block: block_index - 1, inline: last_index }
 				}
 			} else {
-				state_copy.selection = create_selection()
+				if (!preserve_caret_position) state_copy.selection = create_selection()
 			}
 		}
 

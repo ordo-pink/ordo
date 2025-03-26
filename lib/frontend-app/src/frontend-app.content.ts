@@ -85,12 +85,17 @@ export const init_content: TF = () => {
 		const user = ordo_app_state.zags.select("user")
 
 		if (size > 0) {
-			// TODO Check if metadata exists
+			// TODO Find a better way to check whether metadata should be updated
 			void metadata_query
 				.get_by_fsid(fsid)
+				.pipe(R.ops.chain(R.FromNullable))
+				.pipe(R.ops.chain(metadata => R.If(metadata?.get_size() !== size)))
 				.cata(
 					R.catas.if_ok(() =>
-						content_repository.put(user?.get_uid() ?? null, fsid, content).invoke(invokers0.or_else(alert_rrr)),
+						content_repository
+							.put(user?.get_uid() ?? null, fsid, content)
+							.and(() => commands.emit("cmd.metadata.set_size", { fsid, size }))
+							.invoke(invokers0.or_else(alert_rrr)),
 					),
 				)
 		}

@@ -145,6 +145,64 @@ export const Inline = ({ block_index, inline_index, metadata, node }: TInlineNod
 								fsid,
 							})
 						})
+						.case("ArrowLeft", () => {
+							const selection = window.getSelection()
+
+							if (block_index !== 0 && inline_index === 0 && selection && selection.focusOffset === 0) {
+								RTE.$.update(`state.${fsid}`, state => {
+									const state_copy = { ...state }
+
+									const prev_block = state_copy.content[block_index - 1]
+
+									if (RTE.Guards.is_rte_parent(prev_block)) {
+										const prev_block_last_inline = prev_block.children[prev_block.children.length - 1]
+										if (RTE.Guards.is_rte_text_node(prev_block_last_inline)) {
+											event.preventDefault()
+
+											state_copy.selection.block = block_index - 1
+											state_copy.selection.inline = prev_block.children.length - 1
+											state_copy.selection.anchor = prev_block_last_inline.value.length
+											state_copy.selection.focus = prev_block_last_inline.value.length
+										}
+									}
+
+									return state_copy
+								})
+							}
+						})
+						.case("ArrowRight", () => {
+							const selection = window.getSelection()
+							const state = RTE.$.select(`state.${fsid}`)
+
+							if (
+								selection &&
+								block_index < state.content.length - 1 &&
+								RTE.Guards.is_rte_parent(state.content[block_index]) &&
+								inline_index === state.content[block_index].children.length - 1 &&
+								RTE.Guards.is_rte_text_node(state.content[block_index].children[inline_index]) &&
+								selection.focusOffset === state.content[block_index].children[inline_index].value.length
+							) {
+								const next_block = state.content[block_index + 1]
+
+								if (RTE.Guards.is_rte_parent(next_block)) {
+									const next_block_first_inline = next_block.children[0]
+									if (RTE.Guards.is_rte_text_node(next_block_first_inline)) {
+										event.preventDefault()
+
+										RTE.$.update(`state.${fsid}`, state => {
+											const state_copy = { ...state }
+
+											state_copy.selection.block = block_index + 1
+											state_copy.selection.inline = 0
+											state_copy.selection.anchor = 0
+											state_copy.selection.focus = 0
+
+											return state_copy
+										})
+									}
+								}
+							}
+						})
 						.case("ArrowUp", () => {
 							if (block_index !== 0) {
 								event.preventDefault()

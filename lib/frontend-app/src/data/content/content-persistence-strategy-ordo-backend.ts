@@ -26,7 +26,11 @@ export const PersistenceStrategyContentOrdoBackend = {
 	Of: (dt_host: string, fetch: Ordo.Fetch): Ordo.Content.PersistenceStrategy => {
 		return {
 			clear: () => Oath.Reject(RRR.codes.eio("NOT IMPLEMENTED")),
-			delete: () => Oath.Reject(RRR.codes.eio("NOT IMPLEMENTED")), // TODO
+			delete: (uid, fsid) =>
+				Oath.FromPromise(() => fetch(`${dt_host}/${uid}/${fsid}`, { credentials: "include", method: "DELETE" }))
+					.and(res => res.json())
+					.and(res => Oath.If(res.success))
+					.pipe(ops0.rejected_map((e: Error) => RRR.codes.eio(e?.message, e))), // TODO
 			exists: () => Oath.Reject(RRR.codes.eio("NOT IMPLEMENTED")),
 			list: () => Oath.Reject(RRR.codes.eio("NOT IMPLEMENTED")),
 			get: (uid, fsid) =>
@@ -38,8 +42,7 @@ export const PersistenceStrategyContentOrdoBackend = {
 				Oath.FromPromise(() =>
 					fetch(`${dt_host}/${uid}/${fsid}`, { credentials: "include", method: "PUT", body: body as ArrayBuffer }),
 				)
-					.and(res => res.json())
-					.and(res => Oath.If(res.success))
+					.and(res => Oath.If(res.status === 200 || res.status === 404))
 					.pipe(ops0.rejected_map((e: Error) => RRR.codes.eio(e?.message, e))),
 		}
 	},

@@ -46,7 +46,7 @@ export const init_content: TF = () => {
 	const dt_host = ordo_app_state.zags.select("hosts.dt")
 	const fetch = ordo_app_state.zags.select("fetch")
 
-	logger.debug("🟡 Initialising metadata...")
+	logger.debug("🟡 Initialising content...")
 
 	const local_strategy = PersistenceStrategyContentIndexedDB.Of(
 		INDEXEDDB_NAME,
@@ -96,14 +96,7 @@ export const init_content: TF = () => {
 		}
 	})
 
-	commands.on("cmd.content.remove", fsid => {
-		const user = ordo_app_state.zags.select("user")
-
-		content_repository
-			.remove(user?.get_uid() ?? null, fsid)
-			.invoke(invokers0.to_promise)
-			.catch(console.error)
-	})
+	commands.on("cmd.content.remove", fsid => commands.emit("cmd.metadata.remove", fsid))
 
 	commands.on("cmd.content.upload", async ({ content, type, name, parent }) => {
 		const metadata_query = ordo_app_state.zags.select("queries.metadata")
@@ -136,7 +129,7 @@ export const init_content: TF = () => {
 		return content_repository.put(user?.get_uid() || null, metadata.get_fsid(), content).invoke(invokers0.or_else(alert_rrr))
 	})
 
-	logger.debug("🟢 Initialised metadata.")
+	logger.debug("🟢 Initialised content.")
 
 	const get_content_query = (fid: symbol) =>
 		ContentQuery.Of(content_repository, permission =>
@@ -159,13 +152,11 @@ export const init_content: TF = () => {
 
 // --- Internal ---
 
-const get_string_size = (str: string) => new Blob([str]).size
-
 // TODO Move to tau
 const is_array_buffer = (x: unknown): x is ArrayBuffer => is_instance_of(ArrayBuffer, x)
 
 const get_size = (content: Ordo.Content.Instance) =>
 	Switch.Match(content)
-		.case(is_string, () => get_string_size(content as string))
+		.case(is_string, () => (content as ArrayBuffer).byteLength)
 		.case(is_array_buffer, () => (content as ArrayBuffer).byteLength)
 		.default(() => 0)

@@ -62,7 +62,7 @@ export const create_function_state_source: TMaokaJab<TCreateFunctionStateResult>
 	const { get_router } = init_router()
 	const { get_user_query } = init_user()
 	const { content_repository, get_content_query } = init_content()
-	const { metadata_repository, get_metadata_query } = init_metadata()
+	const { metadata_repository, get_metadata_query } = init_metadata(content_repository)
 
 	return {
 		source: {

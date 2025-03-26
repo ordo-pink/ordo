@@ -19,7 +19,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Oath, ops0 } from "@ordo-pink/oath"
 import { Result } from "@ordo-pink/result"
 import { ZAGS } from "@ordo-pink/zags"
 
@@ -49,70 +48,4 @@ export const MetadataRepository: Ordo.Metadata.RepositoryStatic = {
 			},
 		}
 	},
-}
-
-// TODO: Add types
-// TODO: Add hash and last update
-// TODO: Use all three in Manager
-export const CacheMetadataRepository: Ordo.Metadata.RepositoryAsyncStatic = {
-	Of: () => {
-		const indexed_db = indexedDB.open("ordo.pink", 3)
-
-		const result_p = new Promise<IDBDatabase>((resolve, reject) => {
-			indexed_db.onsuccess = (event: any) => {
-				resolve(event.target.result as IDBDatabase)
-			}
-
-			indexed_db.onerror = (event: any) => {
-				reject(event.target.error?.message ?? "Something wrong with IndexedDB")
-			}
-		})
-
-		return {
-			get: () =>
-				Oath.FromPromise(() => result_p)
-					.pipe(ops0.chain(db => Oath.FromNullable(db)))
-					.pipe(ops0.rejected_map(rrr => RRR.codes.eio("Failed to access IndexedDB cache", rrr)))
-					.pipe(ops0.map(db => db.transaction("metadata", "readonly")))
-					.pipe(ops0.map(transaction => transaction.objectStore("metadata")))
-					.pipe(ops0.map(storage => storage.get("items")))
-					.pipe(
-						ops0.chain(
-							result =>
-								new Oath<Ordo.Metadata.DTO[], Ordo.Rrr<"EIO">>((resolve, reject) => {
-									result.onsuccess = event => resolve((event.target as any)?.result ?? [])
-									result.onerror = () => reject(RRR.codes.eio("Failed to access cache inside IndexedDB"))
-								}),
-						),
-					),
-			put: metadata =>
-				Oath.Try(() => indexed_db.result)
-					.pipe(ops0.chain(db => Oath.FromNullable(db)))
-					.pipe(ops0.rejected_map(() => RRR.codes.eio("Failed to access cache inside IndexedDB")))
-					.pipe(ops0.map(db => db.transaction("metadata", "readwrite")))
-					.pipe(ops0.map(transaction => transaction.objectStore("metadata")))
-					.pipe(ops0.map(storage => storage.put(metadata, "items")))
-					.pipe(
-						ops0.chain(
-							result =>
-								new Oath<void, Ordo.Rrr<"EIO">>((resolve, reject) => {
-									result.onsuccess = () => resolve(void 0)
-									result.onerror = () => reject(RRR.codes.eio("Failed to access cache inside IndexedDB"))
-								}),
-						),
-					),
-		}
-	},
-}
-
-export const RemoteMetadataRepository: Ordo.Metadata.RepositoryAsyncStatic = {
-	Of: (data_host, fetch) => ({
-		get: () =>
-			Oath.Try(() => fetch(`${data_host}`, { credentials: "include" }))
-				.pipe(ops0.chain(response => Oath.FromPromise(() => response.json())))
-				.pipe(ops0.chain(r => Oath.If(r.success, { T: () => r.result, F: () => r.error })))
-				.pipe(ops0.rejected_map(error => RRR.codes.eio(error))),
-
-		put: () => Oath.Reject(RRR.codes.eio("TODO: UNIMPLEMENTED")),
-	}),
 }

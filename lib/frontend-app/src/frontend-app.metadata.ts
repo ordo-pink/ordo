@@ -24,17 +24,18 @@ import { ConsoleLogger } from "@ordo-pink/logger"
 import { Result } from "@ordo-pink/result"
 import { ZAGS } from "@ordo-pink/zags"
 import { call_once } from "@ordo-pink/tau"
+import { invokers0 } from "@ordo-pink/oath"
 
 import { MetadataCommand } from "./data/metadata/metadata-command.impl"
 import { MetadataQuery } from "./data/metadata/metadata-query.impl"
 import { MetadataRepository } from "./data/metadata/metadata-repository.impl"
 import { ordo_app_state } from "../app.state"
 
-type TInitMetadataFn = () => {
+type TInitMetadataFn = (content_repository: Ordo.Content.Repository) => {
 	metadata_repository: Ordo.Metadata.Repository
 	get_metadata_query: (fid: symbol) => Ordo.Metadata.Query
 }
-export const init_metadata: TInitMetadataFn = call_once(() => {
+export const init_metadata: TInitMetadataFn = call_once(content_repository => {
 	const { logger, commands, known_functions, queries } = ordo_app_state.zags.unwrap()
 
 	logger.debug("🟡 Initialising metadata...")
@@ -84,8 +85,12 @@ export const init_metadata: TInitMetadataFn = call_once(() => {
 	)
 
 	commands.on("cmd.metadata.remove", fsid => {
+		const user = queries.user.get_current().cata(Result.catas.or_else(() => null))
 		metadata_command.remove(fsid).cata(Result.catas.or_else(alert_rrr))
-		// TODO Remove contentOrdo.Metadata.Instance[] | null
+		content_repository
+			.remove(user?.get_uid() ?? null, fsid)
+			.invoke(invokers0.to_promise)
+			.catch(alert_rrr)
 	})
 
 	commands.on("cmd.metadata.add_links", ({ fsid, links }) =>

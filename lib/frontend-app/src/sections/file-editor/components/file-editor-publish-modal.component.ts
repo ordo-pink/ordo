@@ -19,13 +19,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Dialog } from "@ordo-pink/maoka-components"
+import { /* CheckboxInput, */ Dialog } from "@ordo-pink/maoka-components"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { NotificationType } from "@ordo-pink/core"
-import { invokers0 } from "@ordo-pink/oath"
 // import { Result } from "@ordo-pink/result"
+import { invokers0 } from "@ordo-pink/oath"
 
 export const PublishMetadataModal = (fsid: Ordo.Metadata.FSID) =>
 	Maoka.create("div", ({ use }) => {

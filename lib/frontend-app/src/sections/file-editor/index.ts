@@ -189,8 +189,11 @@ export default create_function(
 
 			return content_query
 				.get(user.get_uid(), fsid)
+				.and(Oath.FromNullable)
+				.fix(() => new ArrayBuffer(0))
 				.and(content =>
 					Oath.FromNullable(fa)
+
 						// TODO Render file as is if there is no content_to_string
 						.and(fa => Oath.FromNullable(fa.content_to_string).fix(() => ({ render: () => "", styles: [] })))
 						.and(({ render, styles }) =>

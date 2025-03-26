@@ -25,25 +25,55 @@ import { Switch } from "@ordo-pink/switch"
 import { type TBlockNodeParams, type TRTEHeaderNode } from "../../rte.types"
 import { Inline } from "../inline.component"
 
-export const Header = ({ block_index, metadata, node }: TBlockNodeParams<TRTEHeaderNode>) =>
+export const Header = ({ block_index, metadata, node, is_editable, is_embedded }: TBlockNodeParams<TRTEHeaderNode>) =>
 	Switch.Match(node.level)
 		.case(1, () =>
-			StyledH1(() => () => node.children.map((node, inline_index) => Inline({ node, block_index, inline_index, metadata }))),
+			StyledH1(
+				() => () =>
+					node.children.map((node, inline_index) =>
+						Inline({ node, block_index, inline_index, metadata, is_editable, is_embedded }),
+					),
+			),
 		)
 		.case(2, () =>
-			StyledH2(() => () => node.children.map((node, inline_index) => Inline({ node, block_index, inline_index, metadata }))),
+			StyledH2(
+				() => () =>
+					node.children.map((node, inline_index) =>
+						Inline({ node, block_index, inline_index, metadata, is_editable, is_embedded }),
+					),
+			),
 		)
 		.case(3, () =>
-			StyledH3(() => () => node.children.map((node, inline_index) => Inline({ node, block_index, inline_index, metadata }))),
+			StyledH3(
+				() => () =>
+					node.children.map((node, inline_index) =>
+						Inline({ node, block_index, inline_index, metadata, is_editable, is_embedded }),
+					),
+			),
 		)
 		.case(4, () =>
-			StyledH4(() => () => node.children.map((node, inline_index) => Inline({ node, block_index, inline_index, metadata }))),
+			StyledH4(
+				() => () =>
+					node.children.map((node, inline_index) =>
+						Inline({ node, block_index, inline_index, metadata, is_editable, is_embedded }),
+					),
+			),
 		)
 		.case(5, () =>
-			StyledH5(() => () => node.children.map((node, inline_index) => Inline({ node, block_index, inline_index, metadata }))),
+			StyledH5(
+				() => () =>
+					node.children.map((node, inline_index) =>
+						Inline({ node, block_index, inline_index, metadata, is_editable, is_embedded }),
+					),
+			),
 		)
 		.case(6, () =>
-			StyledH6(() => () => node.children.map((node, inline_index) => Inline({ node, block_index, inline_index, metadata }))),
+			StyledH6(
+				() => () =>
+					node.children.map((node, inline_index) =>
+						Inline({ node, block_index, inline_index, metadata, is_editable, is_embedded }),
+					),
+			),
 		)
 		.default(() => "INVALID HEADER")
 

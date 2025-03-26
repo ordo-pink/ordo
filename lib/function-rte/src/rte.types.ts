@@ -109,9 +109,6 @@ export type TRTEContent = TRTENode[]
 
 export type TRTEEditorState = {
 	content: TRTEContent
-	is_editable: boolean
-	is_embedded: boolean
-	quick_menu: { x: number; y: number } | null
 	selection: TRTESelection
 }
 
@@ -124,6 +121,8 @@ export type TBlockNodeParams<$TNode> = {
 	metadata: Ordo.Metadata.Instance
 	block_index: number
 	node: $TNode
+	is_editable: boolean
+	is_embedded: boolean
 }
 
 export type TInlineNodeParams<$TNode> = TBlockNodeParams<$TNode> & {

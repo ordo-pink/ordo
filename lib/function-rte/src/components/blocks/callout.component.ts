@@ -42,7 +42,7 @@ import { Inline } from "../inline.component"
 import { RTE } from "../../rte"
 
 // TODO Copy CSS
-export const Callout = ({ node, block_index, metadata }: TBlockNodeParams<TRTECalloutNode>) =>
+export const Callout = ({ node, block_index, metadata, is_editable, is_embedded }: TBlockNodeParams<TRTECalloutNode>) =>
 	StyledCallout(({ refresh }) => {
 		let node_type = node.callout_type
 		let title = node.title
@@ -112,6 +112,7 @@ export const Callout = ({ node, block_index, metadata }: TBlockNodeParams<TRTECa
 									return state
 								})
 							},
+							disabled: !is_editable,
 							placeholder: "Enter title",
 							custom_class: "rte_blocks_callout-card_title",
 							transparent: true,
@@ -161,7 +162,10 @@ export const Callout = ({ node, block_index, metadata }: TBlockNodeParams<TRTECa
 						}),
 					]),
 					StyledCalloutMessage(
-						() => () => node.children.map((node, inline_index) => Inline({ node, block_index, inline_index, metadata })),
+						() => () =>
+							node.children.map((node, inline_index) =>
+								Inline({ node, block_index, inline_index, metadata, is_editable, is_embedded }),
+							),
 					),
 				]),
 

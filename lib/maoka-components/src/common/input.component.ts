@@ -31,35 +31,37 @@ import "../../maoka-components.css"
 const is_valid$ = ZAGS.Of({ value: true })
 
 type TInputProps = {
-	initial_value?: string
-	on_input?: (event: Event) => void
-	on_focus?: (event: FocusEvent) => void
-	on_blur?: (event: FocusEvent) => void
-	placeholder?: string
-	type?: "text" | "email"
-	label?: string
-	custom_class?: string
-	transparent?: boolean
-	autofocus?: boolean
 	autocomplete?: string
+	autofocus?: boolean
+	custom_class?: string
+	disabled?: boolean
+	initial_value?: string
+	label?: string
+	on_blur?: (event: FocusEvent) => void
+	on_focus?: (event: FocusEvent) => void
+	on_input?: (event: Event) => void
+	placeholder?: string
 	required?: boolean
+	transparent?: boolean
+	type?: "text" | "email"
 	validate?: (value: string) => boolean
 	validation_error_message?: string
 }
 const Text = ({
-	label = "",
-	on_input = () => void 0,
-	placeholder,
-	type = "text",
-	initial_value,
-	custom_class = "",
-	transparent,
-	autofocus = false,
 	autocomplete,
-	required = false,
-	validate = () => true,
+	autofocus = false,
+	custom_class = "",
+	disabled,
+	initial_value,
+	label = "",
 	on_blur,
 	on_focus,
+	on_input = () => void 0,
+	placeholder,
+	required = false,
+	transparent,
+	type = "text",
+	validate = () => true,
 	validation_error_message = "",
 }: TInputProps) =>
 	Maoka.create("label", ({ use }) => {
@@ -77,6 +79,8 @@ const Text = ({
 			Maoka.create("input", ({ element, use }) => {
 				const is_mobile = use(MaokaJabs.is_mobile)
 				const is_dom = use(MaokaDOM.Jabs.is_dom)
+
+				if (disabled) use(MaokaJabs.set_attribute("disabled", "true"))
 
 				use(
 					MaokaJabs.listen("oninput", event => {
@@ -138,29 +142,31 @@ const Text = ({
 	})
 
 export const Email = ({
+	autocomplete = "username",
+	autofocus = false,
+	custom_class = "",
+	disabled = false,
+	initial_value = "",
 	label = "",
 	on_input = () => void 0,
 	placeholder,
-	type = "email",
-	initial_value = "",
-	custom_class = "",
-	autofocus = false,
-	autocomplete = "username",
-	validate = CurrentUser.Validations.is_email,
 	required = true,
+	type = "email",
+	validate = CurrentUser.Validations.is_email,
 	validation_error_message = "WHOOPS",
 }: TInputProps) =>
 	Text({
+		autocomplete,
+		autofocus,
+		custom_class,
+		disabled,
+		initial_value,
 		label,
 		on_input,
 		placeholder,
-		type,
-		initial_value,
-		custom_class,
-		autofocus,
-		autocomplete,
-		validate,
 		required,
+		type,
+		validate,
 		validation_error_message,
 	})
 

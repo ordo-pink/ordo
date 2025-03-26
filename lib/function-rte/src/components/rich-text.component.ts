@@ -60,10 +60,7 @@ export const RichText = (
 						length = 0
 						RTE.$.update(`state.${fsid}`, () => ({
 							content: RTE.Utils.create_content(),
-							is_editable,
-							is_embedded,
 							is_focused: !is_embedded,
-							quick_menu: null,
 							selection: RTE.Utils.create_selection(),
 						}))
 					},
@@ -71,10 +68,7 @@ export const RichText = (
 						length = state.length
 						RTE.$.update(`state.${fsid}`, () => ({
 							content: state as TRTEContent,
-							is_editable,
-							is_embedded,
 							is_focused: !is_embedded,
-							quick_menu: null,
 							selection: RTE.Utils.create_selection(),
 						}))
 						refresh()
@@ -107,7 +101,7 @@ export const RichText = (
 
 			if (!state) return
 
-			return state.content.map((_, line_index) => Block(line_index, metadata))
+			return state.content.map((_, line_index) => Block(line_index, metadata, is_editable, is_embedded))
 		}
 	})
 

@@ -29,7 +29,13 @@ import { noop } from "@ordo-pink/tau"
 import { type TInlineNodeParams, type TRTECodeNode, type TRTETextNode } from "../rte.types"
 import { RTE } from "../rte"
 
-export const Inline = ({ block_index, inline_index, metadata, node }: TInlineNodeParams<TRTETextNode | TRTECodeNode>) =>
+export const Inline = ({
+	block_index,
+	inline_index,
+	metadata,
+	node,
+	is_editable,
+}: TInlineNodeParams<TRTETextNode | TRTECodeNode>) =>
 	Switch.Match(node.type)
 		.case("code", () => StyledCode(() => () => node.value))
 		.case("text", () =>
@@ -40,7 +46,7 @@ export const Inline = ({ block_index, inline_index, metadata, node }: TInlineNod
 
 				use(MaokaJabs.set_attribute("data-block_index", String(block_index)))
 				use(MaokaJabs.set_attribute("data-inline_index", String(inline_index)))
-				use(MaokaJabs.set_attribute("contenteditable", "true"))
+				if (is_editable) use(MaokaJabs.set_attribute("contenteditable", "true"))
 				use(MaokaJabs.listen("onkeydown", event => handle_keydown(event)))
 				use(MaokaJabs.listen("oninput", event => handle_input(event)))
 				use(MaokaJabs.listen("onclick", event => handle_click(event)))

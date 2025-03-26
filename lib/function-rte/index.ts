@@ -37,6 +37,8 @@ import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStr } from "@ordo-pink/maoka-render-string"
 import { TwoLetterLocale } from "@ordo-pink/locale"
 
+import db_styles from "@ordo-pink/function-database/src/database.css?inline"
+
 import { CalloutType } from "./src/rte.constants"
 import { RTE } from "./src/rte"
 import { RichText } from "./src/components/rich-text.component"
@@ -275,7 +277,7 @@ export default create_function(
 
 		commands.emit("cmd.functions.file_associations.register", {
 			content_to_string: {
-				styles: [rte_styles],
+				styles: [rte_styles, db_styles], // TODO Recursively use styles of nested file associations
 				render: ({ metadata, content, is_editable, is_embedded }) =>
 					MaokaStr.render(
 						MaokaOrdo.Components.WithState(ctx, () => RichText(metadata, content, is_editable, is_embedded)),

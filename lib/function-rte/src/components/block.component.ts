@@ -43,7 +43,7 @@ import { LineNumber } from "./line-number.component"
 import { Paragraph } from "./blocks/paragraph.component"
 import { RTE } from "../rte"
 
-export const Block = (block_index: number, metadata: Ordo.Metadata.Instance) =>
+export const Block = (block_index: number, metadata: Ordo.Metadata.Instance, is_editable: boolean, is_embedded: boolean) =>
 	StyledLine(({ use }) => {
 		const fsid = metadata.get_fsid()
 		const get_node = use(MaokaOrdo.Jabs.happy_marriage$(RTE.$, s => s.state[fsid].content[block_index]))
@@ -103,12 +103,14 @@ export const Block = (block_index: number, metadata: Ordo.Metadata.Instance) =>
 			return [
 				line_number,
 				Switch.Match(node.type)
-					.case("h", () => Header({ node: node as TRTEHeaderNode, block_index, metadata }))
-					.case("p", () => Paragraph({ node: node as TRTEParagraphNode, block_index, metadata }))
-					.case("bq", () => Blockquote({ node: node as TRTEBlockquoteNode, block_index, metadata }))
-					.case("incoming_links", () => IncomingLinks({ node: node as TRTEIncomingLinksNode, block_index, metadata }))
-					.case("callout", () => Callout({ node: node as TRTECalloutNode, block_index, metadata }))
-					.case("embed", () => Embed({ node: node as TRTEEmbedNode, block_index, metadata }))
+					.case("h", () => Header({ node: node as TRTEHeaderNode, block_index, metadata, is_editable, is_embedded }))
+					.case("p", () => Paragraph({ node: node as TRTEParagraphNode, block_index, metadata, is_editable, is_embedded }))
+					.case("bq", () => Blockquote({ node: node as TRTEBlockquoteNode, block_index, metadata, is_editable, is_embedded }))
+					.case("incoming_links", () =>
+						IncomingLinks({ node: node as TRTEIncomingLinksNode, block_index, metadata, is_editable, is_embedded }),
+					)
+					.case("callout", () => Callout({ node: node as TRTECalloutNode, block_index, metadata, is_editable, is_embedded }))
+					.case("embed", () => Embed({ node: node as TRTEEmbedNode, block_index, metadata, is_editable, is_embedded }))
 					.default(() => "UNIMPLEMENTED"),
 			]
 		}

@@ -28,7 +28,7 @@ import { TBlockNodeParams, type TRTEBlockquoteNode } from "../../rte.types"
 import { Inline } from "../inline.component"
 import { RTE } from "../../rte"
 
-export const Blockquote = ({ block_index, metadata, node }: TBlockNodeParams<TRTEBlockquoteNode>) =>
+export const Blockquote = ({ block_index, metadata, node, is_editable, is_embedded }: TBlockNodeParams<TRTEBlockquoteNode>) =>
 	StyledBlockquote(({ use }) => {
 		const fsid = metadata.get_fsid()
 		if (node.cite) use(MaokaJabs.set_attribute("cite", node.cite))
@@ -36,7 +36,9 @@ export const Blockquote = ({ block_index, metadata, node }: TBlockNodeParams<TRT
 		let value = node.cite
 
 		return () => [
-			...node.children.map((node, inline_index) => Inline({ node, block_index, inline_index, metadata })),
+			...node.children.map((node, inline_index) =>
+				Inline({ node, block_index, inline_index, metadata, is_editable, is_embedded }),
+			),
 			InputOffset(() => noop),
 			Input.Text({
 				initial_value: value,
@@ -54,6 +56,7 @@ export const Blockquote = ({ block_index, metadata, node }: TBlockNodeParams<TRT
 						return state
 					})
 				},
+				disabled: !is_editable,
 				placeholder: "Enter cite source",
 				custom_class: "rte_blocks_blockquote_cite",
 				transparent: true,

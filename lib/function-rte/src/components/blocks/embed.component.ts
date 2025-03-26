@@ -29,77 +29,76 @@ import { ordo_app_state } from "@ordo-pink/frontend-app/app.state"
 import { type TBlockNodeParams, type TRTEEmbedNode } from "../../rte.types"
 import { RTE } from "../../rte"
 
-export const Embed = ({ node, block_index, metadata }: TBlockNodeParams<TRTEEmbedNode>) =>
-	StyledEmbed(({ refresh }) => {
-		return () =>
-			node.fsid
-				? StyledEmbedWithFSID(({ use }) => {
-						const get_metadata = use(MaokaOrdo.Jabs.Metadata.get_by_fsid$(node.fsid))
+export const Embed = ({ node, block_index, metadata, is_editable, is_embedded }: TBlockNodeParams<TRTEEmbedNode>) =>
+	is_embedded
+		? void 0
+		: StyledEmbed(({ refresh }) => {
+				return () =>
+					node.fsid
+						? StyledEmbedWithFSID(({ use }) => {
+								const get_metadata = use(MaokaOrdo.Jabs.Metadata.get_by_fsid$(node.fsid))
 
-						const content_query = use(MaokaOrdo.Jabs.get_content_query)
-						const content0 = content_query.get("" as any, node.fsid!)
+								const content_query = use(MaokaOrdo.Jabs.get_content_query)
+								const content0 = content_query.get("" as any, node.fsid!)
 
-						// TODO Unsupported file component
-						return async () => {
-							const metadata = get_metadata()
-							const content = await content0.invoke(invokers0.or_else(() => null))
-							const fas = ordo_app_state.zags.select("functions.file_assocs")
-							const fa = fas.find(fa => fa.types.some(t => t.name === get_metadata()?.get_type())) ?? null
+								// TODO Unsupported file component
+								return async () => {
+									const metadata = get_metadata()
+									const content = await content0.invoke(invokers0.or_else(() => null))
+									const fas = ordo_app_state.zags.select("functions.file_assocs")
+									const fa = fas.find(fa => fa.types.some(t => t.name === get_metadata()?.get_type())) ?? null
 
-							if (!metadata || !fa || !fa.render) return [] as any // TODO Improve type definition for TMaokaChildren
+									if (!metadata || !fa || !fa.render) return [] as any // TODO Improve type definition for TMaokaChildren
 
-							const is_editable = true // TODO Check if user has edit rights
-							const is_embedded = true
+									return [
+										StyledEmbedTitleWrapper(() => () => MetadataLink({ metadata, children: metadata.get_name() })),
+										fa.render({ metadata, content, is_editable, is_embedded: true }),
+									]
+								}
+							})
+						: StyledNoFSIDEmbed(({ use }) => {
+								const fsid = metadata.get_fsid()
 
-							return [
-								StyledEmbedTitleWrapper(() => () => MetadataLink({ metadata, children: metadata.get_name() })),
-								fa.render({ metadata, content, is_editable, is_embedded }),
-							]
-						}
-					})
-				: StyledNoFSIDEmbed(({ use }) => {
-						const fsid = metadata.get_fsid()
+								const commands = use(MaokaOrdo.Jabs.get_commands)
+								const metadata_query = use(MaokaOrdo.Jabs.get_metadata_query)
 
-						const commands = use(MaokaOrdo.Jabs.get_commands)
-						const metadata_query = use(MaokaOrdo.Jabs.get_metadata_query)
+								const on_click = (event: MouseEvent) => {
+									event.preventDefault()
 
-						const on_click = (event: MouseEvent) => {
-							event.preventDefault()
+									metadata_query
+										.get()
+										.pipe(R.ops.chain(R.FromNullable))
+										.pipe(R.ops.map(metadata => metadata.filter(i => i.get_fsid() !== fsid && !i.get_links().includes(fsid))))
+										.pipe(
+											R.ops.map(metadata =>
+												commands.emit("cmd.application.command_palette.show", {
+													max_items: 100,
+													on_select: item => {
+														RTE.$.update(`state.${fsid}`, state => {
+															if (RTE.Guards.is_rte_embed_node(state.content[block_index])) {
+																const state_copy = { ...state }
+																state_copy.content[block_index].fsid = item.value
+																return state_copy
+															}
 
-							metadata_query
-								.get()
-								.pipe(R.ops.chain(R.FromNullable))
-								.pipe(R.ops.map(metadata => metadata.filter(i => i.get_fsid() !== fsid && !i.get_links().includes(fsid))))
-								.pipe(
-									R.ops.map(metadata =>
-										commands.emit("cmd.application.command_palette.show", {
-											max_items: 100,
-											on_select: item => {
-												RTE.$.update(`state.${fsid}`, state => {
-													if (RTE.Guards.is_rte_embed_node(state.content[block_index])) {
-														const state_copy = { ...state }
-														state_copy.content[block_index].fsid = item.value
-														return state_copy
-													}
+															return state
+														})
 
-													return state
-												})
+														refresh()
+													},
+													items: metadata.map(item => ({
+														readable_name: item.get_name() as Ordo.I18N.TranslationKey,
+														value: item.get_fsid(),
+														render_icon: () => MetadataIcon({ metadata: item }),
+													})),
+												}),
+											),
+										)
+								}
 
-												refresh()
-											},
-											items: metadata.map(item => ({
-												readable_name: item.get_name() as Ordo.I18N.TranslationKey,
-												value: item.get_fsid(),
-												render_icon: () => MetadataIcon({ metadata: item }),
-											})),
-										}),
-									),
-								)
-						}
-
-						return () => Button.Neutral({ on_click, text: "Choose a file to embed" })
-					})
-	})
+								return () => Button.Neutral({ on_click, text: "Choose a file to embed" })
+							})
+			})
 
 // --- Internal ---
 

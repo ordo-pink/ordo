@@ -112,7 +112,38 @@ export const Inline = ({ block_index, inline_index, metadata, node }: TInlineNod
 					Switch.Match(event.code)
 						.case("Enter", () => {
 							event.preventDefault()
-							commands.emit("cmd.rte.add_block", { block: RTE.Utils.create_paragraph(), block_index: block_index + 1, fsid })
+
+							const selection = window.getSelection()
+							const state = RTE.$.select(`state.${fsid}`)
+							const block = state.content[block_index]
+
+							if (!RTE.Guards.is_rte_parent(block)) return
+
+							const inline = block.children[inline_index]
+
+							if (!RTE.Guards.is_rte_text_node(inline)) return
+
+							let next_line_value = ""
+
+							if (selection) {
+								const start = selection.anchorOffset > selection.focusOffset ? selection.focusOffset : selection.anchorOffset
+								const end = selection.anchorOffset > selection.focusOffset ? selection.anchorOffset : selection.focusOffset
+
+								next_line_value = inline.value.slice(end)
+
+								RTE.$.update(`state.${fsid}.content`, content => {
+									const content_copy = { ...content }
+									;(content_copy[block_index] as any).children[inline_index].value = inline.value.slice(0, start)
+
+									return content
+								})
+							}
+
+							commands.emit("cmd.rte.add_block", {
+								block: RTE.Utils.create_paragraph(next_line_value),
+								block_index: block_index + 1,
+								fsid,
+							})
 						})
 						.case("ArrowUp", () => {
 							if (block_index !== 0) {

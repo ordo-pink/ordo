@@ -43,6 +43,8 @@ import { RichText } from "./src/components/rich-text.component"
 import { TRTENode } from "./src/rte.types"
 import { create_selection } from "./src/rte.utils"
 
+import rte_styles from "./src/rte.css?inline"
+
 declare global {
 	interface t {
 		rte: {
@@ -273,6 +275,7 @@ export default create_function(
 
 		commands.emit("cmd.functions.file_associations.register", {
 			content_to_string: {
+				styles: [rte_styles],
 				render: ({ metadata, content, is_editable, is_embedded }) =>
 					MaokaStr.render(
 						MaokaOrdo.Components.WithState(ctx, () => RichText(metadata, content, is_editable, is_embedded)),

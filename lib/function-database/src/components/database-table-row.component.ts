@@ -30,6 +30,8 @@ import { R } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
 import { noop } from "@ordo-pink/tau"
 
+import { database$ } from "../database.state"
+
 export const DatabaseTableRow = (columns: Ordo.I18N.TranslationKey[], child: Ordo.Metadata.Instance, is_editable: boolean) =>
 	Maoka.create("tr", ({ use }) => {
 		use(MaokaJabs.set_class("database_table-row"))
@@ -39,11 +41,11 @@ export const DatabaseTableRow = (columns: Ordo.I18N.TranslationKey[], child: Ord
 				Switch.Match(column)
 					.case("t.database.column_names.name", () => FileNameCell(child, is_editable))
 					.case("t.database.column_names.labels", () => LabelsCell(child.get_fsid()))
-					.case("t.database.column_names.created_at", () => DateCell(child.get_created_at()))
-					.case("t.database.column_names.parent", () => LinksCell(child, "parent"))
-					.case("t.database.column_names.outgoing_links", () => LinksCell(child, "outgoing"))
-					.case("t.database.column_names.incoming_links", () => LinksCell(child, "incoming"))
-					.case("t.database.column_names.created_by", () => UserCell(child))
+					.case("t.database.column_names.created_at", () => DateCell(column, child.get_created_at()))
+					.case("t.database.column_names.parent", () => LinksCell(column, child, "parent"))
+					.case("t.database.column_names.outgoing_links", () => LinksCell(column, child, "outgoing"))
+					.case("t.database.column_names.incoming_links", () => LinksCell(column, child, "incoming"))
+					.case("t.database.column_names.created_by", () => UserCell(column, child))
 					.default(() => Cell("TODO")),
 			)
 	})
@@ -51,8 +53,13 @@ export const DatabaseTableRow = (columns: Ordo.I18N.TranslationKey[], child: Ord
 // --- Internal ---
 
 const UserCellWrapper = MaokaStyled.Tags.td("database_cell")
-const UserCell = (metadata: Ordo.Metadata.Instance) =>
+const UserCell = (column: string, metadata: Ordo.Metadata.Instance) =>
 	UserCellWrapper(({ use }) => {
+		const width_state = database$.select("width")
+		const width = width_state?.[column] ?? 200
+
+		use(MaokaJabs.set_style({ width: `${width}px` }))
+
 		const user_query = use(MaokaOrdo.Jabs.get_user_query)
 
 		use(MaokaOrdo.Jabs.happy_marriage$(user_query.$))
@@ -73,8 +80,13 @@ const Cell = (value: TMaokaChildren, on_click?: (event: MouseEvent) => void) =>
 		return () => value
 	})
 
-const LinksCell = (metadata: Ordo.Metadata.Instance, type: "parent" | "incoming" | "outgoing") =>
+const LinksCell = (column: string, metadata: Ordo.Metadata.Instance, type: "parent" | "incoming" | "outgoing") =>
 	Maoka.create("td", ({ use }) => {
+		const width_state = database$.select("width")
+		const width = width_state?.[column] ?? 200
+
+		use(MaokaJabs.set_style({ width: `${width}px` }))
+
 		const fsid = metadata.get_fsid()
 
 		use(MaokaJabs.set_class("database_cell-links"))
@@ -131,6 +143,11 @@ const LinkBlock = MaokaStyled.Tags.span()
 
 const LabelsCell = (fsid: Ordo.Metadata.FSID) =>
 	Maoka.create("td", ({ use }) => {
+		const width_state = database$.select("width")
+		const width = width_state?.["t.database.column_names.labels"] ?? 200
+
+		use(MaokaJabs.set_style({ width: `${width}px` }))
+
 		use(MaokaJabs.set_class("database_cell-multiple database_cell-labels"))
 		use(MaokaJabs.listen("onclick", () => handle_click()))
 		if (use(MaokaDOM.Jabs.is_dom)) use(MaokaJabs.add_class("clickable"))
@@ -147,8 +164,13 @@ const LabelsCell = (fsid: Ordo.Metadata.FSID) =>
 		}
 	})
 
-const DateCell = (date: Date) =>
+const DateCell = (column: string, date: Date) =>
 	Maoka.create("td", ({ use }) => {
+		const width_state = database$.select("width")
+		const width = width_state?.[column] ?? 200
+
+		use(MaokaJabs.set_style({ width: `${width}px` }))
+
 		use(MaokaJabs.set_class("database_cell-date"))
 		use(MaokaJabs.set_attribute("title", date.toLocaleString()))
 
@@ -158,8 +180,11 @@ const DateCell = (date: Date) =>
 const FileNameCell = (metadata: Ordo.Metadata.Instance, is_editable: boolean) =>
 	Maoka.create("td", ({ use }) => {
 		const { emit } = use(MaokaOrdo.Jabs.get_commands)
+		const width_state = database$.select("width")
+		const width = width_state?.["t.database.column_names.name"] ?? 300
 
 		use(MaokaJabs.set_class("database_cell-filename"))
+		use(MaokaJabs.set_style({ width: `${width}px` }))
 		use(MaokaJabs.listen("oncontextmenu", event => handle_context_menu(event)))
 
 		const handle_context_menu = (event: MouseEvent) => emit("cmd.application.context_menu.show", { event, payload: metadata })

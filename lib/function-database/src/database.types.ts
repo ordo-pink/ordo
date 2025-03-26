@@ -27,6 +27,7 @@ export type TDatabaseState = {
 	sorting?: Partial<Record<TColumnName, SortingDirection>>
 	visible_columns?: TColumnName[]
 	columns?: TColumn<any>[]
+	width?: Record<TColumnName, number>
 }
 
 export type TColumnName = string

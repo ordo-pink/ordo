@@ -112,7 +112,7 @@ export const Database = (metadata: Ordo.Metadata.Instance, content: Ordo.Content
 
 const DatabaseTableBody = MaokaStyled.Tags.tbody()
 
-const DatabaseTable = MaokaStyled.Tags.table("w-full border database_border-color h-full")
+const DatabaseTable = MaokaStyled.Tags.table("border database_border-color h-full")
 
 const to_sorted_children = (
 	db_state: TDatabaseState,

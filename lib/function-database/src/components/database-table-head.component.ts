@@ -27,6 +27,7 @@ import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { Switch } from "@ordo-pink/switch"
 import { noop } from "@ordo-pink/tau"
 
+import { ColumnResizer } from "./database-column-resizer.component"
 import { SortingDirection } from "../database.constants"
 import { database$ } from "../database.state"
 
@@ -64,7 +65,7 @@ const TableHeadCell = (column: Ordo.I18N.TranslationKey, is_editable: boolean) =
 					.case(SortingDirection.DESC, () => BsCaretDown("rotate-180"))
 					.default(noop)
 
-				return [t_column, caret]
+				return [t_column, caret, ColumnResizer(column)]
 			})
 	})
 

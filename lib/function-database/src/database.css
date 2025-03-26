@@ -19,7 +19,7 @@
 }
 
 .database_cell-multiple {
-	@apply database_border-color flex w-fit flex-wrap gap-1 text-sm;
+	@apply database_border-color flex flex-wrap gap-1 text-sm;
 }
 
 .database_cell-labels {
@@ -39,7 +39,7 @@
 }
 
 .database_cell-filename-text {
-	@apply w-full outline-none;
+	@apply text-wrap break-words outline-none;
 }
 
 .database_table-actions_tr {
@@ -55,11 +55,15 @@
 }
 
 .database_table-head_cell {
-	@apply database_border-color border px-2 py-1 text-sm font-bold text-neutral-500;
+	@apply database_border-color relative border py-1 pl-2 pr-3 text-sm font-bold text-neutral-500;
 }
 
 .database_table-head_cell-content {
 	@apply flex items-center justify-between;
+}
+
+.database_table-head_cell-resizer {
+	@apply absolute right-0 top-0 h-full w-1 cursor-col-resize select-none rounded-sm transition-colors hover:bg-pink-500;
 }
 
 .database_options {

@@ -1,2 +1,14 @@
-smol = true
 telemetry = false
+
+[test]
+root = "lib"
+coverage = true
+coverageThreshold = { line = 0.7, function = 0.8, statement = 0.9 }
+coverageReporter = ["text", "lcov"]
+coverageDir = "var/test/coverage"
+
+[install]
+saveTextLockfile = false
+
+[install.cache]
+dir = "var/bun/cache"

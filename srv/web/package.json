@@ -1,26 +1,13 @@
 {
-  "name": "my",
-  "version": "0.0.0",
-  "devDependencies": {
-    "@types/node": "^20.11.16",
-    "@types/react": "^18.2.43",
-    "@types/react-dom": "^18.2.17",
-    "@typescript-eslint/eslint-plugin": "^6.14.0",
-    "@typescript-eslint/parser": "^6.14.0",
-    "@vitejs/plugin-react-swc": "^3.5.0",
-    "eslint": "^8.55.0",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "eslint-plugin-react-refresh": "^0.4.5",
-    "postcss-nesting": "^13.0.0",
-    "typescript": "^5.2.2",
-    "vite": "^5.4.14"
-  },
-  "private": true,
-  "scripts": {
-    "dev": "vite --force",
-    "build": "vite build",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
-  },
-  "type": "module"
+	"name": "my",
+	"version": "0.0.0",
+	"devDependencies": {},
+	"private": true,
+	"scripts": {
+		"dev": "vite --force",
+		"build": "vite build",
+		"lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+		"preview": "vite preview"
+	},
+	"type": "module"
 }

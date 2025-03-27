@@ -22,7 +22,15 @@
 import node_fs from "node:fs"
 import node_path from "node:path"
 
-import { pascal, snake, title } from "case"
+const pascal = (s: string) =>
+	s
+		.split("-")
+		.map(s => title(s))
+		.join("")
+
+const snake = (s: string) => s.split("-").join("_")
+
+const title = (s: string) => s[0].toLocaleUpperCase().concat(s.slice(1))
 
 import { type TCommandHandler, type TLicenseType, create_progress, get_license, get_spdx_record } from "@ordo-pink/binutil"
 import { is_reserved_javascript_keyword } from "@ordo-pink/rkwjs"

@@ -22,9 +22,9 @@
 import { Oath, ops0 } from "@ordo-pink/oath"
 import { BackendUserKeys } from "@ordo-pink/backend"
 import { CurrentUser } from "@ordo-pink/core"
-import { type TIntake } from "@ordo-pink/routary"
+import { type Intake } from "@ordo-pink/routary"
 import { default_handler } from "@ordo-pink/backend-util-default-handler"
-import { extract_request_body } from "@ordo-pink/backend-util-extract-body"
+import { parse_json_body } from "@ordo-pink/backend-util-body"
 
 import { exists_by_email_rrr, invalid_email_rrr } from "../../rrrs/invalid-user-email.rrr"
 import { exists_by_handle, invalid_handle_rrr } from "../../rrrs/invalid-user-handle.rrr"
@@ -35,7 +35,7 @@ import { check_if_id_param_is_valid } from "../../common/validate-id-param"
 
 export const handle_update_user = default_handler<TIDContext>(intake =>
 	Oath.Merge([check_if_edited_user_is_current_user(intake), check_if_id_param_is_valid(intake)])
-		.pipe(ops0.chain(() => extract_request_body(intake)))
+		.pipe(ops0.chain(() => parse_json_body(intake)))
 		.pipe(ops0.chain(valdiate_body(intake)))
 		.pipe(ops0.chain(get_current_user(intake)))
 		.pipe(ops0.map(merge_users))
@@ -47,7 +47,7 @@ export const handle_update_user = default_handler<TIDContext>(intake =>
 
 const { is_email, is_handle, is_installed_functions, is_first_name, is_last_name } = CurrentUser.Validations
 
-type I = TIntake<TIDContext>
+type I = Intake<TIDContext>
 
 const check_email_is_not_taken_if_present = (body: Record<string, any>, i: I) =>
 	body.email

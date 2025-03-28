@@ -24,7 +24,7 @@ import { CheckboxInput, Dialog, Input } from "@ordo-pink/maoka-components"
 import { CommandPaletteItemType, CurrentUser, RRR } from "@ordo-pink/core"
 import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
 import { call_once, noop } from "@ordo-pink/tau"
-import { ConsoleLogger } from "@ordo-pink/logger"
+import { console_logger } from "@ordo-pink/logger"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
@@ -99,7 +99,7 @@ export const init_user = call_once(() => {
 				Result.If(known_functions.has_permissions(fid, { queries: [permission] }), {
 					F: () => {
 						const rrr = RRR.codes.eperm(`UserQuery permission RRR. Did you forget to request query permission '${permission}'?`)
-						ConsoleLogger.error(rrr.message)
+						console_logger.error(rrr.message)
 						return rrr
 					},
 				}),

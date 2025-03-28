@@ -1,0 +1,135 @@
+import * as tau from "@ordo-pink/tau"
+import { BackendUser, BackendUserKeys } from "@ordo-pink/backend"
+import { CurrentUser, RRR } from "@ordo-pink/core"
+import { Oath, ops0 } from "@ordo-pink/oath"
+import { default_handler } from "@ordo-pink/routary-ordo"
+
+import * as fns from "../fns"
+import { type BackendAuth } from "../backend-au.types"
+
+export const handle_verify_code = default_handler<BackendAuth.Intake>(intake => {
+	intake.request_id = intake.create_request_id()
+	intake.request_language = fns.get_lang(intake.req)
+	const debug_step = debug(intake)
+
+	return get_request_body(intake.req)
+		.pipe(ops0.chain(validate_request_body))
+		.pipe(ops0.tap(debug_step("Provided email", ({ email }) => fns.obfuscate_email(email))))
+		.pipe(ops0.chain(get_code_hash(intake)))
+		.pipe(ops0.tap(debug_step("Code verified successfully")))
+		.pipe(ops0.tap(remove_auth_record(intake.auth_storage)))
+		.pipe(ops0.tap(debug_step("Auth record removed")))
+		.pipe(ops0.chain(get_or_create_user(intake)))
+		.pipe(ops0.tap(debug_step("User upserted", user => user.get_uid())))
+		.pipe(ops0.tap(send_email(intake)))
+		.pipe(ops0.tap(debug_step("Email sent")))
+		.pipe(ops0.chain(create_session_id(intake)))
+		.pipe(ops0.chain(persist_session_id(intake)))
+		.pipe(ops0.tap(debug_step("User session persisted")))
+		.pipe(ops0.map(({ user }) => void (intake.payload = CurrentUser.Serialize(user.to_dto()))))
+		.pipe(ops0.map(() => intake))
+		.pipe(ops0.rejected_map(rrr => ({ intake, rrr })))
+})
+
+// --- Internal ---
+
+const is_email = CurrentUser.Validations.is_email
+const is_code = (x: unknown): x is number => tau.is_finite_non_negative_int(x)
+
+// TODO Move to lib
+
+const get_request_body = (req: Request): Oath<any, Ordo.Rrr<"EIO">> =>
+	Oath.Try(
+		() => req.json(),
+		error => RRR.codes.eio("Failed to parse request body", error),
+	)
+
+const validate_request_body = (body: any) =>
+	Oath.Merge({
+		email: Oath.If(body && body.email && is_email(body.email), {
+			T: () => body.email as BackendAuth.Email,
+			F: () => RRR.codes.einval("Provided email is invalid", body.email),
+		}),
+		code: Oath.If(body && body.code && is_code(body.code), {
+			T: () => body.code as BackendAuth.Code,
+			F: () => RRR.codes.einval("Provided code is invalid", body.code),
+		}),
+	})
+
+type Pair = { email: BackendAuth.Email; code: BackendAuth.Code }
+
+const not_found_rrr = (email: BackendAuth.Email) => () => RRR.codes.enoent("User not found", fns.obfuscate_email(email))
+
+const get_code_hash =
+	(intake: BackendAuth.Intake) =>
+	({ email, code }: Pair) =>
+		Oath.FromNullable(intake.auth_storage.get(email), not_found_rrr(email))
+			.pipe(ops0.chain(({ hash }) => intake.code_strategy.verify(hash, code)))
+			.pipe(ops0.chain(is_valid => Oath.If(is_valid, { T: () => email, F: not_found_rrr(email) })))
+
+const remove_auth_record =
+	(auth_storage: BackendAuth.Storage) =>
+	(email: BackendAuth.Email): void =>
+		void auth_storage.delete(email)
+
+const send_email =
+	(intake: BackendAuth.Intake) =>
+	(user: OrdoBackend.User.Instance): void =>
+		intake.email_strategy.send({
+			to: user.get_email(),
+			content: fns.create_user_authenticated_email_body(intake.request_language, intake.request_ip!),
+			subject: fns.create_user_authenticated_email_subject(intake.request_language),
+		})
+
+// TODO Move to lib
+
+const ignore_debug_value = Symbol.for("ignore_debug_value")
+const default_debug_value_callback = () => ignore_debug_value
+
+const debug =
+	(intake: BackendAuth.Intake) =>
+	<$X>(message: string, cb: (params: $X) => any = default_debug_value_callback) =>
+	(x: $X): void => {
+		const more_data = cb(x)
+
+		more_data === ignore_debug_value
+			? intake.logger.debug(intake.request_id, message)
+			: intake.logger.debug(intake.request_id, `${message}:`, more_data)
+	}
+
+const create_user = (email: Ordo.User.Email) => (intake: BackendAuth.Intake) =>
+	Oath.Resolve(intake.defaults)
+		.pipe(ops0.map(d => BackendUser.create(email, d.file_limit, d.max_upload_size, d.max_functions)))
+		.pipe(ops0.chain(intake.user_persistence_strategy.create))
+
+const get_or_create_user = (intake: BackendAuth.Intake) => (email: Ordo.User.Email) =>
+	intake.user_mapping_strategy
+		.exists_by_email(email)
+		.pipe(
+			ops0.chain(exists =>
+				Oath.If(exists)
+					.pipe(ops0.chain(() => intake.user_mapping_strategy.get_by_email(email)))
+					.pipe(ops0.chain(id => intake.user_persistence_strategy.read(id))),
+			),
+		)
+		.pipe(ops0.rejected_map(() => intake))
+		.fix(create_user(email))
+
+const create_session_id = (intake: BackendAuth.Intake) => (user: OrdoBackend.User.Instance) =>
+	Oath.Try(() => [crypto.randomUUID(), Date.now(), `${intake.req.headers.get("X-Device")}`] as Ordo.User.Session)
+		.pipe(ops0.map(sid => ({ sid, user })))
+		.pipe(ops0.rejected_map(error => RRR.codes.eio("Failed to create session", error)))
+
+const persist_session_id =
+	(intake: BackendAuth.Intake) => (params: { sid: Ordo.User.Session; user: OrdoBackend.User.Instance }) =>
+		Oath.Resolve(params.user.to_dto())
+			.and(d =>
+				intake.user_persistence_strategy.update(
+					params.user.get_uid(),
+					BackendUser.from_dto({
+						...d,
+						[BackendUserKeys.SESSIONS]: [...d[BackendUserKeys.SESSIONS], params.sid],
+					}),
+				),
+			)
+			.and(() => params)

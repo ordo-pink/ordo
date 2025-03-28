@@ -19,10 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { TEnumValidations, UserSubscription } from "@ordo-pink/core"
 import type { Oath } from "@ordo-pink/oath"
-
-import type { BackendUserKeys } from "./backend.constants"
+import type { UserSubscription } from "@ordo-pink/core"
 
 declare global {
 	namespace OrdoBackend {
@@ -62,24 +60,24 @@ declare global {
 		namespace User {
 			export type DTO = [...Ordo.User.Current.DTO, string?, string?]
 
-			type PersistenceStrategy = {
-				exists_by_id: (id: Ordo.User.UID) => Oath<boolean, Ordo.Rrr<"EIO">>
-				exists_by_email: (email: Ordo.User.Email) => Oath<boolean, Ordo.Rrr<"EIO">>
+			type MappingStrategy = {
 				exists_by_handle: (handle: Ordo.User.Handle) => Oath<boolean, Ordo.Rrr<"EIO">>
-				get_by_id: (id: Ordo.User.UID) => Oath<Instance, Ordo.Rrr<"EIO" | "ENOENT">>
-				get_by_email: (email: Ordo.User.Email) => Oath<Instance, Ordo.Rrr<"EIO" | "ENOENT">>
-				get_by_handle: (handle: Ordo.User.Handle) => Oath<Instance, Ordo.Rrr<"EIO" | "ENOENT">>
-				create: (user: Instance) => Oath<Instance, Ordo.Rrr<"EIO" | "EEXIST">>
-				update: (id: Ordo.User.UID, user: DTO) => Oath<Instance, Ordo.Rrr<"EIO" | "ENOENT" | "EINVAL">>
-				remove: (id: Ordo.User.UID) => Oath<void, Ordo.Rrr<"EIO" | "ENOENT">>
+				exists_by_email: (email: Ordo.User.Email) => Oath<boolean, Ordo.Rrr<"EIO">>
+				get_by_email: (email: Ordo.User.Email) => Oath<Ordo.User.UID, Ordo.Rrr<"EIO" | "ENOENT">>
+				get_by_handle: (handle: Ordo.User.Handle) => Oath<Ordo.User.UID, Ordo.Rrr<"EIO" | "ENOENT">>
 			}
 
-			export type Validations = TEnumValidations<typeof BackendUserKeys>
+			type PersistenceStrategy = {
+				exists: (id: Ordo.User.UID) => Oath<boolean, Ordo.Rrr<"EIO">>
+				create: (user: Instance) => Oath<Instance, Ordo.Rrr<"EIO" | "EEXIST">>
+				read: (id: Ordo.User.UID) => Oath<Instance, Ordo.Rrr<"EIO" | "ENOENT">>
+				update: (id: Ordo.User.UID, user: Instance) => Oath<Instance, Ordo.Rrr<"EIO" | "ENOENT" | "EINVAL">>
+				delete: (id: Ordo.User.UID) => Oath<void, Ordo.Rrr<"EIO" | "ENOENT">>
+			}
 
 			export type Static = {
-				Validations: OrdoBackend.User.Validations
-				FromDTO: (dto: OrdoBackend.User.DTO) => OrdoBackend.User.Instance
-				New: (
+				from_dto: (dto: OrdoBackend.User.DTO) => OrdoBackend.User.Instance
+				create: (
 					email: Ordo.User.Email,
 					file_limit: number,
 					max_upload_size: number,

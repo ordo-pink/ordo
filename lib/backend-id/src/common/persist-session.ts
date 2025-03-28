@@ -21,14 +21,14 @@
 
 import { Oath, ops0 } from "@ordo-pink/oath"
 import { BackendUserKeys } from "@ordo-pink/backend"
-import { type TIntake } from "@ordo-pink/routary"
+import { type Intake } from "@ordo-pink/routary"
 
 import { type TIDContext } from "../backend-id.types"
 
 const { SESSIONS } = BackendUserKeys
 
 export const persist_session_id =
-	(i: TIntake<TIDContext>) => (params: { sid: Ordo.User.Session; user: OrdoBackend.User.Instance }) =>
+	(i: Intake<TIDContext>) => (params: { sid: Ordo.User.Session; user: OrdoBackend.User.Instance }) =>
 		Oath.Resolve(params.user.to_dto())
 			.and(d => i.user_persistence_strategy.update(params.user.get_uid(), { ...d, [SESSIONS]: [...d[SESSIONS], params.sid] }))
 			.and(() => params)

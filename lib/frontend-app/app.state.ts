@@ -20,7 +20,7 @@
  */
 
 import { MaokaZAGS } from "@ordo-pink/maoka-zags"
-import { type TLogger } from "@ordo-pink/logger"
+import { type Logger } from "@ordo-pink/logger"
 
 import { CommandPaletteLocation, EMPTY_COMMAND_PALETTE } from "./src/components/command-palette/constants"
 import { create_route } from "./src/frontend-app.router"
@@ -62,7 +62,7 @@ export const ordo_app_state = MaokaZAGS.Of<TOrdoState>({
 })
 
 export type TOrdoState = {
-	logger: TLogger
+	logger: Logger
 	commands: Ordo.Command.Commands
 	known_functions: OrdoInternal.KnownFunctions
 	hosts: Ordo.Hosts

@@ -1,0 +1,6 @@
+export * from "./impl/create-request-code-email-body.fn"
+export * from "./impl/create-request-code-email-subject.fn"
+export * from "./impl/create-user-authenticated-email-body.fn"
+export * from "./impl/create-user-authenticated-email-subject.fn"
+export * from "./impl/get-lang.fn"
+export * from "./impl/obfuscate-email.fn"

@@ -24,7 +24,7 @@
  *
  * @see https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
  */
-export enum TwoLetterLocale {
+export enum TWO_LETTER_LOCALE {
 	ABKHAZIAN_ABKHAZ = "ab",
 	AFAR = "aa",
 	AFRIKAANS = "af",
@@ -213,7 +213,7 @@ export enum TwoLetterLocale {
 /**
  * Readable name for a ISO 639.1 locale.
  */
-export enum TwoLetterLocaleReadableName {
+export enum LOCALE_READABLE_NAME {
 	ab = "Аԥсуа бызшәа",
 	aa = "Afar",
 	af = "Afrikaans",
@@ -399,6 +399,6 @@ export enum TwoLetterLocaleReadableName {
 	zu = "isiZulu",
 }
 
-export const twoLetterLocaleToReadableName = (locale: TwoLetterLocale) => TwoLetterLocaleReadableName[locale]
+export const twoLetterLocaleToReadableName = (locale: TWO_LETTER_LOCALE) => LOCALE_READABLE_NAME[locale]
 
-export type ISO_639_1_Locale = `${TwoLetterLocale}`
+export type ISO_639_1_Locale = `${TWO_LETTER_LOCALE}`

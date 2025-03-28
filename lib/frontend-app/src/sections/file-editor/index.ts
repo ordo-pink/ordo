@@ -26,7 +26,7 @@ import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { MetadataIcon } from "@ordo-pink/maoka-components"
 import { R } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
-import { TwoLetterLocale } from "@ordo-pink/locale"
+import { TWO_LETTER_LOCALE } from "@ordo-pink/locale"
 
 import { FileEditorSidebar } from "./file-editor.sidebar"
 import { FileEditorWorkspace } from "./file-editor.workspace"
@@ -90,7 +90,7 @@ export default create_function(
 		cmd.on("cmd.file_editor.open_file", x => void cmd.emit("cmd.application.router.navigate", { url: `/editor/${x}` }))
 
 		cmd.emit("cmd.application.add_translations", {
-			lang: TwoLetterLocale.ENGLISH,
+			lang: TWO_LETTER_LOCALE.ENGLISH,
 			translations: {
 				"t.file_editor.command_palette.open": "Open File Editor",
 				"t.file_editor.command_palette.open_file": "Open in File Editor...",

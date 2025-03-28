@@ -21,10 +21,10 @@
 
 import { expect, test } from "bun:test"
 
-import { TwoLetterLocale, TwoLetterLocaleReadableName, twoLetterLocaleToReadableName } from "./impl"
+import { TWO_LETTER_LOCALE, LOCALE_READABLE_NAME, twoLetterLocaleToReadableName } from "./impl"
 
 test("locale", () => {
-	const locale = Object.values(TwoLetterLocale).filter(value => Number.isNaN(Number(value)))[0]
+	const locale = Object.values(TWO_LETTER_LOCALE).filter(value => Number.isNaN(Number(value)))[0]
 
-	expect(twoLetterLocaleToReadableName(locale)).toEqual(TwoLetterLocaleReadableName[locale])
+	expect(twoLetterLocaleToReadableName(locale)).toEqual(LOCALE_READABLE_NAME[locale])
 })

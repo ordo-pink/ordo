@@ -22,18 +22,18 @@
 import { is_finite_non_negative_int, is_object, lt } from "@ordo-pink/tau"
 import { ErrorType } from "@ordo-pink/core"
 
-export const eperm = (message: string, ...debug: any[]) => compose_rrr(message)("EPERM", debug)
-export const enoent = (message: string, ...debug: any[]) => compose_rrr(message)("ENOENT", debug)
-export const eintr = (message: string, ...debug: any[]) => compose_rrr(message)("EINTR", debug)
-export const eio = (message: string, ...debug: any[]) => compose_rrr(message)("EIO", debug)
-export const enxio = (message: string, ...debug: any[]) => compose_rrr(message)("ENXIO", debug)
-export const eagain = (message: string, ...debug: any[]) => compose_rrr(message)("EAGAIN", debug)
-export const eacces = (message: string, ...debug: any[]) => compose_rrr(message)("EACCES", debug)
-export const eexist = (message: string, ...debug: any[]) => compose_rrr(message)("EEXIST", debug)
-export const einval = (message: string, ...debug: any[]) => compose_rrr(message)("EINVAL", debug)
-export const enotrecoverable = (message: string, ...debug: any[]) => compose_rrr(message)("ENOTRECOVERABLE", debug)
-export const efbig = (message: string, ...debug: any[]) => compose_rrr(message)("EFBIG", debug)
-export const enospc = (message: string, ...debug: any[]) => compose_rrr(message)("ENOSPC", debug)
+export const eperm = (message: string, ...debug: any[]) => compose_rrr(message)("EPERM", ...debug)
+export const enoent = (message: string, ...debug: any[]) => compose_rrr(message)("ENOENT", ...debug)
+export const eintr = (message: string, ...debug: any[]) => compose_rrr(message)("EINTR", ...debug)
+export const eio = (message: string, ...debug: any[]) => compose_rrr(message)("EIO", ...debug)
+export const enxio = (message: string, ...debug: any[]) => compose_rrr(message)("ENXIO", ...debug)
+export const eagain = (message: string, ...debug: any[]) => compose_rrr(message)("EAGAIN", ...debug)
+export const eacces = (message: string, ...debug: any[]) => compose_rrr(message)("EACCES", ...debug)
+export const eexist = (message: string, ...debug: any[]) => compose_rrr(message)("EEXIST", ...debug)
+export const einval = (message: string, ...debug: any[]) => compose_rrr(message)("EINVAL", ...debug)
+export const enotrecoverable = (message: string, ...debug: any[]) => compose_rrr(message)("ENOTRECOVERABLE", ...debug)
+export const efbig = (message: string, ...debug: any[]) => compose_rrr(message)("EFBIG", ...debug)
+export const enospc = (message: string, ...debug: any[]) => compose_rrr(message)("ENOSPC", ...debug)
 
 export const compose_rrr =
 	(message: string) =>

@@ -5,29 +5,29 @@
 
 import { colonoscope, is_colonoscopy_doctor } from "@ordo-pink/colonoscope"
 
-import { type TBearing, type TRoutary, type TShaft } from "./routary.types"
+import { type Routary } from "./routary.types"
 
 // TODO Drop requirement for colonoscope
-export const Routary = {
-	Of: <$TChamber>(chamber: $TChamber, shaft: TShaft<$TChamber> = {}): TRoutary<$TChamber> => ({
+export const routary = {
+	create: <$Chamber>(chamber: $Chamber, shaft: Routary.Shaft<$Chamber> = {}): Routary.Instance<$Chamber> => ({
 		use: f => f(chamber, shaft),
-		get: (gasket, gear) => Routary.Of(chamber, shaft).each(gasket, ["GET"], gear),
-		put: (gasket, gear) => Routary.Of(chamber, shaft).each(gasket, ["PUT"], gear),
-		head: (gasket, gear) => Routary.Of(chamber, shaft).each(gasket, ["HEAD"], gear),
-		post: (gasket, gear) => Routary.Of(chamber, shaft).each(gasket, ["POST"], gear),
-		patch: (gasket, gear) => Routary.Of(chamber, shaft).each(gasket, ["PATCH"], gear),
-		delete: (gasket, gear) => Routary.Of(chamber, shaft).each(gasket, ["DELETE"], gear),
-		options: (gasket, gear) => Routary.Of(chamber, shaft).each(gasket, ["OPTIONS"], gear),
+		get: (gasket, gear) => routary.create(chamber, shaft).each(gasket, ["GET"], gear),
+		put: (gasket, gear) => routary.create(chamber, shaft).each(gasket, ["PUT"], gear),
+		head: (gasket, gear) => routary.create(chamber, shaft).each(gasket, ["HEAD"], gear),
+		post: (gasket, gear) => routary.create(chamber, shaft).each(gasket, ["POST"], gear),
+		patch: (gasket, gear) => routary.create(chamber, shaft).each(gasket, ["PATCH"], gear),
+		delete: (gasket, gear) => routary.create(chamber, shaft).each(gasket, ["DELETE"], gear),
+		options: (gasket, gear) => routary.create(chamber, shaft).each(gasket, ["OPTIONS"], gear),
 		each: (gasket, bearings, gear) => {
 			bearings.forEach(bearing => {
 				if (!shaft[bearing]) shaft[bearing] = {}
 				shaft[bearing][gasket] = gear
 			})
 
-			return Routary.Of(chamber, shaft)
+			return routary.create(chamber, shaft)
 		},
 		start: crown_gear => (req, server) => {
-			const current_bearing = req.method as TBearing
+			const current_bearing = req.method as Routary.Bearing
 			let current_gasket = new URL(req.url).pathname
 			if (current_gasket.endsWith("/") && current_gasket.length > 1) current_gasket = current_gasket.slice(0, -1)
 			let params = {} as Record<string, string>

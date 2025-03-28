@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { ConsoleLogger } from "@ordo-pink/logger"
+import { console_logger } from "@ordo-pink/logger"
 import { R } from "@ordo-pink/result"
 import { call_once } from "@ordo-pink/tau"
 
@@ -47,6 +47,6 @@ export const init_fetch: TF = call_once(() => {
 })
 
 const forbidden_fetch = () => {
-	ConsoleLogger.error("Fetch permission RRR. Did you forget to request query permission 'application.fetch'?")
+	console_logger.error("Fetch permission RRR. Did you forget to request query permission 'application.fetch'?")
 	return Promise.reject("Permission Denied")
 }

@@ -21,10 +21,10 @@
 
 import { Metadata, NotificationType, RRR } from "@ordo-pink/core"
 import { is_instance_of, is_string } from "@ordo-pink/tau"
-import { ConsoleLogger } from "@ordo-pink/logger"
 import { R } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
 import { ZAGS } from "@ordo-pink/zags"
+import { console_logger } from "@ordo-pink/logger"
 import { invokers0 } from "@ordo-pink/oath"
 
 import { ContentQuery } from "./data/content/content-query.impl"
@@ -143,7 +143,7 @@ export const init_content: TF = () => {
 					const rrr = RRR.codes.eperm(
 						`ContentQuery permission RRR. Did you forget to request query permission '${permission}'?`,
 					)
-					ConsoleLogger.error(rrr.message)
+					console_logger.error(rrr.message)
 					return rrr
 				},
 			}),

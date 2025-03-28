@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { ConsoleLogger, type TLogger } from "@ordo-pink/logger"
+import { console_logger, type Logger } from "@ordo-pink/logger"
 import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
 import { type TDTChamber, create_backend_dt } from "@ordo-pink/backend-dt"
 import { PersistenceStrategyDataFS } from "@ordo-pink/backend-persistence-strategy-data-fs"
@@ -70,13 +70,13 @@ void main()
 
 // --- Internal ---
 
-const logger: TLogger = {
-	alert: (...message) => ConsoleLogger.alert("[DT]", ...message),
-	crit: (...message) => ConsoleLogger.crit("[DT]", ...message),
-	debug: (...message) => ConsoleLogger.debug("[DT]", ...message),
-	error: (...message) => ConsoleLogger.error("[DT]", ...message),
-	info: (...message) => ConsoleLogger.info("[DT]", ...message),
-	notice: (...message) => ConsoleLogger.notice("[DT]", ...message),
-	panic: (...message) => ConsoleLogger.panic("[DT]", ...message),
-	warn: (...message) => ConsoleLogger.warn("[DT]", ...message),
+const logger: Logger = {
+	alert: (...message) => console_logger.alert("[DT]", ...message),
+	crit: (...message) => console_logger.crit("[DT]", ...message),
+	debug: (...message) => console_logger.debug("[DT]", ...message),
+	error: (...message) => console_logger.error("[DT]", ...message),
+	info: (...message) => console_logger.info("[DT]", ...message),
+	notice: (...message) => console_logger.notice("[DT]", ...message),
+	panic: (...message) => console_logger.panic("[DT]", ...message),
+	warn: (...message) => console_logger.warn("[DT]", ...message),
 }

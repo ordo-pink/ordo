@@ -21,12 +21,12 @@
 
 import { Oath, ops0 } from "@ordo-pink/oath"
 import { CurrentUser } from "@ordo-pink/core"
-import { type TIntake } from "@ordo-pink/routary"
+import { type Intake } from "@ordo-pink/routary"
 
 import { type TIDContext } from "../backend-id.types"
 import { invalid_id_rrr } from "../rrrs/invalid-user-id.rrr"
 
-export const check_if_id_param_is_valid = (intake: TIntake<TIDContext>) =>
+export const check_if_id_param_is_valid = (intake: Intake<TIDContext>) =>
 	Oath.Resolve(intake.params.user_id)
 		.pipe(id => Oath.If(is_uid(id)))
 		.pipe(ops0.rejected_map(() => invalid_id_rrr(intake.params.user_id, intake)))

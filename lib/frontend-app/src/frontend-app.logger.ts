@@ -20,17 +20,17 @@
  */
 
 import { O } from "@ordo-pink/option"
-import { type TLogger } from "@ordo-pink/logger"
+import { type Logger } from "@ordo-pink/logger"
 import { call_once } from "@ordo-pink/tau"
 
 import { ordo_app_state } from "../app.state"
 
-type TF = (logger: TLogger) => { get_logger: (fid: symbol) => TLogger }
+type TF = (logger: Logger) => { get_logger: (fid: symbol) => Logger }
 export const init_logger: TF = call_once(logger => {
 	const { is_dev, app_fid } = ordo_app_state.zags.select("constants")
 	const known_functions = ordo_app_state.zags.select("known_functions")
 
-	const get_logger = (fid: symbol): TLogger => {
+	const get_logger = (fid: symbol): Logger => {
 		// TODO Fix option cata
 		const known_function = known_functions.exchange(fid).cata(O.catas.or_else(() => "unauthorised")) as string
 		const prefix = `@${known_function} ::`

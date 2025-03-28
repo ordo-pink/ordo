@@ -22,7 +22,7 @@
 import { BsFileEarmarkRuled } from "@ordo-pink/frontend-icons"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStr } from "@ordo-pink/maoka-render-string"
-import { TwoLetterLocale } from "@ordo-pink/locale"
+import { TWO_LETTER_LOCALE } from "@ordo-pink/locale"
 import { create_function } from "@ordo-pink/core"
 
 import { Database } from "./src/database.component"
@@ -112,7 +112,7 @@ export default create_function(
 		const commands = ctx.commands
 
 		commands.emit("cmd.application.add_translations", {
-			lang: TwoLetterLocale.ENGLISH,
+			lang: TWO_LETTER_LOCALE.ENGLISH,
 			translations: {
 				"t.database.columns": "Columns",
 				"t.database.column_names.created_at": "Creation Date",

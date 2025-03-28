@@ -20,7 +20,7 @@
  */
 
 import { NotificationType, RRR } from "@ordo-pink/core"
-import { ConsoleLogger } from "@ordo-pink/logger"
+import { console_logger } from "@ordo-pink/logger"
 import { Result } from "@ordo-pink/result"
 import { ZAGS } from "@ordo-pink/zags"
 import { call_once } from "@ordo-pink/tau"
@@ -116,7 +116,7 @@ export const init_metadata: TInitMetadataFn = call_once(content_repository => {
 					const rrr = RRR.codes.eperm(
 						`MetadataQuery permission RRR. Did you forget to request query permission '${permission}'?`,
 					)
-					ConsoleLogger.error(rrr.message)
+					console_logger.error(rrr.message)
 					return rrr
 				},
 			}),

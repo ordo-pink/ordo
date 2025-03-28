@@ -3,14 +3,14 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import type { TDefaultContext } from "@ordo-pink/backend-util-default-handler"
-import type { TLogger } from "@ordo-pink/logger"
+import type { DefaultContext } from "@ordo-pink/backend-util-default-handler"
+import type { Logger } from "@ordo-pink/logger"
 
 export type TPBChamber = {
 	id_host: string
 	allow_origin: string[]
 	data_persistence_strategy: OrdoBackend.Data.PersistenceStrategy
-	logger: TLogger
+	logger: Logger
 }
 
-export type TPBContext = TDefaultContext & TPBChamber
+export type TPBContext = DefaultContext & TPBChamber

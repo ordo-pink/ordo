@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: Unlicense
  */
 
+import { type Logger } from "@ordo-pink/logger"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { R } from "@ordo-pink/result"
-import { type TLogger } from "@ordo-pink/logger"
 import { type TMaokaJab } from "@ordo-pink/maoka"
 import { type TZags } from "@ordo-pink/zags"
 import { deep_equals } from "@ordo-pink/tau"
@@ -24,7 +24,7 @@ export const get_file_associations$: TMaokaJab<() => Ordo.FileAssociation.Instan
 	return use(happy_marriage$(file_associations$, x => x.value))
 }
 
-export const get_logger: TMaokaJab<TLogger> = ({ use }) => {
+export const get_logger: TMaokaJab<Logger> = ({ use }) => {
 	const zags = use(ordo_context.consume)
 	return zags.logger
 }

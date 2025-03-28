@@ -22,11 +22,11 @@
 import { BackendUser, BackendUserKeys } from "@ordo-pink/backend"
 import { Oath, ops0 } from "@ordo-pink/oath"
 import { RRR } from "@ordo-pink/core"
-import { type TIntake } from "@ordo-pink/routary"
+import { type Intake } from "@ordo-pink/routary"
 
 import { type TIDContext } from "../backend-id.types"
 
-export const get_user_from_cookie = (intake: TIntake<TIDContext>) =>
+export const get_user_from_cookie = (intake: Intake<TIDContext>) =>
 	Oath.FromNullable(intake.req.headers.get("Cookie"))
 		.and(cookie => cookie.split("="))
 		.and(([uid, sid]) =>

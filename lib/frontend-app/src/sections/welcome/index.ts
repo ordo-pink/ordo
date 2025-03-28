@@ -21,7 +21,7 @@
 
 import { BsCollection, BsEnvelopeAt, BsQuestionOctagon, BsSendCheck } from "@ordo-pink/frontend-icons"
 import { CommandPaletteItemType, create_function } from "@ordo-pink/core"
-import { TwoLetterLocale } from "@ordo-pink/locale"
+import { TWO_LETTER_LOCALE } from "@ordo-pink/locale"
 
 import { WelcomeWorkspace } from "./welcome.workspace"
 
@@ -59,7 +59,7 @@ export default create_function(
 		const translate = state.translate
 
 		commands.emit("cmd.application.add_translations", {
-			lang: TwoLetterLocale.ENGLISH,
+			lang: TWO_LETTER_LOCALE.ENGLISH,
 			translations: {
 				"t.welcome.go_to_welcome_page": "Open welcome page",
 				"t.welcome.landing_page.cookie_banner.message": "Wait, what?!",

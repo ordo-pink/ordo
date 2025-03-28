@@ -20,12 +20,12 @@
  */
 
 import { Oath, ops0 } from "@ordo-pink/oath"
-import { type TIntake } from "@ordo-pink/routary"
-import { unknown_error } from "@ordo-pink/backend-util-extract-body"
+import { type Intake } from "@ordo-pink/routary"
+import { json_body_rrr } from "@ordo-pink/backend-util-body"
 
 import { type TIDContext } from "../backend-id.types"
 
-export const create_session_id = (intake: TIntake<TIDContext>) => (user: OrdoBackend.User.Instance) =>
+export const create_session_id = (intake: Intake<TIDContext>) => (user: OrdoBackend.User.Instance) =>
 	Oath.Try(() => [crypto.randomUUID(), Date.now(), intake.req.headers.get("User-Agent") ?? undefined] as Ordo.User.Session)
 		.pipe(ops0.map(sid => ({ sid, user })))
-		.pipe(ops0.rejected_map(rrr => unknown_error(rrr, intake)))
+		.pipe(ops0.rejected_map(rrr => json_body_rrr(rrr, intake)))

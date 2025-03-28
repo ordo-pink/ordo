@@ -19,12 +19,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type * as T from "./logger.types"
+import type { Logger } from "./logger.types"
 
 /**
  * An average console enjoyer.
  */
-export const ConsoleLogger: T.TLogger = {
+export const console_logger: Logger = {
 	alert: (...args) => console.error("🚨 [ALRT]:", ...args),
 	crit: (...args) => console.error("🚑️ [CRIT]:", ...args),
 	debug: (...args) => console.debug("🔨 [DEBG]:", ...args),
@@ -38,7 +38,7 @@ export const ConsoleLogger: T.TLogger = {
 /**✓
  * An average silence fan.
  */
-export const IgnoreLogger: T.TLogger = {
+export const ignore_logger: Logger = {
 	alert: () => void 0,
 	crit: () => void 0,
 	debug: () => void 0,

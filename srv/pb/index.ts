@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { ConsoleLogger, type TLogger } from "@ordo-pink/logger"
+import { console_logger, type Logger } from "@ordo-pink/logger"
 import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
 import { PersistenceStrategyDataFS } from "@ordo-pink/backend-persistence-strategy-data-fs"
 import { create_backend_pb } from "@ordo-pink/backend-pb"
@@ -62,13 +62,13 @@ void main()
 
 // --- Internal ---
 
-const logger: TLogger = {
-	alert: (...message) => ConsoleLogger.alert("[PB]", ...message),
-	crit: (...message) => ConsoleLogger.crit("[PB]", ...message),
-	debug: (...message) => ConsoleLogger.debug("[PB]", ...message),
-	error: (...message) => ConsoleLogger.error("[PB]", ...message),
-	info: (...message) => ConsoleLogger.info("[PB]", ...message),
-	notice: (...message) => ConsoleLogger.notice("[PB]", ...message),
-	panic: (...message) => ConsoleLogger.panic("[PB]", ...message),
-	warn: (...message) => ConsoleLogger.warn("[PB]", ...message),
+const logger: Logger = {
+	alert: (...message) => console_logger.alert("[PB]", ...message),
+	crit: (...message) => console_logger.crit("[PB]", ...message),
+	debug: (...message) => console_logger.debug("[PB]", ...message),
+	error: (...message) => console_logger.error("[PB]", ...message),
+	info: (...message) => console_logger.info("[PB]", ...message),
+	notice: (...message) => console_logger.notice("[PB]", ...message),
+	panic: (...message) => console_logger.panic("[PB]", ...message),
+	warn: (...message) => console_logger.warn("[PB]", ...message),
 }

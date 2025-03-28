@@ -27,7 +27,7 @@ import { noop } from "@ordo-pink/tau"
 export const PersistenceStategyUserFS = {
 	Of: (db_path: string): OrdoBackend.User.PersistenceStrategy => {
 		const users0 = Oath.FromPromise(() => Bun.file(db_path).json() as Promise<OrdoBackend.User.DTO[]>)
-			.pipe(ops0.map(dtos => dtos.map(BackendUser.FromDTO)))
+			.pipe(ops0.map(dtos => dtos.map(BackendUser.from_dto)))
 			.pipe(ops0.rejected_map(error => RRR.codes.eio(error.message, error.name, error.cause, error.stack)))
 
 		const save_users = (users: OrdoBackend.User.Instance[]) =>
@@ -59,7 +59,7 @@ export const PersistenceStategyUserFS = {
 
 			exists_by_handle: handle => users0.pipe(ops0.map(users => exists(users, BackendUserKeys.HANDLE, handle))),
 
-			exists_by_id: id => users0.pipe(ops0.map(users => exists(users, BackendUserKeys.UID, id))),
+			exists: id => users0.pipe(ops0.map(users => exists(users, BackendUserKeys.UID, id))),
 
 			get_by_email: email =>
 				users0
@@ -71,12 +71,12 @@ export const PersistenceStategyUserFS = {
 					.pipe(ops0.map(users => users.find(u => u.get_handle() === handle)))
 					.pipe(ops0.chain(user => Oath.FromNullable(user, () => user_not_found(BackendUserKeys.HANDLE, handle)))),
 
-			get_by_id: id =>
+			read: id =>
 				users0
 					.pipe(ops0.map(users => users.find(u => u.get_uid() === id)))
 					.pipe(ops0.chain(user => Oath.FromNullable(user, () => user_not_found(BackendUserKeys.UID, id)))),
 
-			remove: id =>
+			delete: id =>
 				users0
 					.pipe(
 						ops0.chain(users =>
@@ -105,12 +105,12 @@ export const PersistenceStategyUserFS = {
 							users.toSpliced(
 								users.findIndex(u => u.get_uid() === id),
 								1,
-								BackendUser.FromDTO(user),
+								BackendUser.from_dto(user),
 							),
 						),
 					)
 					.pipe(ops0.chain(save_users))
-					.pipe(ops0.map(() => BackendUser.FromDTO(user))),
+					.pipe(ops0.map(() => BackendUser.from_dto(user))),
 		}
 	},
 }

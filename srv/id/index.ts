@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { ConsoleLogger, type TLogger } from "@ordo-pink/logger"
+import { console_logger, type Logger } from "@ordo-pink/logger"
 import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
 import { type TIDChamber, create_backend_id } from "@ordo-pink/backend-id"
 import { is_finite_non_negative_int, is_finite_positive_int, is_port, is_positive_number } from "@ordo-pink/tau"
@@ -90,13 +90,13 @@ void main()
 
 // --- Internal ---
 
-const logger: TLogger = {
-	alert: (...message) => ConsoleLogger.alert("[ID]", ...message),
-	crit: (...message) => ConsoleLogger.crit("[ID]", ...message),
-	debug: (...message) => ConsoleLogger.debug("[ID]", ...message),
-	error: (...message) => ConsoleLogger.error("[ID]", ...message),
-	info: (...message) => ConsoleLogger.info("[ID]", ...message),
-	notice: (...message) => ConsoleLogger.notice("[ID]", ...message),
-	panic: (...message) => ConsoleLogger.panic("[ID]", ...message),
-	warn: (...message) => ConsoleLogger.warn("[ID]", ...message),
+const logger: Logger = {
+	alert: (...message) => console_logger.alert("[ID]", ...message),
+	crit: (...message) => console_logger.crit("[ID]", ...message),
+	debug: (...message) => console_logger.debug("[ID]", ...message),
+	error: (...message) => console_logger.error("[ID]", ...message),
+	info: (...message) => console_logger.info("[ID]", ...message),
+	notice: (...message) => console_logger.notice("[ID]", ...message),
+	panic: (...message) => console_logger.panic("[ID]", ...message),
+	warn: (...message) => console_logger.warn("[ID]", ...message),
 }

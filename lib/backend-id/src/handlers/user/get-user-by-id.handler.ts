@@ -21,7 +21,7 @@
 
 import { Oath, ops0 } from "@ordo-pink/oath"
 import { PublicUser } from "@ordo-pink/core"
-import { type TIntake } from "@ordo-pink/routary"
+import { type Intake } from "@ordo-pink/routary"
 import { default_handler } from "@ordo-pink/backend-util-default-handler"
 
 import { type TIDContext } from "../../backend-id.types"
@@ -39,7 +39,7 @@ export const handle_get_user_by_id = default_handler<TIDContext>(intake =>
 
 // --- Internal ---
 
-type I = TIntake<TIDContext>
+type I = Intake<TIDContext>
 
 const serialize_to_public_user = PublicUser.Serialize
 

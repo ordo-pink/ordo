@@ -1,0 +1,22 @@
+meta {
+  name: [pub] Request Code
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{AU_HOST}}/request-code
+  body: json
+  auth: none
+}
+
+headers {
+  Origin: {{ORIGIN}}
+  Accept-Language: {{ACCEPT_LANGUAGE}}
+}
+
+body:json {
+  {
+    "email": "{{USER_EMAIL}}"
+  }
+}

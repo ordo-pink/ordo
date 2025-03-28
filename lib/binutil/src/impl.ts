@@ -90,21 +90,8 @@ export const get_opts = (args: string[]): TOpts => {
 	return opts
 }
 
-export const run_async_command: TRunCommandFn = (command, options) =>
-	Oath.Resolve(Bun.spawn(command.trim().split(" "), options)).pipe(
-		ops0.chain(proc =>
-			Oath.Try(async () => {
-				if (proc) {
-					if (proc && ((proc && options?.stdout === "pipe") || options?.stdout === "inherit"))
-						// @ts-ignore
-						for await (const chunk of proc.stdout) process.stdout.write(chunk)
-					if (proc && (options?.stderr === "pipe" || options?.stderr === "inherit"))
-						// @ts-ignore
-						for await (const chunk of proc.stderr) process.stderr.write(chunk)
-				}
-			}),
-		),
-	)
+export const run_async_command = (cmd: string, options?: SpawnOptions.OptionsObject) =>
+	Oath.Resolve(Bun.spawn(cmd.trim().split(" "), { ...options, stdout: "inherit", stderr: "inherit", stdin: "inherit" }))
 
 type TRunCommandFn = (cmd: string, options?: SpawnOptions.OptionsObject) => Oath<void, Error>
 export const run_command: TRunCommandFn = (command, options) =>

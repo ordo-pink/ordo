@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { Routary, type TBearing, type TGasket, type TGear, type TIntake } from "@ordo-pink/routary"
+import { type Routary, routary } from "@ordo-pink/routary"
 
-import { type TRoutaryCORS } from "./routary-cors.types"
+import { type RoutaryCORS } from "./routary-cors.types"
 
-export const routary_cors: TRoutaryCORS =
+export const routary_cors: RoutaryCORS.Constructor =
 	({ allow_origin, allow_headers = [], max_age = 0, success_status = 204, allow_credentials = false }) =>
 	(chamber, shaft) => {
 		const options = {} as Record<string, string[]>
@@ -15,36 +15,38 @@ export const routary_cors: TRoutaryCORS =
 		Object.keys(shaft).forEach(bearing => {
 			if (bearing === "OPTIONS") return
 
-			Object.keys(shaft[bearing as TBearing] as Record<TGasket, TGear<{ headers: Headers }>>).forEach(gasket => {
-				if (!options[gasket]) options[gasket] = ["OPTIONS"]
-				options[gasket].push(bearing)
+			Object.keys(shaft[bearing as Routary.Bearing] as Record<Routary.Gasket, Routary.Gear<{ headers: Headers }>>).forEach(
+				gasket => {
+					if (!options[gasket]) options[gasket] = ["OPTIONS"]
+					options[gasket].push(bearing)
 
-				const gear = shaft[bearing as TBearing]![gasket]
+					const gear = shaft[bearing as Routary.Bearing]![gasket]
 
-				shaft[bearing as TBearing]![gasket] = intake => {
-					if (typeof allow_origin === "string") allow_origin = [allow_origin]
-					const origin = intake.req.headers.get("origin")
+					shaft[bearing as Routary.Bearing]![gasket] = intake => {
+						if (typeof allow_origin === "string") allow_origin = [allow_origin]
+						const origin = intake.req.headers.get("origin")
 
-					if (!origin || !allow_origin.includes(origin)) return gear(intake)
+						if (!origin || !allow_origin.includes(origin)) return gear(intake)
 
-					if (!intake.headers) intake.headers = new Headers()
+						if (!intake.headers) intake.headers = new Headers()
 
-					intake.headers.set("Access-Control-Allow-Origin", origin)
-					intake.headers.set("Access-Control-Allow-Methods", options[gasket].join(", "))
+						intake.headers.set("Access-Control-Allow-Origin", origin)
+						intake.headers.set("Access-Control-Allow-Methods", options[gasket].join(", "))
 
-					if (allow_credentials) intake.headers.set("Access-Control-Allow-Credentials", "true")
-					if (max_age) intake.headers.set("Access-Control-Max-Age", String(max_age))
-					if (allow_headers.length) intake.headers.set("Access-Control-Allow-Headers", allow_headers.join(", "))
+						if (allow_credentials) intake.headers.set("Access-Control-Allow-Credentials", "true")
+						if (max_age) intake.headers.set("Access-Control-Max-Age", String(max_age))
+						if (allow_headers.length) intake.headers.set("Access-Control-Allow-Headers", allow_headers.join(", "))
 
-					return gear(intake)
-				}
-			})
+						return gear(intake)
+					}
+				},
+			)
 		})
 
 		if (!shaft.OPTIONS) shaft.OPTIONS = {}
 
 		Object.keys(options).forEach(gasket => {
-			shaft.OPTIONS![gasket] = (intake: TIntake<Record<string, unknown>>) => {
+			shaft.OPTIONS![gasket] = (intake: Routary.Intake<Record<string, unknown>>) => {
 				if (typeof allow_origin === "string") allow_origin = [allow_origin]
 				const origin = intake.req.headers.get("origin")
 
@@ -63,5 +65,5 @@ export const routary_cors: TRoutaryCORS =
 			}
 		})
 
-		return Routary.Of(chamber, shaft)
+		return routary.create(chamber, shaft)
 	}

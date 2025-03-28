@@ -21,7 +21,7 @@
 
 import { type TPartner, ZAGS } from "@ordo-pink/zags"
 import { call_once, keys_of } from "@ordo-pink/tau"
-import { TwoLetterLocale } from "@ordo-pink/locale"
+import { TWO_LETTER_LOCALE } from "@ordo-pink/locale"
 
 import { frontend_app_en_translations } from "./translations/frontend-app-en.translations"
 import { ordo_app_state } from "../app.state"
@@ -51,7 +51,7 @@ export const init_i18n: TInitI18nFn = call_once(() => {
 	translate.$ = translate_version$
 
 	commands.emit("cmd.application.add_translations", {
-		lang: TwoLetterLocale.ENGLISH,
+		lang: TWO_LETTER_LOCALE.ENGLISH,
 		translations: frontend_app_en_translations,
 	})
 
@@ -65,5 +65,5 @@ export const init_i18n: TInitI18nFn = call_once(() => {
 // --- Internal ---
 
 const translations$ = ZAGS.Of({} as Ordo.I18N.Translations)
-const language$ = ZAGS.Of({ current_lang: TwoLetterLocale.ENGLISH })
+const language$ = ZAGS.Of({ current_lang: TWO_LETTER_LOCALE.ENGLISH })
 const translate_version$ = ZAGS.Of({ version: 0 })

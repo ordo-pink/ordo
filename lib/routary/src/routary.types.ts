@@ -5,33 +5,35 @@
 
 import { type Server } from "bun"
 
-export type TGear<$TChamber> = (intake: TIntake<$TChamber>) => TExhaust
+export module Routary {
+	export type Gear<$Chamber> = (intake: Intake<$Chamber>) => Exhaust
 
-export type TShaft<$TChamber> = Partial<Record<TBearing, Record<TGasket, TGear<$TChamber>>>>
+	export type Shaft<$Chamber> = Partial<Record<Bearing, Record<Gasket, Gear<$Chamber>>>>
 
-export type TGasket = string
+	export type Gasket = string
 
-export type TIntake<$TChamber = Record<string, unknown>> = {
-	req: Request
-	server: Server
-	params: Record<string, string>
-} & $TChamber
+	export type Intake<$Chamber = Record<string, unknown>> = {
+		req: Request
+		server: Server
+		params: Record<string, string>
+	} & $Chamber
 
-export type TExhaust = Response | Promise<Response>
+	export type Exhaust = Response | Promise<Response>
 
-export type TBearing = "GET" | "PUT" | "HEAD" | "POST" | "PATCH" | "DELETE" | "OPTIONS"
+	export type Bearing = "GET" | "PUT" | "HEAD" | "POST" | "PATCH" | "DELETE" | "OPTIONS"
 
-export type TRoutary<$TChamber> = {
-	use: <$TNewChamber extends Record<string, unknown>>(
-		callback: (chamber: $TChamber, shaft: TShaft<$TChamber>) => TRoutary<$TChamber & $TNewChamber>,
-	) => TRoutary<$TChamber & $TNewChamber>
-	get: (gasket: TGasket, gear: TGear<$TChamber>) => TRoutary<$TChamber>
-	post: (gasket: TGasket, gear: TGear<$TChamber>) => TRoutary<$TChamber>
-	put: (gasket: TGasket, gear: TGear<$TChamber>) => TRoutary<$TChamber>
-	patch: (gasket: TGasket, gear: TGear<$TChamber>) => TRoutary<$TChamber>
-	delete: (gasket: TGasket, gear: TGear<$TChamber>) => TRoutary<$TChamber>
-	head: (gasket: TGasket, gear: TGear<$TChamber>) => TRoutary<$TChamber>
-	options: (gasket: TGasket, gear: TGear<$TChamber>) => TRoutary<$TChamber>
-	each: (gasket: TGasket, bearings: TBearing[], gear: TGear<$TChamber>) => TRoutary<$TChamber>
-	start: (crown_gear: TGear<$TChamber>) => (req: Request, server: Server) => Response | Promise<Response>
+	export type Instance<$TChamber> = {
+		use: <$TNewChamber extends Record<string, unknown>>(
+			callback: (chamber: $TChamber, shaft: Shaft<$TChamber>) => Instance<$TChamber & $TNewChamber>,
+		) => Instance<$TChamber & $TNewChamber>
+		get: (gasket: Gasket, gear: Gear<$TChamber>) => Instance<$TChamber>
+		post: (gasket: Gasket, gear: Gear<$TChamber>) => Instance<$TChamber>
+		put: (gasket: Gasket, gear: Gear<$TChamber>) => Instance<$TChamber>
+		patch: (gasket: Gasket, gear: Gear<$TChamber>) => Instance<$TChamber>
+		delete: (gasket: Gasket, gear: Gear<$TChamber>) => Instance<$TChamber>
+		head: (gasket: Gasket, gear: Gear<$TChamber>) => Instance<$TChamber>
+		options: (gasket: Gasket, gear: Gear<$TChamber>) => Instance<$TChamber>
+		each: (gasket: Gasket, bearings: Bearing[], gear: Gear<$TChamber>) => Instance<$TChamber>
+		start: (crown_gear: Gear<$TChamber>) => (req: Request, server: Server) => Response | Promise<Response>
+	}
 }

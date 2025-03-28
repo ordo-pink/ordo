@@ -26,7 +26,7 @@
  *
  * @see https://www.rfc-editor.org/rfc/rfc5424
  */
-export type TLogger = {
+export type Logger = {
 	/**
 	 * Severity Level 0: Emergency: system is unusable.
 	 *

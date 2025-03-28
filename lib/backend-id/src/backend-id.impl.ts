@@ -20,7 +20,7 @@
  */
 
 import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
-import { Routary, type TIntake } from "@ordo-pink/routary"
+import { routary, type Intake } from "@ordo-pink/routary"
 import { set_x_response_time_header, start_response_timer, stop_response_timer } from "@ordo-pink/backend-util-response-time"
 import { create_json_response } from "@ordo-pink/backend-util-create-response"
 import { extract_request_ip } from "@ordo-pink/backend-util-extract-request-ip"
@@ -40,7 +40,8 @@ import { handle_validate_code } from "./handlers/codes/validate-code.handler"
 
 // TODO Global stats when API is ready
 export const create_backend_id = (chamber: TIDChamber) =>
-	Routary.Of<TIDContext>({ ...chamber, request_ip: null, status: 200, headers: new Headers() })
+	routary
+		.create<TIDContext>({ ...chamber, request_ip: null, status: 200, headers: new Headers() })
 		.post("/codes/request", handle_request_code)
 		.post("/codes/validate", handle_validate_code)
 
@@ -64,7 +65,7 @@ export const create_backend_id = (chamber: TIDChamber) =>
 
 		.start(intake =>
 			// TODO Extract to lib
-			Oath.Resolve<TIntake<TIDContext>>({ ...intake, headers: new Headers(), status: 404, request_ip: null })
+			Oath.Resolve<Intake<TIDContext>>({ ...intake, headers: new Headers(), status: 404, request_ip: null })
 				.pipe(ops0.tap(start_response_timer))
 				.pipe(ops0.tap(extract_request_ip))
 				.pipe(ops0.tap(set_content_type_application_json_header))

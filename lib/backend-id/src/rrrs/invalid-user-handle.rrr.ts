@@ -20,16 +20,16 @@
  */
 
 import { RRR } from "@ordo-pink/core"
-import { TIntake } from "@ordo-pink/routary"
+import { Intake } from "@ordo-pink/routary"
 
 import { TIDContext } from "../backend-id.types"
 
-export const invalid_handle_rrr = (handle: string, intake: TIntake<TIDContext>) => ({
+export const invalid_handle_rrr = (handle: string, intake: Intake<TIDContext>) => ({
 	rrr: RRR.codes.einval("invalid user handle", handle),
 	intake,
 })
 
-export const exists_by_handle = (handle: string, intake: TIntake<TIDContext>) => ({
+export const exists_by_handle = (handle: string, intake: Intake<TIDContext>) => ({
 	rrr: RRR.codes.eexist("user already exists", handle),
 	intake,
 })

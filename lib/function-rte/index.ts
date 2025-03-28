@@ -35,7 +35,7 @@ import {
 import { ContextMenuItemType, create_function } from "@ordo-pink/core"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStr } from "@ordo-pink/maoka-render-string"
-import { TwoLetterLocale } from "@ordo-pink/locale"
+import { TWO_LETTER_LOCALE } from "@ordo-pink/locale"
 
 import db_styles from "@ordo-pink/function-database/src/database.css?inline"
 
@@ -113,7 +113,7 @@ export default create_function(
 		const commands = ctx.commands
 
 		commands.emit("cmd.application.add_translations", {
-			lang: TwoLetterLocale.ENGLISH,
+			lang: TWO_LETTER_LOCALE.ENGLISH,
 			translations: {
 				"t.rte.file_association.readable_name": "Rich Text",
 				"t.rte.file_association.description":

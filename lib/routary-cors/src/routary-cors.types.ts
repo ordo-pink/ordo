@@ -3,16 +3,18 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { TRoutary } from "@ordo-pink/routary"
+import { Routary } from "@ordo-pink/routary"
 
-export type TRoutaryCORSParams = {
-	allow_origin: string | string[]
-	max_age?: number
-	success_status?: number
-	allow_headers?: string[]
-	allow_credentials?: boolean
+export module RoutaryCORS {
+	export type Params = {
+		allow_origin: string | string[]
+		max_age?: number
+		success_status?: number
+		allow_headers?: string[]
+		allow_credentials?: boolean
+	}
+
+	export type Instance<$Chamber extends { headers: Headers }> = Parameters<Routary.Instance<$Chamber>["use"]>[0]
+
+	export type Constructor = <$Chamber extends { headers: Headers }>(params: Params) => Instance<$Chamber>
 }
-
-export type TRoutaryCORS = <$TChamber extends Record<string, unknown> & { headers: Headers }>(
-	params: TRoutaryCORSParams,
-) => Parameters<TRoutary<$TChamber>["use"]>[0]

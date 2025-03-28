@@ -19,17 +19,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { TDefaultContext } from "@ordo-pink/backend-util-default-handler"
-import type { TLogger } from "@ordo-pink/logger"
+import type { DefaultContext } from "@ordo-pink/backend-util-default-handler"
+import type { Logger } from "@ordo-pink/logger"
 
 export type TIDChamber = {
 	allow_origin: string[]
 	defaults: { file_limit: number; max_upload_size: number; max_functions: number }
-	logger: TLogger
+	logger: Logger
 	notification_strategy: OrdoBackend.Notification.EmailStrategy
 	session_lifetime: number
 	user_persistence_strategy: OrdoBackend.User.PersistenceStrategy
 	web_host: string
 }
 
-export type TIDContext = TDefaultContext & TIDChamber
+export type TIDContext = DefaultContext & TIDChamber

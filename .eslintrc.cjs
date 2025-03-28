@@ -5,7 +5,12 @@ module.exports = {
 		node: true,
 	},
 	ignorePatterns: [".eslintrc.cjs", "*.config.js", "*.config.cjs", "*.js"],
-	extends: ["eslint:recommended", "plugin:@typescript-eslint/recommended-type-checked", "plugin:tailwindcss/recommended", "prettier"],
+	extends: [
+		"eslint:recommended",
+		"plugin:@typescript-eslint/recommended-type-checked",
+		"plugin:tailwindcss/recommended",
+		"prettier",
+	],
 	overrides: [
 		{
 			env: { node: true },

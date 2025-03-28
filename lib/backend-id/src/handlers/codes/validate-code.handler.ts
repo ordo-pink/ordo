@@ -22,9 +22,9 @@
 import { CurrentUser, RRR } from "@ordo-pink/core"
 import { Oath, ops0 } from "@ordo-pink/oath"
 import { BackendUserKeys } from "@ordo-pink/backend"
-import { type TIntake } from "@ordo-pink/routary"
+import { type Intake } from "@ordo-pink/routary"
 import { default_handler } from "@ordo-pink/backend-util-default-handler"
-import { extract_request_body } from "@ordo-pink/backend-util-extract-body"
+import { parse_json_body } from "@ordo-pink/backend-util-body"
 import { is_non_empty_string } from "@ordo-pink/tau"
 
 import { type TIDContext } from "../../backend-id.types"
@@ -33,7 +33,7 @@ import { extract_body_email } from "../../common/extract-body-email"
 import { persist_session_id } from "../../common/persist-session"
 
 export const handle_validate_code = default_handler<TIDContext>(intake =>
-	extract_request_body(intake)
+	parse_json_body(intake)
 		.pipe(ops0.chain(validate_request_body(intake)))
 		.pipe(ops0.chain(validate_user_code(intake)))
 		.pipe(ops0.chain(drop_user_code(intake)))
@@ -54,7 +54,7 @@ export const handle_validate_code = default_handler<TIDContext>(intake =>
 
 // --- Internal ---
 
-type I = TIntake<TIDContext>
+type I = Intake<TIDContext>
 
 const validate_request_body = (intake: I) => (body: any) =>
 	Oath.Merge({

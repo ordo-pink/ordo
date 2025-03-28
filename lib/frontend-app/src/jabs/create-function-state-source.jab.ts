@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { ConsoleLogger, TLogger } from "@ordo-pink/logger"
+import { console_logger, Logger } from "@ordo-pink/logger"
 import { type TMaokaJab } from "@ordo-pink/maoka"
 import { type TZags } from "@ordo-pink/zags"
 
@@ -38,7 +38,7 @@ export type TFunctionStateSource = {
 	get_commands: (fid: symbol) => Ordo.Command.Commands
 	get_content_query: (fid: symbol) => Ordo.Content.Query
 	get_fetch: (fid: symbol) => Ordo.Fetch
-	get_logger: (fid: symbol) => TLogger // TODO Move TLogger to global Ordo
+	get_logger: (fid: symbol) => Logger // TODO Move TLogger to global Ordo
 	get_metadata_query: (fid: symbol) => Ordo.Metadata.Query
 	get_router: (fid: symbol) => TZags<{ current_route: Ordo.Router.Route; routes: Record<string, string> }>
 	get_file_associations: (fid: symbol) => TZags<{ value: Ordo.FileAssociation.Instance[] }>
@@ -54,7 +54,7 @@ export type TCreateFunctionStateResult = {
 
 export const create_function_state_source: TMaokaJab<TCreateFunctionStateResult> = () => {
 	const known_functions = init_known_functions()
-	const { get_logger } = init_logger(ConsoleLogger)
+	const { get_logger } = init_logger(console_logger)
 	const { get_fetch } = init_fetch()
 	const { get_commands } = init_commands()
 	const { translate } = init_i18n()

@@ -19,8 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { DefaultContext } from "@ordo-pink/backend-util-default-handler"
 import type { Logger } from "@ordo-pink/logger"
+import type { RoutaryOrdo } from "@ordo-pink/routary-ordo"
 
 export type TIDChamber = {
 	allow_origin: string[]
@@ -29,7 +29,8 @@ export type TIDChamber = {
 	notification_strategy: OrdoBackend.Notification.EmailStrategy
 	session_lifetime: number
 	user_persistence_strategy: OrdoBackend.User.PersistenceStrategy
+	user_mapping_strategy: OrdoBackend.User.MappingStrategy
 	web_host: string
 }
 
-export type TIDContext = DefaultContext & TIDChamber
+export type TIDContext = RoutaryOrdo.Chamber & TIDChamber

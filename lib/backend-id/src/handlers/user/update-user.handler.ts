@@ -19,12 +19,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { CurrentUser, CurrentUserKeys } from "@ordo-pink/core"
 import { Oath, ops0 } from "@ordo-pink/oath"
-import { BackendUserKeys } from "@ordo-pink/backend"
-import { CurrentUser } from "@ordo-pink/core"
-import { type Intake } from "@ordo-pink/routary"
-import { default_handler } from "@ordo-pink/backend-util-default-handler"
-import { parse_json_body } from "@ordo-pink/backend-util-body"
+import { default_handler, extract_json_body } from "@ordo-pink/routary-ordo"
+import { type Routary } from "@ordo-pink/routary"
 
 import { exists_by_email_rrr, invalid_email_rrr } from "../../rrrs/invalid-user-email.rrr"
 import { exists_by_handle, invalid_handle_rrr } from "../../rrrs/invalid-user-handle.rrr"
@@ -35,7 +33,7 @@ import { check_if_id_param_is_valid } from "../../common/validate-id-param"
 
 export const handle_update_user = default_handler<TIDContext>(intake =>
 	Oath.Merge([check_if_edited_user_is_current_user(intake), check_if_id_param_is_valid(intake)])
-		.pipe(ops0.chain(() => parse_json_body(intake)))
+		.pipe(ops0.chain(() => extract_json_body(intake)))
 		.pipe(ops0.chain(valdiate_body(intake)))
 		.pipe(ops0.chain(get_current_user(intake)))
 		.pipe(ops0.map(merge_users))
@@ -47,30 +45,22 @@ export const handle_update_user = default_handler<TIDContext>(intake =>
 
 const { is_email, is_handle, is_installed_functions, is_first_name, is_last_name } = CurrentUser.Validations
 
-type I = Intake<TIDContext>
+type I = Routary.Intake<TIDContext>
 
 const check_email_is_not_taken_if_present = (body: Record<string, any>, i: I) =>
 	body.email
 		? Oath.If(is_email(body.email), { F: () => invalid_email_rrr(body.email, i) })
 				.and(() => body.email as Ordo.User.Email)
-				.pipe(ops0.chain(email => i.user_persistence_strategy.get_by_email(email).fix(() => null)))
-				.pipe(
-					ops0.chain(user =>
-						Oath.If(!user || user.get_uid() === i.params.user_id, { F: () => exists_by_email_rrr(body.email, i) }),
-					),
-				)
+				.pipe(ops0.chain(email => i.user_mapping_strategy.get_by_email(email).fix(() => null)))
+				.pipe(ops0.chain(id => Oath.If(!id || id === i.params.user_id, { F: () => exists_by_email_rrr(body.email, i) })))
 		: Oath.Resolve(void 0)
 
 const check_handle_is_not_taken_if_present = (body: Record<string, any>, i: I) =>
 	body.handle
 		? Oath.If(is_handle(body.handle), { F: () => invalid_handle_rrr(body.handle, i) })
 				.and(() => body.handle as Ordo.User.Handle)
-				.pipe(ops0.chain(handle => i.user_persistence_strategy.get_by_handle(handle).fix(() => null)))
-				.pipe(
-					ops0.chain(user =>
-						Oath.If(!user || user.get_uid() === i.params.user_id, { F: () => exists_by_handle(body.handle, i) }),
-					),
-				)
+				.pipe(ops0.chain(handle => i.user_mapping_strategy.get_by_handle(handle).fix(() => null)))
+				.pipe(ops0.chain(id => Oath.If(!id || id === i.params.user_id, { F: () => exists_by_handle(body.handle, i) })))
 		: Oath.Resolve(void 0)
 
 const check_installed_functions_is_valid_if_present = (body: Record<string, any>, i: I) =>
@@ -90,40 +80,38 @@ const check_last_name_is_valid_if_present = (body: Record<string, any>, i: I) =>
 		? Oath.If(is_last_name(body.last_name), { F: () => invalid_last_name_rrr(body.last_name, i) })
 		: Oath.Resolve(void 0)
 
-const valdiate_body = (i: I) => (body: Record<string, any>) =>
+const valdiate_body = (i: I) => (body: any) =>
 	Oath.Merge([
 		check_email_is_not_taken_if_present(body, i),
 		check_handle_is_not_taken_if_present(body, i),
 		check_installed_functions_is_valid_if_present(body, i),
 		check_first_name_is_valid_if_present(body, i),
 		check_last_name_is_valid_if_present(body, i),
-	]).pipe(ops0.map(() => body as Partial<OrdoBackend.User.DTO>))
+	]).pipe(ops0.map(() => body as Partial<Ordo.User.Current.DTO>))
 
-const get_current_user = (i: I) => (updated_user: Partial<OrdoBackend.User.DTO>) =>
+const get_current_user = (i: I) => (updated_user: Partial<Ordo.User.Current.DTO>) =>
 	i.user_persistence_strategy
-		.get_by_id(i.params.user_id as Ordo.User.UID)
+		.read(i.params.user_id as Ordo.User.UID)
 		.pipe(ops0.rejected_map(rrr => ({ rrr, intake: i })))
 		.pipe(ops0.map(user => ({ user, updated_user })))
 
-const update_user = (id: Ordo.User.UID, intake: I) => (user: OrdoBackend.User.DTO) =>
-	intake.user_persistence_strategy.update(id, user).pipe(ops0.rejected_map(rrr => ({ rrr, intake })))
+const update_user = (id: Ordo.User.UID, intake: I) => (user: Ordo.User.Current.DTO) =>
+	intake.user_persistence_strategy.update(id, CurrentUser.FromDTO(user)).pipe(ops0.rejected_map(rrr => ({ rrr, intake })))
 
 const merge_users = (users: {
-	user: OrdoBackend.User.Instance
-	updated_user: Partial<OrdoBackend.User.DTO>
-}): OrdoBackend.User.DTO => [
-	users.user.to_dto()[BackendUserKeys.UID],
-	users.updated_user[BackendUserKeys.HANDLE] ?? users.user.to_dto()[BackendUserKeys.HANDLE],
-	users.user.to_dto()[BackendUserKeys.CREATED_AT],
-	users.user.to_dto()[BackendUserKeys.SUBSCRIPTION],
-	users.updated_user[BackendUserKeys.FIRST_NAME] ?? users.user.to_dto()[BackendUserKeys.FIRST_NAME],
-	users.updated_user[BackendUserKeys.LAST_NAME] ?? users.user.to_dto()[BackendUserKeys.LAST_NAME],
-	users.updated_user[BackendUserKeys.EMAIL] ?? users.user.to_dto()[BackendUserKeys.EMAIL],
-	users.user.to_dto()[BackendUserKeys.FILE_LIMIT],
-	users.updated_user[BackendUserKeys.INSTALLED_FUNCTIONS] ?? users.user.to_dto()[BackendUserKeys.INSTALLED_FUNCTIONS],
-	users.user.to_dto()[BackendUserKeys.MAX_FUNCTIONS],
-	users.user.to_dto()[BackendUserKeys.MAX_UPLOAD_SIZE],
-	users.user.to_dto()[BackendUserKeys.SESSIONS],
-	users.user.to_dto()[BackendUserKeys.EMAIL_CODE],
-	users.user.to_dto()[BackendUserKeys.PASSWORD],
+	user: Ordo.User.Current.Instance
+	updated_user: Partial<Ordo.User.Current.DTO>
+}): Ordo.User.Current.DTO => [
+	users.user.to_dto()[CurrentUserKeys.UID],
+	users.updated_user[CurrentUserKeys.HANDLE] ?? users.user.to_dto()[CurrentUserKeys.HANDLE],
+	users.user.to_dto()[CurrentUserKeys.CREATED_AT],
+	users.user.to_dto()[CurrentUserKeys.SUBSCRIPTION],
+	users.updated_user[CurrentUserKeys.FIRST_NAME] ?? users.user.to_dto()[CurrentUserKeys.FIRST_NAME],
+	users.updated_user[CurrentUserKeys.LAST_NAME] ?? users.user.to_dto()[CurrentUserKeys.LAST_NAME],
+	users.updated_user[CurrentUserKeys.EMAIL] ?? users.user.to_dto()[CurrentUserKeys.EMAIL],
+	users.user.to_dto()[CurrentUserKeys.FILE_LIMIT],
+	users.updated_user[CurrentUserKeys.INSTALLED_FUNCTIONS] ?? users.user.to_dto()[CurrentUserKeys.INSTALLED_FUNCTIONS],
+	users.user.to_dto()[CurrentUserKeys.MAX_FUNCTIONS],
+	users.user.to_dto()[CurrentUserKeys.MAX_UPLOAD_SIZE],
+	users.user.to_dto()[CurrentUserKeys.SESSIONS],
 ]

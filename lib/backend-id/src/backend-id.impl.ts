@@ -19,14 +19,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
-import { routary, type Intake } from "@ordo-pink/routary"
-import { set_x_response_time_header, start_response_timer, stop_response_timer } from "@ordo-pink/backend-util-response-time"
-import { create_json_response } from "@ordo-pink/backend-util-create-response"
-import { extract_request_ip } from "@ordo-pink/backend-util-extract-request-ip"
-import { log_request } from "@ordo-pink/backend-util-log-request"
+import { TWO_LETTER_LOCALE } from "@ordo-pink/locale"
+import { rickroll } from "@ordo-pink/rickroll"
+import { routary } from "@ordo-pink/routary"
 import { routary_cors } from "@ordo-pink/routary-cors"
-import { set_content_type_application_json_header } from "@ordo-pink/backend-util-set-header"
 
 import { type TIDChamber, type TIDContext } from "./backend-id.types"
 import { handle_delete_user } from "./handlers/user/delete-user.handler"
@@ -34,17 +30,12 @@ import { handle_get_session } from "./handlers/session/get-session.hanlder"
 import { handle_get_user_by_handle } from "./handlers/user/get-user-by-handle.handler"
 import { handle_get_user_by_id } from "./handlers/user/get-user-by-id.handler"
 import { handle_invalidate_session } from "./handlers/session/invalidate.handler"
-import { handle_request_code } from "./handlers/codes/request-code.handler"
 import { handle_update_user } from "./handlers/user/update-user.handler"
-import { handle_validate_code } from "./handlers/codes/validate-code.handler"
 
 // TODO Global stats when API is ready
 export const create_backend_id = (chamber: TIDChamber) =>
 	routary
-		.create<TIDContext>({ ...chamber, request_ip: null, status: 200, headers: new Headers() })
-		.post("/codes/request", handle_request_code)
-		.post("/codes/validate", handle_validate_code)
-
+		.create<TIDContext>({ ...chamber, status: 200, headers: new Headers(), request_language: TWO_LETTER_LOCALE.ENGLISH })
 		.get("/session", handle_get_session)
 		.delete("/session", handle_invalidate_session)
 
@@ -63,16 +54,4 @@ export const create_backend_id = (chamber: TIDChamber) =>
 			}),
 		)
 
-		.start(intake =>
-			// TODO Extract to lib
-			Oath.Resolve<Intake<TIDContext>>({ ...intake, headers: new Headers(), status: 404, request_ip: null })
-				.pipe(ops0.tap(start_response_timer))
-				.pipe(ops0.tap(extract_request_ip))
-				.pipe(ops0.tap(set_content_type_application_json_header))
-				.pipe(ops0.tap(stop_response_timer))
-				.pipe(ops0.tap(set_x_response_time_header))
-				.pipe(ops0.tap(log_request))
-				.pipe(ops0.tap(intake => void (intake.payload = "resource not found")))
-				.pipe(ops0.map(create_json_response))
-				.invoke(invokers0.force_resolve),
-		)
+		.start(() => rickroll)

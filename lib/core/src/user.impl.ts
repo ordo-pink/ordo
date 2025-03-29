@@ -170,6 +170,27 @@ export const CurrentUser: Ordo.User.Current.Static = {
 				dto[CurrentUserKeys.SESSIONS],
 			] as const,
 	}),
+	Create: (email, file_limit, max_upload_size, max_functions, subscription = UserSubscription.FREE) => {
+		const uid = crypto.randomUUID()
+		const handle = `@${email.split("@")[0].replaceAll(".", "_").replaceAll("/", "")}${uid.split("-")[0]}` as Ordo.User.Handle
+
+		const user = []
+
+		user[CurrentUserKeys.UID] = uid
+		user[CurrentUserKeys.HANDLE] = handle
+		user[CurrentUserKeys.CREATED_AT] = Date.now()
+		user[CurrentUserKeys.SUBSCRIPTION] = subscription
+		user[CurrentUserKeys.FIRST_NAME] = 0
+		user[CurrentUserKeys.LAST_NAME] = 0
+		user[CurrentUserKeys.EMAIL] = email
+		user[CurrentUserKeys.FILE_LIMIT] = file_limit
+		user[CurrentUserKeys.INSTALLED_FUNCTIONS] = []
+		user[CurrentUserKeys.MAX_FUNCTIONS] = max_functions
+		user[CurrentUserKeys.MAX_UPLOAD_SIZE] = max_upload_size
+		user[CurrentUserKeys.SESSIONS] = []
+
+		return CurrentUser.FromDTO(user as Ordo.User.Current.DTO)
+	},
 }
 
 export const PublicUserValidations: Ordo.User.Public.Validations = {

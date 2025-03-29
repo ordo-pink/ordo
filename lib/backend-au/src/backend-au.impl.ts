@@ -29,7 +29,7 @@ import { BackendAuth } from "./backend-au.types"
 import { handle_request_code } from "./handlers/request-code.handler"
 import { handle_verify_code } from "./handlers/verify-code.handler"
 
-export const create_backend_auth = (params: BackendAuth.Chamber) => {
+export const create_backend_auth = (params: BackendAuth.Params) => {
 	const interval = setInterval(() => {
 		const now = Date.now()
 

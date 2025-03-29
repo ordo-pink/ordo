@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import type { DefaultContext } from "@ordo-pink/backend-util-default-handler"
 import type { Logger } from "@ordo-pink/logger"
+import type { RoutaryOrdo } from "@ordo-pink/routary-ordo"
 
 export type TDTChamber = {
 	allow_origin: string[]
@@ -14,4 +14,4 @@ export type TDTChamber = {
 	dt_host: string
 }
 
-export type TDTContext = DefaultContext & TDTChamber
+export type TDTContext = RoutaryOrdo.Chamber & TDTChamber

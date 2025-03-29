@@ -25,6 +25,7 @@ import { type Logger, console_logger } from "@ordo-pink/logger"
 import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
 import { RRR } from "@ordo-pink/core"
 import { PersistenceStrategyDataFS } from "@ordo-pink/backend-persistence-strategy-data-fs"
+import { persistence_strategy_user } from "@ordo-pink/backend-persistence-strategy-user"
 
 const env_rrr = (env_var: string) => (value?: any) =>
 	value != null ? `Invalid value for ${env_var}: "${value}"` : `Missing value for ${env_var}`
@@ -56,7 +57,7 @@ const get_env = () =>
 			.and(s => s.split(", "))
 			.pipe(ops0.rejected_map(env_rrr("ORDO_AU_ALLOW_ORIGIN"))),
 
-		session_lifetime: Oath.FromNullable(Bun.env.ORDO_AU_SESSION_LIFETIME)
+		session_lifetime_s: Oath.FromNullable(Bun.env.ORDO_AU_SESSION_LIFETIME)
 			.and(s => Number.parseInt(s, 10))
 			.and(n => Oath.If(tau.is_finite_positive_int(n), { T: () => n }))
 			.pipe(ops0.rejected_map(env_rrr("ORDO_AU_SESSION_LIFETIME"))),
@@ -71,40 +72,42 @@ const get_env = () =>
 
 const main = () =>
 	get_env()
-		.and(({ allow_origin, code_lifetime_ms, data_root, port, max_functions, max_upload_size, file_limit }) =>
-			Oath.Merge({
-				allow_origin,
-				logger,
-				defaults: { file_limit, max_functions, max_upload_size },
-				email_strategy: { send: ({ content }) => logger.notice("NOTIFICATION:", "::", content) }, // TODO
-				// session_lifetime,
-				user_persistence_strategy: PersistenceStategyUser.Of(PersistenceStrategyDataFS.Of(data_root)),
-				auth_storage: new Map(),
-				code_strategy: {
-					generate: () =>
-						Oath.Resolve(new Uint8Array(6))
-							.pipe(ops0.map(ua => crypto.getRandomValues(ua)))
-							.and(num_array => num_array.join(""))
-							.and(num_string => num_string.slice(0, 6)),
-					hash: code =>
-						Oath.Try(
-							() => Bun.password.hash(code, { algorithm: "bcrypt", cost: 4 }),
-							error => RRR.codes.eio("Failed to hash code", error),
-						),
-					verify: (hash, code) =>
-						Oath.Try(
-							() => Bun.password.verify(code, hash),
-							error => RRR.codes.eio("Failed to verify code", error),
-						),
-				},
-				create_request_id: () => crypto.randomUUID(),
-				data_persistence_strategy: null as any,
-				port: Number(port),
-				code_lifetime_ms,
-				// web_host,
-			} satisfies BackendAuth.Chamber)
-				.and(create_backend_auth)
-				.and(fetch => Bun.serve({ fetch, port })),
+		.and(
+			({ allow_origin, code_lifetime_ms, data_root, port, max_functions, max_upload_size, file_limit, session_lifetime_s }) =>
+				Oath.Merge({
+					allow_origin,
+					logger,
+					defaults: { file_limit, max_functions, max_upload_size },
+					email_strategy: { send: ({ content }) => logger.notice("NOTIFICATION:", "::", content) }, // TODO
+					// session_lifetime,
+					user_persistence_strategy: persistence_strategy_user(PersistenceStrategyDataFS.Of(data_root)),
+					auth_storage: new Map(),
+					code_strategy: {
+						generate: () =>
+							Oath.Resolve(new Uint8Array(6))
+								.pipe(ops0.map(ua => crypto.getRandomValues(ua)))
+								.and(num_array => num_array.join(""))
+								.and(num_string => num_string.slice(0, 6)),
+						hash: code =>
+							Oath.Try(
+								() => Bun.password.hash(code, { algorithm: "bcrypt", cost: 4 }),
+								error => RRR.codes.eio("Failed to hash code", error),
+							),
+						verify: (hash, code) =>
+							Oath.Try(
+								() => Bun.password.verify(code, hash),
+								error => RRR.codes.eio("Failed to verify code", error),
+							),
+					},
+					create_request_id: () => crypto.randomUUID(),
+					data_persistence_strategy: null as any,
+					port: Number(port),
+					code_lifetime_ms,
+					session_lifetime_s,
+					// web_host,
+				} satisfies BackendAuth.Params)
+					.and(create_backend_auth)
+					.and(fetch => Bun.serve({ fetch, port })),
 		)
 
 		.pipe(ops0.tap(server => logger.info(`server running on http://${server.hostname}:${server.port}`)))

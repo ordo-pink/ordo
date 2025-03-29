@@ -21,8 +21,8 @@
 
 import { Oath, ops0 } from "@ordo-pink/oath"
 import { PublicUser } from "@ordo-pink/core"
-import { type Intake } from "@ordo-pink/routary"
-import { default_handler } from "@ordo-pink/backend-util-default-handler"
+import { type Routary } from "@ordo-pink/routary"
+import { default_handler } from "@ordo-pink/routary-ordo"
 
 import { type TIDContext } from "../../backend-id.types"
 import { invalid_id_rrr } from "../../rrrs/invalid-user-id.rrr"
@@ -39,7 +39,7 @@ export const handle_get_user_by_id = default_handler<TIDContext>(intake =>
 
 // --- Internal ---
 
-type I = Intake<TIDContext>
+type I = Routary.Intake<TIDContext>
 
 const serialize_to_public_user = PublicUser.Serialize
 
@@ -47,4 +47,4 @@ const validate_user_id = (intake: I) => (id: unknown) =>
 	Oath.If(PublicUser.Validations.is_uid(id), { T: () => id as Ordo.User.UID, F: () => invalid_id_rrr(id, intake) })
 
 const get_by_id = (intake: I) => (id: Ordo.User.UID) =>
-	intake.user_persistence_strategy.get_by_id(id).pipe(ops0.rejected_map(rrr => ({ rrr, intake })))
+	intake.user_persistence_strategy.read(id).pipe(ops0.rejected_map(rrr => ({ rrr, intake })))

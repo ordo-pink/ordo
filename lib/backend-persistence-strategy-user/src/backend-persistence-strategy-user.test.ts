@@ -21,9 +21,8 @@
 
 import { afterEach, describe, expect, test } from "bun:test"
 
-import { BackendUser, BackendUserKeys } from "@ordo-pink/backend"
+import { CurrentUser, CurrentUserKeys, RRR } from "@ordo-pink/core"
 import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
-import { RRR } from "@ordo-pink/core"
 
 import { USER_FILE_FSID, persistence_strategy_user } from "./backend-persistence-strategy-user.impl"
 
@@ -51,7 +50,7 @@ const persistence_strategy_data: OrdoBackend.Data.PersistenceStrategy = {
 
 const user_storage = persistence_strategy_user(persistence_strategy_data)
 
-const test_user = BackendUser.create("test@test.com", 1, 1, 1)
+const test_user = CurrentUser.Create("test@test.com", 1, 1, 1)
 
 describe("persistence_strategy_user", () => {
 	afterEach(() => {
@@ -107,8 +106,8 @@ describe("persistence_strategy_user", () => {
 			await user_storage.create(test_user).invoke(invokers0.to_promise)
 			const dto = test_user.to_dto()
 			const new_email = "test1@email.com"
-			dto[BackendUserKeys.EMAIL] = new_email
-			await user_storage.update(test_user.get_uid(), BackendUser.from_dto(dto)).invoke(invokers0.to_promise)
+			dto[CurrentUserKeys.EMAIL] = new_email
+			await user_storage.update(test_user.get_uid(), CurrentUser.FromDTO(dto)).invoke(invokers0.to_promise)
 			const updated_user = await user_storage.read(test_user.get_uid()).invoke(invokers0.to_promise)
 			expect(updated_user.get_email()).toEqual(new_email)
 		})
@@ -136,7 +135,7 @@ describe("persistence_strategy_user", () => {
 		})
 
 		test("should resolve with true if user exists", async () => {
-			const user = BackendUser.create("test@test.com", 1, 1, 1)
+			const user = CurrentUser.Create("test@test.com", 1, 1, 1)
 			await user_storage.create(user).invoke(invokers0.to_promise)
 			expect(await user_storage.exists(user.get_uid()).invoke(invokers0.to_promise)).toBeTrue()
 		})

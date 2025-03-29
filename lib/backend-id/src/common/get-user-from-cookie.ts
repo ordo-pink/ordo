@@ -19,41 +19,45 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { BackendUser, BackendUserKeys } from "@ordo-pink/backend"
+import { CurrentUser, CurrentUserKeys, RRR } from "@ordo-pink/core"
 import { Oath, ops0 } from "@ordo-pink/oath"
-import { RRR } from "@ordo-pink/core"
-import { type Intake } from "@ordo-pink/routary"
+import { type Routary } from "@ordo-pink/routary"
 
 import { type TIDContext } from "../backend-id.types"
 
-export const get_user_from_cookie = (intake: Intake<TIDContext>) =>
+export const get_user_from_cookie = (intake: Routary.Intake<TIDContext>) =>
 	Oath.FromNullable(intake.req.headers.get("Cookie"))
 		.and(cookie => cookie.split("="))
 		.and(([uid, sid]) =>
 			Oath.Merge({
-				uid: Oath.If(BackendUser.Validations.is_uid(uid), { T: () => uid as Ordo.User.UID }),
-				sid: Oath.If(BackendUser.Validations.is_uid(sid), { T: () => sid as Ordo.User.SessionID }),
+				uid: Oath.If(CurrentUser.Validations.is_uid(uid), { T: () => uid as Ordo.User.UID }),
+				sid: Oath.If(CurrentUser.Validations.is_uid(sid), { T: () => sid as Ordo.User.SessionID }),
 			}).and(({ uid, sid }) =>
 				intake.user_persistence_strategy
-					.get_by_id(uid)
-
+					.read(uid)
 					.and(user =>
 						Oath.If(
 							user.get_sessions().some(session => session[0] === sid),
 							{ T: () => ({ user, uid, sid }) },
 						),
 					)
-					.and(({ user, uid, sid }) =>
-						intake.user_persistence_strategy
-							.update(user.get_uid(), {
-								...user.to_dto(),
-								[BackendUserKeys.SESSIONS]: user.get_sessions().toSpliced(
-									user.get_sessions().findIndex(session => session[0] === sid),
-									1,
-									[sid, Date.now(), intake.req.headers.get("user-agent") ?? void 0],
+					.and(params =>
+						Oath.Resolve(params.user)
+							.and(user => user.to_dto())
+							.pipe(
+								ops0.tap(
+									dto =>
+										void (dto[CurrentUserKeys.SESSIONS] = dto[CurrentUserKeys.SESSIONS].toSpliced(
+											dto[CurrentUserKeys.SESSIONS].findIndex(session => session[0] === sid),
+											1,
+											[sid, Date.now(), intake.req.headers.get("user-agent") ?? void 0],
+										)),
 								),
-							})
-							.and(user => ({ user, uid, sid })),
+							)
+							.and(dto => ({ uid, sid, user: CurrentUser.FromDTO(dto) })),
+					)
+					.and(({ user, uid, sid }) =>
+						intake.user_persistence_strategy.update(user.get_uid(), user).and(user => ({ user, uid, sid })),
 					),
 			),
 		)

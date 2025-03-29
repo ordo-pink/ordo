@@ -19,17 +19,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { CurrentUser, CurrentUserKeys } from "@ordo-pink/core"
 import { Oath, ops0 } from "@ordo-pink/oath"
-import { BackendUserKeys } from "@ordo-pink/backend"
-import { type Intake } from "@ordo-pink/routary"
+import { type Routary } from "@ordo-pink/routary"
 
 import { type TIDContext } from "../backend-id.types"
 
-const { SESSIONS } = BackendUserKeys
+const { SESSIONS } = CurrentUserKeys
 
 export const persist_session_id =
-	(i: Intake<TIDContext>) => (params: { sid: Ordo.User.Session; user: OrdoBackend.User.Instance }) =>
+	(i: Routary.Intake<TIDContext>) => (params: { sid: Ordo.User.Session; user: Ordo.User.Current.Instance }) =>
 		Oath.Resolve(params.user.to_dto())
-			.and(d => i.user_persistence_strategy.update(params.user.get_uid(), { ...d, [SESSIONS]: [...d[SESSIONS], params.sid] }))
+			.pipe(ops0.tap(dto => void (dto[SESSIONS] = [...dto[SESSIONS], params.sid])))
+			.and(dto => i.user_persistence_strategy.update(params.user.get_uid(), CurrentUser.FromDTO(dto)))
 			.and(() => params)
 			.pipe(ops0.rejected_map(rrr => ({ rrr, intake: i })))

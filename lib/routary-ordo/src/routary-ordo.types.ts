@@ -4,6 +4,7 @@
  */
 
 import type { Logger } from "@ordo-pink/logger"
+import type { Oath } from "@ordo-pink/oath"
 import type { Routary } from "@ordo-pink/routary"
 import type { TWO_LETTER_LOCALE } from "@ordo-pink/locale"
 
@@ -18,7 +19,6 @@ export module RoutaryOrdo {
 		response_time?: number
 		stop_response_timer?: ResponseTimer
 		status: number
-		user_persistence_strategy: OrdoBackend.User.PersistenceStrategy
 	}
 
 	export type SetHeader = (key: string, value: string) => <$Intake extends { headers: Headers }>(intake: $Intake) => void
@@ -37,7 +37,9 @@ export module RoutaryOrdo {
 
 	export type ExtractRequestIP = <$Intake extends Routary.Intake<RoutaryOrdo.Chamber>>(intake: $Intake) => void
 
-	export type ExtractJSONBody = <$Intake extends Routary.Intake = Routary.Intake>(intake: $Intake) => any
+	export type ExtractJSONBody = <$Intake extends Routary.Intake = Routary.Intake>(
+		intake: $Intake,
+	) => Oath<any, { rrr: Ordo.Rrr<"EIO">; intake: Routary.Intake<any> }>
 
 	export type Rejection = { rrr: Ordo.Rrr; intake: Routary.Intake<RoutaryOrdo.Chamber> }
 }

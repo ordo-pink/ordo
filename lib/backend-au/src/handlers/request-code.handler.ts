@@ -5,7 +5,7 @@ import * as fns from "../fns"
 import { type BackendAuth } from "../backend-au.types"
 import { default_handler } from "@ordo-pink/routary-ordo"
 
-export const handle_request_code = default_handler<BackendAuth.Intake>(intake => {
+export const handle_request_code = default_handler<BackendAuth.Chamber>(intake => {
 	intake.request_id = intake.create_request_id()
 	intake.request_language = fns.get_lang(intake.req)
 	const debug_step = debug(intake)

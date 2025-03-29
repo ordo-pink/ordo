@@ -19,18 +19,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { BackendUser, BackendUserKeys } from "@ordo-pink/backend"
+import { CurrentUser, CurrentUserKeys, RRR } from "@ordo-pink/core"
 import { Oath, ops0 } from "@ordo-pink/oath"
-import { RRR } from "@ordo-pink/core"
 import { noop } from "@ordo-pink/tau"
 
 export const PersistenceStategyUserFS = {
 	Of: (db_path: string): OrdoBackend.User.PersistenceStrategy => {
-		const users0 = Oath.FromPromise(() => Bun.file(db_path).json() as Promise<OrdoBackend.User.DTO[]>)
-			.pipe(ops0.map(dtos => dtos.map(BackendUser.from_dto)))
+		const users0 = Oath.FromPromise(() => Bun.file(db_path).json() as Promise<Ordo.User.Current.DTO[]>)
+			.pipe(ops0.map(dtos => dtos.map(CurrentUser.FromDTO)))
 			.pipe(ops0.rejected_map(error => RRR.codes.eio(error.message, error.name, error.cause, error.stack)))
 
-		const save_users = (users: OrdoBackend.User.Instance[]) =>
+		const save_users = (users: Ordo.User.Current.Instance[]) =>
 			Oath.Resolve(users.map(user => user.to_dto()))
 				.pipe(ops0.map(dtos => dtos.map(dto => JSON.stringify(dto))))
 				.pipe(ops0.chain(dtos => Oath.FromPromise(() => Bun.write(db_path, `[\n  ${dtos.join("\n  ")}\n]`))))
@@ -46,43 +45,29 @@ export const PersistenceStategyUserFS = {
 							const handle = user.get_handle()
 
 							return Oath.Merge([
-								Oath.If(!exists(users, BackendUserKeys.UID, uid), { F: () => user_already_exists("id", uid) }),
-								Oath.If(!exists(users, BackendUserKeys.EMAIL, email), { F: () => user_already_exists("email", email) }),
-								Oath.If(!exists(users, BackendUserKeys.HANDLE, handle), { F: () => user_already_exists("handle", handle) }),
+								Oath.If(!exists(users, CurrentUserKeys.UID, uid), { F: () => user_already_exists("id", uid) }),
+								Oath.If(!exists(users, CurrentUserKeys.EMAIL, email), { F: () => user_already_exists("email", email) }),
+								Oath.If(!exists(users, CurrentUserKeys.HANDLE, handle), { F: () => user_already_exists("handle", handle) }),
 							]).pipe(ops0.map(() => users))
 						}),
 					)
 					.pipe(ops0.chain(users => save_users([...users, user])))
 					.pipe(ops0.map(() => user)),
 
-			exists_by_email: email => users0.pipe(ops0.map(users => exists(users, BackendUserKeys.EMAIL, email))),
-
-			exists_by_handle: handle => users0.pipe(ops0.map(users => exists(users, BackendUserKeys.HANDLE, handle))),
-
-			exists: id => users0.pipe(ops0.map(users => exists(users, BackendUserKeys.UID, id))),
-
-			get_by_email: email =>
-				users0
-					.pipe(ops0.map(users => users.find(u => u.get_email() === email)))
-					.pipe(ops0.chain(user => Oath.FromNullable(user, () => user_not_found(BackendUserKeys.EMAIL, email)))),
-
-			get_by_handle: handle =>
-				users0
-					.pipe(ops0.map(users => users.find(u => u.get_handle() === handle)))
-					.pipe(ops0.chain(user => Oath.FromNullable(user, () => user_not_found(BackendUserKeys.HANDLE, handle)))),
+			exists: id => users0.pipe(ops0.map(users => exists(users, CurrentUserKeys.UID, id))),
 
 			read: id =>
 				users0
 					.pipe(ops0.map(users => users.find(u => u.get_uid() === id)))
-					.pipe(ops0.chain(user => Oath.FromNullable(user, () => user_not_found(BackendUserKeys.UID, id)))),
+					.pipe(ops0.chain(user => Oath.FromNullable(user, () => user_not_found(CurrentUserKeys.UID, id)))),
 
 			delete: id =>
 				users0
 					.pipe(
 						ops0.chain(users =>
-							Oath.If(exists(users, BackendUserKeys.UID, id), {
+							Oath.If(exists(users, CurrentUserKeys.UID, id), {
 								T: () => users,
-								F: () => user_not_found(BackendUserKeys.UID, id),
+								F: () => user_not_found(CurrentUserKeys.UID, id),
 							}),
 						),
 					)
@@ -94,9 +79,9 @@ export const PersistenceStategyUserFS = {
 				users0
 					.pipe(
 						ops0.chain(users =>
-							Oath.If(exists(users, BackendUserKeys.UID, id), {
+							Oath.If(exists(users, CurrentUserKeys.UID, id), {
 								T: () => users,
-								F: () => user_not_found(BackendUserKeys.UID, id),
+								F: () => user_not_found(CurrentUserKeys.UID, id),
 							}),
 						),
 					)
@@ -105,23 +90,23 @@ export const PersistenceStategyUserFS = {
 							users.toSpliced(
 								users.findIndex(u => u.get_uid() === id),
 								1,
-								BackendUser.from_dto(user),
+								user,
 							),
 						),
 					)
 					.pipe(ops0.chain(save_users))
-					.pipe(ops0.map(() => BackendUser.from_dto(user))),
+					.pipe(ops0.map(() => user)),
 		}
 	},
 }
 
-const exists = <$TKey extends BackendUserKeys>(
-	users: OrdoBackend.User.Instance[],
+const exists = <$TKey extends CurrentUserKeys>(
+	users: Ordo.User.Current.Instance[],
 	key: $TKey,
-	value: OrdoBackend.User.DTO[$TKey],
+	value: Ordo.User.Current.DTO[$TKey],
 ) => users.some(u => u.to_dto()[key] === value)
 
 const user_already_exists = (key: string, value: unknown) => RRR.codes.eexist("user already exists", key, value)
 
-const user_not_found = <$TKey extends keyof OrdoBackend.User.DTO>(key: $TKey, value: OrdoBackend.User.DTO[$TKey]) =>
+const user_not_found = <$TKey extends keyof Ordo.User.Current.DTO>(key: $TKey, value: Ordo.User.Current.DTO[$TKey]) =>
 	RRR.codes.enoent("user not found", key, value)

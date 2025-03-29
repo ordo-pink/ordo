@@ -609,6 +609,13 @@ declare global {
 
 				type Static = {
 					FromDTO: (dto: Ordo.DTOLike<Ordo.User.Current.DTO>) => Ordo.User.Current.Instance
+					Create: (
+						email: Ordo.User.Email,
+						file_limit: number,
+						max_upload_size: number,
+						max_functions: number,
+						subscription?: C.UserSubscription,
+					) => Ordo.User.Current.Instance
 					Serialize: (dto: Ordo.DTOLike<Ordo.User.Current.DTO>) => Ordo.User.Current.DTO
 					Validations: Ordo.User.Current.Validations
 				}

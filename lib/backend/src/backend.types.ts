@@ -20,7 +20,6 @@
  */
 
 import type { Oath } from "@ordo-pink/oath"
-import type { UserSubscription } from "@ordo-pink/core"
 
 declare global {
 	namespace OrdoBackend {
@@ -58,8 +57,6 @@ declare global {
 		}
 
 		namespace User {
-			export type DTO = Ordo.User.Current.DTO
-
 			type MappingStrategy = {
 				exists_by_handle: (handle: Ordo.User.Handle) => Oath<boolean, Ordo.Rrr<"EIO">>
 				exists_by_email: (email: Ordo.User.Email) => Oath<boolean, Ordo.Rrr<"EIO">>
@@ -69,27 +66,13 @@ declare global {
 
 			type PersistenceStrategy = {
 				exists: (id: Ordo.User.UID) => Oath<boolean, Ordo.Rrr<"EIO">>
-				create: (user: Instance) => Oath<Instance, Ordo.Rrr<"EIO" | "EEXIST">>
-				read: (id: Ordo.User.UID) => Oath<Instance, Ordo.Rrr<"EIO" | "ENOENT">>
-				update: (id: Ordo.User.UID, user: Instance) => Oath<Instance, Ordo.Rrr<"EIO" | "ENOENT" | "EINVAL">>
+				create: (user: Ordo.User.Current.Instance) => Oath<Ordo.User.Current.Instance, Ordo.Rrr<"EIO" | "EEXIST">>
+				read: (id: Ordo.User.UID) => Oath<Ordo.User.Current.Instance, Ordo.Rrr<"EIO" | "ENOENT">>
+				update: (
+					id: Ordo.User.UID,
+					user: Ordo.User.Current.Instance,
+				) => Oath<Ordo.User.Current.Instance, Ordo.Rrr<"EIO" | "ENOENT" | "EINVAL">>
 				delete: (id: Ordo.User.UID) => Oath<void, Ordo.Rrr<"EIO" | "ENOENT">>
-			}
-
-			export type Static = {
-				from_dto: (dto: OrdoBackend.User.DTO) => OrdoBackend.User.Instance
-				create: (
-					email: Ordo.User.Email,
-					file_limit: number,
-					max_upload_size: number,
-					max_functions: number,
-					subscription?: UserSubscription,
-				) => OrdoBackend.User.Instance
-			}
-
-			export type Instance = Omit<Ordo.User.Current.Instance, "to_dto"> & {
-				validate_code: (code: string) => Oath<boolean>
-				validate_password: (password: string) => Oath<boolean>
-				to_dto: () => OrdoBackend.User.DTO
 			}
 		}
 	}

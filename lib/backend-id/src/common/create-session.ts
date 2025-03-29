@@ -25,7 +25,7 @@ import { json_body_rrr } from "@ordo-pink/backend-util-body"
 
 import { type TIDContext } from "../backend-id.types"
 
-export const create_session_id = (intake: Intake<TIDContext>) => (user: OrdoBackend.User.Instance) =>
+export const create_session_id = (intake: Intake<TIDContext>) => (user: Ordo.User.Current.Instance) =>
 	Oath.Try(() => [crypto.randomUUID(), Date.now(), intake.req.headers.get("User-Agent") ?? undefined] as Ordo.User.Session)
 		.pipe(ops0.map(sid => ({ sid, user })))
 		.pipe(ops0.rejected_map(rrr => json_body_rrr(rrr, intake)))

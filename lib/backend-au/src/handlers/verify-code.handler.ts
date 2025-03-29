@@ -1,13 +1,12 @@
 import * as tau from "@ordo-pink/tau"
-import { BackendUser, BackendUserKeys } from "@ordo-pink/backend"
-import { CurrentUser, RRR } from "@ordo-pink/core"
+import { CurrentUser, CurrentUserKeys, RRR } from "@ordo-pink/core"
 import { Oath, ops0 } from "@ordo-pink/oath"
 import { default_handler } from "@ordo-pink/routary-ordo"
 
 import * as fns from "../fns"
 import { type BackendAuth } from "../backend-au.types"
 
-export const handle_verify_code = default_handler<BackendAuth.Intake>(intake => {
+export const handle_verify_code = default_handler<BackendAuth.Chamber>(intake => {
 	intake.request_id = intake.create_request_id()
 	intake.request_language = fns.get_lang(intake.req)
 	const debug_step = debug(intake)
@@ -26,6 +25,7 @@ export const handle_verify_code = default_handler<BackendAuth.Intake>(intake => 
 		.pipe(ops0.chain(create_session_id(intake)))
 		.pipe(ops0.chain(persist_session_id(intake)))
 		.pipe(ops0.tap(debug_step("User session persisted")))
+		.pipe(ops0.tap(set_cookie(intake)))
 		.pipe(ops0.map(({ user }) => void (intake.payload = CurrentUser.Serialize(user.to_dto()))))
 		.pipe(ops0.map(() => intake))
 		.pipe(ops0.rejected_map(rrr => ({ intake, rrr })))
@@ -56,13 +56,13 @@ const validate_request_body = (body: any) =>
 		}),
 	})
 
-type Pair = { email: BackendAuth.Email; code: BackendAuth.Code }
+type P1 = { email: BackendAuth.Email; code: BackendAuth.Code }
 
 const not_found_rrr = (email: BackendAuth.Email) => () => RRR.codes.enoent("User not found", fns.obfuscate_email(email))
 
 const get_code_hash =
 	(intake: BackendAuth.Intake) =>
-	({ email, code }: Pair) =>
+	({ email, code }: P1) =>
 		Oath.FromNullable(intake.auth_storage.get(email), not_found_rrr(email))
 			.pipe(ops0.chain(({ hash }) => intake.code_strategy.verify(hash, code)))
 			.pipe(ops0.chain(is_valid => Oath.If(is_valid, { T: () => email, F: not_found_rrr(email) })))
@@ -74,7 +74,7 @@ const remove_auth_record =
 
 const send_email =
 	(intake: BackendAuth.Intake) =>
-	(user: OrdoBackend.User.Instance): void =>
+	(user: Ordo.User.Current.Instance): void =>
 		intake.email_strategy.send({
 			to: user.get_email(),
 			content: fns.create_user_authenticated_email_body(intake.request_language, intake.request_ip!),
@@ -99,7 +99,7 @@ const debug =
 
 const create_user = (email: Ordo.User.Email) => (intake: BackendAuth.Intake) =>
 	Oath.Resolve(intake.defaults)
-		.pipe(ops0.map(d => BackendUser.create(email, d.file_limit, d.max_upload_size, d.max_functions)))
+		.pipe(ops0.map(d => CurrentUser.Create(email, d.file_limit, d.max_upload_size, d.max_functions)))
 		.pipe(ops0.chain(intake.user_persistence_strategy.create))
 
 const get_or_create_user = (intake: BackendAuth.Intake) => (email: Ordo.User.Email) =>
@@ -115,21 +115,20 @@ const get_or_create_user = (intake: BackendAuth.Intake) => (email: Ordo.User.Ema
 		.pipe(ops0.rejected_map(() => intake))
 		.fix(create_user(email))
 
-const create_session_id = (intake: BackendAuth.Intake) => (user: OrdoBackend.User.Instance) =>
+const create_session_id = (intake: BackendAuth.Intake) => (user: Ordo.User.Current.Instance) =>
 	Oath.Try(() => [crypto.randomUUID(), Date.now(), `${intake.req.headers.get("X-Device")}`] as Ordo.User.Session)
 		.pipe(ops0.map(sid => ({ sid, user })))
 		.pipe(ops0.rejected_map(error => RRR.codes.eio("Failed to create session", error)))
 
-const persist_session_id =
-	(intake: BackendAuth.Intake) => (params: { sid: Ordo.User.Session; user: OrdoBackend.User.Instance }) =>
-		Oath.Resolve(params.user.to_dto())
-			.and(d =>
-				intake.user_persistence_strategy.update(
-					params.user.get_uid(),
-					BackendUser.from_dto({
-						...d,
-						[BackendUserKeys.SESSIONS]: [...d[BackendUserKeys.SESSIONS], params.sid],
-					}),
-				),
-			)
-			.and(() => params)
+type P2 = { sid: Ordo.User.Session; user: Ordo.User.Current.Instance }
+const persist_session_id = (intake: BackendAuth.Intake) => (params: P2) =>
+	Oath.Resolve(params.user.to_dto())
+		.pipe(ops0.tap(dto => void (dto[CurrentUserKeys.SESSIONS] = [...dto[CurrentUserKeys.SESSIONS], params.sid])))
+		.and(dto => intake.user_persistence_strategy.update(params.user.get_uid(), CurrentUser.FromDTO(dto)))
+		.and(() => params)
+
+const set_cookie = (intake: BackendAuth.Intake) => (params: P2) =>
+	intake.headers.set(
+		"Set-Cookie",
+		`${params.user.get_uid()}=${params.sid[0]}; Secure; HttpOnly; SameSite=Strict; Path=/; Max-Age=${intake.session_lifetime_s}`,
+	)

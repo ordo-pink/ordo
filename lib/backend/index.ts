@@ -19,6 +19,4 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export * from "./src/backend.constants"
-export * from "./src/backend.impl"
 export * from "./src/backend.types"

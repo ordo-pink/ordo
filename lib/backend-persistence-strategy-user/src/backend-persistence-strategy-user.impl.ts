@@ -19,9 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { CurrentUser, RRR } from "@ordo-pink/core"
 import { Oath, ops0 } from "@ordo-pink/oath"
-import { BackendUser } from "@ordo-pink/backend"
-import { RRR } from "@ordo-pink/core"
 
 import { type PersistenceStrategyUser } from "./backend-persistence-strategy-user.types"
 
@@ -46,7 +45,7 @@ export const persistence_strategy_user: PersistenceStrategyUser = persistence_st
 			.pipe(ops0.chain(e => Oath.If(e, { F: () => RRR.codes.enoent("User not found", id) })))
 			.pipe(ops0.chain(() => persistence_strategy_data.read(id, USER_FILE_FSID)))
 			.pipe(ops0.chain(s => Oath.Try(() => Bun.readableStreamToJSON(s), e_to_rrr("Could not get user"))))
-			.pipe(ops0.map(dto => BackendUser.from_dto(dto))),
+			.pipe(ops0.map(dto => CurrentUser.FromDTO(dto))),
 
 	delete: () => Oath.Reject(RRR.codes.eio("Not implemented")),
 

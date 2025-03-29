@@ -20,7 +20,7 @@
  */
 
 import { CurrentUser } from "@ordo-pink/core"
-import { default_handler } from "@ordo-pink/backend-util-default-handler"
+import { default_handler } from "@ordo-pink/routary-ordo"
 
 import { type TIDContext } from "../../backend-id.types"
 import { get_user_from_cookie } from "../../common/get-user-from-cookie"

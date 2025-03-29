@@ -22,18 +22,18 @@ export module Routary {
 
 	export type Bearing = "GET" | "PUT" | "HEAD" | "POST" | "PATCH" | "DELETE" | "OPTIONS"
 
-	export type Instance<$TChamber> = {
+	export type Instance<$Chamber> = {
 		use: <$TNewChamber extends Record<string, unknown>>(
-			callback: (chamber: $TChamber, shaft: Shaft<$TChamber>) => Instance<$TChamber & $TNewChamber>,
-		) => Instance<$TChamber & $TNewChamber>
-		get: (gasket: Gasket, gear: Gear<$TChamber>) => Instance<$TChamber>
-		post: (gasket: Gasket, gear: Gear<$TChamber>) => Instance<$TChamber>
-		put: (gasket: Gasket, gear: Gear<$TChamber>) => Instance<$TChamber>
-		patch: (gasket: Gasket, gear: Gear<$TChamber>) => Instance<$TChamber>
-		delete: (gasket: Gasket, gear: Gear<$TChamber>) => Instance<$TChamber>
-		head: (gasket: Gasket, gear: Gear<$TChamber>) => Instance<$TChamber>
-		options: (gasket: Gasket, gear: Gear<$TChamber>) => Instance<$TChamber>
-		each: (gasket: Gasket, bearings: Bearing[], gear: Gear<$TChamber>) => Instance<$TChamber>
-		start: (crown_gear: Gear<$TChamber>) => (req: Request, server: Server) => Response | Promise<Response>
+			callback: (chamber: $Chamber, shaft: Shaft<$Chamber>) => Instance<$Chamber & $TNewChamber>,
+		) => Instance<$Chamber & $TNewChamber>
+		get: (gasket: Gasket, gear: Gear<$Chamber>) => Instance<$Chamber>
+		post: (gasket: Gasket, gear: Gear<$Chamber>) => Instance<$Chamber>
+		put: (gasket: Gasket, gear: Gear<$Chamber>) => Instance<$Chamber>
+		patch: (gasket: Gasket, gear: Gear<$Chamber>) => Instance<$Chamber>
+		delete: (gasket: Gasket, gear: Gear<$Chamber>) => Instance<$Chamber>
+		head: (gasket: Gasket, gear: Gear<$Chamber>) => Instance<$Chamber>
+		options: (gasket: Gasket, gear: Gear<$Chamber>) => Instance<$Chamber>
+		each: (gasket: Gasket, bearings: Bearing[], gear: Gear<$Chamber>) => Instance<$Chamber>
+		start: (crown_gear: Gear<$Chamber>) => (req: Request, server: Server) => Response | Promise<Response>
 	}
 }

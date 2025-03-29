@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { BackendUserKeys } from "@ordo-pink/backend"
+import { CurrentUserKeys } from "@ordo-pink/core"
 import type { Logger } from "@ordo-pink/logger"
 import type { Oath } from "@ordo-pink/oath"
 import { Routary } from "@ordo-pink/routary"
@@ -32,7 +32,7 @@ export namespace BackendAuth {
 	/**
 	 * User email type alias.
 	 */
-	export type Email = OrdoBackend.User.DTO[BackendUserKeys.EMAIL]
+	export type Email = Ordo.User.Current.DTO[CurrentUserKeys.EMAIL]
 
 	/**
 	 * User authentication code type alias.
@@ -52,20 +52,23 @@ export namespace BackendAuth {
 
 	export type Storage = Map<BackendAuth.Email, { hash: BackendAuth.CodeHash; timestamp: number }>
 
-	export type Chamber = {
+	export type Params = {
 		allow_origin: string[]
 		auth_storage: BackendAuth.Storage
+		code_lifetime_ms: number
 		code_strategy: BackendAuth.CodeStrategy
 		create_request_id: () => string
 		data_persistence_strategy: OrdoBackend.Data.PersistenceStrategy
 		defaults: { file_limit: number; max_upload_size: number; max_functions: number }
 		email_strategy: OrdoBackend.Notification.EmailStrategy
-		user_persistence_strategy: OrdoBackend.User.PersistenceStrategy
-		user_mapping_strategy: OrdoBackend.User.MappingStrategy
 		logger: Logger
 		port: number
-		code_lifetime_ms: number
+		session_lifetime_s: number
+		user_mapping_strategy: OrdoBackend.User.MappingStrategy
+		user_persistence_strategy: OrdoBackend.User.PersistenceStrategy
 	}
 
-	export type Intake = Routary.Intake<RoutaryOrdo.Chamber & Chamber>
+	export type Chamber = RoutaryOrdo.Chamber & Params
+
+	export type Intake = Routary.Intake<BackendAuth.Chamber>
 }

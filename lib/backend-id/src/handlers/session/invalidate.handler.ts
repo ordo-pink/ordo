@@ -19,10 +19,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { CurrentUser, CurrentUserKeys } from "@ordo-pink/core"
 import { Oath, ops0 } from "@ordo-pink/oath"
-import { BackendUserKeys } from "@ordo-pink/backend"
-import { CurrentUser } from "@ordo-pink/core"
-import { default_handler } from "@ordo-pink/backend-util-default-handler"
+import { default_handler } from "@ordo-pink/routary-ordo"
 
 import { type TIDContext } from "../../backend-id.types"
 import { get_user_from_cookie } from "../../common/get-user-from-cookie"
@@ -32,10 +31,10 @@ export const handle_invalidate_session = default_handler<TIDContext>(intake =>
 		.and(({ sid, uid, user }) =>
 			Oath.Resolve(user.to_dto())
 				.and(dto => {
-					const sessions = dto[BackendUserKeys.SESSIONS].filter(session => session[0] !== sid)
-					dto[BackendUserKeys.SESSIONS] = sessions
+					const sessions = dto[CurrentUserKeys.SESSIONS].filter(session => session[0] !== sid)
+					dto[CurrentUserKeys.SESSIONS] = sessions
 
-					return intake.user_persistence_strategy.update(uid, dto)
+					return intake.user_persistence_strategy.update(uid, CurrentUser.FromDTO(dto))
 				})
 				.and(() => ({ sid, uid, user })),
 		)

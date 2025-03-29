@@ -21,8 +21,8 @@
 
 import { afterEach, describe, expect, test } from "bun:test"
 
+import { BackendUser, BackendUserKeys } from "@ordo-pink/backend"
 import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
-import { BackendUser } from "@ordo-pink/backend"
 import { RRR } from "@ordo-pink/core"
 
 import { USER_FILE_FSID, persistence_strategy_user } from "./backend-persistence-strategy-user.impl"
@@ -51,7 +51,7 @@ const persistence_strategy_data: OrdoBackend.Data.PersistenceStrategy = {
 
 const user_storage = persistence_strategy_user(persistence_strategy_data)
 
-const broken_user_storage = persistence_strategy_user({} as any)
+const test_user = BackendUser.create("test@test.com", 1, 1, 1)
 
 describe("persistence_strategy_user", () => {
 	afterEach(() => {
@@ -63,43 +63,71 @@ describe("persistence_strategy_user", () => {
 	})
 
 	test("should throw error if persistence_strategy_data is not PersistenceStrategyData", () => {
+		const broken_user_storage = persistence_strategy_user({} as any)
 		expect(() => broken_user_storage.exists(crypto.randomUUID()).invoke(invokers0.to_promise)).toThrow()
 	})
 
 	describe("create", () => {
 		test("should properly create a user", async () => {
-			const user = BackendUser.create("test@test.com", 1, 1, 1)
-			await user_storage.create(user).invoke(invokers0.to_promise)
-			expect(data[`${user.get_uid()}/${USER_FILE_FSID}`]).toBeInstanceOf(ReadableStream)
+			await user_storage.create(test_user).invoke(invokers0.to_promise)
+			expect(data[`${test_user.get_uid()}/${USER_FILE_FSID}`]).toBeInstanceOf(ReadableStream)
 		})
 
-		test.todo("should not create user if it already exists")
+		test("should not create user if it already exists", async () => {
+			await user_storage.create(test_user).invoke(invokers0.to_promise)
+			expect(() => user_storage.create(test_user).invoke(invokers0.to_promise)).toThrow("User already exists")
+		})
 
-		test.todo("should reject with EIO if persistence_strategy_data fails")
+		test("should reject with EIO if persistence_strategy_data fails", () => {
+			const broken_user_storage = persistence_strategy_user({ exists: () => Oath.Reject(RRR.codes.eio("asdf")) } as any)
+			expect(() => broken_user_storage.create(test_user).invoke(invokers0.to_promise)).toThrow("asdf")
+		})
 	})
 
 	describe("read", () => {
-		test.todo("should properly read a user")
+		test("should properly read a user", async () => {
+			await user_storage.create(test_user).invoke(invokers0.to_promise)
+			const user = await user_storage.read(test_user.get_uid()).invoke(invokers0.to_promise)
 
-		test.todo("should not read user if it does not exist")
+			expect(user.to_dto()).toEqual(test_user.to_dto())
+		})
 
-		test.todo("should reject with EIO if persistence_strategy_data fails")
+		test("should not read user if it does not exist", () => {
+			expect(() => user_storage.read(test_user.get_uid()).invoke(invokers0.to_promise)).toThrow("User not found")
+		})
+
+		test("should reject with EIO if persistence_strategy_data fails", () => {
+			const broken_user_storage = persistence_strategy_user({ exists: () => Oath.Reject(RRR.codes.eio("asdf")) } as any)
+			expect(() => broken_user_storage.read(test_user.get_uid()).invoke(invokers0.to_promise)).toThrow("asdf")
+		})
 	})
 
 	describe("update", () => {
-		test.todo("should properly update a user")
+		test("should properly update a user", async () => {
+			await user_storage.create(test_user).invoke(invokers0.to_promise)
+			const dto = test_user.to_dto()
+			const new_email = "test1@email.com"
+			dto[BackendUserKeys.EMAIL] = new_email
+			await user_storage.update(test_user.get_uid(), BackendUser.from_dto(dto)).invoke(invokers0.to_promise)
+			const updated_user = await user_storage.read(test_user.get_uid()).invoke(invokers0.to_promise)
+			expect(updated_user.get_email()).toEqual(new_email)
+		})
 
-		test.todo("should not update user if it does not exist")
+		test("should not update user if it does not exist", () => {
+			expect(() => user_storage.update(crypto.randomUUID(), test_user).invoke(invokers0.to_promise)).toThrow("User not found")
+		})
 
-		test.todo("should reject with EIO if persistence_strategy_data fails")
+		test("should reject with EIO if persistence_strategy_data fails", () => {
+			const broken_user_storage = persistence_strategy_user({ exists: () => Oath.Reject(RRR.codes.eio("asdf")) } as any)
+			expect(() => broken_user_storage.update(test_user.get_uid(), test_user).invoke(invokers0.to_promise)).toThrow("asdf")
+		})
 	})
 
 	describe("delete", () => {
-		test.todo("should properly delete a user")
-
-		test.todo("should not delete user if it does not exist")
-
-		test.todo("should reject with EIO if persistence_strategy_data fails")
+		test("should not be implemented", () => {
+			const broken_user_storage = persistence_strategy_user({ exists: () => Oath.Reject(RRR.codes.eio("asdf")) } as any)
+			expect(() => broken_user_storage.delete(crypto.randomUUID()).invoke(invokers0.to_promise)).toThrow("Not implemented")
+		})
 	})
 
 	describe("exists", () => {

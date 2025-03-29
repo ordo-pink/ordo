@@ -58,7 +58,7 @@ declare global {
 		}
 
 		namespace User {
-			export type DTO = [...Ordo.User.Current.DTO, string?, string?]
+			export type DTO = Ordo.User.Current.DTO
 
 			type MappingStrategy = {
 				exists_by_handle: (handle: Ordo.User.Handle) => Oath<boolean, Ordo.Rrr<"EIO">>

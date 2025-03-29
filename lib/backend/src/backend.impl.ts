@@ -52,8 +52,6 @@ export const BackendUser: OrdoBackend.User.Static = {
 			dto[BackendUserKeys.MAX_FUNCTIONS],
 			dto[BackendUserKeys.MAX_UPLOAD_SIZE],
 			dto[BackendUserKeys.SESSIONS],
-			dto[BackendUserKeys.EMAIL_CODE],
-			dto[BackendUserKeys.PASSWORD],
 		],
 	}),
 
@@ -67,16 +65,14 @@ export const BackendUser: OrdoBackend.User.Static = {
 		user[BackendUserKeys.HANDLE] = handle
 		user[BackendUserKeys.CREATED_AT] = Date.now()
 		user[BackendUserKeys.SUBSCRIPTION] = subscription
-		user[BackendUserKeys.FIRST_NAME] = void 0
-		user[BackendUserKeys.LAST_NAME] = void 0
+		user[BackendUserKeys.FIRST_NAME] = 0
+		user[BackendUserKeys.LAST_NAME] = 0
 		user[BackendUserKeys.EMAIL] = email
 		user[BackendUserKeys.FILE_LIMIT] = file_limit
 		user[BackendUserKeys.INSTALLED_FUNCTIONS] = []
 		user[BackendUserKeys.MAX_FUNCTIONS] = max_functions
 		user[BackendUserKeys.MAX_UPLOAD_SIZE] = max_upload_size
 		user[BackendUserKeys.SESSIONS] = []
-		user[BackendUserKeys.EMAIL_CODE] = void 0
-		user[BackendUserKeys.PASSWORD] = void 0
 
 		return BackendUser.from_dto(user as OrdoBackend.User.DTO)
 	},

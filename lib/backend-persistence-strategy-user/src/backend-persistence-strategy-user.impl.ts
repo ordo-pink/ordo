@@ -20,6 +20,7 @@
  */
 
 import { Oath, ops0 } from "@ordo-pink/oath"
+import { BackendUser } from "@ordo-pink/backend"
 import { RRR } from "@ordo-pink/core"
 
 import { type PersistenceStrategyUser } from "./backend-persistence-strategy-user.types"
@@ -41,13 +42,19 @@ export const persistence_strategy_user: PersistenceStrategyUser = persistence_st
 
 	read: id =>
 		persistence_strategy_data
-			.read(id, USER_FILE_FSID)
-			.pipe(ops0.chain(s => Oath.Try(() => Bun.readableStreamToJSON(s), e_to_rrr("Could not get user")))),
+			.exists(id, USER_FILE_FSID)
+			.pipe(ops0.chain(e => Oath.If(e, { F: () => RRR.codes.enoent("User not found", id) })))
+			.pipe(ops0.chain(() => persistence_strategy_data.read(id, USER_FILE_FSID)))
+			.pipe(ops0.chain(s => Oath.Try(() => Bun.readableStreamToJSON(s), e_to_rrr("Could not get user"))))
+			.pipe(ops0.map(dto => BackendUser.from_dto(dto))),
 
 	delete: () => Oath.Reject(RRR.codes.eio("Not implemented")),
 
 	update: (id, u) =>
-		Oath.Try(() => JSON.stringify(u.to_dto()), e_to_rrr("Could not save user"))
+		persistence_strategy_data
+			.exists(id, USER_FILE_FSID)
+			.pipe(ops0.chain(e => Oath.If(e, { F: () => RRR.codes.enoent("User not found", id) })))
+			.pipe(ops0.chain(() => Oath.Try(() => JSON.stringify(u.to_dto()), e_to_rrr("Could not save user"))))
 			.pipe(ops0.chain(s => Oath.Try(() => new Blob([s], { type }).stream(), e_to_rrr("Could not save user"))))
 			.pipe(ops0.chain(s => persistence_strategy_data.update(u.get_uid(), USER_FILE_FSID, s)))
 			.pipe(ops0.map(() => u)),

@@ -62,6 +62,7 @@ declare global {
 				exists_by_email: (email: Ordo.User.Email) => Oath<boolean, Ordo.Rrr<"EIO">>
 				get_by_email: (email: Ordo.User.Email) => Oath<Ordo.User.UID, Ordo.Rrr<"EIO" | "ENOENT">>
 				get_by_handle: (handle: Ordo.User.Handle) => Oath<Ordo.User.UID, Ordo.Rrr<"EIO" | "ENOENT">>
+				refresh: (id: Ordo.User.UID) => Oath<void, Ordo.Rrr<"EIO" | "ENOENT">>
 			}
 
 			type PersistenceStrategy = {

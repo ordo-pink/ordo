@@ -72,6 +72,7 @@ export const eq = (target: number) => (val: number) => target === val
 export const gte = (min: number) => (val: number) => eq(min)(val) || gt(min)(val)
 export const lte = (max: number) => (val: number) => eq(max)(val) || lt(max)(val)
 export const noop = (): void => {}
+export const undef = (): undefined => {}
 
 export const is_port = (x: string) => {
 	const n = Number.parseInt(x, 10)

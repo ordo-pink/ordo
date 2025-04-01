@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ */
+
 export * from "./impl/create-response.fn"
 export * from "./impl/extract-request-body.fn"
 export * from "./impl/extract-request-ip.fn"

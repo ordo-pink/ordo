@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { console_logger, Logger } from "@ordo-pink/logger"
+import { Logger, console_logger } from "@ordo-pink/logger"
 import { type TMaokaJab } from "@ordo-pink/maoka"
 import { type TZags } from "@ordo-pink/zags"
 

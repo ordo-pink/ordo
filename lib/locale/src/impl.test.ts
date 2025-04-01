@@ -21,7 +21,7 @@
 
 import { expect, test } from "bun:test"
 
-import { TWO_LETTER_LOCALE, LOCALE_READABLE_NAME, twoLetterLocaleToReadableName } from "./impl"
+import { LOCALE_READABLE_NAME, TWO_LETTER_LOCALE, twoLetterLocaleToReadableName } from "./impl"
 
 test("locale", () => {
 	const locale = Object.values(TWO_LETTER_LOCALE).filter(value => Number.isNaN(Number(value)))[0]

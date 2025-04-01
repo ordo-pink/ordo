@@ -20,11 +20,11 @@
  */
 
 import { RRR } from "@ordo-pink/core"
-import { type Intake } from "@ordo-pink/routary"
+import { Routary } from "@ordo-pink/routary"
 
 import { type TIDContext } from "../backend-id.types"
 
-export const invalid_id_rrr = (id: unknown, intake: Intake<TIDContext>) => ({
+export const invalid_id_rrr = (id: unknown, intake: Routary.Intake<TIDContext>) => ({
 	rrr: RRR.codes.einval("invalid user id", id),
 	intake,
 })

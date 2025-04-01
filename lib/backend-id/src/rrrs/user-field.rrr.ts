@@ -20,21 +20,21 @@
  */
 
 import { RRR } from "@ordo-pink/core"
-import { type Intake } from "@ordo-pink/routary"
+import { Routary } from "@ordo-pink/routary"
 
 import { type TIDContext } from "../backend-id.types"
 
-export const invalid_installed_functions_rrr = (installed_functions: unknown, intake: Intake<TIDContext>) => ({
+export const invalid_installed_functions_rrr = (installed_functions: unknown, intake: Routary.Intake<TIDContext>) => ({
 	rrr: RRR.codes.einval("invalid installed functions", installed_functions),
 	intake,
 })
 
-export const invalid_first_name_rrr = (first_name: unknown, intake: Intake<TIDContext>) => ({
+export const invalid_first_name_rrr = (first_name: unknown, intake: Routary.Intake<TIDContext>) => ({
 	rrr: RRR.codes.einval("invalid first name", first_name),
 	intake,
 })
 
-export const invalid_last_name_rrr = (last_name: unknown, intake: Intake<TIDContext>) => ({
+export const invalid_last_name_rrr = (last_name: unknown, intake: Routary.Intake<TIDContext>) => ({
 	rrr: RRR.codes.einval("invalid last name", last_name),
 	intake,
 })

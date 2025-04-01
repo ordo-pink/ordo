@@ -19,8 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { O } from "@ordo-pink/option"
 import { type Logger } from "@ordo-pink/logger"
+import { O } from "@ordo-pink/option"
 import { call_once } from "@ordo-pink/tau"
 
 import { ordo_app_state } from "../app.state"

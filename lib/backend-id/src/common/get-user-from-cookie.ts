@@ -33,7 +33,7 @@ export const get_user_from_cookie = (intake: Routary.Intake<TIDContext>) =>
 				uid: Oath.If(CurrentUser.Validations.is_uid(uid), { T: () => uid as Ordo.User.UID }),
 				sid: Oath.If(CurrentUser.Validations.is_uid(sid), { T: () => sid as Ordo.User.SessionID }),
 			}).and(({ uid, sid }) =>
-				intake.user_persistence_strategy
+				intake.persistence_strategy_user
 					.read(uid)
 					.and(user =>
 						Oath.If(
@@ -57,7 +57,7 @@ export const get_user_from_cookie = (intake: Routary.Intake<TIDContext>) =>
 							.and(dto => ({ uid, sid, user: CurrentUser.FromDTO(dto) })),
 					)
 					.and(({ user, uid, sid }) =>
-						intake.user_persistence_strategy.update(user.get_uid(), user).and(user => ({ user, uid, sid })),
+						intake.persistence_strategy_user.update(user.get_uid(), user).and(user => ({ user, uid, sid })),
 					),
 			),
 		)

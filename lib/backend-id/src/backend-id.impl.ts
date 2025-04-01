@@ -26,7 +26,7 @@ import { routary_cors } from "@ordo-pink/routary-cors"
 
 import { type TIDChamber, type TIDContext } from "./backend-id.types"
 import { handle_delete_user } from "./handlers/user/delete-user.handler"
-import { handle_get_session } from "./handlers/session/get-session.hanlder"
+import { handle_get_session } from "./handlers/session/get-session.handler"
 import { handle_get_user_by_handle } from "./handlers/user/get-user-by-handle.handler"
 import { handle_get_user_by_id } from "./handlers/user/get-user-by-id.handler"
 import { handle_invalidate_session } from "./handlers/session/invalidate.handler"

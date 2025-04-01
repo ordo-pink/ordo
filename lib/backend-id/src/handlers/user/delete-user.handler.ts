@@ -29,6 +29,6 @@ import { check_if_id_param_is_valid } from "../../common/validate-id-param"
 export const handle_delete_user = default_handler<TIDContext>(intake =>
 	Oath.Merge([check_if_edited_user_is_current_user(intake), check_if_id_param_is_valid(intake)])
 		.and(() => intake.params.user_id as Ordo.User.UID)
-		.and(id => intake.user_persistence_strategy.delete(id).pipe(ops0.rejected_map(rrr => ({ rrr, intake }))))
+		.and(id => intake.persistence_strategy_user.delete(id).pipe(ops0.rejected_map(rrr => ({ rrr, intake }))))
 		.and(() => intake),
 )

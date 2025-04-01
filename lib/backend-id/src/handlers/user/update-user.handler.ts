@@ -51,7 +51,7 @@ const check_email_is_not_taken_if_present = (body: Record<string, any>, i: I) =>
 	body.email
 		? Oath.If(is_email(body.email), { F: () => invalid_email_rrr(body.email, i) })
 				.and(() => body.email as Ordo.User.Email)
-				.pipe(ops0.chain(email => i.user_mapping_strategy.get_by_email(email).fix(() => null)))
+				.pipe(ops0.chain(email => i.reference_mapping_user.get_by_email(email).fix(() => null)))
 				.pipe(ops0.chain(id => Oath.If(!id || id === i.params.user_id, { F: () => exists_by_email_rrr(body.email, i) })))
 		: Oath.Resolve(void 0)
 
@@ -59,7 +59,7 @@ const check_handle_is_not_taken_if_present = (body: Record<string, any>, i: I) =
 	body.handle
 		? Oath.If(is_handle(body.handle), { F: () => invalid_handle_rrr(body.handle, i) })
 				.and(() => body.handle as Ordo.User.Handle)
-				.pipe(ops0.chain(handle => i.user_mapping_strategy.get_by_handle(handle).fix(() => null)))
+				.pipe(ops0.chain(handle => i.reference_mapping_user.get_by_handle(handle).fix(() => null)))
 				.pipe(ops0.chain(id => Oath.If(!id || id === i.params.user_id, { F: () => exists_by_handle(body.handle, i) })))
 		: Oath.Resolve(void 0)
 
@@ -90,13 +90,13 @@ const valdiate_body = (i: I) => (body: any) =>
 	]).pipe(ops0.map(() => body as Partial<Ordo.User.Current.DTO>))
 
 const get_current_user = (i: I) => (updated_user: Partial<Ordo.User.Current.DTO>) =>
-	i.user_persistence_strategy
+	i.persistence_strategy_user
 		.read(i.params.user_id as Ordo.User.UID)
 		.pipe(ops0.rejected_map(rrr => ({ rrr, intake: i })))
 		.pipe(ops0.map(user => ({ user, updated_user })))
 
 const update_user = (id: Ordo.User.UID, intake: I) => (user: Ordo.User.Current.DTO) =>
-	intake.user_persistence_strategy.update(id, CurrentUser.FromDTO(user)).pipe(ops0.rejected_map(rrr => ({ rrr, intake })))
+	intake.persistence_strategy_user.update(id, CurrentUser.FromDTO(user)).pipe(ops0.rejected_map(rrr => ({ rrr, intake })))
 
 const merge_users = (users: {
 	user: Ordo.User.Current.Instance

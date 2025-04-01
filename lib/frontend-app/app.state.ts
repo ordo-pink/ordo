@@ -19,16 +19,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { MaokaZAGS } from "@ordo-pink/maoka-zags"
 import { type Logger } from "@ordo-pink/logger"
+import { MaokaZAGS } from "@ordo-pink/maoka-zags"
 
 import { CommandPaletteLocation, EMPTY_COMMAND_PALETTE } from "./src/components/command-palette/constants"
 import { create_route } from "./src/frontend-app.router"
 
 // @ts-ignore
-const is_dev = import.meta.env.DEV
+const is_dev = !!import.meta.env.DEV && import.meta.env.DEV === "true"
 const app_name = "pink.ordo.app" // TODO Take from env
-const version = "v0.7.0" // TODO Take from env
+const version = "v0.8.0" // TODO Take from env
 const hosts = {} as Ordo.Hosts // TODO Take from env
 const app_fid = Symbol.for(app_name)
 const app_fn = { fid: app_fid, name: app_name, permissions: { commands: [], queries: [] } }

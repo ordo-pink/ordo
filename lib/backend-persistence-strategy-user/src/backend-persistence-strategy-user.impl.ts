@@ -30,10 +30,10 @@ type Mapping = {
 	handle: Partial<Record<Ordo.User.Handle, Ordo.User.UID>>
 }
 
-export const mapping_strategy_user = (
+export const create_reference_mapping_user = (
 	persistence_strategy_data: OrdoBackend.Data.PersistenceStrategy,
 	persistence_strategy_user: OrdoBackend.User.PersistenceStrategy,
-): OrdoBackend.User.MappingStrategy => {
+): OrdoBackend.User.ReferenceMapping => {
 	let storage_p = get_storage_p(persistence_strategy_data)
 
 	const ms0 = Oath.FromPromise<Mapping, never>(() => storage_p)
@@ -80,12 +80,8 @@ export const mapping_strategy_user = (
 				.pipe(ops0.chain(m => Oath.Try(() => JSON.stringify(m), to_rrr("Could not save mapping"))))
 				.pipe(ops0.chain(s => Oath.Try(() => new Blob([s], { type }).stream(), to_rrr("Could not save mapping"))))
 				.pipe(ops0.chain(s => persistence_strategy_data.update(SYSTEM_DATA_FSID, USER_MAPPING_FSID, s)))
-				.pipe(
-					ops0.map(() => {
-						ms0.cancel()
-						storage_p = get_storage_p(persistence_strategy_data)
-					}),
-				),
+				.pipe(ops0.rejected_map(e => (e.code === RRR.enum.EIO ? e : RRR.codes.eio(e.message, ...e.debug)) as Ordo.Rrr<"EIO">))
+				.pipe(ops0.map(() => void (storage_p = get_storage_p(persistence_strategy_data)))),
 	}
 }
 
@@ -97,7 +93,7 @@ const get_storage_p = (persistence_strategy_data: OrdoBackend.Data.PersistenceSt
 		)
 		.invoke(invokers0.or_else(() => ({ email: {}, handle: {} }) as Mapping))
 
-export const persistence_strategy_user: PersistenceStrategyUser = persistence_strategy_data => ({
+export const create_persistence_strategy_user: PersistenceStrategyUser = persistence_strategy_data => ({
 	create: u =>
 		persistence_strategy_data
 			.exists(u.get_uid(), USER_FILE_FSID)

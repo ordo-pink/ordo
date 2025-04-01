@@ -34,7 +34,7 @@ export const handle_invalidate_session = default_handler<TIDContext>(intake =>
 					const sessions = dto[CurrentUserKeys.SESSIONS].filter(session => session[0] !== sid)
 					dto[CurrentUserKeys.SESSIONS] = sessions
 
-					return intake.user_persistence_strategy.update(uid, CurrentUser.FromDTO(dto))
+					return intake.persistence_strategy_user.update(uid, CurrentUser.FromDTO(dto))
 				})
 				.and(() => ({ sid, uid, user })),
 		)

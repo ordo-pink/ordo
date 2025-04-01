@@ -20,11 +20,11 @@
  */
 
 import type { TMaokaChildren, TMaokaComponent } from "@ordo-pink/maoka"
-import type { Oath } from "@ordo-pink/oath"
 import type { Logger } from "@ordo-pink/logger"
+import type { Oath } from "@ordo-pink/oath"
 import type { TResult } from "@ordo-pink/result"
-import type { TZags } from "@ordo-pink/zags"
 import type { TWO_LETTER_LOCALE } from "@ordo-pink/locale"
+import type { TZags } from "@ordo-pink/zags"
 
 import type * as C from "./constants"
 
@@ -350,7 +350,7 @@ declare global {
 
 		type Fetch = typeof window.fetch
 
-		type Hosts = { id: string; dt: string; pb: string; web: string }
+		type Hosts = { au: string; id: string; dt: string; pb: string; web: string }
 
 		type DTOLike<$TDTO extends any[]> = [...$TDTO, ...any]
 

@@ -23,7 +23,12 @@ import { die, run_command } from "@ordo-pink/binutil"
 import { getc } from "@ordo-pink/getc"
 import { invokers0 } from "@ordo-pink/oath"
 
-const { ORDO_ID_HOST, ORDO_DT_HOST, ORDO_PB_HOST } = getc(["ORDO_ID_HOST", "ORDO_DT_HOST", "ORDO_PB_HOST"])
+const { ORDO_ID_HOST, ORDO_DT_HOST, ORDO_PB_HOST, ORDO_AU_HOST } = getc([
+	"ORDO_AU_HOST",
+	"ORDO_ID_HOST",
+	"ORDO_DT_HOST",
+	"ORDO_PB_HOST",
+])
 
 void run_command("npm run dev", {
 	cwd: "./srv/web",
@@ -34,6 +39,7 @@ void run_command("npm run dev", {
 		VITE_ORDO_ID_HOST: ORDO_ID_HOST,
 		VITE_ORDO_PB_HOST: ORDO_PB_HOST,
 		VITE_ORDO_DT_HOST: ORDO_DT_HOST,
+		VITE_ORDO_AU_HOST: ORDO_AU_HOST,
 		FORCE_COLOR: "1",
 	},
 }).invoke(invokers0.or_else(die()))

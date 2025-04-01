@@ -7,7 +7,7 @@ meta {
 patch {
   url: {{ID_HOST}}/users/:user_id
   body: json
-  auth: bearer
+  auth: none
 }
 
 params:path {
@@ -16,10 +16,6 @@ params:path {
 
 headers {
   Origin: {{ORIGIN}}
-}
-
-auth:bearer {
-  token: {{CURRENT_TOKEN}}
 }
 
 body:json {

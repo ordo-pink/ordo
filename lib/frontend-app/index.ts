@@ -51,14 +51,16 @@ export type TAppOptions = {
 	dt_host: string
 	id_host: string
 	pb_host: string
+	au_host: string
 }
 
 // TODO Move translations from file explorer
-export const App = ({ id_host, dt_host, pb_host }: TAppOptions) =>
+export const App = ({ au_host, dt_host, id_host, pb_host }: TAppOptions) =>
 	Maoka.create("div", ({ use }) => {
 		ordo_app_state.zags.update("hosts.id", () => id_host)
 		ordo_app_state.zags.update("hosts.dt", () => dt_host)
 		ordo_app_state.zags.update("hosts.pb", () => pb_host)
+		ordo_app_state.zags.update("hosts.au", () => au_host)
 
 		const { app_fid } = ordo_app_state.zags.select("constants")
 

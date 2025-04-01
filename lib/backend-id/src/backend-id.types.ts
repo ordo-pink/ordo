@@ -28,8 +28,8 @@ export type TIDChamber = {
 	logger: Logger
 	notification_strategy: OrdoBackend.Notification.EmailStrategy
 	session_lifetime: number
-	user_persistence_strategy: OrdoBackend.User.PersistenceStrategy
-	user_mapping_strategy: OrdoBackend.User.MappingStrategy
+	persistence_strategy_user: OrdoBackend.User.PersistenceStrategy
+	reference_mapping_user: OrdoBackend.User.ReferenceMapping
 	web_host: string
 }
 

@@ -28,7 +28,12 @@ export const handle_verify_code = default_handler<BackendAuth.Chamber>(intake =>
 		.pipe(ops0.tap(set_cookie(intake)))
 		.pipe(ops0.map(({ user }) => void (intake.payload = CurrentUser.Serialize(user.to_dto()))))
 		.pipe(ops0.map(() => intake))
-		.pipe(ops0.rejected_map(rrr => ({ intake, rrr })))
+		.pipe(
+			ops0.rejected_map(rrr => {
+				intake.headers.delete("Set-Cookie")
+				return { intake, rrr }
+			}),
+		)
 })
 
 // --- Internal ---
@@ -100,16 +105,16 @@ const debug =
 const create_user = (email: Ordo.User.Email) => (intake: BackendAuth.Intake) =>
 	Oath.Resolve(intake.defaults)
 		.pipe(ops0.map(d => CurrentUser.Create(email, d.file_limit, d.max_upload_size, d.max_functions)))
-		.pipe(ops0.chain(intake.user_persistence_strategy.create))
+		.pipe(ops0.chain(intake.persistence_strategy_user.create))
 
 const get_or_create_user = (intake: BackendAuth.Intake) => (email: Ordo.User.Email) =>
-	intake.user_mapping_strategy
+	intake.reference_mapping_user
 		.exists_by_email(email)
 		.pipe(
 			ops0.chain(exists =>
 				Oath.If(exists)
-					.pipe(ops0.chain(() => intake.user_mapping_strategy.get_by_email(email)))
-					.pipe(ops0.chain(id => intake.user_persistence_strategy.read(id))),
+					.pipe(ops0.chain(() => intake.reference_mapping_user.get_by_email(email)))
+					.pipe(ops0.chain(id => intake.persistence_strategy_user.read(id))),
 			),
 		)
 		.pipe(ops0.rejected_map(() => intake))
@@ -124,7 +129,8 @@ type P2 = { sid: Ordo.User.Session; user: Ordo.User.Current.Instance }
 const persist_session_id = (intake: BackendAuth.Intake) => (params: P2) =>
 	Oath.Resolve(params.user.to_dto())
 		.pipe(ops0.tap(dto => void (dto[CurrentUserKeys.SESSIONS] = [...dto[CurrentUserKeys.SESSIONS], params.sid])))
-		.and(dto => intake.user_persistence_strategy.update(params.user.get_uid(), CurrentUser.FromDTO(dto)))
+		.and(dto => intake.persistence_strategy_user.update(params.user.get_uid(), CurrentUser.FromDTO(dto)))
+		.pipe(ops0.chain(user => intake.reference_mapping_user.refresh(user.get_uid())))
 		.and(() => params)
 
 const set_cookie = (intake: BackendAuth.Intake) => (params: P2) =>

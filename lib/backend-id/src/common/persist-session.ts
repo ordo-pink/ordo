@@ -31,6 +31,6 @@ export const persist_session_id =
 	(i: Routary.Intake<TIDContext>) => (params: { sid: Ordo.User.Session; user: Ordo.User.Current.Instance }) =>
 		Oath.Resolve(params.user.to_dto())
 			.pipe(ops0.tap(dto => void (dto[SESSIONS] = [...dto[SESSIONS], params.sid])))
-			.and(dto => i.user_persistence_strategy.update(params.user.get_uid(), CurrentUser.FromDTO(dto)))
+			.and(dto => i.persistence_strategy_user.update(params.user.get_uid(), CurrentUser.FromDTO(dto)))
 			.and(() => params)
 			.pipe(ops0.rejected_map(rrr => ({ rrr, intake: i })))

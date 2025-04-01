@@ -57,12 +57,54 @@ declare global {
 		}
 
 		namespace User {
-			type MappingStrategy = {
+			/**
+			 * Reference mapping serves in-memory mapping of user emails and handles to their identifiers. The
+			 * mapping values cannot be updated directly, but the `refresh` method can be used to update the info
+			 * stored for a specific identifier.
+			 */
+			type ReferenceMapping = {
+				/**
+				 * Lazily resolves with a boolean indicating whether a user exists with given handle.
+				 *
+				 * Rejects with EIO if the underlying persistence strategy cannot access mapping data.
+				 */
 				exists_by_handle: (handle: Ordo.User.Handle) => Oath<boolean, Ordo.Rrr<"EIO">>
-				exists_by_email: (email: Ordo.User.Email) => Oath<boolean, Ordo.Rrr<"EIO">>
-				get_by_email: (email: Ordo.User.Email) => Oath<Ordo.User.UID, Ordo.Rrr<"EIO" | "ENOENT">>
+
+				/**
+				 * Resolves the {@link Ordo.User.UID identifier} of the user by given {@link Ordo.User.Handle handle}.
+				 *
+				 * Rejects with EIO if the underlying persistence strategy cannot access mapping data.
+				 * Rejects with ENOENT if the user with given {@link Ordo.User.Handle handle} does not exist.
+				 */
 				get_by_handle: (handle: Ordo.User.Handle) => Oath<Ordo.User.UID, Ordo.Rrr<"EIO" | "ENOENT">>
-				refresh: (id: Ordo.User.UID) => Oath<void, Ordo.Rrr<"EIO" | "ENOENT">>
+
+				/**
+				 * Lazily resolves with a boolean indicating whether a user exists with given {@link Ordo.User.Email email}.
+				 *
+				 * Rejects with EIO if the underlying persistence strategy cannot access mapping data.
+				 */
+				exists_by_email: (email: Ordo.User.Email) => Oath<boolean, Ordo.Rrr<"EIO">>
+
+				/**
+				 * Resolves the {@link Ordo.User.UID identifier} of the user by given {@link Ordo.User.Email email}.
+				 *
+				 * Rejects with EIO if the underlying persistence strategy cannot access mapping data.
+				 * Rejects with ENOENT if the user with given email does not exist.
+				 */
+				get_by_email: (email: Ordo.User.Email) => Oath<Ordo.User.UID, Ordo.Rrr<"EIO" | "ENOENT">>
+
+				/**
+				 * Triggers refresh of user mappings for given {@link Ordo.User.UID identifier}.
+				 *
+				 * - Creates a mapping if it did not exist.
+				 * - Updates {@link Ordo.User.Handle handle} and {@link Ordo.User.Email email} if they changed.
+				 * - Removes the user if it no longer exists.
+				 *
+				 * Resolves with void on success.
+				 *
+				 * Rejects with EIO if the underlying persistence strategy cannot access or persist mapping data.
+				 */
+				refresh: (id: Ordo.User.UID) => Oath<void, Ordo.Rrr<"EIO">>
 			}
 
 			type PersistenceStrategy = {

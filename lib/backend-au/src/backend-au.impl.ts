@@ -48,6 +48,6 @@ export const create_backend_auth = (params: BackendAuth.Params) => {
 		.post("/request-code", handle_request_code)
 		.post("/verify-code", handle_verify_code)
 		.get("/healthcheck", () => new Response("OK")) // TODO Extract to lib
-		.use(routary_cors({ allow_origin: params.allow_origin, allow_headers: ["content-type"] }))
+		.use(routary_cors({ allow_origin: params.allow_origin, allow_headers: ["content-type"], allow_credentials: true }))
 		.start(() => rickroll)
 }

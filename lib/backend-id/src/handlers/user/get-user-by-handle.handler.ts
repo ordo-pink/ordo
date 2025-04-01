@@ -49,7 +49,7 @@ const validate_user_handle = (intake: I) => (handle?: string) =>
 	Oath.If(is_handle(handle), { F: () => invalid_handle_rrr(handle!, intake), T: () => handle as Ordo.User.Handle })
 
 const get_user_by_handle = (intake: I) => (handle: Ordo.User.Handle) =>
-	intake.user_mapping_strategy
+	intake.reference_mapping_user
 		.get_by_handle(handle)
-		.pipe(ops0.chain(id => intake.user_persistence_strategy.read(id)))
+		.pipe(ops0.chain(id => intake.persistence_strategy_user.read(id)))
 		.pipe(ops0.rejected_map(rrr => ({ rrr, intake })))

@@ -20,15 +20,15 @@
  */
 
 import { BsBoxArrowInRight, BsBoxArrowRight } from "@ordo-pink/frontend-icons"
-import { CheckboxInput, Dialog, Input } from "@ordo-pink/maoka-components"
 import { CommandPaletteItemType, CurrentUser, RRR } from "@ordo-pink/core"
+import { /* CheckboxInput, */ Dialog, Input } from "@ordo-pink/maoka-components"
 import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
 import { call_once, noop } from "@ordo-pink/tau"
-import { console_logger } from "@ordo-pink/logger"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { Result } from "@ordo-pink/result"
+import { console_logger } from "@ordo-pink/logger"
 
 import { UserQuery } from "./data/user/user-query.impl"
 import { ordo_app_state } from "../app.state"
@@ -114,12 +114,12 @@ const clean_up_auth = () => {
 
 const RequestCodeModal = Maoka.create("div", ({ use }) => {
 	let email = ""
-	let consent = false
+	// let consent = false
 	let is_valid = false
 
 	const commands = use(MaokaOrdo.Jabs.get_commands)
 	const fetch = use(MaokaOrdo.Jabs.get_fetch)
-	const id_host = ordo_app_state.zags.select("hosts.id")
+	const au_host = ordo_app_state.zags.select("hosts.au")
 
 	// TODO Show hint
 	// const t_hint = "We'll send you a magic link that will let you in." // TODO i18n
@@ -139,21 +139,21 @@ const RequestCodeModal = Maoka.create("div", ({ use }) => {
 		is_valid = validate(email)
 	}
 
-	const handle_checkbox_change = () => {
-		consent = !consent
-	}
+	// const handle_checkbox_change = () => {
+	// 	consent = !consent
+	// }
 
 	return () =>
 		// TODO render_icon
 		Dialog({
 			action: () =>
-				Oath.If(is_valid && consent)
+				Oath.If(is_valid /* && consent */)
 					.and(() => new Headers())
 					.pipe(ops0.tap(headers => headers.append("content-type", "application/json")))
 					.and(headers => ({ headers, method: "POST" }))
 					.and(init => ({ ...init, body: JSON.stringify({ email }) }))
 					// TODO Get input from env
-					.and(init => Oath.FromPromise(() => fetch(`${id_host}/codes/request`, init)))
+					.and(init => Oath.FromPromise(() => fetch(`${au_host}/request-code`, init)))
 					.and(res => res.json())
 					.and(res => Oath.If(res.success))
 					.and(() => commands.emit("cmd.auth.show_validate_code_modal", email as Ordo.User.Email))
@@ -170,21 +170,21 @@ const RequestCodeModal = Maoka.create("div", ({ use }) => {
 
 				const input_params = { autofocus, label, placeholder, initial_value, on_input, validate, validation_error_message }
 
-				const on_change = handle_checkbox_change
+				// const on_change = handle_checkbox_change
 				label = t_checkbox_label
 
-				const checkbox_params = { on_change, checked: consent, label }
+				// const checkbox_params = { on_change, checked: consent, label }
 
 				return [
 					CodeModalInputWrapper(() => () => Input.Email(input_params)),
-					RequestCodeModalCheckboxWrapper(() => () => CheckboxInput(checkbox_params)),
+					// RequestCodeModalCheckboxWrapper(() => () => CheckboxInput(checkbox_params)),
 				]
 			},
 			title: t_title,
 		})
 })
 
-const RequestCodeModalCheckboxWrapper = MaokaStyled.Tags.div("px-8")
+// const RequestCodeModalCheckboxWrapper = MaokaStyled.Tags.div("px-8")
 
 const CodeModalInputWrapper = MaokaStyled.Tags.div("py-4")
 
@@ -195,7 +195,7 @@ const ValidateCodeModal = (email: Ordo.User.Email) =>
 
 		const commands = use(MaokaOrdo.Jabs.get_commands)
 		const fetch = use(MaokaOrdo.Jabs.get_fetch)
-		const id_host = ordo_app_state.zags.select("hosts.id")
+		const au_host = ordo_app_state.zags.select("hosts.au")
 
 		const validate = (x: string) => /^\d{6}$/.test(x)
 
@@ -214,9 +214,9 @@ const ValidateCodeModal = (email: Ordo.User.Email) =>
 						.and(() => new Headers())
 						.pipe(ops0.tap(headers => headers.append("content-type", "application/json")))
 						.and(headers => ({ headers, method: "POST" }))
-						.and(init => ({ ...init, body: JSON.stringify({ email, code }), credentials: "include" as const }))
+						.and(init => ({ ...init, body: JSON.stringify({ email, code: Number(code) }), credentials: "include" as const }))
 						// TODO Get input from env
-						.and(init => Oath.FromPromise(() => fetch(`${id_host}/codes/validate`, init)))
+						.and(init => Oath.FromPromise(() => fetch(`${au_host}/verify-code`, init)))
 						.and(res => res.json())
 						.and(res => Oath.If(res.success, { T: () => res.payload }))
 						.and(user => ordo_app_state.zags.update("user", () => CurrentUser.FromDTO(user)))

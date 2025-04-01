@@ -23,9 +23,9 @@ import * as tau from "@ordo-pink/tau"
 import { BackendAuth, create_backend_auth } from "@ordo-pink/backend-au"
 import { type Logger, console_logger } from "@ordo-pink/logger"
 import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
-import { RRR } from "@ordo-pink/core"
+import { create_persistence_strategy_user, create_reference_mapping_user } from "@ordo-pink/backend-persistence-strategy-user"
 import { PersistenceStrategyDataFS } from "@ordo-pink/backend-persistence-strategy-data-fs"
-import { persistence_strategy_user } from "@ordo-pink/backend-persistence-strategy-user"
+import { RRR } from "@ordo-pink/core"
 
 const env_rrr = (env_var: string) => (value?: any) =>
 	value != null ? `Invalid value for ${env_var}: "${value}"` : `Missing value for ${env_var}`
@@ -73,14 +73,18 @@ const get_env = () =>
 const main = () =>
 	get_env()
 		.and(
-			({ allow_origin, code_lifetime_ms, data_root, port, max_functions, max_upload_size, file_limit, session_lifetime_s }) =>
-				Oath.Merge({
+			({ allow_origin, code_lifetime_ms, data_root, port, max_functions, max_upload_size, file_limit, session_lifetime_s }) => {
+				const persistence_strategy_data = PersistenceStrategyDataFS.Of(data_root)
+				const persistence_strategy_user = create_persistence_strategy_user(persistence_strategy_data)
+				const reference_mapping_user = create_reference_mapping_user(persistence_strategy_data, persistence_strategy_user)
+
+				return Oath.Merge({
 					allow_origin,
 					logger,
 					defaults: { file_limit, max_functions, max_upload_size },
 					email_strategy: { send: ({ content }) => logger.notice("NOTIFICATION:", "::", content) }, // TODO
 					// session_lifetime,
-					user_persistence_strategy: persistence_strategy_user(PersistenceStrategyDataFS.Of(data_root)),
+					persistence_strategy_user,
 					auth_storage: new Map(),
 					code_strategy: {
 						generate: () =>
@@ -104,10 +108,12 @@ const main = () =>
 					port: Number(port),
 					code_lifetime_ms,
 					session_lifetime_s,
+					reference_mapping_user,
 					// web_host,
 				} satisfies BackendAuth.Params)
 					.and(create_backend_auth)
-					.and(fetch => Bun.serve({ fetch, port })),
+					.and(fetch => Bun.serve({ fetch, port }))
+			},
 		)
 
 		.pipe(ops0.tap(server => logger.info(`server running on http://${server.hostname}:${server.port}`)))

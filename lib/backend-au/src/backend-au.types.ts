@@ -64,8 +64,8 @@ export namespace BackendAuth {
 		logger: Logger
 		port: number
 		session_lifetime_s: number
-		user_mapping_strategy: OrdoBackend.User.MappingStrategy
-		user_persistence_strategy: OrdoBackend.User.PersistenceStrategy
+		reference_mapping_user: OrdoBackend.User.ReferenceMapping
+		persistence_strategy_user: OrdoBackend.User.PersistenceStrategy
 	}
 
 	export type Chamber = RoutaryOrdo.Chamber & Params

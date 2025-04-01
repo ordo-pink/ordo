@@ -47,4 +47,4 @@ const validate_user_id = (intake: I) => (id: unknown) =>
 	Oath.If(PublicUser.Validations.is_uid(id), { T: () => id as Ordo.User.UID, F: () => invalid_id_rrr(id, intake) })
 
 const get_by_id = (intake: I) => (id: Ordo.User.UID) =>
-	intake.user_persistence_strategy.read(id).pipe(ops0.rejected_map(rrr => ({ rrr, intake })))
+	intake.persistence_strategy_user.read(id).pipe(ops0.rejected_map(rrr => ({ rrr, intake })))

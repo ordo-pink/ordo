@@ -25,10 +25,12 @@ import { default_handler } from "@ordo-pink/routary-ordo"
 import { type TIDContext } from "../../backend-id.types"
 import { get_user_from_cookie } from "../../common/get-user-from-cookie"
 
-export const handle_get_session = default_handler<TIDContext>(intake =>
-	get_user_from_cookie(intake)
+export const handle_get_session = default_handler<TIDContext>(intake => {
+	intake.request_id = crypto.randomUUID() // TODO Move id generation and error handling to routary-ordo
+
+	return get_user_from_cookie(intake)
 		.and(({ user }) => user.to_dto())
 		.and(CurrentUser.Serialize)
 		.and(dto => void (intake.payload = dto))
-		.and(() => intake),
-)
+		.and(() => intake)
+})

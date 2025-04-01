@@ -1,24 +1,24 @@
 import { CurrentUser, RRR } from "@ordo-pink/core"
 import { Oath, ops0 } from "@ordo-pink/oath"
+import { default_handler, huyami } from "@ordo-pink/routary-ordo"
 
 import * as fns from "../fns"
 import { type BackendAuth } from "../backend-au.types"
-import { default_handler } from "@ordo-pink/routary-ordo"
 
 export const handle_request_code = default_handler<BackendAuth.Chamber>(intake => {
 	intake.request_id = intake.create_request_id()
 	intake.request_language = fns.get_lang(intake.req)
-	const debug_step = debug(intake)
+	const debug = huyami(intake)
 
 	return get_request_body(intake.req)
 		.pipe(ops0.chain(validate_request_body))
-		.pipe(ops0.tap(debug_step("Provided email", email => fns.obfuscate_email(email))))
+		.pipe(ops0.tap(debug("Provided email", email => fns.obfuscate_email(email))))
 		.pipe(ops0.chain(create_code(intake.code_strategy)))
-		.pipe(ops0.tap(debug_step("Code generated")))
+		.pipe(ops0.tap(debug("Code generated")))
 		.pipe(ops0.tap(persist_pair(intake.auth_storage)))
-		.pipe(ops0.tap(debug_step("Auth record persisted")))
+		.pipe(ops0.tap(debug("Auth record persisted")))
 		.pipe(ops0.tap(send_email(intake)))
-		.pipe(ops0.tap(debug_step("Email sent")))
+		.pipe(ops0.tap(debug("Email sent")))
 		.pipe(ops0.map(() => intake))
 		.pipe(ops0.rejected_map(rrr => ({ intake, rrr })))
 })
@@ -62,19 +62,3 @@ const send_email =
 			content: fns.create_request_code_email_body(intake.request_language, code),
 			subject: fns.create_request_code_email_subject(intake.request_language),
 		})
-
-// TODO Move to lib
-
-const ignore_debug_value = Symbol.for("ignore_debug_value")
-const default_debug_value_callback = () => ignore_debug_value
-
-const debug =
-	(intake: BackendAuth.Intake) =>
-	<$X>(message: string, cb: (params: $X) => any = default_debug_value_callback) =>
-	(x: $X): void => {
-		const more_data = cb(x)
-
-		more_data === ignore_debug_value
-			? intake.logger.debug(intake.request_id, message)
-			: intake.logger.debug(intake.request_id, `${message}:`, more_data)
-	}

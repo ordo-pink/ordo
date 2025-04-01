@@ -1,7 +1,7 @@
 import * as tau from "@ordo-pink/tau"
 import { CurrentUser, CurrentUserKeys, RRR } from "@ordo-pink/core"
 import { Oath, ops0 } from "@ordo-pink/oath"
-import { default_handler } from "@ordo-pink/routary-ordo"
+import { default_handler, huyami } from "@ordo-pink/routary-ordo"
 
 import * as fns from "../fns"
 import { type BackendAuth } from "../backend-au.types"
@@ -9,22 +9,22 @@ import { type BackendAuth } from "../backend-au.types"
 export const handle_verify_code = default_handler<BackendAuth.Chamber>(intake => {
 	intake.request_id = intake.create_request_id()
 	intake.request_language = fns.get_lang(intake.req)
-	const debug_step = debug(intake)
+	const debug = huyami(intake)
 
 	return get_request_body(intake.req)
 		.pipe(ops0.chain(validate_request_body))
-		.pipe(ops0.tap(debug_step("Provided email", ({ email }) => fns.obfuscate_email(email))))
+		.pipe(ops0.tap(debug("Provided email", ({ email }) => fns.obfuscate_email(email))))
 		.pipe(ops0.chain(get_code_hash(intake)))
-		.pipe(ops0.tap(debug_step("Code verified successfully")))
+		.pipe(ops0.tap(debug("Code verified successfully")))
 		.pipe(ops0.tap(remove_auth_record(intake.auth_storage)))
-		.pipe(ops0.tap(debug_step("Auth record removed")))
+		.pipe(ops0.tap(debug("Auth record removed")))
 		.pipe(ops0.chain(get_or_create_user(intake)))
-		.pipe(ops0.tap(debug_step("User upserted", user => user.get_uid())))
+		.pipe(ops0.tap(debug("User upserted", user => user.get_uid())))
 		.pipe(ops0.tap(send_email(intake)))
-		.pipe(ops0.tap(debug_step("Email sent")))
+		.pipe(ops0.tap(debug("Email sent")))
 		.pipe(ops0.chain(create_session_id(intake)))
 		.pipe(ops0.chain(persist_session_id(intake)))
-		.pipe(ops0.tap(debug_step("User session persisted")))
+		.pipe(ops0.tap(debug("User session persisted")))
 		.pipe(ops0.tap(set_cookie(intake)))
 		.pipe(ops0.map(({ user }) => void (intake.payload = CurrentUser.Serialize(user.to_dto()))))
 		.pipe(ops0.map(() => intake))
@@ -85,22 +85,6 @@ const send_email =
 			content: fns.create_user_authenticated_email_body(intake.request_language, intake.request_ip!),
 			subject: fns.create_user_authenticated_email_subject(intake.request_language),
 		})
-
-// TODO Move to lib
-
-const ignore_debug_value = Symbol.for("ignore_debug_value")
-const default_debug_value_callback = () => ignore_debug_value
-
-const debug =
-	(intake: BackendAuth.Intake) =>
-	<$X>(message: string, cb: (params: $X) => any = default_debug_value_callback) =>
-	(x: $X): void => {
-		const more_data = cb(x)
-
-		more_data === ignore_debug_value
-			? intake.logger.debug(intake.request_id, message)
-			: intake.logger.debug(intake.request_id, `${message}:`, more_data)
-	}
 
 const create_user = (email: Ordo.User.Email) => (intake: BackendAuth.Intake) =>
 	Oath.Resolve(intake.defaults)

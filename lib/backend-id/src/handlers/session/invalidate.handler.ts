@@ -26,8 +26,10 @@ import { default_handler } from "@ordo-pink/routary-ordo"
 import { type TIDContext } from "../../backend-id.types"
 import { get_user_from_cookie } from "../../common/get-user-from-cookie"
 
-export const handle_invalidate_session = default_handler<TIDContext>(intake =>
-	get_user_from_cookie(intake)
+export const handle_invalidate_session = default_handler<TIDContext>(intake => {
+	intake.request_id = crypto.randomUUID() // TODO Move id generation and error handling to routary-ordo
+
+	return get_user_from_cookie(intake)
 		.and(({ sid, uid, user }) =>
 			Oath.Resolve(user.to_dto())
 				.and(dto => {
@@ -46,5 +48,5 @@ export const handle_invalidate_session = default_handler<TIDContext>(intake =>
 		.and(({ user }) => user.to_dto())
 		.and(CurrentUser.Serialize)
 		.and(dto => void (intake.payload = dto))
-		.and(() => intake),
-)
+		.and(() => intake)
+})

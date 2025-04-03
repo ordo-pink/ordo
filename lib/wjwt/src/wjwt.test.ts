@@ -7,11 +7,13 @@ import { expect, test } from "bun:test"
 
 import { WJWT } from "./wjwt"
 
+const iss = "issuer inc."
+
 const payload = {
 	aud: "asdf",
 	exp: Date.now() / 1000 + 600,
 	iat: Date.now(),
-	iss: "asdf",
+	iss,
 	jti: crypto.randomUUID(),
 	sub: crypto.randomUUID(),
 }
@@ -22,7 +24,14 @@ const get_ecdsa_wjwt = async () => {
 		["sign", "verify"],
 	)
 
-	return WJWT({ alg: { name: "ECDSA", hash: { name: "SHA-256" }, namedCurve: "P-256" }, private_key, public_key, aud: "asdf" })
+	return WJWT({
+		alg: { name: "ECDSA", hash: { name: "SHA-256" }, namedCurve: "P-256" },
+		private_key,
+		public_key,
+		aud: "asdf",
+		iss,
+		token_lifetime: 1000,
+	})
 }
 
 const get_rse_wjwt = async () => {
@@ -48,6 +57,8 @@ const get_rse_wjwt = async () => {
 		private_key,
 		public_key,
 		aud: "asdf",
+		iss,
+		token_lifetime: 1000,
 	})
 }
 
@@ -55,13 +66,13 @@ test("wjwt should sign given payload with ECDSA", async () => {
 	const wjwt = await get_ecdsa_wjwt()
 	const signed = await wjwt.sign(payload)
 
-	expect(signed).toBeTypeOf("string")
+	expect(signed?.token).toBeTypeOf("string")
 })
 
 test("wjwt should verify given token with ECDSA", async () => {
 	const wjwt = await get_ecdsa_wjwt()
 	const signed = await wjwt.sign(payload)
-	const verified = await wjwt.verify(signed)
+	const verified = await wjwt.verify(signed.token)
 
 	expect(verified).toBeTrue()
 })
@@ -70,13 +81,13 @@ test("wjwt should sign given payload with RSA", async () => {
 	const wjwt = await get_rse_wjwt()
 	const signed = await wjwt.sign(payload)
 
-	expect(signed).toBeTypeOf("string")
+	expect(signed?.token).toBeTypeOf("string")
 })
 
 test("wjwt should verify given token with RSA", async () => {
 	const wjwt = await get_rse_wjwt()
 	const signed = await wjwt.sign(payload)
-	const verified = await wjwt.verify(signed)
+	const verified = await wjwt.verify(signed.token)
 
 	expect(verified).toBeTrue()
 })
@@ -84,7 +95,7 @@ test("wjwt should verify given token with RSA", async () => {
 test("wjwt should decode given token", async () => {
 	const wjwt = await get_ecdsa_wjwt()
 	const signed = await wjwt.sign(payload)
-	const decoded = wjwt.decode(signed)
+	const decoded = wjwt.decode(signed.token)
 
 	expect(decoded && decoded.payload).toEqual(payload)
 })

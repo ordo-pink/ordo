@@ -16,7 +16,7 @@ test("ZAGS should marry given handlers", () => {
 	let y = 0
 
 	zags.marry(({ x }) => void (y = x))
-	zags.update({ x: 1 })
+	zags.update("x", () => 1)
 
 	expect(y).toEqual(1)
 })
@@ -39,7 +39,7 @@ test("ZAGS should apply partial updates", () => {
 	let result = state
 
 	zags.marry(state => void (result = state))
-	zags.update({ x: 1 })
+	zags.update("x", () => 1)
 
 	expect(result).toEqual({ x: 1, y: 0 })
 })
@@ -52,13 +52,13 @@ test("ZAGS should divorce given handlers", () => {
 
 	zags.marry(inc)
 
-	zags.update({ x: 1 })
-	zags.update({ x: 1 })
+	zags.update("x", () => 1)
+	zags.update("x", () => 1)
 
 	zags.divorce(inc)
 
-	zags.update({ x: 1 })
-	zags.update({ x: 1 })
+	zags.update("x", () => 1)
+	zags.update("x", () => 1)
 
-	expect(x).toEqual(3)
+	expect(x).toEqual(2)
 })

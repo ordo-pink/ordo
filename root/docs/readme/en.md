@@ -4,6 +4,7 @@
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/9f9131e0-14d5-42b2-8df4-36d3cad185f7/deploy-status)](https://app.netlify.com/sites/ordo-pink/deploys)
 [![Lint](https://github.com/ordo-pink/ordo/actions/workflows/lint.yml/badge.svg)](https://github.com/ordo-pink/ordo/actions/workflows/lint.yml)
+[![Lint](https://github.com/ordo-pink/ordo/actions/workflows/test.yml/badge.svg)](https://github.com/ordo-pink/ordo/actions/workflows/test.yml)
 [![license](https://img.shields.io/github/license/ordo-pink/ordo)](https://github.com/ordo-pink/ordo)
 [![https://good-labs.github.io/greater-good-affirmation/assets/images/badge.svg](https://good-labs.github.io/greater-good-affirmation/assets/images/badge.svg)](https://good-labs.github.io/greater-good-affirmation)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fordo-pink%2Fordo.svg?type=shield&issueType=license)](https://app.fossa.com/projects/git%2Bgithub.com%2Fordo-pink%2Fordo?ref=badge_shield&issueType=license)

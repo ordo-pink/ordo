@@ -19,10 +19,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { console_logger, type Logger } from "@ordo-pink/logger"
+import { type Logger, console_logger } from "@ordo-pink/logger"
 import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
 import { PersistenceStrategyDataFS } from "@ordo-pink/backend-persistence-strategy-data-fs"
-import { create_backend_pb } from "@ordo-pink/backend-pb"
+import { create_backend_server_pb } from "@ordo-pink/backend-server-pb"
 import { is_port } from "@ordo-pink/tau"
 
 const env_rrr = (env_var: string) => (value?: any) =>
@@ -47,7 +47,7 @@ const main = () =>
 	get_env()
 		.and(({ port, data_path, allow_origin, id_host }) =>
 			Oath.Merge({ logger, data_persistence_strategy: PersistenceStrategyDataFS.Of(data_path), allow_origin, id_host })
-				.and(create_backend_pb)
+				.and(create_backend_server_pb)
 				.and(fetch => Bun.serve({ fetch, port })),
 		)
 		.pipe(ops0.tap(server => logger.info(`server running on http://${server.hostname}:${server.port}`)))

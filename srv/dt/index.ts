@@ -19,9 +19,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { console_logger, type Logger } from "@ordo-pink/logger"
+import { type Logger, console_logger } from "@ordo-pink/logger"
 import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
-import { type TDTChamber, create_backend_dt } from "@ordo-pink/backend-dt"
+import { type TDTChamber, create_backend_server_dt } from "@ordo-pink/backend-server-dt"
 import { PersistenceStrategyDataFS } from "@ordo-pink/backend-persistence-strategy-data-fs"
 import { is_port } from "@ordo-pink/tau"
 
@@ -55,7 +55,7 @@ const main = () =>
 				id_host,
 				dt_host,
 			} satisfies TDTChamber)
-				.and(create_backend_dt)
+				.and(create_backend_server_dt)
 				.and(fetch => Bun.serve({ fetch, port })),
 		)
 		.pipe(ops0.tap(server => logger.info(`server running on http://${server.hostname}:${server.port}`)))

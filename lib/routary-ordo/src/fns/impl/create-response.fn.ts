@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { rrr } from "@ordo-pink/core"
 import { type Routary } from "@ordo-pink/routary"
 import { Switch } from "@ordo-pink/switch"
+import { rrr } from "@ordo-pink/core"
 
 import { type RoutaryOrdo } from "../../routary-ordo.types"
 
@@ -29,27 +29,27 @@ export const create_response = <
 
 type TStatusFromRRRParams<$TContext extends RoutaryOrdo.Chamber> = { rrr: Ordo.Rrr; intake: Routary.Intake<$TContext> }
 export const status_from_rrr = <$TContext extends RoutaryOrdo.Chamber>({
-	rrr,
+	rrr: e,
 	intake,
 }: TStatusFromRRRParams<$TContext>): Routary.Intake<$TContext> => {
-	intake.logger.error(intake.request_id, "ERROR:", rrr.message)
-	intake.logger.debug(intake.request_id, "An error occured:", rrr.message, ...rrr.debug)
+	intake.logger.error(intake.request_id, "ERROR:", e.message)
+	intake.logger.debug(intake.request_id, "An error occured:", e.message, ...e.debug)
 
 	if (intake.headers.get("Content-Type") !== "application/json") {
 		intake.headers.set("Content-Type", "application/json")
-		intake.payload = JSON.stringify({ success: false, payload: rrr.message })
+		intake.payload = JSON.stringify({ success: false, payload: e.message })
 	} else {
-		intake.payload = rrr.message
+		intake.payload = e.message
 	}
 
-	intake.status = Switch.Match(rrr.code)
-		.case([rrr.enum.EAGAIN, rrr.enum.ENXIO], () => 408)
-		.case([rrr.enum.EFBIG, rrr.enum.ENOSPC], () => 413)
-		.case(rrr.enum.EINVAL, () => 400)
-		.case(rrr.enum.EACCES, () => 401)
-		.case(rrr.enum.EPERM, () => 403)
-		.case(rrr.enum.ENOENT, () => 404)
-		.case(rrr.enum.EEXIST, () => 409)
+	intake.status = Switch.Match(e.code)
+		.case([rrr.type.EAGAIN, rrr.type.ENXIO], () => 408)
+		.case([rrr.type.EFBIG, rrr.type.ENOSPC], () => 413)
+		.case(rrr.type.EINVAL, () => 400)
+		.case(rrr.type.EACCES, () => 401)
+		.case(rrr.type.EPERM, () => 403)
+		.case(rrr.type.ENOENT, () => 404)
+		.case(rrr.type.EEXIST, () => 409)
 		.default(() => 500)
 
 	return intake

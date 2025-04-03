@@ -23,7 +23,7 @@ import { describe, expect, it } from "bun:test"
 
 import { MR } from "./metadata-repository.impl"
 import { Metadata } from "../../../../core/src/metadata.impl"
-import { RRR } from "../../../../core/src/rrr"
+import { rrr } from "../../../../core/src/rrr"
 
 describe("metadata-repository", () => {
 	const metadata$ = new BehaviorSubject<Ordo.Metadata.Instance[] | null>(null)
@@ -36,7 +36,7 @@ describe("metadata-repository", () => {
 			const { key, code, message: location } = metadataRepository.get().unwrap() as Ordo.Rrr
 
 			expect(key).toEqual("EAGAIN")
-			expect(code).toEqual(RRR.enum.EAGAIN)
+			expect(code).toEqual(rrr.type.EAGAIN)
 			expect(location).toEqual("MR")
 		})
 
@@ -64,7 +64,7 @@ describe("metadata-repository", () => {
 			const { key, code, debug: spec, message: location } = metadataRepository.put(null as any).unwrap() as Ordo.Rrr
 			expect(key).toEqual("EINVAL")
 			expect(spec).toEqual(".put: null")
-			expect(code).toEqual(RRR.enum.EINVAL)
+			expect(code).toEqual(rrr.type.EINVAL)
 			expect(location).toEqual("MR")
 		})
 	})

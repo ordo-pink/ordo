@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { CurrentUser, CurrentUserKeys, METADATA_CONTENT_FSID, Metadata, RRR } from "@ordo-pink/core"
+import { CurrentUser, CurrentUserKeys, METADATA_CONTENT_FSID, Metadata, rrr } from "@ordo-pink/core"
 import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
 import { Routary, routary } from "@ordo-pink/routary"
 import {
@@ -130,8 +130,8 @@ export const create_backend_server_dt = (chamber: TDTChamber) =>
 
 export const validate_request_params = (intake: Routary.Intake<TDTContext>) =>
 	Oath.Merge([
-		Oath.If(Metadata.Validations.is_fsid(intake.params.fsid)).pipe(ops0.rejected_map(() => RRR.codes.einval("Invalid FSID"))),
-		Oath.If(CurrentUser.Validations.is_uid(intake.params.uid)).pipe(ops0.rejected_map(() => RRR.codes.einval("Invalid UID"))),
+		Oath.If(Metadata.Validations.is_fsid(intake.params.fsid)).pipe(ops0.rejected_map(() => rrr.codes.einval("Invalid FSID"))),
+		Oath.If(CurrentUser.Validations.is_uid(intake.params.uid)).pipe(ops0.rejected_map(() => rrr.codes.einval("Invalid UID"))),
 	]).pipe(ops0.map(() => intake))
 
 export const authenticate = (intake: Routary.Intake<TDTContext>) =>
@@ -141,13 +141,13 @@ export const authenticate = (intake: Routary.Intake<TDTContext>) =>
 		.pipe(ops0.chain(res => Oath.FromPromise(() => res.json())))
 		.pipe(ops0.chain(body => Oath.If(body?.success, { T: () => body.payload })))
 		.pipe(ops0.chain(x => Oath.If(CurrentUser.Validations.is_dto(x), { T: () => x as Ordo.User.Current.DTO })))
-		.pipe(ops0.rejected_map(e => RRR.codes.eacces(e?.message ?? "Unauthorized")))
+		.pipe(ops0.rejected_map(e => rrr.codes.eacces(e?.message ?? "Unauthorized")))
 
 // TODO checking permissions for editing files of other users
 export const check_authorization = (intake: Routary.Intake<TDTContext>) => (user: Ordo.User.Current.DTO) =>
 	Oath.If(user[CurrentUserKeys.UID] === intake.params.uid)
 		.pipe(ops0.map(() => user))
-		.pipe(ops0.rejected_map(() => RRR.codes.eperm("Permission denied")))
+		.pipe(ops0.rejected_map(() => rrr.codes.eperm("Permission denied")))
 
 export const check_file_exists =
 	(intake: Routary.Intake<TDTContext>) =>
@@ -156,7 +156,7 @@ export const check_file_exists =
 			.exists(uid, fsid)
 			.pipe(ops0.chain(exists => Oath.If(exists)))
 			.pipe(ops0.map(() => ({ uid, fsid })))
-			.pipe(ops0.rejected_map(() => RRR.codes.enoent("File not found")))
+			.pipe(ops0.rejected_map(() => rrr.codes.enoent("File not found")))
 
 export type TIDs = { uid: Ordo.User.UID; fsid: Ordo.Metadata.FSID }
 export const extract_ids = (intake: Routary.Intake<TDTContext>) => () => ({
@@ -171,19 +171,19 @@ const check_file_does_not_exist =
 			.exists(uid, fsid)
 			.pipe(ops0.chain(exists => Oath.If(!exists)))
 			.pipe(ops0.map(() => ({ uid, fsid })))
-			.pipe(ops0.rejected_map(() => RRR.codes.eexist("File already exists")))
+			.pipe(ops0.rejected_map(() => rrr.codes.eexist("File already exists")))
 
 export const validate_body_is_not_empty = (intake: Routary.Intake<TDTContext>) =>
 	Oath.FromNullable(intake.req.body)
 		.pipe(ops0.map(() => intake))
-		.pipe(ops0.rejected_map(() => RRR.codes.einval("Empty file body")))
+		.pipe(ops0.rejected_map(() => rrr.codes.einval("Empty file body")))
 
 export const validate_file_size_limit = (intake: Routary.Intake<TDTContext>) => (user: Ordo.User.Current.DTO) =>
 	Oath.FromNullable(intake.req.headers.get("content-length"))
 		.pipe(ops0.map(file_size => Number.parseInt(file_size, 10)))
 		.pipe(ops0.chain(file_size => Oath.If(is_finite_non_negative_int(file_size), { T: () => file_size })))
 		.pipe(ops0.chain(file_size => Oath.If(CurrentUser.FromDTO(user).can_upload(file_size))))
-		.pipe(ops0.rejected_map(() => RRR.codes.efbig("File too big")))
+		.pipe(ops0.rejected_map(() => rrr.codes.efbig("File too big")))
 
 // TODO check if attemted to create a file in other user's space
 export const check_can_create_files = (intake: Routary.Intake<TDTContext>) => (user: Ordo.User.Current.DTO) =>
@@ -195,7 +195,7 @@ export const check_can_create_files = (intake: Routary.Intake<TDTContext>) => (u
 		.pipe(ops0.map(total_files => CurrentUser.FromDTO(user).can_create_files(total_files)))
 		.pipe(ops0.chain(can_create => Oath.If(can_create)))
 		.pipe(ops0.map(() => user))
-		.pipe(ops0.rejected_map(() => RRR.codes.enospc("Too many files")))
+		.pipe(ops0.rejected_map(() => rrr.codes.enospc("Too many files")))
 
 const check_total_files_limit_if_file_does_not_exist = (intake: Routary.Intake<TDTContext>) => (user: Ordo.User.Current.DTO) =>
 	intake.data_persistence_strategy

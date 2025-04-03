@@ -6,8 +6,8 @@
 import { S3Client, S3File } from "bun"
 
 import { Oath, ops0 } from "@ordo-pink/oath"
-import { RRR } from "@ordo-pink/core"
 import { prop } from "@ordo-pink/tau"
+import { rrr } from "@ordo-pink/core"
 
 import { type TPersistenceStrategyDataS3 } from "./backend-persistence-strategy-data-bun-s3.types"
 
@@ -69,9 +69,9 @@ export const PersistenceStrategyDataS3: TPersistenceStrategyDataS3 = {
 
 // --- Internal ---
 
-const already_exists_rrr = () => RRR.codes.eexist("File already exists")
-const not_found_rrr = () => RRR.codes.enoent("File not found")
-const io_rrr = (e: Error) => RRR.codes.eio(e.message)
+const already_exists_rrr = () => rrr.codes.eexist("File already exists")
+const not_found_rrr = () => rrr.codes.enoent("File not found")
+const io_rrr = (e: Error) => rrr.codes.eio(e.message)
 
 const get_file = (s3: S3Client) => (path: string) =>
 	Oath.Try(() => s3.file(path))
@@ -124,7 +124,7 @@ const get_file_modification_timestamp = (file: S3File) =>
 		.pipe(ops0.map(stat => stat.lastModified.getTime()))
 		.pipe(ops0.map(milliseconds => milliseconds / 1000))
 		.pipe(ops0.map(Math.floor))
-		.pipe(ops0.rejected_map(e => RRR.codes.eio(e.message)))
+		.pipe(ops0.rejected_map(e => rrr.codes.eio(e.message)))
 
 const get_file_content = (file: S3File) => Oath.Try(() => file.readable).pipe(ops0.rejected_map(io_rrr))
 

@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { CurrentUser, CurrentUserKeys, RRR } from "@ordo-pink/core"
+import { CurrentUser, CurrentUserKeys, rrr } from "@ordo-pink/core"
 import { Oath, ops0 } from "@ordo-pink/oath"
 import { type Routary } from "@ordo-pink/routary"
 
@@ -68,5 +68,5 @@ export const get_user_from_cookie = (intake: Routary.Intake<TIDContext>) => {
 						.pipe(ops0.tap(debug("Current session updated"))),
 				),
 		)
-		.pipe(ops0.rejected_map(() => ({ rrr: RRR.codes.enoent("User not found"), intake })))
+		.pipe(ops0.rejected_map(() => ({ rrr: rrr.codes.enoent("User not found"), intake })))
 }

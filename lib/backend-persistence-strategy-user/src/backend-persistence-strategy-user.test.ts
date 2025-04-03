@@ -21,7 +21,7 @@
 
 import { afterEach, describe, expect, test } from "bun:test"
 
-import { CurrentUser, CurrentUserKeys, RRR } from "@ordo-pink/core"
+import { CurrentUser, CurrentUserKeys, rrr } from "@ordo-pink/core"
 import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
 
 import { USER_FILE_FSID, create_persistence_strategy_user } from "./backend-persistence-strategy-user.impl"
@@ -78,7 +78,7 @@ describe("persistence_strategy_user", () => {
 		})
 
 		test("should reject with EIO if persistence_strategy_data fails", () => {
-			const broken_user_storage = create_persistence_strategy_user({ exists: () => Oath.Reject(RRR.codes.eio("asdf")) } as any)
+			const broken_user_storage = create_persistence_strategy_user({ exists: () => Oath.Reject(rrr.codes.eio("asdf")) } as any)
 			expect(() => broken_user_storage.create(test_user).invoke(invokers0.to_promise)).toThrow("asdf")
 		})
 	})
@@ -96,7 +96,7 @@ describe("persistence_strategy_user", () => {
 		})
 
 		test("should reject with EIO if persistence_strategy_data fails", () => {
-			const broken_user_storage = create_persistence_strategy_user({ exists: () => Oath.Reject(RRR.codes.eio("asdf")) } as any)
+			const broken_user_storage = create_persistence_strategy_user({ exists: () => Oath.Reject(rrr.codes.eio("asdf")) } as any)
 			expect(() => broken_user_storage.read(test_user.get_uid()).invoke(invokers0.to_promise)).toThrow("asdf")
 		})
 	})
@@ -117,14 +117,14 @@ describe("persistence_strategy_user", () => {
 		})
 
 		test("should reject with EIO if persistence_strategy_data fails", () => {
-			const broken_user_storage = create_persistence_strategy_user({ exists: () => Oath.Reject(RRR.codes.eio("asdf")) } as any)
+			const broken_user_storage = create_persistence_strategy_user({ exists: () => Oath.Reject(rrr.codes.eio("asdf")) } as any)
 			expect(() => broken_user_storage.update(test_user.get_uid(), test_user).invoke(invokers0.to_promise)).toThrow("asdf")
 		})
 	})
 
 	describe("delete", () => {
 		test("should not be implemented", () => {
-			const broken_user_storage = create_persistence_strategy_user({ exists: () => Oath.Reject(RRR.codes.eio("asdf")) } as any)
+			const broken_user_storage = create_persistence_strategy_user({ exists: () => Oath.Reject(rrr.codes.eio("asdf")) } as any)
 			expect(() => broken_user_storage.delete(crypto.randomUUID()).invoke(invokers0.to_promise)).toThrow("Not implemented")
 		})
 	})
@@ -141,7 +141,7 @@ describe("persistence_strategy_user", () => {
 		})
 
 		test("should reject with EIO if persistence_strategy_data fails", () => {
-			const broken_user_storage = create_persistence_strategy_user({ exists: () => Oath.Reject(RRR.codes.eio("asdf")) } as any)
+			const broken_user_storage = create_persistence_strategy_user({ exists: () => Oath.Reject(rrr.codes.eio("asdf")) } as any)
 			expect(() => broken_user_storage.exists(crypto.randomUUID()).invoke(invokers0.to_promise)).toThrow("Could not check user")
 		})
 	})

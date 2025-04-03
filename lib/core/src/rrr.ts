@@ -22,46 +22,34 @@
 import { is_finite_non_negative_int, is_object, lt } from "@ordo-pink/tau"
 import { ErrorType } from "@ordo-pink/core"
 
-export const eperm = (message: string, ...debug: any[]) => compose_rrr(message)("EPERM", ...debug)
-export const enoent = (message: string, ...debug: any[]) => compose_rrr(message)("ENOENT", ...debug)
-export const eintr = (message: string, ...debug: any[]) => compose_rrr(message)("EINTR", ...debug)
-export const eio = (message: string, ...debug: any[]) => compose_rrr(message)("EIO", ...debug)
-export const enxio = (message: string, ...debug: any[]) => compose_rrr(message)("ENXIO", ...debug)
-export const eagain = (message: string, ...debug: any[]) => compose_rrr(message)("EAGAIN", ...debug)
-export const eacces = (message: string, ...debug: any[]) => compose_rrr(message)("EACCES", ...debug)
-export const eexist = (message: string, ...debug: any[]) => compose_rrr(message)("EEXIST", ...debug)
-export const einval = (message: string, ...debug: any[]) => compose_rrr(message)("EINVAL", ...debug)
-export const enotrecoverable = (message: string, ...debug: any[]) => compose_rrr(message)("ENOTRECOVERABLE", ...debug)
-export const efbig = (message: string, ...debug: any[]) => compose_rrr(message)("EFBIG", ...debug)
-export const enospc = (message: string, ...debug: any[]) => compose_rrr(message)("ENOSPC", ...debug)
+const eperm = (message: string, ...debug: any[]) => compose_rrr(message)("EPERM", ...debug)
+const enoent = (message: string, ...debug: any[]) => compose_rrr(message)("ENOENT", ...debug)
+const eintr = (message: string, ...debug: any[]) => compose_rrr(message)("EINTR", ...debug)
+const eio = (message: string, ...debug: any[]) => compose_rrr(message)("EIO", ...debug)
+const enxio = (message: string, ...debug: any[]) => compose_rrr(message)("ENXIO", ...debug)
+const eagain = (message: string, ...debug: any[]) => compose_rrr(message)("EAGAIN", ...debug)
+const eacces = (message: string, ...debug: any[]) => compose_rrr(message)("EACCES", ...debug)
+const eexist = (message: string, ...debug: any[]) => compose_rrr(message)("EEXIST", ...debug)
+const einval = (message: string, ...debug: any[]) => compose_rrr(message)("EINVAL", ...debug)
+const enotrecoverable = (message: string, ...debug: any[]) => compose_rrr(message)("ENOTRECOVERABLE", ...debug)
+const efbig = (message: string, ...debug: any[]) => compose_rrr(message)("EFBIG", ...debug)
+const enospc = (message: string, ...debug: any[]) => compose_rrr(message)("ENOSPC", ...debug)
 
-export const compose_rrr =
+const compose_rrr =
 	(message: string) =>
 	<$TKey extends keyof typeof ErrorType>(key: $TKey, ...debug: any[]): Ordo.Rrr<$TKey> => ({
-		key,
 		code: ErrorType[key] as const,
 		debug,
+		key,
 		message,
 	})
 
-export const compose_rrr_thunk =
-	(message: string) =>
-	<$TKey extends keyof typeof ErrorType>(key: $TKey, ...debug: any[]) =>
-	(): Ordo.Rrr<$TKey> => ({
-		key,
-		code: ErrorType[key] as const,
-		debug,
-		message,
-	})
-
-export const RRR = {
-	enum: ErrorType,
-	compose: compose_rrr,
+export const rrr = {
+	type: ErrorType,
 	is_rrr: (e: unknown): e is Ordo.Rrr => {
 		const x = e as Ordo.Rrr
-		return is_object(x) && is_finite_non_negative_int(x.code) && lt(RRR.enum.length)(x.code)
+		return is_object(x) && is_finite_non_negative_int(x.code) && lt(rrr.type.length)(x.code)
 	},
-	compose_thunk: compose_rrr_thunk,
 	codes: {
 		eperm,
 		enoent,

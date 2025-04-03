@@ -21,8 +21,8 @@
 
 import { type TZags, ZAGS } from "@ordo-pink/zags"
 import { R } from "@ordo-pink/result"
-import { RRR } from "@ordo-pink/core"
 import { call_once } from "@ordo-pink/tau"
+import { rrr } from "@ordo-pink/core"
 
 import { ordo_app_state } from "../app.state"
 
@@ -32,28 +32,36 @@ type TF = () => {
 export const init_functions: TF = call_once(() => {
 	const { logger, commands, known_functions } = ordo_app_state.zags.unwrap()
 
-	commands.on("cmd.functions.file_associations.register", assoc =>
-		R.If(!ordo_app_state.zags.select("functions.file_assocs").some(f => f.name === assoc.name))
-			.pipe(R.ops.err_map(log_rrr_exists(assoc.name)))
-			.pipe(R.ops.map(() => ordo_app_state.zags.update("functions.file_assocs", as => as.concat(assoc)))),
+	commands.on(
+		"cmd.functions.file_associations.register",
+		assoc =>
+			void R.If(!ordo_app_state.zags.select("functions.file_assocs").some(f => f.name === assoc.name))
+				.pipe(R.ops.err_map(log_rrr_exists(assoc.name)))
+				.pipe(R.ops.map(() => ordo_app_state.zags.update("functions.file_assocs", as => as.concat(assoc)))),
 	)
 
-	commands.on("cmd.functions.file_associations.unregister", name =>
-		R.FromNullable(ordo_app_state.zags.select("functions.file_assocs").find(a => a.name === name))
-			.pipe(R.ops.err_map(log_rrr_enoent(name)))
-			.pipe(R.ops.map(() => ordo_app_state.zags.update("functions.file_assocs", as => as.filter(a => a.name !== name)))),
+	commands.on(
+		"cmd.functions.file_associations.unregister",
+		name =>
+			void R.FromNullable(ordo_app_state.zags.select("functions.file_assocs").find(a => a.name === name))
+				.pipe(R.ops.err_map(log_rrr_enoent(name)))
+				.pipe(R.ops.map(() => ordo_app_state.zags.update("functions.file_assocs", as => as.filter(a => a.name !== name)))),
 	)
 
-	commands.on("cmd.functions.activities.register", activity =>
-		R.If(!ordo_app_state.zags.select("functions.activities").some(a => a.name === activity.name))
-			.pipe(R.ops.err_map(log_rrr_exists(activity.name)))
-			.pipe(R.ops.map(() => ordo_app_state.zags.update("functions.activities", as => as.concat(activity)))),
+	commands.on(
+		"cmd.functions.activities.register",
+		activity =>
+			void R.If(!ordo_app_state.zags.select("functions.activities").some(a => a.name === activity.name))
+				.pipe(R.ops.err_map(log_rrr_exists(activity.name)))
+				.pipe(R.ops.map(() => ordo_app_state.zags.update("functions.activities", as => as.concat(activity)))),
 	)
 
-	commands.on("cmd.functions.activities.unregister", name =>
-		R.FromNullable(ordo_app_state.zags.select("functions.activities").find(a => a.name === name))
-			.pipe(R.ops.err_map(log_rrr_enoent(name)))
-			.pipe(R.ops.map(() => ordo_app_state.zags.update("functions.activities", as => as.filter(a => a.name !== name)))),
+	commands.on(
+		"cmd.functions.activities.unregister",
+		name =>
+			void R.FromNullable(ordo_app_state.zags.select("functions.activities").find(a => a.name === name))
+				.pipe(R.ops.err_map(log_rrr_enoent(name)))
+				.pipe(R.ops.map(() => ordo_app_state.zags.update("functions.activities", as => as.filter(a => a.name !== name)))),
 	)
 
 	logger.debug("🟢 Initialised activities.")
@@ -80,7 +88,7 @@ export const init_functions: TF = call_once(() => {
 // --- Internal ---
 
 type TLogAlreadyExistsFn = (name: string) => () => Ordo.Rrr<"EEXIST">
-const log_rrr_exists: TLogAlreadyExistsFn = name => () => RRR.codes.eexist(`Activity "${name}" already registered`)
+const log_rrr_exists: TLogAlreadyExistsFn = name => () => rrr.codes.eexist(`Activity "${name}" already registered`)
 
 type TLogActivityNotFoundFn = (name: string) => () => Ordo.Rrr<"ENOENT">
-const log_rrr_enoent: TLogActivityNotFoundFn = name => () => RRR.codes.enoent(`Activity with name "${name}" is not registerred`)
+const log_rrr_enoent: TLogActivityNotFoundFn = name => () => rrr.codes.enoent(`Activity with name "${name}" is not registerred`)

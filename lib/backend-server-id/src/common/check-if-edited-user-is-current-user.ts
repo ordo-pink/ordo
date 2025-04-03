@@ -20,8 +20,8 @@
  */
 
 import { Oath } from "@ordo-pink/oath"
-import { RRR } from "@ordo-pink/core"
 import { type Routary } from "@ordo-pink/routary"
+import { rrr } from "@ordo-pink/core"
 
 import { type TIDContext } from "../backend-server-id.types"
 import { get_user_from_cookie } from "./get-user-from-cookie"
@@ -29,6 +29,6 @@ import { get_user_from_cookie } from "./get-user-from-cookie"
 export const check_if_edited_user_is_current_user = (intake: Routary.Intake<TIDContext>) =>
 	get_user_from_cookie(intake).and(({ user }) =>
 		Oath.If(user.get_uid() === intake.params.user_id, {
-			F: () => ({ rrr: RRR.codes.eperm("Cannot edit other user"), intake: intake }),
+			F: () => ({ rrr: rrr.codes.eperm("Cannot edit other user"), intake: intake }),
 		}),
 	)

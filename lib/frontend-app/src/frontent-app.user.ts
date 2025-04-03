@@ -20,7 +20,7 @@
  */
 
 import { BsBoxArrowInRight, BsBoxArrowRight } from "@ordo-pink/frontend-icons"
-import { CommandPaletteItemType, CurrentUser, RRR } from "@ordo-pink/core"
+import { CommandPaletteItemType, CurrentUser, rrr } from "@ordo-pink/core"
 import { /* CheckboxInput, */ Dialog, Input } from "@ordo-pink/maoka-components"
 import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
 import { call_once, noop } from "@ordo-pink/tau"
@@ -98,9 +98,9 @@ export const init_user = call_once(() => {
 			UserQuery.Of(permission =>
 				Result.If(known_functions.has_permissions(fid, { queries: [permission] }), {
 					F: () => {
-						const rrr = RRR.codes.eperm(`UserQuery permission RRR. Did you forget to request query permission '${permission}'?`)
-						console_logger.error(rrr.message)
-						return rrr
+						const e = rrr.codes.eperm(`UserQuery permission RRR. Did you forget to request query permission '${permission}'?`)
+						console_logger.error(e.message)
+						return e
 					},
 				}),
 			),

@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { CurrentUser, RRR } from "@ordo-pink/core"
+import { CurrentUser, rrr } from "@ordo-pink/core"
 import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
 import { keys_of, undef } from "@ordo-pink/tau"
 
@@ -43,10 +43,10 @@ export const create_reference_mapping_user = (
 
 		exists_by_handle: handle => ms0.and(ms => !!ms.handle[handle]),
 
-		get_by_email: email => ms0.and(m => Oath.FromNullable(m.email[email], () => RRR.codes.enoent("User not found"))),
+		get_by_email: email => ms0.and(m => Oath.FromNullable(m.email[email], () => rrr.codes.enoent("User not found"))),
 
 		get_by_handle: handle =>
-			ms0.and(m => Oath.FromNullable(m.handle[handle], () => RRR.codes.enoent("User not found", handle))),
+			ms0.and(m => Oath.FromNullable(m.handle[handle], () => rrr.codes.enoent("User not found", handle))),
 
 		refresh: id =>
 			ms0
@@ -80,7 +80,7 @@ export const create_reference_mapping_user = (
 				.pipe(ops0.chain(m => Oath.Try(() => JSON.stringify(m), to_rrr("Could not save mapping"))))
 				.pipe(ops0.chain(s => Oath.Try(() => new Blob([s], { type }).stream(), to_rrr("Could not save mapping"))))
 				.pipe(ops0.chain(s => persistence_strategy_data.update(SYSTEM_DATA_FSID, USER_MAPPING_FSID, s)))
-				.pipe(ops0.rejected_map(e => (e.code === RRR.enum.EIO ? e : RRR.codes.eio(e.message, ...e.debug)) as Ordo.Rrr<"EIO">))
+				.pipe(ops0.rejected_map(e => (e.code === rrr.type.EIO ? e : rrr.codes.eio(e.message, ...e.debug)) as Ordo.Rrr<"EIO">))
 				.pipe(ops0.map(() => void (storage_p = get_storage_p(persistence_strategy_data)))),
 	}
 }
@@ -97,7 +97,7 @@ export const create_persistence_strategy_user: PersistenceStrategyUser = persist
 	create: u =>
 		persistence_strategy_data
 			.exists(u.get_uid(), USER_FILE_FSID)
-			.pipe(ops0.chain(e => Oath.If(!e, { F: () => RRR.codes.eexist("User already exists", u.get_uid()) })))
+			.pipe(ops0.chain(e => Oath.If(!e, { F: () => rrr.codes.eexist("User already exists", u.get_uid()) })))
 			.pipe(ops0.chain(() => Oath.Try(() => JSON.stringify(u.to_dto()), to_rrr("Could not create user"))))
 			.pipe(ops0.chain(s => Oath.Try(() => new Blob([s], { type }).stream(), to_rrr("Could not create user"))))
 			.pipe(ops0.chain(stream => persistence_strategy_data.create(u.get_uid(), USER_FILE_FSID, stream)))
@@ -106,22 +106,22 @@ export const create_persistence_strategy_user: PersistenceStrategyUser = persist
 	exists: id =>
 		persistence_strategy_data
 			.exists(id, USER_FILE_FSID)
-			.pipe(ops0.rejected_map(rrr => RRR.codes.eio("Could not check user", ...rrr.debug))),
+			.pipe(ops0.rejected_map(e => rrr.codes.eio("Could not check user", ...e.debug))),
 
 	read: id =>
 		persistence_strategy_data
 			.exists(id, USER_FILE_FSID)
-			.pipe(ops0.chain(e => Oath.If(e, { F: () => RRR.codes.enoent("User not found", id) })))
+			.pipe(ops0.chain(e => Oath.If(e, { F: () => rrr.codes.enoent("User not found", id) })))
 			.pipe(ops0.chain(() => persistence_strategy_data.read(id, USER_FILE_FSID)))
 			.pipe(ops0.chain(s => Oath.Try(() => Bun.readableStreamToJSON(s), to_rrr("Could not get user"))))
 			.pipe(ops0.map(dto => CurrentUser.FromDTO(dto))),
 
-	delete: () => Oath.Reject(RRR.codes.eio("Not implemented")),
+	delete: () => Oath.Reject(rrr.codes.eio("Not implemented")),
 
 	update: (id, u) =>
 		persistence_strategy_data
 			.exists(id, USER_FILE_FSID)
-			.pipe(ops0.chain(e => Oath.If(e, { F: () => RRR.codes.enoent("User not found", id) })))
+			.pipe(ops0.chain(e => Oath.If(e, { F: () => rrr.codes.enoent("User not found", id) })))
 			.pipe(ops0.chain(() => Oath.Try(() => JSON.stringify(u.to_dto()), to_rrr("Could not save user"))))
 			.pipe(ops0.chain(s => Oath.Try(() => new Blob([s], { type }).stream(), to_rrr("Could not save user"))))
 			.pipe(ops0.chain(s => persistence_strategy_data.update(u.get_uid(), USER_FILE_FSID, s)))
@@ -138,4 +138,4 @@ const USER_MAPPING_FSID = "5045c1f6-b1ba-4251-b761-7b7f502e7d70"
 
 const type = "application/json"
 
-const to_rrr = (message: string) => (error: Error) => RRR.codes.eio(message, error)
+const to_rrr = (message: string) => (error: Error) => rrr.codes.eio(message, error)

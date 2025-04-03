@@ -20,9 +20,9 @@
  */
 
 import { Oath, ops0 } from "@ordo-pink/oath"
-import { RRR } from "@ordo-pink/core"
 import { Result } from "@ordo-pink/result"
 import { ZAGS } from "@ordo-pink/zags"
+import { rrr } from "@ordo-pink/core"
 
 import { CurrentUser, PublicUser } from "../../../../core/src/user.impl"
 import { ordo_app_state } from "../../../app.state"
@@ -54,14 +54,14 @@ export const UserQuery: Ordo.User.QueryStatic = {
 					.and(() =>
 						Oath.If(CurrentUser.Validations.is_uid(id))
 							.and(() => id)
-							.pipe(ops0.rejected_map(() => RRR.codes.einval("Invalid user id"))),
+							.pipe(ops0.rejected_map(() => rrr.codes.einval("Invalid user id"))),
 					)
 					.and(
 						id =>
 							user_cache[id] ??
 							Oath.FromPromise(() => fetch(`${id_host}/users/${id}`, { credentials: "include" }))
 								.and(res => res.json())
-								.and(res => Oath.If(res.success, { T: () => res.payload, F: () => RRR.codes.eio(res.payload) }))
+								.and(res => Oath.If(res.success, { T: () => res.payload, F: () => rrr.codes.eio(res.payload) }))
 								.pipe(ops0.tap(dto => void (user_cache[dto.id] = dto))),
 					)
 					.and(PublicUser.FromDTO),
@@ -72,14 +72,14 @@ export const UserQuery: Ordo.User.QueryStatic = {
 					.and(() =>
 						Oath.If(CurrentUser.Validations.is_handle(handle))
 							.and(() => handle)
-							.pipe(ops0.rejected_map(() => RRR.codes.einval("Invalid user handle"))),
+							.pipe(ops0.rejected_map(() => rrr.codes.einval("Invalid user handle"))),
 					)
 					.and(
 						handle =>
 							user_cache[handle] ??
 							Oath.FromPromise(() => fetch(`${id_host}/users/handle/${handle}`, { credentials: "include" }))
 								.and(res => res.json())
-								.and(res => Oath.If(res.success, { T: () => res.payload, F: () => RRR.codes.eio(res.payload) }))
+								.and(res => Oath.If(res.success, { T: () => res.payload, F: () => rrr.codes.eio(res.payload) }))
 								.pipe(ops0.tap(dto => void (user_cache[dto.handle] = dto))),
 					)
 					.and(PublicUser.FromDTO),

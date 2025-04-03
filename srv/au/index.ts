@@ -25,7 +25,7 @@ import { type Logger, console_logger } from "@ordo-pink/logger"
 import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
 import { create_persistence_strategy_user, create_reference_mapping_user } from "@ordo-pink/backend-persistence-strategy-user"
 import { PersistenceStrategyDataFS } from "@ordo-pink/backend-persistence-strategy-data-fs"
-import { RRR } from "@ordo-pink/core"
+import { rrr } from "@ordo-pink/core"
 
 const env_rrr = (env_var: string) => (value?: any) =>
 	value != null ? `Invalid value for ${env_var}: "${value}"` : `Missing value for ${env_var}`
@@ -95,12 +95,12 @@ const main = () =>
 						hash: code =>
 							Oath.Try(
 								() => Bun.password.hash(code, { algorithm: "bcrypt", cost: 4 }),
-								error => RRR.codes.eio("Failed to hash code", error),
+								error => rrr.codes.eio("Failed to hash code", error),
 							),
 						verify: (hash, code) =>
 							Oath.Try(
 								() => Bun.password.verify(code, hash),
-								error => RRR.codes.eio("Failed to verify code", error),
+								error => rrr.codes.eio("Failed to verify code", error),
 							),
 					},
 					create_request_id: () => crypto.randomUUID(),

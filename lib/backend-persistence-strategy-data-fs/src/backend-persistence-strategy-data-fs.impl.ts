@@ -7,8 +7,8 @@ import { BunFile } from "bun"
 import { resolve } from "path"
 
 import { Oath, ops0 } from "@ordo-pink/oath"
-import { RRR } from "@ordo-pink/core"
 import { prop } from "@ordo-pink/tau"
+import { rrr } from "@ordo-pink/core"
 
 import { TPersistenceStategyDataFS } from "./backend-persistence-strategy-data-fs.types"
 
@@ -67,9 +67,9 @@ export const PersistenceStrategyDataFS: TPersistenceStategyDataFS = {
 
 // --- Internal ---
 
-const already_exists_rrr = () => RRR.codes.eexist("File already exists")
-const not_found_rrr = () => RRR.codes.enoent("File not found")
-const io_rrr = (e: Error) => RRR.codes.eio(e.message)
+const already_exists_rrr = () => rrr.codes.eexist("File already exists")
+const not_found_rrr = () => rrr.codes.enoent("File not found")
+const io_rrr = (e: Error) => rrr.codes.eio(e.message)
 
 const get_file = (path: string) => Oath.Try(() => Bun.file(path)).pipe(ops0.rejected_map(io_rrr))
 

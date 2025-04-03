@@ -21,8 +21,8 @@
 
 import { call_once, deep_equals } from "@ordo-pink/tau"
 import { Oath } from "@ordo-pink/oath"
-import { RRR } from "@ordo-pink/core"
 import { ZAGS } from "@ordo-pink/zags"
+import { rrr } from "@ordo-pink/core"
 
 import { ordo_app_state } from "../app.state"
 
@@ -75,7 +75,7 @@ export const init_commands: TF = call_once(() => {
 
 			if (!known_functions.has_permissions(fid, { commands: [name] })) {
 				dequeue({ name, payload, fid })
-				command.callback(RRR.codes.eperm(`${func} permission RRR. Did you forget to request command permission '${name}'?`))
+				command.callback(rrr.codes.eperm(`${func} permission RRR. Did you forget to request command permission '${name}'?`))
 
 				return
 			}

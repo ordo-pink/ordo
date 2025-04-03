@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { CurrentUser, RRR } from "@ordo-pink/core"
+import { CurrentUser, rrr } from "@ordo-pink/core"
 import { Oath, ops0 } from "@ordo-pink/oath"
 import { default_handler, huyami } from "@ordo-pink/routary-ordo"
 
@@ -53,13 +53,13 @@ const is_email = CurrentUser.Validations.is_email
 const get_request_body = (req: Request): Oath<any, Ordo.Rrr<"EIO">> =>
 	Oath.Try(
 		() => req.json(),
-		error => RRR.codes.eio("Failed to parse request body", error),
+		error => rrr.codes.eio("Failed to parse request body", error),
 	)
 
 const validate_request_body = (body: any) =>
 	Oath.If(body && body.email && is_email(body.email), {
 		T: () => body.email as BackendAuth.Email,
-		F: () => RRR.codes.einval("Provided email is invalid", body.email),
+		F: () => rrr.codes.einval("Provided email is invalid", body.email),
 	})
 
 type Triplet = [BackendAuth.Email, BackendAuth.Code, BackendAuth.CodeHash]

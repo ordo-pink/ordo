@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Metadata, NotificationType, RRR } from "@ordo-pink/core"
+import { Metadata, NotificationType, rrr } from "@ordo-pink/core"
 import { is_instance_of, is_string } from "@ordo-pink/tau"
 import { R } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
@@ -127,7 +127,7 @@ export const init_content: TF = () => {
 		}
 
 		if (!Metadata.Validations.is_metadata(metadata))
-			return alert_rrr(RRR.codes.enoent("Metadata creation failed", { type, name, parent }))
+			return alert_rrr(rrr.codes.enoent("Metadata creation failed", { type, name, parent }))
 
 		const user = ordo_app_state.zags.select("user")
 
@@ -140,11 +140,9 @@ export const init_content: TF = () => {
 		ContentQuery.Of(content_repository, permission =>
 			R.If(known_functions.has_permissions(fid, { queries: [permission] }), {
 				F: () => {
-					const rrr = RRR.codes.eperm(
-						`ContentQuery permission RRR. Did you forget to request query permission '${permission}'?`,
-					)
-					console_logger.error(rrr.message)
-					return rrr
+					const e = rrr.codes.eperm(`ContentQuery permission RRR. Did you forget to request query permission '${permission}'?`)
+					console_logger.error(e.message)
+					return e
 				},
 			}),
 		)

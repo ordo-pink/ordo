@@ -20,7 +20,7 @@
  */
 
 import * as tau from "@ordo-pink/tau"
-import { CurrentUser, CurrentUserKeys, RRR } from "@ordo-pink/core"
+import { CurrentUser, CurrentUserKeys, rrr } from "@ordo-pink/core"
 import { Oath, ops0 } from "@ordo-pink/oath"
 import { default_handler, huyami } from "@ordo-pink/routary-ordo"
 
@@ -67,24 +67,24 @@ const is_code = (x: unknown): x is number => tau.is_finite_non_negative_int(x)
 const get_request_body = (req: Request): Oath<any, Ordo.Rrr<"EIO">> =>
 	Oath.Try(
 		() => req.json(),
-		error => RRR.codes.eio("Failed to parse request body", error),
+		error => rrr.codes.eio("Failed to parse request body", error),
 	)
 
 const validate_request_body = (body: any) =>
 	Oath.Merge({
 		email: Oath.If(body && body.email && is_email(body.email), {
 			T: () => body.email as BackendAuth.Email,
-			F: () => RRR.codes.einval("Provided email is invalid", body.email),
+			F: () => rrr.codes.einval("Provided email is invalid", body.email),
 		}),
 		code: Oath.If(body && body.code && is_code(body.code), {
 			T: () => body.code as BackendAuth.Code,
-			F: () => RRR.codes.einval("Provided code is invalid", body.code),
+			F: () => rrr.codes.einval("Provided code is invalid", body.code),
 		}),
 	})
 
 type P1 = { email: BackendAuth.Email; code: BackendAuth.Code }
 
-const not_found_rrr = (email: BackendAuth.Email) => () => RRR.codes.enoent("User not found", fns.obfuscate_email(email))
+const not_found_rrr = (email: BackendAuth.Email) => () => rrr.codes.enoent("User not found", fns.obfuscate_email(email))
 
 const get_code_hash =
 	(intake: BackendAuth.Intake) =>
@@ -128,7 +128,7 @@ const get_or_create_user = (intake: BackendAuth.Intake) => (email: Ordo.User.Ema
 const create_session_id = (intake: BackendAuth.Intake) => (user: Ordo.User.Current.Instance) =>
 	Oath.Try(() => [crypto.randomUUID(), Date.now(), `${intake.req.headers.get("X-Device")}`] as Ordo.User.Session)
 		.pipe(ops0.map(sid => ({ sid, user })))
-		.pipe(ops0.rejected_map(error => RRR.codes.eio("Failed to create session", error)))
+		.pipe(ops0.rejected_map(error => rrr.codes.eio("Failed to create session", error)))
 
 type P2 = { sid: Ordo.User.Session; user: Ordo.User.Current.Instance }
 const persist_session_id = (intake: BackendAuth.Intake) => (params: P2) =>

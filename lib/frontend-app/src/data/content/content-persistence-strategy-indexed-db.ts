@@ -21,8 +21,8 @@
 
 import { Oath, ops0 } from "@ordo-pink/oath"
 import { IndexedDBStorePromise } from "@ordo-pink/oath-indexeddb"
-import { RRR } from "@ordo-pink/core"
 import { noop } from "@ordo-pink/tau"
+import { rrr } from "@ordo-pink/core"
 
 export const PersistenceStrategyContentIndexedDB = {
 	Of: (
@@ -33,7 +33,7 @@ export const PersistenceStrategyContentIndexedDB = {
 	): Ordo.Content.PersistenceStrategy => {
 		const indexed_db = indexedDB.open(db_name, db_version)
 
-		const eio = (rrr: Error) => RRR.codes.eio("IndexedDB Error", rrr)
+		const eio = (e: Error) => rrr.codes.eio("IndexedDB Error", e)
 
 		const db_promise = new Promise<IDBDatabase>((resolve, reject) => {
 			indexed_db.onupgradeneeded = on_upgrade_needed(indexed_db)

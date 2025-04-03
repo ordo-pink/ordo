@@ -19,12 +19,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { RRR } from "@ordo-pink/core"
 import { Routary } from "@ordo-pink/routary"
+import { rrr } from "@ordo-pink/core"
 
 import { type TIDContext } from "../backend-server-id.types"
 
 export const invalid_id_rrr = (id: unknown, intake: Routary.Intake<TIDContext>) => ({
-	rrr: RRR.codes.einval("invalid user id", id),
+	rrr: rrr.codes.einval("invalid user id", id),
 	intake,
 })

@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { NotificationType, RRR } from "@ordo-pink/core"
+import { NotificationType, rrr } from "@ordo-pink/core"
 import { Result } from "@ordo-pink/result"
 import { ZAGS } from "@ordo-pink/zags"
 import { call_once } from "@ordo-pink/tau"
@@ -113,11 +113,9 @@ export const init_metadata: TInitMetadataFn = call_once(content_repository => {
 		MetadataQuery.Of(metadata_repository, permission =>
 			Result.If(known_functions.has_permissions(fid, { queries: [permission] }), {
 				F: () => {
-					const rrr = RRR.codes.eperm(
-						`MetadataQuery permission RRR. Did you forget to request query permission '${permission}'?`,
-					)
-					console_logger.error(rrr.message)
-					return rrr
+					const e = rrr.codes.eperm(`MetadataQuery permission RRR. Did you forget to request query permission '${permission}'?`)
+					console_logger.error(e.message)
+					return e
 				},
 			}),
 		)

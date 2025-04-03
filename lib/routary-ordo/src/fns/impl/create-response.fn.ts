@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { RRR } from "@ordo-pink/core"
+import { rrr } from "@ordo-pink/core"
 import { type Routary } from "@ordo-pink/routary"
 import { Switch } from "@ordo-pink/switch"
 
@@ -43,13 +43,13 @@ export const status_from_rrr = <$TContext extends RoutaryOrdo.Chamber>({
 	}
 
 	intake.status = Switch.Match(rrr.code)
-		.case([RRR.enum.EAGAIN, RRR.enum.ENXIO], () => 408)
-		.case([RRR.enum.EFBIG, RRR.enum.ENOSPC], () => 413)
-		.case(RRR.enum.EINVAL, () => 400)
-		.case(RRR.enum.EACCES, () => 401)
-		.case(RRR.enum.EPERM, () => 403)
-		.case(RRR.enum.ENOENT, () => 404)
-		.case(RRR.enum.EEXIST, () => 409)
+		.case([rrr.enum.EAGAIN, rrr.enum.ENXIO], () => 408)
+		.case([rrr.enum.EFBIG, rrr.enum.ENOSPC], () => 413)
+		.case(rrr.enum.EINVAL, () => 400)
+		.case(rrr.enum.EACCES, () => 401)
+		.case(rrr.enum.EPERM, () => 403)
+		.case(rrr.enum.ENOENT, () => 404)
+		.case(rrr.enum.EEXIST, () => 409)
 		.default(() => 500)
 
 	return intake

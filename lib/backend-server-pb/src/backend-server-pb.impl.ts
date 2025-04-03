@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { CurrentUser, CurrentUserKeys, METADATA_CONTENT_FSID, Metadata, RRR } from "@ordo-pink/core"
+import { CurrentUser, CurrentUserKeys, METADATA_CONTENT_FSID, Metadata, rrr } from "@ordo-pink/core"
 import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
 import { Routary, routary } from "@ordo-pink/routary"
 import {
@@ -36,7 +36,7 @@ export const create_backend_server_pb = (chamber: TPBChamber) =>
 								.and(res => res.json())
 								.and(res => Oath.If(res.success, { T: () => res.payload as Ordo.User.Public.DTO }))
 								.and(user => ({ uid: user[CurrentUserKeys.UID], fsid }))
-								.pipe(ops0.rejected_map(() => RRR.codes.enoent("User not found"))),
+								.pipe(ops0.rejected_map(() => rrr.codes.enoent("User not found"))),
 						),
 					)
 					.pipe(ops0.chain(check_file_exists(intake)))
@@ -46,14 +46,14 @@ export const create_backend_server_pb = (chamber: TPBChamber) =>
 								.read(uid, METADATA_CONTENT_FSID)
 								.pipe(ops0.chain(stream => Oath.FromPromise(() => new Response(stream).json() as Promise<Ordo.Metadata.DTO[]>)))
 								.pipe(ops0.chain(metadata => Oath.FromNullable(metadata.find(item => item.fsid === fsid))))
-								.pipe(ops0.rejected_map(() => RRR.codes.enoent("User metadata not found")))
+								.pipe(ops0.rejected_map(() => rrr.codes.enoent("User metadata not found")))
 								.pipe(
 									ops0.chain(m =>
 										Oath.If(m.props && m.props.public_id, { T: () => m })
 											.pipe(ops0.tap(m => intake.headers.set("Last-Modified", new Date(m.updated_at).toUTCString())))
 											.pipe(ops0.tap(() => intake.headers.set("Content-Type", "text/html")))
 											.pipe(ops0.map(m => ({ uid, fsid: m.props!.public_id })))
-											.pipe(ops0.rejected_map(() => RRR.codes.enoent("File not found"))),
+											.pipe(ops0.rejected_map(() => rrr.codes.enoent("File not found"))),
 									),
 								),
 						),
@@ -79,9 +79,9 @@ export const create_backend_server_pb = (chamber: TPBChamber) =>
 
 const validate_request_params = (intake: Routary.Intake<TPBContext>) =>
 	Oath.Merge([
-		Oath.If(Metadata.Validations.is_fsid(intake.params.fsid)).pipe(ops0.rejected_map(() => RRR.codes.einval("Invalid FSID"))),
+		Oath.If(Metadata.Validations.is_fsid(intake.params.fsid)).pipe(ops0.rejected_map(() => rrr.codes.einval("Invalid FSID"))),
 		Oath.If(CurrentUser.Validations.is_handle(intake.params.handle)).pipe(
-			ops0.rejected_map(() => RRR.codes.einval("Invalid handle")),
+			ops0.rejected_map(() => rrr.codes.einval("Invalid handle")),
 		),
 	]).pipe(ops0.map(() => intake))
 
@@ -92,7 +92,7 @@ const check_file_exists =
 			.exists(uid, fsid)
 			.pipe(ops0.chain(exists => Oath.If(exists)))
 			.pipe(ops0.map(() => ({ uid, fsid })))
-			.pipe(ops0.rejected_map(() => RRR.codes.enoent("File not found")))
+			.pipe(ops0.rejected_map(() => rrr.codes.enoent("File not found")))
 
 type TIDs = { uid: Ordo.User.UID; fsid: Ordo.Metadata.FSID }
 const extract_ids = (intake: Routary.Intake<TPBContext>) => () => ({

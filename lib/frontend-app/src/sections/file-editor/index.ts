@@ -20,7 +20,7 @@
  */
 
 import { BsBoxArrowUp, BsCloudMinus, BsCloudPlus, BsLayoutTextWindow } from "@ordo-pink/frontend-icons"
-import { CommandPaletteItemType, ContextMenuItemType, Metadata, RRR, create_function } from "@ordo-pink/core"
+import { CommandPaletteItemType, ContextMenuItemType, Metadata, create_function, rrr } from "@ordo-pink/core"
 import { Oath, invokers0 } from "@ordo-pink/oath"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { MetadataIcon } from "@ordo-pink/maoka-components"
@@ -176,9 +176,9 @@ export default create_function(
 			const user = state.user_query.get_current().cata(R.catas.or_else(() => null))
 			const fas = state.file_associations$.select("value")
 
-			if (!metadata) return
-
-			if (!user) throw RRR.codes.eperm(`Cannot publish '${metadata.get_name()}' because user is not authenticated`)
+			if (!metadata) throw rrr.codes.enoent("File nto found")
+			if (!metadata.get_size()) throw rrr.codes.einval(`Cannot publish '${metadata.get_name()}' because it is empty`)
+			if (!user) throw rrr.codes.eperm(`Cannot publish '${metadata.get_name()}' because user is not authenticated`)
 
 			const name = `.${metadata.get_name()}-pub`
 			const metadata_type = metadata.get_type()
@@ -222,8 +222,8 @@ export default create_function(
 					}),
 				)
 				.invoke(
-					invokers0.or_else(rrr => {
-						throw RRR.codes.eperm(`Could not publish '${metadata.get_name()}'`, rrr)
+					invokers0.or_else(e => {
+						throw rrr.codes.eperm(`Could not publish '${metadata.get_name()}'`, e)
 					}),
 				)
 		})

@@ -22,7 +22,7 @@
 import { Result } from "@ordo-pink/result"
 import { ZAGS } from "@ordo-pink/zags"
 
-import { RRR } from "../../../../core/src/rrr"
+import { rrr } from "../../../../core/src/rrr"
 
 // TODO Move to frontend-app
 export const MetadataRepository: Ordo.Metadata.RepositoryStatic = {
@@ -34,14 +34,14 @@ export const MetadataRepository: Ordo.Metadata.RepositoryStatic = {
 			get: () =>
 				Result.Try(() => metadata$.select("items"))
 					.pipe(Result.ops.chain(Result.FromNullable))
-					.pipe(Result.ops.err_map(() => RRR.codes.eagain("Loading"))),
+					.pipe(Result.ops.err_map(() => rrr.codes.eagain("Loading"))),
 
 			put: metadata =>
 				Result.FromNullable(metadata)
 					.pipe(Result.ops.chain(() => Result.If(Array.isArray(metadata), { T: () => metadata }))) // TODO: Add validations
 					.pipe(Result.ops.map(metadata => metadata.map(i => i.to_dto())))
 					.pipe(Result.ops.chain(() => Result.Try(() => metadata$.update("items", () => metadata), console.error)))
-					.pipe(Result.ops.err_map(() => RRR.codes.einval("MetadataRepository could not put metadata", metadata))),
+					.pipe(Result.ops.err_map(() => rrr.codes.einval("MetadataRepository could not put metadata", metadata))),
 
 			get $() {
 				return version_zags

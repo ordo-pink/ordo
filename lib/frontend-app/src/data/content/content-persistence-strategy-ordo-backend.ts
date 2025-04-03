@@ -20,30 +20,30 @@
  */
 
 import { Oath, ops0 } from "@ordo-pink/oath"
-import { RRR } from "@ordo-pink/core"
+import { rrr } from "@ordo-pink/core"
 
 export const PersistenceStrategyContentOrdoBackend = {
 	Of: (dt_host: string, fetch: Ordo.Fetch): Ordo.Content.PersistenceStrategy => {
 		return {
-			clear: () => Oath.Reject(RRR.codes.eio("NOT IMPLEMENTED")),
+			clear: () => Oath.Reject(rrr.codes.eio("NOT IMPLEMENTED")),
 			delete: (uid, fsid) =>
 				Oath.FromPromise(() => fetch(`${dt_host}/${uid}/${fsid}`, { credentials: "include", method: "DELETE" }))
 					.and(res => res.json())
 					.and(res => Oath.If(res.success))
-					.pipe(ops0.rejected_map((e: Error) => RRR.codes.eio(e?.message, e))), // TODO
-			exists: () => Oath.Reject(RRR.codes.eio("NOT IMPLEMENTED")),
-			list: () => Oath.Reject(RRR.codes.eio("NOT IMPLEMENTED")),
+					.pipe(ops0.rejected_map((e: Error) => rrr.codes.eio(e?.message, e))), // TODO
+			exists: () => Oath.Reject(rrr.codes.eio("NOT IMPLEMENTED")),
+			list: () => Oath.Reject(rrr.codes.eio("NOT IMPLEMENTED")),
 			get: (uid, fsid) =>
 				Oath.FromPromise(() => fetch(`${dt_host}/${uid}/${fsid}`, { credentials: "include" }))
 					.and(res => Oath.If(res.status === 200, { T: () => res }))
 					.and(res => res.body)
-					.pipe(ops0.rejected_map((e: Error) => RRR.codes.eio(e?.message, e))),
+					.pipe(ops0.rejected_map((e: Error) => rrr.codes.eio(e?.message, e))),
 			put: (uid, fsid, body) =>
 				Oath.FromPromise(() =>
 					fetch(`${dt_host}/${uid}/${fsid}`, { credentials: "include", method: "PUT", body: body as ArrayBuffer }),
 				)
 					.and(res => Oath.If(res.status === 200 || res.status === 404))
-					.pipe(ops0.rejected_map((e: Error) => RRR.codes.eio(e?.message, e))),
+					.pipe(ops0.rejected_map((e: Error) => rrr.codes.eio(e?.message, e))),
 		}
 	},
 }

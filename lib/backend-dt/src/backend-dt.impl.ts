@@ -121,7 +121,7 @@ export const create_backend_dt = (chamber: TDTChamber) =>
 		.use(
 			routary_cors({
 				allow_origin: chamber.allow_origin,
-				allow_headers: ["content-type", "authorization"],
+				allow_headers: ["content-type"],
 				allow_credentials: true,
 			}),
 		)

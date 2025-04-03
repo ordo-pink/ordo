@@ -51,6 +51,7 @@ declare global {
 					content: string
 					cc?: string[]
 					bcc?: string[]
+					preview_title?: string
 					headers?: Record<string, string>
 				}) => void
 			}

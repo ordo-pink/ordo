@@ -73,7 +73,7 @@ export const create_backend_pb = (chamber: TPBChamber) =>
 
 		.get("/healthcheck", () => new Response("OK"))
 
-		.use(routary_cors({ allow_origin: chamber.allow_origin, allow_headers: ["content-type", "authorization"] }))
+		.use(routary_cors({ allow_origin: chamber.allow_origin, allow_headers: ["content-type"] }))
 
 		.start(() => rickroll)
 

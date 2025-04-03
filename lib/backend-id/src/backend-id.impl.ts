@@ -30,9 +30,10 @@ import { handle_get_session } from "./handlers/session/get-session.handler"
 import { handle_get_user_by_handle } from "./handlers/user/get-user-by-handle.handler"
 import { handle_get_user_by_id } from "./handlers/user/get-user-by-id.handler"
 import { handle_invalidate_session } from "./handlers/session/invalidate.handler"
-import { handle_update_user } from "./handlers/user/update-user.handler"
+// import { handle_update_user } from "./handlers/user/update-user.handler"
 
 // TODO Global stats when API is ready
+// TODO Custom handlers for updating email & handle + disallow editing them in PATCH
 export const create_backend_id = (chamber: TIDChamber) =>
 	routary
 		.create<TIDContext>({ ...chamber, status: 200, headers: new Headers(), request_language: TWO_LETTER_LOCALE.ENGLISH })
@@ -41,7 +42,7 @@ export const create_backend_id = (chamber: TIDChamber) =>
 
 		.get("/users/:user_id", handle_get_user_by_id)
 		.get("/users/handle/:user_handle", handle_get_user_by_handle)
-		.patch("/users/:user_id", handle_update_user)
+		// .patch("/users/:user_id", handle_update_user)
 		.delete("/users/:user_id", handle_delete_user)
 
 		.get("/healthcheck", () => new Response("OK")) // TODO Extract to lib
@@ -49,7 +50,7 @@ export const create_backend_id = (chamber: TIDChamber) =>
 		.use(
 			routary_cors({
 				allow_origin: chamber.allow_origin,
-				allow_headers: ["content-type", "authorization"],
+				allow_headers: ["content-type"],
 				allow_credentials: true,
 			}),
 		)

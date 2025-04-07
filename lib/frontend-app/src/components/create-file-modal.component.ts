@@ -26,7 +26,7 @@ import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { Switch } from "@ordo-pink/switch"
-import { invokers0 } from "@ordo-pink/oath"
+import { oath } from "@ordo-pink/oath"
 
 export const CreateFileModal = (parent: Ordo.Metadata.FSID | null = null) =>
 	Maoka.create("div", ({ use }) => {
@@ -46,8 +46,8 @@ export const CreateFileModal = (parent: Ordo.Metadata.FSID | null = null) =>
 				action: () => {
 					void commands
 						.naga("cmd.metadata.create", { name: state.name, parent, type })
-						.and(() => commands.emit("cmd.application.modal.hide"))
-						.invoke(invokers0.or_else(console.error))
+						.pipe(oath.ops.and(() => commands.emit("cmd.application.modal.hide")))
+						.cata(oath.catas.or_else(console.error))
 				},
 				action_hotkey: "enter",
 				action_text: t_ok,

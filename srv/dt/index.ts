@@ -20,53 +20,56 @@
  */
 
 import { type Logger, console_logger } from "@ordo-pink/logger"
-import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
 import { type TDTChamber, create_backend_server_dt } from "@ordo-pink/backend-server-dt"
-import { PersistenceStrategyDataFS } from "@ordo-pink/backend-persistence-strategy-data-fs"
+import { create_persistence_strategy_data_fs } from "@ordo-pink/backend-persistence-strategy-data-fs"
 import { is_port } from "@ordo-pink/tau"
+import { oath } from "@ordo-pink/oath"
 
 const env_rrr = (env_var: string) => (value?: any) =>
 	value != null ? `Invalid value for ${env_var}: "${value}"` : `Missing value for ${env_var}`
 
 const get_env = () =>
-	Oath.Merge({
-		port: Oath.FromNullable(Bun.env.ORDO_DT_PORT)
-			.and(n => Oath.If(is_port(n), { T: () => n }))
-			.pipe(ops0.rejected_map(env_rrr("ORDO_DT_PORT"))),
+	oath.merge({
+		port: oath
+			.from_nullable(Bun.env.ORDO_DT_PORT)
+			.pipe(oath.ops.and(n => oath.if(is_port(n), { on_true: () => n })))
+			.pipe(oath.ops.rejected_map(env_rrr("ORDO_DT_PORT"))),
 
-		allow_origin: Oath.FromNullable(Bun.env.ORDO_DT_ALLOW_ORIGIN)
-			.and(s => s.split(", "))
-			.pipe(ops0.rejected_map(env_rrr("ORDO_DT_ALLOW_ORIGIN"))),
+		allow_origin: oath
+			.from_nullable(Bun.env.ORDO_DT_ALLOW_ORIGIN)
+			.pipe(oath.ops.and(s => s.split(", ")))
+			.pipe(oath.ops.rejected_map(env_rrr("ORDO_DT_ALLOW_ORIGIN"))),
 
-		data_path: Oath.FromNullable(Bun.env.ORDO_DT_DATA_PATH, env_rrr("ORDO_DT_DATA_PATH")),
+		data_path: oath.from_nullable(Bun.env.ORDO_DT_DATA_PATH, env_rrr("ORDO_DT_DATA_PATH")),
 
-		id_host: Oath.FromNullable(Bun.env.ORDO_ID_HOST, env_rrr("ORDO_ID_HOST")),
+		id_host: oath.from_nullable(Bun.env.ORDO_ID_HOST, env_rrr("ORDO_ID_HOST")),
 
-		dt_host: Oath.FromNullable(Bun.env.ORDO_DT_HOST, env_rrr("ORDO_DT_HOST")),
+		dt_host: oath.from_nullable(Bun.env.ORDO_DT_HOST, env_rrr("ORDO_DT_HOST")),
 	})
 
 const main = () =>
 	get_env()
-		.and(({ allow_origin, port, data_path, id_host, dt_host }) =>
-			Oath.Merge({
-				allow_origin,
-				logger,
-				data_persistence_strategy: PersistenceStrategyDataFS.Of(data_path),
-				id_host,
-				dt_host,
-			} satisfies TDTChamber)
-				.and(create_backend_server_dt)
-				.and(fetch => Bun.serve({ fetch, port })),
+		.pipe(
+			oath.ops.and(({ allow_origin, port, data_path, id_host, dt_host }) =>
+				oath
+					.merge({
+						allow_origin,
+						logger,
+						data_persistence_strategy: create_persistence_strategy_data_fs({ root: data_path }),
+						id_host,
+						dt_host,
+					} satisfies TDTChamber)
+					.pipe(oath.ops.and(create_backend_server_dt))
+					.pipe(oath.ops.and(fetch => Bun.serve({ fetch, port }))),
+			),
 		)
-		.pipe(ops0.tap(server => logger.info(`server running on http://${server.hostname}:${server.port}`)))
-		.invoke(
-			invokers0.or_else(e => {
+		.pipe(oath.ops.tap(server => logger.info(`server running on http://${server.hostname}:${server.port}`)))
+		.cata(
+			oath.catas.or_else(e => {
 				logger.panic(e)
 				process.exit(1)
 			}),
 		)
-
-void main()
 
 // --- Internal ---
 
@@ -80,3 +83,5 @@ const logger: Logger = {
 	panic: (...message) => console_logger.panic("[DT]", ...message),
 	warn: (...message) => console_logger.warn("[DT]", ...message),
 }
+
+void main()

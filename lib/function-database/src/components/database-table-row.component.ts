@@ -25,10 +25,10 @@ import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
-import { Oath } from "@ordo-pink/oath"
 import { R } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
 import { noop } from "@ordo-pink/tau"
+import { oath } from "@ordo-pink/oath"
 
 import { database$ } from "../database.state"
 
@@ -65,11 +65,12 @@ const UserCell = (column: string, metadata: Ordo.Metadata.Instance) =>
 		use(MaokaOrdo.Jabs.happy_marriage$(user_query.$))
 
 		return () =>
-			Oath.FromNullable(metadata.get_created_by())
-				.and(id => user_query.get_by_id(id))
-				.and(Oath.FromNullable)
-				.and(user => UserReference(user))
-				.fork(noop, x => x)
+			oath
+				.from_nullable(metadata.get_created_by())
+				.pipe(oath.ops.and(id => user_query.get_by_id(id)))
+				.pipe(oath.ops.and(oath.from_nullable))
+				.pipe(oath.ops.and(user => UserReference(user)))
+				.cata(oath.catas.or_else(noop))
 	})
 
 const Cell = (value: TMaokaChildren, on_click?: (event: MouseEvent) => void) =>

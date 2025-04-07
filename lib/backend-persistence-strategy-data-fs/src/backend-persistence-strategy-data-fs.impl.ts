@@ -6,11 +6,11 @@
 import { BunFile } from "bun"
 import { resolve } from "path"
 
-import { Oath, ops0 } from "@ordo-pink/oath"
+import { oath } from "@ordo-pink/oath"
 import { prop } from "@ordo-pink/tau"
 import { rrr } from "@ordo-pink/core"
 
-import { TPersistenceStategyDataFS } from "./backend-persistence-strategy-data-fs.types"
+import { PersistenceStrategyDataFS } from "./backend-persistence-strategy-data-fs.types"
 
 /**
  * `PersistenceStrategyDataFS` implements `OrdoBackend.Data.PersistenceStrategy` for storing data
@@ -23,91 +23,93 @@ import { TPersistenceStategyDataFS } from "./backend-persistence-strategy-data-f
  * @example
  * const data_ps = PersistenceStrategyDataFS.of("/var/dt/files")
  */
-export const PersistenceStrategyDataFS: TPersistenceStategyDataFS = {
-	Of: root => {
-		const get_path = get_path_from_root(root)
+export const create_persistence_strategy_data_fs: PersistenceStrategyDataFS.Create = ({ root }) => {
+	const get_path = get_path_from_root(root)
 
-		return {
-			exists: (uid, fsid) =>
-				get_path(uid, fsid)
-					.pipe(ops0.chain(check_file_exists))
-					.pipe(ops0.map(prop("exists"))),
+	return {
+		exists: (uid, fsid) =>
+			get_path(uid, fsid)
+				.pipe(oath.ops.chain(check_file_exists))
+				.pipe(oath.ops.map(prop("exists"))),
 
-			create: (uid, fsid, content) =>
-				get_path(uid, fsid)
-					.pipe(ops0.chain(validate_file_does_not_exist))
-					.pipe(ops0.map(prop("path")))
-					.pipe(ops0.chain(write_file(content))),
+		create: (uid, fsid, content) =>
+			get_path(uid, fsid)
+				.pipe(oath.ops.chain(validate_file_does_not_exist))
+				.pipe(oath.ops.map(prop("path")))
+				.pipe(oath.ops.chain(write_file(content))),
 
-			read: (uid, fsid) =>
-				get_path(uid, fsid)
-					.pipe(ops0.chain(validate_file_exists))
-					.pipe(ops0.map(prop("file")))
-					.pipe(ops0.chain(get_file_content)),
+		read: (uid, fsid) =>
+			get_path(uid, fsid)
+				.pipe(oath.ops.chain(validate_file_exists))
+				.pipe(oath.ops.map(prop("file")))
+				.pipe(oath.ops.chain(get_file_content)),
 
-			update: (uid, fsid, content) =>
-				get_path(uid, fsid)
-					.pipe(ops0.chain(get_file))
-					.pipe(ops0.chain(write_file(content))),
+		update: (uid, fsid, content) =>
+			get_path(uid, fsid)
+				.pipe(oath.ops.chain(get_file))
+				.pipe(oath.ops.chain(write_file(content))),
 
-			delete: (uid, fsid) =>
-				get_path(uid, fsid)
-					.pipe(ops0.chain(validate_file_exists))
-					.pipe(ops0.map(prop("file")))
-					.pipe(ops0.chain(delete_file)),
+		delete: (uid, fsid) =>
+			get_path(uid, fsid)
+				.pipe(oath.ops.chain(validate_file_exists))
+				.pipe(oath.ops.map(prop("file")))
+				.pipe(oath.ops.chain(delete_file)),
 
-			mtime: (uid, fsid) =>
-				get_path(uid, fsid)
-					.pipe(ops0.chain(validate_file_exists))
-					.pipe(ops0.map(prop("file")))
-					.pipe(ops0.map(file => file.lastModified)),
-		}
-	},
+		mtime: (uid, fsid) =>
+			get_path(uid, fsid)
+				.pipe(oath.ops.chain(validate_file_exists))
+				.pipe(oath.ops.map(prop("file")))
+				.pipe(oath.ops.map(file => file.lastModified)),
+	}
 }
 
 // --- Internal ---
 
 const already_exists_rrr = () => rrr.codes.eexist("File already exists")
 const not_found_rrr = () => rrr.codes.enoent("File not found")
-const io_rrr = (e: Error) => rrr.codes.eio(e.message)
+const io_rrr = (e: unknown) => rrr.codes.eio("Failed to store local data", e)
 
-const get_file = (path: string) => Oath.Try(() => Bun.file(path)).pipe(ops0.rejected_map(io_rrr))
+const get_file = (path: string) => oath.try(() => Bun.file(path)).pipe(oath.ops.rejected_map(io_rrr))
 
 const check_file_exists = (path: string) =>
 	get_file(path).pipe(
-		ops0.chain(file =>
-			Oath.FromPromise(() => file.exists())
-				.fix(() => false)
-				.pipe(ops0.map(exists => ({ file, exists }))),
+		oath.ops.chain(file =>
+			oath
+				.from_promise(() => file.exists())
+				.pipe(oath.ops.fix(() => false))
+				.pipe(oath.ops.map(exists => ({ file, exists }))),
 		),
 	)
 
 const write_file = (content: ReadableStream) => (path: BunFile | string) =>
-	Oath.Try(() => Bun.readableStreamToArrayBuffer(content))
-		.pipe(ops0.chain(input => Oath.FromPromise(() => Bun.write(path as BunFile, input))))
-		.pipe(ops0.rejected_map(io_rrr))
+	oath
+		.from_promise(() => Bun.readableStreamToArrayBuffer(content) as Promise<ArrayBuffer>)
+		.pipe(oath.ops.chain(input => oath.from_promise(() => Bun.write(path, input))))
+		.pipe(oath.ops.rejected_map(io_rrr))
 
-const delete_file = (file: BunFile) => Oath.Try(() => file.delete()).pipe(ops0.rejected_map(io_rrr))
+const delete_file = (file: BunFile) => oath.from_promise(() => file.delete()).pipe(oath.ops.rejected_map(io_rrr))
 
 const validate_file_exists = (path: string) =>
 	check_file_exists(path).pipe(
-		ops0.chain(({ exists, file }) =>
-			Oath.If(exists)
-				.pipe(ops0.rejected_map(not_found_rrr))
-				.pipe(ops0.map(() => ({ path, file }))),
+		oath.ops.chain(({ exists, file }) =>
+			oath
+				.if(exists)
+				.pipe(oath.ops.rejected_map(not_found_rrr))
+				.pipe(oath.ops.map(() => ({ path, file }))),
 		),
 	)
 
 const validate_file_does_not_exist = (path: string) =>
 	check_file_exists(path).pipe(
-		ops0.chain(({ exists, file }) =>
-			Oath.If(!exists)
-				.pipe(ops0.rejected_map(already_exists_rrr))
-				.pipe(ops0.map(() => ({ path, file }))),
+		oath.ops.chain(({ exists, file }) =>
+			oath
+				.if(!exists)
+				.pipe(oath.ops.rejected_map(already_exists_rrr))
+				.pipe(oath.ops.map(() => ({ path, file }))),
 		),
 	)
 
-const get_file_content = (file: BunFile) => Oath.Try(() => file.stream()).pipe(ops0.rejected_map(io_rrr))
+const get_file_content = (file: BunFile) => oath.try(() => file.stream()).pipe(oath.ops.rejected_map(io_rrr))
 
 const get_path_from_root = (root: string) => (uid: Ordo.User.UID, fsid: Ordo.Metadata.FSID) =>
-	Oath.Try(() => resolve(root, uid, ...fsid.split("-"))).pipe(ops0.rejected_map(io_rrr))
+	oath.try(() => resolve(root, uid, ...fsid.split("-"))).pipe(oath.ops.rejected_map(io_rrr))

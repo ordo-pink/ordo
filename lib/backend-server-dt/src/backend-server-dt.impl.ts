@@ -4,7 +4,6 @@
  */
 
 import { CurrentUser, CurrentUserKeys, METADATA_CONTENT_FSID, Metadata, rrr } from "@ordo-pink/core"
-import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
 import { Routary, routary } from "@ordo-pink/routary"
 import {
 	create_response,
@@ -17,6 +16,7 @@ import {
 } from "@ordo-pink/routary-ordo"
 import { TWO_LETTER_LOCALE } from "@ordo-pink/locale"
 import { is_finite_non_negative_int } from "@ordo-pink/tau"
+import { oath } from "@ordo-pink/oath"
 import { rickroll } from "@ordo-pink/rickroll"
 import { routary_cors } from "@ordo-pink/routary-cors"
 
@@ -28,60 +28,62 @@ export const create_backend_server_dt = (chamber: TDTChamber) =>
 	routary
 		.create<TDTContext>({ ...chamber, headers: new Headers(), status: 200, request_language: TWO_LETTER_LOCALE.ENGLISH })
 		.head("/:uid/:fsid", intake => {
-			return Oath.Resolve(intake)
-				.pipe(ops0.tap(start_response_timer))
-				.pipe(ops0.tap(extract_request_ip))
-				.pipe(ops0.chain(validate_request_params))
-				.pipe(ops0.chain(authenticate))
-				.pipe(ops0.chain(check_authorization(intake)))
-				.pipe(ops0.map(extract_ids(intake)))
-				.pipe(ops0.chain(check_file_exists(intake)))
-				.pipe(ops0.chain(set_last_modified_header(intake)))
-				.pipe(ops0.map(() => intake))
-				.pipe(ops0.rejected_map(rrr => ({ rrr, intake })))
-				.fix(status_from_rrr)
-				.pipe(ops0.tap(stop_response_timer))
-				.pipe(ops0.tap(log_request))
-				.pipe(ops0.map(create_response))
-				.invoke(invokers0.force_resolve)
+			return oath
+				.of(intake)
+				.pipe(oath.ops.tap(start_response_timer))
+				.pipe(oath.ops.tap(extract_request_ip))
+				.pipe(oath.ops.chain(validate_request_params))
+				.pipe(oath.ops.chain(authenticate))
+				.pipe(oath.ops.chain(check_authorization(intake)))
+				.pipe(oath.ops.map(extract_ids(intake)))
+				.pipe(oath.ops.chain(check_file_exists(intake)))
+				.pipe(oath.ops.chain(set_last_modified_header(intake)))
+				.pipe(oath.ops.map(() => intake))
+				.pipe(oath.ops.rejected_map(rrr => ({ rrr, intake })))
+				.pipe(oath.ops.fix(status_from_rrr))
+				.pipe(oath.ops.tap(stop_response_timer))
+				.pipe(oath.ops.tap(log_request))
+				.pipe(oath.ops.map(create_response))
+				.cata(oath.catas.unwrap())
 		})
 
 		.get("/:uid/:fsid", intake => {
-			return Oath.Resolve(intake)
-				.pipe(ops0.tap(start_response_timer))
-				.pipe(ops0.tap(extract_request_ip))
-				.pipe(ops0.chain(validate_request_params))
-				.pipe(ops0.chain(authenticate))
-				.pipe(ops0.chain(check_authorization(intake)))
-				.pipe(ops0.map(extract_ids(intake)))
-				.pipe(ops0.chain(check_file_exists(intake)))
-				.pipe(ops0.chain(set_last_modified_header(intake)))
-				.pipe(ops0.chain(({ uid, fsid }) => intake.data_persistence_strategy.read(uid, fsid)))
-				.pipe(ops0.tap(file => void (intake.payload = file)))
-				.pipe(ops0.map(() => intake))
-				.pipe(ops0.tap(intake => intake.headers.set("Content-Type", "application/octet-stream")))
-				.pipe(ops0.rejected_map(rrr => ({ rrr, intake })))
-				.fix(status_from_rrr)
-				.pipe(ops0.tap(stop_response_timer))
-				.pipe(ops0.tap(log_request))
-				.pipe(ops0.map(create_response))
-				.invoke(invokers0.force_resolve)
+			return oath
+				.of(intake)
+				.pipe(oath.ops.tap(start_response_timer))
+				.pipe(oath.ops.tap(extract_request_ip))
+				.pipe(oath.ops.chain(validate_request_params))
+				.pipe(oath.ops.chain(authenticate))
+				.pipe(oath.ops.chain(check_authorization(intake)))
+				.pipe(oath.ops.map(extract_ids(intake)))
+				.pipe(oath.ops.chain(check_file_exists(intake)))
+				.pipe(oath.ops.chain(set_last_modified_header(intake)))
+				.pipe(oath.ops.chain(({ uid, fsid }) => intake.data_persistence_strategy.read(uid, fsid)))
+				.pipe(oath.ops.tap(file => void (intake.payload = file)))
+				.pipe(oath.ops.map(() => intake))
+				.pipe(oath.ops.tap(intake => intake.headers.set("Content-Type", "application/octet-stream")))
+				.pipe(oath.ops.rejected_map(rrr => ({ rrr, intake })))
+				.pipe(oath.ops.fix(status_from_rrr))
+				.pipe(oath.ops.tap(stop_response_timer))
+				.pipe(oath.ops.tap(log_request))
+				.pipe(oath.ops.map(create_response))
+				.cata(oath.catas.unwrap())
 		})
 
 		.post(
 			"/:uid/:fsid",
 			default_handler(intake =>
 				validate_request_params(intake)
-					.pipe(ops0.chain(validate_body_is_not_empty))
-					.pipe(ops0.chain(authenticate))
-					.pipe(ops0.chain(check_authorization(intake)))
-					.pipe(ops0.chain(check_can_create_files(intake)))
-					.pipe(ops0.chain(validate_file_size_limit(intake)))
-					.pipe(ops0.map(extract_ids(intake)))
-					.pipe(ops0.chain(check_file_does_not_exist(intake)))
-					.pipe(ops0.chain(({ uid, fsid }) => intake.data_persistence_strategy.create(uid, fsid, intake.req.body!)))
-					.pipe(ops0.map(() => intake))
-					.pipe(ops0.rejected_map(rrr => ({ rrr, intake }))),
+					.pipe(oath.ops.chain(validate_body_is_not_empty))
+					.pipe(oath.ops.chain(authenticate))
+					.pipe(oath.ops.chain(check_authorization(intake)))
+					.pipe(oath.ops.chain(check_can_create_files(intake)))
+					.pipe(oath.ops.chain(validate_file_size_limit(intake)))
+					.pipe(oath.ops.map(extract_ids(intake)))
+					.pipe(oath.ops.chain(check_file_does_not_exist(intake)))
+					.pipe(oath.ops.chain(({ uid, fsid }) => intake.data_persistence_strategy.create(uid, fsid, intake.req.body!)))
+					.pipe(oath.ops.map(() => intake))
+					.pipe(oath.ops.rejected_map(rrr => ({ rrr, intake }))),
 			),
 		)
 
@@ -89,16 +91,16 @@ export const create_backend_server_dt = (chamber: TDTChamber) =>
 			"/:uid/:fsid",
 			default_handler(intake =>
 				validate_request_params(intake)
-					.pipe(ops0.chain(validate_body_is_not_empty))
-					.pipe(ops0.chain(authenticate))
-					.pipe(ops0.chain(check_authorization(intake)))
-					.pipe(ops0.chain(check_total_files_limit_if_file_does_not_exist(intake)))
-					.pipe(ops0.chain(validate_file_size_limit(intake)))
-					.pipe(ops0.map(extract_ids(intake)))
-					.pipe(ops0.chain(({ uid, fsid }) => intake.data_persistence_strategy.update(uid, fsid, intake.req.body!)))
-					.pipe(ops0.map(() => intake))
-					.pipe(ops0.map(() => intake))
-					.pipe(ops0.rejected_map(rrr => ({ rrr, intake }))),
+					.pipe(oath.ops.chain(validate_body_is_not_empty))
+					.pipe(oath.ops.chain(authenticate))
+					.pipe(oath.ops.chain(check_authorization(intake)))
+					.pipe(oath.ops.chain(check_total_files_limit_if_file_does_not_exist(intake)))
+					.pipe(oath.ops.chain(validate_file_size_limit(intake)))
+					.pipe(oath.ops.map(extract_ids(intake)))
+					.pipe(oath.ops.chain(({ uid, fsid }) => intake.data_persistence_strategy.update(uid, fsid, intake.req.body!)))
+					.pipe(oath.ops.map(() => intake))
+					.pipe(oath.ops.map(() => intake))
+					.pipe(oath.ops.rejected_map(rrr => ({ rrr, intake }))),
 			),
 		)
 
@@ -106,13 +108,13 @@ export const create_backend_server_dt = (chamber: TDTChamber) =>
 			"/:uid/:fsid",
 			default_handler(intake =>
 				validate_request_params(intake)
-					.pipe(ops0.chain(authenticate))
-					.pipe(ops0.chain(check_authorization(intake)))
-					.pipe(ops0.map(extract_ids(intake)))
-					.pipe(ops0.chain(check_file_exists(intake)))
-					.pipe(ops0.chain(({ uid, fsid }) => intake.data_persistence_strategy.delete(uid, fsid)))
-					.pipe(ops0.map(() => intake))
-					.pipe(ops0.rejected_map(rrr => ({ rrr, intake }))),
+					.pipe(oath.ops.chain(authenticate))
+					.pipe(oath.ops.chain(check_authorization(intake)))
+					.pipe(oath.ops.map(extract_ids(intake)))
+					.pipe(oath.ops.chain(check_file_exists(intake)))
+					.pipe(oath.ops.chain(({ uid, fsid }) => intake.data_persistence_strategy.delete(uid, fsid)))
+					.pipe(oath.ops.map(() => intake))
+					.pipe(oath.ops.rejected_map(rrr => ({ rrr, intake }))),
 			),
 		)
 
@@ -129,34 +131,42 @@ export const create_backend_server_dt = (chamber: TDTChamber) =>
 		.start(() => rickroll)
 
 export const validate_request_params = (intake: Routary.Intake<TDTContext>) =>
-	Oath.Merge([
-		Oath.If(Metadata.Validations.is_fsid(intake.params.fsid)).pipe(ops0.rejected_map(() => rrr.codes.einval("Invalid FSID"))),
-		Oath.If(CurrentUser.Validations.is_uid(intake.params.uid)).pipe(ops0.rejected_map(() => rrr.codes.einval("Invalid UID"))),
-	]).pipe(ops0.map(() => intake))
+	oath
+		.all([
+			oath
+				.if(Metadata.Validations.is_fsid(intake.params.fsid))
+				.pipe(oath.ops.rejected_map(() => rrr.codes.einval("Invalid FSID"))),
+			oath
+				.if(CurrentUser.Validations.is_uid(intake.params.uid))
+				.pipe(oath.ops.rejected_map(() => rrr.codes.einval("Invalid UID"))),
+		])
+		.pipe(oath.ops.map(() => intake))
 
 export const authenticate = (intake: Routary.Intake<TDTContext>) =>
-	Oath.Resolve(intake.req.headers)
-		.pipe(ops0.map(headers => ({ headers, method: "GET", credentials: "include" as const })))
-		.pipe(ops0.chain(init => Oath.FromPromise(() => fetch(`${intake.id_host}/session`, init))))
-		.pipe(ops0.chain(res => Oath.FromPromise(() => res.json())))
-		.pipe(ops0.chain(body => Oath.If(body?.success, { T: () => body.payload })))
-		.pipe(ops0.chain(x => Oath.If(CurrentUser.Validations.is_dto(x), { T: () => x as Ordo.User.Current.DTO })))
-		.pipe(ops0.rejected_map(e => rrr.codes.eacces(e?.message ?? "Unauthorized")))
+	oath
+		.of(intake.req.headers)
+		.pipe(oath.ops.map(headers => ({ headers, method: "GET", credentials: "include" as const })))
+		.pipe(oath.ops.chain(init => oath.from_promise(() => fetch(`${intake.id_host}/session`, init))))
+		.pipe(oath.ops.chain(res => oath.from_promise(() => res.json())))
+		.pipe(oath.ops.chain(body => oath.if(body?.success, { on_true: () => body.payload })))
+		.pipe(oath.ops.chain(x => oath.if(CurrentUser.Validations.is_dto(x), { on_true: () => x as Ordo.User.Current.DTO })))
+		.pipe(oath.ops.rejected_map(e => rrr.codes.eacces("Unauthorized", e)))
 
 // TODO checking permissions for editing files of other users
 export const check_authorization = (intake: Routary.Intake<TDTContext>) => (user: Ordo.User.Current.DTO) =>
-	Oath.If(user[CurrentUserKeys.UID] === intake.params.uid)
-		.pipe(ops0.map(() => user))
-		.pipe(ops0.rejected_map(() => rrr.codes.eperm("Permission denied")))
+	oath
+		.if(user[CurrentUserKeys.UID] === intake.params.uid)
+		.pipe(oath.ops.map(() => user))
+		.pipe(oath.ops.rejected_map(() => rrr.codes.eperm("Permission denied")))
 
 export const check_file_exists =
 	(intake: Routary.Intake<TDTContext>) =>
 	({ uid, fsid }: TIDs) =>
 		intake.data_persistence_strategy
 			.exists(uid, fsid)
-			.pipe(ops0.chain(exists => Oath.If(exists)))
-			.pipe(ops0.map(() => ({ uid, fsid })))
-			.pipe(ops0.rejected_map(() => rrr.codes.enoent("File not found")))
+			.pipe(oath.ops.chain(exists => oath.if(exists)))
+			.pipe(oath.ops.map(() => ({ uid, fsid })))
+			.pipe(oath.ops.rejected_map(() => rrr.codes.enoent("File not found")))
 
 export type TIDs = { uid: Ordo.User.UID; fsid: Ordo.Metadata.FSID }
 export const extract_ids = (intake: Routary.Intake<TDTContext>) => () => ({
@@ -169,45 +179,47 @@ const check_file_does_not_exist =
 	({ uid, fsid }: TIDs) =>
 		intake.data_persistence_strategy
 			.exists(uid, fsid)
-			.pipe(ops0.chain(exists => Oath.If(!exists)))
-			.pipe(ops0.map(() => ({ uid, fsid })))
-			.pipe(ops0.rejected_map(() => rrr.codes.eexist("File already exists")))
+			.pipe(oath.ops.chain(exists => oath.if(!exists)))
+			.pipe(oath.ops.map(() => ({ uid, fsid })))
+			.pipe(oath.ops.rejected_map(() => rrr.codes.eexist("File already exists")))
 
 export const validate_body_is_not_empty = (intake: Routary.Intake<TDTContext>) =>
-	Oath.FromNullable(intake.req.body)
-		.pipe(ops0.map(() => intake))
-		.pipe(ops0.rejected_map(() => rrr.codes.einval("Empty file body")))
+	oath
+		.from_nullable(intake.req.body)
+		.pipe(oath.ops.map(() => intake))
+		.pipe(oath.ops.rejected_map(() => rrr.codes.einval("Empty file body")))
 
 export const validate_file_size_limit = (intake: Routary.Intake<TDTContext>) => (user: Ordo.User.Current.DTO) =>
-	Oath.FromNullable(intake.req.headers.get("content-length"))
-		.pipe(ops0.map(file_size => Number.parseInt(file_size, 10)))
-		.pipe(ops0.chain(file_size => Oath.If(is_finite_non_negative_int(file_size), { T: () => file_size })))
-		.pipe(ops0.chain(file_size => Oath.If(CurrentUser.FromDTO(user).can_upload(file_size))))
-		.pipe(ops0.rejected_map(() => rrr.codes.efbig("File too big")))
+	oath
+		.from_nullable(intake.req.headers.get("content-length"))
+		.pipe(oath.ops.map(file_size => Number.parseInt(file_size, 10)))
+		.pipe(oath.ops.chain(file_size => oath.if(is_finite_non_negative_int(file_size), { on_true: () => file_size })))
+		.pipe(oath.ops.chain(file_size => oath.if(CurrentUser.FromDTO(user).can_upload(file_size))))
+		.pipe(oath.ops.rejected_map(() => rrr.codes.efbig("File too big")))
 
 // TODO check if attemted to create a file in other user's space
 export const check_can_create_files = (intake: Routary.Intake<TDTContext>) => (user: Ordo.User.Current.DTO) =>
 	intake.data_persistence_strategy
 		.read(user[CurrentUserKeys.UID], METADATA_CONTENT_FSID)
-		.pipe(ops0.chain(stream => Oath.Try(() => new Response(stream).json())))
-		.pipe(ops0.map(metadata => metadata.length))
-		.fix(() => 0)
-		.pipe(ops0.map(total_files => CurrentUser.FromDTO(user).can_create_files(total_files)))
-		.pipe(ops0.chain(can_create => Oath.If(can_create)))
-		.pipe(ops0.map(() => user))
-		.pipe(ops0.rejected_map(() => rrr.codes.enospc("Too many files")))
+		.pipe(oath.ops.chain(stream => oath.from_promise(() => new Response(stream).json())))
+		.pipe(oath.ops.map(metadata => metadata.length))
+		.pipe(oath.ops.fix(() => 0))
+		.pipe(oath.ops.map(total_files => CurrentUser.FromDTO(user).can_create_files(total_files)))
+		.pipe(oath.ops.chain(can_create => oath.if(can_create)))
+		.pipe(oath.ops.map(() => user))
+		.pipe(oath.ops.rejected_map(() => rrr.codes.enospc("Too many files")))
 
 const check_total_files_limit_if_file_does_not_exist = (intake: Routary.Intake<TDTContext>) => (user: Ordo.User.Current.DTO) =>
 	intake.data_persistence_strategy
 		.exists(intake.params.uid as Ordo.User.UID, intake.params.fsid as Ordo.Metadata.FSID)
-		.pipe(ops0.chain(exists => (exists ? Oath.Resolve(user) : check_can_create_files(intake)(user))))
+		.pipe(oath.ops.chain(exists => (exists ? oath.of(user) : check_can_create_files(intake)(user))))
 
 const set_last_modified_header =
 	(intake: Routary.Intake<TDTContext>) =>
 	({ uid, fsid }: TIDs) =>
 		intake.data_persistence_strategy
 			.mtime(uid, fsid)
-			.pipe(ops0.map(mtime => new Date(mtime)))
-			.pipe(ops0.map(date => date.toUTCString()))
-			.pipe(ops0.tap(last_modified => intake.headers.set("Last-Modified", last_modified)))
-			.pipe(ops0.map(() => ({ uid, fsid })))
+			.pipe(oath.ops.map(mtime => new Date(mtime)))
+			.pipe(oath.ops.map(date => date.toUTCString()))
+			.pipe(oath.ops.tap(last_modified => intake.headers.set("Last-Modified", last_modified)))
+			.pipe(oath.ops.map(() => ({ uid, fsid })))

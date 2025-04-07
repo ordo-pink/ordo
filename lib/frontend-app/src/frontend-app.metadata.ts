@@ -24,7 +24,7 @@ import { Result } from "@ordo-pink/result"
 import { ZAGS } from "@ordo-pink/zags"
 import { call_once } from "@ordo-pink/tau"
 import { console_logger } from "@ordo-pink/logger"
-import { invokers0 } from "@ordo-pink/oath"
+import { oath } from "@ordo-pink/oath"
 
 import { MetadataCommand } from "./data/metadata/metadata-command.impl"
 import { MetadataQuery } from "./data/metadata/metadata-query.impl"
@@ -89,7 +89,7 @@ export const init_metadata: TInitMetadataFn = call_once(content_repository => {
 		metadata_command.remove(fsid).cata(Result.catas.or_else(alert_rrr))
 		content_repository
 			.remove(user?.get_uid() ?? null, fsid)
-			.invoke(invokers0.to_promise)
+			.cata(oath.catas.to_promise())
 			.catch(alert_rrr)
 	})
 

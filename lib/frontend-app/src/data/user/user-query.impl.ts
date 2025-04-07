@@ -19,9 +19,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Oath, ops0 } from "@ordo-pink/oath"
 import { Result } from "@ordo-pink/result"
 import { ZAGS } from "@ordo-pink/zags"
+import { oath } from "@ordo-pink/oath"
 import { rrr } from "@ordo-pink/core"
 
 import { CurrentUser, PublicUser } from "../../../../core/src/user.impl"
@@ -50,39 +50,59 @@ export const UserQuery: Ordo.User.QueryStatic = {
 
 			get_by_id: id =>
 				check_permission("user.get_by_id")
-					.cata({ Ok: () => Oath.Resolve(void 0), Err: rrr => Oath.Reject<Ordo.Rrr<"EPERM">, void>(rrr) })
-					.and(() =>
-						Oath.If(CurrentUser.Validations.is_uid(id))
-							.and(() => id)
-							.pipe(ops0.rejected_map(() => rrr.codes.einval("Invalid user id"))),
+					.cata({ Ok: () => oath.of(void 0), Err: rrr => oath.reject<Ordo.Rrr<"EPERM">, void>(rrr) })
+					.pipe(
+						oath.ops.and(() =>
+							oath
+								.if(CurrentUser.Validations.is_uid(id))
+								.pipe(oath.ops.and(() => id))
+								.pipe(oath.ops.rejected_map(() => rrr.codes.einval("Invalid user id"))),
+						),
 					)
-					.and(
-						id =>
-							user_cache[id] ??
-							Oath.FromPromise(() => fetch(`${id_host}/users/${id}`, { credentials: "include" }))
-								.and(res => res.json())
-								.and(res => Oath.If(res.success, { T: () => res.payload, F: () => rrr.codes.eio(res.payload) }))
-								.pipe(ops0.tap(dto => void (user_cache[dto.id] = dto))),
+					.pipe(
+						oath.ops.and(
+							id =>
+								user_cache[id] ??
+								oath
+									.from_promise(() => fetch(`${id_host}/users/${id}`, { credentials: "include" }))
+									.pipe(oath.ops.and(res => res.json()))
+									.pipe(
+										oath.ops.and(res =>
+											oath.if(res.success, { on_true: () => res.payload, on_false: () => rrr.codes.eio(res.payload) }),
+										),
+									)
+									.pipe(oath.ops.tap(dto => void (user_cache[dto.id] = dto))),
+						),
 					)
-					.and(PublicUser.FromDTO),
+					.pipe(oath.ops.and(PublicUser.FromDTO)),
 
 			get_by_handle: handle =>
 				check_permission("user.get_by_id")
-					.cata({ Ok: () => Oath.Resolve(void 0), Err: rrr => Oath.Reject<Ordo.Rrr<"EPERM">, void>(rrr) })
-					.and(() =>
-						Oath.If(CurrentUser.Validations.is_handle(handle))
-							.and(() => handle)
-							.pipe(ops0.rejected_map(() => rrr.codes.einval("Invalid user handle"))),
+					.cata({ Ok: () => oath.of(void 0), Err: rrr => oath.reject<Ordo.Rrr<"EPERM">, void>(rrr) })
+					.pipe(
+						oath.ops.and(() =>
+							oath
+								.if(CurrentUser.Validations.is_handle(handle))
+								.pipe(oath.ops.and(() => handle))
+								.pipe(oath.ops.rejected_map(() => rrr.codes.einval("Invalid user handle"))),
+						),
 					)
-					.and(
-						handle =>
-							user_cache[handle] ??
-							Oath.FromPromise(() => fetch(`${id_host}/users/handle/${handle}`, { credentials: "include" }))
-								.and(res => res.json())
-								.and(res => Oath.If(res.success, { T: () => res.payload, F: () => rrr.codes.eio(res.payload) }))
-								.pipe(ops0.tap(dto => void (user_cache[dto.handle] = dto))),
+					.pipe(
+						oath.ops.and(
+							handle =>
+								user_cache[handle] ??
+								oath
+									.from_promise(() => fetch(`${id_host}/users/handle/${handle}`, { credentials: "include" }))
+									.pipe(oath.ops.and(res => res.json()))
+									.pipe(
+										oath.ops.and(res =>
+											oath.if(res.success, { on_true: () => res.payload, on_false: () => rrr.codes.eio(res.payload) }),
+										),
+									)
+									.pipe(oath.ops.tap(dto => void (user_cache[dto.handle] = dto))),
+						),
 					)
-					.and(PublicUser.FromDTO),
+					.pipe(oath.ops.and(PublicUser.FromDTO)),
 
 			get $() {
 				return version_zags

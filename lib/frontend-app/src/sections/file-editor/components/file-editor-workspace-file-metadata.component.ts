@@ -20,7 +20,6 @@
  */
 
 import { Input, Label, MetadataIcon, MetadataLink } from "@ordo-pink/maoka-components"
-import { Oath, invokers0 } from "@ordo-pink/oath"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
@@ -28,6 +27,7 @@ import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { R } from "@ordo-pink/result"
 import { noop } from "@ordo-pink/tau"
+import { oath } from "@ordo-pink/oath"
 
 // TODO Refresh if metadata was changed from the outside
 export const FileMetadata = (metadata: Ordo.Metadata.Instance) =>
@@ -74,14 +74,20 @@ export const FileMetadata = (metadata: Ordo.Metadata.Instance) =>
 									.then(content =>
 										commands
 											.naga("cmd.content.upload", { content, name: ".hero-image", parent: fsid, type: file.type })
-											.and(() =>
-												metadata_query
-													.get_by_name(".hero-image", fsid, { show_hidden: true })
-													.pipe(R.ops.chain(R.FromNullable))
-													.cata({ Ok: m => Oath.Resolve(m), Err: Oath.Reject }),
+											.pipe(
+												oath.ops.and(() =>
+													metadata_query
+														.get_by_name(".hero-image", fsid, { show_hidden: true })
+														.pipe(R.ops.chain(R.FromNullable))
+														.cata({ Ok: m => oath.of(m), Err: oath.reject }),
+												),
 											)
-											.and(m => commands.naga("cmd.metadata.set_property", { fsid, key: "hero_image", value: m.get_fsid() }))
-											.invoke(invokers0.to_promise),
+											.pipe(
+												oath.ops.and(m =>
+													commands.naga("cmd.metadata.set_property", { fsid, key: "hero_image", value: m.get_fsid() }),
+												),
+											)
+											.cata(oath.catas.unwrap()),
 									)
 									.catch(console.error)
 									.then(() => refresh(), noop)
@@ -129,22 +135,28 @@ const BackgroundImage = (metadata: Ordo.Metadata.Instance) =>
 					.get_by_fsid(hero_image_fsid, { show_hidden: true })
 					.pipe(R.ops.chain(R.FromNullable))
 					.pipe(R.ops.map(m => ({ fsid: m.get_fsid(), uid: m.get_created_by(), type: m.get_type() })))
-					.cata({ Ok: ctx => Oath.Resolve(ctx), Err: () => Oath.Reject() })
-					.and(({ uid, fsid, type }) => content_query.get(uid!, fsid).and(ab => new Blob([ab as ArrayBuffer], { type })))
-					.and(blob => URL.createObjectURL(blob))
-					.and(url => {
-						src = url
-					})
+					.cata({ Ok: ctx => oath.of<typeof ctx, void>(ctx), Err: () => oath.reject(void 0) })
+					.pipe(
+						oath.ops.chain(({ uid, fsid, type }) =>
+							content_query.get(uid!, fsid).pipe(oath.ops.map(ab => new Blob([ab as ArrayBuffer], { type }))),
+						),
+					)
+					.pipe(oath.ops.and(blob => URL.createObjectURL(blob)))
+					.pipe(
+						oath.ops.and(url => {
+							src = url
+						}),
+					)
 
 				fetch_background0
-					.invoke(invokers0.to_promise)
+					.cata(oath.catas.to_promise())
 					.then(() => refresh())
 					.catch(() => {
 						// src = void 0
 					})
 
 				return () => {
-					fetch_background0.cancel()
+					fetch_background0.cancel("Fetch task restarted with new updates")
 					if (src) URL.revokeObjectURL(src)
 				}
 			}),

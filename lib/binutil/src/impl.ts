@@ -23,7 +23,7 @@ import { Dirent } from "fs"
 import { SpawnOptions } from "bun"
 import chalk from "chalk"
 
-import { Oath, ops0 } from "@ordo-pink/oath"
+import { Oath, oath } from "@ordo-pink/oath"
 import { create_parent_if_not_exists0, file_exists0, is_file0, write_file0 } from "@ordo-pink/fs"
 
 import type { TLicenseType, TOpts } from "./types"
@@ -91,11 +91,11 @@ export const get_opts = (args: string[]): TOpts => {
 }
 
 export const run_async_command = (cmd: string, options?: SpawnOptions.OptionsObject) =>
-	Oath.Resolve(Bun.spawn(cmd.trim().split(" "), { ...options, stdout: "inherit", stderr: "inherit", stdin: "inherit" }))
+	oath.of(Bun.spawn(cmd.trim().split(" "), { ...options, stdout: "inherit", stderr: "inherit", stdin: "inherit" }))
 
-type TRunCommandFn = (cmd: string, options?: SpawnOptions.OptionsObject) => Oath<void, Error>
+type TRunCommandFn = (cmd: string, options?: SpawnOptions.OptionsObject) => Oath.Instance<void, Error>
 export const run_command: TRunCommandFn = (command, options) =>
-	Oath.Try(() => {
+	oath.try(() => {
 		const result = Bun.spawnSync(command.trim().split(" "), options)
 		const stderr_string = result.stderr?.toString("utf8").trim()
 
@@ -143,9 +143,10 @@ export const dirents_to_dirs: (dirents: Dirent[]) => Dirent[] = dirents => diren
 const _get_name: (dirent: Dirent) => string = dirent => dirent.name
 export const get_dirent_names: (dirents: Dirent[]) => string[] = dirents => dirents.map(_get_name)
 
-const _check_file_exists0 = (path: string): Oath<string | boolean> => is_file0(path).pipe(ops0.map(e => (e ? path : e)))
-export const check_files_exist: (paths: string[]) => Oath<(string | boolean)[]> = paths =>
-	Oath.Merge(paths.map(_check_file_exists0))
+const _check_file_exists0 = (path: string): Oath.Instance<string | boolean> =>
+	is_file0(path).pipe(oath.ops.map(e => (e ? path : e)))
+export const check_files_exist: (paths: string[]) => Oath.Instance<(string | boolean)[]> = paths =>
+	oath.all(paths.map(_check_file_exists0))
 
 export const get_existing_paths = (paths: (string | boolean)[]): string[] => paths.filter(path => Boolean(path)) as string[]
 
@@ -153,8 +154,8 @@ export const get_current_year = (): number => new Date(Date.now()).getFullYear()
 
 export const create_repository_file = (path: string, content: string) =>
 	create_parent_if_not_exists0(path)
-		.pipe(ops0.chain(() => file_exists0(path)))
-		.pipe(ops0.chain(exists => (exists ? Oath.Empty() : write_file0(path, content, "utf-8"))))
+		.pipe(oath.ops.chain(() => file_exists0(path)))
+		.pipe(oath.ops.chain(exists => (exists ? oath.empty() : write_file0(path, content, "utf-8"))))
 
 export const COPYRIGHT_OWNERS = "谢尔盖 ||↓ and the Ordo.pink contributors"
 

@@ -39,7 +39,7 @@ export module RoutaryOrdo {
 
 	export type ExtractJSONBody = <$Intake extends Routary.Intake = Routary.Intake>(
 		intake: $Intake,
-	) => Oath<any, { rrr: Ordo.Rrr<"EIO">; intake: Routary.Intake<any> }>
+	) => Oath.Instance<any, { rrr: Ordo.Rrr<"EIO">; intake: Routary.Intake<any> }>
 
 	export type Rejection = { rrr: Ordo.Rrr; intake: Routary.Intake<RoutaryOrdo.Chamber> }
 }

@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-export type TPersistenceStrategyDataFSParams = { root: string }
+export namespace PersistenceStrategyDataFS {
+	export type Params = { root: string }
 
-export type TPersistenceStategyDataFS = {
-	Of: (root: string) => OrdoBackend.Data.PersistenceStrategy
+	export type Create = (params: PersistenceStrategyDataFS.Params) => OrdoBackend.Data.PersistenceStrategy
 }

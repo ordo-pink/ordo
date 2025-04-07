@@ -22,13 +22,13 @@
 import { BsBoxArrowInRight, BsBoxArrowRight } from "@ordo-pink/frontend-icons"
 import { CommandPaletteItemType, CurrentUser, rrr } from "@ordo-pink/core"
 import { /* CheckboxInput, */ Dialog, Input } from "@ordo-pink/maoka-components"
-import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
 import { call_once, noop } from "@ordo-pink/tau"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { Result } from "@ordo-pink/result"
 import { console_logger } from "@ordo-pink/logger"
+import { oath } from "@ordo-pink/oath"
 
 import { UserQuery } from "./data/user/user-query.impl"
 import { ordo_app_state } from "../app.state"
@@ -44,9 +44,10 @@ export const init_user = call_once(() => {
 
 	// TODO Invalidate cookie instead of token
 	const handle_sign_out = () =>
-		Oath.Resolve({ method: "DELETE", credentials: "include" as const })
-			.and(init => Oath.Try(() => fetch(`${hosts.id}/session`, init)))
-			.invoke(invokers0.force_resolve)
+		oath
+			.of({ method: "DELETE", credentials: "include" as const })
+			.pipe(oath.ops.and(init => oath.try(() => fetch(`${hosts.id}/session`, init))))
+			.cata(oath.catas.to_promise())
 			.then(clean_up_auth)
 			.then(() => {
 				const history_length = history.length
@@ -56,12 +57,13 @@ export const init_user = call_once(() => {
 
 	logger.debug("🟡 Initialising metadata...")
 
-	Oath.FromPromise(() => fetch(`${hosts.id}/session`, { credentials: "include" }))
-		.and(res => res.json())
-		.and(res => Oath.If(res.success, { T: () => res.payload as Ordo.User.Current.DTO }))
-		.and(dto => CurrentUser.FromDTO(dto))
-		.and(user => ordo_app_state.zags.update("user", () => user))
-		.invoke(invokers0.to_promise)
+	oath
+		.from_promise(() => fetch(`${hosts.id}/session`, { credentials: "include" }))
+		.pipe(oath.ops.and(res => res.json()))
+		.pipe(oath.ops.and(res => oath.if(res.success, { on_true: () => res.payload as Ordo.User.Current.DTO })))
+		.pipe(oath.ops.and(dto => CurrentUser.FromDTO(dto)))
+		.pipe(oath.ops.and(user => ordo_app_state.zags.update("user", () => user)))
+		.cata(oath.catas.to_promise())
 		.catch(noop)
 
 	ordo_app_state.zags.cheat("user", user => {
@@ -147,17 +149,18 @@ const RequestCodeModal = Maoka.create("div", ({ use }) => {
 		// TODO render_icon
 		Dialog({
 			action: () =>
-				Oath.If(is_valid /* && consent */)
-					.and(() => new Headers())
-					.pipe(ops0.tap(headers => headers.append("content-type", "application/json")))
-					.and(headers => ({ headers, method: "POST" }))
-					.and(init => ({ ...init, body: JSON.stringify({ email }) }))
+				oath
+					.if(is_valid /* && consent */)
+					.pipe(oath.ops.and(() => new Headers()))
+					.pipe(oath.ops.tap(headers => headers.append("content-type", "application/json")))
+					.pipe(oath.ops.and(headers => ({ headers, method: "POST" })))
+					.pipe(oath.ops.and(init => ({ ...init, body: JSON.stringify({ email }) })))
 					// TODO Get input from env
-					.and(init => Oath.FromPromise(() => fetch(`${au_host}/request-code`, init)))
-					.and(res => res.json())
-					.and(res => Oath.If(res.success))
-					.and(() => commands.emit("cmd.auth.show_validate_code_modal", email as Ordo.User.Email))
-					.invoke(invokers0.or_nothing),
+					.pipe(oath.ops.and(init => oath.from_promise(() => fetch(`${au_host}/request-code`, init))))
+					.pipe(oath.ops.and(res => res.json()))
+					.pipe(oath.ops.and(res => oath.if(res.success)))
+					.pipe(oath.ops.and(() => commands.emit("cmd.auth.show_validate_code_modal", email as Ordo.User.Email)))
+					.cata(oath.catas.to_promise()),
 			action_hotkey: "shift+enter",
 			action_text: t_next,
 			body: () => {
@@ -210,18 +213,25 @@ const ValidateCodeModal = (email: Ordo.User.Email) =>
 		return () =>
 			Dialog({
 				action: () =>
-					Oath.If(is_valid)
-						.and(() => new Headers())
-						.pipe(ops0.tap(headers => headers.append("content-type", "application/json")))
-						.and(headers => ({ headers, method: "POST" }))
-						.and(init => ({ ...init, body: JSON.stringify({ email, code: Number(code) }), credentials: "include" as const }))
+					oath
+						.if(is_valid)
+						.pipe(oath.ops.and(() => new Headers()))
+						.pipe(oath.ops.tap(headers => headers.append("content-type", "application/json")))
+						.pipe(oath.ops.and(headers => ({ headers, method: "POST" })))
+						.pipe(
+							oath.ops.and(init => ({
+								...init,
+								body: JSON.stringify({ email, code: Number(code) }),
+								credentials: "include" as const,
+							})),
+						)
 						// TODO Get input from env
-						.and(init => Oath.FromPromise(() => fetch(`${au_host}/verify-code`, init)))
-						.and(res => res.json())
-						.and(res => Oath.If(res.success, { T: () => res.payload }))
-						.and(user => ordo_app_state.zags.update("user", () => CurrentUser.FromDTO(user)))
-						.and(() => commands.emit("cmd.application.modal.hide"))
-						.invoke(invokers0.or_nothing),
+						.pipe(oath.ops.and(init => oath.from_promise(() => fetch(`${au_host}/verify-code`, init))))
+						.pipe(oath.ops.and(res => res.json()))
+						.pipe(oath.ops.and(res => oath.if(res.success, { on_true: () => res.payload })))
+						.pipe(oath.ops.and(user => ordo_app_state.zags.update("user", () => CurrentUser.FromDTO(user))))
+						.pipe(oath.ops.and(() => commands.emit("cmd.application.modal.hide")))
+						.cata(oath.catas.to_promise()),
 				action_text: "Join",
 				title: "Enter code",
 				action_hotkey: "enter",

@@ -20,9 +20,9 @@
  */
 
 import { CurrentUser, CurrentUserKeys } from "@ordo-pink/core"
-import { Oath, ops0 } from "@ordo-pink/oath"
 import { default_handler, extract_json_body } from "@ordo-pink/routary-ordo"
 import { type Routary } from "@ordo-pink/routary"
+import { oath } from "@ordo-pink/oath"
 
 import { exists_by_email_rrr, invalid_email_rrr } from "../../rrrs/invalid-user-email.rrr"
 import { exists_by_handle, invalid_handle_rrr } from "../../rrrs/invalid-user-handle.rrr"
@@ -32,13 +32,14 @@ import { check_if_edited_user_is_current_user } from "../../common/check-if-edit
 import { check_if_id_param_is_valid } from "../../common/validate-id-param"
 
 export const handle_update_user = default_handler<TIDContext>(intake =>
-	Oath.Merge([check_if_edited_user_is_current_user(intake), check_if_id_param_is_valid(intake)])
-		.pipe(ops0.chain(() => extract_json_body(intake)))
-		.pipe(ops0.chain(valdiate_body(intake)))
-		.pipe(ops0.chain(get_current_user(intake)))
-		.pipe(ops0.map(merge_users))
-		.pipe(ops0.chain(update_user(intake.params.user_id as Ordo.User.UID, intake)))
-		.pipe(ops0.map(() => intake)),
+	oath
+		.all([check_if_edited_user_is_current_user(intake), check_if_id_param_is_valid(intake)])
+		.pipe(oath.ops.chain(() => extract_json_body(intake)))
+		.pipe(oath.ops.chain(valdiate_body(intake)))
+		.pipe(oath.ops.chain(get_current_user(intake)))
+		.pipe(oath.ops.map(merge_users))
+		.pipe(oath.ops.chain(update_user(intake.params.user_id as Ordo.User.UID, intake)))
+		.pipe(oath.ops.map(() => intake)),
 )
 
 // --- Internal ---
@@ -49,54 +50,62 @@ type I = Routary.Intake<TIDContext>
 
 const check_email_is_not_taken_if_present = (body: Record<string, any>, i: I) =>
 	body.email
-		? Oath.If(is_email(body.email), { F: () => invalid_email_rrr(body.email, i) })
-				.and(() => body.email as Ordo.User.Email)
-				.pipe(ops0.chain(email => i.reference_mapping_user.get_by_email(email).fix(() => null)))
-				.pipe(ops0.chain(id => Oath.If(!id || id === i.params.user_id, { F: () => exists_by_email_rrr(body.email, i) })))
-		: Oath.Resolve(void 0)
+		? oath
+				.if(is_email(body.email), { on_false: () => invalid_email_rrr(body.email, i) })
+				.pipe(oath.ops.and(() => body.email as Ordo.User.Email))
+				.pipe(oath.ops.chain(email => i.reference_mapping_user.get_by_email(email).pipe(oath.ops.fix(() => null))))
+				.pipe(
+					oath.ops.chain(id => oath.if(!id || id === i.params.user_id, { on_false: () => exists_by_email_rrr(body.email, i) })),
+				)
+		: oath.of(void 0)
 
 const check_handle_is_not_taken_if_present = (body: Record<string, any>, i: I) =>
 	body.handle
-		? Oath.If(is_handle(body.handle), { F: () => invalid_handle_rrr(body.handle, i) })
-				.and(() => body.handle as Ordo.User.Handle)
-				.pipe(ops0.chain(handle => i.reference_mapping_user.get_by_handle(handle).fix(() => null)))
-				.pipe(ops0.chain(id => Oath.If(!id || id === i.params.user_id, { F: () => exists_by_handle(body.handle, i) })))
-		: Oath.Resolve(void 0)
+		? oath
+				.if(is_handle(body.handle), { on_false: () => invalid_handle_rrr(body.handle, i) })
+				.pipe(oath.ops.and(() => body.handle as Ordo.User.Handle))
+				.pipe(oath.ops.chain(handle => i.reference_mapping_user.get_by_handle(handle).pipe(oath.ops.fix(() => null))))
+				.pipe(
+					oath.ops.chain(id => oath.if(!id || id === i.params.user_id, { on_false: () => exists_by_handle(body.handle, i) })),
+				)
+		: oath.of(void 0)
 
 const check_installed_functions_is_valid_if_present = (body: Record<string, any>, i: I) =>
 	body.installed_functions
-		? Oath.If(is_installed_functions(body.installed_functions), {
-				F: () => invalid_installed_functions_rrr(body.installed_functions, i),
+		? oath.if(is_installed_functions(body.installed_functions), {
+				on_false: () => invalid_installed_functions_rrr(body.installed_functions, i),
 			})
-		: Oath.Resolve(void 0)
+		: oath.of(void 0)
 
 const check_first_name_is_valid_if_present = (body: Record<string, any>, i: I) =>
 	body.first_name
-		? Oath.If(is_first_name(body.first_name), { F: () => invalid_first_name_rrr(body.first_name, i) })
-		: Oath.Resolve(void 0)
+		? oath.if(is_first_name(body.first_name), { on_false: () => invalid_first_name_rrr(body.first_name, i) })
+		: oath.of(void 0)
 
 const check_last_name_is_valid_if_present = (body: Record<string, any>, i: I) =>
 	body.last_name
-		? Oath.If(is_last_name(body.last_name), { F: () => invalid_last_name_rrr(body.last_name, i) })
-		: Oath.Resolve(void 0)
+		? oath.if(is_last_name(body.last_name), { on_false: () => invalid_last_name_rrr(body.last_name, i) })
+		: oath.of(void 0)
 
 const valdiate_body = (i: I) => (body: any) =>
-	Oath.Merge([
-		check_email_is_not_taken_if_present(body, i),
-		check_handle_is_not_taken_if_present(body, i),
-		check_installed_functions_is_valid_if_present(body, i),
-		check_first_name_is_valid_if_present(body, i),
-		check_last_name_is_valid_if_present(body, i),
-	]).pipe(ops0.map(() => body as Partial<Ordo.User.Current.DTO>))
+	oath
+		.all([
+			check_email_is_not_taken_if_present(body, i),
+			check_handle_is_not_taken_if_present(body, i),
+			check_installed_functions_is_valid_if_present(body, i),
+			check_first_name_is_valid_if_present(body, i),
+			check_last_name_is_valid_if_present(body, i),
+		])
+		.pipe(oath.ops.map(() => body as Partial<Ordo.User.Current.DTO>))
 
 const get_current_user = (i: I) => (updated_user: Partial<Ordo.User.Current.DTO>) =>
 	i.persistence_strategy_user
 		.read(i.params.user_id as Ordo.User.UID)
-		.pipe(ops0.rejected_map(rrr => ({ rrr, intake: i })))
-		.pipe(ops0.map(user => ({ user, updated_user })))
+		.pipe(oath.ops.rejected_map(rrr => ({ rrr, intake: i })))
+		.pipe(oath.ops.map(user => ({ user, updated_user })))
 
 const update_user = (id: Ordo.User.UID, intake: I) => (user: Ordo.User.Current.DTO) =>
-	intake.persistence_strategy_user.update(id, CurrentUser.FromDTO(user)).pipe(ops0.rejected_map(rrr => ({ rrr, intake })))
+	intake.persistence_strategy_user.update(id, CurrentUser.FromDTO(user)).pipe(oath.ops.rejected_map(rrr => ({ rrr, intake })))
 
 const merge_users = (users: {
 	user: Ordo.User.Current.Instance

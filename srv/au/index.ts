@@ -22,109 +22,125 @@
 import * as tau from "@ordo-pink/tau"
 import { BackendAuth, create_backend_server_au } from "@ordo-pink/backend-server-au"
 import { type Logger, console_logger } from "@ordo-pink/logger"
-import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
 import { create_persistence_strategy_user, create_reference_mapping_user } from "@ordo-pink/backend-persistence-strategy-user"
-import { PersistenceStrategyDataFS } from "@ordo-pink/backend-persistence-strategy-data-fs"
+import { create_persistence_strategy_data_fs } from "@ordo-pink/backend-persistence-strategy-data-fs"
+import { oath } from "@ordo-pink/oath"
 import { rrr } from "@ordo-pink/core"
 
 const env_rrr = (env_var: string) => (value?: any) =>
 	value != null ? `Invalid value for ${env_var}: "${value}"` : `Missing value for ${env_var}`
 
 const get_env = () =>
-	Oath.Merge({
-		port: Oath.FromNullable(Bun.env.ORDO_AU_PORT)
-			.and(n => Oath.If(tau.is_port(n), { T: () => n }))
-			.pipe(ops0.rejected_map(env_rrr("ORDO_AU_PORT"))),
+	oath.merge({
+		port: oath
+			.from_nullable(Bun.env.ORDO_AU_PORT)
+			.pipe(oath.ops.and(n => oath.if(tau.is_port(n), { on_true: () => n })))
+			.pipe(oath.ops.rejected_map(env_rrr("ORDO_AU_PORT"))),
 
-		data_root: Oath.FromNullable(Bun.env.ORDO_DT_DATA_PATH, env_rrr("ORDO_DT_DATA_PATH")),
+		data_root: oath.from_nullable(Bun.env.ORDO_DT_DATA_PATH, env_rrr("ORDO_DT_DATA_PATH")),
 
-		file_limit: Oath.FromNullable(Bun.env.ORDO_AU_DEFAULT_FILE_LIMIT)
-			.and(s => Number.parseInt(s, 10))
-			.and(n => Oath.If(tau.is_finite_positive_int(n), { T: () => n }))
-			.pipe(ops0.rejected_map(env_rrr("ORDO_AU_DEFAULT_FILE_LIMIT"))),
+		file_limit: oath
+			.from_nullable(Bun.env.ORDO_AU_DEFAULT_FILE_LIMIT)
+			.pipe(oath.ops.and(s => Number.parseInt(s, 10)))
+			.pipe(oath.ops.and(n => oath.if(tau.is_finite_positive_int(n), { on_true: () => n })))
+			.pipe(oath.ops.rejected_map(env_rrr("ORDO_AU_DEFAULT_FILE_LIMIT"))),
 
-		max_upload_size: Oath.FromNullable(Bun.env.ORDO_AU_DEFAULT_MAX_UPLOAD_SIZE)
-			.and(s => Number.parseFloat(s))
-			.and(n => Oath.If(tau.is_positive_number(n), { T: () => n }))
-			.pipe(ops0.rejected_map(env_rrr("ORDO_AU_DEFAULT_MAX_UPLOAD_SIZE"))),
+		max_upload_size: oath
+			.from_nullable(Bun.env.ORDO_AU_DEFAULT_MAX_UPLOAD_SIZE)
+			.pipe(oath.ops.and(s => Number.parseFloat(s)))
+			.pipe(oath.ops.and(n => oath.if(tau.is_positive_number(n), { on_true: () => n })))
+			.pipe(oath.ops.rejected_map(env_rrr("ORDO_AU_DEFAULT_MAX_UPLOAD_SIZE"))),
 
-		max_functions: Oath.FromNullable(Bun.env.ORDO_AU_DEFAULT_MAX_FUNCTIONS)
-			.and(s => Number.parseInt(s, 10))
-			.and(n => Oath.If(tau.is_finite_non_negative_int(n), { T: () => n }))
-			.pipe(ops0.rejected_map(env_rrr("ORDO_AU_DEFAULT_MAX_FUNCTIONS"))),
+		max_functions: oath
+			.from_nullable(Bun.env.ORDO_AU_DEFAULT_MAX_FUNCTIONS)
+			.pipe(oath.ops.and(s => Number.parseInt(s, 10)))
+			.pipe(oath.ops.and(n => oath.if(tau.is_finite_non_negative_int(n), { on_true: () => n })))
+			.pipe(oath.ops.rejected_map(env_rrr("ORDO_AU_DEFAULT_MAX_FUNCTIONS"))),
 
-		allow_origin: Oath.FromNullable(Bun.env.ORDO_AU_ALLOW_ORIGIN)
-			.and(s => s.split(", "))
-			.pipe(ops0.rejected_map(env_rrr("ORDO_AU_ALLOW_ORIGIN"))),
+		allow_origin: oath
+			.from_nullable(Bun.env.ORDO_AU_ALLOW_ORIGIN)
+			.pipe(oath.ops.and(s => s.split(", ")))
+			.pipe(oath.ops.rejected_map(env_rrr("ORDO_AU_ALLOW_ORIGIN"))),
 
-		session_lifetime_s: Oath.FromNullable(Bun.env.ORDO_AU_SESSION_LIFETIME)
-			.and(s => Number.parseInt(s, 10))
-			.and(n => Oath.If(tau.is_finite_positive_int(n), { T: () => n }))
-			.pipe(ops0.rejected_map(env_rrr("ORDO_AU_SESSION_LIFETIME"))),
+		session_lifetime_s: oath
+			.from_nullable(Bun.env.ORDO_AU_SESSION_LIFETIME)
+			.pipe(oath.ops.and(s => Number.parseInt(s, 10)))
+			.pipe(oath.ops.and(n => oath.if(tau.is_finite_positive_int(n), { on_true: () => n })))
+			.pipe(oath.ops.rejected_map(env_rrr("ORDO_AU_SESSION_LIFETIME"))),
 
-		code_lifetime_ms: Oath.FromNullable(Bun.env.ORDO_AU_CODE_LIFETIME_MS)
-			.and(s => Number.parseInt(s, 10))
-			.and(n => Oath.If(tau.is_finite_positive_int(n), { T: () => n }))
-			.pipe(ops0.rejected_map(env_rrr("ORDO_AU_CODE_LIFETIME_MS"))),
+		code_lifetime_ms: oath
+			.from_nullable(Bun.env.ORDO_AU_CODE_LIFETIME_MS)
+			.pipe(oath.ops.and(s => Number.parseInt(s, 10)))
+			.pipe(oath.ops.and(n => oath.if(tau.is_finite_positive_int(n), { on_true: () => n })))
+			.pipe(oath.ops.rejected_map(env_rrr("ORDO_AU_CODE_LIFETIME_MS"))),
 
-		web_host: Oath.FromNullable(Bun.env.ORDO_WEB_HOST, env_rrr("ORDO_WEB_HOST")),
+		web_host: oath.from_nullable(Bun.env.ORDO_WEB_HOST, env_rrr("ORDO_WEB_HOST")),
 	})
 
 const main = () =>
 	get_env()
-		.and(
-			({ allow_origin, code_lifetime_ms, data_root, port, max_functions, max_upload_size, file_limit, session_lifetime_s }) => {
-				const persistence_strategy_data = PersistenceStrategyDataFS.Of(data_root)
-				const persistence_strategy_user = create_persistence_strategy_user(persistence_strategy_data)
-				const reference_mapping_user = create_reference_mapping_user(persistence_strategy_data, persistence_strategy_user)
-
-				return Oath.Merge({
+		.pipe(
+			oath.ops.and(
+				({
 					allow_origin,
-					logger,
-					defaults: { file_limit, max_functions, max_upload_size },
-					email_strategy: { send: ({ content }) => logger.notice("NOTIFICATION:", "::", content) }, // TODO
-					// session_lifetime,
-					persistence_strategy_user,
-					auth_storage: new Map(),
-					code_strategy: {
-						generate: () =>
-							Oath.Resolve(new Uint8Array(6))
-								.pipe(ops0.map(ua => crypto.getRandomValues(ua)))
-								.and(num_array => num_array.join(""))
-								.and(num_string => num_string.slice(0, 6)),
-						hash: code =>
-							Oath.Try(
-								() => Bun.password.hash(code, { algorithm: "bcrypt", cost: 4 }),
-								error => rrr.codes.eio("Failed to hash code", error),
-							),
-						verify: (hash, code) =>
-							Oath.Try(
-								() => Bun.password.verify(code, hash),
-								error => rrr.codes.eio("Failed to verify code", error),
-							),
-					},
-					create_request_id: () => crypto.randomUUID(),
-					data_persistence_strategy: null as any,
-					port: Number(port),
 					code_lifetime_ms,
+					data_root,
+					port,
+					max_functions,
+					max_upload_size,
+					file_limit,
 					session_lifetime_s,
-					reference_mapping_user,
-					// web_host,
-				} satisfies BackendAuth.Params)
-					.and(create_backend_server_au)
-					.and(fetch => Bun.serve({ fetch, port }))
-			},
+				}) => {
+					const persistence_strategy_data = create_persistence_strategy_data_fs({ root: data_root })
+					const persistence_strategy_user = create_persistence_strategy_user(persistence_strategy_data)
+					const reference_mapping_user = create_reference_mapping_user(persistence_strategy_data, persistence_strategy_user)
+
+					return oath
+						.merge({
+							allow_origin,
+							logger,
+							defaults: { file_limit, max_functions, max_upload_size },
+							email_strategy: { send: ({ content }) => logger.notice("NOTIFICATION:", "::", content) }, // TODO
+							// session_lifetime,
+							persistence_strategy_user,
+							auth_storage: new Map(),
+							code_strategy: {
+								generate: () =>
+									oath
+										.of(new Uint8Array(6))
+										.pipe(oath.ops.map(ua => crypto.getRandomValues(ua)))
+										.pipe(oath.ops.and(num_array => num_array.join("")))
+										.pipe(oath.ops.and(num_string => num_string.slice(0, 6))),
+								hash: code =>
+									oath
+										.from_promise(() => Bun.password.hash(code, { algorithm: "bcrypt", cost: 4 }))
+										.pipe(oath.ops.rejected_map(error => rrr.codes.eio("Failed to hash code", error))),
+								verify: (hash, code) =>
+									oath
+										.from_promise(() => Bun.password.verify(code, hash))
+										.pipe(oath.ops.rejected_map(error => rrr.codes.eio("Failed to verify code", error))),
+							},
+							create_request_id: () => crypto.randomUUID(),
+							data_persistence_strategy: null as any,
+							port: Number(port),
+							code_lifetime_ms,
+							session_lifetime_s,
+							reference_mapping_user,
+							// web_host,
+						} satisfies BackendAuth.Params)
+						.pipe(oath.ops.and(create_backend_server_au))
+						.pipe(oath.ops.and(fetch => Bun.serve({ fetch, port })))
+				},
+			),
 		)
 
-		.pipe(ops0.tap(server => logger.info(`server running on http://${server.hostname}:${server.port}`)))
-		.invoke(
-			invokers0.or_else(e => {
+		.pipe(oath.ops.tap(server => logger.info(`server running on http://${server.hostname}:${server.port}`)))
+		.cata(
+			oath.catas.or_else(e => {
 				logger.panic(e)
 				process.exit(1)
 			}),
 		)
-
-void main()
 
 // --- Internal ---
 
@@ -138,3 +154,5 @@ const logger: Logger = {
 	panic: (...message) => console_logger.panic("[AU]", ...message),
 	warn: (...message) => console_logger.warn("[AU]", ...message),
 }
+
+void main()

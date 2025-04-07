@@ -190,6 +190,7 @@ const create_tutorial_files = (emit: Ordo.Command.EmitFn, metadata_query: Ordo.M
 	const last_file_content =
 		// eslint-disable-next-line quotes
 		'[{"type":"p","children":[{"type":"text","value":"Hello, friend."}]},{"type":"p","children":[{"type":"text","value":""}]},{"type":"p","children":[{"type":"text","value":"This is basically the end of the road so far. But there is way more for us to go."}]},{"type":"p","children":[{"type":"text","value":"Keep in mind, that ORDO is local first, and all the stuff you have here is stored on your computer. Don\'t wipe it out with cleaners."}]},{"type":"p","children":[{"type":"text","value":"We\'ll soon add a way to sync between your devices but for now it is what it is. Enjoy!"}]},{"type":"p","children":[{"type":"text","value":""}]},{"type":"p","children":[{"type":"text","value":"To reach out to us, ping @ordo_pink on X or drop us an email hello@ordo.pink. Yes, as you can see, links are not supported yet. So as Ctrl + A."}]},{"type":"p","children":[{"type":"text","value":""}]},{"type":"p","children":[{"type":"text","value":"Cheers! 🍻"}]},{"type":"p","children":[{"type":"text","value":""}]},{"type":"p","children":[{"type":"text","value":"(To remove this tutorial, simply right-click on the `Start here!` file and then `Remove file`. It will cascade delete the others inside)"}]}]'
+	const last_file_ab = new TextEncoder().encode(last_file_content).buffer
 
 	emit("cmd.metadata.create", { name: "Start here!", parent: null, labels, type: "database/ordo" })
 
@@ -216,5 +217,5 @@ const create_tutorial_files = (emit: Ordo.Command.EmitFn, metadata_query: Ordo.M
 		.pipe(Result.ops.map(x => x.get_fsid()))
 		.cata(Result.catas.or_else(() => null as never))
 
-	emit("cmd.content.set", { fsid: last_file_fsid, content: last_file_content, content_type: "text/ordo" })
+	emit("cmd.content.set", { fsid: last_file_fsid, content: last_file_ab, content_type: "text/ordo" })
 }

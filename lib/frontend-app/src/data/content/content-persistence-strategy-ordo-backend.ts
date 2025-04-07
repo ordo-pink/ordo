@@ -19,31 +19,33 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Oath, ops0 } from "@ordo-pink/oath"
+import { oath } from "@ordo-pink/oath"
 import { rrr } from "@ordo-pink/core"
 
 export const PersistenceStrategyContentOrdoBackend = {
 	Of: (dt_host: string, fetch: Ordo.Fetch): Ordo.Content.PersistenceStrategy => {
 		return {
-			clear: () => Oath.Reject(rrr.codes.eio("NOT IMPLEMENTED")),
+			clear: () => oath.reject(rrr.codes.eio("NOT IMPLEMENTED")),
 			delete: (uid, fsid) =>
-				Oath.FromPromise(() => fetch(`${dt_host}/${uid}/${fsid}`, { credentials: "include", method: "DELETE" }))
-					.and(res => res.json())
-					.and(res => Oath.If(res.success))
-					.pipe(ops0.rejected_map((e: Error) => rrr.codes.eio(e?.message, e))), // TODO
-			exists: () => Oath.Reject(rrr.codes.eio("NOT IMPLEMENTED")),
-			list: () => Oath.Reject(rrr.codes.eio("NOT IMPLEMENTED")),
+				oath
+					.from_promise(() => fetch(`${dt_host}/${uid}/${fsid}`, { credentials: "include", method: "DELETE" }))
+					.pipe(oath.ops.and(res => res.json()))
+					.pipe(oath.ops.and(res => oath.if(res.success)))
+					.pipe(oath.ops.rejected_map(e => rrr.codes.eio("Failed to delete content", e))), // TODO
+			exists: () => oath.reject(rrr.codes.eio("NOT IMPLEMENTED")),
+			list: () => oath.reject(rrr.codes.eio("NOT IMPLEMENTED")),
 			get: (uid, fsid) =>
-				Oath.FromPromise(() => fetch(`${dt_host}/${uid}/${fsid}`, { credentials: "include" }))
-					.and(res => Oath.If(res.status === 200, { T: () => res }))
-					.and(res => res.body)
-					.pipe(ops0.rejected_map((e: Error) => rrr.codes.eio(e?.message, e))),
+				oath
+					.from_promise(() => fetch(`${dt_host}/${uid}/${fsid}`, { credentials: "include" }))
+					.pipe(oath.ops.and(res => oath.if(res.status === 200, { on_true: () => res })))
+					.pipe(oath.ops.and(res => res.body))
+					.pipe(oath.ops.rejected_map(e => rrr.codes.eio("Failed to get content", e))),
 			put: (uid, fsid, body) =>
-				Oath.FromPromise(() =>
-					fetch(`${dt_host}/${uid}/${fsid}`, { credentials: "include", method: "PUT", body: body as ArrayBuffer }),
-				)
-					.and(res => Oath.If(res.status === 200 || res.status === 404))
-					.pipe(ops0.rejected_map((e: Error) => rrr.codes.eio(e?.message, e))),
+				oath
+					.of({ credentials: "include", method: "PUT", body: body as ArrayBuffer } as const)
+					.pipe(oath.ops.and(init => oath.from_promise(() => fetch(`${dt_host}/${uid}/${fsid}`, init))))
+					.pipe(oath.ops.and(res => oath.if(res.status === 200 || res.status === 404)))
+					.pipe(oath.ops.rejected_map(e => rrr.codes.eio("Failed to set content", e))),
 		}
 	},
 }

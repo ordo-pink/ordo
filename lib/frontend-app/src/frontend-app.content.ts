@@ -25,7 +25,7 @@ import { R } from "@ordo-pink/result"
 import { Switch } from "@ordo-pink/switch"
 import { ZAGS } from "@ordo-pink/zags"
 import { console_logger } from "@ordo-pink/logger"
-import { invokers0 } from "@ordo-pink/oath"
+import { oath } from "@ordo-pink/oath"
 
 import { ContentQuery } from "./data/content/content-query.impl"
 import { ContentRepository } from "./data/content/content-repository.impl"
@@ -94,8 +94,8 @@ export const init_content: TF = () => {
 					R.catas.if_ok(() =>
 						content_repository
 							.put(user?.get_uid() ?? null, fsid, content)
-							.and(() => commands.emit("cmd.metadata.set_size", { fsid, size }))
-							.invoke(invokers0.or_else(alert_rrr)),
+							.pipe(oath.ops.and(() => commands.emit("cmd.metadata.set_size", { fsid, size })))
+							.cata(oath.catas.or_else(alert_rrr)),
 					),
 				)
 		}
@@ -115,15 +115,17 @@ export const init_content: TF = () => {
 		if (!metadata) {
 			metadata = await commands
 				.naga("cmd.metadata.create", { name, parent, type, size })
-				.and(() =>
-					metadata_query
-						.get_by_name(name, parent, { show_hidden: true })
-						.pipe(R.ops.chain(R.FromNullable))
-						.cata(R.catas.or_else(() => null)),
+				.pipe(
+					oath.ops.and(() =>
+						metadata_query
+							.get_by_name(name, parent, { show_hidden: true })
+							.pipe(R.ops.chain(R.FromNullable))
+							.cata(R.catas.or_else(() => null)),
+					),
 				)
-				.invoke(invokers0.to_promise)
+				.cata(oath.catas.to_promise())
 		} else {
-			await commands.naga("cmd.metadata.set_size", { fsid: metadata.get_fsid(), size }).invoke(invokers0.to_promise)
+			await commands.naga("cmd.metadata.set_size", { fsid: metadata.get_fsid(), size }).cata(oath.catas.to_promise())
 		}
 
 		if (!Metadata.Validations.is_metadata(metadata))
@@ -131,7 +133,7 @@ export const init_content: TF = () => {
 
 		const user = ordo_app_state.zags.select("user")
 
-		return content_repository.put(user?.get_uid() || null, metadata.get_fsid(), content).invoke(invokers0.or_else(alert_rrr))
+		return content_repository.put(user?.get_uid() || null, metadata.get_fsid(), content).cata(oath.catas.or_else(alert_rrr))
 	})
 
 	logger.debug("🟢 Initialised content.")

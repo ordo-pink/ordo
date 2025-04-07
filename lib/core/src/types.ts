@@ -655,8 +655,10 @@ declare global {
 			type Query = {
 				is_authenticated: () => boolean
 				get_current: () => TResult<Ordo.User.Current.Instance | null, Ordo.Rrr<"EPERM">>
-				get_by_id: (uid: Ordo.User.UID) => Oath<Ordo.User.Public.Instance, Ordo.Rrr<"EPERM" | "EINVAL" | "EIO">>
-				get_by_handle: (handle: Ordo.User.Handle) => Oath<Ordo.User.Public.Instance, Ordo.Rrr<"EPERM" | "EINVAL" | "EIO">>
+				get_by_id: (uid: Ordo.User.UID) => Oath.Instance<Ordo.User.Public.Instance, Ordo.Rrr<"EPERM" | "EINVAL" | "EIO">>
+				get_by_handle: (
+					handle: Ordo.User.Handle,
+				) => Oath.Instance<Ordo.User.Public.Instance, Ordo.Rrr<"EPERM" | "EINVAL" | "EIO">>
 				get $(): TZags<{ version: number }>
 			}
 
@@ -672,12 +674,16 @@ declare global {
 			type Instance = ArrayBuffer | ArrayBufferLike | ReadableStream | null
 
 			type PersistenceStrategy = {
-				clear: () => Oath<void, Ordo.Rrr<"EIO">>
-				delete: (uid: Ordo.User.UID, fsid: Ordo.Metadata.FSID) => Oath<void, Ordo.Rrr<"ENOENT" | "EIO">>
-				exists: (uid: Ordo.User.UID, fsid: Ordo.Metadata.FSID) => Oath<boolean, Ordo.Rrr<"EIO">>
-				get: (uid: Ordo.User.UID, fsid: Ordo.Metadata.FSID) => Oath<Ordo.Content.Instance, Ordo.Rrr<"ENOENT" | "EIO">>
-				list: () => Oath<Record<string, any>, Ordo.Rrr<"EIO">>
-				put: (uid: Ordo.User.UID, fsid: Ordo.Metadata.FSID, content: Ordo.Content.Instance) => Oath<void, Ordo.Rrr<"EIO">>
+				clear: () => Oath.Instance<void, Ordo.Rrr<"EIO">>
+				delete: (uid: Ordo.User.UID, fsid: Ordo.Metadata.FSID) => Oath.Instance<void, Ordo.Rrr<"ENOENT" | "EIO">>
+				exists: (uid: Ordo.User.UID, fsid: Ordo.Metadata.FSID) => Oath.Instance<boolean, Ordo.Rrr<"EIO">>
+				get: (uid: Ordo.User.UID, fsid: Ordo.Metadata.FSID) => Oath.Instance<Ordo.Content.Instance, Ordo.Rrr<"ENOENT" | "EIO">>
+				list: () => Oath.Instance<Record<string, any>, Ordo.Rrr<"EIO">>
+				put: (
+					uid: Ordo.User.UID,
+					fsid: Ordo.Metadata.FSID,
+					content: Ordo.Content.Instance,
+				) => Oath.Instance<void, Ordo.Rrr<"EIO">>
 			}
 
 			type RepositoryStatic = {
@@ -692,17 +698,17 @@ declare global {
 				get: (
 					uid: Ordo.User.UID | null,
 					fsid: Ordo.Metadata.FSID,
-				) => Oath<Ordo.Content.Instance, Ordo.Rrr<"EIO" | "EACCES" | "EINVAL">>
-				get_all: () => Oath<Record<string, Ordo.Content.Instance>, Ordo.Rrr<"EIO">>
+				) => Oath.Instance<Ordo.Content.Instance, Ordo.Rrr<"EIO" | "EACCES" | "EINVAL">>
+				get_all: () => Oath.Instance<Record<string, Ordo.Content.Instance>, Ordo.Rrr<"EIO">>
 				put: (
 					uid: Ordo.User.UID | null,
 					fsid: Ordo.Metadata.FSID,
 					content: Ordo.Content.Instance,
-				) => Oath<void, Ordo.Rrr<"EINVAL" | "EACCES" | "EIO">>
+				) => Oath.Instance<void, Ordo.Rrr<"EINVAL" | "EACCES" | "EIO">>
 				remove: (
 					uid: Ordo.User.UID | null,
 					fsid: Ordo.Metadata.FSID,
-				) => Oath<void, Ordo.Rrr<"EINVAL" | "ENOENT" | "EACCES" | "EIO">>
+				) => Oath.Instance<void, Ordo.Rrr<"EINVAL" | "ENOENT" | "EACCES" | "EIO">>
 				get $(): TZags<{ version: number }>
 			}
 
@@ -717,7 +723,7 @@ declare global {
 				get: (
 					uid: Ordo.User.UID,
 					fsid: Ordo.Metadata.FSID,
-				) => Oath<Ordo.Content.Instance, Ordo.Rrr<"EPERM" | "EIO" | "EACCES" | "EINVAL" | "ENOENT">>
+				) => Oath.Instance<Ordo.Content.Instance, Ordo.Rrr<"EPERM" | "EIO" | "EACCES" | "EINVAL" | "ENOENT">, true>
 			}
 		}
 
@@ -814,8 +820,8 @@ declare global {
 			}
 
 			type RepositoryAsync = {
-				get: () => Oath<Ordo.Metadata.DTO[], Ordo.Rrr<"EIO">>
-				put: (metadata: Ordo.Metadata.DTO[]) => Oath<void, Ordo.Rrr<"EINVAL" | "EIO">>
+				get: () => Oath.Instance<Ordo.Metadata.DTO[], Ordo.Rrr<"EIO">>
+				put: (metadata: Ordo.Metadata.DTO[]) => Oath.Instance<void, Ordo.Rrr<"EINVAL" | "EIO">>
 			}
 
 			type QueryOptions = { show_hidden?: boolean }
@@ -1041,7 +1047,7 @@ declare global {
 			type EmitNagaFn = <$TKey extends Ordo.Command.Name>(
 				name: $TKey,
 				...rest: Ordo.Command.Record[$TKey] extends void ? [key?: string] : [payload: Ordo.Command.Record[$TKey], key?: string]
-			) => Oath<void, Ordo.Rrr>
+			) => Oath.Instance<void, Ordo.Rrr>
 
 			type CancelFn = <$TKey extends Ordo.Command.Name>(name: $TKey, payload?: Ordo.Command.Record[$TKey], key?: string) => void
 
@@ -1067,8 +1073,8 @@ declare global {
 				/**
 				 * Emit given command with given payload. You can provide an optional key that you can use
 				 * later to apply targeted cancellation for the command. Emission does not happen if there
-				 * is a command with given key already. The command returns an Oath that will be resolved
-				 * when the command succeeds or rejected when it fails. As with every other Oath, you need
+				 * is a command with given key already. The command returns an Oath.Instance that will be resolved
+				 * when the command succeeds or rejected when it fails. As with every other Oath.Instance, you need
 				 * to invoke it to get the result.
 				 */
 				naga: Ordo.Command.EmitNagaFn

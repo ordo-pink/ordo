@@ -19,9 +19,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Oath, ops0 } from "@ordo-pink/oath"
-import { IndexedDBStorePromise } from "@ordo-pink/oath-indexeddb"
+import { IndexedDBStorePromise } from "@ordo-pink/indexeddb-promise"
 import { noop } from "@ordo-pink/tau"
+import { oath } from "@ordo-pink/oath"
 import { rrr } from "@ordo-pink/core"
 
 export const PersistenceStrategyContentIndexedDB = {
@@ -33,7 +33,7 @@ export const PersistenceStrategyContentIndexedDB = {
 	): Ordo.Content.PersistenceStrategy => {
 		const indexed_db = indexedDB.open(db_name, db_version)
 
-		const eio = (e: Error) => rrr.codes.eio("IndexedDB Error", e)
+		const eio = (e: unknown) => rrr.codes.eio("IndexedDB Error", e)
 
 		const db_promise = new Promise<IDBDatabase>((resolve, reject) => {
 			indexed_db.onupgradeneeded = on_upgrade_needed(indexed_db)
@@ -47,32 +47,39 @@ export const PersistenceStrategyContentIndexedDB = {
 			}
 		})
 
-		const store0 = Oath.Resolve(() => db_promise)
-			.and(f => Oath.FromPromise(f).pipe(ops0.rejected_map(eio)))
-			.and(db => Oath.FromNullable(db, () => eio(new Error("Could not establish IndexedDB connection"))))
-			.and(db => Oath.Try(() => db.transaction([store_name], "readwrite"), eio))
-			.and(transaction => Oath.Try(() => transaction.objectStore(store_name), eio))
-			.and(store => IndexedDBStorePromise.Of(store))
+		const store0 = oath
+			.of(() => db_promise)
+			.pipe(oath.ops.and(f => oath.from_promise(f).pipe(oath.ops.rejected_map(eio))))
+			.pipe(oath.ops.and(db => oath.from_nullable(db, () => eio(new Error("Could not establish IndexedDB connection")))))
+			.pipe(oath.ops.and(db => oath.try(() => db.transaction([store_name], "readwrite"))))
+			.pipe(oath.ops.and(transaction => oath.try(() => transaction.objectStore(store_name), eio)))
+			.pipe(oath.ops.and(store => IndexedDBStorePromise.Of(store)))
 
 		return {
-			clear: () => store0.and(s => s.clear()).pipe(ops0.rejected_map(eio)),
-			delete: (uid, fsid) => store0.and(s => s.delete(get_path(uid, fsid))).pipe(ops0.rejected_map(eio)),
+			clear: () => store0.pipe(oath.ops.and(s => s.clear())).pipe(oath.ops.rejected_map(eio)),
+			delete: (uid, fsid) => store0.pipe(oath.ops.and(s => s.delete(get_path(uid, fsid)))).pipe(oath.ops.rejected_map(eio)),
 			exists: (uid, fsid) =>
 				store0
-					.and(s => s.count(get_path(uid, fsid)))
-					.and(count => count > 0)
-					.pipe(ops0.rejected_map(eio)),
-			get: (uid, fsid) => store0.and(s => s.get(get_path(uid, fsid))).pipe(ops0.rejected_map(eio)),
+					.pipe(oath.ops.and(s => s.count(get_path(uid, fsid))))
+					.pipe(oath.ops.and(count => count > 0))
+					.pipe(oath.ops.rejected_map(eio)),
+			get: (uid, fsid) => store0.pipe(oath.ops.and(s => s.get(get_path(uid, fsid)))).pipe(oath.ops.rejected_map(eio)),
 			list: () =>
 				store0
-					.and(s => s.get_all_keys())
-					.and(keys => Oath.Merge(keys.reduce((acc, key) => ({ ...acc, [key as string]: store0.and(s => s.get(key)) }), {})))
-					.pipe(ops0.rejected_map(eio)),
+					.pipe(oath.ops.and(s => s.get_all_keys()))
+					.pipe(
+						oath.ops.and(keys =>
+							oath.merge(
+								keys.reduce((acc, key) => ({ ...acc, [key as string]: store0.pipe(oath.ops.and(s => s.get(key))) }), {}),
+							),
+						),
+					)
+					.pipe(oath.ops.rejected_map(eio)),
 			put: (uid, fsid, content) =>
 				store0
-					.and(s => s.put(content, get_path(uid, fsid)))
-					.and(noop)
-					.pipe(ops0.rejected_map(eio)),
+					.pipe(oath.ops.and(s => s.put(content, get_path(uid, fsid))))
+					.pipe(oath.ops.and(noop))
+					.pipe(oath.ops.rejected_map(eio)),
 		}
 	},
 }

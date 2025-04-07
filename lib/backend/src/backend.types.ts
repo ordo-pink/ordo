@@ -25,20 +25,20 @@ declare global {
 	namespace OrdoBackend {
 		namespace Data {
 			type PersistenceStrategy = {
-				exists: (uid: Ordo.User.UID, fsid: Ordo.Metadata.FSID) => Oath<boolean, Ordo.Rrr<"EIO">>
+				exists: (uid: Ordo.User.UID, fsid: Ordo.Metadata.FSID) => Oath.Instance<boolean, Ordo.Rrr<"EIO">>
 				create: (
 					uid: Ordo.User.UID,
 					fsid: Ordo.Metadata.FSID,
 					input: ReadableStream,
-				) => Oath<number, Ordo.Rrr<"EIO" | "EEXIST">>
-				read: (uid: Ordo.User.UID, fsid: Ordo.Metadata.FSID) => Oath<ReadableStream, Ordo.Rrr<"EIO" | "ENOENT">>
+				) => Oath.Instance<number, Ordo.Rrr<"EIO" | "EEXIST">>
+				read: (uid: Ordo.User.UID, fsid: Ordo.Metadata.FSID) => Oath.Instance<ReadableStream, Ordo.Rrr<"EIO" | "ENOENT">>
 				update: (
 					uid: Ordo.User.UID,
 					fsid: Ordo.Metadata.FSID,
 					input: ReadableStream,
-				) => Oath<number, Ordo.Rrr<"EIO" | "ENOENT">>
-				delete: (uid: Ordo.User.UID, fsid: Ordo.Metadata.FSID) => Oath<void, Ordo.Rrr<"EIO" | "ENOENT">>
-				mtime: (uid: Ordo.User.UID, fsid: Ordo.Metadata.FSID) => Oath<number, Ordo.Rrr<"EIO" | "ENOENT">>
+				) => Oath.Instance<number, Ordo.Rrr<"EIO" | "ENOENT">>
+				delete: (uid: Ordo.User.UID, fsid: Ordo.Metadata.FSID) => Oath.Instance<void, Ordo.Rrr<"EIO" | "ENOENT">>
+				mtime: (uid: Ordo.User.UID, fsid: Ordo.Metadata.FSID) => Oath.Instance<number, Ordo.Rrr<"EIO" | "ENOENT">>
 			}
 		}
 
@@ -69,7 +69,7 @@ declare global {
 				 *
 				 * Rejects with EIO if the underlying persistence strategy cannot access mapping data.
 				 */
-				exists_by_handle: (handle: Ordo.User.Handle) => Oath<boolean, Ordo.Rrr<"EIO">>
+				exists_by_handle: (handle: Ordo.User.Handle) => Oath.Instance<boolean, Ordo.Rrr<"EIO">>
 
 				/**
 				 * Resolves the {@link Ordo.User.UID identifier} of the user by given {@link Ordo.User.Handle handle}.
@@ -77,14 +77,14 @@ declare global {
 				 * Rejects with EIO if the underlying persistence strategy cannot access mapping data.
 				 * Rejects with ENOENT if the user with given {@link Ordo.User.Handle handle} does not exist.
 				 */
-				get_by_handle: (handle: Ordo.User.Handle) => Oath<Ordo.User.UID, Ordo.Rrr<"EIO" | "ENOENT">>
+				get_by_handle: (handle: Ordo.User.Handle) => Oath.Instance<Ordo.User.UID, Ordo.Rrr<"EIO" | "ENOENT">>
 
 				/**
 				 * Lazily resolves with a boolean indicating whether a user exists with given {@link Ordo.User.Email email}.
 				 *
 				 * Rejects with EIO if the underlying persistence strategy cannot access mapping data.
 				 */
-				exists_by_email: (email: Ordo.User.Email) => Oath<boolean, Ordo.Rrr<"EIO">>
+				exists_by_email: (email: Ordo.User.Email) => Oath.Instance<boolean, Ordo.Rrr<"EIO">>
 
 				/**
 				 * Resolves the {@link Ordo.User.UID identifier} of the user by given {@link Ordo.User.Email email}.
@@ -92,7 +92,7 @@ declare global {
 				 * Rejects with EIO if the underlying persistence strategy cannot access mapping data.
 				 * Rejects with ENOENT if the user with given email does not exist.
 				 */
-				get_by_email: (email: Ordo.User.Email) => Oath<Ordo.User.UID, Ordo.Rrr<"EIO" | "ENOENT">>
+				get_by_email: (email: Ordo.User.Email) => Oath.Instance<Ordo.User.UID, Ordo.Rrr<"EIO" | "ENOENT">>
 
 				/**
 				 * Triggers refresh of user mappings for given {@link Ordo.User.UID identifier}.
@@ -105,18 +105,18 @@ declare global {
 				 *
 				 * Rejects with EIO if the underlying persistence strategy cannot access or persist mapping data.
 				 */
-				refresh: (id: Ordo.User.UID) => Oath<void, Ordo.Rrr<"EIO">>
+				refresh: (id: Ordo.User.UID) => Oath.Instance<void, Ordo.Rrr<"EIO">>
 			}
 
 			type PersistenceStrategy = {
-				exists: (id: Ordo.User.UID) => Oath<boolean, Ordo.Rrr<"EIO">>
-				create: (user: Ordo.User.Current.Instance) => Oath<Ordo.User.Current.Instance, Ordo.Rrr<"EIO" | "EEXIST">>
-				read: (id: Ordo.User.UID) => Oath<Ordo.User.Current.Instance, Ordo.Rrr<"EIO" | "ENOENT">>
+				exists: (id: Ordo.User.UID) => Oath.Instance<boolean, Ordo.Rrr<"EIO">>
+				create: (user: Ordo.User.Current.Instance) => Oath.Instance<Ordo.User.Current.Instance, Ordo.Rrr<"EIO" | "EEXIST">>
+				read: (id: Ordo.User.UID) => Oath.Instance<Ordo.User.Current.Instance, Ordo.Rrr<"EIO" | "ENOENT">>
 				update: (
 					id: Ordo.User.UID,
 					user: Ordo.User.Current.Instance,
-				) => Oath<Ordo.User.Current.Instance, Ordo.Rrr<"EIO" | "ENOENT" | "EINVAL">>
-				delete: (id: Ordo.User.UID) => Oath<void, Ordo.Rrr<"EIO" | "ENOENT">>
+				) => Oath.Instance<Ordo.User.Current.Instance, Ordo.Rrr<"EIO" | "ENOENT" | "EINVAL">>
+				delete: (id: Ordo.User.UID) => Oath.Instance<void, Ordo.Rrr<"EIO" | "ENOENT">>
 			}
 		}
 	}

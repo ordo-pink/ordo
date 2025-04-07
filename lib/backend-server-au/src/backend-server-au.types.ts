@@ -45,9 +45,9 @@ export namespace BackendAuth {
 	export type CodeHash = string
 
 	export type CodeStrategy = {
-		hash: (code: BackendAuth.Code) => Oath<string, Ordo.Rrr<"EIO">>
-		generate: () => Oath<string, Ordo.Rrr<"EIO">>
-		verify: (hash: BackendAuth.CodeHash, code: BackendAuth.Code) => Oath<boolean, Ordo.Rrr<"EIO">>
+		hash: (code: BackendAuth.Code) => Oath.Instance<string, Ordo.Rrr<"EIO">>
+		generate: () => Oath.Instance<string, Ordo.Rrr<"EIO">>
+		verify: (hash: BackendAuth.CodeHash, code: BackendAuth.Code) => Oath.Instance<boolean, Ordo.Rrr<"EIO">>
 	}
 
 	export type Storage = Map<BackendAuth.Email, { hash: BackendAuth.CodeHash; timestamp: number }>

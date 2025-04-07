@@ -20,8 +20,8 @@
  */
 
 import { call_once, deep_equals } from "@ordo-pink/tau"
-import { Oath } from "@ordo-pink/oath"
 import { ZAGS } from "@ordo-pink/zags"
+import { oath } from "@ordo-pink/oath"
 import { rrr } from "@ordo-pink/core"
 
 import { ordo_app_state } from "../app.state"
@@ -53,7 +53,7 @@ export const init_commands: TF = call_once(() => {
 				enqueue({ name, payload, key, fid, callback: () => void 0 })
 			},
 			naga: (name, payload?, key = crypto.randomUUID()) => {
-				return new Oath<void, Ordo.Rrr>((resolve, reject) => {
+				return oath.new<void, Ordo.Rrr>((resolve, reject) => {
 					const callback = (rrr?: Ordo.Rrr) => (rrr ? reject(rrr) : resolve(void 0))
 					enqueue({ name, payload, key, fid, callback })
 				})

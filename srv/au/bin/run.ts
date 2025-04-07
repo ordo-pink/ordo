@@ -20,10 +20,10 @@
  */
 
 import { die, run_async_command } from "@ordo-pink/binutil"
-import { invokers0 } from "@ordo-pink/oath"
+import { oath } from "@ordo-pink/oath"
 
 void run_async_command("opt/bun run --watch srv/au/index.ts", {
 	stdout: "pipe",
 	stderr: "pipe",
 	env: { ...process.env, FORCE_COLOR: "1" },
-}).invoke(invokers0.or_else(die()))
+}).cata(oath.catas.or_else(die()))

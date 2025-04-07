@@ -23,7 +23,7 @@ import { Button, MetadataIcon, MetadataLink } from "@ordo-pink/maoka-components"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { R } from "@ordo-pink/result"
-import { invokers0 } from "@ordo-pink/oath"
+import { oath } from "@ordo-pink/oath"
 import { ordo_app_state } from "@ordo-pink/frontend-app/app.state"
 
 import { type TBlockNodeParams, type TRTEEmbedNode } from "../../rte.types"
@@ -44,7 +44,7 @@ export const Embed = ({ node, block_index, metadata, is_editable, is_embedded }:
 								// TODO Unsupported file component
 								return async () => {
 									const metadata = get_metadata()
-									const content = await content0.invoke(invokers0.or_else(() => null))
+									const content = await content0.cata(oath.catas.or_else(() => null))
 									const fas = ordo_app_state.zags.select("functions.file_assocs")
 									const fa = fas.find(fa => fa.types.some(t => t.name === get_metadata()?.get_type())) ?? null
 

@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ */
+
 import { type Oath } from "../oath.types"
 import { if_ok_cata } from "./impl/if-ok.impl"
 import { noop_cata } from "./impl/noop.impl"

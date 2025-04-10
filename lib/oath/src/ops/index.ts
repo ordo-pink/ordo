@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ */
+
 import { bimap_op, map_op, rejected_map_op } from "./impl/map.impl"
 import { rejected_tap_op, tap_op } from "./impl/tap.impl"
 import { type Oath } from "../oath.types"

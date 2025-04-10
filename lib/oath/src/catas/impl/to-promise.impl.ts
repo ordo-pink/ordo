@@ -7,7 +7,7 @@ export const to_promise_cata: Oath.Catas.ToPromise = f => ({
 			return resolved && typeof resolved.then === "function" ? resolved : Promise.resolve(resolved)
 		}
 
-		return x && typeof (x as any).then === "function" ? (x as any) : Promise.resolve(x)
+		return x && typeof (x as any).then === "function" ? (x as any) : Promise.reject(x)
 	},
 	resolve: x => x && (typeof (x as any).then === "function" ? (x as unknown as Promise<any>) : Promise.resolve(x)),
 })

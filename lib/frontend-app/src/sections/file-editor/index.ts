@@ -21,7 +21,6 @@
 
 import { BsBoxArrowUp, BsCloudMinus, BsCloudPlus, BsLayoutTextWindow } from "@ordo-pink/frontend-icons"
 import { CommandPaletteItemType, ContextMenuItemType, Metadata, create_function, rrr } from "@ordo-pink/core"
-import { Oath, invokers0 } from "@ordo-pink/oath"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { MetadataIcon } from "@ordo-pink/maoka-components"
 import { R } from "@ordo-pink/result"
@@ -36,6 +35,7 @@ import { ordo_app_state } from "../../../app.state"
 import core_styles from "@ordo-pink/frontend-app/index.css?inline"
 import maoka_components from "@ordo-pink/maoka-components/maoka-components.css?inline"
 import { noop } from "@ordo-pink/tau"
+import { oath } from "@ordo-pink/oath"
 
 export default create_function(
 	"pink.ordo.editor",
@@ -189,40 +189,58 @@ export default create_function(
 
 			return content_query
 				.get(user.get_uid(), fsid)
-				.and(Oath.FromNullable)
-				.fix(() => new ArrayBuffer(0))
-				.and(content =>
-					Oath.FromNullable(fa)
+				.pipe(oath.ops.and(oath.from_nullable))
+				.pipe(oath.ops.fix(() => new ArrayBuffer(0)))
+				.pipe(
+					oath.ops.and(content =>
+						oath
+							.from_nullable(fa)
 
-						// TODO Render file as is if there is no content_to_string
-						.and(fa => Oath.FromNullable(fa.content_to_string).fix(() => ({ render: () => "", styles: [] })))
-						.and(({ render, styles }) =>
-							Oath.FromNullable(render)
-								.fix(() => () => "")
-								.and(f => Oath.Merge({ str: f({ metadata, content, is_editable: false, is_embedded: false }), styles })),
-						),
+							// TODO Render file as is if there is no content_to_string
+							.pipe(
+								oath.ops.and(fa =>
+									oath.from_nullable(fa.content_to_string).pipe(oath.ops.fix(() => ({ render: () => "", styles: [] }))),
+								),
+							)
+							.pipe(
+								oath.ops.and(({ render, styles }) =>
+									oath
+										.from_nullable(render)
+										.pipe(oath.ops.fix(() => () => ""))
+										.pipe(
+											oath.ops.and(f =>
+												oath.merge({ str: f({ metadata, content, is_editable: false, is_embedded: false }), styles }),
+											),
+										),
+								),
+							),
+					),
 				)
-				.and(({ str, styles }) => create_publishable_page(metadata.get_name(), str, ...(styles ?? [])))
-				.and(content =>
-					cmd.naga("cmd.content.upload", {
-						name,
-						parent: fsid,
-						content: new TextEncoder().encode(content).buffer,
-						type: "text/html",
-					}),
+				.pipe(oath.ops.and(({ str, styles }) => create_publishable_page(metadata.get_name(), str, ...(styles ?? []))))
+				.pipe(
+					oath.ops.and(content =>
+						cmd.naga("cmd.content.upload", {
+							name,
+							parent: fsid,
+							content: new TextEncoder().encode(content).buffer,
+							type: "text/html",
+						}),
+					),
 				)
-				.and(() => metadata_query.get_by_name(name, fsid, { show_hidden: true }))
-				.and(r => r.cata({ Ok: m => Oath.Resolve(m), Err: () => Oath.Reject(null) }))
-				.and(Oath.FromNullable)
-				.and(public_metadata =>
-					cmd.naga("cmd.metadata.set_property", {
-						fsid: metadata.get_fsid(),
-						key: "public_id",
-						value: public_metadata.get_fsid(),
-					}),
+				.pipe(oath.ops.and(() => metadata_query.get_by_name(name, fsid, { show_hidden: true })))
+				.pipe(oath.ops.and(r => r.cata({ Ok: m => oath.of(m), Err: () => oath.reject(null) })))
+				.pipe(oath.ops.and(oath.from_nullable))
+				.pipe(
+					oath.ops.and(public_metadata =>
+						cmd.naga("cmd.metadata.set_property", {
+							fsid: metadata.get_fsid(),
+							key: "public_id",
+							value: public_metadata.get_fsid(),
+						}),
+					),
 				)
-				.invoke(
-					invokers0.or_else(e => {
+				.cata(
+					oath.catas.or_else(e => {
 						throw rrr.codes.eperm(`Could not publish '${metadata.get_name()}'`, e)
 					}),
 				)

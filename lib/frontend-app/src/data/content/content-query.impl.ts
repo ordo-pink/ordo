@@ -19,11 +19,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Oath } from "@ordo-pink/oath"
+import { oath } from "@ordo-pink/oath"
 
 // TODO Move to frontend-app
 export const ContentQuery: Ordo.Content.QueryStatic = {
 	Of: (repo: Ordo.Content.Repository, check_query_permission) => ({
-		get: (uid, fsid) => check_query_permission("content.get").cata({ Ok: () => repo.get(uid, fsid), Err: x => Oath.Reject(x) }),
+		get: (uid, fsid) => check_query_permission("content.get").cata({ Ok: () => repo.get(uid, fsid), Err: x => oath.reject(x) }),
 	}),
 }

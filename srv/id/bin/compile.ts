@@ -21,9 +21,9 @@
 
 import { create_dir_if_not_exists0, mv0 } from "@ordo-pink/fs"
 import { die, run_bun_command } from "@ordo-pink/binutil"
-import { Oath } from "@ordo-pink/oath"
 import { getc } from "@ordo-pink/getc"
 import { keys_of } from "@ordo-pink/tau"
+import { oath } from "@ordo-pink/oath"
 
 const env = getc()
 
@@ -35,8 +35,9 @@ const moveCompiledFileToOutDirectory0 = () => mv0("id", "var/out/id")
 const command = "build srv/id/index.ts --outfile=id --compile "
 const envDefinitions = defineEnv(env)
 
-void Oath.of(command.concat(envDefinitions))
-	.chain(run_bun_command)
-	.chain(createOutDirectoryIfNotExists0)
-	.chain(moveCompiledFileToOutDirectory0)
-	.orElse(die())
+void oath
+	.of(command.concat(envDefinitions))
+	.pipe(oath.ops.chain(run_bun_command))
+	.pipe(oath.ops.chain(createOutDirectoryIfNotExists0))
+	.pipe(oath.ops.chain(moveCompiledFileToOutDirectory0))
+	.cata(oath.catas.or_else(die()))

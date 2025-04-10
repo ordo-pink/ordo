@@ -105,11 +105,11 @@ export const create_context = <$TValue>() => {
 		provide:
 			(value: $TValue): TMaokaJab =>
 			props => {
-				if (!state[props.rid]) state[props.rid] = value
+				if (!state[props.root.id]) state[props.root.id] = value
 			},
 
 		consume: (props: TMaokaProps) => {
-			return state[props.rid] ?? ({} as $TValue)
+			return state[props.root.id] ?? ({} as $TValue)
 		},
 	}
 }

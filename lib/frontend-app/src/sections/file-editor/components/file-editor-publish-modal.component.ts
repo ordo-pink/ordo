@@ -25,7 +25,7 @@ import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { NotificationType } from "@ordo-pink/core"
 // import { Result } from "@ordo-pink/result"
-import { invokers0 } from "@ordo-pink/oath"
+import { oath } from "@ordo-pink/oath"
 
 export const PublishMetadataModal = (fsid: Ordo.Metadata.FSID) =>
 	Maoka.create("div", ({ use }) => {
@@ -45,8 +45,8 @@ export const PublishMetadataModal = (fsid: Ordo.Metadata.FSID) =>
 
 			pages_to_publish.forEach(
 				fsid =>
-					void commands.naga("cmd.metadata.publish", fsid).invoke(
-						invokers0.or_else(rrr => {
+					void commands.naga("cmd.metadata.publish", fsid).cata(
+						oath.catas.or_else(rrr => {
 							if (rrr.debug && rrr.debug.length) logger.error(...rrr.debug)
 
 							commands.emit("cmd.application.notification.show", {

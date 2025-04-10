@@ -42,7 +42,7 @@ export const init_fetch: TF = call_once(() => {
 		get_fetch: fid =>
 			R.If(known_functions.has_permissions(fid, { queries: ["application.fetch"] }))
 				.pipe(R.ops.map(() => fetch))
-				.cata(R.catas.or_else(() => forbidden_fetch)),
+				.cata(R.catas.or_else(() => forbidden_fetch as unknown as Ordo.Fetch)),
 	}
 })
 

@@ -19,16 +19,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Oath } from "@ordo-pink/oath"
 import { type Routary } from "@ordo-pink/routary"
+import { oath } from "@ordo-pink/oath"
 import { rrr } from "@ordo-pink/core"
 
 import { type TIDContext } from "../backend-server-id.types"
 import { get_user_from_cookie } from "./get-user-from-cookie"
 
 export const check_if_edited_user_is_current_user = (intake: Routary.Intake<TIDContext>) =>
-	get_user_from_cookie(intake).and(({ user }) =>
-		Oath.If(user.get_uid() === intake.params.user_id, {
-			F: () => ({ rrr: rrr.codes.eperm("Cannot edit other user"), intake: intake }),
-		}),
+	get_user_from_cookie(intake).pipe(
+		oath.ops.and(({ user }) =>
+			oath.if(user.get_uid() === intake.params.user_id, {
+				on_false: () => ({ rrr: rrr.codes.eperm("Cannot edit other user"), intake: intake }),
+			}),
+		),
 	)

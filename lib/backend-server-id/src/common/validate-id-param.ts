@@ -19,16 +19,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Oath, ops0 } from "@ordo-pink/oath"
 import { CurrentUser } from "@ordo-pink/core"
 import { type Routary } from "@ordo-pink/routary"
+import { oath } from "@ordo-pink/oath"
 
 import { type TIDContext } from "../backend-server-id.types"
 import { invalid_id_rrr } from "../rrrs/invalid-user-id.rrr"
 
 export const check_if_id_param_is_valid = (intake: Routary.Intake<TIDContext>) =>
-	Oath.Resolve(intake.params.user_id)
-		.pipe(id => Oath.If(is_uid(id)))
-		.pipe(ops0.rejected_map(() => invalid_id_rrr(intake.params.user_id, intake)))
+	oath
+		.of(intake.params.user_id)
+		.pipe(id => oath.if(is_uid(id)))
+		.pipe(oath.ops.rejected_map(() => invalid_id_rrr(intake.params.user_id, intake)))
 
 const { is_uid } = CurrentUser.Validations

@@ -20,7 +20,7 @@
  */
 
 import { CurrentUser, rrr } from "@ordo-pink/core"
-import { Oath, ops0 } from "@ordo-pink/oath"
+import { Oath, oath } from "@ordo-pink/oath"
 import { default_handler, huyami } from "@ordo-pink/routary-ordo"
 
 import * as fns from "../fns"
@@ -32,16 +32,16 @@ export const handle_request_code = default_handler<BackendAuth.Chamber>(intake =
 	const debug = huyami(intake)
 
 	return get_request_body(intake.req)
-		.pipe(ops0.chain(validate_request_body))
-		.pipe(ops0.tap(debug("Provided email", email => fns.obfuscate_email(email))))
-		.pipe(ops0.chain(create_code(intake.code_strategy)))
-		.pipe(ops0.tap(debug("Code generated")))
-		.pipe(ops0.tap(persist_pair(intake.auth_storage)))
-		.pipe(ops0.tap(debug("Auth record persisted")))
-		.pipe(ops0.tap(send_email(intake)))
-		.pipe(ops0.tap(debug("Email sent")))
-		.pipe(ops0.map(() => intake))
-		.pipe(ops0.rejected_map(rrr => ({ intake, rrr })))
+		.pipe(oath.ops.chain(validate_request_body))
+		.pipe(oath.ops.tap(debug("Provided email", email => fns.obfuscate_email(email))))
+		.pipe(oath.ops.chain(create_code(intake.code_strategy)))
+		.pipe(oath.ops.tap(debug("Code generated")))
+		.pipe(oath.ops.tap(persist_pair(intake.auth_storage)))
+		.pipe(oath.ops.tap(debug("Auth record persisted")))
+		.pipe(oath.ops.tap(send_email(intake)))
+		.pipe(oath.ops.tap(debug("Email sent")))
+		.pipe(oath.ops.map(() => intake))
+		.pipe(oath.ops.rejected_map(rrr => ({ intake, rrr })))
 })
 
 // --- Internal ---
@@ -50,16 +50,16 @@ const is_email = CurrentUser.Validations.is_email
 
 // TODO Move to lib
 
-const get_request_body = (req: Request): Oath<any, Ordo.Rrr<"EIO">> =>
-	Oath.Try(
+const get_request_body = (req: Request): Oath.Instance<any, Ordo.Rrr<"EIO">> =>
+	oath.try(
 		() => req.json(),
 		error => rrr.codes.eio("Failed to parse request body", error),
 	)
 
 const validate_request_body = (body: any) =>
-	Oath.If(body && body.email && is_email(body.email), {
-		T: () => body.email as BackendAuth.Email,
-		F: () => rrr.codes.einval("Provided email is invalid", body.email),
+	oath.if(body && body.email && is_email(body.email), {
+		on_true: () => body.email as BackendAuth.Email,
+		on_false: () => rrr.codes.einval("Provided email is invalid", body.email),
 	})
 
 type Triplet = [BackendAuth.Email, BackendAuth.Code, BackendAuth.CodeHash]
@@ -67,8 +67,8 @@ type Triplet = [BackendAuth.Email, BackendAuth.Code, BackendAuth.CodeHash]
 const create_code = (code_strategy: BackendAuth.CodeStrategy) => (email: BackendAuth.Email) =>
 	code_strategy
 		.generate()
-		.and(code => code_strategy.hash(code).and(hash => [code, hash]))
-		.and(([code, hash]) => [email, code, hash] as Triplet)
+		.pipe(oath.ops.and(code => code_strategy.hash(code).pipe(oath.ops.and(hash => [code, hash]))))
+		.pipe(oath.ops.and(([code, hash]) => [email, code, hash] as Triplet))
 
 const persist_pair =
 	(auth_storage: BackendAuth.Storage) =>

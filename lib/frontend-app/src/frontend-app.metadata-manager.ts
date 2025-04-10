@@ -23,8 +23,8 @@
 // TODO Access file by user_handle and prop link (e.g. https://pub.ordo.pink/@ordo-blog/en/release-0.8.0)
 //                                                     ^-----pub host------^ ^----user---^ ^--file_id---^
 
-import { METADATA_CONTENT_FSID, Metadata } from "@ordo-pink/core"
-import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
+import { METADATA_CONTENT_FSID, Metadata, rrr } from "@ordo-pink/core"
+import { Oath, oath } from "@ordo-pink/oath"
 import { Result } from "@ordo-pink/result"
 import { is_array } from "@ordo-pink/tau"
 
@@ -38,13 +38,13 @@ export const MetadataManager = {
 
 		const get_metadata_content0 = content_repository
 			.get(user?.get_uid() ?? null, METADATA_CONTENT_FSID)
-			.and(Oath.FromNullable)
-			.and(content => new TextDecoder().decode(content as ArrayBuffer))
-			.and(content => Oath.Try(() => JSON.parse(content) as Ordo.Metadata.DTO[]))
-			.fix(() => [] as Ordo.Metadata.DTO[])
-			.and(dtos => dtos.map(Metadata.FromDTO))
-			.and(metadata_repository.put)
-			.and(result => result.cata({ Ok: () => Oath.Resolve(void 0), Err: Oath.Reject }))
+			.pipe(oath.ops.and(oath.from_nullable))
+			.pipe(oath.ops.and(content => new TextDecoder().decode(content as ArrayBuffer)))
+			.pipe(oath.ops.and(content => oath.try(() => JSON.parse(content) as Ordo.Metadata.DTO[])))
+			.pipe(oath.ops.fix(() => [] as Ordo.Metadata.DTO[]))
+			.pipe(oath.ops.and(dtos => dtos.map(Metadata.FromDTO)))
+			.pipe(oath.ops.and(metadata_repository.put))
+			.pipe(oath.ops.and(result => result.cata({ Ok: () => oath.of(void 0), Err: oath.reject })))
 
 		// Wait for content changes to arrive in case the state needs to be refreshed after sync with remote
 		content_repository.$.marry((_, is_update) => {
@@ -55,12 +55,12 @@ export const MetadataManager = {
 
 			void content_repository
 				.get(user?.get_uid() ?? null, METADATA_CONTENT_FSID)
-				.and(stream => new Response(stream as ArrayBuffer))
-				.and(res => res.json())
-				.and(items => Oath.If(is_array(items), { T: () => items }))
-				.and(items => items.map(Metadata.FromDTO))
-				.and(json => metadata_repository.put(json))
-				.invoke(invokers0.to_promise)
+				.pipe(oath.ops.and(stream => new Response(stream as ArrayBuffer)))
+				.pipe(oath.ops.and(res => res.json()))
+				.pipe(oath.ops.and(items => oath.if(is_array(items), { on_true: () => items })))
+				.pipe(oath.ops.and(items => items.map(Metadata.FromDTO)))
+				.pipe(oath.ops.and(json => metadata_repository.put(json)))
+				.cata(oath.catas.unwrap())
 		})
 
 		let divorce_metadata_repository: () => void
@@ -71,7 +71,7 @@ export const MetadataManager = {
 				const mark_get_complete = () => on_state_change("get-remote-complete")
 				const mark_put_complete = () => on_state_change("put-remote-complete")
 
-				let previous_save_attempt0: Oath<void, Error>
+				let previous_save_attempt0: Oath.Instance<void, Error>
 
 				divorce_metadata_repository = metadata_repository.$.marry(({ version }) => {
 					// Version 0 means the metadata was not yet initialized
@@ -80,7 +80,7 @@ export const MetadataManager = {
 
 					if (previous_save_attempt0) {
 						on_state_change("put-remote-complete")
-						previous_save_attempt0.cancel()
+						previous_save_attempt0.cancel("Save attempt prevented due to newer update")
 					}
 
 					const dtos = metadata_repository
@@ -92,30 +92,42 @@ export const MetadataManager = {
 
 					const user = ordo_app_state.zags.select("user")
 
-					previous_save_attempt0 = Oath.Resolve(on_state_change("put-remote"))
-						.and(() => {
-							if (user) {
-								const authenticated_dtos = dtos.map(dto => {
-									if (!dto.created_by) dto.created_by = user.get_uid()
-									if (!dto.updated_by) dto.updated_by = user.get_uid()
+					previous_save_attempt0 = oath
+						.of(on_state_change("put-remote"))
+						.pipe(
+							oath.ops.and(() => {
+								if (user) {
+									const authenticated_dtos = dtos.map(dto => {
+										if (!dto.created_by) dto.created_by = user.get_uid()
+										if (!dto.updated_by) dto.updated_by = user.get_uid()
 
-									return dto
-								})
+										return dto
+									})
 
-								return authenticated_dtos
-							}
+									return authenticated_dtos
+								}
 
-							return dtos
-						})
-						.and(dtos => Oath.Try(() => JSON.stringify(dtos)))
-						.and(str =>
-							content_repository.put(user?.get_uid() ?? null, METADATA_CONTENT_FSID, new TextEncoder().encode(str).buffer),
+								return dtos
+							}),
 						)
+						.pipe(
+							oath.ops.and(dtos =>
+								oath.try(
+									() => JSON.stringify(dtos),
+									e => rrr.codes.eio("Failed to get content", e),
+								),
+							),
+						)
+						.pipe(
+							oath.ops.and(str =>
+								content_repository.put(user?.get_uid() ?? null, METADATA_CONTENT_FSID, new TextEncoder().encode(str).buffer),
+							),
+						) as any
 
 					previous_save_attempt0 &&
-						void previous_save_attempt0.pipe(ops0.bitap(mark_put_complete, mark_put_complete)).invoke(
-							invokers0.or_else(e => {
-								if ((e as any) === "Cancelled") return
+						void previous_save_attempt0.pipe(oath.ops.tap(mark_put_complete, mark_put_complete)).cata(
+							oath.catas.or_else(e => {
+								if ((e as any) === "Save attempt prevented due to newer update") return
 								logger.error(e)
 							}),
 						)
@@ -123,13 +135,14 @@ export const MetadataManager = {
 
 				cancel_get_content = () => {
 					mark_get_complete()
-					get_metadata_content0.cancel()
+					get_metadata_content0.cancel("Save attempt prevented due to newer update")
 				}
 
-				return Oath.Resolve(on_state_change("get-remote"))
+				return oath
+					.of(on_state_change("get-remote"))
 					.pipe(() => get_metadata_content0)
-					.pipe(ops0.bitap(mark_get_complete, mark_get_complete))
-					.invoke(invokers0.or_else(console.error)) // TODO handling persistence errors
+					.pipe(oath.ops.tap(mark_get_complete, mark_get_complete))
+					.cata(oath.catas.or_else(console.error)) as any // TODO handling persistence errors
 			},
 			cancel: () => {
 				if (divorce_metadata_repository) divorce_metadata_repository()

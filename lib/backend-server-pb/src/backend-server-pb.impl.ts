@@ -4,7 +4,6 @@
  */
 
 import { CurrentUser, CurrentUserKeys, METADATA_CONTENT_FSID, Metadata, rrr } from "@ordo-pink/core"
-import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
 import { Routary, routary } from "@ordo-pink/routary"
 import {
 	create_response,
@@ -15,6 +14,7 @@ import {
 	stop_response_timer,
 } from "@ordo-pink/routary-ordo"
 import { TWO_LETTER_LOCALE } from "@ordo-pink/locale"
+import { oath } from "@ordo-pink/oath"
 import { rickroll } from "@ordo-pink/rickroll"
 import { routary_cors } from "@ordo-pink/routary-cors"
 
@@ -25,49 +25,56 @@ export const create_backend_server_pb = (chamber: TPBChamber) =>
 		.create<TPBContext>({ ...chamber, headers: new Headers(), status: 200, request_language: TWO_LETTER_LOCALE.ENGLISH })
 		.get("/:handle/:fsid", intake => {
 			return (
-				Oath.Resolve(intake)
-					.pipe(ops0.tap(start_response_timer))
-					.pipe(ops0.tap(extract_request_ip))
-					.pipe(ops0.chain(validate_request_params))
-					.pipe(ops0.map(extract_ids(intake)))
+				oath
+					.of(intake)
+					.pipe(oath.ops.tap(start_response_timer))
+					.pipe(oath.ops.tap(extract_request_ip))
+					.pipe(oath.ops.chain(validate_request_params))
+					.pipe(oath.ops.map(extract_ids(intake)))
 					.pipe(
-						ops0.chain(({ handle, fsid }) =>
-							Oath.FromPromise(() => fetch(`${intake.id_host}/users/handle/${handle}`))
-								.and(res => res.json())
-								.and(res => Oath.If(res.success, { T: () => res.payload as Ordo.User.Public.DTO }))
-								.and(user => ({ uid: user[CurrentUserKeys.UID], fsid }))
-								.pipe(ops0.rejected_map(() => rrr.codes.enoent("User not found"))),
+						oath.ops.chain(({ handle, fsid }) =>
+							oath
+								.from_promise(() => fetch(`${intake.id_host}/users/handle/${handle}`))
+								.pipe(oath.ops.and(res => res.json()))
+								.pipe(oath.ops.and(res => oath.if(res.success, { on_true: () => res.payload as Ordo.User.Public.DTO })))
+								.pipe(oath.ops.and(user => ({ uid: user[CurrentUserKeys.UID], fsid })))
+								.pipe(oath.ops.rejected_map(() => rrr.codes.enoent("User not found"))),
 						),
 					)
-					.pipe(ops0.chain(check_file_exists(intake)))
+					.pipe(oath.ops.chain(check_file_exists(intake)))
 					.pipe(
-						ops0.chain(({ uid, fsid }) =>
+						oath.ops.chain(({ uid, fsid }) =>
 							intake.data_persistence_strategy
 								.read(uid, METADATA_CONTENT_FSID)
-								.pipe(ops0.chain(stream => Oath.FromPromise(() => new Response(stream).json() as Promise<Ordo.Metadata.DTO[]>)))
-								.pipe(ops0.chain(metadata => Oath.FromNullable(metadata.find(item => item.fsid === fsid))))
-								.pipe(ops0.rejected_map(() => rrr.codes.enoent("User metadata not found")))
 								.pipe(
-									ops0.chain(m =>
-										Oath.If(m.props && m.props.public_id, { T: () => m })
-											.pipe(ops0.tap(m => intake.headers.set("Last-Modified", new Date(m.updated_at).toUTCString())))
-											.pipe(ops0.tap(() => intake.headers.set("Content-Type", "text/html")))
-											.pipe(ops0.map(m => ({ uid, fsid: m.props!.public_id })))
-											.pipe(ops0.rejected_map(() => rrr.codes.enoent("File not found"))),
+									oath.ops.chain(stream =>
+										oath.from_promise(() => new Response(stream).json() as Promise<Ordo.Metadata.DTO[]>),
+									),
+								)
+								.pipe(oath.ops.chain(metadata => oath.from_nullable(metadata.find(item => item.fsid === fsid))))
+								.pipe(oath.ops.rejected_map(() => rrr.codes.enoent("User metadata not found")))
+								.pipe(
+									oath.ops.chain(m =>
+										oath
+											.if(m.props && m.props.public_id, { on_true: () => m })
+											.pipe(oath.ops.tap(m => intake.headers.set("Last-Modified", new Date(m.updated_at).toUTCString())))
+											.pipe(oath.ops.tap(() => intake.headers.set("Content-Type", "text/html")))
+											.pipe(oath.ops.map(m => ({ uid, fsid: m.props!.public_id })))
+											.pipe(oath.ops.rejected_map(() => rrr.codes.enoent("File not found"))),
 									),
 								),
 						),
 					)
 					// TODO Check file is public
-					.pipe(ops0.chain(({ uid, fsid }) => intake.data_persistence_strategy.read(uid, fsid)))
-					.pipe(ops0.tap(file => void (intake.payload = file)))
-					.pipe(ops0.map(() => intake))
-					.pipe(ops0.rejected_map(rrr => ({ rrr, intake: intake })))
-					.fix(status_from_rrr)
-					.pipe(ops0.tap(stop_response_timer))
-					.pipe(ops0.tap(log_request))
-					.pipe(ops0.map(create_response))
-					.invoke(invokers0.force_resolve)
+					.pipe(oath.ops.chain(({ uid, fsid }) => intake.data_persistence_strategy.read(uid, fsid)))
+					.pipe(oath.ops.tap(file => void (intake.payload = file)))
+					.pipe(oath.ops.map(() => intake))
+					.pipe(oath.ops.rejected_map(rrr => ({ rrr, intake: intake })))
+					.pipe(oath.ops.fix(status_from_rrr))
+					.pipe(oath.ops.tap(stop_response_timer))
+					.pipe(oath.ops.tap(log_request))
+					.pipe(oath.ops.map(create_response))
+					.cata(oath.catas.unwrap())
 			)
 		})
 
@@ -78,21 +85,25 @@ export const create_backend_server_pb = (chamber: TPBChamber) =>
 		.start(() => rickroll)
 
 const validate_request_params = (intake: Routary.Intake<TPBContext>) =>
-	Oath.Merge([
-		Oath.If(Metadata.Validations.is_fsid(intake.params.fsid)).pipe(ops0.rejected_map(() => rrr.codes.einval("Invalid FSID"))),
-		Oath.If(CurrentUser.Validations.is_handle(intake.params.handle)).pipe(
-			ops0.rejected_map(() => rrr.codes.einval("Invalid handle")),
-		),
-	]).pipe(ops0.map(() => intake))
+	oath
+		.all([
+			oath
+				.if(Metadata.Validations.is_fsid(intake.params.fsid))
+				.pipe(oath.ops.rejected_map(() => rrr.codes.einval("Invalid FSID"))),
+			oath
+				.if(CurrentUser.Validations.is_handle(intake.params.handle))
+				.pipe(oath.ops.rejected_map(() => rrr.codes.einval("Invalid handle"))),
+		])
+		.pipe(oath.ops.map(() => intake))
 
 const check_file_exists =
 	(intake: Routary.Intake<TPBContext>) =>
 	({ uid, fsid }: TIDs) =>
 		intake.data_persistence_strategy
 			.exists(uid, fsid)
-			.pipe(ops0.chain(exists => Oath.If(exists)))
-			.pipe(ops0.map(() => ({ uid, fsid })))
-			.pipe(ops0.rejected_map(() => rrr.codes.enoent("File not found")))
+			.pipe(oath.ops.chain(exists => oath.if(exists)))
+			.pipe(oath.ops.map(() => ({ uid, fsid })))
+			.pipe(oath.ops.rejected_map(() => rrr.codes.enoent("File not found")))
 
 type TIDs = { uid: Ordo.User.UID; fsid: Ordo.Metadata.FSID }
 const extract_ids = (intake: Routary.Intake<TPBContext>) => () => ({

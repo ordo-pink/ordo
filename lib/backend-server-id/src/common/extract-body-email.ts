@@ -19,19 +19,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Oath, ops0 } from "@ordo-pink/oath"
 import { CurrentUser } from "@ordo-pink/core"
 import { type Routary } from "@ordo-pink/routary"
 
 import { email_missing_rrr, invalid_email_rrr } from "../rrrs/invalid-user-email.rrr"
 import { type TIDContext } from "../backend-server-id.types"
+import { oath } from "@ordo-pink/oath"
 
 export const extract_body_email = (intake: Routary.Intake<TIDContext>) => (request_body: any) =>
-	Oath.FromNullable(request_body.email)
-		.pipe(ops0.rejected_map(() => email_missing_rrr(intake)))
+	oath
+		.from_nullable(request_body.email)
+		.pipe(oath.ops.rejected_map(() => email_missing_rrr(intake)))
 		.pipe(
-			ops0.chain(email =>
-				Oath.If(is_email(email), { T: () => email as Ordo.User.Email, F: () => invalid_email_rrr(email, intake) }),
+			oath.ops.chain(email =>
+				oath.if(is_email(email), { on_true: () => email as Ordo.User.Email, on_false: () => invalid_email_rrr(email, intake) }),
 			),
 		)
 

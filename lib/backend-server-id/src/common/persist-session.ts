@@ -20,8 +20,8 @@
  */
 
 import { CurrentUser, CurrentUserKeys } from "@ordo-pink/core"
-import { Oath, ops0 } from "@ordo-pink/oath"
 import { type Routary } from "@ordo-pink/routary"
+import { oath } from "@ordo-pink/oath"
 
 import { type TIDContext } from "../backend-server-id.types"
 
@@ -29,8 +29,9 @@ const { SESSIONS } = CurrentUserKeys
 
 export const persist_session_id =
 	(i: Routary.Intake<TIDContext>) => (params: { sid: Ordo.User.Session; user: Ordo.User.Current.Instance }) =>
-		Oath.Resolve(params.user.to_dto())
-			.pipe(ops0.tap(dto => void (dto[SESSIONS] = [...dto[SESSIONS], params.sid])))
-			.and(dto => i.persistence_strategy_user.update(params.user.get_uid(), CurrentUser.FromDTO(dto)))
-			.and(() => params)
-			.pipe(ops0.rejected_map(rrr => ({ rrr, intake: i })))
+		oath
+			.of(params.user.to_dto())
+			.pipe(oath.ops.tap(dto => void (dto[SESSIONS] = [...dto[SESSIONS], params.sid])))
+			.pipe(oath.ops.and(dto => i.persistence_strategy_user.update(params.user.get_uid(), CurrentUser.FromDTO(dto))))
+			.pipe(oath.ops.and(() => params))
+			.pipe(oath.ops.rejected_map(rrr => ({ rrr, intake: i })))

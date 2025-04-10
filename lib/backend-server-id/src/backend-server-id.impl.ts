@@ -25,7 +25,6 @@ import { routary } from "@ordo-pink/routary"
 import { routary_cors } from "@ordo-pink/routary-cors"
 
 import { type TIDChamber, type TIDContext } from "./backend-server-id.types"
-import { handle_delete_user } from "./handlers/user/delete-user.handler"
 import { handle_get_session } from "./handlers/session/get-session.handler"
 import { handle_get_user_by_handle } from "./handlers/user/get-user-by-handle.handler"
 import { handle_get_user_by_id } from "./handlers/user/get-user-by-id.handler"
@@ -43,7 +42,7 @@ export const create_backend_server_id = (chamber: TIDChamber) =>
 		.get("/users/:user_id", handle_get_user_by_id)
 		.get("/users/handle/:user_handle", handle_get_user_by_handle)
 		// .patch("/users/:user_id", handle_update_user)
-		.delete("/users/:user_id", handle_delete_user)
+		// .delete("/users/:user_id", handle_delete_user)
 
 		.get("/healthcheck", () => new Response("OK")) // TODO Extract to lib
 

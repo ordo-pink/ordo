@@ -23,7 +23,7 @@ import { BigIntStats, Stats, promises, watch } from "fs"
 import { cwd } from "process"
 import { join } from "path"
 
-import { Oath, ops0 } from "@ordo-pink/oath"
+import { Oath, oath } from "@ordo-pink/oath"
 import { noop } from "@ordo-pink/tau"
 
 export const get_parent_path = (path: string) => {
@@ -38,8 +38,8 @@ export const get_absolute_path = (path: string) => {
 
 const oathify =
 	<T extends (...args: any[]) => any>(f: T) =>
-	(...args: Parameters<T>): T extends (...args: any[]) => infer I ? Oath<Awaited<I>, Error> : never =>
-		Oath.FromPromise(() => f(...args)) as any
+	(...args: Parameters<T>): T extends (...args: any[]) => infer I ? Oath.Instance<Awaited<I>, Error> : never =>
+		oath.from_promise(() => f(...args)) as any
 
 export const mkdir0 = oathify(promises.mkdir)
 export const rmdir0 = oathify(promises.rm)
@@ -50,34 +50,35 @@ export const removeFile0 = rmdir0
 export const mv0 = oathify(promises.rename)
 export const rename0 = mv0
 export const stat0 = (...args: Parameters<typeof promises.stat>) =>
-	Oath.FromPromise<Stats | BigIntStats, Error>(() => promises.stat(...args))
+	oath.from_promise<Stats | BigIntStats, Error>(() => promises.stat(...args))
 export const readdir0 = oathify(promises.readdir)
 export const mkdir_rec0 = (path: string) => mkdir0(path, { recursive: true })
 
 export const write_file_rec0 = (...[path, data, options]: Parameters<typeof write_file0>) =>
-	Oath.If(typeof path === "string", {
-		F: () => new Error("writeFileRecursive0 can only create files from string paths"),
-	})
-		.pipe(ops0.chain(() => create_parent_if_not_exists0(path as string)))
-		.pipe(ops0.chain(() => write_file0(path, data, options)))
+	oath
+		.if(typeof path === "string", {
+			on_false: () => new Error("writeFileRecursive0 can only create files from string paths"),
+		})
+		.pipe(oath.ops.chain(() => create_parent_if_not_exists0(path as string)))
+		.pipe(oath.ops.chain(() => write_file0(path, data, options)))
 
 export const create_dir_if_not_exists0 = (path: string) =>
 	stat0(path)
-		.fix(() => mkdir_rec0(path))
-		.pipe(ops0.map(noop))
+		.pipe(oath.ops.fix(() => mkdir_rec0(path)))
+		.pipe(oath.ops.map(noop))
 
 export const create_parent_if_not_exists0 = (path: string) =>
-	Oath.Resolve(path).pipe(ops0.map(get_parent_path)).pipe(ops0.chain(create_dir_if_not_exists0))
+	oath.of(path).pipe(oath.ops.map(get_parent_path)).pipe(oath.ops.chain(create_dir_if_not_exists0))
 
 export const file_exists0 = (path: string) =>
 	stat0(path)
-		.pipe(ops0.map(stat => stat.isFile()))
-		.fix(() => false)
+		.pipe(oath.ops.map(stat => stat.isFile()))
+		.pipe(oath.ops.fix(() => false))
 
 export const dir_exists0 = (path: string) =>
 	stat0(path)
-		.pipe(ops0.map(stat => stat.isDirectory()))
-		.fix(() => false)
+		.pipe(oath.ops.map(stat => stat.isDirectory()))
+		.pipe(oath.ops.fix(() => false))
 
 export const is_file0 = file_exists0
 export const is_dir0 = dir_exists0

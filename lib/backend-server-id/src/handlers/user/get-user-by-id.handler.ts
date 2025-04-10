@@ -19,22 +19,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Oath, ops0 } from "@ordo-pink/oath"
 import { PublicUser } from "@ordo-pink/core"
 import { type Routary } from "@ordo-pink/routary"
 import { default_handler } from "@ordo-pink/routary-ordo"
+import { oath } from "@ordo-pink/oath"
 
 import { type TIDContext } from "../../backend-server-id.types"
 import { invalid_id_rrr } from "../../rrrs/invalid-user-id.rrr"
 
 export const handle_get_user_by_id = default_handler<TIDContext>(intake =>
-	Oath.Resolve(intake.params.user_id)
-		.pipe(ops0.chain(validate_user_id(intake)))
-		.pipe(ops0.chain(get_by_id(intake)))
-		.pipe(ops0.map(u => u.to_dto()))
-		.pipe(ops0.map(serialize_to_public_user))
-		.pipe(ops0.map(user => void (intake.payload = user)))
-		.pipe(ops0.map(() => intake)),
+	oath
+		.of(intake.params.user_id)
+		.pipe(oath.ops.chain(validate_user_id(intake)))
+		.pipe(oath.ops.chain(get_by_id(intake)))
+		.pipe(oath.ops.map(u => u.to_dto()))
+		.pipe(oath.ops.map(serialize_to_public_user))
+		.pipe(oath.ops.map(user => void (intake.payload = user)))
+		.pipe(oath.ops.map(() => intake)),
 )
 
 // --- Internal ---
@@ -44,7 +45,7 @@ type I = Routary.Intake<TIDContext>
 const serialize_to_public_user = PublicUser.Serialize
 
 const validate_user_id = (intake: I) => (id: unknown) =>
-	Oath.If(PublicUser.Validations.is_uid(id), { T: () => id as Ordo.User.UID, F: () => invalid_id_rrr(id, intake) })
+	oath.if(PublicUser.Validations.is_uid(id), { on_true: () => id as Ordo.User.UID, on_false: () => invalid_id_rrr(id, intake) })
 
 const get_by_id = (intake: I) => (id: Ordo.User.UID) =>
-	intake.persistence_strategy_user.read(id).pipe(ops0.rejected_map(rrr => ({ rrr, intake })))
+	intake.persistence_strategy_user.read(id).pipe(oath.ops.rejected_map(rrr => ({ rrr, intake })))

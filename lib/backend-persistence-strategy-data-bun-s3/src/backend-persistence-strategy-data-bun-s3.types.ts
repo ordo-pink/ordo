@@ -3,14 +3,14 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-export type TPersistenceStrategyDataS3Params = {
-	access_key: string
-	secret_key: string
-	region: string
-	bucket: string
-	endpoint?: string
-}
+export namespace PersistenceStrategyDataBunS3 {
+	export type Params = {
+		access_key: string
+		secret_key: string
+		region: string
+		bucket: string
+		endpoint?: string
+	}
 
-export type TPersistenceStrategyDataS3 = {
-	Of: (params: TPersistenceStrategyDataS3Params) => OrdoBackend.Data.PersistenceStrategy
+	export type Create = (params: PersistenceStrategyDataBunS3.Params) => OrdoBackend.Data.PersistenceStrategy
 }

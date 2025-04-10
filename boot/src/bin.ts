@@ -1,5 +1,5 @@
-import { Oath } from "@ordo-pink/oath"
 import { get_opts } from "@ordo-pink/binutil"
+import { oath } from "@ordo-pink/oath"
 
 import commands from "./cmd"
 
@@ -8,11 +8,16 @@ const all_args = process.argv.slice(2)
 const opts = get_opts(all_args)
 
 const main = () =>
-	Oath.FromNullable(all_args[0])
-		.and(command_name => Oath.If(command_name === "--help", { T: show_help }).fix(() => command_name))
-		.and(command_name => Oath.FromNullable(commands[command_name]))
-		.and(command => Oath.Try(() => command.handler(opts)))
-		.fork(educate, () => void 0)
+	oath
+		.from_nullable(all_args[0])
+		.pipe(
+			oath.ops.and(command_name =>
+				oath.if(command_name === "--help", { on_true: show_help }).pipe(oath.ops.fix(() => command_name)),
+			),
+		)
+		.pipe(oath.ops.and(command_name => oath.from_nullable(commands[command_name])))
+		.pipe(oath.ops.and(command => oath.try(() => command.handler(opts))))
+		.cata({ reject: educate, resolve: () => void 0 })
 
 const educate = () => {
 	if (!all_args[0]) console.error("ERROR: Invalid usage: command not provided. Type 'bin/dog --help' for details.")

@@ -20,80 +20,89 @@
  */
 
 import { type Logger, console_logger } from "@ordo-pink/logger"
-import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
 import { type TIDChamber, create_backend_server_id } from "@ordo-pink/backend-server-id"
 import { create_persistence_strategy_user, create_reference_mapping_user } from "@ordo-pink/backend-persistence-strategy-user"
 import { is_finite_non_negative_int, is_finite_positive_int, is_port, is_positive_number } from "@ordo-pink/tau"
-import { PersistenceStrategyDataFS } from "@ordo-pink/backend-persistence-strategy-data-fs"
+import { create_persistence_strategy_data_fs } from "@ordo-pink/backend-persistence-strategy-data-fs"
+import { oath } from "@ordo-pink/oath"
 
 const env_rrr = (env_var: string) => (value?: any) =>
 	value != null ? `Invalid value for ${env_var}: "${value}"` : `Missing value for ${env_var}`
 
 const get_env = () =>
-	Oath.Merge({
-		port: Oath.FromNullable(Bun.env.ORDO_ID_PORT)
-			.and(n => Oath.If(is_port(n), { T: () => n }))
-			.pipe(ops0.rejected_map(env_rrr("ORDO_ID_PORT"))),
+	oath.merge({
+		port: oath
+			.from_nullable(Bun.env.ORDO_ID_PORT)
+			.pipe(oath.ops.and(n => oath.if(is_port(n), { on_true: () => n })))
+			.pipe(oath.ops.rejected_map(env_rrr("ORDO_ID_PORT"))),
 
-		data_root: Oath.FromNullable(Bun.env.ORDO_DT_DATA_PATH, env_rrr("ORDO_DT_DATA_PATH")),
+		data_root: oath.from_nullable(Bun.env.ORDO_DT_DATA_PATH, env_rrr("ORDO_DT_DATA_PATH")),
 
-		allow_origin: Oath.FromNullable(Bun.env.ORDO_ID_ALLOW_ORIGIN)
-			.and(s => s.split(", "))
-			.pipe(ops0.rejected_map(env_rrr("ORDO_ID_ALLOW_ORIGIN"))),
+		allow_origin: oath
+			.from_nullable(Bun.env.ORDO_ID_ALLOW_ORIGIN)
+			.pipe(oath.ops.and(s => s.split(", ")))
+			.pipe(oath.ops.rejected_map(env_rrr("ORDO_ID_ALLOW_ORIGIN"))),
 
-		file_limit: Oath.FromNullable(Bun.env.ORDO_ID_DEFAULT_FILE_LIMIT)
-			.and(s => Number.parseInt(s, 10))
-			.and(n => Oath.If(is_finite_positive_int(n), { T: () => n }))
-			.pipe(ops0.rejected_map(env_rrr("ORDO_ID_DEFAULT_FILE_LIMIT"))),
+		file_limit: oath
+			.from_nullable(Bun.env.ORDO_ID_DEFAULT_FILE_LIMIT)
+			.pipe(oath.ops.and(s => Number.parseInt(s, 10)))
+			.pipe(oath.ops.and(n => oath.if(is_finite_positive_int(n), { on_true: () => n })))
+			.pipe(oath.ops.rejected_map(env_rrr("ORDO_ID_DEFAULT_FILE_LIMIT"))),
 
-		max_upload_size: Oath.FromNullable(Bun.env.ORDO_ID_DEFAULT_MAX_UPLOAD_SIZE)
-			.and(s => Number.parseFloat(s))
-			.and(n => Oath.If(is_positive_number(n), { T: () => n }))
-			.pipe(ops0.rejected_map(env_rrr("ORDO_ID_DEFAULT_MAX_UPLOAD_SIZE"))),
+		max_upload_size: oath
+			.from_nullable(Bun.env.ORDO_ID_DEFAULT_MAX_UPLOAD_SIZE)
+			.pipe(oath.ops.and(s => Number.parseFloat(s)))
+			.pipe(oath.ops.and(n => oath.if(is_positive_number(n), { on_true: () => n })))
+			.pipe(oath.ops.rejected_map(env_rrr("ORDO_ID_DEFAULT_MAX_UPLOAD_SIZE"))),
 
-		max_functions: Oath.FromNullable(Bun.env.ORDO_ID_DEFAULT_MAX_FUNCTIONS)
-			.and(s => Number.parseInt(s, 10))
-			.and(n => Oath.If(is_finite_non_negative_int(n), { T: () => n }))
-			.pipe(ops0.rejected_map(env_rrr("ORDO_ID_DEFAULT_MAX_FUNCTIONS"))),
+		max_functions: oath
+			.from_nullable(Bun.env.ORDO_ID_DEFAULT_MAX_FUNCTIONS)
+			.pipe(oath.ops.and(s => Number.parseInt(s, 10)))
+			.pipe(oath.ops.and(n => oath.if(is_finite_non_negative_int(n), { on_true: () => n })))
+			.pipe(oath.ops.rejected_map(env_rrr("ORDO_ID_DEFAULT_MAX_FUNCTIONS"))),
 
-		session_lifetime: Oath.FromNullable(Bun.env.ORDO_ID_SESSION_LIFETIME)
-			.and(s => Number.parseInt(s, 10))
-			.and(n => Oath.If(is_finite_positive_int(n), { T: () => n }))
-			.pipe(ops0.rejected_map(env_rrr("ORDO_ID_SESSION_LIFETIME"))),
+		session_lifetime: oath
+			.from_nullable(Bun.env.ORDO_ID_SESSION_LIFETIME)
+			.pipe(oath.ops.and(s => Number.parseInt(s, 10)))
+			.pipe(oath.ops.and(n => oath.if(is_finite_positive_int(n), { on_true: () => n })))
+			.pipe(oath.ops.rejected_map(env_rrr("ORDO_ID_SESSION_LIFETIME"))),
 
-		web_host: Oath.FromNullable(Bun.env.ORDO_WEB_HOST, env_rrr("ORDO_WEB_HOST")),
-		dt_host: Oath.FromNullable(Bun.env.ORDO_DT_HOST, env_rrr("ORDO_DT_HOST")),
+		web_host: oath.from_nullable(Bun.env.ORDO_WEB_HOST, env_rrr("ORDO_WEB_HOST")),
+		dt_host: oath.from_nullable(Bun.env.ORDO_DT_HOST, env_rrr("ORDO_DT_HOST")),
 	})
 
 const main = () =>
 	get_env()
-		.and(({ allow_origin, data_root, file_limit, max_functions, max_upload_size, session_lifetime, port, web_host }) => {
-			const persistence_strategy_data = PersistenceStrategyDataFS.Of(data_root)
-			const persistence_strategy_user = create_persistence_strategy_user(persistence_strategy_data)
-			const reference_mapping_user = create_reference_mapping_user(persistence_strategy_data, persistence_strategy_user)
+		.pipe(
+			oath.ops.and(
+				({ allow_origin, data_root, file_limit, max_functions, max_upload_size, session_lifetime, port, web_host }) => {
+					const persistence_strategy_data = create_persistence_strategy_data_fs({ root: data_root })
+					const persistence_strategy_user = create_persistence_strategy_user(persistence_strategy_data)
+					const reference_mapping_user = create_reference_mapping_user(persistence_strategy_data, persistence_strategy_user)
 
-			return Oath.Merge({
-				allow_origin,
-				defaults: { file_limit, max_functions, max_upload_size },
-				logger,
-				notification_strategy: { send: ({ content }) => logger.notice("NOTIFICATION:", "::", content) }, // TODO
-				session_lifetime,
-				web_host,
-				reference_mapping_user,
-				persistence_strategy_user,
-			} satisfies TIDChamber)
-				.and(create_backend_server_id)
-				.and(fetch => Bun.serve({ fetch, port }))
-		})
-		.pipe(ops0.tap(server => logger.info(`server running on http://${server.hostname}:${server.port}`)))
-		.invoke(
-			invokers0.or_else(e => {
+					return oath
+						.merge({
+							allow_origin,
+							defaults: { file_limit, max_functions, max_upload_size },
+							logger,
+							notification_strategy: { send: ({ content }) => logger.notice("NOTIFICATION:", "::", content) }, // TODO
+							session_lifetime,
+							web_host,
+							reference_mapping_user,
+							persistence_strategy_user,
+						} satisfies TIDChamber)
+						.pipe(oath.ops.and(create_backend_server_id))
+						.pipe(oath.ops.and(fetch => Bun.serve({ fetch, port })))
+				},
+			),
+		)
+		.pipe(oath.ops.tap(server => logger.info(`server running on http://${server.hostname}:${server.port}`)))
+		.cata(
+			oath.catas.or_else(e => {
 				logger.panic(e)
 				process.exit(1)
 			}),
 		)
-
-void main()
 
 // --- Internal ---
 
@@ -107,3 +116,5 @@ const logger: Logger = {
 	panic: (...message) => console_logger.panic("[ID]", ...message),
 	warn: (...message) => console_logger.warn("[ID]", ...message),
 }
+
+void main()

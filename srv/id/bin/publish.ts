@@ -21,6 +21,7 @@
 
 import { die, run_command } from "@ordo-pink/binutil"
 import { getc } from "@ordo-pink/getc"
+import { oath } from "@ordo-pink/oath"
 
 const {
 	ORDO_ID_ENV,
@@ -47,6 +48,6 @@ const login = `docker login --username ${ORDO_ID_DOCKER_REGISTRY_USERNAME} --pas
 const publish = `docker push ${ORDO_ID_DOCKER_REGISTRY}/${ORDO_ID_DOCKER_REGISTRY_SCOPE}/id:${ORDO_ID_VERSION}`
 
 void run_command(build)
-	.chain(() => run_command(login))
-	.chain(() => run_command(publish))
-	.orElse(die())
+	.pipe(oath.ops.chain(() => run_command(login)))
+	.pipe(oath.ops.chain(() => run_command(publish)))
+	.cata(oath.catas.or_else(die()))

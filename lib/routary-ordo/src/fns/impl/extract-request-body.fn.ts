@@ -3,17 +3,14 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { Oath } from "@ordo-pink/oath"
 import { type Routary } from "@ordo-pink/routary"
+import { oath } from "@ordo-pink/oath"
 import { rrr } from "@ordo-pink/core"
 
 import { type RoutaryOrdo } from "../../routary-ordo.types"
 
 export const extract_json_body: RoutaryOrdo.ExtractJSONBody = intake =>
-	Oath.Try(
-		() => intake.req.json(),
-		error => to_rrr(error, intake),
-	)
+	oath.from_promise(() => intake.req.json()).pipe(oath.ops.rejected_map(error => to_rrr(error, intake)))
 
 // --- Internal ---
 

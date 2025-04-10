@@ -20,8 +20,8 @@
  */
 
 import { CurrentUser, rrr } from "@ordo-pink/core"
-import { Oath, invokers0, ops0 } from "@ordo-pink/oath"
 import { keys_of, undef } from "@ordo-pink/tau"
+import { oath } from "@ordo-pink/oath"
 
 import { type PersistenceStrategyUser } from "./backend-persistence-strategy-user.types"
 
@@ -36,34 +36,35 @@ export const create_reference_mapping_user = (
 ): OrdoBackend.User.ReferenceMapping => {
 	let storage_p = get_storage_p(persistence_strategy_data)
 
-	const ms0 = Oath.FromPromise<Mapping, never>(() => storage_p)
+	const ms0 = oath.from_promise<Mapping, never>(() => storage_p)
 
 	return {
-		exists_by_email: email => ms0.and(ms => !!ms.email[email]),
+		exists_by_email: email => ms0.pipe(oath.ops.and(ms => !!ms.email[email])),
 
-		exists_by_handle: handle => ms0.and(ms => !!ms.handle[handle]),
+		exists_by_handle: handle => ms0.pipe(oath.ops.and(ms => !!ms.handle[handle])),
 
-		get_by_email: email => ms0.and(m => Oath.FromNullable(m.email[email], () => rrr.codes.enoent("User not found"))),
+		get_by_email: email =>
+			ms0.pipe(oath.ops.and(m => oath.from_nullable(m.email[email], () => rrr.codes.enoent("User not found")))),
 
 		get_by_handle: handle =>
-			ms0.and(m => Oath.FromNullable(m.handle[handle], () => rrr.codes.enoent("User not found", handle))),
+			ms0.pipe(oath.ops.and(m => oath.from_nullable(m.handle[handle], () => rrr.codes.enoent("User not found", handle)))),
 
 		refresh: id =>
 			ms0
 				.pipe(
-					ops0.chain((mapping: Mapping) =>
-						Oath.Merge({
+					oath.ops.chain((mapping: Mapping) =>
+						oath.merge({
 							current: {
 								email: keys_of(mapping.email).find(key => mapping.email[key] === id),
 								handle: keys_of(mapping.handle).find(key => mapping.handle[key] === id),
 							},
 							mapping,
-							user: persistence_strategy_user.read(id).fix(undef),
+							user: persistence_strategy_user.read(id).pipe(oath.ops.fix(undef)),
 						}),
 					),
 				)
 				.pipe(
-					ops0.map(({ current, mapping, user }) => {
+					oath.ops.map(({ current, mapping, user }) => {
 						if (!user) {
 							if (current.email) mapping.email[current.email] = undefined
 							if (current.handle) mapping.handle[current.handle] = undefined
@@ -77,11 +78,13 @@ export const create_reference_mapping_user = (
 						return mapping
 					}),
 				)
-				.pipe(ops0.chain(m => Oath.Try(() => JSON.stringify(m), to_rrr("Could not save mapping"))))
-				.pipe(ops0.chain(s => Oath.Try(() => new Blob([s], { type }).stream(), to_rrr("Could not save mapping"))))
-				.pipe(ops0.chain(s => persistence_strategy_data.update(SYSTEM_DATA_FSID, USER_MAPPING_FSID, s)))
-				.pipe(ops0.rejected_map(e => (e.code === rrr.type.EIO ? e : rrr.codes.eio(e.message, ...e.debug)) as Ordo.Rrr<"EIO">))
-				.pipe(ops0.map(() => void (storage_p = get_storage_p(persistence_strategy_data)))),
+				.pipe(oath.ops.chain(m => oath.try(() => JSON.stringify(m), to_rrr("Could not save mapping"))))
+				.pipe(oath.ops.chain(s => oath.try(() => new Blob([s], { type }).stream(), to_rrr("Could not save mapping"))))
+				.pipe(oath.ops.chain(s => persistence_strategy_data.update(SYSTEM_DATA_FSID, USER_MAPPING_FSID, s)))
+				.pipe(
+					oath.ops.rejected_map(e => (e.code === rrr.type.EIO ? e : rrr.codes.eio(e.message, ...e.debug)) as Ordo.Rrr<"EIO">),
+				)
+				.pipe(oath.ops.map(() => void (storage_p = get_storage_p(persistence_strategy_data)))),
 	}
 }
 
@@ -89,43 +92,52 @@ const get_storage_p = (persistence_strategy_data: OrdoBackend.Data.PersistenceSt
 	persistence_strategy_data
 		.read(SYSTEM_DATA_FSID, USER_MAPPING_FSID)
 		.pipe(
-			ops0.chain(s => Oath.Try(() => Bun.readableStreamToJSON(s) as Promise<Mapping>, to_rrr("Could not get user mapping"))),
+			oath.ops.chain(s =>
+				oath.try(() => Bun.readableStreamToJSON(s) as Promise<Mapping>, to_rrr("Could not get user mapping")),
+			),
 		)
-		.invoke(invokers0.or_else(() => ({ email: {}, handle: {} }) as Mapping))
+		.cata(oath.catas.or_else(() => Promise.resolve({ email: {}, handle: {} } as Mapping)))
 
 export const create_persistence_strategy_user: PersistenceStrategyUser = persistence_strategy_data => ({
 	create: u =>
 		persistence_strategy_data
 			.exists(u.get_uid(), USER_FILE_FSID)
-			.pipe(ops0.chain(e => Oath.If(!e, { F: () => rrr.codes.eexist("User already exists", u.get_uid()) })))
-			.pipe(ops0.chain(() => Oath.Try(() => JSON.stringify(u.to_dto()), to_rrr("Could not create user"))))
-			.pipe(ops0.chain(s => Oath.Try(() => new Blob([s], { type }).stream(), to_rrr("Could not create user"))))
-			.pipe(ops0.chain(stream => persistence_strategy_data.create(u.get_uid(), USER_FILE_FSID, stream)))
-			.pipe(ops0.map(() => u)),
+			.pipe(oath.ops.chain(e => oath.if(!e, { on_false: () => rrr.codes.eexist("User already exists", u.get_uid()) })))
+			.pipe(oath.ops.chain(() => oath.try(() => JSON.stringify(u.to_dto()), to_rrr("Could not create user"))))
+			.pipe(oath.ops.chain(s => oath.try(() => new Blob([s], { type }).stream(), to_rrr("Could not create user"))))
+			.pipe(oath.ops.chain(stream => persistence_strategy_data.create(u.get_uid(), USER_FILE_FSID, stream)))
+			.pipe(oath.ops.map(() => u)),
 
 	exists: id =>
 		persistence_strategy_data
 			.exists(id, USER_FILE_FSID)
-			.pipe(ops0.rejected_map(e => rrr.codes.eio("Could not check user", ...e.debug))),
+			.pipe(oath.ops.rejected_map(e => rrr.codes.eio("Could not check user", ...e.debug))),
 
 	read: id =>
 		persistence_strategy_data
 			.exists(id, USER_FILE_FSID)
-			.pipe(ops0.chain(e => Oath.If(e, { F: () => rrr.codes.enoent("User not found", id) })))
-			.pipe(ops0.chain(() => persistence_strategy_data.read(id, USER_FILE_FSID)))
-			.pipe(ops0.chain(s => Oath.Try(() => Bun.readableStreamToJSON(s), to_rrr("Could not get user"))))
-			.pipe(ops0.map(dto => CurrentUser.FromDTO(dto))),
-
-	delete: () => Oath.Reject(rrr.codes.eio("Not implemented")),
+			.pipe(oath.ops.chain(e => oath.if(e, { on_false: () => rrr.codes.enoent("User not found", id) })))
+			.pipe(
+				oath.ops.chain(() =>
+					persistence_strategy_data.read(id, USER_FILE_FSID).pipe(oath.ops.rejected_map(to_rrr("Could not get user"))),
+				),
+			)
+			.pipe(
+				oath.ops.chain(s =>
+					oath.from_promise(() => Bun.readableStreamToJSON(s)).pipe(oath.ops.rejected_map(to_rrr("Could not get user"))),
+				),
+			)
+			.pipe(oath.ops.map(dto => CurrentUser.FromDTO(dto))),
+	delete: () => oath.reject(rrr.codes.eio("Not implemented")),
 
 	update: (id, u) =>
 		persistence_strategy_data
 			.exists(id, USER_FILE_FSID)
-			.pipe(ops0.chain(e => Oath.If(e, { F: () => rrr.codes.enoent("User not found", id) })))
-			.pipe(ops0.chain(() => Oath.Try(() => JSON.stringify(u.to_dto()), to_rrr("Could not save user"))))
-			.pipe(ops0.chain(s => Oath.Try(() => new Blob([s], { type }).stream(), to_rrr("Could not save user"))))
-			.pipe(ops0.chain(s => persistence_strategy_data.update(u.get_uid(), USER_FILE_FSID, s)))
-			.pipe(ops0.map(() => u)),
+			.pipe(oath.ops.chain(e => oath.if(e, { on_false: () => rrr.codes.enoent("User not found", id) })))
+			.pipe(oath.ops.chain(() => oath.try(() => JSON.stringify(u.to_dto()), to_rrr("Could not save user"))))
+			.pipe(oath.ops.chain(s => oath.try(() => new Blob([s], { type }).stream(), to_rrr("Could not save user"))))
+			.pipe(oath.ops.chain(s => persistence_strategy_data.update(u.get_uid(), USER_FILE_FSID, s)))
+			.pipe(oath.ops.map(() => u)),
 })
 
 // --- Internal ---
@@ -138,4 +150,4 @@ const USER_MAPPING_FSID = "5045c1f6-b1ba-4251-b761-7b7f502e7d70"
 
 const type = "application/json"
 
-const to_rrr = (message: string) => (error: Error) => rrr.codes.eio(message, error)
+const to_rrr = (message: string) => (error: unknown) => rrr.codes.eio(message, error)

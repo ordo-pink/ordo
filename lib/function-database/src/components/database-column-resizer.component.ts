@@ -22,6 +22,7 @@
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
+
 import { database$ } from "../database.state"
 
 const StyledColumnResizer = MaokaStyled.Tags.div("database_table-head_cell-resizer")

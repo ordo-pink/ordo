@@ -20,8 +20,8 @@
  */
 
 import { CurrentUser, CurrentUserKeys } from "@ordo-pink/core"
-import { Oath, ops0 } from "@ordo-pink/oath"
 import { default_handler } from "@ordo-pink/routary-ordo"
+import { oath } from "@ordo-pink/oath"
 
 import { type TIDContext } from "../../backend-server-id.types"
 import { get_user_from_cookie } from "../../common/get-user-from-cookie"
@@ -30,23 +30,28 @@ export const handle_invalidate_session = default_handler<TIDContext>(intake => {
 	intake.request_id = crypto.randomUUID() // TODO Move id generation and error handling to routary-ordo
 
 	return get_user_from_cookie(intake)
-		.and(({ sid, uid, user }) =>
-			Oath.Resolve(user.to_dto())
-				.and(dto => {
-					const sessions = dto[CurrentUserKeys.SESSIONS].filter(session => session[0] !== sid)
-					dto[CurrentUserKeys.SESSIONS] = sessions
+		.pipe(
+			oath.ops.and(({ sid, uid, user }) =>
+				oath
+					.of(user.to_dto())
+					.pipe(
+						oath.ops.and(dto => {
+							const sessions = dto[CurrentUserKeys.SESSIONS].filter(session => session[0] !== sid)
+							dto[CurrentUserKeys.SESSIONS] = sessions
 
-					return intake.persistence_strategy_user.update(uid, CurrentUser.FromDTO(dto))
-				})
-				.and(() => ({ sid, uid, user })),
+							return intake.persistence_strategy_user.update(uid, CurrentUser.FromDTO(dto))
+						}),
+					)
+					.pipe(oath.ops.and(() => ({ sid, uid, user }))),
+			),
 		)
 		.pipe(
-			ops0.tap(({ uid, sid }) => {
+			oath.ops.tap(({ uid, sid }) => {
 				intake.headers.set("Set-Cookie", `${uid}=${sid}; Expires=${new Date().toISOString()}`)
 			}),
 		)
-		.and(({ user }) => user.to_dto())
-		.and(CurrentUser.Serialize)
-		.and(dto => void (intake.payload = dto))
-		.and(() => intake)
+		.pipe(oath.ops.and(({ user }) => user.to_dto()))
+		.pipe(oath.ops.and(CurrentUser.Serialize))
+		.pipe(oath.ops.and(dto => void (intake.payload = dto)))
+		.pipe(oath.ops.and(() => intake))
 })

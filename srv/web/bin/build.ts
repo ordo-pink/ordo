@@ -19,14 +19,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Oath, invokers0 } from "@ordo-pink/oath"
 import { die, run_command } from "@ordo-pink/binutil"
+import { oath } from "@ordo-pink/oath"
 
 const main = () =>
 	run_command(clean_up_cmd, { stdout: "inherit", stderr: "inherit" })
-		.and(bundle_client_code)
-		.and(setup_netlify_redirects)
-		.invoke(invokers0.or_else(die()))
+		.pipe(oath.ops.and(bundle_client_code))
+		.pipe(oath.ops.and(setup_netlify_redirects))
+		.cata(oath.catas.or_else(die()))
 
 // --- Internal ---
 
@@ -48,8 +48,8 @@ const bundle_client_code = () =>
 		env: { ...process.env, NODE_ENV: "production" },
 	})
 
-const setup_netlify_redirects = () => Oath.FromPromise(() => Bun.write(redirects_path, redirects_content))
+const setup_netlify_redirects = () => oath.from_promise(() => Bun.write(redirects_path, redirects_content))
 
 // --- Invoke ---
 
-main().catch(console.error)
+main()

@@ -21,7 +21,7 @@
 
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
-import { invokers0 } from "@ordo-pink/oath"
+import { oath } from "@ordo-pink/oath"
 import { ordo_app_state } from "@ordo-pink/frontend-app/app.state"
 
 export const RenderPicker = (metadata: Ordo.Metadata.Instance) =>
@@ -44,7 +44,7 @@ export const RenderPicker = (metadata: Ordo.Metadata.Instance) =>
 
 		// TODO Unsupported file component
 		return async () => {
-			const content = await content0.invoke(invokers0.or_else(() => null))
+			const content = await content0.cata(oath.catas.or_else(() => null))
 
 			if (!fa || !fa.render) return
 

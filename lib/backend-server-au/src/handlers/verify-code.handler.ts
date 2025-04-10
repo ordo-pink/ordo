@@ -21,7 +21,7 @@
 
 import * as tau from "@ordo-pink/tau"
 import { CurrentUser, CurrentUserKeys, rrr } from "@ordo-pink/core"
-import { Oath, ops0 } from "@ordo-pink/oath"
+import { Oath, oath } from "@ordo-pink/oath"
 import { default_handler, huyami } from "@ordo-pink/routary-ordo"
 
 import * as fns from "../fns"
@@ -33,24 +33,24 @@ export const handle_verify_code = default_handler<BackendAuth.Chamber>(intake =>
 	const debug = huyami(intake)
 
 	return get_request_body(intake.req)
-		.pipe(ops0.chain(validate_request_body))
-		.pipe(ops0.tap(debug("Provided email", ({ email }) => fns.obfuscate_email(email))))
-		.pipe(ops0.chain(get_code_hash(intake)))
-		.pipe(ops0.tap(debug("Code verified successfully")))
-		.pipe(ops0.tap(remove_auth_record(intake.auth_storage)))
-		.pipe(ops0.tap(debug("Auth record removed")))
-		.pipe(ops0.chain(get_or_create_user(intake)))
-		.pipe(ops0.tap(debug("User upserted", user => user.get_uid())))
-		.pipe(ops0.tap(send_email(intake)))
-		.pipe(ops0.tap(debug("Email sent")))
-		.pipe(ops0.chain(create_session_id(intake)))
-		.pipe(ops0.chain(persist_session_id(intake)))
-		.pipe(ops0.tap(debug("User session persisted")))
-		.pipe(ops0.tap(set_cookie(intake)))
-		.pipe(ops0.map(({ user }) => void (intake.payload = CurrentUser.Serialize(user.to_dto()))))
-		.pipe(ops0.map(() => intake))
+		.pipe(oath.ops.chain(validate_request_body))
+		.pipe(oath.ops.tap(debug("Provided email", ({ email }) => fns.obfuscate_email(email))))
+		.pipe(oath.ops.chain(get_code_hash(intake)))
+		.pipe(oath.ops.tap(debug("Code verified successfully")))
+		.pipe(oath.ops.tap(remove_auth_record(intake.auth_storage)))
+		.pipe(oath.ops.tap(debug("Auth record removed")))
+		.pipe(oath.ops.chain(get_or_create_user(intake)))
+		.pipe(oath.ops.tap(debug("User upserted", user => user.get_uid())))
+		.pipe(oath.ops.tap(send_email(intake)))
+		.pipe(oath.ops.tap(debug("Email sent")))
+		.pipe(oath.ops.chain(create_session_id(intake)))
+		.pipe(oath.ops.chain(persist_session_id(intake)))
+		.pipe(oath.ops.tap(debug("User session persisted")))
+		.pipe(oath.ops.tap(set_cookie(intake)))
+		.pipe(oath.ops.map(({ user }) => void (intake.payload = CurrentUser.Serialize(user.to_dto()))))
+		.pipe(oath.ops.map(() => intake))
 		.pipe(
-			ops0.rejected_map(rrr => {
+			oath.ops.rejected_map(rrr => {
 				intake.headers.delete("Set-Cookie")
 				return { intake, rrr }
 			}),
@@ -64,21 +64,21 @@ const is_code = (x: unknown): x is number => tau.is_finite_non_negative_int(x)
 
 // TODO Move to lib
 
-const get_request_body = (req: Request): Oath<any, Ordo.Rrr<"EIO">> =>
-	Oath.Try(
+const get_request_body = (req: Request): Oath.Instance<any, Ordo.Rrr<"EIO">> =>
+	oath.try(
 		() => req.json(),
 		error => rrr.codes.eio("Failed to parse request body", error),
 	)
 
 const validate_request_body = (body: any) =>
-	Oath.Merge({
-		email: Oath.If(body && body.email && is_email(body.email), {
-			T: () => body.email as BackendAuth.Email,
-			F: () => rrr.codes.einval("Provided email is invalid", body.email),
+	oath.merge({
+		email: oath.if(body && body.email && is_email(body.email), {
+			on_true: () => body.email as BackendAuth.Email,
+			on_false: () => rrr.codes.einval("Provided email is invalid", body.email),
 		}),
-		code: Oath.If(body && body.code && is_code(body.code), {
-			T: () => body.code as BackendAuth.Code,
-			F: () => rrr.codes.einval("Provided code is invalid", body.code),
+		code: oath.if(body && body.code && is_code(body.code), {
+			on_true: () => body.code as BackendAuth.Code,
+			on_false: () => rrr.codes.einval("Provided code is invalid", body.code),
 		}),
 	})
 
@@ -89,9 +89,10 @@ const not_found_rrr = (email: BackendAuth.Email) => () => rrr.codes.enoent("User
 const get_code_hash =
 	(intake: BackendAuth.Intake) =>
 	({ email, code }: P1) =>
-		Oath.FromNullable(intake.auth_storage.get(email), not_found_rrr(email))
-			.pipe(ops0.chain(({ hash }) => intake.code_strategy.verify(hash, code)))
-			.pipe(ops0.chain(is_valid => Oath.If(is_valid, { T: () => email, F: not_found_rrr(email) })))
+		oath
+			.from_nullable(intake.auth_storage.get(email), not_found_rrr(email))
+			.pipe(oath.ops.chain(({ hash }) => intake.code_strategy.verify(hash, code)))
+			.pipe(oath.ops.chain(is_valid => oath.if(is_valid, { on_true: () => email, on_false: not_found_rrr(email) })))
 
 const remove_auth_record =
 	(auth_storage: BackendAuth.Storage) =>
@@ -108,35 +109,39 @@ const send_email =
 		})
 
 const create_user = (email: Ordo.User.Email) => (intake: BackendAuth.Intake) =>
-	Oath.Resolve(intake.defaults)
-		.pipe(ops0.map(d => CurrentUser.Create(email, d.file_limit, d.max_upload_size, d.max_functions)))
-		.pipe(ops0.chain(intake.persistence_strategy_user.create))
+	oath
+		.of(intake.defaults)
+		.pipe(oath.ops.map(d => CurrentUser.Create(email, d.file_limit, d.max_upload_size, d.max_functions)))
+		.pipe(oath.ops.chain(intake.persistence_strategy_user.create))
 
 const get_or_create_user = (intake: BackendAuth.Intake) => (email: Ordo.User.Email) =>
 	intake.reference_mapping_user
 		.exists_by_email(email)
 		.pipe(
-			ops0.chain(exists =>
-				Oath.If(exists)
-					.pipe(ops0.chain(() => intake.reference_mapping_user.get_by_email(email)))
-					.pipe(ops0.chain(id => intake.persistence_strategy_user.read(id))),
+			oath.ops.chain(exists =>
+				oath
+					.if(exists)
+					.pipe(oath.ops.chain(() => intake.reference_mapping_user.get_by_email(email)))
+					.pipe(oath.ops.chain(id => intake.persistence_strategy_user.read(id))),
 			),
 		)
-		.pipe(ops0.rejected_map(() => intake))
-		.fix(create_user(email))
+		.pipe(oath.ops.rejected_map(() => intake))
+		.pipe(oath.ops.fix(create_user(email)))
 
 const create_session_id = (intake: BackendAuth.Intake) => (user: Ordo.User.Current.Instance) =>
-	Oath.Try(() => [crypto.randomUUID(), Date.now(), `${intake.req.headers.get("X-Device")}`] as Ordo.User.Session)
-		.pipe(ops0.map(sid => ({ sid, user })))
-		.pipe(ops0.rejected_map(error => rrr.codes.eio("Failed to create session", error)))
+	oath
+		.try(() => [crypto.randomUUID(), Date.now(), `${intake.req.headers.get("X-Device")}`] as Ordo.User.Session)
+		.pipe(oath.ops.map(sid => ({ sid, user })))
+		.pipe(oath.ops.rejected_map(error => rrr.codes.eio("Failed to create session", error)))
 
 type P2 = { sid: Ordo.User.Session; user: Ordo.User.Current.Instance }
 const persist_session_id = (intake: BackendAuth.Intake) => (params: P2) =>
-	Oath.Resolve(params.user.to_dto())
-		.pipe(ops0.tap(dto => void (dto[CurrentUserKeys.SESSIONS] = [...dto[CurrentUserKeys.SESSIONS], params.sid])))
-		.and(dto => intake.persistence_strategy_user.update(params.user.get_uid(), CurrentUser.FromDTO(dto)))
-		.pipe(ops0.chain(user => intake.reference_mapping_user.refresh(user.get_uid())))
-		.and(() => params)
+	oath
+		.of(params.user.to_dto())
+		.pipe(oath.ops.tap(dto => void (dto[CurrentUserKeys.SESSIONS] = [...dto[CurrentUserKeys.SESSIONS], params.sid])))
+		.pipe(oath.ops.and(dto => intake.persistence_strategy_user.update(params.user.get_uid(), CurrentUser.FromDTO(dto))))
+		.pipe(oath.ops.chain(user => intake.reference_mapping_user.refresh(user.get_uid())))
+		.pipe(oath.ops.and(() => params))
 
 const set_cookie = (intake: BackendAuth.Intake) => (params: P2) =>
 	intake.headers.set(

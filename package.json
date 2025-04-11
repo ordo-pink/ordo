@@ -2,8 +2,11 @@
 	"devDependencies": {
 		"@types/bun": "^1.2.8",
 		"@types/eslint": "^8.56.12",
+		"@types/react": "^19.1.0",
+		"@types/react-dom": "^19.1.2",
 		"@typescript-eslint/eslint-plugin": "^6.21.0",
 		"@typescript-eslint/parser": "^6.21.0",
+		"@vitejs/plugin-react": "^4.3.4",
 		"@vituum/vite-plugin-postcss": "^1.1.0",
 		"autoprefixer": "^10.4.21",
 		"eslint": "^8.57.1",
@@ -21,5 +24,10 @@
 		"vite": "^6.2.5",
 		"vite-plugin-image-optimizer": "^1.1.8",
 		"vite-tsconfig-paths": "^4.3.2"
+	},
+	"dependencies": {
+		"@xyflow/react": "^12.5.5",
+		"react": "^19.1.0",
+		"react-dom": "^19.1.0"
 	}
 }

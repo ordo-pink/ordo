@@ -20,6 +20,7 @@
  */
 
 import { Maoka } from "@ordo-pink/maoka"
+import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { oath } from "@ordo-pink/oath"
 import { ordo_app_state } from "@ordo-pink/frontend-app/app.state"
@@ -41,6 +42,8 @@ export const RenderPicker = (metadata: Ordo.Metadata.Instance) =>
 
 			if (fa) refresh()
 		})
+
+		use(MaokaJabs.set_class("flex-grow overflow-auto"))
 
 		// TODO Unsupported file component
 		return async () => {

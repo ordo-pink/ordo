@@ -1,0 +1,8 @@
+.react-flow__attribution {
+	@apply bg-transparent;
+}
+
+.react-flow,
+.react-flow__background {
+	@apply !bg-transparent;
+}

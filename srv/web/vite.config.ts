@@ -23,11 +23,13 @@ import { resolve } from "node:path"
 
 import { ViteImageOptimizer } from "vite-plugin-image-optimizer"
 import { defineConfig } from "vite"
+import react from "@vitejs/plugin-react"
 import tsconfigPaths from "vite-tsconfig-paths"
 
 // https://vitejs.dev/config/
 export default defineConfig({
 	plugins: [
+		react(),
 		// @ts-ignore
 		tsconfigPaths(),
 		// @ts-ignore

@@ -1,34 +1,31 @@
 {
 	"compilerOptions": {
-		"outDir": "./var/out",
-		"lib": ["ESNext", "DOM"],
-		"allowJs": true,
-		"esModuleInterop": true,
-		"allowSyntheticDefaultImports": true,
-		"strict": true,
-		"noEmit": true,
 		"allowImportingTsExtensions": true,
-		"forceConsistentCasingInFileNames": true,
-		"noFallthroughCasesInSwitch": true,
-		"strictFunctionTypes": true,
+		"allowJs": true,
+		"allowSyntheticDefaultImports": true,
 		"alwaysStrict": true,
+		"baseUrl": ".",
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"isolatedModules": true,
+		"jsx": "preserve",
+		"lib": ["ESNext", "DOM"],
+		"module": "CommonJS",
+		"noEmit": true,
+		"noFallthroughCasesInSwitch": true,
+		"outDir": "./var/out",
+		"paths": {
+			"@ordo-pink/*": ["./lib/*"]
+		},
+		"skipLibCheck": true,
+		"strict": true,
 		"strictBindCallApply": true,
+		"strictFunctionTypes": true,
 		"strictNullChecks": true,
 		"strictPropertyInitialization": true,
 		"stripInternal": true,
-		"skipLibCheck": true,
-		"isolatedModules": true,
-		"target": "ESNext",
-		"module": "CommonJS",
-		"baseUrl": ".",
-		"paths": {
-			"@ordo-pink/*": ["./lib/*"]
-		}
+		"target": "ESNext"
 	},
-	"include": [
-		"./boot/**/*.ts",
-		"./srv/**/*.ts",
-		"./lib/**/*.ts",
-	],
+	"include": ["./boot/**/*.ts", "./srv/**/*.ts", "./lib/**/*.ts", "./lib/**/*.tsx"],
 	"exclude": ["node_modules"]
 }

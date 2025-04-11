@@ -26,7 +26,7 @@ import { CommandPaletteLocation, EMPTY_COMMAND_PALETTE } from "./src/components/
 import { create_route } from "./src/frontend-app.router"
 
 // @ts-ignore
-const is_dev = !!import.meta.env.DEV && import.meta.env.DEV === "true"
+const is_dev = !!import.meta.env.DEV // && import.meta.env.DEV === "true"
 const app_name = "pink.ordo.app" // TODO Take from env
 const version = "v0.8.0" // TODO Take from env
 const hosts = {} as Ordo.Hosts // TODO Take from env

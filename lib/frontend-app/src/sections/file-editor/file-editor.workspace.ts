@@ -29,7 +29,7 @@ import { FileMetadata } from "./components/file-editor-workspace-file-metadata.c
 import { RenderPicker } from "./components/file-editor-workspace-render-picker.component"
 import { TitleSetter } from "./components/file-editor-workspace-title-setter.component"
 
-const StyledFileEditorWorkspace = MaokaStyled.Tags.div("h-full")
+const StyledFileEditorWorkspace = MaokaStyled.Tags.div("flex flex-col h-full overflow-hidden")
 
 export const FileEditorWorkspace = StyledFileEditorWorkspace(({ use }) => {
 	const get_route_params = use(MaokaOrdo.Jabs.get_route_params$)

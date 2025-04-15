@@ -32,6 +32,6 @@ export const persist_session_id =
 		oath
 			.of(params.user.to_dto())
 			.pipe(oath.ops.tap(dto => void (dto[SESSIONS] = [...dto[SESSIONS], params.sid])))
-			.pipe(oath.ops.and(dto => i.persistence_strategy_user.update(params.user.get_uid(), CurrentUser.FromDTO(dto))))
-			.pipe(oath.ops.and(() => params))
-			.pipe(oath.ops.rejected_map(rrr => ({ rrr, intake: i })))
+			.pipe(oath.ops.chain(dto => i.persistence_strategy_user.update(params.user.get_uid(), CurrentUser.FromDTO(dto))))
+			.pipe(oath.ops.map(() => params))
+			.pipe(oath.ops.rmap(rrr => ({ rrr, intake: i })))

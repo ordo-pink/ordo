@@ -1,18 +1,3 @@
-/*
- * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
- * SPDX-License-Identifier: Unlicense
- */
-
 import { Oath } from "../../oath.types"
 
-export const to_promise_cata: Oath.Catas.ToPromise = f => ({
-	reject: x => {
-		if (f) {
-			const resolved = f(x)
-			return resolved && typeof resolved.then === "function" ? resolved : Promise.resolve(resolved)
-		}
-
-		return x && typeof (x as any).then === "function" ? (x as any) : Promise.reject(x)
-	},
-	resolve: x => x && (typeof (x as any).then === "function" ? (x as unknown as Promise<any>) : Promise.resolve(x)),
-})
+export const to_promise_cata: Oath.Catas.ToPromise = () => ({ resolve: x => x })

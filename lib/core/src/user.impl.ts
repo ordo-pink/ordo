@@ -84,8 +84,9 @@ export const CurrentUserValidations: Ordo.User.Current.Validations = {
 	is_subscription: (x): x is Ordo.User.Current.DTO[CurrentUserKeys.SUBSCRIPTION] =>
 		TAU.is_number(x) && TAU.gte(0)(x) && TAU.lt(UserSubscription.length)(x),
 	is_email: (x): x is Ordo.User.Current.DTO[CurrentUserKeys.EMAIL] =>
-		TAU.is_non_empty_string(x) &&
-		/^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/.test(
+		TAU.is_string(x) &&
+		// eslint-disable-next-line no-useless-escape
+		/^[a-z0-9!#$%&'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+\/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/i.test(
 			x,
 		),
 	is_file_limit: (x): x is Ordo.User.Current.DTO[CurrentUserKeys.FILE_LIMIT] => TAU.is_positive_number(x),

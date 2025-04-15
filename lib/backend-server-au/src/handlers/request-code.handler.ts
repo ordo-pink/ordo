@@ -41,7 +41,7 @@ export const handle_request_code = default_handler<BackendAuth.Chamber>(intake =
 		.pipe(oath.ops.tap(send_email(intake)))
 		.pipe(oath.ops.tap(debug("Email sent")))
 		.pipe(oath.ops.map(() => intake))
-		.pipe(oath.ops.rejected_map(rrr => ({ intake, rrr })))
+		.pipe(oath.ops.rmap(rrr => ({ intake, rrr })))
 })
 
 // --- Internal ---
@@ -51,10 +51,7 @@ const is_email = CurrentUser.Validations.is_email
 // TODO Move to lib
 
 const get_request_body = (req: Request): Oath.Instance<any, Ordo.Rrr<"EIO">> =>
-	oath.try(
-		() => req.json(),
-		error => rrr.codes.eio("Failed to parse request body", error),
-	)
+	oath.from_promise(() => req.json()).pipe(oath.ops.rmap(error => rrr.codes.eio("Failed to parse request body", error)))
 
 const validate_request_body = (body: any) =>
 	oath.if(body && body.email && is_email(body.email), {
@@ -67,8 +64,8 @@ type Triplet = [BackendAuth.Email, BackendAuth.Code, BackendAuth.CodeHash]
 const create_code = (code_strategy: BackendAuth.CodeStrategy) => (email: BackendAuth.Email) =>
 	code_strategy
 		.generate()
-		.pipe(oath.ops.and(code => code_strategy.hash(code).pipe(oath.ops.and(hash => [code, hash]))))
-		.pipe(oath.ops.and(([code, hash]) => [email, code, hash] as Triplet))
+		.pipe(oath.ops.chain(code => code_strategy.hash(code).pipe(oath.ops.map(hash => [code, hash]))))
+		.pipe(oath.ops.map(([code, hash]) => [email, code, hash] as Triplet))
 
 const persist_pair =
 	(auth_storage: BackendAuth.Storage) =>

@@ -39,15 +39,15 @@ export const create_reference_mapping_user = (
 	const ms0 = oath.from_promise<Mapping, never>(() => storage_p)
 
 	return {
-		exists_by_email: email => ms0.pipe(oath.ops.and(ms => !!ms.email[email])),
+		exists_by_email: email => ms0.pipe(oath.ops.map(ms => !!ms.email[email])),
 
-		exists_by_handle: handle => ms0.pipe(oath.ops.and(ms => !!ms.handle[handle])),
+		exists_by_handle: handle => ms0.pipe(oath.ops.map(ms => !!ms.handle[handle])),
 
 		get_by_email: email =>
-			ms0.pipe(oath.ops.and(m => oath.from_nullable(m.email[email], () => rrr.codes.enoent("User not found")))),
+			ms0.pipe(oath.ops.chain(m => oath.from_nullable(m.email[email], () => rrr.codes.enoent("User not found")))),
 
 		get_by_handle: handle =>
-			ms0.pipe(oath.ops.and(m => oath.from_nullable(m.handle[handle], () => rrr.codes.enoent("User not found", handle)))),
+			ms0.pipe(oath.ops.chain(m => oath.from_nullable(m.handle[handle], () => rrr.codes.enoent("User not found", handle)))),
 
 		refresh: id =>
 			ms0
@@ -81,9 +81,7 @@ export const create_reference_mapping_user = (
 				.pipe(oath.ops.chain(m => oath.try(() => JSON.stringify(m), to_rrr("Could not save mapping"))))
 				.pipe(oath.ops.chain(s => oath.try(() => new Blob([s], { type }).stream(), to_rrr("Could not save mapping"))))
 				.pipe(oath.ops.chain(s => persistence_strategy_data.update(SYSTEM_DATA_FSID, USER_MAPPING_FSID, s)))
-				.pipe(
-					oath.ops.rejected_map(e => (e.code === rrr.type.EIO ? e : rrr.codes.eio(e.message, ...e.debug)) as Ordo.Rrr<"EIO">),
-				)
+				.pipe(oath.ops.rmap(e => (e.code === rrr.type.EIO ? e : rrr.codes.eio(e.message, ...e.debug)) as Ordo.Rrr<"EIO">))
 				.pipe(oath.ops.map(() => void (storage_p = get_storage_p(persistence_strategy_data)))),
 	}
 }
@@ -93,7 +91,9 @@ const get_storage_p = (persistence_strategy_data: OrdoBackend.Data.PersistenceSt
 		.read(SYSTEM_DATA_FSID, USER_MAPPING_FSID)
 		.pipe(
 			oath.ops.chain(s =>
-				oath.try(() => Bun.readableStreamToJSON(s) as Promise<Mapping>, to_rrr("Could not get user mapping")),
+				oath
+					.from_promise(() => Bun.readableStreamToJSON(s) as Promise<Mapping>)
+					.pipe(oath.ops.rmap(to_rrr("Could not get user mapping"))),
 			),
 		)
 		.cata(oath.catas.or_else(() => Promise.resolve({ email: {}, handle: {} } as Mapping)))
@@ -111,7 +111,7 @@ export const create_persistence_strategy_user: PersistenceStrategyUser = persist
 	exists: id =>
 		persistence_strategy_data
 			.exists(id, USER_FILE_FSID)
-			.pipe(oath.ops.rejected_map(e => rrr.codes.eio("Could not check user", ...e.debug))),
+			.pipe(oath.ops.rmap(e => rrr.codes.eio("Could not check user", ...e.debug))),
 
 	read: id =>
 		persistence_strategy_data
@@ -119,12 +119,12 @@ export const create_persistence_strategy_user: PersistenceStrategyUser = persist
 			.pipe(oath.ops.chain(e => oath.if(e, { on_false: () => rrr.codes.enoent("User not found", id) })))
 			.pipe(
 				oath.ops.chain(() =>
-					persistence_strategy_data.read(id, USER_FILE_FSID).pipe(oath.ops.rejected_map(to_rrr("Could not get user"))),
+					persistence_strategy_data.read(id, USER_FILE_FSID).pipe(oath.ops.rmap(to_rrr("Could not get user"))),
 				),
 			)
 			.pipe(
 				oath.ops.chain(s =>
-					oath.from_promise(() => Bun.readableStreamToJSON(s)).pipe(oath.ops.rejected_map(to_rrr("Could not get user"))),
+					oath.from_promise(() => Bun.readableStreamToJSON(s)).pipe(oath.ops.rmap(to_rrr("Could not get user"))),
 				),
 			)
 			.pipe(oath.ops.map(dto => CurrentUser.FromDTO(dto))),

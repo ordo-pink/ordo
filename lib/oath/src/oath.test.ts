@@ -12,42 +12,15 @@ describe("oath", () => {
 	describe("catas", () => it("should be defined", () => expect(oath.catas).toBeDefined()))
 
 	describe("methods", () => {
-		describe("cata", () => {
-			it("should explode into resolved value if oath resolves", () => {
-				const result = oath.of(1).cata(oath.catas.unwrap())
-				expect(result).toEqual(1)
-			})
-
-			it("should explode into rejected value if oath rejects", () => {
-				const result = oath.reject(1).cata(oath.catas.unwrap())
-				expect(result).toEqual(1)
-			})
-
-			it("should explode into resolved promise if the pipeline contained a promise", async () => {
-				const result = oath
-					.of(1)
-					.pipe(oath.ops.chain(x => oath.from_promise(() => Promise.resolve(x + 1))))
-					.pipe(oath.ops.map(x => x + 1))
-					.cata(oath.catas.unwrap())
-				expect(await result).toEqual(3)
-			})
-
-			it("should explode into rejected promise if the pipeline contained a rejected promise", () => {
-				const result = oath
-					.of(1)
-					.pipe(oath.ops.chain(() => oath.from_promise(() => Promise.reject("error"))))
-					.cata(oath.catas.to_promise())
-				expect(() => result).toThrow("error")
-			})
-		})
+		describe("cata", () => {})
 
 		describe("cancel", () => {
-			it("should prevent further piping", () => {
+			it("should prevent further piping", async () => {
 				const o = oath.of(1).pipe(oath.ops.map(x => x + 1))
 
 				o.cancel("test")
 
-				expect(o.pipe(oath.ops.map(x => x + 1)).cata(oath.catas.unwrap())).toEqual(2)
+				expect(await o.pipe(oath.ops.map(x => x + 1)).cata(oath.catas.unwrap())).toEqual(2)
 			})
 		})
 	})

@@ -9,8 +9,8 @@ import { oath } from "../../oath.impl"
 
 test.describe("oath.catas", () => {
 	test.describe("unwrap", () => {
-		test.it("should return whatever resolves", () => {
-			const result = oath.of(1).cata(oath.catas.unwrap())
+		test.it("should return whatever resolves", async () => {
+			const result = await oath.of(1).cata(oath.catas.unwrap())
 
 			test.expect(result).toBe(1)
 		})
@@ -22,8 +22,8 @@ test.describe("oath.catas", () => {
 			test.expect(await result).toBe(1)
 		})
 
-		test.it("should return whatever rejects", () => {
-			const result = oath.reject(1).cata(oath.catas.unwrap())
+		test.it("should return whatever rejects", async () => {
+			const result = await oath.reject<number, number>(1).cata(oath.catas.unwrap())
 
 			test.expect(result).toBe(1)
 		})

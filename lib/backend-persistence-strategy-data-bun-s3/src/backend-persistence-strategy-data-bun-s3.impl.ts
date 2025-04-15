@@ -81,7 +81,7 @@ const get_file = (s3: S3Client) => (path: string) =>
 	oath
 		.try(() => s3.file(path))
 		.pipe(oath.ops.map(file => ({ path, file })))
-		.pipe(oath.ops.rejected_map(io_rrr))
+		.pipe(oath.ops.rmap(io_rrr))
 
 const check_file_exists = (s3: S3Client) => (path: string) =>
 	oath
@@ -111,7 +111,7 @@ const validate_file_does_not_exist = (s3: S3Client) => (path: string) =>
 			oath.ops.chain(({ exists, file }) =>
 				oath
 					.if(!exists, { on_false: already_exists_rrr, on_true: () => ({ path, file }) })
-					.pipe(oath.ops.rejected_map(already_exists_rrr)),
+					.pipe(oath.ops.rmap(already_exists_rrr)),
 			),
 		)
 
@@ -119,9 +119,9 @@ const write_file = (s3: S3Client, content: ReadableStream) => (path: string) =>
 	oath
 		.try(() => new Response(content))
 		.pipe(oath.ops.chain(data => oath.from_promise(() => s3.write(path, data))))
-		.pipe(oath.ops.rejected_map(io_rrr))
+		.pipe(oath.ops.rmap(io_rrr))
 
-const delete_file = (file: S3File) => oath.from_promise(() => file.delete()).pipe(oath.ops.rejected_map(io_rrr))
+const delete_file = (file: S3File) => oath.from_promise(() => file.delete()).pipe(oath.ops.rmap(io_rrr))
 
 const get_file_modification_timestamp = (file: S3File) =>
 	oath
@@ -130,6 +130,6 @@ const get_file_modification_timestamp = (file: S3File) =>
 		.pipe(oath.ops.map(milliseconds => milliseconds / 1000))
 		.pipe(oath.ops.bimap(Math.floor, io_rrr))
 
-const get_file_content = (file: S3File) => oath.try(() => file.readable).pipe(oath.ops.rejected_map(io_rrr))
+const get_file_content = (file: S3File) => oath.try(() => file.readable).pipe(oath.ops.rmap(io_rrr))
 
 const get_key = (uid: Ordo.User.UID, fsid: Ordo.Metadata.FSID) => oath.resolve(`${uid}/${fsid}`)

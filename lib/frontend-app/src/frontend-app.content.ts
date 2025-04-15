@@ -94,7 +94,7 @@ export const init_content: TF = () => {
 					R.catas.if_ok(() =>
 						content_repository
 							.put(user?.get_uid() ?? null, fsid, content)
-							.pipe(oath.ops.and(() => commands.emit("cmd.metadata.set_size", { fsid, size })))
+							.pipe(oath.ops.tap(() => commands.emit("cmd.metadata.set_size", { fsid, size })))
 							.cata(oath.catas.or_else(alert_rrr)),
 					),
 				)
@@ -116,7 +116,7 @@ export const init_content: TF = () => {
 			metadata = await commands
 				.naga("cmd.metadata.create", { name, parent, type, size })
 				.pipe(
-					oath.ops.and(() =>
+					oath.ops.map(() =>
 						metadata_query
 							.get_by_name(name, parent, { show_hidden: true })
 							.pipe(R.ops.chain(R.FromNullable))

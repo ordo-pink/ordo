@@ -31,9 +31,9 @@ export const get_user_from_cookie = (intake: Routary.Intake<TIDContext>) => {
 
 	return oath
 		.from_nullable(intake.req.headers.get("Cookie"))
-		.pipe(oath.ops.and(cookie => cookie.split("=")))
+		.pipe(oath.ops.map(cookie => cookie.split("=")))
 		.pipe(
-			oath.ops.and(([uid, sid]) =>
+			oath.ops.chain(([uid, sid]) =>
 				oath
 					.merge({
 						uid: oath.if(CurrentUser.Validations.is_uid(uid), { on_true: () => uid as Ordo.User.UID }),
@@ -41,11 +41,11 @@ export const get_user_from_cookie = (intake: Routary.Intake<TIDContext>) => {
 					})
 					.pipe(oath.ops.tap(debug("Cookie extracted", ({ uid }) => uid)))
 					.pipe(
-						oath.ops.and(({ uid, sid }) =>
+						oath.ops.chain(({ uid, sid }) =>
 							intake.persistence_strategy_user
 								.read(uid)
 								.pipe(
-									oath.ops.and(user =>
+									oath.ops.chain(user =>
 										oath.if(
 											user.get_sessions().some(session => session[0] === sid),
 											{ on_true: () => ({ user, uid, sid }) },
@@ -54,10 +54,10 @@ export const get_user_from_cookie = (intake: Routary.Intake<TIDContext>) => {
 								)
 								.pipe(oath.ops.tap(debug("User and session are valid", ({ uid }) => uid)))
 								.pipe(
-									oath.ops.and(params =>
+									oath.ops.chain(params =>
 										oath
-											.resolve(params.user)
-											.pipe(oath.ops.and(user => user.to_dto()))
+											.of(params.user)
+											.pipe(oath.ops.map(user => user.to_dto()))
 											.pipe(
 												oath.ops.tap(
 													dto =>
@@ -68,14 +68,14 @@ export const get_user_from_cookie = (intake: Routary.Intake<TIDContext>) => {
 														)),
 												),
 											)
-											.pipe(oath.ops.and(dto => ({ uid, sid, user: CurrentUser.FromDTO(dto) }))),
+											.pipe(oath.ops.map(dto => ({ uid, sid, user: CurrentUser.FromDTO(dto) }))),
 									),
 								)
 								.pipe(
-									oath.ops.and(({ user, uid, sid }) =>
+									oath.ops.chain(({ user, uid, sid }) =>
 										intake.persistence_strategy_user
 											.update(user.get_uid(), user)
-											.pipe(oath.ops.and(user => ({ user, uid, sid }))),
+											.pipe(oath.ops.map(user => ({ user, uid, sid }))),
 									),
 								)
 								.pipe(oath.ops.tap(debug("Current session updated"))),
@@ -83,5 +83,5 @@ export const get_user_from_cookie = (intake: Routary.Intake<TIDContext>) => {
 					),
 			),
 		)
-		.pipe(oath.ops.rejected_map(() => ({ rrr: rrr.codes.enoent("User not found"), intake })))
+		.pipe(oath.ops.rmap(() => ({ rrr: rrr.codes.enoent("User not found"), intake })))
 }

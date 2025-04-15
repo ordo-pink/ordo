@@ -21,7 +21,13 @@ export const create: Oath.Constructors.Create = (fork, cancellation_reason) => {
 		},
 
 		cancel: r => void (reason = r),
-		cata: explosion => fork(explosion.resolve as any, explosion.reject as any),
+		cata: boom =>
+			new Promise((res, rej) =>
+				fork(
+					x => res(boom.resolve(x)),
+					x => (boom.reject ? res(boom.reject(x) as any) : rej(x)),
+				),
+			),
 		pipe: f => (reason ? (create(fork, reason) as any) : f(create(fork, reason) as any)),
 	}
 }

@@ -49,21 +49,21 @@ export const PersistenceStrategyContentIndexedDB = {
 
 		const store0 = oath
 			.of(() => db_promise)
-			.pipe(oath.ops.and(f => oath.from_promise(f).pipe(oath.ops.rejected_map(eio))))
+			.pipe(oath.ops.and(f => oath.from_promise(f).pipe(oath.ops.rmap(eio))))
 			.pipe(oath.ops.and(db => oath.from_nullable(db, () => eio(new Error("Could not establish IndexedDB connection")))))
 			.pipe(oath.ops.and(db => oath.try(() => db.transaction([store_name], "readwrite"))))
 			.pipe(oath.ops.and(transaction => oath.try(() => transaction.objectStore(store_name), eio)))
 			.pipe(oath.ops.and(store => IndexedDBStorePromise.Of(store)))
 
 		return {
-			clear: () => store0.pipe(oath.ops.and(s => s.clear())).pipe(oath.ops.rejected_map(eio)),
-			delete: (uid, fsid) => store0.pipe(oath.ops.and(s => s.delete(get_path(uid, fsid)))).pipe(oath.ops.rejected_map(eio)),
+			clear: () => store0.pipe(oath.ops.and(s => s.clear())).pipe(oath.ops.rmap(eio)),
+			delete: (uid, fsid) => store0.pipe(oath.ops.and(s => s.delete(get_path(uid, fsid)))).pipe(oath.ops.rmap(eio)),
 			exists: (uid, fsid) =>
 				store0
 					.pipe(oath.ops.and(s => s.count(get_path(uid, fsid))))
 					.pipe(oath.ops.and(count => count > 0))
-					.pipe(oath.ops.rejected_map(eio)),
-			get: (uid, fsid) => store0.pipe(oath.ops.and(s => s.get(get_path(uid, fsid)))).pipe(oath.ops.rejected_map(eio)),
+					.pipe(oath.ops.rmap(eio)),
+			get: (uid, fsid) => store0.pipe(oath.ops.and(s => s.get(get_path(uid, fsid)))).pipe(oath.ops.rmap(eio)),
 			list: () =>
 				store0
 					.pipe(oath.ops.and(s => s.get_all_keys()))
@@ -74,12 +74,12 @@ export const PersistenceStrategyContentIndexedDB = {
 							),
 						),
 					)
-					.pipe(oath.ops.rejected_map(eio)),
+					.pipe(oath.ops.rmap(eio)),
 			put: (uid, fsid, content) =>
 				store0
 					.pipe(oath.ops.and(s => s.put(content, get_path(uid, fsid))))
 					.pipe(oath.ops.and(noop))
-					.pipe(oath.ops.rejected_map(eio)),
+					.pipe(oath.ops.rmap(eio)),
 		}
 	},
 }

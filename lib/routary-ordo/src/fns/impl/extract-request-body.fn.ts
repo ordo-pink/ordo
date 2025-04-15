@@ -10,7 +10,7 @@ import { rrr } from "@ordo-pink/core"
 import { type RoutaryOrdo } from "../../routary-ordo.types"
 
 export const extract_json_body: RoutaryOrdo.ExtractJSONBody = intake =>
-	oath.from_promise(() => intake.req.json()).pipe(oath.ops.rejected_map(error => to_rrr(error, intake)))
+	oath.from_promise(() => intake.req.json()).pipe(oath.ops.rmap(error => to_rrr(error, intake)))
 
 // --- Internal ---
 

@@ -35,7 +35,7 @@ const get_env = () =>
 		port: oath
 			.from_nullable(Bun.env.ORDO_AU_PORT)
 			.pipe(oath.ops.and(n => oath.if(tau.is_port(n), { on_true: () => n })))
-			.pipe(oath.ops.rejected_map(env_rrr("ORDO_AU_PORT"))),
+			.pipe(oath.ops.rmap(env_rrr("ORDO_AU_PORT"))),
 
 		data_root: oath.from_nullable(Bun.env.ORDO_DT_DATA_PATH, env_rrr("ORDO_DT_DATA_PATH")),
 
@@ -43,36 +43,36 @@ const get_env = () =>
 			.from_nullable(Bun.env.ORDO_AU_DEFAULT_FILE_LIMIT)
 			.pipe(oath.ops.and(s => Number.parseInt(s, 10)))
 			.pipe(oath.ops.and(n => oath.if(tau.is_finite_positive_int(n), { on_true: () => n })))
-			.pipe(oath.ops.rejected_map(env_rrr("ORDO_AU_DEFAULT_FILE_LIMIT"))),
+			.pipe(oath.ops.rmap(env_rrr("ORDO_AU_DEFAULT_FILE_LIMIT"))),
 
 		max_upload_size: oath
 			.from_nullable(Bun.env.ORDO_AU_DEFAULT_MAX_UPLOAD_SIZE)
 			.pipe(oath.ops.and(s => Number.parseFloat(s)))
 			.pipe(oath.ops.and(n => oath.if(tau.is_positive_number(n), { on_true: () => n })))
-			.pipe(oath.ops.rejected_map(env_rrr("ORDO_AU_DEFAULT_MAX_UPLOAD_SIZE"))),
+			.pipe(oath.ops.rmap(env_rrr("ORDO_AU_DEFAULT_MAX_UPLOAD_SIZE"))),
 
 		max_functions: oath
 			.from_nullable(Bun.env.ORDO_AU_DEFAULT_MAX_FUNCTIONS)
 			.pipe(oath.ops.and(s => Number.parseInt(s, 10)))
 			.pipe(oath.ops.and(n => oath.if(tau.is_finite_non_negative_int(n), { on_true: () => n })))
-			.pipe(oath.ops.rejected_map(env_rrr("ORDO_AU_DEFAULT_MAX_FUNCTIONS"))),
+			.pipe(oath.ops.rmap(env_rrr("ORDO_AU_DEFAULT_MAX_FUNCTIONS"))),
 
 		allow_origin: oath
 			.from_nullable(Bun.env.ORDO_AU_ALLOW_ORIGIN)
 			.pipe(oath.ops.and(s => s.split(", ")))
-			.pipe(oath.ops.rejected_map(env_rrr("ORDO_AU_ALLOW_ORIGIN"))),
+			.pipe(oath.ops.rmap(env_rrr("ORDO_AU_ALLOW_ORIGIN"))),
 
 		session_lifetime_s: oath
 			.from_nullable(Bun.env.ORDO_AU_SESSION_LIFETIME)
 			.pipe(oath.ops.and(s => Number.parseInt(s, 10)))
 			.pipe(oath.ops.and(n => oath.if(tau.is_finite_positive_int(n), { on_true: () => n })))
-			.pipe(oath.ops.rejected_map(env_rrr("ORDO_AU_SESSION_LIFETIME"))),
+			.pipe(oath.ops.rmap(env_rrr("ORDO_AU_SESSION_LIFETIME"))),
 
 		code_lifetime_ms: oath
 			.from_nullable(Bun.env.ORDO_AU_CODE_LIFETIME_MS)
 			.pipe(oath.ops.and(s => Number.parseInt(s, 10)))
 			.pipe(oath.ops.and(n => oath.if(tau.is_finite_positive_int(n), { on_true: () => n })))
-			.pipe(oath.ops.rejected_map(env_rrr("ORDO_AU_CODE_LIFETIME_MS"))),
+			.pipe(oath.ops.rmap(env_rrr("ORDO_AU_CODE_LIFETIME_MS"))),
 
 		web_host: oath.from_nullable(Bun.env.ORDO_WEB_HOST, env_rrr("ORDO_WEB_HOST")),
 	})
@@ -114,11 +114,11 @@ const main = () =>
 								hash: code =>
 									oath
 										.from_promise(() => Bun.password.hash(code, { algorithm: "bcrypt", cost: 4 }))
-										.pipe(oath.ops.rejected_map(error => rrr.codes.eio("Failed to hash code", error))),
+										.pipe(oath.ops.rmap(error => rrr.codes.eio("Failed to hash code", error))),
 								verify: (hash, code) =>
 									oath
 										.from_promise(() => Bun.password.verify(code, hash))
-										.pipe(oath.ops.rejected_map(error => rrr.codes.eio("Failed to verify code", error))),
+										.pipe(oath.ops.rmap(error => rrr.codes.eio("Failed to verify code", error))),
 							},
 							create_request_id: () => crypto.randomUUID(),
 							data_persistence_strategy: null as any,
@@ -133,7 +133,6 @@ const main = () =>
 				},
 			),
 		)
-
 		.pipe(oath.ops.tap(server => logger.info(`server running on http://${server.hostname}:${server.port}`)))
 		.cata(
 			oath.catas.or_else(e => {

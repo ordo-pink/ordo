@@ -7,7 +7,7 @@ import { type Oath } from "../../oath.types"
 import { create } from "../../constructors"
 import { map_op } from "./map.impl"
 
-export const ap_op: Oath.Operators.Ap = x => o =>
+export const ap_op: Oath.Ops.Ap = x => o =>
 	create((resolve, reject) =>
 		o.pipe(
 			map_op(f =>

@@ -11,17 +11,18 @@ describe("oath.ops", () => {
 	describe("map", () => {
 		it("should be defined", () => expect(oath.ops.map).toBeDefined())
 
-		it("should map over resolved oath", () =>
-			expect(
-				oath
-					.of(1)
-					.pipe(oath.ops.map(x => x + 1))
-					.cata(oath.catas.unwrap()),
-			).toEqual(2))
+		it("should map over resolved oath", async () => {
+			const result = oath
+				.of(1)
+				.pipe(oath.ops.map(x => x + 1))
+				.cata(oath.catas.unwrap())
 
-		it("should not map over rejected oath", () =>
+			expect(await result).toEqual(2)
+		})
+
+		it("should not map over rejected oath", async () =>
 			expect(
-				oath
+				await oath
 					.reject(1)
 					.pipe(oath.ops.map(() => 2))
 					.cata(oath.catas.unwrap()),
@@ -29,21 +30,21 @@ describe("oath.ops", () => {
 	})
 
 	describe("rejected_map", () => {
-		it("should be defined", () => expect(oath.ops.rejected_map).toBeDefined())
+		it("should be defined", () => expect(oath.ops.rmap).toBeDefined())
 
-		it("should map over rejected oath", () =>
+		it("should map over rejected oath", async () =>
 			expect(
-				oath
-					.reject(1)
-					.pipe(oath.ops.rejected_map(x => x + 1))
+				await oath
+					.reject<number, number>(1)
+					.pipe(oath.ops.rmap(x => x + 1))
 					.cata(oath.catas.unwrap()),
 			).toEqual(2))
 
-		it("should not map over rejected oath", () =>
+		it("should not map over rejected oath", async () =>
 			expect(
-				oath
+				await oath
 					.of(1)
-					.pipe(oath.ops.rejected_map(() => 2))
+					.pipe(oath.ops.rmap(() => 2))
 					.cata(oath.catas.unwrap()),
 			).toEqual(1))
 	})

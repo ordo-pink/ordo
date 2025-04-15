@@ -31,7 +31,7 @@ export const PersistenceStrategyContentOrdoBackend = {
 					.from_promise(() => fetch(`${dt_host}/${uid}/${fsid}`, { credentials: "include", method: "DELETE" }))
 					.pipe(oath.ops.and(res => res.json()))
 					.pipe(oath.ops.and(res => oath.if(res.success)))
-					.pipe(oath.ops.rejected_map(e => rrr.codes.eio("Failed to delete content", e))), // TODO
+					.pipe(oath.ops.rmap(e => rrr.codes.eio("Failed to delete content", e))), // TODO
 			exists: () => oath.reject(rrr.codes.eio("NOT IMPLEMENTED")),
 			list: () => oath.reject(rrr.codes.eio("NOT IMPLEMENTED")),
 			get: (uid, fsid) =>
@@ -39,13 +39,13 @@ export const PersistenceStrategyContentOrdoBackend = {
 					.from_promise(() => fetch(`${dt_host}/${uid}/${fsid}`, { credentials: "include" }))
 					.pipe(oath.ops.and(res => oath.if(res.status === 200, { on_true: () => res })))
 					.pipe(oath.ops.and(res => res.body))
-					.pipe(oath.ops.rejected_map(e => rrr.codes.eio("Failed to get content", e))),
+					.pipe(oath.ops.rmap(e => rrr.codes.eio("Failed to get content", e))),
 			put: (uid, fsid, body) =>
 				oath
 					.of({ credentials: "include", method: "PUT", body: body as ArrayBuffer } as const)
 					.pipe(oath.ops.and(init => oath.from_promise(() => fetch(`${dt_host}/${uid}/${fsid}`, init))))
 					.pipe(oath.ops.and(res => oath.if(res.status === 200 || res.status === 404)))
-					.pipe(oath.ops.rejected_map(e => rrr.codes.eio("Failed to set content", e))),
+					.pipe(oath.ops.rmap(e => rrr.codes.eio("Failed to set content", e))),
 		}
 	},
 }

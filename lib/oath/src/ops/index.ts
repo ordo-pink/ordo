@@ -16,7 +16,7 @@ export * from "./impl/chain.impl"
 export * from "./impl/map.impl"
 export * from "./impl/tap.impl"
 
-export const ops: Oath.Operators.Static = {
+export const ops: Oath.Ops.Static = {
 	and: and_op,
 	ap: ap_op,
 	chain: chain_op,
@@ -24,6 +24,6 @@ export const ops: Oath.Operators.Static = {
 	fix: fix_op,
 	map: map_op,
 	tap: tap_op,
-	rejected_map: rejected_map_op,
-	rejected_tap: rejected_tap_op,
+	rmap: rejected_map_op,
+	rtap: rejected_tap_op,
 }

@@ -34,38 +34,38 @@ const get_env = () =>
 		port: oath
 			.from_nullable(Bun.env.ORDO_ID_PORT)
 			.pipe(oath.ops.and(n => oath.if(is_port(n), { on_true: () => n })))
-			.pipe(oath.ops.rejected_map(env_rrr("ORDO_ID_PORT"))),
+			.pipe(oath.ops.rmap(env_rrr("ORDO_ID_PORT"))),
 
 		data_root: oath.from_nullable(Bun.env.ORDO_DT_DATA_PATH, env_rrr("ORDO_DT_DATA_PATH")),
 
 		allow_origin: oath
 			.from_nullable(Bun.env.ORDO_ID_ALLOW_ORIGIN)
 			.pipe(oath.ops.and(s => s.split(", ")))
-			.pipe(oath.ops.rejected_map(env_rrr("ORDO_ID_ALLOW_ORIGIN"))),
+			.pipe(oath.ops.rmap(env_rrr("ORDO_ID_ALLOW_ORIGIN"))),
 
 		file_limit: oath
 			.from_nullable(Bun.env.ORDO_ID_DEFAULT_FILE_LIMIT)
 			.pipe(oath.ops.and(s => Number.parseInt(s, 10)))
 			.pipe(oath.ops.and(n => oath.if(is_finite_positive_int(n), { on_true: () => n })))
-			.pipe(oath.ops.rejected_map(env_rrr("ORDO_ID_DEFAULT_FILE_LIMIT"))),
+			.pipe(oath.ops.rmap(env_rrr("ORDO_ID_DEFAULT_FILE_LIMIT"))),
 
 		max_upload_size: oath
 			.from_nullable(Bun.env.ORDO_ID_DEFAULT_MAX_UPLOAD_SIZE)
 			.pipe(oath.ops.and(s => Number.parseFloat(s)))
 			.pipe(oath.ops.and(n => oath.if(is_positive_number(n), { on_true: () => n })))
-			.pipe(oath.ops.rejected_map(env_rrr("ORDO_ID_DEFAULT_MAX_UPLOAD_SIZE"))),
+			.pipe(oath.ops.rmap(env_rrr("ORDO_ID_DEFAULT_MAX_UPLOAD_SIZE"))),
 
 		max_functions: oath
 			.from_nullable(Bun.env.ORDO_ID_DEFAULT_MAX_FUNCTIONS)
 			.pipe(oath.ops.and(s => Number.parseInt(s, 10)))
 			.pipe(oath.ops.and(n => oath.if(is_finite_non_negative_int(n), { on_true: () => n })))
-			.pipe(oath.ops.rejected_map(env_rrr("ORDO_ID_DEFAULT_MAX_FUNCTIONS"))),
+			.pipe(oath.ops.rmap(env_rrr("ORDO_ID_DEFAULT_MAX_FUNCTIONS"))),
 
 		session_lifetime: oath
 			.from_nullable(Bun.env.ORDO_ID_SESSION_LIFETIME)
 			.pipe(oath.ops.and(s => Number.parseInt(s, 10)))
 			.pipe(oath.ops.and(n => oath.if(is_finite_positive_int(n), { on_true: () => n })))
-			.pipe(oath.ops.rejected_map(env_rrr("ORDO_ID_SESSION_LIFETIME"))),
+			.pipe(oath.ops.rmap(env_rrr("ORDO_ID_SESSION_LIFETIME"))),
 
 		web_host: oath.from_nullable(Bun.env.ORDO_WEB_HOST, env_rrr("ORDO_WEB_HOST")),
 		dt_host: oath.from_nullable(Bun.env.ORDO_DT_HOST, env_rrr("ORDO_DT_HOST")),

@@ -69,7 +69,7 @@ const already_exists_rrr = () => rrr.codes.eexist("File already exists")
 const not_found_rrr = () => rrr.codes.enoent("File not found")
 const io_rrr = (e: unknown) => rrr.codes.eio("Failed to store local data", e)
 
-const get_file = (path: string) => oath.try(() => Bun.file(path)).pipe(oath.ops.rejected_map(io_rrr))
+const get_file = (path: string) => oath.try(() => Bun.file(path)).pipe(oath.ops.rmap(io_rrr))
 
 const check_file_exists = (path: string) =>
 	get_file(path).pipe(
@@ -85,16 +85,16 @@ const write_file = (content: ReadableStream) => (path: BunFile | string) =>
 	oath
 		.from_promise(() => Bun.readableStreamToArrayBuffer(content) as Promise<ArrayBuffer>)
 		.pipe(oath.ops.chain(input => oath.from_promise(() => Bun.write(path, input))))
-		.pipe(oath.ops.rejected_map(io_rrr))
+		.pipe(oath.ops.rmap(io_rrr))
 
-const delete_file = (file: BunFile) => oath.from_promise(() => file.delete()).pipe(oath.ops.rejected_map(io_rrr))
+const delete_file = (file: BunFile) => oath.from_promise(() => file.delete()).pipe(oath.ops.rmap(io_rrr))
 
 const validate_file_exists = (path: string) =>
 	check_file_exists(path).pipe(
 		oath.ops.chain(({ exists, file }) =>
 			oath
 				.if(exists)
-				.pipe(oath.ops.rejected_map(not_found_rrr))
+				.pipe(oath.ops.rmap(not_found_rrr))
 				.pipe(oath.ops.map(() => ({ path, file }))),
 		),
 	)
@@ -104,12 +104,12 @@ const validate_file_does_not_exist = (path: string) =>
 		oath.ops.chain(({ exists, file }) =>
 			oath
 				.if(!exists)
-				.pipe(oath.ops.rejected_map(already_exists_rrr))
+				.pipe(oath.ops.rmap(already_exists_rrr))
 				.pipe(oath.ops.map(() => ({ path, file }))),
 		),
 	)
 
-const get_file_content = (file: BunFile) => oath.try(() => file.stream()).pipe(oath.ops.rejected_map(io_rrr))
+const get_file_content = (file: BunFile) => oath.try(() => file.stream()).pipe(oath.ops.rmap(io_rrr))
 
 const get_path_from_root = (root: string) => (uid: Ordo.User.UID, fsid: Ordo.Metadata.FSID) =>
-	oath.try(() => resolve(root, uid, ...fsid.split("-"))).pipe(oath.ops.rejected_map(io_rrr))
+	oath.try(() => resolve(root, uid, ...fsid.split("-"))).pipe(oath.ops.rmap(io_rrr))

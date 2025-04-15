@@ -33,14 +33,14 @@ const get_env = () =>
 		port: oath
 			.from_nullable(Bun.env.ORDO_PB_PORT)
 			.pipe(oath.ops.and(n => oath.if(is_port(n), { on_true: () => n })))
-			.pipe(oath.ops.rejected_map(env_rrr("ORDO_PB_PORT"))),
+			.pipe(oath.ops.rmap(env_rrr("ORDO_PB_PORT"))),
 
 		data_path: oath.from_nullable(Bun.env.ORDO_DT_DATA_PATH, env_rrr("ORDO_DT_DATA_PATH")),
 
 		allow_origin: oath
 			.from_nullable(Bun.env.ORDO_DT_ALLOW_ORIGIN)
 			.pipe(oath.ops.and(s => s.split(", ")))
-			.pipe(oath.ops.rejected_map(env_rrr("ORDO_DT_ALLOW_ORIGIN"))),
+			.pipe(oath.ops.rmap(env_rrr("ORDO_DT_ALLOW_ORIGIN"))),
 
 		id_host: oath.from_nullable(Bun.env.ORDO_ID_HOST, env_rrr("ORDO_ID_HOST")),
 	})

@@ -15,11 +15,7 @@ export const default_handler =
 	): Routary.Gear<$Chamber> =>
 	intake =>
 		oath
-			.of<Routary.Intake<$Chamber>>({
-				...intake,
-				status: 200,
-				headers: intake.headers ?? new Headers(),
-			})
+			.of<Routary.Intake<$Chamber>>({ ...intake, status: 200, headers: intake.headers ?? new Headers() })
 			.pipe(oath.ops.tap(fns.start_response_timer))
 			.pipe(oath.ops.tap(fns.extract_request_ip))
 			.pipe(oath.ops.tap(fns.set_header("Content-Type", "application/json")))
@@ -28,4 +24,4 @@ export const default_handler =
 			.pipe(oath.ops.tap(fns.stop_response_timer))
 			.pipe(oath.ops.tap(fns.log_request))
 			.pipe(oath.ops.map(fns.create_json_response))
-			.cata(oath.catas.unwrap())
+			.cata(oath.catas.to_promise())

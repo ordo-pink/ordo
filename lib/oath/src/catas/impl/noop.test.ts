@@ -9,9 +9,9 @@ import { oath } from "../../oath.impl"
 
 test.describe("oath.catas", () => {
 	test.describe("noop", () => {
-		test.it("should return undefined no matter what", () => {
-			const result1 = oath.of(1).cata(oath.catas.noop())
-			const result2 = oath.reject(1).cata(oath.catas.noop())
+		test.it("should return undefined no matter what", async () => {
+			const result1 = await oath.of(1).cata(oath.catas.noop())
+			const result2 = await oath.reject(1).cata(oath.catas.noop())
 
 			test.expect(result1).toBe(undefined)
 			test.expect(result2).toBe(undefined)

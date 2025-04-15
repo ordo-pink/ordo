@@ -18,6 +18,7 @@ declare global {
 			context_menu: {
 				show_create_file: () => Ordo.Metadata.FSID
 				create_node: () => { x: number; y: number; from?: string }
+				add_existing_file: () => { x: number; y: number }
 			}
 		}
 	}

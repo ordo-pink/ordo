@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: Unlicense
  */
 
+import { ReactFlowProvider } from "@xyflow/react"
+
 import { Root, createRoot } from "react-dom/client"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
@@ -15,13 +17,27 @@ export default create_function(
 	"pink.ordo.board",
 	{
 		commands: [
+			"cmd.application.command_palette.show",
 			"cmd.application.context_menu.add",
 			"cmd.application.context_menu.show",
+			"cmd.board.context_menu.create_node",
 			"cmd.content.set",
 			"cmd.functions.file_associations.register",
+			"cmd.metadata.create",
+			"cmd.metadata.remove",
 			"cmd.metadata.show_create_modal",
 		],
-		queries: [],
+		queries: [
+			"metadata.get",
+			"metadata.get_by_name",
+			"metadata.get_children",
+			"metadata.get_by_fsid",
+			"metadata.get_outgoing_links",
+			"metadata.has_children",
+			"metadata.get_incoming_links",
+			"content.get",
+			"metadata.$",
+		],
 	},
 	ctx => {
 		let root: Root | undefined
@@ -32,10 +48,23 @@ export default create_function(
 				use(
 					MaokaDOM.Jabs.onmount(() => {
 						if (MaokaDOM.is_maoka_dom_element(element)) {
-							if (!root) root = createRoot(element)
-							else root.unmount()
-
-							root.render(<Flow commands={ctx.commands} {...params} />)
+							if (!root) {
+								root = createRoot(element)
+								root.render(
+									<ReactFlowProvider>
+										<Flow ctx={ctx} {...params} />
+									</ReactFlowProvider>,
+								)
+							} else {
+								root.unmount()
+								root = undefined
+								root = createRoot(element)
+								root.render(
+									<ReactFlowProvider>
+										<Flow ctx={ctx} {...params} />
+									</ReactFlowProvider>,
+								)
+							}
 						}
 					}),
 				)

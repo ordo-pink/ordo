@@ -25,7 +25,7 @@ import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { oath } from "@ordo-pink/oath"
 import { ordo_app_state } from "@ordo-pink/frontend-app/app.state"
 
-export const RenderPicker = (metadata: Ordo.Metadata.Instance) =>
+export const RenderPicker = (metadata: Ordo.Metadata.Instance, force_editable?: boolean, force_embedded?: boolean) =>
 	Maoka.create("div", ({ refresh, use }) => {
 		const metadata_fsid = metadata.get_fsid()
 		const metadata_type = metadata.get_type()
@@ -51,8 +51,8 @@ export const RenderPicker = (metadata: Ordo.Metadata.Instance) =>
 
 			if (!fa || !fa.render) return
 
-			const is_editable = true // TODO Check if user has edit rights
-			const is_embedded = false
+			const is_editable = force_editable ?? true // TODO Check if user has edit rights
+			const is_embedded = force_embedded ?? false
 
 			return fa.render({ metadata, content, is_editable, is_embedded })
 		}

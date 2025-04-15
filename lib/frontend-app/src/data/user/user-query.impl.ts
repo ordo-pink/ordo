@@ -56,7 +56,7 @@ export const UserQuery: Ordo.User.QueryStatic = {
 							oath
 								.if(CurrentUser.Validations.is_uid(id))
 								.pipe(oath.ops.and(() => id))
-								.pipe(oath.ops.rejected_map(() => rrr.codes.einval("Invalid user id"))),
+								.pipe(oath.ops.rmap(() => rrr.codes.einval("Invalid user id"))),
 						),
 					)
 					.pipe(
@@ -84,7 +84,7 @@ export const UserQuery: Ordo.User.QueryStatic = {
 							oath
 								.if(CurrentUser.Validations.is_handle(handle))
 								.pipe(oath.ops.and(() => handle))
-								.pipe(oath.ops.rejected_map(() => rrr.codes.einval("Invalid user handle"))),
+								.pipe(oath.ops.rmap(() => rrr.codes.einval("Invalid user handle"))),
 						),
 					)
 					.pipe(

@@ -30,8 +30,8 @@ export const handle_get_session = default_handler<TIDContext>(intake => {
 	intake.request_id = crypto.randomUUID() // TODO Move id generation and error handling to routary-ordo
 
 	return get_user_from_cookie(intake)
-		.pipe(oath.ops.and(({ user }) => user.to_dto()))
-		.pipe(oath.ops.and(CurrentUser.Serialize))
-		.pipe(oath.ops.and(dto => void (intake.payload = dto)))
-		.pipe(oath.ops.and(() => intake))
+		.pipe(oath.ops.map(({ user }) => user.to_dto()))
+		.pipe(oath.ops.map(CurrentUser.Serialize))
+		.pipe(oath.ops.map(dto => void (intake.payload = dto)))
+		.pipe(oath.ops.map(() => intake))
 })

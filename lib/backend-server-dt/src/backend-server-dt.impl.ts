@@ -39,7 +39,7 @@ export const create_backend_server_dt = (chamber: TDTChamber) =>
 				.pipe(oath.ops.chain(check_file_exists(intake)))
 				.pipe(oath.ops.chain(set_last_modified_header(intake)))
 				.pipe(oath.ops.map(() => intake))
-				.pipe(oath.ops.rejected_map(rrr => ({ rrr, intake })))
+				.pipe(oath.ops.rmap(rrr => ({ rrr, intake })))
 				.pipe(oath.ops.fix(status_from_rrr))
 				.pipe(oath.ops.tap(stop_response_timer))
 				.pipe(oath.ops.tap(log_request))
@@ -62,7 +62,7 @@ export const create_backend_server_dt = (chamber: TDTChamber) =>
 				.pipe(oath.ops.tap(file => void (intake.payload = file)))
 				.pipe(oath.ops.map(() => intake))
 				.pipe(oath.ops.tap(intake => intake.headers.set("Content-Type", "application/octet-stream")))
-				.pipe(oath.ops.rejected_map(rrr => ({ rrr, intake })))
+				.pipe(oath.ops.rmap(rrr => ({ rrr, intake })))
 				.pipe(oath.ops.fix(status_from_rrr))
 				.pipe(oath.ops.tap(stop_response_timer))
 				.pipe(oath.ops.tap(log_request))
@@ -83,7 +83,7 @@ export const create_backend_server_dt = (chamber: TDTChamber) =>
 					.pipe(oath.ops.chain(check_file_does_not_exist(intake)))
 					.pipe(oath.ops.chain(({ uid, fsid }) => intake.data_persistence_strategy.create(uid, fsid, intake.req.body!)))
 					.pipe(oath.ops.map(() => intake))
-					.pipe(oath.ops.rejected_map(rrr => ({ rrr, intake }))),
+					.pipe(oath.ops.rmap(rrr => ({ rrr, intake }))),
 			),
 		)
 
@@ -100,7 +100,7 @@ export const create_backend_server_dt = (chamber: TDTChamber) =>
 					.pipe(oath.ops.chain(({ uid, fsid }) => intake.data_persistence_strategy.update(uid, fsid, intake.req.body!)))
 					.pipe(oath.ops.map(() => intake))
 					.pipe(oath.ops.map(() => intake))
-					.pipe(oath.ops.rejected_map(rrr => ({ rrr, intake }))),
+					.pipe(oath.ops.rmap(rrr => ({ rrr, intake }))),
 			),
 		)
 
@@ -114,7 +114,7 @@ export const create_backend_server_dt = (chamber: TDTChamber) =>
 					.pipe(oath.ops.chain(check_file_exists(intake)))
 					.pipe(oath.ops.chain(({ uid, fsid }) => intake.data_persistence_strategy.delete(uid, fsid)))
 					.pipe(oath.ops.map(() => intake))
-					.pipe(oath.ops.rejected_map(rrr => ({ rrr, intake }))),
+					.pipe(oath.ops.rmap(rrr => ({ rrr, intake }))),
 			),
 		)
 
@@ -133,12 +133,8 @@ export const create_backend_server_dt = (chamber: TDTChamber) =>
 export const validate_request_params = (intake: Routary.Intake<TDTContext>) =>
 	oath
 		.all([
-			oath
-				.if(Metadata.Validations.is_fsid(intake.params.fsid))
-				.pipe(oath.ops.rejected_map(() => rrr.codes.einval("Invalid FSID"))),
-			oath
-				.if(CurrentUser.Validations.is_uid(intake.params.uid))
-				.pipe(oath.ops.rejected_map(() => rrr.codes.einval("Invalid UID"))),
+			oath.if(Metadata.Validations.is_fsid(intake.params.fsid)).pipe(oath.ops.rmap(() => rrr.codes.einval("Invalid FSID"))),
+			oath.if(CurrentUser.Validations.is_uid(intake.params.uid)).pipe(oath.ops.rmap(() => rrr.codes.einval("Invalid UID"))),
 		])
 		.pipe(oath.ops.map(() => intake))
 
@@ -150,14 +146,14 @@ export const authenticate = (intake: Routary.Intake<TDTContext>) =>
 		.pipe(oath.ops.chain(res => oath.from_promise(() => res.json())))
 		.pipe(oath.ops.chain(body => oath.if(body?.success, { on_true: () => body.payload })))
 		.pipe(oath.ops.chain(x => oath.if(CurrentUser.Validations.is_dto(x), { on_true: () => x as Ordo.User.Current.DTO })))
-		.pipe(oath.ops.rejected_map(e => rrr.codes.eacces("Unauthorized", e)))
+		.pipe(oath.ops.rmap(e => rrr.codes.eacces("Unauthorized", e)))
 
 // TODO checking permissions for editing files of other users
 export const check_authorization = (intake: Routary.Intake<TDTContext>) => (user: Ordo.User.Current.DTO) =>
 	oath
 		.if(user[CurrentUserKeys.UID] === intake.params.uid)
 		.pipe(oath.ops.map(() => user))
-		.pipe(oath.ops.rejected_map(() => rrr.codes.eperm("Permission denied")))
+		.pipe(oath.ops.rmap(() => rrr.codes.eperm("Permission denied")))
 
 export const check_file_exists =
 	(intake: Routary.Intake<TDTContext>) =>
@@ -166,7 +162,7 @@ export const check_file_exists =
 			.exists(uid, fsid)
 			.pipe(oath.ops.chain(exists => oath.if(exists)))
 			.pipe(oath.ops.map(() => ({ uid, fsid })))
-			.pipe(oath.ops.rejected_map(() => rrr.codes.enoent("File not found")))
+			.pipe(oath.ops.rmap(() => rrr.codes.enoent("File not found")))
 
 export type TIDs = { uid: Ordo.User.UID; fsid: Ordo.Metadata.FSID }
 export const extract_ids = (intake: Routary.Intake<TDTContext>) => () => ({
@@ -181,13 +177,13 @@ const check_file_does_not_exist =
 			.exists(uid, fsid)
 			.pipe(oath.ops.chain(exists => oath.if(!exists)))
 			.pipe(oath.ops.map(() => ({ uid, fsid })))
-			.pipe(oath.ops.rejected_map(() => rrr.codes.eexist("File already exists")))
+			.pipe(oath.ops.rmap(() => rrr.codes.eexist("File already exists")))
 
 export const validate_body_is_not_empty = (intake: Routary.Intake<TDTContext>) =>
 	oath
 		.from_nullable(intake.req.body)
 		.pipe(oath.ops.map(() => intake))
-		.pipe(oath.ops.rejected_map(() => rrr.codes.einval("Empty file body")))
+		.pipe(oath.ops.rmap(() => rrr.codes.einval("Empty file body")))
 
 export const validate_file_size_limit = (intake: Routary.Intake<TDTContext>) => (user: Ordo.User.Current.DTO) =>
 	oath
@@ -195,7 +191,7 @@ export const validate_file_size_limit = (intake: Routary.Intake<TDTContext>) => 
 		.pipe(oath.ops.map(file_size => Number.parseInt(file_size, 10)))
 		.pipe(oath.ops.chain(file_size => oath.if(is_finite_non_negative_int(file_size), { on_true: () => file_size })))
 		.pipe(oath.ops.chain(file_size => oath.if(CurrentUser.FromDTO(user).can_upload(file_size))))
-		.pipe(oath.ops.rejected_map(() => rrr.codes.efbig("File too big")))
+		.pipe(oath.ops.rmap(() => rrr.codes.efbig("File too big")))
 
 // TODO check if attemted to create a file in other user's space
 export const check_can_create_files = (intake: Routary.Intake<TDTContext>) => (user: Ordo.User.Current.DTO) =>
@@ -207,7 +203,7 @@ export const check_can_create_files = (intake: Routary.Intake<TDTContext>) => (u
 		.pipe(oath.ops.map(total_files => CurrentUser.FromDTO(user).can_create_files(total_files)))
 		.pipe(oath.ops.chain(can_create => oath.if(can_create)))
 		.pipe(oath.ops.map(() => user))
-		.pipe(oath.ops.rejected_map(() => rrr.codes.enospc("Too many files")))
+		.pipe(oath.ops.rmap(() => rrr.codes.enospc("Too many files")))
 
 const check_total_files_limit_if_file_does_not_exist = (intake: Routary.Intake<TDTContext>) => (user: Ordo.User.Current.DTO) =>
 	intake.data_persistence_strategy

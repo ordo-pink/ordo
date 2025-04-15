@@ -30,6 +30,6 @@ export const check_if_id_param_is_valid = (intake: Routary.Intake<TIDContext>) =
 	oath
 		.of(intake.params.user_id)
 		.pipe(id => oath.if(is_uid(id)))
-		.pipe(oath.ops.rejected_map(() => invalid_id_rrr(intake.params.user_id, intake)))
+		.pipe(oath.ops.rmap(() => invalid_id_rrr(intake.params.user_id, intake)))
 
 const { is_uid } = CurrentUser.Validations

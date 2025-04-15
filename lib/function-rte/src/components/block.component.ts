@@ -118,4 +118,4 @@ export const Block = (block_index: number, metadata: Ordo.Metadata.Instance, is_
 
 // --- Internal ---
 
-const StyledLine = MaokaStyled.Tags.div("flex items-center px-4 md:px-12 my-3")
+const StyledLine = MaokaStyled.Tags.div("flex items-center my-3")

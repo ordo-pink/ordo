@@ -28,7 +28,7 @@ import { get_user_from_cookie } from "./get-user-from-cookie"
 
 export const check_if_edited_user_is_current_user = (intake: Routary.Intake<TIDContext>) =>
 	get_user_from_cookie(intake).pipe(
-		oath.ops.and(({ user }) =>
+		oath.ops.chain(({ user }) =>
 			oath.if(user.get_uid() === intake.params.user_id, {
 				on_false: () => ({ rrr: rrr.codes.eperm("Cannot edit other user"), intake: intake }),
 			}),

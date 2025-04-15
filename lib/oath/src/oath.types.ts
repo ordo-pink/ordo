@@ -3,78 +3,70 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-// deno-lint-ignore-file no-explicit-any
-
 export namespace Oath {
 	export type CancellationReason = string & NonNullable<unknown>
 
-	export namespace Operators {
+	export namespace Ops {
 		export type Static = {
-			and: Oath.Operators.And
-			ap: Oath.Operators.Ap
-			bimap: Oath.Operators.BiMap
-			chain: Oath.Operators.Chain
-			fix: Oath.Operators.Fix
-			map: Oath.Operators.Map
-			rejected_map: Oath.Operators.RejectedMap
-			rejected_tap: Oath.Operators.RejectedTap
-			tap: Oath.Operators.Tap
+			and: Oath.Ops.And
+			ap: Oath.Ops.Ap
+			bimap: Oath.Ops.BiMap
+			chain: Oath.Ops.Chain
+			fix: Oath.Ops.Fix
+			map: Oath.Ops.Map
+			rmap: Oath.Ops.RMap
+			rtap: Oath.Ops.RTap
+			tap: Oath.Ops.Tap
 		}
 
 		// TODO Infer _NewReject
 		export type Fix = <_Resolve, _Reject, _NewResolve>(
-			on_reject: (rejected: _Reject) => _NewResolve,
+			f: (x: _Reject) => _NewResolve,
 		) => (
 			o: Oath.Instance<_Resolve, _Reject>,
 		) => _NewResolve extends PromiseLike<infer _Resolved>
-			? Instance<_Resolved, _Reject, true>
+			? Instance<_Resolved, _Reject>
 			: _NewResolve extends Instance<infer _Resolve, infer __NewReject>
 				? Instance<_Resolve, __NewReject>
 				: Instance<_Resolve | _NewResolve, never>
 
 		export type And = <_Resolve, _Reject, _NewResolve, _NewReject>(
-			on_resolve: (resolved: _Resolve) => _NewResolve,
-			on_reject?: (rejected: _Reject) => _NewReject,
+			f: (x: _Resolve) => _NewResolve,
+			on_rejected?: (x: _Reject) => _NewReject,
 		) => (
 			o: Oath.Instance<_Resolve, _Reject>,
-		) => typeof on_reject extends (x: _Reject) => _NewReject
+		) => typeof on_rejected extends (x: _Reject) => _NewReject
 			? _NewResolve extends PromiseLike<infer _Resolved>
-				? Instance<_Resolved, _NewReject, true>
+				? Instance<_Resolved, _NewReject>
 				: _NewResolve extends Instance<infer _Resolve, infer _Reject>
 					? Instance<_Resolve, _NewReject | _Reject>
 					: Instance<_NewResolve, _NewReject>
 			: _NewResolve extends PromiseLike<infer _Resolved>
-				? Instance<_Resolved, _Reject, true>
+				? Instance<_Resolved, _Reject>
 				: _NewResolve extends Instance<infer _Resolve, infer U>
 					? Instance<_Resolve, _Reject | U>
 					: Instance<_NewResolve, _Reject>
 
-		export type Chain = <_Resolve, _Reject, _Async extends boolean, _NewResolve, _NewReject, _NewAsync extends boolean>(
-			on_resolved: (x: _Resolve) => Oath.Instance<_NewResolve, _NewReject, _NewAsync>,
-		) => (
-			o: Oath.Instance<_Resolve, _Reject, _Async>,
-		) => _Async extends true
-			? Oath.Instance<_NewResolve, _Reject | _NewReject, true>
-			: _NewAsync extends true
-				? Oath.Instance<_NewResolve, _Reject | _NewReject, true>
-				: Oath.Instance<_NewResolve, _Reject | _NewReject, false>
+		export type Chain = <_Resolve, _Reject, _NewResolve, _NewReject>(
+			f: (x: _Resolve) => Oath.Instance<_NewResolve, _NewReject>,
+		) => (o: Oath.Instance<_Resolve, _Reject>) => Oath.Instance<_NewResolve, _Reject | _NewReject>
 
-		export type Tap = <$Resolve, $Reject>(
-			on_resolved: (x: $Resolve) => any,
-			on_rejected?: (x: $Reject) => any,
-		) => (o: Oath.Instance<$Resolve, $Reject>) => Oath.Instance<$Resolve, $Reject>
+		export type Tap = <_Resolve, _Reject>(
+			f: (x: _Resolve) => any,
+			on_rejected?: (x: _Reject) => any,
+		) => (o: Oath.Instance<_Resolve, _Reject>) => Oath.Instance<_Resolve, _Reject>
 
-		export type RejectedTap = <_Resolve, _Reject>(
-			on_rejected: (x: _Reject) => any,
+		export type RTap = <_Resolve, _Reject>(
+			f: (x: _Reject) => any,
 			on_resolved?: (x: _Resolve) => any,
 		) => (o: Oath.Instance<_Resolve, _Reject>) => Oath.Instance<_Resolve, _Reject>
 
 		export type Map = <_Resolve, _Reject, _NewResolve>(
-			on_resolved: (x: _Resolve) => _NewResolve,
+			f: (x: _Resolve) => _NewResolve,
 		) => (o: Oath.Instance<_Resolve, _Reject>) => Oath.Instance<_NewResolve, _Reject>
 
-		export type RejectedMap = <_Resolve, _Reject, _NewReject>(
-			on_rejected: (x: _Reject) => _NewReject,
+		export type RMap = <_Resolve, _Reject, _NewReject>(
+			f: (x: _Reject) => _NewReject,
 		) => (o: Oath.Instance<_Resolve, _Reject>) => Oath.Instance<_Resolve, _NewReject>
 
 		export type BiMap = <_Resolve, _Reject, _NewResolve, _NewReject>(
@@ -82,9 +74,11 @@ export namespace Oath {
 			on_rejected: (x: _Reject) => _NewReject,
 		) => (o: Oath.Instance<_Resolve, _Reject>) => Oath.Instance<_NewResolve, _NewReject>
 
-		export type Ap = <_Resolve>(
-			resolve: Oath.Instance<_Resolve, never>,
-		) => <_NewResolve, _Reject>(o: Oath.Instance<(x: _Resolve) => _NewResolve, _Reject>) => Oath.Instance<_NewResolve, _Reject>
+		export type Ap = <_Resolve, _Reject>(
+			x: Oath.Instance<_Resolve, _Reject>,
+		) => <_NewResolve, _NewReject>(
+			o: Oath.Instance<(x: _Resolve) => _NewResolve, _NewReject>,
+		) => Oath.Instance<_NewResolve, _Reject | _NewReject>
 	}
 
 	export namespace Constructors {
@@ -108,9 +102,7 @@ export namespace Oath {
 
 		export type Reject = <_Reject, _Resolve = never>(x: _Reject) => Oath.Instance<_Resolve, _Reject>
 
-		export type FromPromise = <$Resolve, $Reject = unknown>(
-			p: () => Promise<$Resolve>,
-		) => Oath.Instance<$Resolve, $Reject, true>
+		export type FromPromise = <$Resolve, $Reject = unknown>(p: () => Promise<$Resolve>) => Oath.Instance<$Resolve, $Reject>
 
 		export type FromNullable = <$Nullable, _OnNull = null>(
 			x: $Nullable | null | undefined,
@@ -125,15 +117,15 @@ export namespace Oath {
 		export type Merge = <$Values extends Record<string, unknown>>(
 			values: $Values,
 		) => Oath.Instance<
-			{ [P in keyof $Values]: TUnderOath<$Values[P]> },
-			TRecordToUnion<{ [P in keyof $Values]: TUnderOathRejected<$Values[P]> }>
+			{ [P in keyof $Values]: UnderOath<$Values[P]> },
+			Oath.RecordToUnion<{ [P in keyof $Values]: UnderOathRejected<$Values[P]> }>
 		>
 
 		export type All = <$Values extends readonly unknown[] | []>(
 			values: $Values,
 		) => Oath.Instance<
-			{ -readonly [P in keyof $Values]: TUnderOath<$Values[P]> },
-			TArrayToUnion<{ -readonly [P in keyof $Values]: TUnderOathRejected<$Values[P]> }>
+			{ -readonly [P in keyof $Values]: UnderOath<$Values[P]> },
+			Oath.ArrayToUnion<{ -readonly [P in keyof $Values]: UnderOathRejected<$Values[P]> }>
 		>
 
 		export type Try = <$Resolve, $Reject = unknown, _NewReject = $Reject>(
@@ -142,29 +134,20 @@ export namespace Oath {
 		) => Oath.Instance<$Resolve, _NewReject>
 
 		export type Create = <_Resolve, _Reject>(
-			fork: (resolve: (resolved: _Resolve) => _Resolve, reject: (rejected: _Reject) => _Reject) => any,
+			fork: (resolve: (resolved: _Resolve) => any, reject: (rejected: _Reject) => any) => any,
 			cancellation_reason?: CancellationReason,
 		) => Oath.Instance<_Resolve, _Reject>
 	}
 
 	export namespace Methods {
-		export type Fork<$Resolve, $Reject> = <_NewResolve, _NewReject>(
-			on_resolve: (x: $Resolve) => _NewResolve,
-			on_reject: (x: $Reject | Oath.CancellationReason) => _NewReject | Oath.CancellationReason,
-		) => Promise<_NewResolve>
-
-		export type Cata<$Resolve, $Reject, $Async extends boolean> = <_NewResolve, _NewReject>(explosion: {
+		export type Cata<$Resolve, $Reject> = <_NewResolve, _NewReject>(boom: {
 			resolve: (resolved: $Resolve) => _NewResolve
-			reject: (rejected: $Reject) => _NewReject
-		}) => $Async extends true ? Promise<Awaited<_NewResolve | _NewReject>> : _NewResolve | _NewReject
+			reject?: (rejected: $Reject) => _NewReject
+		}) => typeof boom extends undefined ? Promise<_NewResolve> : Promise<_NewResolve | _NewReject>
 
-		export type Pipe<$Resolve, $Reject, $Async extends boolean> = <_NewResolve, _NewReject, _NewAsync extends boolean>(
-			operator: (o: Oath.Instance<$Resolve, $Reject, $Async>) => Oath.Instance<_NewResolve, _NewReject, _NewAsync>,
-		) => $Async extends true
-			? Oath.Instance<_NewResolve, _NewReject, true>
-			: _NewAsync extends true
-				? Oath.Instance<_NewResolve, _NewReject, true>
-				: Oath.Instance<_NewResolve, _NewReject, false>
+		export type Pipe<$Resolve, $Reject> = <_NewResolve, _NewReject>(
+			op: (o: Oath.Instance<$Resolve, $Reject>) => Oath.Instance<_NewResolve, _NewReject>,
+		) => Oath.Instance<_NewResolve, _NewReject>
 
 		export type Cancel = (reason: CancellationReason) => void
 	}
@@ -178,15 +161,8 @@ export namespace Oath {
 			to_promise: Oath.Catas.ToPromise
 		}
 
-		export type ToPromise = <_Resolve, _Reject>(
-			on_reject?: (x: _Reject) => any,
-		) => {
-			resolve: (x: _Resolve) => Promise<Awaited<_Resolve>>
-			reject: (
-				x: _Reject,
-			) => typeof on_reject extends (x: _Reject) => infer _NewResolve
-				? Promise<Awaited<_Resolve | _NewResolve>>
-				: Promise<Awaited<_Resolve>>
+		export type ToPromise = <_Resolve>() => {
+			resolve: (x: _Resolve) => _Resolve
 		}
 
 		export type Noop = () => { resolve: () => void; reject: () => void }
@@ -208,77 +184,52 @@ export namespace Oath {
 		}
 	}
 
-	export type Instance<$Resolve, $Reject = never, $Async extends boolean = false> = {
+	export type Instance<$Resolve, $Reject = never> = {
 		get is_cancelled(): boolean
 		get is_oath(): true
 		get reason(): Oath.CancellationReason | undefined
 
-		// and: O.Methods.And<$Resolve, $Reject>
 		cancel: Oath.Methods.Cancel
-		cata: Oath.Methods.Cata<$Resolve, $Reject, $Async>
-		// fix: O.Methods.Fix<$Resolve, $Reject>
-		// fork: O.Methods.Fork<$Resolve, $Reject>
-		pipe: Oath.Methods.Pipe<$Resolve, $Reject, $Async>
+		cata: Oath.Methods.Cata<$Resolve, $Reject>
+		pipe: Oath.Methods.Pipe<$Resolve, $Reject>
 	}
 
 	export type Static = Oath.Constructors.Static & {
 		catas: Oath.Catas.Static
-		ops: Oath.Operators.Static
+		ops: Oath.Ops.Static
 	}
-}
-
-/**
- * TUnderOath is an equivalent of Promise `Awaited` type that unwraps the resolving
- * value from the asynchronous box (a Promise or an Oath).
- */
-export type TUnderOath<T> = T extends object & {
-	cata: (explosion: infer F) => any
-}
-	? F extends { resolve: (value: infer V, ...args: infer _) => any }
-		? TUnderOath<V>
-		: never
-	: Awaited<T>
-
-// type TUnderOath<T> = T extends Oath.Instance<infer __Resolve, any, any> ? TUnderOath<__Resolve> : Awaited<T>
-
-/**
- * TUnderOathRejected is like `TUnderOath` but instead of unwrapping the resolving
- * value, it unwraps the rejecting value from the asynchronous box (a Promise or an Oath).
- */
-export type TUnderOathRejected<T> = T extends object & {
-	fix(on_reject: infer F): any
-}
-	? F extends (value: infer V) => any
-		? V
-		: never
-	: never
-
-/**
- * An "explosion" provided to the `Oath.If` as a second parameter to specify a value that
- * should be resolved or rejected.
- */
-export type TOathIfExplosion<$TResolve, $TReject> = {
-	/**
-	 * A thunk of a value that should be resolved if `Oath.If` check is `true`.
-	 *
-	 * @default undefined
-	 */
-	T?: () => $TResolve
 
 	/**
-	 * A thunk of a value that should be rejected if `Oath.If` check is `false`.
-	 *
-	 * @default undefined
+	 * TUnderOath is an equivalent of Promise `Awaited` type that unwraps the resolving
+	 * value from the asynchronous box (a Promise or an Oath).
 	 */
-	F?: () => $TReject
+	export type UnderOath<$X> = $X extends object & {
+		cata: (boom: infer __Boom) => any
+	}
+		? __Boom extends { resolve: (value: infer __Resolved, ...args: infer _) => any }
+			? UnderOath<__Resolved>
+			: never
+		: Awaited<$X>
+
+	/**
+	 * TUnderOathRejected is like `TUnderOath` but instead of unwrapping the resolving
+	 * value, it unwraps the rejecting value from the asynchronous box (a Promise or an Oath).
+	 */
+	export type UnderOathRejected<$X> = $X extends object & {
+		cata: (boom: infer __Boom) => any
+	}
+		? __Boom extends { reject: (x: infer __Rejected) => any }
+			? __Rejected
+			: never
+		: never
+
+	/**
+	 * Transforms an array type into an intersection (` | `).
+	 */
+	export type ArrayToUnion<T> = T extends Array<infer U> ? U : T
+
+	/**
+	 * Transforms values of an object type into an intersection (` | `).
+	 */
+	export type RecordToUnion<T extends Record<string, unknown>> = { [P in keyof T]: T[P] }[keyof T]
 }
-
-/**
- * Transforms an array type into an intersection (` | `).
- */
-export type TArrayToUnion<T> = T extends Array<infer U> ? U : T
-
-/**
- * Transforms values of an object type into an intersection (` | `).
- */
-export type TRecordToUnion<T extends Record<string, unknown>> = { [P in keyof T]: T[P] }[keyof T]

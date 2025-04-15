@@ -32,8 +32,8 @@ const progress = create_progress("Adding missing SPDX records")
 export const handle_spdx: TCommandHandler = async () => {
 	oath
 		.all([...(await create_licenses("lib")), ...(await create_licenses("srv"))])
-		.pipe(oath.ops.and(xs => oath.all(xs.flatMap(x => x))))
-		.pipe(oath.ops.and(xs => xs.filter(Boolean)))
+		.pipe(oath.ops.chain(xs => oath.all(xs.flatMap(x => x))))
+		.pipe(oath.ops.map(xs => xs.filter(Boolean)))
 		.cata({ reject: e => progress.break("ERROR: Unexpected error", e), resolve: noop })
 
 	progress.finish()

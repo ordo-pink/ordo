@@ -6,7 +6,7 @@
 import { type Oath } from "../../oath.types"
 import { create } from "../../constructors/impl/create.impl"
 
-export const tap_op: Oath.Operators.Tap = (f, g) => o =>
+export const tap_op: Oath.Ops.Tap = (f, g) => o =>
 	create((on_resolve, on_reject) =>
 		o.cata({
 			reject: reject => {
@@ -20,7 +20,7 @@ export const tap_op: Oath.Operators.Tap = (f, g) => o =>
 		}),
 	)
 
-export const rejected_tap_op: Oath.Operators.RejectedTap = (g, f) => o =>
+export const rejected_tap_op: Oath.Ops.RTap = (g, f) => o =>
 	create((on_resolve, on_reject) =>
 		o.cata({
 			reject: reject => {

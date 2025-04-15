@@ -11,12 +11,12 @@ const main = () =>
 	oath
 		.from_nullable(all_args[0])
 		.pipe(
-			oath.ops.and(command_name =>
+			oath.ops.chain(command_name =>
 				oath.if(command_name === "--help", { on_true: show_help }).pipe(oath.ops.fix(() => command_name)),
 			),
 		)
-		.pipe(oath.ops.and(command_name => oath.from_nullable(commands[command_name])))
-		.pipe(oath.ops.and(command => oath.try(() => command.handler(opts))))
+		.pipe(oath.ops.chain(command_name => oath.from_nullable(commands[command_name])))
+		.pipe(oath.ops.chain(command => oath.try(() => command.handler(opts))))
 		.cata({ reject: educate, resolve: () => void 0 })
 
 const educate = () => {

@@ -26,7 +26,7 @@ export const routary = {
 
 			return routary.create(chamber, shaft)
 		},
-		start: crown_gear => (req, server) => {
+		start: crown_gear => async (req, server) => {
 			const current_bearing = req.method as Routary.Bearing
 			let current_gasket = new URL(req.url).pathname
 			if (current_gasket.endsWith("/") && current_gasket.length > 1) current_gasket = current_gasket.slice(0, -1)

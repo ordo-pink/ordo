@@ -29,7 +29,7 @@ import { oath } from "@ordo-pink/oath"
 export const extract_body_email = (intake: Routary.Intake<TIDContext>) => (request_body: any) =>
 	oath
 		.from_nullable(request_body.email)
-		.pipe(oath.ops.rejected_map(() => email_missing_rrr(intake)))
+		.pipe(oath.ops.rmap(() => email_missing_rrr(intake)))
 		.pipe(
 			oath.ops.chain(email =>
 				oath.if(is_email(email), { on_true: () => email as Ordo.User.Email, on_false: () => invalid_email_rrr(email, intake) }),

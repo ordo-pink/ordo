@@ -44,7 +44,7 @@ export const RichText = (
 		const commands = use(MaokaOrdo.Jabs.get_commands)
 
 		const handle_mount = () => {
-			RTE.$.update("focus", prev => (is_embedded ? prev : fsid))
+			RTE.$.update("focus", prev => (is_embedded ? (is_editable ? fsid : prev) : fsid))
 
 			R.FromNullable(content)
 				.pipe(
@@ -99,7 +99,7 @@ export const RichText = (
 		return () => {
 			const state = RTE.$.select(`state.${fsid}`)
 
-			if (!state) return
+			if (!state) return null
 
 			return state.content.map((_, line_index) => Block(line_index, metadata, is_editable, is_embedded))
 		}

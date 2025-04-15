@@ -49,12 +49,8 @@ export const handle_verify_code = default_handler<BackendAuth.Chamber>(intake =>
 		.pipe(oath.ops.tap(set_cookie(intake)))
 		.pipe(oath.ops.map(({ user }) => void (intake.payload = CurrentUser.Serialize(user.to_dto()))))
 		.pipe(oath.ops.map(() => intake))
-		.pipe(
-			oath.ops.rejected_map(rrr => {
-				intake.headers.delete("Set-Cookie")
-				return { intake, rrr }
-			}),
-		)
+		.pipe(oath.ops.rtap(() => intake.headers.delete("Set-Cookie")))
+		.pipe(oath.ops.rmap(rrr => ({ rrr, intake })))
 })
 
 // --- Internal ---
@@ -65,10 +61,7 @@ const is_code = (x: unknown): x is number => tau.is_finite_non_negative_int(x)
 // TODO Move to lib
 
 const get_request_body = (req: Request): Oath.Instance<any, Ordo.Rrr<"EIO">> =>
-	oath.try(
-		() => req.json(),
-		error => rrr.codes.eio("Failed to parse request body", error),
-	)
+	oath.from_promise(() => req.json()).pipe(oath.ops.rmap(error => rrr.codes.eio("Failed to parse request body", error)))
 
 const validate_request_body = (body: any) =>
 	oath.merge({
@@ -125,23 +118,23 @@ const get_or_create_user = (intake: BackendAuth.Intake) => (email: Ordo.User.Ema
 					.pipe(oath.ops.chain(id => intake.persistence_strategy_user.read(id))),
 			),
 		)
-		.pipe(oath.ops.rejected_map(() => intake))
+		.pipe(oath.ops.rmap(() => intake))
 		.pipe(oath.ops.fix(create_user(email)))
 
 const create_session_id = (intake: BackendAuth.Intake) => (user: Ordo.User.Current.Instance) =>
 	oath
 		.try(() => [crypto.randomUUID(), Date.now(), `${intake.req.headers.get("X-Device")}`] as Ordo.User.Session)
 		.pipe(oath.ops.map(sid => ({ sid, user })))
-		.pipe(oath.ops.rejected_map(error => rrr.codes.eio("Failed to create session", error)))
+		.pipe(oath.ops.rmap(error => rrr.codes.eio("Failed to create session", error)))
 
 type P2 = { sid: Ordo.User.Session; user: Ordo.User.Current.Instance }
 const persist_session_id = (intake: BackendAuth.Intake) => (params: P2) =>
 	oath
 		.of(params.user.to_dto())
 		.pipe(oath.ops.tap(dto => void (dto[CurrentUserKeys.SESSIONS] = [...dto[CurrentUserKeys.SESSIONS], params.sid])))
-		.pipe(oath.ops.and(dto => intake.persistence_strategy_user.update(params.user.get_uid(), CurrentUser.FromDTO(dto))))
+		.pipe(oath.ops.chain(dto => intake.persistence_strategy_user.update(params.user.get_uid(), CurrentUser.FromDTO(dto))))
 		.pipe(oath.ops.chain(user => intake.reference_mapping_user.refresh(user.get_uid())))
-		.pipe(oath.ops.and(() => params))
+		.pipe(oath.ops.map(() => params))
 
 const set_cookie = (intake: BackendAuth.Intake) => (params: P2) =>
 	intake.headers.set(

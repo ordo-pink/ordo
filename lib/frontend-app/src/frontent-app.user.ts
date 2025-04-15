@@ -46,7 +46,7 @@ export const init_user = call_once(() => {
 	const handle_sign_out = () =>
 		oath
 			.of({ method: "DELETE", credentials: "include" as const })
-			.pipe(oath.ops.and(init => oath.try(() => fetch(`${hosts.id}/session`, init))))
+			.pipe(oath.ops.and(init => oath.from_promise(() => fetch(`${hosts.id}/session`, init))))
 			.cata(oath.catas.to_promise())
 			.then(clean_up_auth)
 			.then(() => {

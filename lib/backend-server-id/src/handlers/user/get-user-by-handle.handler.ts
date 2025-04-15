@@ -53,4 +53,4 @@ const get_user_by_handle = (intake: I) => (handle: Ordo.User.Handle) =>
 	intake.reference_mapping_user
 		.get_by_handle(handle)
 		.pipe(oath.ops.chain(id => intake.persistence_strategy_user.read(id)))
-		.pipe(oath.ops.rejected_map(rrr => ({ rrr, intake })))
+		.pipe(oath.ops.rmap(rrr => ({ rrr, intake })))

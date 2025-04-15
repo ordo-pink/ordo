@@ -1,8 +1,25 @@
 .react-flow__attribution {
-	@apply bg-transparent;
+	@apply bg-transparent opacity-10;
 }
 
 .react-flow,
 .react-flow__background {
 	@apply !bg-transparent;
+}
+
+.react-flow__node-embed {
+	@apply rounded-md bg-neutral-300 p-2  dark:bg-neutral-900;
+}
+
+.react-flow__node-embed.selected {
+	@apply ring-1 ring-pink-500;
+}
+
+.react-flow__resize-control {
+	content: "->";
+	@apply !-mx-3 !-my-3 !size-6 !border-0 !bg-transparent !pr-2 !text-right;
+}
+
+.react-flow__resize-control::after {
+	content: "🡮";
 }

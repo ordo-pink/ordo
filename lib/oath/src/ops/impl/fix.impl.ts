@@ -6,7 +6,7 @@
 import { create, from_promise } from "../../constructors"
 import { Oath } from "../../oath.types"
 
-export const fix_op: Oath.Operators.Fix = on_reject => o =>
+export const fix_op: Oath.Ops.Fix = on_reject => o =>
 	create((resolve, reject) =>
 		o.cata({
 			resolve: resolved => resolve(resolved),
@@ -19,7 +19,7 @@ export const fix_op: Oath.Operators.Fix = on_reject => o =>
 					if (forked.then) return from_promise(() => forked).cata({ resolve, reject } as any)
 					return resolve(forked)
 				} catch (e) {
-					reject(e as never)
+					return reject(e as never)
 				}
 			},
 		}),

@@ -65,5 +65,5 @@ export const routary_cors: RoutaryCORS.Constructor =
 			}
 		})
 
-		return routary.create(chamber, shaft)
+		return routary.http(chamber, shaft)
 	}

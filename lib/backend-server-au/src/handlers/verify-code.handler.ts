@@ -27,9 +27,7 @@ import { default_handler, huyami } from "@ordo-pink/routary-ordo"
 import * as fns from "../fns"
 import { type BackendAuth } from "../backend-server-au.types"
 
-export const handle_verify_code = default_handler<BackendAuth.Chamber>(intake => {
-	intake.request_id = intake.create_request_id()
-	intake.request_language = fns.get_lang(intake.req)
+export const handle_verify_code = default_handler<BackendAuth.Fuel>(intake => {
 	const debug = huyami(intake)
 
 	return get_request_body(intake.req)
@@ -97,7 +95,7 @@ const send_email =
 	(user: Ordo.User.Current.Instance): void =>
 		intake.email_strategy.send({
 			to: user.get_email(),
-			content: fns.create_user_authenticated_email_body(intake.request_language, intake.request_ip!),
+			content: fns.create_user_authenticated_email_body(intake.request_language, intake.request_ip as string),
 			subject: fns.create_user_authenticated_email_subject(intake.request_language),
 		})
 

@@ -27,8 +27,8 @@ export const create_response = <
 	status,
 }: $TIntake): Response => new Response(payload as any, { headers, status })
 
-type TStatusFromRRRParams<$TContext extends RoutaryOrdo.Chamber> = { rrr: Ordo.Rrr; intake: Routary.Intake<$TContext> }
-export const status_from_rrr = <$TContext extends RoutaryOrdo.Chamber>({
+type TStatusFromRRRParams<$TContext extends RoutaryOrdo.Fuel> = { rrr: Ordo.Rrr; intake: Routary.Intake<$TContext> }
+export const status_from_rrr = <$TContext extends RoutaryOrdo.Fuel>({
 	rrr: e,
 	intake,
 }: TStatusFromRRRParams<$TContext>): Routary.Intake<$TContext> => {

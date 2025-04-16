@@ -9,7 +9,7 @@ const ignore_debug_value = Symbol.for("ignore_debug_value")
 const default_debug_value_callback = () => ignore_debug_value
 
 export const huyami =
-	(intake: RoutaryOrdo.Chamber) =>
+	(intake: RoutaryOrdo.Fuel) =>
 	<$X>(message: string, cb: (params: $X) => any = default_debug_value_callback) =>
 	(x: $X): void => {
 		const more_data = cb(x)

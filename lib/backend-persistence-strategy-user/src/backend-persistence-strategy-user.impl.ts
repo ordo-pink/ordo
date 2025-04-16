@@ -96,7 +96,7 @@ const get_storage_p = (persistence_strategy_data: OrdoBackend.Data.PersistenceSt
 					.pipe(oath.ops.rmap(to_rrr("Could not get user mapping"))),
 			),
 		)
-		.cata(oath.catas.or_else(() => Promise.resolve({ email: {}, handle: {} } as Mapping)))
+		.cata(oath.catas.or_else(() => ({ email: {}, handle: {} }) as Mapping))
 
 export const create_persistence_strategy_user: PersistenceStrategyUser = persistence_strategy_data => ({
 	create: u =>

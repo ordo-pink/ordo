@@ -8,23 +8,23 @@ import { colonoscope, is_colonoscopy_doctor } from "@ordo-pink/colonoscope"
 import { type Routary } from "./routary.types"
 
 // TODO Drop requirement for colonoscope
-export const routary = {
-	create: <$Chamber>(chamber: $Chamber, shaft: Routary.Shaft<$Chamber> = {}): Routary.Instance<$Chamber> => ({
-		use: f => f(chamber, shaft),
-		get: (gasket, gear) => routary.create(chamber, shaft).each(gasket, ["GET"], gear),
-		put: (gasket, gear) => routary.create(chamber, shaft).each(gasket, ["PUT"], gear),
-		head: (gasket, gear) => routary.create(chamber, shaft).each(gasket, ["HEAD"], gear),
-		post: (gasket, gear) => routary.create(chamber, shaft).each(gasket, ["POST"], gear),
-		patch: (gasket, gear) => routary.create(chamber, shaft).each(gasket, ["PATCH"], gear),
-		delete: (gasket, gear) => routary.create(chamber, shaft).each(gasket, ["DELETE"], gear),
-		options: (gasket, gear) => routary.create(chamber, shaft).each(gasket, ["OPTIONS"], gear),
+export const routary: Routary.Static = {
+	http: (fuel, shaft = {}) => ({
+		use: f => f(fuel, shaft),
+		get: (gasket, gear) => routary.http(fuel, shaft).each(gasket, ["GET"], gear),
+		put: (gasket, gear) => routary.http(fuel, shaft).each(gasket, ["PUT"], gear),
+		head: (gasket, gear) => routary.http(fuel, shaft).each(gasket, ["HEAD"], gear),
+		post: (gasket, gear) => routary.http(fuel, shaft).each(gasket, ["POST"], gear),
+		patch: (gasket, gear) => routary.http(fuel, shaft).each(gasket, ["PATCH"], gear),
+		delete: (gasket, gear) => routary.http(fuel, shaft).each(gasket, ["DELETE"], gear),
+		options: (gasket, gear) => routary.http(fuel, shaft).each(gasket, ["OPTIONS"], gear),
 		each: (gasket, bearings, gear) => {
 			bearings.forEach(bearing => {
 				if (!shaft[bearing]) shaft[bearing] = {}
 				shaft[bearing][gasket] = gear
 			})
 
-			return routary.create(chamber, shaft)
+			return routary.http(fuel, shaft)
 		},
 		start: crown_gear => async (req, server) => {
 			const current_bearing = req.method as Routary.Bearing
@@ -32,7 +32,7 @@ export const routary = {
 			if (current_gasket.endsWith("/") && current_gasket.length > 1) current_gasket = current_gasket.slice(0, -1)
 			let params = {} as Record<string, string>
 
-			if (!shaft[current_bearing]) return crown_gear({ req, params, server, ...chamber })
+			if (!shaft[current_bearing]) return crown_gear({ ...fuel, req, params, server })
 
 			const fitting_gasket = Object.keys(shaft[current_bearing]).find(bearing => {
 				if (is_colonoscopy_doctor(bearing)) {
@@ -47,9 +47,9 @@ export const routary = {
 				return bearing === current_gasket
 			})
 
-			if (!fitting_gasket) return crown_gear({ req, params, server, ...chamber })
+			if (!fitting_gasket) return crown_gear({ ...fuel, req, params, server })
 
-			return shaft[current_bearing][fitting_gasket]({ req, params, server, ...chamber })
+			return shaft[current_bearing][fitting_gasket]({ ...fuel, req, params, server })
 		},
 	}),
 }

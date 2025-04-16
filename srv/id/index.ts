@@ -20,7 +20,7 @@
  */
 
 import { type Logger, console_logger } from "@ordo-pink/logger"
-import { type TIDChamber, create_backend_server_id } from "@ordo-pink/backend-server-id"
+import { type TIDFuel, create_backend_server_id } from "@ordo-pink/backend-server-id"
 import { create_persistence_strategy_user, create_reference_mapping_user } from "@ordo-pink/backend-persistence-strategy-user"
 import { is_finite_non_negative_int, is_finite_positive_int, is_port, is_positive_number } from "@ordo-pink/tau"
 import { create_persistence_strategy_data_fs } from "@ordo-pink/backend-persistence-strategy-data-fs"
@@ -86,11 +86,11 @@ const main = () =>
 							defaults: { file_limit, max_functions, max_upload_size },
 							logger,
 							notification_strategy: { send: ({ content }) => logger.notice("NOTIFICATION:", "::", content) }, // TODO
-							session_lifetime,
+							session_lifetime_s: session_lifetime,
 							web_host,
 							reference_mapping_user,
 							persistence_strategy_user,
-						} satisfies TIDChamber)
+						} satisfies TIDFuel)
 						.pipe(oath.ops.and(create_backend_server_id))
 						.pipe(oath.ops.and(fetch => Bun.serve({ fetch, port })))
 				},

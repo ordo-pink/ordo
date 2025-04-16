@@ -20,13 +20,13 @@ import { oath } from "@ordo-pink/oath"
 import { rickroll } from "@ordo-pink/rickroll"
 import { routary_cors } from "@ordo-pink/routary-cors"
 
-import { type TDTChamber, type TDTContext } from "./backend-server-dt.types"
+import { type TDTFuel, type TDTContext } from "./backend-server-dt.types"
 
 // TODO Extract colonoscope from Routary
 // TODO WebSocket for dt-dt and dt-web notifications
-export const create_backend_server_dt = (chamber: TDTChamber) =>
+export const create_backend_server_dt = (chamber: TDTFuel) =>
 	routary
-		.create<TDTContext>({ ...chamber, headers: new Headers(), status: 200, request_language: TWO_LETTER_LOCALE.ENGLISH })
+		.http<TDTContext>({ ...chamber, headers: new Headers(), status: 200, request_language: TWO_LETTER_LOCALE.ENGLISH })
 		.head("/:uid/:fsid", intake => {
 			return oath
 				.of(intake)

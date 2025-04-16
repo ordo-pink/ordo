@@ -28,6 +28,7 @@ import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { Result } from "@ordo-pink/result"
 import { console_logger } from "@ordo-pink/logger"
+import { get_device_info } from "@ordo-pink/get-device-info"
 import { oath } from "@ordo-pink/oath"
 
 import { UserQuery } from "./data/user/user-query.impl"
@@ -57,8 +58,17 @@ export const init_user = call_once(() => {
 
 	logger.debug("🟡 Initialising metadata...")
 
+	const headers = new Headers()
+	headers.append("X-Device", get_device_info(navigator))
+
+	const init = {
+		credentials: "include",
+		headers,
+		method: "POST",
+	} as const
+
 	oath
-		.from_promise(() => fetch(`${hosts.id}/session`, { credentials: "include" }))
+		.from_promise(() => fetch(`${hosts.id}/session`, init))
 		.pipe(oath.ops.and(res => res.json()))
 		.pipe(oath.ops.and(res => oath.if(res.success, { on_true: () => res.payload as Ordo.User.Current.DTO })))
 		.pipe(oath.ops.and(dto => CurrentUser.FromDTO(dto)))
@@ -217,6 +227,7 @@ const ValidateCodeModal = (email: Ordo.User.Email) =>
 						.if(is_valid)
 						.pipe(oath.ops.and(() => new Headers()))
 						.pipe(oath.ops.tap(headers => headers.append("content-type", "application/json")))
+						.pipe(oath.ops.tap(headers => headers.append("x-device", get_device_info(navigator))))
 						.pipe(oath.ops.and(headers => ({ headers, method: "POST" })))
 						.pipe(
 							oath.ops.and(init => ({

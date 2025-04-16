@@ -19,12 +19,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { CurrentUser, CurrentUserKeys, rrr } from "@ordo-pink/core"
+import { CurrentUser, rrr } from "@ordo-pink/core"
 import { type Routary } from "@ordo-pink/routary"
+import { huyami } from "@ordo-pink/routary-ordo"
 import { oath } from "@ordo-pink/oath"
 
 import { type TIDContext } from "../backend-server-id.types"
-import { huyami } from "@ordo-pink/routary-ordo"
 
 export const get_user_from_cookie = (intake: Routary.Intake<TIDContext>) => {
 	const debug = huyami(intake)
@@ -52,33 +52,7 @@ export const get_user_from_cookie = (intake: Routary.Intake<TIDContext>) => {
 										),
 									),
 								)
-								.pipe(oath.ops.tap(debug("User and session are valid", ({ uid }) => uid)))
-								.pipe(
-									oath.ops.chain(params =>
-										oath
-											.of(params.user)
-											.pipe(oath.ops.map(user => user.to_dto()))
-											.pipe(
-												oath.ops.tap(
-													dto =>
-														void (dto[CurrentUserKeys.SESSIONS] = dto[CurrentUserKeys.SESSIONS].toSpliced(
-															dto[CurrentUserKeys.SESSIONS].findIndex(session => session[0] === sid),
-															1,
-															[sid, Date.now()],
-														)),
-												),
-											)
-											.pipe(oath.ops.map(dto => ({ uid, sid, user: CurrentUser.FromDTO(dto) }))),
-									),
-								)
-								.pipe(
-									oath.ops.chain(({ user, uid, sid }) =>
-										intake.persistence_strategy_user
-											.update(user.get_uid(), user)
-											.pipe(oath.ops.map(user => ({ user, uid, sid }))),
-									),
-								)
-								.pipe(oath.ops.tap(debug("Current session updated"))),
+								.pipe(oath.ops.tap(debug("User and session are valid", ({ uid }) => uid))),
 						),
 					),
 			),

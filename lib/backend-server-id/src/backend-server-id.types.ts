@@ -22,15 +22,15 @@
 import type { Logger } from "@ordo-pink/logger"
 import type { RoutaryOrdo } from "@ordo-pink/routary-ordo"
 
-export type TIDChamber = {
+export type TIDFuel = {
 	allow_origin: string[]
 	defaults: { file_limit: number; max_upload_size: number; max_functions: number }
 	logger: Logger
 	notification_strategy: OrdoBackend.Notification.EmailStrategy
-	session_lifetime: number
+	session_lifetime_s: number
 	persistence_strategy_user: OrdoBackend.User.PersistenceStrategy
 	reference_mapping_user: OrdoBackend.User.ReferenceMapping
 	web_host: string
 }
 
-export type TIDContext = RoutaryOrdo.Chamber & TIDChamber
+export type TIDContext = RoutaryOrdo.Fuel & TIDFuel

@@ -68,7 +68,7 @@ export namespace BackendAuth {
 		persistence_strategy_user: OrdoBackend.User.PersistenceStrategy
 	}
 
-	export type Chamber = RoutaryOrdo.Chamber & Params
+	export type Fuel = RoutaryOrdo.Fuel & Params
 
-	export type Intake = Routary.Intake<BackendAuth.Chamber>
+	export type Intake = Routary.Intake<BackendAuth.Fuel>
 }

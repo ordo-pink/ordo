@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: Unlicense
  */
 
+export * from "./impl/assign-request-id.fn"
+export * from "./impl/assign-request-language.fn"
 export * from "./impl/create-response.fn"
 export * from "./impl/extract-request-body.fn"
 export * from "./impl/extract-request-ip.fn"

@@ -26,9 +26,7 @@ import { default_handler, huyami } from "@ordo-pink/routary-ordo"
 import * as fns from "../fns"
 import { type BackendAuth } from "../backend-server-au.types"
 
-export const handle_request_code = default_handler<BackendAuth.Chamber>(intake => {
-	intake.request_id = intake.create_request_id()
-	intake.request_language = fns.get_lang(intake.req)
+export const handle_request_code = default_handler<BackendAuth.Fuel>(intake => {
 	const debug = huyami(intake)
 
 	return get_request_body(intake.req)

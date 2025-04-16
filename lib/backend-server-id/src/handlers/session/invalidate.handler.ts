@@ -27,31 +27,28 @@ import { type TIDContext } from "../../backend-server-id.types"
 import { get_user_from_cookie } from "../../common/get-user-from-cookie"
 
 export const handle_invalidate_session = default_handler<TIDContext>(intake => {
-	intake.request_id = crypto.randomUUID() // TODO Move id generation and error handling to routary-ordo
+	// TODO Move id generation and error handling to routary-ordo
 
 	return get_user_from_cookie(intake)
 		.pipe(
-			oath.ops.and(({ sid, uid, user }) =>
+			oath.ops.chain(({ sid, uid, user }) =>
 				oath
 					.of(user.to_dto())
 					.pipe(
-						oath.ops.and(dto => {
+						oath.ops.chain(dto => {
 							const sessions = dto[CurrentUserKeys.SESSIONS].filter(session => session[0] !== sid)
 							dto[CurrentUserKeys.SESSIONS] = sessions
 
 							return intake.persistence_strategy_user.update(uid, CurrentUser.FromDTO(dto))
 						}),
 					)
-					.pipe(oath.ops.and(() => ({ sid, uid, user }))),
+					.pipe(oath.ops.rmap(rrr => ({ rrr, intake })))
+					.pipe(oath.ops.map(() => ({ sid, uid, user }))),
 			),
 		)
-		.pipe(
-			oath.ops.tap(({ uid, sid }) => {
-				intake.headers.set("Set-Cookie", `${uid}=${sid}; Expires=${new Date().toISOString()}`)
-			}),
-		)
-		.pipe(oath.ops.and(({ user }) => user.to_dto()))
-		.pipe(oath.ops.and(CurrentUser.Serialize))
-		.pipe(oath.ops.and(dto => void (intake.payload = dto)))
-		.pipe(oath.ops.and(() => intake))
+		.pipe(oath.ops.tap(p => intake.headers.set("Set-Cookie", `${p.uid}=${p.sid}; Expires=${new Date().toISOString()}`)))
+		.pipe(oath.ops.map(({ user }) => user.to_dto()))
+		.pipe(oath.ops.map(CurrentUser.Serialize))
+		.pipe(oath.ops.tap(dto => void (intake.payload = dto)))
+		.pipe(oath.ops.map(() => intake))
 })

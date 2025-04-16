@@ -9,7 +9,7 @@ import type { Routary } from "@ordo-pink/routary"
 import type { TWO_LETTER_LOCALE } from "@ordo-pink/locale"
 
 export module RoutaryOrdo {
-	export type Chamber = {
+	export type Fuel = {
 		headers: Headers
 		logger: Logger
 		payload?: unknown
@@ -23,23 +23,25 @@ export module RoutaryOrdo {
 
 	export type SetHeader = (key: string, value: string) => <$Intake extends { headers: Headers }>(intake: $Intake) => void
 
-	export type SetHeaderCurry = (
-		key: string,
-	) => (value: string) => <$Chamber extends { headers: Headers }>(intake: $Chamber) => void
+	export type SetHeaderCurry = (key: string) => (value: string) => <$Fuel extends { headers: Headers }>(intake: $Fuel) => void
 
 	export type ResponseTimer = () => void
 
-	export type StartResponseTimer = <$Chamber extends RoutaryOrdo.Chamber>(intake: $Chamber) => void
+	export type StartResponseTimer = <$Fuel extends RoutaryOrdo.Fuel>(intake: $Fuel) => void
 
-	export type StopResponseTimer = <$Chamber extends RoutaryOrdo.Chamber>(intake: $Chamber) => void
+	export type StopResponseTimer = <$Fuel extends RoutaryOrdo.Fuel>(intake: $Fuel) => void
 
-	export type LogRequest = <$Intake extends Routary.Intake<RoutaryOrdo.Chamber>>(params: $Intake) => void
+	export type LogRequest = <$Intake extends Routary.Intake<RoutaryOrdo.Fuel>>(params: $Intake) => void
 
-	export type ExtractRequestIP = <$Intake extends Routary.Intake<RoutaryOrdo.Chamber>>(intake: $Intake) => void
+	export type AssignRequestId = <$Intake extends RoutaryOrdo.Fuel>(intake: $Intake) => void
+
+	export type AssignRequestLanguage = <$Intake extends Routary.Intake<RoutaryOrdo.Fuel>>(intake: $Intake) => void
+
+	export type ExtractRequestIP = <$Intake extends Routary.Intake<RoutaryOrdo.Fuel>>(intake: $Intake) => void
 
 	export type ExtractJSONBody = <$Intake extends Routary.Intake = Routary.Intake>(
 		intake: $Intake,
 	) => Oath.Instance<any, { rrr: Ordo.Rrr<"EIO">; intake: Routary.Intake<any> }>
 
-	export type Rejection = { rrr: Ordo.Rrr; intake: Routary.Intake<RoutaryOrdo.Chamber> }
+	export type Rejection = { rrr: Ordo.Rrr; intake: Routary.Intake<RoutaryOrdo.Fuel> }
 }

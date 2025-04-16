@@ -19,15 +19,46 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { CurrentUser } from "@ordo-pink/core"
+import { CurrentUser, CurrentUserKeys } from "@ordo-pink/core"
 import { default_handler } from "@ordo-pink/routary-ordo"
 import { oath } from "@ordo-pink/oath"
 
 import { type TIDContext } from "../../backend-server-id.types"
 import { get_user_from_cookie } from "../../common/get-user-from-cookie"
+import { persist_session_id } from "../../common/persist-session"
 
-export const handle_get_session = default_handler<TIDContext>(intake => {
+export const handle_refresh_session = default_handler<TIDContext>(intake => {
 	return get_user_from_cookie(intake)
+		.pipe(
+			oath.ops.chain(({ sid, user }) =>
+				oath
+					.of(user)
+					.pipe(oath.ops.map(user => user.to_dto()))
+					.pipe(
+						oath.ops.map(dto => {
+							const index = dto[CurrentUserKeys.SESSIONS].findIndex(session => session[0] === sid)
+							const session = dto[CurrentUserKeys.SESSIONS][index]
+
+							dto[CurrentUserKeys.SESSIONS] = dto[CurrentUserKeys.SESSIONS].toSpliced(index, 1, [
+								session[0],
+								Date.now(),
+								session[2],
+							])
+
+							return { user: CurrentUser.FromDTO(dto), session }
+						}),
+					),
+			),
+		)
+		.pipe(oath.ops.chain(persist_session_id(intake)))
+		.pipe(
+			oath.ops.tap(params =>
+				intake.headers.set(
+					"Set-Cookie",
+					`${params.user.get_uid()}=${params.session[0]}; Secure; HttpOnly; SameSite=Strict; Path=/; Max-Age=${intake.session_lifetime_s}`,
+				),
+			),
+		)
 		.pipe(oath.ops.map(({ user }) => user.to_dto()))
 		.pipe(oath.ops.map(CurrentUser.Serialize))
 		.pipe(oath.ops.map(dto => void (intake.payload = dto)))

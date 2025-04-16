@@ -44,10 +44,12 @@ export const create_backend_server_au = (params: BackendAuth.Params) => {
 	interval.unref()
 
 	return routary
-		.create({ ...params, status: 200, headers: new Headers(), request_language: TWO_LETTER_LOCALE.ENGLISH })
+		.http({ ...params, status: 200, headers: new Headers(), request_language: TWO_LETTER_LOCALE.ENGLISH })
 		.post("/request-code", handle_request_code)
 		.post("/verify-code", handle_verify_code)
 		.get("/healthcheck", () => new Response("OK")) // TODO Extract to lib
-		.use(routary_cors({ allow_origin: params.allow_origin, allow_headers: ["content-type"], allow_credentials: true }))
+		.use(
+			routary_cors({ allow_origin: params.allow_origin, allow_headers: ["content-type", "x-device"], allow_credentials: true }),
+		)
 		.start(() => rickroll)
 }

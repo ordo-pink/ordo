@@ -14,7 +14,7 @@ export module RoutaryCORS {
 		allow_credentials?: boolean
 	}
 
-	export type Instance<$Chamber extends { headers: Headers }> = Parameters<Routary.Instance<$Chamber>["use"]>[0]
+	export type Instance<$Fuel extends { headers: Headers }> = Parameters<Routary.Instance<$Fuel>["use"]>[0]
 
-	export type Constructor = <$Chamber extends { headers: Headers }>(params: Params) => Instance<$Chamber>
+	export type Constructor = <$Fuel extends { headers: Headers }>(params: Params) => Instance<$Fuel>
 }

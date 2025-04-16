@@ -6,11 +6,11 @@
 import type { Logger } from "@ordo-pink/logger"
 import type { RoutaryOrdo } from "@ordo-pink/routary-ordo"
 
-export type TPBChamber = {
+export type TPBFuel = {
 	id_host: string
 	allow_origin: string[]
 	data_persistence_strategy: OrdoBackend.Data.PersistenceStrategy
 	logger: Logger
 }
 
-export type TPBContext = RoutaryOrdo.Chamber & TPBChamber
+export type TPBContext = RoutaryOrdo.Fuel & TPBFuel

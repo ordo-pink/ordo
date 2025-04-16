@@ -20,7 +20,7 @@
  */
 
 import { type Logger, console_logger } from "@ordo-pink/logger"
-import { type TDTChamber, create_backend_server_dt } from "@ordo-pink/backend-server-dt"
+import { type TDTFuel, create_backend_server_dt } from "@ordo-pink/backend-server-dt"
 import { create_persistence_strategy_data_fs } from "@ordo-pink/backend-persistence-strategy-data-fs"
 import { is_port } from "@ordo-pink/tau"
 import { oath } from "@ordo-pink/oath"
@@ -58,7 +58,7 @@ const main = () =>
 						data_persistence_strategy: create_persistence_strategy_data_fs({ root: data_path }),
 						id_host,
 						dt_host,
-					} satisfies TDTChamber)
+					} satisfies TDTFuel)
 					.pipe(oath.ops.and(create_backend_server_dt))
 					.pipe(oath.ops.and(fetch => Bun.serve({ fetch, port }))),
 			),

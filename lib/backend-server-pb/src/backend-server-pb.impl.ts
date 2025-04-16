@@ -18,11 +18,11 @@ import { oath } from "@ordo-pink/oath"
 import { rickroll } from "@ordo-pink/rickroll"
 import { routary_cors } from "@ordo-pink/routary-cors"
 
-import { type TPBChamber, type TPBContext } from "./backend-server-pb.types"
+import { type TPBFuel, type TPBContext } from "./backend-server-pb.types"
 
-export const create_backend_server_pb = (chamber: TPBChamber) =>
+export const create_backend_server_pb = (chamber: TPBFuel) =>
 	routary
-		.create<TPBContext>({ ...chamber, headers: new Headers(), status: 200, request_language: TWO_LETTER_LOCALE.ENGLISH })
+		.http<TPBContext>({ ...chamber, headers: new Headers(), status: 200, request_language: TWO_LETTER_LOCALE.ENGLISH })
 		.get("/:handle/:fsid", intake => {
 			return (
 				oath

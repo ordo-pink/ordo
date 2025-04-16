@@ -5,11 +5,33 @@
 
 import { Sweech } from "./sweech.types.ts"
 
+/**
+ * A light-weight, well-typed, health-checked, and dependency-free alternative to JavaScript switch statement.
+ * @module
+ */
+
 // --- Public ---
 
+/**
+ * Helper object that contains a pointing interface to put value
+ * into Switch.
+ */
 export const sweech: Sweech.Static = {
+	/**
+	 * A pointing interface to put the value into Switch.
+	 *
+	 * @example `Switch.of(myVariableWithIDontKnowWhichThingInside)`
+	 */
 	match: x => _swich(x),
+
+	/**
+	 * Create an empty switch that compares provided values against `true`.
+	 */
 	of_true: () => _swich(true),
+
+	/**
+	 * Create an empty switch that compares provided values against `false`.
+	 */
 	of_false: () => _swich(false),
 }
 

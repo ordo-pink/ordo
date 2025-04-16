@@ -6,21 +6,14 @@
 import { Sweech } from "./sweech.types.ts"
 
 /**
- * A light-weight, well-typed, health-checked, and dependency-free alternative to JavaScript switch statement.
- * @module
- */
-
-// --- Public ---
-
-/**
  * Helper object that contains a pointing interface to put value
- * into Switch.
+ * into sweech.
  */
 export const sweech: Sweech.Static = {
 	/**
-	 * A pointing interface to put the value into Switch.
+	 * A pointing interface to put the value into sweech.
 	 *
-	 * @example `Switch.of(myVariableWithIDontKnowWhichThingInside)`
+	 * @example `sweech.match(myVariableWithIDontKnowWhichThingInside)`
 	 */
 	match: x => _swich(x),
 
@@ -37,18 +30,61 @@ export const sweech: Sweech.Static = {
 
 // --- Internal ---
 
+/**
+ * A pointing interface to put the value into sweech that got matched.
+ *
+ * @example `sweech.match(myVariableWithIDontKnowWhichThingInside)`
+ */
 const _switch_matched = <$Context, $Result extends unknown[] = []>(x: $Context): Sweech.Instance<$Context, $Result> => ({
+	/**
+	 * Define cases like you would normally do with a switch statement, or use
+	 * predicate functions to validate the value held inside sweech.
+	 *
+	 * @example `sweech.match(1).case(1, () => "one!").case(2, () => "Numbers, mate, remember numbers!")`
+	 * @example `sweech.match(num).case((n) => n % 2 === 0, () => "even").case((n) => n % 2 === -1, () => "this is odd!")`
+	 */
 	case: () => _switch_matched(x),
+
+	/**
+	 * Folds the sweech and returns a value that was defined in the matched
+	 * case onTrue thunk. If none of the case matched, the thunk provided as
+	 * `.default` argument will be called instead.
+	 *
+	 * @example `sweech.match(myBoolean).case(true, () => "oh, thanks!").default(() => "You WHAT?")`
+	 */
 	default: () => (x as any)(),
 })
 
+/**
+ * A pointing interface to put the value into sweech that did not match yet.
+ *
+ * @example `sweech.match(myVariableWithIDontKnowWhichThingInside)`
+ */
 const _swich = <$Context, $Result extends unknown[] = []>(x: $Context): Sweech.Instance<$Context, $Result> => ({
+	/**
+	 * Define cases like you would normally do with a switch statement, or use
+	 * predicate functions to validate the value held inside sweech.
+	 *
+	 * @example `sweech.match(1).case(1, () => "one!").case(2, () => "Numbers, mate, remember numbers!")`
+	 * @example `sweech.match(num).case((n) => n % 2 === 0, () => "even").case((n) => n % 2 === -1, () => "this is odd!")`
+	 */
 	case: (predicate, on_true) => {
 		const isTrue = is_fn(predicate) ? predicate(x) : Array.isArray(predicate) ? predicate.includes(x) : predicate === x
 
 		return isTrue ? _switch_matched(() => on_true(x)) : (_swich(x) as any)
 	},
+
+	/**
+	 * Folds the sweech and returns a value that was defined in the matched
+	 * case onTrue thunk. If none of the case matched, the thunk provided as
+	 * `.default` argument will be called instead.
+	 *
+	 * @example `sweech.match(myBoolean).case(true, () => "oh, thanks!").default(() => "You WHAT?")`
+	 */
 	default: f => f(x),
 })
 
+/**
+ * Function guard.
+ */
 const is_fn = <T = unknown, K = T>(x: unknown): x is (x: T) => K => typeof x == "function"

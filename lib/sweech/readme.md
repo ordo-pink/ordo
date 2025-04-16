@@ -58,16 +58,16 @@ The `.case` accepts two arguments:
   case will be considered matched if the function returns true. **sweech** will always validate the value against the predicate
   (be it a function or a value) at the moment it was defined. But the **onTrue** thunk will only be called when you unfold
   **sweech** by calling `.default`.
-- **onTrue** - a thunk with the value that should be returned if the case matched. Keep in mind that **sweech** will ignore the
+- **on_true** - a thunk with the value that should be returned if the case matched. Keep in mind that **sweech** will ignore the
   rest of the cases defined later in the chain, if the case has already matched. Even if they could also potentially match.
   Another thing to be aware of is that **sweech** is a lazy little one. It does not call the **onTrue** thunk until you end the
   chain with the `.default` method.
 
 The `.default` accepts one argument:
 
-- **onAllFalse** - a thunk with the value that should be returned if none of the cases matched. **sweech** will not unfold the
-  value until you end the `.case` chain with a `.default`. As soon as you call `.default`, the **sweech** will be folded into
-  one of the **onTrue** return values (the one that was matched first in the chain), or the **onAllFalse** return value.
+- **on_none_matched** - a thunk with the value that should be returned if none of the cases matched. **sweech** will not unfold
+  the value until you end the `.case` chain with a `.default`. As soon as you call `.default`, the **sweech** will be folded
+  into one of the **onTrue** return values (the one that was matched first in the chain), or the **onAllFalse** return value.
 
 ## Usage
 

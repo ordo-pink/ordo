@@ -25,7 +25,7 @@ import { Maoka } from "@ordo-pink/maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
-import { Switch } from "@ordo-pink/switch"
+import { sweech } from "@ordo-pink/sweech"
 import { noop } from "@ordo-pink/tau"
 
 import { ordo_app_state } from "../../../app.state"
@@ -66,7 +66,8 @@ export const OrdoSidebar = Maoka.create("aside", ({ use, element }) => {
 
 		if ((!visible || !enabled) && MaokaDOM.is_maoka_dom_element(element) && element.parentElement) element.innerHTML = ""
 
-		return Switch.OfTrue()
+		return sweech
+			.of_true()
 			.case(visible && enabled, () => SidebarRenderer)
 			.default(noop)
 	}
@@ -119,7 +120,8 @@ export const OrdoSidebarButton = Maoka.create("button", ({ use }) => {
 			commands.emit("cmd.application.sidebar.disable")
 		}
 
-		return Switch.OfTrue()
+		return sweech
+			.of_true()
 			.case(enabled && visible, () => BsArrowLeft("rotate-180"))
 			.case(enabled && !visible, () => BsLayoutSidebarInsetReverse())
 			.default(noop)

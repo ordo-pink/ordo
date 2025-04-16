@@ -30,7 +30,7 @@ import { Maoka } from "@ordo-pink/maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaZAGS } from "@ordo-pink/maoka-zags"
-import { Switch } from "@ordo-pink/switch"
+import { sweech } from "@ordo-pink/sweech"
 import { noop } from "@ordo-pink/tau"
 
 import { ordo_app_state } from "../../app.state"
@@ -67,7 +67,8 @@ export const OrdoBackgroundTaskIndicator = Maoka.create("div", ({ use }) => {
 	return () => {
 		const status = get_status()
 
-		return Switch.Match(status)
+		return sweech
+			.match(status)
 			.case(BackgroundTaskStatus.LOADING, () => BsCloudDownload())
 			.case(BackgroundTaskStatus.SAVING, () => BsCloudUpload())
 			.default(() => NoIcon)

@@ -25,7 +25,7 @@ import { Maoka } from "@ordo-pink/maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
-import { Switch } from "@ordo-pink/switch"
+import { sweech } from "@ordo-pink/sweech"
 import { oath } from "@ordo-pink/oath"
 
 export const CreateFileModal = (parent: Ordo.Metadata.FSID | null = null) =>
@@ -138,7 +138,8 @@ const SelectItem = (
 		use(MaokaJabs.set_class("flex gap-x-4"))
 		use(MaokaJabs.listen("onclick", () => on_click(file_association, type.name)))
 
-		const Icon = Switch.OfTrue()
+		const Icon = sweech
+			.of_true()
 			.case(!!file_association.render_icon, () => Maoka.create("span", () => async () => file_association.render_icon!()))
 			.default(() => BsFileEarmarkPlus())
 

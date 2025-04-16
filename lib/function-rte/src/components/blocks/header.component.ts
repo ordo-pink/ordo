@@ -20,13 +20,14 @@
  */
 
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
-import { Switch } from "@ordo-pink/switch"
+import { sweech } from "@ordo-pink/sweech"
 
 import { type TBlockNodeParams, type TRTEHeaderNode } from "../../rte.types"
 import { Inline } from "../inline.component"
 
 export const Header = ({ block_index, metadata, node, is_editable, is_embedded }: TBlockNodeParams<TRTEHeaderNode>) =>
-	Switch.Match(node.level)
+	sweech
+		.match(node.level)
 		.case(1, () =>
 			StyledH1(
 				() => () =>

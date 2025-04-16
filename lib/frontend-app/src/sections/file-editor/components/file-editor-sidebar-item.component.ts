@@ -22,7 +22,7 @@
 import { Maoka, type TMaokaComponent } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
-import { Switch } from "@ordo-pink/switch"
+import { sweech } from "@ordo-pink/sweech"
 import { noop } from "@ordo-pink/tau"
 
 import { FileEditorSidebarDirectory } from "./file-editor-sidebar-directory.component"
@@ -39,7 +39,8 @@ export const FileEditorSidebarItem = (fsid: Ordo.Metadata.FSID, depth = 0): TMao
 			const metadata = get_metadata()
 			const has_children = get_metadata_has_children()
 
-			return Switch.OfTrue()
+			return sweech
+				.of_true()
 				.case(!!metadata && has_children, () => FileEditorSidebarDirectory(metadata!, depth))
 				.case(!!metadata && !has_children, () => FileEditorSidebarFile(metadata!, depth))
 				.default(noop)

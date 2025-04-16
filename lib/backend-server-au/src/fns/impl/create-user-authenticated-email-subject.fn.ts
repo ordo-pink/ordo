@@ -19,10 +19,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Switch } from "@ordo-pink/switch"
+import { sweech } from "@ordo-pink/sweech"
 import { TWO_LETTER_LOCALE } from "@ordo-pink/locale"
 
 export const create_user_authenticated_email_subject = (lang: TWO_LETTER_LOCALE) =>
-	Switch.Match(lang)
+	sweech
+		.match(lang)
 		.case(TWO_LETTER_LOCALE.RUSSIAN, () => "Зафиксирован вход в ваш аккаунт ORDO")
 		.default(() => "Someone just signed in to your ORDO account")

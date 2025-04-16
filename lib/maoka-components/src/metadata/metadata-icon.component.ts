@@ -26,7 +26,7 @@ import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { R } from "@ordo-pink/result"
-import { Switch } from "@ordo-pink/switch"
+import { sweech } from "@ordo-pink/sweech"
 import { emojis } from "@ordo-pink/emojis"
 import { ordo_app_state } from "@ordo-pink/frontend-app/app.state"
 
@@ -124,7 +124,8 @@ const Icon = ({ metadata, custom_class, has_children }: P2) =>
 
 			use(MaokaJabs.set_class(custom_class!))
 
-			return Switch.OfTrue()
+			return sweech
+				.of_true()
 				.case(!fa && has_children, () => BsFolderOpen(custom_class))
 				.case(metadata.get_type() === "text/ordo" && metadata.get_size() === 0, () => BsFileEarmark(custom_class))
 				.case(!!fa && !!fa.render_icon, () => fa!.render_icon!())

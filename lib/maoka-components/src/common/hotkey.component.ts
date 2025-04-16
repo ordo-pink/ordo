@@ -24,7 +24,7 @@ import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { Result } from "@ordo-pink/result"
-import { Switch } from "@ordo-pink/switch"
+import { sweech } from "@ordo-pink/sweech"
 import { create_hotkey_from_event } from "@ordo-pink/hotkey-from-event"
 import { title_case } from "@ordo-pink/tau"
 
@@ -111,7 +111,8 @@ const KeyContainer = MaokaStyled.Tags.span("key-container")
 const Key = (key: string) =>
 	KeyContainer(
 		() => () =>
-			Switch.Match(key)
+			sweech
+				.match(key)
 				.case("backspace", () => "⌫")
 				.case("enter", () => "⏎")
 				.case("escape", () => "Esc")

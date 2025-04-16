@@ -20,7 +20,7 @@
  */
 
 import * as TAU from "@ordo-pink/tau"
-import { Switch } from "@ordo-pink/switch"
+import { sweech } from "@ordo-pink/sweech"
 
 import { CurrentUserKeys, PublicUserKeys, UserSubscription } from "./constants"
 
@@ -42,7 +42,8 @@ const get_user_file_limit = (dto: Ordo.DTOLike<Ordo.User.Current.DTO>) => () => 
 const get_user_first_name = (dto: Ordo.DTOLike<Ordo.User.Public.DTO>) => () => dto[PublicUserKeys.FIRST_NAME] ?? ""
 
 const get_user_full_name = (dto: Ordo.DTOLike<Ordo.User.Public.DTO>) => () =>
-	Switch.OfTrue()
+	sweech
+		.of_true()
 		.case(
 			!!dto[PublicUserKeys.FIRST_NAME] && !!dto[PublicUserKeys.LAST_NAME],
 			() => `${dto[PublicUserKeys.FIRST_NAME]} ${dto[PublicUserKeys.LAST_NAME]}`,

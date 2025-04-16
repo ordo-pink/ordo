@@ -24,7 +24,7 @@ import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { R } from "@ordo-pink/result"
-import { Switch } from "@ordo-pink/switch"
+import { sweech } from "@ordo-pink/sweech"
 
 import {
 	type TRTEBlockquoteNode,
@@ -102,7 +102,8 @@ export const Block = (block_index: number, metadata: Ordo.Metadata.Instance, is_
 
 			return [
 				line_number,
-				Switch.Match(node.type)
+				sweech
+					.match(node.type)
 					.case("h", () => Header({ node: node as TRTEHeaderNode, block_index, metadata, is_editable, is_embedded }))
 					.case("p", () => Paragraph({ node: node as TRTEParagraphNode, block_index, metadata, is_editable, is_embedded }))
 					.case("bq", () => Blockquote({ node: node as TRTEBlockquoteNode, block_index, metadata, is_editable, is_embedded }))

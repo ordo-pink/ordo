@@ -29,7 +29,7 @@ import {
 } from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/maoka"
 import { NotificationType } from "@ordo-pink/core"
-import { Switch } from "@ordo-pink/switch"
+import { sweech } from "@ordo-pink/sweech"
 
 type P = Pick<Ordo.Notification.Instance, "render_icon" | "type">
 export const OrdoNotificationIcon = ({ render_icon, type }: P) =>
@@ -37,7 +37,8 @@ export const OrdoNotificationIcon = ({ render_icon, type }: P) =>
 		if (render_icon) render_icon(element as unknown as HTMLDivElement)
 		else
 			return () =>
-				Switch.Match(type)
+				sweech
+					.match(type)
 					.case(NotificationType.INFO, () => BsInfoCircle("text-sky-500"))
 					.case(NotificationType.QUESTION, () => BsQuestionCircle("text-violet-500"))
 					.case(NotificationType.RRR, () => BsErrorCircle("text-rose-500"))

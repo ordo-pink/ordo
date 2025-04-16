@@ -27,7 +27,7 @@ import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
-import { Switch } from "@ordo-pink/switch"
+import { sweech } from "@ordo-pink/sweech"
 
 import { type TOrdoState, ordo_app_state } from "../../../app.state"
 import { CommandPaletteLocation } from "./constants"
@@ -211,7 +211,8 @@ export const OrdoCommandPalette = Maoka.create("div", ({ use, refresh }) => {
 	use(
 		MaokaDOM.Jabs.onmount(() => {
 			const handle_keydown = (event: KeyboardEvent) =>
-				Switch.Match(event.key)
+				sweech
+					.match(event.key)
 					.case("ArrowUp", handle_arrow_up)
 					.case("ArrowDown", handle_arrow_down)
 					.case("Tab", () => handle_tab(event))

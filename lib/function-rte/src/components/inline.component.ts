@@ -23,7 +23,7 @@ import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
-import { Switch } from "@ordo-pink/switch"
+import { sweech } from "@ordo-pink/sweech"
 import { noop } from "@ordo-pink/tau"
 
 import { type TInlineNodeParams, type TRTECodeNode, type TRTETextNode } from "../rte.types"
@@ -36,7 +36,8 @@ export const Inline = ({
 	node,
 	is_editable,
 }: TInlineNodeParams<TRTETextNode | TRTECodeNode>) =>
-	Switch.Match(node.type)
+	sweech
+		.match(node.type)
 		.case("code", () => StyledCode(() => () => node.value))
 		.case("text", () =>
 			StyledText(({ element, use }) => {
@@ -115,7 +116,8 @@ export const Inline = ({
 					})
 
 				const handle_keydown = (event: KeyboardEvent) =>
-					Switch.Match(event.code)
+					sweech
+						.match(event.code)
 						.case("Enter", () => {
 							event.preventDefault()
 

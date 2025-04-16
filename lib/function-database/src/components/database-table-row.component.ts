@@ -26,7 +26,7 @@ import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { R } from "@ordo-pink/result"
-import { Switch } from "@ordo-pink/switch"
+import { sweech } from "@ordo-pink/sweech"
 import { noop } from "@ordo-pink/tau"
 import { oath } from "@ordo-pink/oath"
 
@@ -38,7 +38,8 @@ export const DatabaseTableRow = (columns: Ordo.I18N.TranslationKey[], child: Ord
 
 		return () =>
 			columns.map(column =>
-				Switch.Match(column)
+				sweech
+					.match(column)
 					.case("t.database.column_names.name", () => FileNameCell(child, is_editable))
 					.case("t.database.column_names.labels", () => LabelsCell(child.get_fsid()))
 					.case("t.database.column_names.created_at", () => DateCell(column, child.get_created_at()))
@@ -107,7 +108,8 @@ const LinksCell = (column: string, metadata: Ordo.Metadata.Instance, type: "pare
 		}
 
 		return () =>
-			Switch.Match(type)
+			sweech
+				.match(type)
 				.case("parent", () =>
 					Maoka.create("div", ({ use }) => {
 						use(MaokaJabs.set_class("database_cell-multiple"))

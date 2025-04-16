@@ -32,7 +32,7 @@ import { Input } from "@ordo-pink/maoka-components"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
-import { Switch } from "@ordo-pink/switch"
+import { sweech } from "@ordo-pink/sweech"
 import { emojis } from "@ordo-pink/emojis"
 import { noop } from "@ordo-pink/tau"
 
@@ -187,7 +187,8 @@ const StyledCalloutCircle = (color_class: string) => MaokaStyled.Tags.div(`rte_b
 const create_callout_card = (card_type: string) => MaokaStyled.Tags.div(`rte_blocks_callout-card ${card_type}`)
 
 const get_callout_icon = (type: CalloutType, custom_class?: string) =>
-	Switch.Match(type)
+	sweech
+		.match(type)
 		.case(CalloutType.INFO, () => BsInfoCircle("text-sky-500".concat(custom_class ? ` ${custom_class}` : "")))
 		.case(CalloutType.QUESTION, () => BsQuestionCircle("text-violet-500".concat(custom_class ? ` ${custom_class}` : "")))
 		.case(CalloutType.RRR, () => BsErrorCircle("text-rose-500".concat(custom_class ? ` ${custom_class}` : "")))
@@ -196,7 +197,8 @@ const get_callout_icon = (type: CalloutType, custom_class?: string) =>
 		.default(() => BsCircle("text-neutral-500".concat(custom_class ? ` ${custom_class}` : "")))
 
 const get_readable_type = (type: CalloutType) =>
-	Switch.Match(type)
+	sweech
+		.match(type)
 		.case(CalloutType.INFO, () => "info")
 		.case(CalloutType.QUESTION, () => "question")
 		.case(CalloutType.RRR, () => "rrr")

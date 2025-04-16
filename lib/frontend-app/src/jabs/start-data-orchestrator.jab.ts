@@ -21,7 +21,7 @@
 
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
-import { Switch } from "@ordo-pink/switch"
+import { sweech } from "@ordo-pink/sweech"
 import { type TMaokaJab } from "@ordo-pink/maoka"
 import { noop } from "@ordo-pink/tau"
 
@@ -36,7 +36,8 @@ export const start_metadata_manager =
 		const metadata_manager = MetadataManager.Of(repositories.metadata, repositories.content)
 
 		await metadata_manager.start(state_change =>
-			Switch.Match(state_change)
+			sweech
+				.match(state_change)
 				.case("get-remote", () => commands.emit("cmd.application.background_task.start_loading"))
 				.case("put-remote", () => commands.emit("cmd.application.background_task.start_saving"))
 				.case("get-remote-complete", () => commands.emit("cmd.application.background_task.reset_status"))

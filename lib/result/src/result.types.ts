@@ -4,7 +4,7 @@
  */
 
 import { TOption } from "@ordo-pink/option"
-import type { TSwitch } from "@ordo-pink/switch"
+import type { TSwitch } from "@ordo-pink/sweech"
 
 export type TMatchResultFn = <$TOk, $TErr>(result: TResult<$TOk, $TErr>) => TSwitch<$TOk | $TErr, []>
 

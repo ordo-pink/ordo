@@ -22,7 +22,7 @@
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { R } from "@ordo-pink/result"
-import { Switch } from "@ordo-pink/switch"
+import { sweech } from "@ordo-pink/sweech"
 
 export const TitleSetter = (metadata: Ordo.Metadata.Instance | null) =>
 	Maoka.create("div", ({ use }) => {
@@ -48,7 +48,8 @@ const set_title = (emit: Ordo.Command.Commands["emit"], title: string) =>
 
 // TODO: Move to metadata utils
 const get_path = (ancestors: Ordo.Metadata.Instance[], metadata: Ordo.Metadata.Instance) =>
-	Switch.OfTrue()
+	sweech
+		.of_true()
 		.case(ancestors.length > 0, () =>
 			ancestors
 				.map(ancestor => ancestor.get_name())

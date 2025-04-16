@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { Switch } from "@ordo-pink/switch"
+import { sweech } from "@ordo-pink/sweech"
 
 export const create_hotkey_from_event = (event: KeyboardEvent, is_darwin: boolean): string => {
 	let hotkey = ""
@@ -13,7 +13,8 @@ export const create_hotkey_from_event = (event: KeyboardEvent, is_darwin: boolea
 	if (event.metaKey) hotkey += "mod+"
 	if (event.shiftKey) hotkey += "shift+"
 
-	hotkey += Switch.Match(event.code)
+	hotkey += sweech
+		.match(event.code)
 		.case("Period", () => ".")
 		.case("Comma", () => ",")
 		.case("Backquote", () => "`")

@@ -20,7 +20,7 @@
  */
 
 import { F } from "@ordo-pink/tau"
-import { Switch } from "@ordo-pink/switch"
+import { sweech } from "@ordo-pink/sweech"
 
 import { MetadataValidations } from "./metadata-validations.impl"
 
@@ -68,7 +68,8 @@ export const Metadata: Ordo.Metadata.Static = {
 
 			const o_dto = o.to_dto()
 
-			return Switch.OfTrue()
+			return sweech
+				.of_true()
 				.case(o_dto.fsid !== dto.fsid, F)
 				.case(o_dto.updated_at !== dto.updated_at, F)
 				.default(

@@ -1,0 +1,6 @@
+{
+	"name": "@ordo-pink/sweech",
+	"version": "0.1.0",
+	"exports": "./index.ts",
+	"exclude": ["**/*.test.ts", ".npmignore"]
+}

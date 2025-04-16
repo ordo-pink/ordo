@@ -2,14 +2,14 @@
 
 # --- Configuration ---
 
-set -ie
+set -eux
 
 # --- Variables ---
 
 PLATFORM=$(uname -ms)
 
-BUN_VERSION="1.2.1"
-DENO_VERSION="2.0.0"
+BUN_VERSION="1.2.8"
+DENO_VERSION="2.2.10"
 TAILWIND_VERSION="v3.1.6"
 
 # --- Internal ---
@@ -76,7 +76,7 @@ function download_deno {
     fi
 
     dir=$(mktemp -d)
-    zip=$dir/bun-$DENO_VERSION.zip
+    zip=$dir/deno-$DENO_VERSION.zip
 
     case $PLATFORM in
     'Darwin arm64') NESTED_DIR="deno-aarch64-apple-darwin" ;;
@@ -130,7 +130,7 @@ download_tailwind
 
 download_bun
 
-# download_deno
+download_deno
 
 ## Install bin dependencies
 opt/bun i

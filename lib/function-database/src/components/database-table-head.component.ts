@@ -24,7 +24,7 @@ import { Maoka } from "@ordo-pink/maoka"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
-import { Switch } from "@ordo-pink/switch"
+import { sweech } from "@ordo-pink/sweech"
 import { noop } from "@ordo-pink/tau"
 
 import { ColumnResizer } from "./database-column-resizer.component"
@@ -60,7 +60,8 @@ const TableHeadCell = (column: Ordo.I18N.TranslationKey, is_editable: boolean) =
 		return () =>
 			DatabaseTableCellContent(() => () => {
 				const state = get_db_state()
-				const caret = Switch.Match(state.sorting?.[column])
+				const caret = sweech
+					.match(state.sorting?.[column])
 					.case(SortingDirection.ASC, () => BsCaretDown())
 					.case(SortingDirection.DESC, () => BsCaretDown("rotate-180"))
 					.default(noop)

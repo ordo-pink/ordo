@@ -24,7 +24,7 @@ import { CommandPaletteItemType, ContextMenuItemType, Metadata, create_function,
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { MetadataIcon } from "@ordo-pink/maoka-components"
 import { R } from "@ordo-pink/result"
-import { Switch } from "@ordo-pink/switch"
+import { sweech } from "@ordo-pink/sweech"
 import { TWO_LETTER_LOCALE } from "@ordo-pink/locale"
 
 import { FileEditorSidebar } from "./file-editor.sidebar"
@@ -296,7 +296,8 @@ const FilePath = MaokaStyled.Tags.div("text-xs text-neutral-600 dark:text-neutra
 
 // TODO Move to utils
 const get_path = (ancestors: Ordo.Metadata.Instance[]) =>
-	Switch.OfTrue()
+	sweech
+		.of_true()
 		.case(ancestors.length > 0, () => ancestors.map(ancestor => ancestor.get_name()).join(" / "))
 		.default(() => "")
 

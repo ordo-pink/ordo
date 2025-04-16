@@ -22,7 +22,7 @@
 import { Metadata, NotificationType, rrr } from "@ordo-pink/core"
 import { is_instance_of, is_string } from "@ordo-pink/tau"
 import { R } from "@ordo-pink/result"
-import { Switch } from "@ordo-pink/switch"
+import { sweech } from "@ordo-pink/sweech"
 import { ZAGS } from "@ordo-pink/zags"
 import { console_logger } from "@ordo-pink/logger"
 import { oath } from "@ordo-pink/oath"
@@ -161,7 +161,8 @@ export const init_content: TF = () => {
 const is_array_buffer = (x: unknown): x is ArrayBuffer => is_instance_of(ArrayBuffer, x)
 
 const get_size = (content: Ordo.Content.Instance) =>
-	Switch.Match(content)
+	sweech
+		.match(content)
 		.case(is_string, () => (content as ArrayBuffer).byteLength)
 		.case(is_array_buffer, () => (content as ArrayBuffer).byteLength)
 		.default(() => 0)

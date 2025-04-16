@@ -4,7 +4,7 @@
  */
 
 import { type Routary } from "@ordo-pink/routary"
-import { Switch } from "@ordo-pink/switch"
+import { sweech } from "@ordo-pink/sweech"
 import { rrr } from "@ordo-pink/core"
 
 import { type RoutaryOrdo } from "../../routary-ordo.types"
@@ -42,7 +42,8 @@ export const status_from_rrr = <$TContext extends RoutaryOrdo.Fuel>({
 		intake.payload = e.message
 	}
 
-	intake.status = Switch.Match(e.code)
+	intake.status = sweech
+		.match(e.code)
 		.case([rrr.type.EAGAIN, rrr.type.ENXIO], () => 408)
 		.case([rrr.type.EFBIG, rrr.type.ENOSPC], () => 413)
 		.case(rrr.type.EINVAL, () => 400)

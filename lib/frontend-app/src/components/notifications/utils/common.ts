@@ -20,10 +20,11 @@
  */
 
 import { NotificationType } from "@ordo-pink/core"
-import { Switch } from "@ordo-pink/switch"
+import { sweech } from "@ordo-pink/sweech"
 
 export const get_readable_type = (type: Ordo.Notification.Instance["type"]) =>
-	Switch.Match(type)
+	sweech
+		.match(type)
 		.case(NotificationType.INFO, () => "info")
 		.case(NotificationType.QUESTION, () => "question")
 		.case(NotificationType.RRR, () => "rrr")

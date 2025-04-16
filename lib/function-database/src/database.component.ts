@@ -25,7 +25,7 @@ import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { R } from "@ordo-pink/result"
-import { Switch } from "@ordo-pink/switch"
+import { sweech } from "@ordo-pink/sweech"
 
 import { DatabaseOptions } from "./components/database-options.component"
 import { DatabaseTableActionsRow } from "./components/database-table-actions-row.component"
@@ -131,7 +131,8 @@ const to_sorted_children = (
 			const x = is_asc ? a : b
 			const y = is_asc ? b : a
 
-			return Switch.Match(column)
+			return sweech
+				.match(column)
 				.case("t.database.column_names.name", () => x.get_name().localeCompare(y.get_name()))
 				.case("t.database.column_names.created_at", () => (x.get_created_at() > y.get_created_at() ? -1 : 1))
 				.case("t.database.column_names.outgoing_links", () => {

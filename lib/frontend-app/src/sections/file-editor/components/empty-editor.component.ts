@@ -24,7 +24,7 @@ import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { R } from "@ordo-pink/result"
-import { Switch } from "@ordo-pink/switch"
+import { sweech } from "@ordo-pink/sweech"
 
 import LogoImage from "../../../../static/logo.png"
 
@@ -83,7 +83,8 @@ const StyledHeader = MaokaStyled.Tags.h2("file-editor_empty_section_title")
 const StyledButtonWrapper = MaokaStyled.Tags.div("file-editor_empty_buttons-section")
 
 const get_path = (ancestors: Ordo.Metadata.Instance[]) =>
-	Switch.OfTrue()
+	sweech
+		.of_true()
 		.case(ancestors.length > 0, () => ancestors.map(ancestor => ancestor.get_name()).join(" / "))
 		.default(() => "")
 

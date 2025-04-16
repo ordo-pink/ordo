@@ -3,10 +3,5 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-/**
- * A light-weight, well-typed, health-checked, and dependency-free alternative to JavaScript switch statement.
- * @module
- */
-
 export * from "./src/sweech.impl.ts"
 export * from "./src/sweech.types.ts"

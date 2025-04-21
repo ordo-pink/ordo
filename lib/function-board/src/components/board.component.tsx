@@ -3,7 +3,6 @@ import {
 	Connection,
 	Edge,
 	Node,
-	NodeTypes,
 	ReactFlow,
 	addEdge,
 	applyEdgeChanges,
@@ -12,27 +11,28 @@ import {
 	useNodesState,
 	useReactFlow,
 } from "@xyflow/react"
-import { memo, useCallback, useEffect, useState } from "react"
+import { useCallback, useContext, useEffect, useMemo } from "react"
 
 import "@xyflow/react/dist/base.css"
 
+import { is_object, noop } from "@ordo-pink/tau"
 import { BsFileEarmarkPlus } from "@ordo-pink/frontend-icons"
 import { ContextMenuItemType } from "@ordo-pink/core"
-import { is_object } from "@ordo-pink/tau"
+import { R } from "@ordo-pink/result"
 import { oath } from "@ordo-pink/oath"
 
 import EmbedNode from "./embed-node.component"
 
 import "./board.css"
-import { R } from "@ordo-pink/result"
+import { board_context } from "../board.context"
 
-type P = Ordo.FileAssociation.RenderParams & {
-	ctx: Ordo.CreateFunction.State
-}
-export default function Board({ content, ctx, metadata }: P) {
+export default function Board({ content, metadata }: Ordo.FileAssociation.RenderParams) {
+	const ctx = useContext(board_context)
+
 	const [nodes, set_nodes] = useNodesState([] as Node[])
 	const [edges, set_edges] = useEdgesState([] as Edge[])
-	const [node_types, set_node_types] = useState({} as NodeTypes)
+
+	const node_types = useMemo(() => ({ embed: EmbedNode }), [])
 
 	const { screenToFlowPosition } = useReactFlow()
 
@@ -48,8 +48,6 @@ export default function Board({ content, ctx, metadata }: P) {
 				ctx.logger.error(e)
 			}
 		}
-
-		set_node_types({ embed: memo(EmbedNode(ctx)) })
 
 		ctx.commands.emit("cmd.application.context_menu.add", {
 			command: "cmd.board.context_menu.create_node",
@@ -78,19 +76,18 @@ export default function Board({ content, ctx, metadata }: P) {
 					value: file.get_fsid(),
 				})),
 				on_select: item => {
-					set_nodes(nodes => [
-						...nodes,
-						{
-							type: "embed",
-							id: item.value,
-							position: { x, y },
-							height: 100,
-							width: 200,
-							data: {},
-							connectable: true,
-							resizing: true,
-						},
-					])
+					const new_node = {
+						type: "embed",
+						id: item.value,
+						position: { x, y },
+						height: 100,
+						width: 200,
+						data: {},
+						connectable: true,
+						resizing: true,
+					}
+
+					set_nodes(nodes => nodes.concat(new_node))
 				},
 			})
 		}
@@ -130,6 +127,7 @@ export default function Board({ content, ctx, metadata }: P) {
 					}),
 				)
 				.cata(oath.catas.or_else(ctx.logger.error))
+				.catch(noop)
 		}
 
 		ctx.commands.on("cmd.board.context_menu.create_node", handle_create_node)

@@ -3,15 +3,16 @@
  * SPDX-License-Identifier: Unlicense
  */
 
+import { Root, createRoot } from "react-dom/client"
 import { ReactFlowProvider } from "@xyflow/react"
 
-import { Root, createRoot } from "react-dom/client"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { create_function } from "@ordo-pink/core"
 
 import Flow from "./src/components/board.component.tsx"
+import { board_context } from "./src/board.context.ts"
 
 export default create_function(
 	"pink.ordo.board",
@@ -50,21 +51,19 @@ export default create_function(
 						if (MaokaDOM.is_maoka_dom_element(element)) {
 							if (!root) {
 								root = createRoot(element)
-								root.render(
-									<ReactFlowProvider>
-										<Flow ctx={ctx} {...params} />
-									</ReactFlowProvider>,
-								)
 							} else {
 								root.unmount()
 								root = undefined
 								root = createRoot(element)
-								root.render(
-									<ReactFlowProvider>
-										<Flow ctx={ctx} {...params} />
-									</ReactFlowProvider>,
-								)
 							}
+
+							root.render(
+								<ReactFlowProvider>
+									<BoardContextProvider value={ctx}>
+										<Flow {...params} />
+									</BoardContextProvider>
+								</ReactFlowProvider>,
+							)
 						}
 					}),
 				)
@@ -87,3 +86,7 @@ export default create_function(
 		})
 	},
 )
+
+// --- Internal ---
+
+const BoardContextProvider = board_context.Provider

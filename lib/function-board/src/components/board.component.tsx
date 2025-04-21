@@ -21,20 +21,19 @@ import { ContextMenuItemType } from "@ordo-pink/core"
 import { R } from "@ordo-pink/result"
 import { oath } from "@ordo-pink/oath"
 
-import EmbedNode from "./embed-node.component"
+import EmbedNode from "./nodes/embed-node.component"
 
 import "./board.css"
 import { board_context } from "../board.context"
 
 export default function Board({ content, metadata }: Ordo.FileAssociation.RenderParams) {
-	const ctx = useContext(board_context)
+	const { commands, logger, metadata_query } = useContext(board_context)
+	const { screenToFlowPosition } = useReactFlow()
 
 	const [nodes, set_nodes] = useNodesState([] as Node[])
 	const [edges, set_edges] = useEdgesState([] as Edge[])
 
 	const node_types = useMemo(() => ({ embed: EmbedNode }), [])
-
-	const { screenToFlowPosition } = useReactFlow()
 
 	useEffect(() => {
 		if (content) {
@@ -45,11 +44,11 @@ export default function Board({ content, metadata }: Ordo.FileAssociation.Render
 				set_nodes(nodes)
 				set_edges(edges)
 			} catch (e) {
-				ctx.logger.error(e)
+				logger.error(e)
 			}
 		}
 
-		ctx.commands.emit("cmd.application.context_menu.add", {
+		commands.emit("cmd.application.context_menu.add", {
 			command: "cmd.board.context_menu.create_node",
 			readable_name: "Create Text Note" as any, // TODO i18n
 			should_show: ({ payload }) => is_object(payload) && payload.location === "pink.ordo.board" && payload.element === "board",
@@ -58,7 +57,7 @@ export default function Board({ content, metadata }: Ordo.FileAssociation.Render
 			payload_creator: ({ event }) => screenToFlowPosition({ x: event.clientX, y: event.clientY }),
 		})
 
-		ctx.commands.emit("cmd.application.context_menu.add", {
+		commands.emit("cmd.application.context_menu.add", {
 			command: "cmd.board.context_menu.add_existing_file",
 			readable_name: "Add Existing File..." as any, // TODO i18n
 			should_show: ({ payload }) => is_object(payload) && payload.location === "pink.ordo.board" && payload.element === "board",
@@ -68,9 +67,9 @@ export default function Board({ content, metadata }: Ordo.FileAssociation.Render
 		})
 
 		const handle_add_existing_file: Ordo.Command.HandlerOf<"cmd.board.context_menu.add_existing_file"> = ({ x, y }) => {
-			const files = ctx.metadata_query.get().cata({ Ok: x => x, Err: () => [] as Ordo.Metadata.Instance[] })
+			const files = metadata_query.get().cata({ Ok: x => x, Err: () => [] as Ordo.Metadata.Instance[] })
 
-			ctx.commands.emit("cmd.application.command_palette.show", {
+			commands.emit("cmd.application.command_palette.show", {
 				items: files.map(file => ({
 					readable_name: file.get_name() as Ordo.I18N.TranslationKey,
 					value: file.get_fsid(),
@@ -96,14 +95,12 @@ export default function Board({ content, metadata }: Ordo.FileAssociation.Render
 			const parent = metadata.get_fsid()
 			const random_name = `.${crypto.randomUUID().replace("-", "")}`
 
-			ctx.commands
+			commands
 				.naga("cmd.metadata.create", { name: random_name, parent })
 				.pipe(oath.ops.tap(console.log))
 				.pipe(
 					oath.ops.chain(() =>
-						ctx.metadata_query
-							.get_by_name(random_name, parent, { show_hidden: true })
-							.cata({ Ok: oath.resolve, Err: oath.reject }),
+						metadata_query.get_by_name(random_name, parent, { show_hidden: true }).cata({ Ok: oath.resolve, Err: oath.reject }),
 					),
 				)
 				.pipe(oath.ops.chain(oath.from_nullable))
@@ -126,16 +123,16 @@ export default function Board({ content, metadata }: Ordo.FileAssociation.Render
 						])
 					}),
 				)
-				.cata(oath.catas.or_else(ctx.logger.error))
+				.cata(oath.catas.or_else(logger.error))
 				.catch(noop)
 		}
 
-		ctx.commands.on("cmd.board.context_menu.create_node", handle_create_node)
-		ctx.commands.on("cmd.board.context_menu.add_existing_file", handle_add_existing_file)
+		commands.on("cmd.board.context_menu.create_node", handle_create_node)
+		commands.on("cmd.board.context_menu.add_existing_file", handle_add_existing_file)
 
 		return () => {
-			ctx.commands.off("cmd.board.context_menu.add_existing_file", handle_add_existing_file)
-			ctx.commands.off("cmd.board.context_menu.create_node", handle_create_node)
+			commands.off("cmd.board.context_menu.add_existing_file", handle_add_existing_file)
+			commands.off("cmd.board.context_menu.create_node", handle_create_node)
 		}
 	}, [])
 
@@ -150,12 +147,12 @@ export default function Board({ content, metadata }: Ordo.FileAssociation.Render
 					onConnect={on_connect}
 					onNodesDelete={nodes =>
 						nodes.forEach(node => {
-							const item = ctx.metadata_query
+							const item = metadata_query
 								.get_by_fsid(node.id as Ordo.Metadata.FSID, { show_hidden: true })
 								.cata(R.catas.or_else(() => null))
 
 							if (item && item.get_parent() === metadata.get_fsid()) {
-								ctx.commands.emit("cmd.metadata.remove", node.id as Ordo.Metadata.FSID)
+								commands.emit("cmd.metadata.remove", node.id as Ordo.Metadata.FSID)
 							}
 						})
 					}
@@ -163,7 +160,7 @@ export default function Board({ content, metadata }: Ordo.FileAssociation.Render
 					onNodesChange={changes => {
 						const updated_nodes = applyNodeChanges(changes, nodes)
 
-						ctx.commands.emit("cmd.content.set", {
+						commands.emit("cmd.content.set", {
 							fsid: metadata.get_fsid(),
 							content: new TextEncoder().encode(JSON.stringify({ nodes: updated_nodes, edges })).buffer,
 							content_type: "board/ordo",
@@ -175,12 +172,12 @@ export default function Board({ content, metadata }: Ordo.FileAssociation.Render
 						event.preventDefault()
 						event.stopPropagation()
 
-						const metadata = ctx.metadata_query
+						const metadata = metadata_query
 							.get_by_fsid(node.id as Ordo.Metadata.FSID, { show_hidden: true })
 							.cata({ Ok: x => x, Err: () => null })
 
 						if (metadata) {
-							ctx.commands.emit("cmd.application.context_menu.show", {
+							commands.emit("cmd.application.context_menu.show", {
 								event: event.nativeEvent,
 								payload: metadata,
 							})
@@ -189,7 +186,7 @@ export default function Board({ content, metadata }: Ordo.FileAssociation.Render
 					onEdgesChange={changes => {
 						const updated_edges = applyEdgeChanges(changes, edges)
 
-						ctx.commands.emit("cmd.content.set", {
+						commands.emit("cmd.content.set", {
 							fsid: metadata.get_fsid(),
 							content: new TextEncoder().encode(JSON.stringify({ edges: updated_edges, nodes })).buffer,
 							content_type: "board/ordo",
@@ -201,7 +198,7 @@ export default function Board({ content, metadata }: Ordo.FileAssociation.Render
 					onContextMenu={event => {
 						event.preventDefault()
 
-						ctx.commands.emit("cmd.application.context_menu.show", {
+						commands.emit("cmd.application.context_menu.show", {
 							event: event.nativeEvent,
 							payload: { location: "pink.ordo.board", element: "board" },
 						})

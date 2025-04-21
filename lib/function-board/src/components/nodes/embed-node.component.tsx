@@ -1,13 +1,15 @@
-import { Handle, Node, NodeProps, NodeResizeControl, Position } from "@xyflow/react"
+import { Handle, NodeProps, NodeResizeControl, Position } from "@xyflow/react"
 import { memo, useContext, useEffect, useRef } from "react"
 
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { RenderPicker } from "@ordo-pink/frontend-app/src/sections/file-editor/components/file-editor-workspace-render-picker.component"
-import { board_context } from "../board.context"
 
-const EmbedNode = ({ id, selected, height }: NodeProps<Node<{ fsid: Ordo.Metadata.FSID }>>) => {
+import { Board } from "../../function-board.types"
+import { board_context } from "../../board.context"
+
+const EmbedNode = ({ id, selected, height }: NodeProps<Board.Nodes.Embed>) => {
 	const ref = useRef<HTMLDivElement>(null)
 	const ctx = useContext(board_context)
 
@@ -23,7 +25,11 @@ const EmbedNode = ({ id, selected, height }: NodeProps<Node<{ fsid: Ordo.Metadat
 
 			MaokaDOM.render(ref.current, Component, () => crypto.randomUUID()).catch(console.error)
 		}
-	}, [])
+
+		return () => {
+			if (ref.current) ref.current.innerHTML = ""
+		}
+	}, [selected])
 
 	return (
 		<div style={{ height: `${height! - 25}px` }} className="overflow-auto">

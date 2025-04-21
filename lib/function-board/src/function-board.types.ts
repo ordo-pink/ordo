@@ -3,12 +3,14 @@
  * SPDX-License-Identifier: Unlicense
  */
 
+import type { Node } from "@xyflow/react"
+
 declare global {
 	interface t {
 		board: {
 			file_association: {
-				readable_name: () => string
 				description: () => string
+				readable_name: () => string
 			}
 		}
 	}
@@ -16,12 +18,17 @@ declare global {
 	interface cmd {
 		board: {
 			context_menu: {
-				show_create_file: () => Ordo.Metadata.FSID
-				create_node: () => { x: number; y: number; from?: string }
 				add_existing_file: () => { x: number; y: number }
+				create_node: () => { x: number; y: number; from?: string }
+				show_create_file: () => Ordo.Metadata.FSID
 			}
 		}
 	}
 }
 
-export {}
+export namespace Board {
+	export namespace Nodes {
+		export type Note = Node<{ content: string }>
+		export type Embed = Node<{ fsid: Ordo.Metadata.FSID }>
+	}
+}

@@ -22,9 +22,9 @@ import { R } from "@ordo-pink/result"
 import { oath } from "@ordo-pink/oath"
 
 import EmbedNode from "./nodes/embed-node.component"
+import { board_context } from "../board.context"
 
 import "./board.css"
-import { board_context } from "../board.context"
 
 export default function Board({ content, metadata }: Ordo.FileAssociation.RenderParams) {
 	const { commands, logger, metadata_query } = useContext(board_context)
@@ -195,6 +195,7 @@ export default function Board({ content, metadata }: Ordo.FileAssociation.Render
 						set_edges(updated_edges)
 					}}
 					colorMode="dark" // TODO Switch between light and dark
+					preventScrolling={false}
 					onContextMenu={event => {
 						event.preventDefault()
 

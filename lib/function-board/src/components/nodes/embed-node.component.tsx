@@ -43,7 +43,7 @@ const EmbedNode = ({ id, selected, height }: NodeProps<Board.Nodes.Embed>) => {
 			<Handle position={Position.Bottom} type="target" id="bt" />
 			<NodeResizeControl />
 
-			<div className="overflow-y-visible" ref={ref} />
+			<div className="h-full overflow-y-visible" ref={ref} />
 		</div>
 	)
 }

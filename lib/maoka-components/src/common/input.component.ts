@@ -24,11 +24,11 @@ import { Maoka } from "@ordo-pink/maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
-import { ZAGS } from "@ordo-pink/zags"
+import { zags } from "@ordo-pink/zags"
 
 import "../../maoka-components.css"
 
-const is_valid$ = ZAGS.Of({ value: true })
+const is_valid$ = zags.of({ value: true })
 
 type TInputProps = {
 	autocomplete?: string

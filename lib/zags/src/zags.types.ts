@@ -106,7 +106,7 @@ export type TZagsStatic = {
 	 * @param partners optional array of predefined partners. You can `divorce` them later if you have
 	 * the reference to the partner.
 	 */
-	Of: <T extends Record<string, unknown>>(initial_state: T, partners?: TPartner<T>[]) => TZags<T>
+	of: <T extends Record<string, unknown>>(initial_state: T, partners?: TPartner<T>[]) => TZags<T>
 }
 
 /**

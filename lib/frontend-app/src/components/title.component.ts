@@ -22,7 +22,7 @@
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
-import { ZAGS } from "@ordo-pink/zags"
+import { zags } from "@ordo-pink/zags"
 
 export const OrdoTitleDisplay = Maoka.create("div", ({ use }) => {
 	const commands = use(MaokaOrdo.Jabs.get_commands)
@@ -54,4 +54,4 @@ export const OrdoTitleDisplay = Maoka.create("div", ({ use }) => {
 
 // --- Internal ---
 
-const title$ = ZAGS.Of<{ title: Ordo.I18N.TranslationKey }>({ title: "t.common.state.loading" })
+const title$ = zags.of<{ title: Ordo.I18N.TranslationKey }>({ title: "t.common.state.loading" })

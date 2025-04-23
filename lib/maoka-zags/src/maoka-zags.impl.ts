@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { type TDotPath, type TZags, ZAGS } from "@ordo-pink/zags"
+import { type TDotPath, type TZags, zags } from "@ordo-pink/zags"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 
 import { type TMaokaZags } from "./maoka-zags.types"
@@ -68,7 +68,7 @@ export const MaokaZAGS = {
 	 * @param initial_state state value to start with.
 	 */
 	Of: <$TState extends Record<string, unknown>>(initial_state: $TState): TMaokaZags<$TState> => {
-		const zags = ZAGS.Of(initial_state)
+		const zags = zags.Of(initial_state)
 
 		return MaokaZAGS.From(zags)
 	},

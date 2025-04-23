@@ -19,8 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { ZAGS } from "@ordo-pink/zags"
+import { zags } from "@ordo-pink/zags"
 
 import { type TDatabaseState } from "./database.types"
 
-export const database$ = ZAGS.Of<TDatabaseState>({ visible_columns: ["t.database.column_names.name"] })
+export const database$ = zags.of<TDatabaseState>({ visible_columns: ["t.database.column_names.name"] })

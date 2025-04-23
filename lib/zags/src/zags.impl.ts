@@ -8,8 +8,8 @@ import { type TZagsStatic } from "./zags.types.ts"
 /**
  * {@link TZagsStatic}
  */
-export const ZAGS: TZagsStatic = {
-	Of: (state, handlers = []) => ({
+export const zags: TZagsStatic = {
+	of: (state, handlers = []) => ({
 		marry: f => {
 			handlers.push(f)
 			f(state, false)

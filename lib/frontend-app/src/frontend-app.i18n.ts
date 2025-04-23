@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { type TPartner, ZAGS } from "@ordo-pink/zags"
+import { type TPartner, zags } from "@ordo-pink/zags"
 import { call_once, keys_of } from "@ordo-pink/tau"
 import { TWO_LETTER_LOCALE } from "@ordo-pink/locale"
 
@@ -64,6 +64,6 @@ export const init_i18n: TInitI18nFn = call_once(() => {
 
 // --- Internal ---
 
-const translations$ = ZAGS.Of({} as Ordo.I18N.Translations)
-const language$ = ZAGS.Of({ current_lang: TWO_LETTER_LOCALE.ENGLISH })
-const translate_version$ = ZAGS.Of({ version: 0 })
+const translations$ = zags.of({} as Ordo.I18N.Translations)
+const language$ = zags.of({ current_lang: TWO_LETTER_LOCALE.ENGLISH })
+const translate_version$ = zags.of({ version: 0 })

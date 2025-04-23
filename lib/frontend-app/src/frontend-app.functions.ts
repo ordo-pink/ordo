@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { type TZags, ZAGS } from "@ordo-pink/zags"
+import { type TZags, zags } from "@ordo-pink/zags"
 import { R } from "@ordo-pink/result"
 import { call_once } from "@ordo-pink/tau"
 import { rrr } from "@ordo-pink/core"
@@ -71,7 +71,7 @@ export const init_functions: TF = call_once(() => {
 			R.If(known_functions.has_permissions(fid, { queries: ["application.file_associations"] }))
 				.pipe(
 					R.ops.map(() => {
-						const zags = ZAGS.Of({ value: [] as Ordo.FileAssociation.Instance[] })
+						const zags = zags.Of({ value: [] as Ordo.FileAssociation.Instance[] })
 						ordo_app_state.zags.cheat("functions.file_assocs", state => zags.update("value", () => state))
 						return zags
 					}),

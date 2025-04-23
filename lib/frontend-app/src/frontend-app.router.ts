@@ -22,7 +22,7 @@
 import { call_once, deep_equals } from "@ordo-pink/tau"
 import { colonoscope, is_colonoscopy_doctor } from "@ordo-pink/colonoscope"
 import { R } from "@ordo-pink/result"
-import { ZAGS } from "@ordo-pink/zags"
+import { zags } from "@ordo-pink/zags"
 
 import { ordo_app_state } from "../app.state"
 
@@ -123,7 +123,7 @@ export const init_router = call_once(() => {
 	}
 })
 
-const router$ = ZAGS.Of<{ current_route: Ordo.Router.Route; routes: Record<string, string> }>({
+const router$ = zags.of<{ current_route: Ordo.Router.Route; routes: Record<string, string> }>({
 	current_route: null as never,
 	routes: {},
 })

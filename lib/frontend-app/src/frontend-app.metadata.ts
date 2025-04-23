@@ -21,7 +21,7 @@
 
 import { NotificationType, rrr } from "@ordo-pink/core"
 import { Result } from "@ordo-pink/result"
-import { ZAGS } from "@ordo-pink/zags"
+import { zags } from "@ordo-pink/zags"
 import { call_once } from "@ordo-pink/tau"
 import { console_logger } from "@ordo-pink/logger"
 import { oath } from "@ordo-pink/oath"
@@ -129,4 +129,4 @@ export const init_metadata: TInitMetadataFn = call_once(content_repository => {
 
 // --- Internal ---
 
-const metadata_zags = ZAGS.Of<{ items: Ordo.Metadata.Instance[] | null }>({ items: null })
+const metadata_zags = zags.of<{ items: Ordo.Metadata.Instance[] | null }>({ items: null })

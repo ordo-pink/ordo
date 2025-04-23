@@ -4,14 +4,14 @@
  */
 
 import { expect, test } from "bun:test"
-import { ZAGS } from "./zags.impl"
+import { zags } from "./zags.impl"
 
 test("zags should exist", () => {
-	expect(ZAGS).toBeDefined()
+	expect(zags).toBeDefined()
 })
 
 test("ZAGS should marry given handlers", () => {
-	const zags = ZAGS.Of({ x: 0 })
+	const zags = zags.Of({ x: 0 })
 
 	let y = 0
 
@@ -22,7 +22,7 @@ test("ZAGS should marry given handlers", () => {
 })
 
 test("ZAGS should call handler with current state on marriage", () => {
-	const zags = ZAGS.Of({ x: 0 })
+	const zags = zags.Of({ x: 0 })
 	const inc = () => x++
 
 	let x = 0
@@ -34,7 +34,7 @@ test("ZAGS should call handler with current state on marriage", () => {
 
 test("ZAGS should apply partial updates", () => {
 	const state = { x: 0, y: 0 }
-	const zags = ZAGS.Of(state)
+	const zags = zags.Of(state)
 
 	let result = state
 
@@ -45,7 +45,7 @@ test("ZAGS should apply partial updates", () => {
 })
 
 test("ZAGS should divorce given handlers", () => {
-	const zags = ZAGS.Of({ x: 0 })
+	const zags = zags.Of({ x: 0 })
 	const inc = () => x++
 
 	let x = 0

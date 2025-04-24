@@ -59,6 +59,8 @@ export namespace Hunt {
 				: never
 	}
 
+	export type State = { barrage: Hunt.Shot[]; gun_storage: Record<string, Hunt.Gun<any>[]> }
+
 	export type Module = {
 		begin: () => {
 			track: Hunt.Track

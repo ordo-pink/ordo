@@ -8,7 +8,7 @@ import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaJabs } from "@ordo-pink/maoka-jabs"
 import { R } from "@ordo-pink/result"
 import { type TMaokaJab } from "@ordo-pink/maoka"
-import { type TZags } from "@ordo-pink/zags"
+import { Zags } from "@ordo-pink/zags"
 import { deep_equals } from "@ordo-pink/tau"
 
 export const ordo_context = MaokaJabs.create_context<Ordo.CreateFunction.State>()
@@ -62,7 +62,7 @@ export const get_route_params$: TMaokaJab<() => Record<string, string>> = ({ use
 }
 
 export const happy_marriage$ = <$TState extends Record<string, unknown>, $TResult = $TState>(
-	zags: TZags<$TState>,
+	zags: Zags.Instance<$TState>,
 	handler: (state: $TState) => $TResult = x => x as unknown as $TResult,
 ): TMaokaJab<() => $TResult> => {
 	return ({ refresh, use }) => {

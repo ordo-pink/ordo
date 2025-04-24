@@ -3,14 +3,14 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { TZags, zags } from "@ordo-pink/zags" // TODO Use new types, publish to jsr
+import { Zags, create_zags } from "@ordo-pink/zags"
 import { deep_equals } from "@ordo-pink/deep-equals"
 
 import { Hunt } from "./hunt.types.ts"
 
 export const hunt: Hunt.Module = {
 	begin: () => {
-		const hunt$ = zags.of<Hunt.State>({ barrage: [], gun_storage: {} })
+		const hunt$ = create_zags<Hunt.State>({ barrage: [], gun_storage: {} })
 		hunt$.marry(internal.handle_barrage_updates(hunt$))
 
 		return { track: internal.track(hunt$), putdown: internal.putdown(hunt$), shoot: internal.shoot(hunt$) }
@@ -19,9 +19,9 @@ export const hunt: Hunt.Module = {
 
 // --- Internal ---
 
-const internal = {
-	handle_barrage_updates:
-		(hunt$: TZags<Hunt.State>) =>
+namespace internal {
+	export const handle_barrage_updates =
+		(hunt$: Zags.Instance<Hunt.State>) =>
 		({ barrage, gun_storage }: Hunt.State) => {
 			for (const shot of barrage) {
 				const bullet = internal.is_loaded_shot_guard(shot) ? shot.bullet : undefined
@@ -46,13 +46,13 @@ const internal = {
 					guns.forEach(gun => gun(bullet))
 				}
 			}
-		},
+		}
 
-	is_loaded_shot_guard: (x: any): x is Hunt.LoadedShot =>
-		!!x && typeof x === "object" && typeof x.prey === "string" && (x as Hunt.LoadedShot).bullet !== undefined,
+	export const is_loaded_shot_guard = (x: any): x is Hunt.LoadedShot =>
+		!!x && typeof x === "object" && typeof x.prey === "string" && (x as Hunt.LoadedShot).bullet !== undefined
 
-	putdown:
-		(hunt$: TZags<Hunt.State>): Hunt.PutDown =>
+	export const putdown =
+		(hunt$: Zags.Instance<Hunt.State>): Hunt.PutDown =>
 		(prey, gun) =>
 			void hunt$.update("gun_storage", state => {
 				if (!state[prey]) return state
@@ -60,15 +60,15 @@ const internal = {
 				state[prey] = state[prey].filter(f => f.toString() !== gun.toString())
 
 				return state
-			}),
+			})
 
-	shoot:
-		(hunt$: TZags<Hunt.State>): Hunt.Shoot =>
+	export const shoot =
+		(hunt$: Zags.Instance<Hunt.State>): Hunt.Shoot =>
 		(prey, bullet) =>
-			void hunt$.update("barrage", state => [...state, { prey, bullet }]),
+			void hunt$.update("barrage", state => [...state, { prey, bullet }])
 
-	track:
-		(hunt$: TZags<Hunt.State>): Hunt.Track =>
+	export const track =
+		(hunt$: Zags.Instance<Hunt.State>): Hunt.Track =>
 		(prey, new_gun) =>
 			void hunt$.update("gun_storage", state => {
 				const guns = state[prey]
@@ -80,5 +80,5 @@ const internal = {
 				}
 
 				return state
-			}),
+			})
 }

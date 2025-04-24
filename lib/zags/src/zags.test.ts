@@ -3,62 +3,150 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { expect, test } from "bun:test"
-import { zags } from "./zags.impl"
+import test from "bun:test"
+import { create_zags } from "./zags.impl"
 
-test("zags should exist", () => {
-	expect(zags).toBeDefined()
-})
+test.describe("zags", () => {
+	test.it("zags should exist", () => {
+		test.expect(create_zags).toBeDefined()
+	})
 
-test("ZAGS should marry given handlers", () => {
-	const zags = zags.Of({ x: 0 })
+	test.describe("cheat", () => {
+		test.it("should cheat with given partners", () => {
+			const zags = create_zags({ x: { y: 0 } })
 
-	let y = 0
+			let x = 0
 
-	zags.marry(({ x }) => void (y = x))
-	zags.update("x", () => 1)
+			const divorce = zags.cheat("x.y", y => (x = y))
 
-	expect(y).toEqual(1)
-})
+			zags.update("x.y", () => 1)
 
-test("ZAGS should call handler with current state on marriage", () => {
-	const zags = zags.Of({ x: 0 })
-	const inc = () => x++
+			divorce()
 
-	let x = 0
+			zags.update("x.y", () => 2)
 
-	zags.marry(inc)
+			test.expect(x).toBe(1)
+		})
 
-	expect(x).toEqual(1)
-})
+		test.it("should not call partner if the state didn't change", () => {
+			const zags = create_zags({ x: { y: 0 }, z: 0 })
 
-test("ZAGS should apply partial updates", () => {
-	const state = { x: 0, y: 0 }
-	const zags = zags.Of(state)
+			let x = 1
 
-	let result = state
+			zags.cheat("x.y", y => (x += y))
 
-	zags.marry(state => void (result = state))
-	zags.update("x", () => 1)
+			zags.update("z", () => 1)
 
-	expect(result).toEqual({ x: 1, y: 0 })
-})
+			test.expect(x).toBe(1)
 
-test("ZAGS should divorce given handlers", () => {
-	const zags = zags.Of({ x: 0 })
-	const inc = () => x++
+			zags.update("x.y", () => 1)
 
-	let x = 0
+			test.expect(x).toBe(2)
+		})
+	})
 
-	zags.marry(inc)
+	test.describe("transform", () => {
+		const zags = create_zags({ x: 0 })
 
-	zags.update("x", () => 1)
-	zags.update("x", () => 1)
+		zags.transform(state => ({ x: ++state.x }))
+		zags.transform(state => ({ x: ++state.x }))
 
-	zags.divorce(inc)
+		test.expect(zags.select("x")).toBe(2)
+	})
 
-	zags.update("x", () => 1)
-	zags.update("x", () => 1)
+	test.describe("unwrap", () => {
+		const zags = create_zags({ x: 0 })
 
-	expect(x).toEqual(2)
+		test.expect(zags.unwrap().x).toBe(0)
+	})
+
+	test.describe("select", () => {
+		test.it("should extract value under given path", () => {
+			const zags = create_zags({ x: 0 })
+
+			test.expect(zags.select("x")).toBe(0)
+
+			zags.update("x", () => 1)
+
+			test.expect(zags.select("x")).toBe(1)
+		})
+	})
+
+	test.describe("marry", () => {
+		test.it("should marry given partners", () => {
+			const zags = create_zags({ x: 0 })
+
+			let y = 0
+
+			zags.marry(({ x }) => void (y = x))
+			zags.update("x", () => 1)
+
+			test.expect(y).toEqual(1)
+		})
+
+		test.it("should call partner with current state on marriage", () => {
+			const zags = create_zags({ x: 0 })
+			const inc = () => x++
+
+			let x = 0
+
+			zags.marry(inc)
+
+			test.expect(x).toEqual(1)
+		})
+
+		test.it("should apply partial updates", () => {
+			const state = { x: 0, y: 0 }
+			const zags = create_zags(state)
+
+			let result = state
+
+			zags.marry(state => void (result = state))
+			zags.update("x", () => 1)
+
+			test.expect(result).toEqual({ x: 1, y: 0 })
+		})
+	})
+
+	test.describe("divorce", () => {
+		test.it("should divorce given partners", () => {
+			const zags = create_zags({ x: 0 })
+
+			let x = 0
+
+			const inc = () => x++
+
+			zags.marry(inc)
+
+			zags.update("x", () => 1)
+			zags.update("x", () => 2)
+
+			zags.divorce(inc)
+
+			zags.update("x", () => 3)
+			zags.update("x", () => 4)
+
+			test.expect(x).toEqual(3)
+		})
+
+		test.it("should divorce given partners", () => {
+			const zags = create_zags({ x: 0 })
+
+			let x = 0
+
+			const inc = () => x++
+
+			const divorce = zags.marry(inc)
+
+			zags.update("x", () => 1)
+			zags.update("x", () => 2)
+
+			divorce()
+
+			zags.update("x", () => 3)
+			zags.update("x", () => 4)
+
+			test.expect(x).toEqual(3)
+		})
+	})
 })

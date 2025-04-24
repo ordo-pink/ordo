@@ -19,8 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { zags } from "@ordo-pink/zags"
+import { create_zags } from "@ordo-pink/zags"
 
 import { type TRTEState } from "./rte.types"
 
-export const rich_text_editor$ = zags.of<TRTEState>({ state: {} })
+export const rich_text_editor$ = create_zags<TRTEState>({ state: {} })

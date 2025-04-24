@@ -20,7 +20,7 @@
  */
 
 import { call_once, deep_equals } from "@ordo-pink/tau"
-import { zags } from "@ordo-pink/zags"
+import { create_zags } from "@ordo-pink/zags"
 import { oath } from "@ordo-pink/oath"
 import { rrr } from "@ordo-pink/core"
 
@@ -163,7 +163,7 @@ const remove = (listener: TCmdListener) =>
 		return state
 	})
 
-const command$ = zags.of({
+const command$ = create_zags({
 	queue: [] as ((Ordo.Command.Command | Ordo.Command.PayloadCommand) & {
 		fid: symbol
 		callback: (rrr?: Ordo.Rrr) => void

@@ -6,11 +6,7 @@
 import { DeepEquals } from "./deep-equals.types.ts"
 
 /**
- * Checks deep equality of two provided elements. Recursively checks equality for objects and arrays.
- *
- * @param x first item to compare
- * @param y second item to compare
- * @returns boolean
+ * @see {@link DeepEquals.Module}
  */
 export const deep_equals: DeepEquals.Module = (x, y) => {
 	if (typeof x !== typeof y) return false
@@ -30,18 +26,16 @@ export const deep_equals: DeepEquals.Module = (x, y) => {
 	return x === y
 }
 
-// --- Internal ---
-
-const internal = {
-	is_arr: Array.isArray,
-	is_obj: (x: unknown): x is Record<string, unknown> => !!x && typeof x === "object",
-	keys: Object.keys,
-	arr_value_deep_equals:
+namespace internal {
+	export const is_arr = Array.isArray
+	export const is_obj = (x: unknown): x is Record<string, unknown> => !!x && typeof x === "object"
+	export const keys = Object.keys
+	export const arr_value_deep_equals =
 		(y: any[]) =>
 		(acc: boolean, item: any, index: number): boolean =>
-			acc && deep_equals(item, y[index]),
-	obj_value_deep_equals:
+			acc && deep_equals(item, y[index])
+	export const obj_value_deep_equals =
 		(x: Record<string, unknown>, y: Record<string, unknown>) =>
 		(acc: boolean, key: string): boolean =>
-			acc && deep_equals(x[key], y[key]),
+			acc && deep_equals(x[key], y[key])
 }

@@ -20,7 +20,7 @@
  */
 
 import { Result } from "@ordo-pink/result"
-import { zags } from "@ordo-pink/zags"
+import { create_zags } from "@ordo-pink/zags"
 import { oath } from "@ordo-pink/oath"
 import { rrr } from "@ordo-pink/core"
 
@@ -31,7 +31,7 @@ const user_cache: Record<string, Ordo.User.Public.DTO> = {}
 
 export const UserQuery: Ordo.User.QueryStatic = {
 	Of: check_permission => {
-		const version_zags = zags.of({ version: 0 })
+		const version_zags = create_zags({ version: 0 })
 		ordo_app_state.zags.cheat("user", (_, is_update) => is_update && version_zags.update("version", i => i + 1))
 
 		const fetch = ordo_app_state.zags.select("fetch")

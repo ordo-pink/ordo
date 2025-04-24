@@ -20,9 +20,9 @@
  */
 
 import { SM_SCREEN_BREAKPOINT } from "@ordo-pink/core"
-import { zags } from "@ordo-pink/zags"
+import { create_zags } from "@ordo-pink/zags"
 
-export const sidebar$ = zags.of<{ enabled: boolean; visible: boolean }>({
+export const sidebar$ = create_zags<{ enabled: boolean; visible: boolean }>({
 	enabled: false,
 	visible: window.innerWidth >= SM_SCREEN_BREAKPOINT,
 })

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { type TDotPath, type TZags, zags } from "@ordo-pink/zags"
+import { Zags, create_zags } from "@ordo-pink/zags"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 
 import { type TMaokaZags } from "./maoka-zags.types"
@@ -13,7 +13,7 @@ import { type TMaokaZags } from "./maoka-zags.types"
  * {@link https://jsr.io/@ordo-pink/maoka 🔗 Maoka}.
  */
 export const MaokaZAGS = {
-	From: <$TState extends Record<string, unknown>>($: TZags<$TState>): TMaokaZags<$TState> => {
+	From: <$TState extends Record<string, unknown>>($: Zags.Instance<$TState>): TMaokaZags<$TState> => {
 		const selection_results = {} as Record<string, Record<any, any>>
 
 		return {
@@ -29,7 +29,7 @@ export const MaokaZAGS = {
 			 * @param path path to desired value.
 			 */
 			select_jab$:
-				<K extends TDotPath<$TState>>(path: K) =>
+				<K extends Zags.Pouch.RecordToDotPaths<$TState>>(path: K) =>
 				({ id, refresh, use }) => {
 					let is_initial_render = true
 
@@ -68,7 +68,7 @@ export const MaokaZAGS = {
 	 * @param initial_state state value to start with.
 	 */
 	Of: <$TState extends Record<string, unknown>>(initial_state: $TState): TMaokaZags<$TState> => {
-		const zags = zags.Of(initial_state)
+		const zags = create_zags(initial_state)
 
 		return MaokaZAGS.From(zags)
 	},

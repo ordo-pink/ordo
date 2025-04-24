@@ -24,7 +24,7 @@ import type { Logger } from "@ordo-pink/logger"
 import type { Oath } from "@ordo-pink/oath"
 import type { TResult } from "@ordo-pink/result"
 import type { TWO_LETTER_LOCALE } from "@ordo-pink/locale"
-import type { TZags } from "@ordo-pink/zags"
+import type { Zags } from "@ordo-pink/zags"
 
 import type * as C from "./constants"
 
@@ -504,10 +504,10 @@ declare global {
 				commands: Ordo.Command.Commands
 				translate: Ordo.I18N.TranslateFn
 				user_query: Ordo.User.Query
-				router$: TZags<{ current_route: Ordo.Router.Route; routes: Record<string, string> }>
+				router$: Zags.Instance<{ current_route: Ordo.Router.Route; routes: Record<string, string> }>
 				metadata_query: Ordo.Metadata.Query
 				content_query: Ordo.Content.Query
-				file_associations$: TZags<{ value: Ordo.FileAssociation.Instance[] }>
+				file_associations$: Zags.Instance<{ value: Ordo.FileAssociation.Instance[] }>
 			}
 
 			type Fn = (
@@ -523,7 +523,7 @@ declare global {
 			type Translations = Record<TWO_LETTER_LOCALE, Record<TranslationKey, string>>
 			type TranslateFn = {
 				(key: Ordo.I18N.TranslationKey, default_value?: string): string
-				$: TZags<{ version: number }>
+				$: Zags.Instance<{ version: number }>
 			}
 		}
 
@@ -659,7 +659,7 @@ declare global {
 				get_by_handle: (
 					handle: Ordo.User.Handle,
 				) => Oath.Instance<Ordo.User.Public.Instance, Ordo.Rrr<"EPERM" | "EINVAL" | "EIO">>
-				get $(): TZags<{ version: number }>
+				get $(): Zags.Instance<{ version: number }>
 			}
 
 			type QueryStatic = {
@@ -688,7 +688,7 @@ declare global {
 
 			type RepositoryStatic = {
 				Of: (
-					auth$: TZags<{ user: Ordo.User.Current.Instance | null }>,
+					auth$: Zags.Instance<{ user: Ordo.User.Current.Instance | null }>,
 					local_strategy: Ordo.Content.PersistenceStrategy,
 					remote_strategy: Ordo.Content.PersistenceStrategy,
 				) => Repository
@@ -709,7 +709,7 @@ declare global {
 					uid: Ordo.User.UID | null,
 					fsid: Ordo.Metadata.FSID,
 				) => Oath.Instance<void, Ordo.Rrr<"EINVAL" | "ENOENT" | "EACCES" | "EIO">>
-				get $(): TZags<{ version: number }>
+				get $(): Zags.Instance<{ version: number }>
 			}
 
 			type QueryStatic = {
@@ -723,7 +723,7 @@ declare global {
 				get: (
 					uid: Ordo.User.UID,
 					fsid: Ordo.Metadata.FSID,
-				) => Oath.Instance<Ordo.Content.Instance, Ordo.Rrr<"EPERM" | "EIO" | "EACCES" | "EINVAL" | "ENOENT">, true>
+				) => Oath.Instance<Ordo.Content.Instance, Ordo.Rrr<"EPERM" | "EIO" | "EACCES" | "EINVAL" | "ENOENT">>
 			}
 		}
 
@@ -806,13 +806,13 @@ declare global {
 			type Label = { name: string; color: C.LabelColor }
 
 			type RepositoryStatic = {
-				Of: (metadata$: TZags<{ items: Ordo.Metadata.Instance[] | null }>) => Repository
+				Of: (metadata$: Zags.Instance<{ items: Ordo.Metadata.Instance[] | null }>) => Repository
 			}
 
 			type Repository = {
 				get: () => TResult<Ordo.Metadata.Instance[], Ordo.Rrr<"EPERM" | "EAGAIN">>
 				put: (metadata: Ordo.Metadata.Instance[]) => TResult<void, Ordo.Rrr<"EINVAL">>
-				get $(): TZags<{ version: number }>
+				get $(): Zags.Instance<{ version: number }>
 			}
 
 			type RepositoryAsyncStatic = {
@@ -834,7 +834,7 @@ declare global {
 			}
 
 			type Query = {
-				get $(): TZags<{ version: number }>
+				get $(): Zags.Instance<{ version: number }>
 
 				get: (options?: QueryOptions) => TResult<Ordo.Metadata.Instance[], Ordo.Rrr<"EPERM" | "EAGAIN">>
 

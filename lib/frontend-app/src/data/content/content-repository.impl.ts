@@ -21,13 +21,13 @@
 
 import { METADATA_CONTENT_FSID } from "@ordo-pink/core"
 import { T } from "@ordo-pink/tau"
-import { zags } from "@ordo-pink/zags"
+import { create_zags } from "@ordo-pink/zags"
 import { oath } from "@ordo-pink/oath"
 
 // TODO !!! Sync storages
 export const ContentRepository: Ordo.Content.RepositoryStatic = {
 	Of: (auth$, local_strategy, remote_strategy) => {
-		const $ = zags.of({ version: 0 })
+		const $ = create_zags({ version: 0 })
 
 		const divorce = auth$.marry(({ user }) => {
 			// Quit from syncing with remote since the user is not authenticated

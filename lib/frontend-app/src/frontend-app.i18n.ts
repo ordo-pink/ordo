@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { type TPartner, zags } from "@ordo-pink/zags"
+import { Zags, create_zags } from "@ordo-pink/zags"
 import { call_once, keys_of } from "@ordo-pink/tau"
 import { TWO_LETTER_LOCALE } from "@ordo-pink/locale"
 
@@ -36,7 +36,7 @@ export const init_i18n: TInitI18nFn = call_once(() => {
 		translations$.update(lang, ts => keys_of(translations).reduce((acc, key) => ({ ...acc, [key]: translations[key] }), ts)),
 	)
 
-	const i18n_partner: TPartner<any> = (_, is_update) => is_update && translate_version$.update("version", v => v + 1)
+	const i18n_partner: Zags.Partner<any> = (_, is_update) => is_update && translate_version$.update("version", v => v + 1)
 
 	translations$.marry(i18n_partner)
 	language$.marry(i18n_partner)
@@ -64,6 +64,6 @@ export const init_i18n: TInitI18nFn = call_once(() => {
 
 // --- Internal ---
 
-const translations$ = zags.of({} as Ordo.I18N.Translations)
-const language$ = zags.of({ current_lang: TWO_LETTER_LOCALE.ENGLISH })
-const translate_version$ = zags.of({ version: 0 })
+const translations$ = create_zags({} as Ordo.I18N.Translations)
+const language$ = create_zags({ current_lang: TWO_LETTER_LOCALE.ENGLISH })
+const translate_version$ = create_zags({ version: 0 })

@@ -3,14 +3,14 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import type { TDotPath, TFromDotPath, TZags } from "@ordo-pink/zags"
 import type { TMaokaJab } from "@ordo-pink/maoka"
+import type { Zags } from "@ordo-pink/zags"
 
 /**
  * MaokaZAGS instance.
  */
 export type TMaokaZags<$TState extends Record<string, unknown>> = {
-	readonly zags: TZags<$TState>
+	readonly zags: Zags.Instance<$TState>
 
 	/**
 	 * A Jab that subscribes to a value extracted with a selector function, and refreshes the Maoka
@@ -19,5 +19,7 @@ export type TMaokaZags<$TState extends Record<string, unknown>> = {
 	 *
 	 * @param selector function that reduces state to desired value.
 	 */
-	select_jab$: <_TKey extends TDotPath<$TState>>(path: _TKey) => TMaokaJab<() => TFromDotPath<$TState, _TKey>>
+	select_jab$: <_TKey extends Zags.Pouch.RecordToDotPaths<$TState>>(
+		path: _TKey,
+	) => TMaokaJab<() => Zags.Pouch.RecordValueByDotPath<$TState, _TKey>>
 }

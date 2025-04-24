@@ -21,7 +21,7 @@
 
 import { Logger, console_logger } from "@ordo-pink/logger"
 import { type TMaokaJab } from "@ordo-pink/maoka"
-import { type TZags } from "@ordo-pink/zags"
+import { Zags } from "@ordo-pink/zags"
 
 import { init_commands } from "../frontend-app.commands"
 import { init_content } from "../frontend-app.content"
@@ -40,8 +40,8 @@ export type TFunctionStateSource = {
 	get_fetch: (fid: symbol) => Ordo.Fetch
 	get_logger: (fid: symbol) => Logger // TODO Move TLogger to global Ordo
 	get_metadata_query: (fid: symbol) => Ordo.Metadata.Query
-	get_router: (fid: symbol) => TZags<{ current_route: Ordo.Router.Route; routes: Record<string, string> }>
-	get_file_associations: (fid: symbol) => TZags<{ value: Ordo.FileAssociation.Instance[] }>
+	get_router: (fid: symbol) => Zags.Instance<{ current_route: Ordo.Router.Route; routes: Record<string, string> }>
+	get_file_associations: (fid: symbol) => Zags.Instance<{ value: Ordo.FileAssociation.Instance[] }>
 	get_user_query: (fid: symbol) => Ordo.User.Query
 	known_functions: OrdoInternal.KnownFunctions
 	translate: Ordo.I18N.TranslateFn

@@ -46,12 +46,30 @@ test.describe("zags", () => {
 	})
 
 	test.describe("transform", () => {
-		const zags = create_zags({ x: 0 })
+		test.it("should replace the whole state object", () => {
+			const zags = create_zags({ x: 0 })
 
-		zags.transform(state => ({ x: ++state.x }))
-		zags.transform(state => ({ x: ++state.x }))
+			const divorce = zags.marry(() => void 0)
 
-		test.expect(zags.select("x")).toBe(2)
+			zags.transform(state => ({ x: ++state.x }))
+			zags.transform(state => ({ x: ++state.x }))
+
+			divorce()
+
+			test.expect(zags.select("x")).toBe(2)
+		})
+
+		test.it("should ignore changes if the state is the same", () => {
+			const zags = create_zags({ x: 0 })
+
+			const mock = test.mock()
+
+			zags.marry((state, is_update) => is_update && mock(state))
+
+			zags.transform(state => ({ x: 0 }))
+
+			test.expect(mock).toBeCalledTimes(0)
+		})
 	})
 
 	test.describe("unwrap", () => {

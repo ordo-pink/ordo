@@ -2,5 +2,8 @@
 	"name": "@ordo-pink/zags",
 	"version": "0.2.0",
 	"exports": "./index.ts",
-	"exclude": ["**/*.test.ts"]
+	"exclude": ["**/*.test.ts"],
+	"imports": {
+		"@ordo-pink/deep-equals": "jsr:@ordo-pink/deep-equals@0"
+	}
 }

@@ -5,10 +5,15 @@
 
 export namespace Zags {
 	/**
+	 * Expected Zags state. Must be a record.
+	 */
+	export type BaseState = Record<string, unknown>
+
+	/**
 	 * Partner is a handler function that will be called as soon as you marry, and then every time the Zags state is
 	 * updated. The partner is provided with the whole Zags state object.
 	 */
-	export type Partner<$State extends Record<string, unknown>> = (
+	export type Partner<$State extends Zags.BaseState> = (
 		/**
 		 * Zags state.
 		 */
@@ -24,208 +29,228 @@ export namespace Zags {
 	) => void
 
 	/**
+	 * Marry to get state updates provided to the partner as soon as they arrive. Returns the divorce function that
+	 * can be used to unsubscribe from state updates.
+	 *
+	 * @example
+	 * ```typescript
+	 * import { create_zags } from "@ordo-pink/zags"
+	 *
+	 * const zags = create_zags({ git: { branch: "dev" } })
+	 *
+	 * zags.marry(({ git }, is_update) => {
+	 * 	if (!is_update) return // Only do the thing if it is an update
+	 * 	console.log("Your new branch name is", git.branch))
+	 * })
+	 * ```
+	 *
+	 * @returns divorce function to unsubscribe from state updates.
+	 */
+	export type Marry<$State extends Zags.BaseState> = (
+		/**
+		 * Partner to be called when state updates. Also called when you marry.
+		 */
+		partner: Zags.Partner<$State>,
+	) => () => void
+
+	/**
+	 * Divorce with provided partner to prevent it from receiving state updates. Alternatively, you can unsubscribe
+	 * by calling the function returned by `zags.marry` or `zags.cheat`.
+	 *
+	 * @example
+	 * ```typescript
+	 * import { create_zags } from "@ordo-pink/zags"
+	 *
+	 * const zags = create_zags({ git: { branch: "dev" } })
+	 *
+	 * const partner = ({ git }, is_update) => {
+	 * 	if (!is_update) return // Only do the thing if it is an update
+	 * 	console.log("Your new branch name is", git.branch))
+	 * }
+	 *
+	 * zags.marry(partner)
+	 * zags.divorce(partner)
+	 *
+	 * zags.update("git.branch", "margarita") // **nothing here**
+	 * ```
+	 *
+	 * @returns divorce function to unsubscribe from state updates.
+	 */
+	export type Divorce<$State extends Zags.BaseState> = (
+		/**
+		 * Partner to stop providing updates to.
+		 */
+		partner: Zags.Partner<$State>,
+	) => void
+
+	/**
+	 * Cheat with provided partner to get state updates as soon as they arrive. Unlike when you marry, with cheating you
+	 * only get the state update under the path you provide. The partner is not called if the state changed, but the
+	 * changes did not affect the state under the provided path.
+	 *
+	 * @since cheating on your loved ones is generally considered a bad idea, we do not recommend cheating.
+	 *
+	 * @example
+	 * ```typescript
+	 * import { create_zags } from "@ordo-pink/zags"
+	 *
+	 * const zags = create_zags({ git: { branch: "dev" } })
+	 *
+	 * zags.cheat("git.branch", branch => console.log("Your branch name is", branch))
+	 * // "Your branch name is dev"
+	 * ```
+	 *
+	 * @returns drop_affair function to unsubscribe from state updates.
+	 */
+	export type Cheat<$State extends Zags.BaseState> = <$DotPath extends Zags.Pouch.RecordToDotPaths<$State>>(
+		/**
+		 * Dot-separated path to the entity to cheat with.
+		 */
+		path: $DotPath,
+
+		/**
+		 * Partner to be called when you cheat. Also called when you cheat for the first time.
+		 */
+		partner: (value: Zags.Pouch.RecordValueByDotPath<$State, $DotPath>, is_update: boolean) => void,
+	) => () => void
+
+	/**
+	 * Update Zags state and call all married and related cheating partners. The partners **WILL NOT** be called if the
+	 * state did not actually change.
+	 *
+	 * @example
+	 * ```typescript
+	 * import { create_zags } from "@ordo-pink/zags"
+	 *
+	 * const zags = create_zags({ git: { branch: "dev" } })
+	 *
+	 * zags.cheat("git.branch", branch => console.log("Your branch name is", branch))
+	 * // "Your branch name is dev"
+	 *
+	 * zags.marry(({ git }, is_update) => {
+	 * 	if (!is_update) return // Only do the thing if it is an update
+	 * 	console.log("Your new branch name is", git.branch))
+	 * })
+	 * // *nothing here*
+	 *
+	 * zags.update("git.branch", _ => "margarita")
+	 * // "Your branch name is margarita"
+	 * // "Your new branch name is margarita"
+	 * ```
+	 */
+	export type Update<$State extends Zags.BaseState> = <$DotPath extends Zags.Pouch.RecordToDotPaths<$State>>(
+		/**
+		 * Dot-separated path to the entity to update.
+		 */
+		path: $DotPath,
+
+		/**
+		 * A callback that is provided with the current value under given path. Whatever is returned, becomes the new value
+		 * under given path.
+		 *
+		 * @returns the value to be put in the state.
+		 */
+		value_creator: (
+			/**
+			 * The value currently residing under the given path.
+			 */
+			prev_value: Zags.Pouch.RecordValueByDotPath<$State, $DotPath>,
+		) => Zags.Pouch.RecordValueByDotPath<$State, $DotPath>,
+	) => void
+
+	/**
+	 * Update the whole Zags state and call all married and all cheating partners. The partners **WILL NOT** be called
+	 * if the state did not actually change.
+	 *
+	 * @example
+	 * ```typescript
+	 * import { create_zags } from "@ordo-pink/zags"
+	 *
+	 * const zags = create_zags({ git: { branch: "dev" } })
+	 *
+	 * zags.cheat("git.branch", branch => console.log("Your branch name is", branch))
+	 * // "Your branch name is dev"
+	 *
+	 * zags.marry(({ git }, is_update) => {
+	 * 	if (!is_update) return // Only do the thing if it is an update
+	 * 	console.log("Your new branch name is", git.branch))
+	 * })
+	 * // *nothing here*
+	 *
+	 * zags.transform(_ => ({ git: { branch: "margarita" } }))
+	 * // "Your branch name is margarita"
+	 * // "Your new branch name is margarita"
+	 * ```
+	 */
+	export type Transform<$State extends Zags.BaseState> = (
+		/**
+		 * A callback that is provided with the current state. Whatever is returned, becomes the new state.
+		 *
+		 * @returns the new state.
+		 */
+		value_creator: (
+			/**
+			 * The current state.
+			 */
+			prev_state: $State,
+		) => $State,
+	) => void
+
+	/**
+	 * Get the value currently stored under given path.
+	 *
+	 * @example
+	 * ```typescript
+	 * import { create_zags } from "@ordo-pink/zags"
+	 *
+	 * const zags = create_zags({ git: { branch: "dev" } })
+	 * const branch = zags.select("git.branch")
+	 *
+	 * console.log(branch) // "dev"
+	 * ```
+	 *
+	 * @returns value residing under given path.
+	 */
+	export type Select<$State extends Zags.BaseState> = <$DotPath extends Zags.Pouch.RecordToDotPaths<$State>>(
+		/**
+		 * Dot-separated path to the value.
+		 */
+		path: $DotPath,
+	) => Zags.Pouch.RecordValueByDotPath<$State, $DotPath>
+
+	/**
+	 * Returns the whole ZAGS state. Beware - making changes the returned value will affect the state but not call
+	 * partners.
+	 */
+	export type Unwrap<$State extends Zags.BaseState> = () => $State
+
+	/**
 	 * Zags instance.
 	 */
-	export type Instance<$State extends Record<string, unknown>> = {
-		/**
-		 * Marry to get state updates provided to the partner as soon as they arrive. Returns the divorce function that
-		 * can be used to unsubscribe from state updates.
-		 *
-		 * @example
-		 * ```typescript
-		 * import { create_zags } from "@ordo-pink/zags"
-		 *
-		 * const zags = create_zags({ git: { branch: "dev" } })
-		 *
-		 * zags.marry(({ git }, is_update) => {
-		 * 	if (!is_update) return // Only do the thing if it is an update
-		 * 	console.log("Your new branch name is", git.branch))
-		 * })
-		 * ```
-		 *
-		 * @returns divorce function to unsubscribe from state updates.
-		 */
-		marry: (
-			/**
-			 * Partner to be called when state updates. Also called when you marry.
-			 */
-			partner: Zags.Partner<$State>,
-		) => () => void
-
-		/**
-		 * Divorce with provided partner to prevent it from receiving state updates. Alternatively, you can unsubscribe
-		 * by calling the function returned by `zags.marry` or `zags.cheat`.
-		 *
-		 * @example
-		 * ```typescript
-		 * import { create_zags } from "@ordo-pink/zags"
-		 *
-		 * const zags = create_zags({ git: { branch: "dev" } })
-		 *
-		 * const partner = ({ git }, is_update) => {
-		 * 	if (!is_update) return // Only do the thing if it is an update
-		 * 	console.log("Your new branch name is", git.branch))
-		 * }
-		 *
-		 * zags.marry(partner)
-		 * zags.divorce(partner)
-		 *
-		 * zags.update("git.branch", "margarita") // **nothing here**
-		 * ```
-		 *
-		 * @returns divorce function to unsubscribe from state updates.
-		 */
-		divorce: (partner: Zags.Partner<$State>) => void
-
-		/**
-		 * Cheat with provided partner to get state updates as soon as they arrive. Unlike when you marry, with cheating you
-		 * only get the state update under the path you provide. The partner is not called if the state changed, but the
-		 * changes did not affect the state under the provided path.
-		 *
-		 * @since cheating on your loved ones is generally considered a bad idea, we do not recommend cheating.
-		 *
-		 * @example
-		 * ```typescript
-		 * import { create_zags } from "@ordo-pink/zags"
-		 *
-		 * const zags = create_zags({ git: { branch: "dev" } })
-		 *
-		 * zags.cheat("git.branch", branch => console.log("Your branch name is", branch))
-		 * // "Your branch name is dev"
-		 * ```
-		 *
-		 * @returns drop_affair function to unsubscribe from state updates.
-		 */
-		cheat: <$DotPath extends Zags.Pouch.RecordToDotPaths<$State>>(
-			/**
-			 * Dot-separated path to the entity to cheat with.
-			 */
-			path: $DotPath,
-
-			/**
-			 * Partner to be called when you cheat. Also called when you cheat for the first time.
-			 */
-			partner: (value: Zags.Pouch.RecordValueByDotPath<$State, $DotPath>, is_update: boolean) => void,
-		) => () => void
-
-		/**
-		 * Update Zags state and call all married and related cheating partners. The partners **WILL NOT** be called if the
-		 * state did not actually change.
-		 *
-		 * @example
-		 * ```typescript
-		 * import { create_zags } from "@ordo-pink/zags"
-		 *
-		 * const zags = create_zags({ git: { branch: "dev" } })
-		 *
-		 * zags.cheat("git.branch", branch => console.log("Your branch name is", branch))
-		 * // "Your branch name is dev"
-		 *
-		 * zags.marry(({ git }, is_update) => {
-		 * 	if (!is_update) return // Only do the thing if it is an update
-		 * 	console.log("Your new branch name is", git.branch))
-		 * })
-		 * // *nothing here*
-		 *
-		 * zags.update("git.branch", _ => "margarita")
-		 * // "Your branch name is margarita"
-		 * // "Your new branch name is margarita"
-		 * ```
-		 */
-		update: <$DotPath extends Zags.Pouch.RecordToDotPaths<$State>>(
-			/**
-			 * Dot-separated path to the entity to update.
-			 */
-			path: $DotPath,
-
-			/**
-			 * A callback that is provided with the current value under given path. Whatever is returned, becomes the new value
-			 * under given path.
-			 *
-			 * @returns the value to be put in the state.
-			 */
-			value_creator: (
-				/**
-				 * The value currently residing under the given path.
-				 */
-				prev_value: Zags.Pouch.RecordValueByDotPath<$State, $DotPath>,
-			) => Zags.Pouch.RecordValueByDotPath<$State, $DotPath>,
-		) => void
-
-		/**
-		 * Update the whole Zags state and call all married and all cheating partners. The partners **WILL NOT** be called
-		 * if the state did not actually change.
-		 *
-		 * @example
-		 * ```typescript
-		 * import { create_zags } from "@ordo-pink/zags"
-		 *
-		 * const zags = create_zags({ git: { branch: "dev" } })
-		 *
-		 * zags.cheat("git.branch", branch => console.log("Your branch name is", branch))
-		 * // "Your branch name is dev"
-		 *
-		 * zags.marry(({ git }, is_update) => {
-		 * 	if (!is_update) return // Only do the thing if it is an update
-		 * 	console.log("Your new branch name is", git.branch))
-		 * })
-		 * // *nothing here*
-		 *
-		 * zags.transform(_ => ({ git: { branch: "margarita" } }))
-		 * // "Your branch name is margarita"
-		 * // "Your new branch name is margarita"
-		 * ```
-		 */
-		transform: (
-			/**
-			 * A callback that is provided with the current state. Whatever is returned, becomes the new state.
-			 *
-			 * @returns the new state.
-			 */
-			value_creator: (
-				/**
-				 * The current state.
-				 */
-				prev_state: $State,
-			) => $State,
-		) => void
-
-		/**
-		 * Get the value currently stored under given path.
-		 *
-		 * @example
-		 * ```typescript
-		 * import { create_zags } from "@ordo-pink/zags"
-		 *
-		 * const zags = create_zags({ git: { branch: "dev" } })
-		 * const branch = zags.select("git.branch")
-		 *
-		 * console.log(branch) // "dev"
-		 * ```
-		 *
-		 * @returns value residing under given path.
-		 */
-		select: <$DotPath extends Zags.Pouch.RecordToDotPaths<$State>>(
-			/**
-			 * Dot-separated path to the value.
-			 */
-			path: $DotPath,
-		) => Zags.Pouch.RecordValueByDotPath<$State, $DotPath>
-
-		/**
-		 * Returns the whole ZAGS state. Beware - making changes the returned value will affect the state but not call
-		 * partners.
-		 */
-		unwrap: () => $State
+	export type Instance<$State extends Zags.BaseState> = {
+		/** @see {@link Zags.Cheat} */
+		cheat: Zags.Cheat<$State>
+		/** @see {@link Zags.Divorce} */
+		divorce: Zags.Divorce<$State>
+		/** @see {@link Zags.Marry} */
+		marry: Zags.Marry<$State>
+		/** @see {@link Zags.Select} */
+		select: Zags.Select<$State>
+		/** @see {@link Zags.Transform} */
+		transform: Zags.Transform<$State>
+		/** @see {@link Zags.Unwrap} */
+		unwrap: Zags.Unwrap<$State>
+		/** @see {@link Zags.Update} */
+		update: Zags.Update<$State>
 	}
 
 	/**
-	 * # ZAGS
+	 * # @ordo-pink/zags
 	 *
 	 * [![License: Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg)](http://unlicense.org/)
 	 *
-	 * A full-featured implementation of [zigzag](https://en.wikipedia.org/wiki/Zigzag) written without Zig. It is also a minimalistic
-	 * state manager, but it is not that important.
+	 * A full-featured implementation of [zigzag](https://en.wikipedia.org/wiki/Zigzag) written without Zig. It is also
+	 * a minimalistic state manager, but it is not that important.
 	 *
 	 * ## Quick Start
 	 *
@@ -254,8 +279,15 @@ export namespace Zags {
 	 *```
 	 * @module
 	 */
-	export type Module = <$State extends Record<string, unknown>>(
+	export type Module = <$State extends Zags.BaseState>(
+		/**
+		 * Initial state of Zags.
+		 */
 		state: $State,
+
+		/**
+		 * Optional predefined array of partners.
+		 */
 		partners?: Zags.Partner<$State>[],
 	) => Zags.Instance<$State>
 
@@ -274,8 +306,8 @@ export namespace Zags {
 		 * ```
 		 *
 		 */
-		export type RecordToDotPaths<$Record extends Record<string, unknown>> = Zags.Pouch.RecordValues<{
-			[_Key in keyof $Record]: $Record[_Key] extends Record<string, unknown>
+		export type RecordToDotPaths<$Record extends Zags.BaseState> = Zags.Pouch.RecordValues<{
+			[_Key in keyof $Record]: $Record[_Key] extends Zags.BaseState
 				? `${string & _Key}.${string & Zags.Pouch.RecordToDotPaths<$Record[_Key]>}` | _Key
 				: _Key
 		}>
@@ -288,7 +320,7 @@ export namespace Zags {
 		 * type Values = RecordValues<{ a: string, b: number }> // string | number
 		 * ```
 		 */
-		export type RecordValues<$Record extends Record<string, unknown>> = $Record extends { [_Key in keyof $Record]: infer Type }
+		export type RecordValues<$Record extends Zags.BaseState> = $Record extends { [_Key in keyof $Record]: infer Type }
 			? Type
 			: never
 
@@ -301,12 +333,12 @@ export namespace Zags {
 		 * ```
 		 */
 		export type RecordValueByDotPath<
-			$Record extends Record<string, unknown>,
+			$Record extends Zags.BaseState,
 			$DotPath extends Zags.Pouch.RecordToDotPaths<$Record>,
-		> = $DotPath extends `${infer Parents}.${infer Current}`
-			? $Record[Parents] extends Record<string, unknown>
-				? Current extends Zags.Pouch.RecordToDotPaths<$Record[Parents]>
-					? RecordValueByDotPath<$Record[Parents], Current>
+		> = $DotPath extends `${infer _Parent}.${infer _Children}`
+			? $Record[_Parent] extends Zags.BaseState
+				? _Children extends Zags.Pouch.RecordToDotPaths<$Record[_Parent]>
+					? RecordValueByDotPath<$Record[_Parent], _Children>
 					: never
 				: never
 			: $DotPath extends keyof $Record

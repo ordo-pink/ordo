@@ -7,17 +7,11 @@ import test from "bun:test"
 
 import { hunt } from "./hunt.impl"
 
-declare global {
-	interface HuntPreys {
-		test: () => string
-	}
-}
-
 test.describe("hunter", () => {
 	test.it("should fire shots", () => {
 		const x = { hello: "world" }
 
-		const hunter = hunt.begin()
+		const hunter = hunt.begin<{ test: () => string }>()
 
 		hunter.track("test", str => void (x.hello = str))
 		hunter.shoot("test", "world1")
@@ -28,7 +22,7 @@ test.describe("hunter", () => {
 	test.it("should fire a barrage of shots", () => {
 		const x = { hello: "world" } as Record<string, string>
 
-		const hunter = hunt.begin()
+		const hunter = hunt.begin<{ test: () => string }>()
 
 		hunter.track("test", str => void (x.hello = str))
 		hunter.track("test", str => void (x[str] = str))
@@ -40,7 +34,7 @@ test.describe("hunter", () => {
 	test.it("should disengage", () => {
 		const x = { hello: "world" } as Record<string, string>
 
-		const hunter = hunt.begin()
+		const hunter = hunt.begin<{ test: () => string }>()
 
 		hunter.track("test", str => void (x.hello = str))
 		hunter.track("test", str => void (x[str] = str))

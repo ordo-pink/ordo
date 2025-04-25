@@ -3,35 +3,45 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-declare global {
-	interface HuntPreys {}
-}
-
 export namespace Hunt {
-	export type Preys = Hunt.Pouch.RecordToKeyValue<Hunt.Pouch.KeyValueToFlatRecord<HuntPreys>>
+	export type Preys<$Preys extends Record<string, unknown>> = Hunt.Pouch.RecordToKeyValue<
+		Hunt.Pouch.KeyValueToFlatRecord<$Preys>
+	>
 
-	export type Prey = keyof Preys
+	export type Prey<$Preys extends Record<string, unknown>> = keyof Preys<$Preys>
 
-	export type BlankShot<$Prey extends Hunt.Prey = Hunt.Prey> = { prey: $Prey }
+	export type BlankShot<$Preys extends Record<string, unknown>, $Prey extends Hunt.Prey<$Preys> = Hunt.Prey<$Preys>> = {
+		prey: $Prey
+	}
 
-	export type LoadedShot<$Prey extends Hunt.Prey = Hunt.Prey, $Bullet = any> = Hunt.BlankShot<$Prey> & {
+	export type LoadedShot<
+		$Preys extends Record<string, unknown>,
+		$Prey extends Hunt.Prey<$Preys> = Hunt.Prey<$Preys>,
+		$Bullet = any,
+	> = Hunt.BlankShot<$Preys, $Prey> & {
 		bullet: $Bullet
 	}
 
-	export type Shot = BlankShot | LoadedShot
+	export type Shot<$Preys extends Record<string, unknown>> = BlankShot<$Preys> | LoadedShot<$Preys>
 
 	export type Gun<$Bullet> = (bullet: $Bullet) => void
 
-	export type GunFor<$Prey extends Hunt.Prey> = Gun<Hunt.Preys[$Prey]>
+	export type GunFor<$Preys extends Record<string, unknown>, $Prey extends Hunt.Prey<$Preys>> = Gun<Hunt.Preys<$Preys>[$Prey]>
 
-	export type Shoot = <$Prey extends Hunt.Prey>(
+	export type Shoot<$Preys extends Record<string, unknown>> = <$Prey extends Hunt.Prey<$Preys>>(
 		prey: $Prey,
-		...rest: Hunt.Preys[$Prey] extends void ? [undefined] : [bullet: Hunt.Preys[$Prey]]
+		...rest: Hunt.Preys<$Preys>[$Prey] extends void ? [undefined] : [bullet: Hunt.Preys<$Preys>[$Prey]]
 	) => void
 
-	export type Track = <$Prey extends Hunt.Prey>(prey: $Prey, gun: Gun<Hunt.Preys[$Prey]>) => void
+	export type Track<$Preys extends Record<string, unknown>> = <$Prey extends Hunt.Prey<$Preys>>(
+		prey: $Prey,
+		gun: Gun<Hunt.Preys<$Preys>[$Prey]>,
+	) => void
 
-	export type PutDown = <$Prey extends Hunt.Prey>(prey: $Prey, gun: Gun<Hunt.Preys[$Prey]>) => void
+	export type PutDown<$Preys extends Record<string, unknown>> = <$Prey extends Hunt.Prey<$Preys>>(
+		prey: $Prey,
+		gun: Gun<Hunt.Preys<$Preys>[$Prey]>,
+	) => void
 
 	export namespace Pouch {
 		export type RecordToKeyValue<$Record extends { key: string; value: any }> = {
@@ -59,13 +69,16 @@ export namespace Hunt {
 				: never
 	}
 
-	export type State = { barrage: Hunt.Shot[]; gun_storage: Record<string, Hunt.Gun<any>[]> }
+	export type State<$Preys extends Record<string, unknown>> = {
+		barrage: Hunt.Shot<$Preys>[]
+		gun_storage: Record<string, Hunt.Gun<any>[]>
+	}
 
 	export type Module = {
-		begin: () => {
-			track: Hunt.Track
-			shoot: Hunt.Shoot
-			putdown: Hunt.PutDown
+		begin: <$Preys extends Record<string, unknown>>() => {
+			track: Hunt.Track<$Preys>
+			shoot: Hunt.Shoot<$Preys>
+			putdown: Hunt.PutDown<$Preys>
 		}
 	}
 }

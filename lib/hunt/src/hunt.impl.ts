@@ -9,29 +9,32 @@ import { deep_equals } from "@ordo-pink/deep-equals"
 import { Hunt } from "./hunt.types.ts"
 
 export const hunt: Hunt.Module = {
-	begin: () => {
-		const hunt$ = create_zags<Hunt.State>({ barrage: [], gun_storage: {} })
+	begin: <$Preys extends Record<string, unknown>>() => {
+		const hunt$ = create_zags<Hunt.State<$Preys>>({ barrage: [], gun_storage: {} })
 		hunt$.marry(internal.handle_barrage_updates(hunt$))
 
-		return { track: internal.track(hunt$), putdown: internal.putdown(hunt$), shoot: internal.shoot(hunt$) }
+		return {
+			putdown: internal.putdown(hunt$),
+			shoot: internal.shoot(hunt$),
+			track: internal.track(hunt$),
+		}
 	},
 }
 
-// --- Internal ---
-
+/** @ignore */
 namespace internal {
 	export const handle_barrage_updates =
-		(hunt$: Zags.Instance<Hunt.State>) =>
-		({ barrage, gun_storage }: Hunt.State) => {
+		<$Preys extends Record<string, unknown>>(hunt$: Zags.Instance<Hunt.State<$Preys>>) =>
+		({ barrage, gun_storage }: Hunt.State<$Preys>) => {
 			for (const shot of barrage) {
 				const bullet = internal.is_loaded_shot_guard(shot) ? shot.bullet : undefined
-				const guns = gun_storage[shot.prey]
+				const guns = gun_storage[shot.prey as string]
 
 				if (guns) {
-					hunt$.update("barrage", state => {
+					hunt$.update("barrage", shots => {
 						const target_is_loaded = internal.is_loaded_shot_guard(shot)
 
-						return state.filter(shot => {
+						return shots.filter(shot => {
 							const current_is_loaded = internal.is_loaded_shot_guard(shot)
 
 							const both_are_empty = !target_is_loaded && !current_is_loaded
@@ -48,37 +51,37 @@ namespace internal {
 			}
 		}
 
-	export const is_loaded_shot_guard = (x: any): x is Hunt.LoadedShot =>
-		!!x && typeof x === "object" && typeof x.prey === "string" && (x as Hunt.LoadedShot).bullet !== undefined
+	export const is_loaded_shot_guard = <$Preys extends Record<string, unknown>>(x: any): x is Hunt.LoadedShot<$Preys> =>
+		!!x && typeof x === "object" && typeof x.prey === "string" && (x as Hunt.LoadedShot<$Preys>).bullet !== undefined
 
 	export const putdown =
-		(hunt$: Zags.Instance<Hunt.State>): Hunt.PutDown =>
+		<$Preys extends Record<string, unknown>>(hunt$: Zags.Instance<Hunt.State<$Preys>>): Hunt.PutDown<$Preys> =>
 		(prey, gun) =>
-			void hunt$.update("gun_storage", state => {
-				if (!state[prey]) return state
+			void hunt$.update("gun_storage", storage => {
+				if (!storage[prey as string]) return storage
 
-				state[prey] = state[prey].filter(f => f.toString() !== gun.toString())
+				storage[prey as string] = storage[prey as string].filter((f: Hunt.Gun<any>) => f.toString() !== gun.toString())
 
-				return state
+				return storage
 			})
 
 	export const shoot =
-		(hunt$: Zags.Instance<Hunt.State>): Hunt.Shoot =>
+		<$Preys extends Record<string, unknown>>(hunt$: Zags.Instance<Hunt.State<$Preys>>): Hunt.Shoot<$Preys> =>
 		(prey, bullet) =>
-			void hunt$.update("barrage", state => [...state, { prey, bullet }])
+			void hunt$.update("barrage", shots => [...shots, { prey, bullet }])
 
 	export const track =
-		(hunt$: Zags.Instance<Hunt.State>): Hunt.Track =>
+		<$Preys extends Record<string, unknown>>(hunt$: Zags.Instance<Hunt.State<$Preys>>): Hunt.Track<$Preys> =>
 		(prey, new_gun) =>
-			void hunt$.update("gun_storage", state => {
-				const guns = state[prey]
+			void hunt$.update("gun_storage", (storage: Record<string, Hunt.Gun<any>[]>) => {
+				const guns = storage[prey as string]
 
 				if (!guns) {
-					state[prey] = [new_gun]
-				} else if (!guns.some(gun => gun.toString() === new_gun.toString())) {
-					state[prey].unshift(new_gun)
+					storage[prey as string] = [new_gun]
+				} else if (!guns.some((gun: Hunt.Gun<any>) => gun.toString() === new_gun.toString())) {
+					storage[prey as string].unshift(new_gun)
 				}
 
-				return state
+				return storage
 			})
 }

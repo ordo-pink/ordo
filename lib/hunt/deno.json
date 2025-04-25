@@ -1,0 +1,10 @@
+{
+	"name": "@ordo-pink/hunt",
+	"version": "0.1.0",
+	"exports": "./index.ts",
+	"exclude": ["**/*.test.ts"],
+	"imports": {
+		"@ordo-pink/deep-equals": "jsr:@ordo-pink/deep-equals@0",
+		"@ordo-pink/zags": "jsr:@ordo-pink/zags@0.2"
+	}
+}

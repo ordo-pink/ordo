@@ -3,84 +3,94 @@
  * SPDX-License-Identifier: Unlicense
  */
 
+import { deep_equals } from "@ordo-pink/deep-equals"
+
 import { Zags } from "./zags.types.ts"
 
-/**
- * @see {@link Zags.Module}
- */
+/** @see {@link Zags.Module} */
 export const create_zags: Zags.Module = (state, partners = []) => ({
-	marry: f => {
-		partners.push(f)
-		f(state, false)
+	cheat: internal.cheat(state, partners),
+	divorce: internal.divorce(partners),
+	marry: internal.marry(state, partners),
+	select: path => {
+		const keys = (path as string).split(".")
+		const location: Record<string, any> = keys.slice(0, -1).reduce((acc, key) => (acc as any)[key], state)
 
-		return () => {
-			const index = partners.indexOf(f)
+		return location[keys[keys.length - 1]]
+	},
+	transform: f => {
+		const state_copy = { ...state }
+		const updated_state = f(state_copy)
 
-			if (index >= 0) partners.splice(index, 1)
+		if (!deep_equals(updated_state, state)) {
+			state = updated_state
+			partners.forEach(f => f(state, true))
 		}
 	},
-	cheat: (path, f) => {
-		let value: any
-
-		const wrapped_f = (state: any, is_update: boolean) => {
-			const keys = (path as string).split(".")
-			const location: Record<string, any> = keys.slice(0, -1).reduce((acc, key) => acc[key], state)
-			const current_value = location[keys[keys.length - 1]]
-
-			if (value !== current_value) {
-				value = current_value
-				f(value, is_update)
-			}
-		}
-
-		partners.push(wrapped_f)
-		wrapped_f(Object.assign({}, state), false)
-
-		return () => {
-			const index = partners.indexOf(wrapped_f)
-
-			if (index >= 0) partners.splice(index, 1)
-		}
-	},
-	divorce: f => {
-		const index = partners.indexOf(f)
-
-		if (index >= 0) partners.splice(index, 1)
-	},
+	unwrap: () => state,
 	update: (path, value_creator) => {
 		const keys = (path as string).split(".")
-		const state_copy = Object.assign({}, state)
+		const state_copy = { ...state }
 
 		const location: Record<string, any> = keys.slice(0, -1).reduce((acc, key) => (acc as any)[key], state_copy)
 		const current_value = location[keys[keys.length - 1]]
-		const value = value_creator(
-			Array.isArray(current_value)
-				? [...current_value]
-				: typeof current_value === "object" && current_value
-					? Object.assign({}, current_value)
-					: current_value,
-		)
+		const value = value_creator(current_value)
 
-		if (value !== current_value) {
+		if (!deep_equals(value, current_value)) {
 			location[keys[keys.length - 1]] = value
 			state = state_copy
 
 			partners.forEach(f => f(state, true))
 		}
 	},
-	select: path => {
-		const keys = (path as string).split(".")
-		const location: Record<string, any> = keys.slice(0, -1).reduce((acc, key) => (acc as any)[key], Object.assign({}, state))
-
-		return location[keys[keys.length - 1]]
-	},
-	transform: f => {
-		const updated_state = f(Object.assign({}, state))
-
-		if (updated_state !== state) {
-			state = updated_state
-			partners.forEach(f => f(state, true))
-		}
-	},
-	unwrap: () => Object.assign({}, state),
 })
+
+/** @ignore */
+namespace internal {
+	export const cheat =
+		<$State extends Zags.BaseState>(state: $State, partners: Zags.Partner<$State>[]): Zags.Cheat<$State> =>
+		(path, f) => {
+			let value: any
+
+			const wrapped_f = (state: any, is_update: boolean) => {
+				const keys = (path as string).split(".")
+				const location: Record<string, any> = keys.slice(0, -1).reduce((acc, key) => acc[key], state)
+				const current_value = location[keys[keys.length - 1]]
+
+				if (!deep_equals(current_value, value)) {
+					value = current_value
+					f(value, is_update)
+				}
+			}
+
+			partners.push(wrapped_f)
+			wrapped_f(state, false)
+
+			return () => {
+				const index = partners.indexOf(wrapped_f)
+
+				if (index >= 0) partners.splice(index, 1)
+			}
+		}
+
+	export const divorce =
+		<$State extends Zags.BaseState>(partners: Zags.Partner<$State>[]): Zags.Divorce<$State> =>
+		f => {
+			const index = partners.indexOf(f)
+
+			if (index >= 0) partners.splice(index, 1)
+		}
+
+	export const marry =
+		<$State extends Zags.BaseState>(state: $State, partners: Zags.Partner<$State>[]): Zags.Marry<$State> =>
+		f => {
+			partners.push(f)
+			f(state, false)
+
+			return () => {
+				const index = partners.indexOf(f)
+
+				if (index >= 0) partners.splice(index, 1)
+			}
+		}
+}

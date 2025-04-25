@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ */
+
 import { LOCALE_READABLE_NAME, TWO_LETTER_LOCALE } from "@ordo-pink/locale"
 import { keys_of } from "@ordo-pink/tau"
 

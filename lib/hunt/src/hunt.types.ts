@@ -4,46 +4,35 @@
  */
 
 export namespace Hunt {
-	export type Preys<$Preys extends Record<string, unknown>> = Hunt.Pouch.RecordToKeyValue<
-		Hunt.Pouch.KeyValueToFlatRecord<$Preys>
-	>
-
-	export type Prey<$Preys extends Record<string, unknown>> = keyof Preys<$Preys>
-
-	export type BlankShot<$Preys extends Record<string, unknown>, $Prey extends Hunt.Prey<$Preys> = Hunt.Prey<$Preys>> = {
-		prey: $Prey
-	}
-
-	export type LoadedShot<
+	export type Shot<
 		$Preys extends Record<string, unknown>,
-		$Prey extends Hunt.Prey<$Preys> = Hunt.Prey<$Preys>,
+		$Prey extends Hunt.Pouch.Prey<$Preys> = Hunt.Pouch.Prey<$Preys>,
 		$Bullet = any,
-	> = Hunt.BlankShot<$Preys, $Prey> & {
-		bullet: $Bullet
-	}
-
-	export type Shot<$Preys extends Record<string, unknown>> = BlankShot<$Preys> | LoadedShot<$Preys>
+	> = { bullet: $Bullet; prey: $Prey }
 
 	export type Gun<$Bullet> = (bullet: $Bullet) => void
 
-	export type GunFor<$Preys extends Record<string, unknown>, $Prey extends Hunt.Prey<$Preys>> = Gun<Hunt.Preys<$Preys>[$Prey]>
+	export type GunFor<$Preys extends Record<string, unknown>, $Prey extends Hunt.Pouch.Prey<$Preys>> = Gun<
+		Hunt.Pouch.ToPreys<$Preys>[$Prey]
+	>
 
-	export type Shoot<$Preys extends Record<string, unknown>> = <$Prey extends Hunt.Prey<$Preys>>(
+	export type Shoot<$Preys extends Record<string, unknown>> = <$Prey extends Hunt.Pouch.Prey<$Preys>>(
 		prey: $Prey,
-		...rest: Hunt.Preys<$Preys>[$Prey] extends void ? [undefined] : [bullet: Hunt.Preys<$Preys>[$Prey]]
+		...rest: Hunt.Pouch.ToPreys<$Preys>[$Prey] extends void ? [undefined] : [bullet: Hunt.Pouch.ToPreys<$Preys>[$Prey]]
 	) => void
 
-	export type Track<$Preys extends Record<string, unknown>> = <$Prey extends Hunt.Prey<$Preys>>(
+	export type Track<$Preys extends Record<string, unknown>> = <$Prey extends Hunt.Pouch.Prey<$Preys>>(
 		prey: $Prey,
-		gun: Gun<Hunt.Preys<$Preys>[$Prey]>,
-	) => void
-
-	export type PutDown<$Preys extends Record<string, unknown>> = <$Prey extends Hunt.Prey<$Preys>>(
-		prey: $Prey,
-		gun: Gun<Hunt.Preys<$Preys>[$Prey]>,
-	) => void
+		gun: Gun<Hunt.Pouch.ToPreys<$Preys>[$Prey]>,
+	) => () => void
 
 	export namespace Pouch {
+		export type ToPreys<$Preys extends Record<string, unknown>> = Hunt.Pouch.RecordToKeyValue<
+			Hunt.Pouch.KeyValueToFlatRecord<$Preys>
+		>
+
+		export type Prey<$Preys extends Record<string, unknown>> = keyof ToPreys<$Preys>
+
 		export type RecordToKeyValue<$Record extends { key: string; value: any }> = {
 			[$Key in $Record["key"]]: Extract<$Record, { key: $Key }>["value"]
 		}
@@ -54,15 +43,15 @@ export namespace Hunt {
 			$Key extends keyof $Record = keyof $Record,
 		> = $Prefix extends null
 			? $Key extends string
-				? $Record[$Key] extends () => infer V
-					? { key: $Key; value: V }
+				? $Record[$Key] extends { args: infer _Args }
+					? { key: $Key; value: _Args }
 					: $Record[$Key] extends object
 						? KeyValueToFlatRecord<$Record[$Key], $Key, keyof $Record[$Key]>
 						: never
 				: never
 			: $Key extends string
-				? $Record[$Key] extends () => infer V
-					? { key: `${$Prefix}.${$Key}`; value: V }
+				? $Record[$Key] extends { args: infer _Args }
+					? { key: `${$Prefix}.${$Key}`; value: _Args }
 					: $Record[$Key] extends object
 						? KeyValueToFlatRecord<$Record[$Key], `${$Prefix}.${$Key}`, keyof $Record[$Key]>
 						: never
@@ -74,11 +63,59 @@ export namespace Hunt {
 		gun_storage: Record<string, Hunt.Gun<any>[]>
 	}
 
+	/**
+	 * # @ordo-pink/hunt
+	 *
+	 * [![License: Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg)](http://unlicense.org/)
+	 *
+	 * > Let the hunt begin.
+	 *
+	 * Hunt is command manager for implementing your own ~~S.P.Q.R.~~ CQRS.
+	 *
+	 * ## Getting Started
+	 *
+	 * ```typescript
+	 * import { hunt } from "@ordo-pink/hunt"
+	 *
+	 * type Preys = {
+	 * 	// The key becomes the command name
+	 * 	// To provide the expected command payload, wrap it with a thunk
+	 * 	replace_str: () => string
+	 * 	// The keys can be nested, which will create dot-separated command names ("maths.add_one")
+	 * 	maths: {
+	 * 		// If you want the command to have no payload, return a thunk that returns `void`
+	 * 		add_one: () => void
+	 * 	}
+	 * }
+	 *
+	 * // Let the hunt begin
+	 * const hunter = hunt.begin<Preys>()
+	 *
+	 * let num = 0
+	 * let str = "Hello, world"
+	 *
+	 * // Register handlers for commands
+	 * // Every command may have multiple handlers
+	 * // When the command is emitted, they will be called in the order they were registered.
+	 * hunter.track("maths.add_one", () => num++)
+	 * hunter.track("replace_str", new_str => void (str = new_str))
+	 *
+	 * // Call the commands
+	 * hunter.shoot("maths.add_one")
+	 * hunter.shoot("maths.add_one")
+	 * hunter.shoot("maths.add_one")
+	 * hunter.shoot("replace_str", "Goodbye, world")
+	 *
+	 * // Check the result
+	 * console.log(num) // 3
+	 * console.log(str) // "Goodbye, world"
+	 * ```
+	 * @module
+	 */
 	export type Module = {
 		begin: <$Preys extends Record<string, unknown>>() => {
 			track: Hunt.Track<$Preys>
 			shoot: Hunt.Shoot<$Preys>
-			putdown: Hunt.PutDown<$Preys>
 		}
 	}
 }

@@ -13,11 +13,7 @@ export const hunt: Hunt.Module = {
 		const hunt$ = create_zags<Hunt.State<$Preys>>({ barrage: [], gun_storage: {} })
 		hunt$.marry(internal.handle_barrage_updates(hunt$))
 
-		return {
-			putdown: internal.putdown(hunt$),
-			shoot: internal.shoot(hunt$),
-			track: internal.track(hunt$),
-		}
+		return { shoot: internal.shoot(hunt$), track: internal.track(hunt$) }
 	},
 }
 
@@ -51,19 +47,8 @@ namespace internal {
 			}
 		}
 
-	export const is_loaded_shot_guard = <$Preys extends Record<string, unknown>>(x: any): x is Hunt.LoadedShot<$Preys> =>
-		!!x && typeof x === "object" && typeof x.prey === "string" && (x as Hunt.LoadedShot<$Preys>).bullet !== undefined
-
-	export const putdown =
-		<$Preys extends Record<string, unknown>>(hunt$: Zags.Instance<Hunt.State<$Preys>>): Hunt.PutDown<$Preys> =>
-		(prey, gun) =>
-			void hunt$.update("gun_storage", storage => {
-				if (!storage[prey as string]) return storage
-
-				storage[prey as string] = storage[prey as string].filter((f: Hunt.Gun<any>) => f.toString() !== gun.toString())
-
-				return storage
-			})
+	export const is_loaded_shot_guard = <$Preys extends Record<string, unknown>>(x: any): x is Hunt.Shot<$Preys> =>
+		!!x && typeof x === "object" && typeof x.prey === "string" && x.bullet !== undefined
 
 	export const shoot =
 		<$Preys extends Record<string, unknown>>(hunt$: Zags.Instance<Hunt.State<$Preys>>): Hunt.Shoot<$Preys> =>
@@ -72,16 +57,27 @@ namespace internal {
 
 	export const track =
 		<$Preys extends Record<string, unknown>>(hunt$: Zags.Instance<Hunt.State<$Preys>>): Hunt.Track<$Preys> =>
-		(prey, new_gun) =>
-			void hunt$.update("gun_storage", (storage: Record<string, Hunt.Gun<any>[]>) => {
+		(prey, new_gun) => {
+			hunt$.update("gun_storage", storage => {
 				const guns = storage[prey as string]
 
 				if (!guns) {
 					storage[prey as string] = [new_gun]
-				} else if (!guns.some((gun: Hunt.Gun<any>) => gun.toString() === new_gun.toString())) {
+				} else if (!guns.some(gun => gun.toString() === new_gun.toString())) {
 					storage[prey as string].unshift(new_gun)
 				}
 
 				return storage
 			})
+
+			return () => {
+				hunt$.update("gun_storage", storage => {
+					if (!storage[prey as string]) return storage
+
+					storage[prey as string] = storage[prey as string].filter(f => f.toString() !== new_gun.toString())
+
+					return storage
+				})
+			}
+		}
 }

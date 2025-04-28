@@ -8,9 +8,9 @@ export namespace Hunt {
 		$Preys extends Record<string, unknown>,
 		$Prey extends Hunt.Pouch.Prey<$Preys> = Hunt.Pouch.Prey<$Preys>,
 		$Bullet = any,
-	> = { bullet: $Bullet; prey: $Prey }
+	> = { bullet: $Bullet; prey: $Prey; callback: (error?: unknown) => Promise<void> }
 
-	export type Gun<$Bullet> = (bullet: $Bullet) => void
+	export type Gun<$Bullet> = (bullet: $Bullet) => void | Promise<void>
 
 	export type GunFor<$Preys extends Record<string, unknown>, $Prey extends Hunt.Pouch.Prey<$Preys>> = Gun<
 		Hunt.Pouch.ToPreys<$Preys>[$Prey]
@@ -18,8 +18,8 @@ export namespace Hunt {
 
 	export type Shoot<$Preys extends Record<string, unknown>> = <$Prey extends Hunt.Pouch.Prey<$Preys>>(
 		prey: $Prey,
-		...rest: Hunt.Pouch.ToPreys<$Preys>[$Prey] extends void ? [undefined] : [bullet: Hunt.Pouch.ToPreys<$Preys>[$Prey]]
-	) => void
+		bullet: Hunt.Pouch.ToPreys<$Preys>[$Prey],
+	) => () => Promise<void>
 
 	export type Track<$Preys extends Record<string, unknown>> = <$Prey extends Hunt.Pouch.Prey<$Preys>>(
 		prey: $Prey,
@@ -61,6 +61,11 @@ export namespace Hunt {
 	export type State<$Preys extends Record<string, unknown>> = {
 		barrage: Hunt.Shot<$Preys>[]
 		gun_storage: Record<string, Hunt.Gun<any>[]>
+	}
+
+	export type Begin = <$Preys extends Record<string, unknown>>() => {
+		track: Hunt.Track<$Preys>
+		shoot: Hunt.Shoot<$Preys>
 	}
 
 	/**
@@ -113,9 +118,7 @@ export namespace Hunt {
 	 * @module
 	 */
 	export type Module = {
-		begin: <$Preys extends Record<string, unknown>>() => {
-			track: Hunt.Track<$Preys>
-			shoot: Hunt.Shoot<$Preys>
-		}
+		/** @see {@link Hunt.Begin} */
+		begin: Hunt.Begin
 	}
 }

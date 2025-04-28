@@ -8,7 +8,9 @@ import { deep_equals } from "@ordo-pink/deep-equals"
 
 import { Hunt } from "./hunt.types.ts"
 
+/** @see {@link Hunt.Module} */
 export const hunt: Hunt.Module = {
+	/** @see {@link Hunt.Begin } */
 	begin: <$Preys extends Record<string, unknown>>() => {
 		const hunt$ = create_zags<Hunt.State<$Preys>>({ barrage: [], gun_storage: {} })
 		hunt$.marry(internal.handle_barrage_updates(hunt$))
@@ -23,37 +25,54 @@ namespace internal {
 		<$Preys extends Record<string, unknown>>(hunt$: Zags.Instance<Hunt.State<$Preys>>) =>
 		({ barrage, gun_storage }: Hunt.State<$Preys>) => {
 			for (const shot of barrage) {
-				const bullet = internal.is_loaded_shot_guard(shot) ? shot.bullet : undefined
 				const guns = gun_storage[shot.prey as string]
 
 				if (guns) {
-					hunt$.update("barrage", shots => {
-						const target_is_loaded = internal.is_loaded_shot_guard(shot)
+					hunt$.update("barrage", shots => shots.filter(is_different_shot(shot)))
 
-						return shots.filter(shot => {
-							const current_is_loaded = internal.is_loaded_shot_guard(shot)
-
-							const both_are_empty = !target_is_loaded && !current_is_loaded
-							const both_are_loaded = target_is_loaded && current_is_loaded
-
-							const is_same_prey = shot.prey === shot.prey
-
-							return !(is_same_prey && (both_are_empty || (both_are_loaded && deep_equals(shot.bullet, shot.bullet))))
-						})
-					})
-
-					guns.forEach(gun => gun(bullet))
+					Promise.all(guns.map(gun => gun(shot.bullet)))
+						.then(() => shot.callback())
+						.catch(shot.callback)
+				} else {
+					hunt$.update("barrage", shots => shots.filter(is_different_prey(shot)))
 				}
 			}
 		}
 
-	export const is_loaded_shot_guard = <$Preys extends Record<string, unknown>>(x: any): x is Hunt.Shot<$Preys> =>
+	export const is_shot = <$Preys extends Record<string, unknown>>(x: any): x is Hunt.Shot<$Preys> =>
 		!!x && typeof x === "object" && typeof x.prey === "string" && x.bullet !== undefined
 
 	export const shoot =
 		<$Preys extends Record<string, unknown>>(hunt$: Zags.Instance<Hunt.State<$Preys>>): Hunt.Shoot<$Preys> =>
-		(prey, bullet) =>
-			void hunt$.update("barrage", shots => [...shots, { prey, bullet }])
+		(prey, bullet) => {
+			const result_zags = create_zags<{ error?: unknown; status: internal.SHOT_STATUS }>({
+				error: void 0,
+				status: internal.SHOT_STATUS.PENDING,
+			})
+
+			const callback = (error?: unknown) => {
+				result_zags.replace(() => ({
+					error,
+					status: error === void 0 ? internal.SHOT_STATUS.FULFILLED : internal.SHOT_STATUS.REJECTED,
+				}))
+
+				return error === void 0 ? Promise.resolve() : Promise.reject(error)
+			}
+
+			hunt$.update("barrage", shots => [...shots, { prey, bullet, callback }])
+
+			return () =>
+				new Promise((resolve, reject) => {
+					const divorce = result_zags.marry((state, is_update) => {
+						if (!is_update || state.status === internal.SHOT_STATUS.PENDING) return
+
+						divorce()
+
+						if (state.status === internal.SHOT_STATUS.REJECTED) reject(state.error)
+						else resolve()
+					})
+				})
+		}
 
 	export const track =
 		<$Preys extends Record<string, unknown>>(hunt$: Zags.Instance<Hunt.State<$Preys>>): Hunt.Track<$Preys> =>
@@ -80,4 +99,20 @@ namespace internal {
 				})
 			}
 		}
+
+	export const is_different_shot =
+		<$Preys extends Record<string, unknown>>(shot: Hunt.Shot<$Preys>) =>
+		(the_shot: Hunt.Shot<$Preys>) =>
+			the_shot.prey !== shot.prey || !deep_equals(the_shot.bullet, shot.bullet)
+
+	export enum SHOT_STATUS {
+		PENDING,
+		FULFILLED,
+		REJECTED,
+	}
+
+	export const is_different_prey =
+		<$Preys extends Record<string, unknown>>(shot: Hunt.Shot<$Preys>) =>
+		(the_shot: Hunt.Shot<$Preys>) =>
+			the_shot.prey !== shot.prey
 }

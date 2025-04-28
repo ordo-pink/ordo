@@ -18,7 +18,7 @@ export const create_zags: Zags.Module = (state, partners = []) => ({
 
 		return location[keys[keys.length - 1]]
 	},
-	transform: f => {
+	replace: f => {
 		const state_copy = { ...state }
 		const updated_state = f(state_copy)
 
@@ -26,6 +26,29 @@ export const create_zags: Zags.Module = (state, partners = []) => ({
 			state = updated_state
 			partners.forEach(f => f(state, true))
 		}
+	},
+	each: r => {
+		const sorted_keys = Object.keys(r).sort((a, b) => (a.split(".").length > b.split(".").length ? 1 : -1))
+
+		let should_let_partners_know = false
+		const state_copy = { ...state }
+
+		for (let i = 0; i < sorted_keys.length; i++) {
+			const keys = sorted_keys[i].split(".")
+
+			const location: Record<string, any> = keys.slice(0, -1).reduce((acc, key) => (acc as any)[key], state_copy)
+			const current_value = location[keys[keys.length - 1]]
+			const value = (r as Record<string, any>)[sorted_keys[i]](current_value)
+
+			if (!deep_equals(value, current_value)) {
+				if (!should_let_partners_know) should_let_partners_know = true
+
+				location[keys[keys.length - 1]] = value
+				state = state_copy
+			}
+		}
+
+		if (should_let_partners_know) partners.forEach(f => f(state, true))
 	},
 	unwrap: () => state,
 	update: (path, value_creator) => {

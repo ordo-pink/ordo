@@ -159,6 +159,43 @@ export namespace Zags {
 	) => void
 
 	/**
+	 * Update Zags state in multiple places with only one partners call after all changes are applied. The partners
+	 * **WILL NOT** be called if the state did not actually change.
+	 *
+	 * NOTE: The most deeply nested updates happen last.
+	 *
+	 * @example
+	 * ```typescript
+	 * import { create_zags } from "@ordo-pink/zags"
+	 *
+	 * const zags = create_zags({ git: { branch: "dev" }, db: { name: "fs" } })
+	 *
+	 * zags.marry(({ git, db }, is_update) => {
+	 * 	if (!is_update) return // Only do the thing if it is an update
+	 * 	console.log("Branch:", git.branch, ", db:", db.name))
+	 * })
+	 *
+	 * zags.each({
+	 * 	"git": _ => ({ branch: "prod" }),
+	 * 	"git.branch": _ => "margarita", // Deeper updates take precedence over shallow ones
+	 * 	"db.name": _ => "s3"
+	 * })
+	 * // "Branch: margarita, db: s3"
+	 * ```
+	 */
+	export type Each<
+		$State extends Zags.BaseState,
+		$Key extends Zags.Pouch.RecordToDotPaths<$State> = Zags.Pouch.RecordToDotPaths<$State>,
+	> = (
+		/**
+		 * @key dot-separated path to the entity to update.
+		 * @value callback that is provided with the current value under given path. Whatever is returned, becomes
+		 * 				the new value under given path.
+		 */
+		increment: Partial<Record<$Key, (prev_value: Zags.Pouch.RecordValueByDotPath<$State, $Key>) => void>>,
+	) => void
+
+	/**
 	 * Update the whole Zags state and call all married and all cheating partners. The partners **WILL NOT** be called
 	 * if the state did not actually change.
 	 *
@@ -182,7 +219,7 @@ export namespace Zags {
 	 * // "Your new branch name is margarita"
 	 * ```
 	 */
-	export type Transform<$State extends Zags.BaseState> = (
+	export type Replace<$State extends Zags.BaseState> = (
 		/**
 		 * A callback that is provided with the current state. Whatever is returned, becomes the new state.
 		 *
@@ -236,12 +273,14 @@ export namespace Zags {
 		marry: Zags.Marry<$State>
 		/** @see {@link Zags.Select} */
 		select: Zags.Select<$State>
-		/** @see {@link Zags.Transform} */
-		transform: Zags.Transform<$State>
+		/** @see {@link Zags.Replace} */
+		replace: Zags.Replace<$State>
 		/** @see {@link Zags.Unwrap} */
 		unwrap: Zags.Unwrap<$State>
 		/** @see {@link Zags.Update} */
 		update: Zags.Update<$State>
+		/** @see {@link Zags.Each} */
+		each: Zags.Each<$State>
 	}
 
 	/**
@@ -321,7 +360,9 @@ export namespace Zags {
 		 * ```
 		 */
 		export type RecordValues<$Record extends Zags.BaseState> = $Record extends { [_Key in keyof $Record]: infer Type }
-			? Type
+			? Type extends NonNullable<unknown>
+				? Type
+				: never
 			: never
 
 		/**

@@ -183,16 +183,15 @@ export namespace Zags {
 	 * // "Branch: margarita, db: s3"
 	 * ```
 	 */
-	export type Each<
-		$State extends Zags.BaseState,
-		$Key extends Zags.Pouch.RecordToDotPaths<$State> = Zags.Pouch.RecordToDotPaths<$State>,
-	> = (
+	export type Each<$State extends Zags.BaseState> = (
 		/**
 		 * @key dot-separated path to the entity to update.
 		 * @value callback that is provided with the current value under given path. Whatever is returned, becomes
 		 * 				the new value under given path.
 		 */
-		increment: Partial<Record<$Key, (prev_value: Zags.Pouch.RecordValueByDotPath<$State, $Key>) => void>>,
+		increment: {
+			[_Key in Zags.Pouch.RecordToDotPaths<$State>]?: (prev_value: Zags.Pouch.RecordValueByDotPath<$State, _Key>) => void
+		},
 	) => void
 
 	/**

@@ -33,17 +33,33 @@ test.describe("hunter", () => {
 
 	test.it("should disengage", () => {
 		const x = { hello: "world" } as Record<string, string>
-
 		const hunter = hunt.begin<{ test: { args: string } }>()
-
 		hunter.track("test", str => void (x.hello = str))
 		const putdown = hunter.track("test", str => void (x[str] = str))
-
 		putdown()
-
-		hunter.shoot("test", "world1")
-
+		hunter.shoot("test", "world1").to_promise()
 		test.expect(x.hello).toBe("world1")
 		test.expect(x.world1).toBeUndefined()
+	})
+
+	test.it("should promise the prey is shot", () => {
+		const x = { hello: "world" } as Record<string, string>
+		const hunter = hunt.begin<{ test: { args: string } }>()
+		hunter.track(
+			"test",
+			str =>
+				new Promise(resolve => {
+					setTimeout(() => {
+						x.hello = str
+						resolve()
+					}, 200)
+				}),
+		)
+		hunter
+			.shoot("test", "world1")
+			.to_promise()
+			.then(() => test.expect(x.hello).toBe("world1"))
+
+		test.expect(x.hello).toBe("world")
 	})
 })

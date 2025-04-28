@@ -19,7 +19,7 @@ export namespace Hunt {
 	export type Shoot<$Preys extends Record<string, unknown>> = <$Prey extends Hunt.Pouch.Prey<$Preys>>(
 		prey: $Prey,
 		bullet: Hunt.Pouch.ToPreys<$Preys>[$Prey],
-	) => () => Promise<void>
+	) => { to_promise: () => Promise<void> }
 
 	export type Track<$Preys extends Record<string, unknown>> = <$Prey extends Hunt.Pouch.Prey<$Preys>>(
 		prey: $Prey,

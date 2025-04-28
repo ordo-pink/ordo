@@ -33,14 +33,9 @@ namespace internal {
 					Promise.all(guns.map(gun => gun(shot.bullet)))
 						.then(() => shot.callback())
 						.catch(shot.callback)
-				} else {
-					hunt$.update("barrage", shots => shots.filter(is_different_prey(shot)))
 				}
 			}
 		}
-
-	export const is_shot = <$Preys extends Record<string, unknown>>(x: any): x is Hunt.Shot<$Preys> =>
-		!!x && typeof x === "object" && typeof x.prey === "string" && x.bullet !== undefined
 
 	export const shoot =
 		<$Preys extends Record<string, unknown>>(hunt$: Zags.Instance<Hunt.State<$Preys>>): Hunt.Shoot<$Preys> =>
@@ -61,17 +56,19 @@ namespace internal {
 
 			hunt$.update("barrage", shots => [...shots, { prey, bullet, callback }])
 
-			return () =>
-				new Promise((resolve, reject) => {
-					const divorce = result_zags.marry((state, is_update) => {
-						if (!is_update || state.status === internal.SHOT_STATUS.PENDING) return
+			return {
+				to_promise: () =>
+					new Promise((resolve, reject) => {
+						const divorce = result_zags.marry((state, is_update) => {
+							if (!is_update || state.status === internal.SHOT_STATUS.PENDING) return
 
-						divorce()
+							divorce()
 
-						if (state.status === internal.SHOT_STATUS.REJECTED) reject(state.error)
-						else resolve()
-					})
-				})
+							if (state.status === internal.SHOT_STATUS.REJECTED) reject(state.error)
+							else resolve()
+						})
+					}),
+			}
 		}
 
 	export const track =
@@ -110,9 +107,4 @@ namespace internal {
 		FULFILLED,
 		REJECTED,
 	}
-
-	export const is_different_prey =
-		<$Preys extends Record<string, unknown>>(shot: Hunt.Shot<$Preys>) =>
-		(the_shot: Hunt.Shot<$Preys>) =>
-			the_shot.prey !== shot.prey
 }

@@ -70,7 +70,7 @@ export namespace Hunt {
 		/**
 		 * Payload to be provided to the gun.
 		 */
-		bullet: $Preys[$Prey],
+		...bullet: $Preys[$Prey] extends void ? [void] : [$Preys[$Prey]]
 	) => {
 		/**
 		 * Turn into promise that resolves if the shot succeeds or rejects if the shot fails. Useful in case you

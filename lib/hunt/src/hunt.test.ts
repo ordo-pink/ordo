@@ -42,6 +42,12 @@ test.describe("hunter", () => {
 		test.expect(x.world1).toBeUndefined()
 	})
 
+	test.it("should not require bullet if it is void", () => {
+		const hunter = hunt.begin<{ test: { args: void } }>()
+
+		hunter.shoot("test")
+	})
+
 	test.it("should work without type suggestions", () => {
 		const hunter = hunt.begin<Record<string, { args: any }>>()
 		let y = 0

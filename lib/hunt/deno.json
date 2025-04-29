@@ -5,6 +5,6 @@
 	"exclude": ["**/*.test.ts"],
 	"imports": {
 		"@ordo-pink/deep-equals": "jsr:@ordo-pink/deep-equals@0",
-		"@ordo-pink/zags": "jsr:@ordo-pink/zags@0.3.1"
+		"@ordo-pink/zags": "jsr:@ordo-pink/zags@0.3.2"
 	}
 }

@@ -42,6 +42,16 @@ test.describe("hunter", () => {
 		test.expect(x.world1).toBeUndefined()
 	})
 
+	test.it("should work without type suggestions", () => {
+		const hunter = hunt.begin<Record<string, { args: any }>>()
+		let y = 0
+
+		hunter.track("hey", x => void (y = x))
+		hunter.shoot("hey", 1)
+
+		test.expect(y).toBe(1)
+	})
+
 	test.it("should promise the prey is shot", () => {
 		const x = { hello: "world" } as Record<string, string>
 		const hunter = hunt.begin<{ test: { args: string } }>()

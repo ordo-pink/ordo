@@ -12,7 +12,7 @@ import { Hunt } from "./hunt.types.ts"
 export const hunt: Hunt.Module = {
 	/** @see {@link Hunt.Begin } */
 	begin: <$Preys extends Record<string, unknown>>() => {
-		const hunt$ = create_zags<Hunt.State<$Preys>>({ barrage: [], gun_storage: {} })
+		const hunt$ = create_zags<Hunt.State<Hunt.Pouch.ToPreys<$Preys>>>({ barrage: [], gun_storage: {} })
 		hunt$.marry(internal.handle_barrage_updates(hunt$))
 
 		return { shoot: internal.shoot(hunt$), track: internal.track(hunt$) }
@@ -22,7 +22,7 @@ export const hunt: Hunt.Module = {
 /** @ignore */
 namespace internal {
 	export const handle_barrage_updates =
-		<$Preys extends Record<string, unknown>>(hunt$: Zags.Instance<Hunt.State<$Preys>>) =>
+		<$Preys extends Hunt.BasePreys>(hunt$: Zags.Instance<Hunt.State<$Preys>>) =>
 		({ barrage, gun_storage }: Hunt.State<$Preys>) => {
 			for (const shot of barrage) {
 				const guns = gun_storage[shot.prey as string]

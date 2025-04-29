@@ -155,12 +155,12 @@ export namespace Hunt {
 	 *
 	 * type Preys = {
 	 * 	// The key becomes the command name
-	 * 	// To provide the expected command payload, wrap it with a thunk
-	 * 	replace_str: () => string
+	 * 	// To provide the expected command payload, wrap it { args: %PAYLOAD_TYPE% }
+	 * 	replace_str: { args: string }
 	 * 	// The keys can be nested, which will create dot-separated command names ("maths.add_one")
 	 * 	maths: {
-	 * 		// If you want the command to have no payload, return a thunk that returns `void`
-	 * 		add_one: () => void
+	 * 		// If you want the command to have no payload, assign args to be `void`
+	 * 		add_one: { args: void }
 	 * 	}
 	 * }
 	 *

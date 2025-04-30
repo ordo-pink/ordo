@@ -20,7 +20,7 @@
  */
 
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 
 import { database$ } from "../database.state"
@@ -77,8 +77,8 @@ export const ColumnResizer = (column: string) =>
 
 			const handle_click = (event: MouseEvent) => event.stopPropagation()
 
-			use(MaokaJabs.listen("onmousedown", handle_mouse_down))
-			use(MaokaJabs.listen("onclick", handle_click))
+			use(maoka_jabs.listen("onmousedown", handle_mouse_down))
+			use(maoka_jabs.listen("onclick", handle_click))
 
 			document.addEventListener("mousemove", handle_mouse_move)
 			document.addEventListener("mouseup", handle_mouse_up)

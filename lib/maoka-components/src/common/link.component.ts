@@ -20,7 +20,7 @@
  */
 
 import { Maoka, TMaokaChildren } from "@ordo-pink/maoka"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStr } from "@ordo-pink/maoka-render-string"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
@@ -37,14 +37,14 @@ export const Link = ({ href, children, custom_class, show_visited, title }: P) =
 	Maoka.create("a", ({ use }) => {
 		const { emit } = use(MaokaOrdo.Jabs.get_commands)
 
-		use(MaokaJabs.listen("onclick", click_listener(emit, href)))
-		use(MaokaJabs.set_attribute("href", href))
-		use(MaokaJabs.set_attribute("title", title))
-		use(MaokaJabs.set_class("link"))
+		use(maoka_jabs.listen("onclick", click_listener(emit, href)))
+		use(maoka_jabs.set_attribute("href", href))
+		use(maoka_jabs.set_attribute("title", title))
+		use(maoka_jabs.set_class("link"))
 
-		if (custom_class) use(MaokaJabs.add_class(custom_class))
-		if (!show_visited) use(MaokaJabs.add_class("link_no-history"))
-		if (is_string(children)) use(MaokaJabs.set_attribute("title", children))
+		if (custom_class) use(maoka_jabs.add_class(custom_class))
+		if (!show_visited) use(maoka_jabs.add_class("link_no-history"))
+		if (is_string(children)) use(maoka_jabs.set_attribute("title", children))
 
 		return () => children
 	})
@@ -63,7 +63,7 @@ export const MetadataLink = ({
 		const user_query = ordo_app_state.zags.select("user")
 		const pb_host = ordo_app_state.zags.select("hosts.pb")
 
-		use(MaokaJabs.listen("oncontextmenu", event => handle_context_menu(event)))
+		use(maoka_jabs.listen("oncontextmenu", event => handle_context_menu(event)))
 
 		if (user_query && MaokaStr.is_maoka_str_element(element)) {
 			const name = metadata.get_property("public_name")

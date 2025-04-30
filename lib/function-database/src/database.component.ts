@@ -21,7 +21,7 @@
 
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { R } from "@ordo-pink/result"
@@ -43,7 +43,7 @@ export const Database = (metadata: Ordo.Metadata.Instance, content: Ordo.Content
 		let db_state = database$.unwrap()
 		const fsid = metadata.get_fsid()
 
-		use(MaokaJabs.set_class("database_view"))
+		use(maoka_jabs.set_class("database_view"))
 
 		use(show_columns_jab(metadata))
 

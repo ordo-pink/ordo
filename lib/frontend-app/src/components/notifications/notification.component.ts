@@ -20,7 +20,7 @@
  */
 
 import { Maoka } from "@ordo-pink/maoka"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { noop } from "@ordo-pink/tau"
 
@@ -35,14 +35,14 @@ export const OrdoNotification = ({ on_click, id, message, duration, render_icon,
 	Maoka.create("div", ({ use }) => {
 		const t = ordo_app_state.zags.select("translate")
 
-		use(MaokaJabs.set_class("notification-card_container"))
+		use(maoka_jabs.set_class("notification-card_container"))
 
 		if (on_click) {
-			use(MaokaJabs.add_class("interactive"))
-			use(MaokaJabs.listen("onclick", on_click))
+			use(maoka_jabs.add_class("interactive"))
+			use(maoka_jabs.listen("onclick", on_click))
 		} else {
-			use(MaokaJabs.remove_class("interactive"))
-			use(MaokaJabs.listen("onclick", noop))
+			use(maoka_jabs.remove_class("interactive"))
+			use(maoka_jabs.listen("onclick", noop))
 		}
 
 		const card_type = get_readable_type(type)

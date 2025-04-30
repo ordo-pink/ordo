@@ -22,7 +22,7 @@
 import { BsFileEarmark, BsFileEarmarkBinary, BsFolderOpen } from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { R } from "@ordo-pink/result"
@@ -55,11 +55,11 @@ export const MetadataIcon = ({ metadata, custom_class = "", show_emoji_picker = 
 
 		use(MaokaDOM.Jabs.onunmount(() => divorce_metadata_query()))
 
-		use(MaokaJabs.set_class("cursor-pointer"))
+		use(maoka_jabs.set_class("cursor-pointer"))
 
 		if (show_emoji_picker)
 			use(
-				MaokaJabs.listen("onclick", event => {
+				maoka_jabs.listen("onclick", event => {
 					event.stopPropagation()
 
 					commands.emit("cmd.application.command_palette.show", {
@@ -98,7 +98,7 @@ export const MetadataIcon = ({ metadata, custom_class = "", show_emoji_picker = 
 		return () => {
 			if (emoji)
 				return Maoka.create("div", ({ use }) => {
-					use(MaokaJabs.set_class(custom_class, "text-[85%]"))
+					use(maoka_jabs.set_class(custom_class, "text-[85%]"))
 					return () => emoji
 				})
 
@@ -122,7 +122,7 @@ const Icon = ({ metadata, custom_class, has_children }: P2) =>
 
 			const fa = file_associations.find(association => association.types.some(type => metadata_content_type === type.name))
 
-			use(MaokaJabs.set_class(custom_class!))
+			use(maoka_jabs.set_class(custom_class!))
 
 			return sweech
 				.of_true()

@@ -19,7 +19,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { TMaokaChildren, TMaokaComponent } from "@ordo-pink/maoka"
 import type { Logger } from "@ordo-pink/logger"
 import type { Oath } from "@ordo-pink/oath"
 import type { TResult } from "@ordo-pink/result"
@@ -27,6 +26,7 @@ import type { TWO_LETTER_LOCALE } from "@ordo-pink/locale"
 import type { Zags } from "@ordo-pink/zags"
 
 import type * as C from "./constants"
+import { Hunt } from "@ordo-pink/hunt"
 
 export type TDropIsPrefix<T extends string> = T extends `is_${infer U}` ? U : never
 
@@ -218,116 +218,117 @@ declare global {
 	 * ```
 	 */
 	interface cmd {
-		application: {
-			set_title: () => Ordo.I18N.TranslationKey
-			add_translations: () => {
-				lang: keyof Ordo.I18N.Translations
-				translations: Partial<Record<Ordo.I18N.TranslationKey, string>>
-			}
-			set_language: () => keyof Ordo.I18N.Translations
-			background_task: {
-				set_status: () => C.BackgroundTaskStatus
-				start_saving: () => void
-				start_loading: () => void
-				reset_status: () => void
-			}
-			notification: {
-				show: () => Partial<Ordo.Notification.Instance> & Pick<Ordo.Notification.Instance, "message">
-				hide: () => string
-			}
-			context_menu: {
-				add: () => Ordo.ContextMenu.Item
-				remove: () => string
-				show: () => Omit<Ordo.ContextMenu.Instance, "structure">
-				hide: () => void
-			}
-			command_palette: {
-				add: () => Ordo.CommandPalette.Item
-				remove: () => string
-				toggle: () => void
-				show: () => Ordo.CommandPalette.Instance
-				hide: () => void
-			}
-			sidebar: {
-				enable: () => void
-				disable: () => void
-				show: () => void
-				hide: () => void
-				toggle: () => void
-			}
-			router: {
-				navigate: () => { url: Ordo.Router.Route["pathname"]; new_tab?: boolean }
-				open_external: () => Ordo.Router.OpenExternalParams
-			}
-			modal: {
-				show: () => Ordo.Modal.Instance
-				hide: () => void
-			}
+		command_palette: {
+			add: { args: Ordo.CommandPalette.Item }
+			remove: { args: string | number }
+			toggle: { args: void }
+			show: { args: Ordo.CommandPalette.Instance | undefined }
+			hide: { args: void }
 		}
-		functions: {
-			activities: {
-				register: () => Ordo.Activity.Instance
-				unregister: () => Ordo.Activity.Instance["name"]
-			}
-			persisted_state: {
-				update: () => { key: string; value: any }
-			}
-			file_associations: {
-				register: () => Ordo.FileAssociation.Instance
-				unregister: () => Ordo.FileAssociation.Instance["name"]
-			}
-		}
-		user: {
-			achievement: {
-				add: () => Ordo.Achievement.Instance
-			}
-			open_achievements: () => void
-			open_current_user_profile: () => void
-			open_settings: () => void
-		}
-		metadata: {
-			add_labels: () => { fsid: Ordo.Metadata.FSID; labels: Ordo.Metadata.Label[] }
-			add_links: () => { fsid: Ordo.Metadata.FSID; links: Ordo.Metadata.FSID[] }
-			create: () => Ordo.Metadata.CreateParams
-			edit_label: () => { old_label: Ordo.Metadata.Label; new_label: Ordo.Metadata.Label }
-			move: () => { fsid: Ordo.Metadata.FSID; new_parent: Ordo.Metadata.FSID | null }
-			open_published_page: () => Ordo.Metadata.FSID
-			publish: () => Ordo.Metadata.FSID
-			remove_labels: () => { fsid: Ordo.Metadata.FSID; labels: Ordo.Metadata.Label[] }
-			remove_links: () => { fsid: Ordo.Metadata.FSID; links: Ordo.Metadata.FSID[] }
-			remove: () => Ordo.Metadata.FSID
-			rename: () => { fsid: Ordo.Metadata.FSID; new_name: string }
-			set_property: () => { fsid: Ordo.Metadata.FSID; key: string; value: any }
-			set_size: () => { fsid: Ordo.Metadata.FSID; size: number }
-			show_create_modal: () => Ordo.Metadata.FSID | null
-			show_edit_label_modal: () => Ordo.Metadata.Label
-			show_edit_labels_palette: () => Ordo.Metadata.FSID
-			show_edit_links_palette: () => { fsid: Ordo.Metadata.FSID; type: "incoming" | "outgoing" }
-			show_move_palette: () => Ordo.Metadata.FSID
-			show_publish_modal: () => Ordo.Metadata.FSID
-			show_remove_modal: () => Ordo.Metadata.FSID
-			show_rename_modal: () => Ordo.Metadata.FSID
-			show_upload_modal: () => Ordo.Metadata.FSID | null
-			unpublish: () => Ordo.Metadata.FSID
-		}
-		content: {
-			set: () => { content_type: string; content: Ordo.Content.Instance; fsid: Ordo.Metadata.FSID }
-			upload: () => { content: Ordo.Content.Instance; name: string; parent: Ordo.Metadata.FSID | null; type: string }
-			remove: () => Ordo.Metadata.FSID
-		}
-		file_editor: { open_file: () => Ordo.Metadata.FSID; open: () => void }
-		welcome: {
-			go_to_email_support: () => void
-			go_to_messenger_support: () => void
-			go_to_welcome_page: () => void
-			open_support_palette: () => void
-		}
-		auth: {
-			request_code: (email: Ordo.User.Email) => void
-			show_request_code_modal: () => void
-			show_validate_code_modal: () => Ordo.User.Email
-			validate_code: (email: Ordo.User.Email, code: string) => void
-		}
+		// application: {
+		// 	set_title: () => Ordo.I18N.TranslationKey
+		// 	add_translations: () => {
+		// 		lang: keyof Ordo.I18N.Translations
+		// 		translations: Partial<Record<Ordo.I18N.TranslationKey, string>>
+		// 	}
+		// 	set_language: () => keyof Ordo.I18N.Translations
+		// 	background_task: {
+		// 		set_status: () => C.BackgroundTaskStatus
+		// 		start_saving: () => void
+		// 		start_loading: () => void
+		// 		reset_status: () => void
+		// 	}
+		// 	notification: {
+		// 		show: () => Partial<Ordo.Notification.Instance> & Pick<Ordo.Notification.Instance, "message">
+		// 		hide: () => string
+		// 	}
+		// 	context_menu: {
+		// 		add: () => Ordo.ContextMenu.Item
+		// 		remove: () => string
+		// 		show: () => Omit<Ordo.ContextMenu.Instance, "structure">
+		// 		hide: () => void
+		// 	}
+
+		// 	sidebar: {
+		// 		enable: () => void
+		// 		disable: () => void
+		// 		show: () => void
+		// 		hide: () => void
+		// 		toggle: () => void
+		// 	}
+		// 	router: {
+		// 		navigate: () => { url: Ordo.Router.Route["pathname"]; new_tab?: boolean }
+		// 		open_external: () => Ordo.Router.OpenExternalParams
+		// 	}
+		// 	modal: {
+		// 		show: () => Ordo.Modal.Instance
+		// 		hide: () => void
+		// 	}
+		// }
+		// functions: {
+		// 	activities: {
+		// 		register: () => Ordo.Activity.Instance
+		// 		unregister: () => Ordo.Activity.Instance["name"]
+		// 	}
+		// 	persisted_state: {
+		// 		update: () => { key: string; value: any }
+		// 	}
+		// 	file_associations: {
+		// 		register: () => Ordo.FileAssociation.Instance
+		// 		unregister: () => Ordo.FileAssociation.Instance["name"]
+		// 	}
+		// }
+		// user: {
+		// 	achievement: {
+		// 		add: () => Ordo.Achievement.Instance
+		// 	}
+		// 	open_achievements: () => void
+		// 	open_current_user_profile: () => void
+		// 	open_settings: () => void
+		// }
+		// metadata: {
+		// 	add_labels: () => { fsid: Ordo.Metadata.FSID; labels: Ordo.Metadata.Label[] }
+		// 	add_links: () => { fsid: Ordo.Metadata.FSID; links: Ordo.Metadata.FSID[] }
+		// 	create: () => Ordo.Metadata.CreateParams
+		// 	edit_label: () => { old_label: Ordo.Metadata.Label; new_label: Ordo.Metadata.Label }
+		// 	move: () => { fsid: Ordo.Metadata.FSID; new_parent: Ordo.Metadata.FSID | null }
+		// 	open_published_page: () => Ordo.Metadata.FSID
+		// 	publish: () => Ordo.Metadata.FSID
+		// 	remove_labels: () => { fsid: Ordo.Metadata.FSID; labels: Ordo.Metadata.Label[] }
+		// 	remove_links: () => { fsid: Ordo.Metadata.FSID; links: Ordo.Metadata.FSID[] }
+		// 	remove: () => Ordo.Metadata.FSID
+		// 	rename: () => { fsid: Ordo.Metadata.FSID; new_name: string }
+		// 	set_property: () => { fsid: Ordo.Metadata.FSID; key: string; value: any }
+		// 	set_size: () => { fsid: Ordo.Metadata.FSID; size: number }
+		// 	show_create_modal: () => Ordo.Metadata.FSID | null
+		// 	show_edit_label_modal: () => Ordo.Metadata.Label
+		// 	show_edit_labels_palette: () => Ordo.Metadata.FSID
+		// 	show_edit_links_palette: () => { fsid: Ordo.Metadata.FSID; type: "incoming" | "outgoing" }
+		// 	show_move_palette: () => Ordo.Metadata.FSID
+		// 	show_publish_modal: () => Ordo.Metadata.FSID
+		// 	show_remove_modal: () => Ordo.Metadata.FSID
+		// 	show_rename_modal: () => Ordo.Metadata.FSID
+		// 	show_upload_modal: () => Ordo.Metadata.FSID | null
+		// 	unpublish: () => Ordo.Metadata.FSID
+		// }
+		// content: {
+		// 	set: () => { content_type: string; content: Ordo.Content.Instance; fsid: Ordo.Metadata.FSID }
+		// 	upload: () => { content: Ordo.Content.Instance; name: string; parent: Ordo.Metadata.FSID | null; type: string }
+		// 	remove: () => Ordo.Metadata.FSID
+		// }
+		// file_editor: { open_file: () => Ordo.Metadata.FSID; open: () => void }
+		// welcome: {
+		// 	go_to_email_support: () => void
+		// 	go_to_messenger_support: () => void
+		// 	go_to_welcome_page: () => void
+		// 	open_support_palette: () => void
+		// }
+		// auth: {
+		// 	request_code: (email: Ordo.User.Email) => void
+		// 	show_request_code_modal: () => void
+		// 	show_validate_code_modal: () => Ordo.User.Email
+		// 	validate_code: (email: Ordo.User.Email, code: string) => void
+		// }
 	}
 
 	/**
@@ -348,9 +349,24 @@ declare global {
 			debug?: any
 		}
 
+		type Preys = Pick<cmd, "command_palette">
+
+		type Hunter = Hunt.Instance<Preys>
+
+		type State = {
+			fetch: Ordo.Fetch
+			hosts: Ordo.Hosts
+			translate: Ordo.I18N.TranslateFn
+			logger: Logger
+			hunter: Ordo.Hunter
+			// TODO: zags: Ordo.Rings
+		}
+
+		export type GunFor<$Prey extends keyof Hunt.Pouch.ToPreys<Ordo.Preys>> = Hunt.GunFor<Hunt.Pouch.ToPreys<Ordo.Preys>, $Prey>
+
 		type Fetch = typeof window.fetch
 
-		type Hosts = { au: string; id: string; dt: string; pb: string; web: string }
+		type Hosts = { au: string; fn: string; id: string; dt: string; pb: string; web: string }
 
 		type DTOLike<$TDTO extends any[]> = [...$TDTO, ...any]
 
@@ -491,29 +507,17 @@ declare global {
 				| `user.${keyof Ordo.User.Query}`
 				| `content.${keyof Ordo.Content.Query}`
 
-			type CommandPermission = Ordo.Command.Name
+			type CommandPermission = keyof Ordo.Preys
 
 			type Permissions = {
 				queries: Ordo.CreateFunction.QueryPermission[]
 				commands: Ordo.CreateFunction.CommandPermission[]
 			}
 
-			type State = {
-				logger: Logger
-				fetch: Ordo.Fetch
-				commands: Ordo.Command.Commands
-				translate: Ordo.I18N.TranslateFn
-				user_query: Ordo.User.Query
-				router$: Zags.Instance<{ current_route: Ordo.Router.Route; routes: Record<string, string> }>
-				metadata_query: Ordo.Metadata.Query
-				content_query: Ordo.Content.Query
-				file_associations$: Zags.Instance<{ value: Ordo.FileAssociation.Instance[] }>
-			}
-
 			type Fn = (
 				name: string,
 				permissions: Ordo.CreateFunction.Permissions,
-				callback: (context: Ordo.CreateFunction.State) => void | Promise<void>,
+				callback: (context: Ordo.State) => void | Promise<void>,
 			) => (params: OrdoInternal.Function.CreateFunctionInternalContext) => void | Promise<void>
 		}
 
@@ -534,9 +538,9 @@ declare global {
 				name: string
 				routes: `/${string}`[]
 				default_route?: `/${string}`
-				render_workspace?: () => TMaokaChildren | Promise<TMaokaChildren>
-				render_sidebar?: () => TMaokaChildren | Promise<TMaokaChildren>
-				render_icon?: () => TMaokaChildren | Promise<TMaokaChildren>
+				render_workspace?: (div: HTMLDivElement) => void | Promise<void>
+				render_sidebar?: (div: HTMLDivElement) => void | Promise<void>
+				render_icon?: (span: HTMLSpanElement) => void | Promise<void>
 				onunmount?: (params: Ordo.Activity.OnUnmountParams) => void
 				is_background?: boolean
 				is_fullscreen?: boolean
@@ -544,11 +548,11 @@ declare global {
 		}
 
 		namespace FileAssociation {
-			type RenderFn = (params: Ordo.FileAssociation.RenderParams) => TMaokaChildren | Promise<TMaokaChildren>
+			type RenderFn = (params: Ordo.FileAssociation.RenderParams) => void | Promise<void>
 
 			type RenderToStringFn = (params: Ordo.FileAssociation.RenderParams) => string | Promise<string>
 
-			type RenderIconFn = () => TMaokaChildren | Promise<TMaokaChildren>
+			type RenderIconFn = (span: HTMLSpanElement) => void | Promise<void>
 
 			type Type = {
 				description: Ordo.I18N.TranslationKey
@@ -569,6 +573,7 @@ declare global {
 			}
 
 			type RenderParams = {
+				div: HTMLDivElement
 				content: Ordo.Content.Instance
 				is_editable: boolean
 				is_embedded: boolean
@@ -1009,86 +1014,8 @@ declare global {
 			}
 		}
 
-		namespace Command {
-			type Record = TFlattenRecord<TRecordToKVUnion<cmd, "cmd">>
-			type Name = keyof Record
-
-			/**
-			 * Command without payload.
-			 */
-			type Command<$TName extends Ordo.Command.Name = Ordo.Command.Name> = {
-				name: $TName
-				key?: string
-			}
-
-			/**
-			 * Command with payload.
-			 */
-			type PayloadCommand<$TName extends Ordo.Command.Name = Ordo.Command.Name, $TPayload = any> = Command<$TName> & {
-				payload: $TPayload
-			}
-
-			/**
-			 * Command handler.
-			 */
-			type CommandHandler<$TPayload> = (payload: $TPayload) => void | Promise<void>
-
-			type HandlerOf<$TKey extends Ordo.Command.Name> = CommandHandler<Ordo.Command.Record[$TKey]>
-
-			type OnFn = <$TKey extends Ordo.Command.Name>(name: $TKey, handler: CommandHandler<Ordo.Command.Record[$TKey]>) => void
-
-			type OffFn = <$TKey extends Ordo.Command.Name>(name: $TKey, handler: CommandHandler<Ordo.Command.Record[$TKey]>) => void
-
-			type EmitFn = <$TKey extends Ordo.Command.Name>(
-				name: $TKey,
-				...rest: Ordo.Command.Record[$TKey] extends void ? [key?: string] : [payload: Ordo.Command.Record[$TKey], key?: string]
-			) => void
-
-			type EmitNagaFn = <$TKey extends Ordo.Command.Name>(
-				name: $TKey,
-				...rest: Ordo.Command.Record[$TKey] extends void ? [key?: string] : [payload: Ordo.Command.Record[$TKey], key?: string]
-			) => Oath.Instance<void, Ordo.Rrr>
-
-			type CancelFn = <$TKey extends Ordo.Command.Name>(name: $TKey, payload?: Ordo.Command.Record[$TKey], key?: string) => void
-
-			type Commands = {
-				/**
-				 * Append a listener to a given command.
-				 */
-				on: Ordo.Command.OnFn
-
-				/**
-				 * Remove given listener for a given command. Make sure you provide a reference to the same
-				 * function as you did when calling `on`.
-				 */
-				off: Ordo.Command.OffFn
-
-				/**
-				 * Emit given command with given payload. You can provide an optional key that you can use
-				 * later to apply targeted cancellation for the command. Emission does not happen if there
-				 * is a command with given key already.
-				 */
-				emit: Ordo.Command.EmitFn
-
-				/**
-				 * Emit given command with given payload. You can provide an optional key that you can use
-				 * later to apply targeted cancellation for the command. Emission does not happen if there
-				 * is a command with given key already. The command returns an Oath.Instance that will be resolved
-				 * when the command succeeds or rejected when it fails. As with every other Oath.Instance, you need
-				 * to invoke it to get the result.
-				 */
-				naga: Ordo.Command.EmitNagaFn
-
-				/**
-				 * Cancel a command with given payload. If you provided a key when emitting the command,
-				 * you can provide it for targeted cancellation.
-				 */
-				cancel: Ordo.Command.CancelFn
-			}
-		}
-
 		namespace Modal {
-			type Instance = { onunmount?: () => void; render: () => TMaokaChildren | Promise<TMaokaChildren> }
+			type Instance = { onunmount?: () => void; render: (div: HTMLDivElement) => void | Promise<void> }
 		}
 
 		namespace Router {
@@ -1140,10 +1067,7 @@ declare global {
 				 */
 				type: C.ContextMenuItemType
 
-				/**
-				 * Name of the command to be invoked when the context menu item is used.
-				 */
-				command: Ordo.Command.Name
+				on_select: () => void | Promise<void>
 
 				/**
 				 * Readable name of the context menu item. Put a translated value here.
@@ -1153,7 +1077,7 @@ declare global {
 				/**
 				 * Icon to be displayed for the context menu item.
 				 */
-				render_icon?: () => TMaokaChildren | Promise<TMaokaChildren>
+				render_icon?: (span: HTMLSpanElement) => void | Promise<void>
 
 				/**
 				 * Keyboard hotkey for the context menu item. It only works while the context menu is
@@ -1242,6 +1166,7 @@ declare global {
 			 * Command palette item.
 			 */
 			type Item<T = any> = {
+				id: string | number
 				/**
 				 * Readable name of the command palette item. Put a translation key here, if you use i18n.
 				 */
@@ -1254,7 +1179,9 @@ declare global {
 				 *
 				 * @optional
 				 */
-				render_icon?: () => TMaokaChildren | Promise<TMaokaChildren>
+				render_icon?: (span: HTMLSpanElement) => void | Promise<void>
+				render_custom_footer?: (div: HTMLDivElement) => void | Promise<void>
+				render_custom_info?: (div: HTMLDivElement) => void | Promise<void>
 
 				/**
 				 * Keyboard hotkey for the context menu item. It only works while the context menu is
@@ -1267,9 +1194,6 @@ declare global {
 				description?: Ordo.I18N.TranslationKey
 
 				type?: C.CommandPaletteItemType
-
-				render_custom_footer?: () => TMaokaComponent // TODO Use standard render approach
-				render_custom_info?: () => TMaokaComponent // TODO Use standard render approach
 			}
 		}
 	}

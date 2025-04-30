@@ -20,7 +20,7 @@
  */
 
 import { Maoka, type TMaokaComponent } from "@ordo-pink/maoka"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { sweech } from "@ordo-pink/sweech"
 import { noop } from "@ordo-pink/tau"
@@ -30,7 +30,7 @@ import { FileEditorSidebarFile } from "./file-editor-sidebar-file.component"
 
 export const FileEditorSidebarItem = (fsid: Ordo.Metadata.FSID, depth = 0): TMaokaComponent =>
 	Maoka.create("div", ({ use }) => {
-		use(MaokaJabs.set_class("cursor-pointer"))
+		use(maoka_jabs.set_class("cursor-pointer"))
 
 		const get_metadata = use(MaokaOrdo.Jabs.Metadata.get_by_fsid$(fsid))
 		const get_metadata_has_children = use(MaokaOrdo.Jabs.Metadata.has_children$(fsid))

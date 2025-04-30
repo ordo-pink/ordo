@@ -21,14 +21,14 @@
 
 import { Dialog } from "@ordo-pink/maoka-components"
 import { Maoka } from "@ordo-pink/maoka"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
 import { DatabaseColumnModalItem } from "./database-columns-modal-item.component"
 import { type TColumnName } from "../database.types"
 
 export const DatabaseColumnsModal = Maoka.create("div", ({ use }) => {
-	use(MaokaJabs.set_class("database_modal_columns"))
+	use(maoka_jabs.set_class("database_modal_columns"))
 
 	const { t } = use(MaokaOrdo.Jabs.get_translations$)
 	const commands = use(MaokaOrdo.Jabs.get_commands)

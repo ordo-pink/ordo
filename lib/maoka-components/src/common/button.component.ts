@@ -21,7 +21,7 @@
 
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 
 import { Hotkey, THotkeyOptions } from "./hotkey.component"
@@ -48,9 +48,9 @@ const Default = ({
 	disabled = () => false,
 }: TButtonProps) =>
 	Maoka.create("button", ({ use, element }) => {
-		use(MaokaJabs.set_class("button", custom_class))
-		use(MaokaJabs.set_attribute("aria-label", aria_label))
-		use(MaokaJabs.listen("onclick", event => handle_click(event)))
+		use(maoka_jabs.set_class("button", custom_class))
+		use(maoka_jabs.set_attribute("aria-label", aria_label))
+		use(maoka_jabs.listen("onclick", event => handle_click(event)))
 
 		const handle_click = (event: MouseEvent) => {
 			event.preventDefault()
@@ -59,7 +59,7 @@ const Default = ({
 		}
 
 		return () => {
-			if (disabled()) use(MaokaJabs.set_attribute("disabled"))
+			if (disabled()) use(maoka_jabs.set_attribute("disabled"))
 			else if (MaokaDOM.is_maoka_dom_element(element)) element.removeAttribute("disabled") // TODO: Add jab
 
 			return [TextContainer(() => () => text), hotkey ? Hotkey(hotkey, hotkey_options) : void 0]

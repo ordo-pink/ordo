@@ -19,14 +19,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { App } from "@ordo-pink/frontend-app"
-import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
+import { app } from "@ordo-pink/frontend-app"
+import { maoka } from "@ordo-pink/maoka"
 
-const app = document.getElementById("app")!
+const body = document.querySelector("body")!
 
 const id_host = import.meta.env.VITE_ORDO_ID_HOST
 const dt_host = import.meta.env.VITE_ORDO_DT_HOST
 const pb_host = import.meta.env.VITE_ORDO_PB_HOST
 const au_host = import.meta.env.VITE_ORDO_AU_HOST
 
-void MaokaDOM.render(app, App({ id_host, dt_host, pb_host, au_host }), () => crypto.randomUUID())
+void maoka.dom.render(body, app({ id_host, dt_host, pb_host, au_host }), () => crypto.randomUUID())

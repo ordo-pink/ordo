@@ -20,15 +20,15 @@
  */
 
 import { Maoka } from "@ordo-pink/maoka"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 
 import { ordo_app_state } from "../../../app.state"
 
 export const Modal = Maoka.create("div", ({ use }) => {
 	const state = ordo_app_state.zags.select("sections.modal")!
 
-	use(MaokaJabs.set_class("modal"))
-	use(MaokaJabs.listen("onclick", event => handle_click(event)))
+	use(maoka_jabs.set_class("modal"))
+	use(maoka_jabs.listen("onclick", event => handle_click(event)))
 
 	const handle_click = (event: MouseEvent) => event.stopPropagation()
 

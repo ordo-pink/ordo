@@ -24,10 +24,10 @@ import { Maoka } from "@ordo-pink/maoka"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
 import { DATABASE_CONTEXT_MENU_PAYLOAD } from "../database.constants"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 
 export const DatabaseOptions = Maoka.create("div", ({ use }) => {
-	use(MaokaJabs.set_class("database_options"))
+	use(maoka_jabs.set_class("database_options"))
 
 	const commands = use(MaokaOrdo.Jabs.get_commands)
 

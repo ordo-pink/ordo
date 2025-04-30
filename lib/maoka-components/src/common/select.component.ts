@@ -21,7 +21,7 @@
 
 import { Maoka, type TMaokaChildren } from "@ordo-pink/maoka"
 import { BsChevronDown } from "@ordo-pink/frontend-icons"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 
 import { ActionListItem } from "./action-list-item.component"
 
@@ -43,8 +43,8 @@ export type TSelectProps<$TValue> = {
 
 export const Select = <$TValue>({ current_value, on_select, items }: TSelectProps<$TValue>) =>
 	Maoka.create("div", ({ use, refresh }) => {
-		use(MaokaJabs.set_attribute("tabindex", "1"))
-		use(MaokaJabs.set_class("relative"))
+		use(maoka_jabs.set_attribute("tabindex", "1"))
+		use(maoka_jabs.set_class("relative"))
 
 		let is_active = false
 		let value = current_value
@@ -72,7 +72,7 @@ export const Select = <$TValue>({ current_value, on_select, items }: TSelectProp
 			}),
 			is_active
 				? Maoka.create("div", ({ use }) => {
-						use(MaokaJabs.set_class("select_color-picker_options-wrapper"))
+						use(maoka_jabs.set_class("select_color-picker_options-wrapper"))
 
 						return () =>
 							items.map(item =>

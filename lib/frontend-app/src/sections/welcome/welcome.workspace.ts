@@ -20,12 +20,12 @@
  */
 
 import { Maoka } from "@ordo-pink/maoka"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 
 import { ordo_app_state } from "../../../app.state"
 
 export const WelcomeWorkspace = Maoka.create("div", ({ use }) => {
-	use(MaokaJabs.set_class("h-full"))
+	use(maoka_jabs.set_class("h-full"))
 
 	const get_user = use(ordo_app_state.select_jab$("user"))
 

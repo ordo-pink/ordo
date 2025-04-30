@@ -22,7 +22,7 @@
 import { Label, Link, MetadataIcon, MetadataLink, UserReference } from "@ordo-pink/maoka-components"
 import { Maoka, type TMaokaChildren } from "@ordo-pink/maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { R } from "@ordo-pink/result"
@@ -34,7 +34,7 @@ import { database$ } from "../database.state"
 
 export const DatabaseTableRow = (columns: Ordo.I18N.TranslationKey[], child: Ordo.Metadata.Instance, is_editable: boolean) =>
 	Maoka.create("tr", ({ use }) => {
-		use(MaokaJabs.set_class("database_table-row"))
+		use(maoka_jabs.set_class("database_table-row"))
 
 		return () =>
 			columns.map(column =>
@@ -59,7 +59,7 @@ const UserCell = (column: string, metadata: Ordo.Metadata.Instance) =>
 		const width_state = database$.select("width")
 		const width = width_state?.[column] ?? 200
 
-		use(MaokaJabs.set_style({ width: `${width}px` }))
+		use(maoka_jabs.set_style({ width: `${width}px` }))
 
 		const user_query = use(MaokaOrdo.Jabs.get_user_query)
 
@@ -76,8 +76,8 @@ const UserCell = (column: string, metadata: Ordo.Metadata.Instance) =>
 
 const Cell = (value: TMaokaChildren, on_click?: (event: MouseEvent) => void) =>
 	Maoka.create("td", ({ use }) => {
-		use(MaokaJabs.set_class("database_cell"))
-		if (on_click) use(MaokaJabs.listen("onclick", on_click))
+		use(maoka_jabs.set_class("database_cell"))
+		if (on_click) use(maoka_jabs.listen("onclick", on_click))
 
 		return () => value
 	})
@@ -87,24 +87,24 @@ const LinksCell = (column: string, metadata: Ordo.Metadata.Instance, type: "pare
 		const width_state = database$.select("width")
 		const width = width_state?.[column] ?? 200
 
-		use(MaokaJabs.set_style({ width: `${width}px` }))
+		use(maoka_jabs.set_style({ width: `${width}px` }))
 
 		const fsid = metadata.get_fsid()
 
-		use(MaokaJabs.set_class("database_cell-links"))
+		use(maoka_jabs.set_class("database_cell-links"))
 
 		if (type === "outgoing") {
 			const commands = use(MaokaOrdo.Jabs.get_commands)
 			const handle_click = () => commands.emit("cmd.metadata.show_edit_links_palette", { fsid, type })
 
-			if (use(MaokaDOM.Jabs.is_dom)) use(MaokaJabs.add_class("clickable"))
-			use(MaokaJabs.listen("onclick", () => handle_click()))
+			if (use(MaokaDOM.Jabs.is_dom)) use(maoka_jabs.add_class("clickable"))
+			use(maoka_jabs.listen("onclick", () => handle_click()))
 		} else if (type === "incoming") {
 			const commands = use(MaokaOrdo.Jabs.get_commands)
 			const handle_click = () => commands.emit("cmd.metadata.show_edit_links_palette", { fsid, type })
 
-			if (use(MaokaDOM.Jabs.is_dom)) use(MaokaJabs.add_class("clickable"))
-			use(MaokaJabs.listen("onclick", () => handle_click()))
+			if (use(MaokaDOM.Jabs.is_dom)) use(maoka_jabs.add_class("clickable"))
+			use(maoka_jabs.listen("onclick", () => handle_click()))
 		}
 
 		return () =>
@@ -112,7 +112,7 @@ const LinksCell = (column: string, metadata: Ordo.Metadata.Instance, type: "pare
 				.match(type)
 				.case("parent", () =>
 					Maoka.create("div", ({ use }) => {
-						use(MaokaJabs.set_class("database_cell-multiple"))
+						use(maoka_jabs.set_class("database_cell-multiple"))
 						const get_parent = use(MaokaOrdo.Jabs.Metadata.get_by_fsid$(metadata.get_parent()))
 
 						return () => {
@@ -125,7 +125,7 @@ const LinksCell = (column: string, metadata: Ordo.Metadata.Instance, type: "pare
 				)
 				.case("outgoing", () =>
 					Maoka.create("div", ({ use }) => {
-						use(MaokaJabs.set_class("database_cell-multiple"))
+						use(maoka_jabs.set_class("database_cell-multiple"))
 						const get_links = use(MaokaOrdo.Jabs.Metadata.get_outgoing_links$(fsid))
 						return () =>
 							get_links().map(link => LinkBlock(() => () => MetadataLink({ metadata: link, children: link.get_name() ?? "/" })))
@@ -133,7 +133,7 @@ const LinksCell = (column: string, metadata: Ordo.Metadata.Instance, type: "pare
 				)
 				.case("incoming", () =>
 					Maoka.create("div", ({ use }) => {
-						use(MaokaJabs.set_class("database_cell-multiple"))
+						use(maoka_jabs.set_class("database_cell-multiple"))
 						const get_links = use(MaokaOrdo.Jabs.Metadata.get_incoming_links$(metadata.get_fsid()))
 						return () =>
 							get_links().map(link => LinkBlock(() => () => MetadataLink({ metadata: link, children: link.get_name() ?? "/" })))
@@ -149,11 +149,11 @@ const LabelsCell = (fsid: Ordo.Metadata.FSID) =>
 		const width_state = database$.select("width")
 		const width = width_state?.["t.database.column_names.labels"] ?? 200
 
-		use(MaokaJabs.set_style({ width: `${width}px` }))
+		use(maoka_jabs.set_style({ width: `${width}px` }))
 
-		use(MaokaJabs.set_class("database_cell-multiple database_cell-labels"))
-		use(MaokaJabs.listen("onclick", () => handle_click()))
-		if (use(MaokaDOM.Jabs.is_dom)) use(MaokaJabs.add_class("clickable"))
+		use(maoka_jabs.set_class("database_cell-multiple database_cell-labels"))
+		use(maoka_jabs.listen("onclick", () => handle_click()))
+		if (use(MaokaDOM.Jabs.is_dom)) use(maoka_jabs.add_class("clickable"))
 
 		const commands = use(MaokaOrdo.Jabs.get_commands)
 		const get_metadata = use(MaokaOrdo.Jabs.Metadata.get_by_fsid$(fsid))
@@ -172,10 +172,10 @@ const DateCell = (column: string, date: Date) =>
 		const width_state = database$.select("width")
 		const width = width_state?.[column] ?? 200
 
-		use(MaokaJabs.set_style({ width: `${width}px` }))
+		use(maoka_jabs.set_style({ width: `${width}px` }))
 
-		use(MaokaJabs.set_class("database_cell-date"))
-		use(MaokaJabs.set_attribute("title", date.toLocaleString()))
+		use(maoka_jabs.set_class("database_cell-date"))
+		use(maoka_jabs.set_attribute("title", date.toLocaleString()))
 
 		return () => date.toLocaleDateString()
 	})
@@ -186,9 +186,9 @@ const FileNameCell = (metadata: Ordo.Metadata.Instance, is_editable: boolean) =>
 		const width_state = database$.select("width")
 		const width = width_state?.["t.database.column_names.name"] ?? 300
 
-		use(MaokaJabs.set_class("database_cell-filename"))
-		use(MaokaJabs.set_style({ width: `${width}px` }))
-		use(MaokaJabs.listen("oncontextmenu", event => handle_context_menu(event)))
+		use(maoka_jabs.set_class("database_cell-filename"))
+		use(maoka_jabs.set_style({ width: `${width}px` }))
+		use(maoka_jabs.listen("oncontextmenu", event => handle_context_menu(event)))
 
 		const handle_context_menu = (event: MouseEvent) => emit("cmd.application.context_menu.show", { event, payload: metadata })
 
@@ -199,7 +199,7 @@ const FileNameCell = (metadata: Ordo.Metadata.Instance, is_editable: boolean) =>
 
 				const commands = use(MaokaOrdo.Jabs.get_commands)
 
-				use(MaokaJabs.set_class("database_cell-filename-wrapper"))
+				use(maoka_jabs.set_class("database_cell-filename-wrapper"))
 
 				const handle_blur = (event: FocusEvent) => {
 					R.FromNullable(event.target as unknown as HTMLDivElement)
@@ -230,10 +230,10 @@ const EditableLink = ({ name, on_blur, is_editable, fsid }: TEditableLinkParams)
 			if (element instanceof HTMLElement) element.blur()
 		}
 
-		use(MaokaJabs.set_class("database_cell-filename-text"))
-		use(MaokaJabs.listen("onkeydown", handle_keydown))
-		use(MaokaJabs.listen("onblur", on_blur))
-		if (is_editable) use(MaokaJabs.set_attribute("contenteditable", "true"))
+		use(maoka_jabs.set_class("database_cell-filename-text"))
+		use(maoka_jabs.listen("onkeydown", handle_keydown))
+		use(maoka_jabs.listen("onblur", on_blur))
+		if (is_editable) use(maoka_jabs.set_attribute("contenteditable", "true"))
 
 		return () => Link({ href: `/editor/${fsid}`, children: name })
 	})

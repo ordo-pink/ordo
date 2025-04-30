@@ -5,13 +5,13 @@
 
 import { type Logger } from "@ordo-pink/logger"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { R } from "@ordo-pink/result"
 import { type TMaokaJab } from "@ordo-pink/maoka"
 import { Zags } from "@ordo-pink/zags"
 import { deep_equals } from "@ordo-pink/tau"
 
-export const ordo_context = MaokaJabs.create_context<Ordo.CreateFunction.State>()
+export const ordo_context = maoka_jabs.create_context<Ordo.CreateFunction.State>()
 
 export const get_commands: TMaokaJab<Ordo.Command.Commands> = ({ use }) => {
 	const zags = use(ordo_context.consume)

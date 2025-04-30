@@ -22,7 +22,7 @@
 import { BsX } from "@ordo-pink/frontend-icons"
 import { LabelColor } from "@ordo-pink/core"
 import { Maoka } from "@ordo-pink/maoka"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { is_string } from "@ordo-pink/tau"
 
@@ -35,8 +35,8 @@ export const Label = (label: Ordo.Metadata.Label, emit: Ordo.Command.EmitFn, met
 		const readable_name = is_string(label) ? label : label.name
 		const color = is_string(label) ? LabelColor.DEFAULT : label.color
 
-		use(MaokaJabs.set_class(`label ${color_class[color]}`))
-		use(MaokaJabs.listen("onclick", event => handle_click(event)))
+		use(maoka_jabs.set_class(`label ${color_class[color]}`))
+		use(maoka_jabs.listen("onclick", event => handle_click(event)))
 
 		const handle_click = (event: MouseEvent) => {
 			event.stopPropagation()
@@ -57,7 +57,7 @@ const TextWrapper = MaokaStyled.Tags.div()
 
 const RemoveLabel = (fsid: Ordo.Metadata.FSID, label: Ordo.Metadata.Label, emit: Ordo.Command.EmitFn) =>
 	Maoka.create("div", ({ use }) => {
-		use(MaokaJabs.listen("onclick", event => handle_click(event)))
+		use(maoka_jabs.listen("onclick", event => handle_click(event)))
 
 		const handle_click = (event: MouseEvent) => {
 			event.stopPropagation()

@@ -24,7 +24,7 @@ import { Hotkey } from "@ordo-pink/maoka-components"
 import { Input } from "@ordo-pink/maoka-components"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { sweech } from "@ordo-pink/sweech"
@@ -34,7 +34,7 @@ import { CommandPaletteLocation } from "./constants"
 import { OrdoCommandPaletteItems } from "./command-palette-items.component"
 
 export const OrdoCommandPalette = Maoka.create("div", ({ use, refresh }) => {
-	use(MaokaJabs.set_class("command-palette"))
+	use(maoka_jabs.set_class("command-palette"))
 
 	let input = ""
 

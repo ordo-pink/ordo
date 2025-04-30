@@ -19,89 +19,114 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Maoka } from "@ordo-pink/maoka"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
-import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
+import { Logger } from "@ordo-pink/logger"
+import { maoka } from "@ordo-pink/maoka"
 
-import { OrdoActivityBar } from "./src/components/activity-bar/activity-bar.component"
-import { OrdoBackgroundTaskIndicator } from "./src/components/background-task-indicator.component"
-import { OrdoContextMenu } from "./src/components/context-menu.component"
-import { OrdoModal } from "./src/components/modal/modal.overlay"
-import { OrdoNotifications } from "./src/components/notifications/notifications-list.component"
-import { OrdoSidebar } from "./src/components/sidebar/sidebar.component"
-import { OrdoTitleDisplay } from "./src/components/title.component"
-import { OrdoWorkspace } from "./src/components/workspace.component"
-import { ordo_app_state } from "./app.state"
+// import { maoka_jabs } from "@ordo-pink/maoka-jabs"
+// import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
-import { create_command_palette } from "./src/jabs/create-command-palette.jab"
-import { create_file_command } from "./src/jabs/commands/create-file.command"
-import { create_function_state } from "./src/jabs/create-function-state.jab"
-import { create_function_state_source } from "./src/jabs/create-function-state-source.jab"
-import { edit_file_labels_command } from "./src/jabs/commands/edit-file-labels.command"
-import { edit_file_links_command } from "./src/jabs/commands/edit-file-links.command"
-import { move_file_command } from "./src/jabs/commands/move-file.command"
-import { remove_file_command } from "./src/jabs/commands/remove-file.command"
-import { rename_file_command } from "./src/jabs/commands/rename-file.command"
-import { start_metadata_manager } from "./src/jabs/start-data-orchestrator.jab"
+// import { OrdoActivityBar } from "./src/components/activity-bar/activity-bar.component"
+// import { OrdoBackgroundTaskIndicator } from "./src/components/background-task-indicator.component"
+// import { OrdoContextMenu } from "./src/components/context-menu.component"
+// import { OrdoModal } from "./src/components/modal/modal.overlay"
+// import { OrdoNotifications } from "./src/components/notifications/notifications-list.component"
+// import { OrdoSidebar } from "./src/components/sidebar/sidebar.component"
+// import { OrdoTitleDisplay } from "./src/components/title.component"
+// import { OrdoWorkspace } from "./src/components/workspace.component"
+// import { ordo_app_state } from "./app.state"
+
+// import { create_command_palette } from "./src/jabs/create-command-palette.jab"
+// import { create_file_command } from "./src/jabs/commands/create-file.command"
+// import { create_function_state } from "./src/jabs/create-function-state.jab"
+// import { create_function_state_source } from "./src/jabs/create-function-state-source.jab"
+// import { edit_file_labels_command } from "./src/jabs/commands/edit-file-labels.command"
+// import { edit_file_links_command } from "./src/jabs/commands/edit-file-links.command"
+// import { move_file_command } from "./src/jabs/commands/move-file.command"
+// import { remove_file_command } from "./src/jabs/commands/remove-file.command"
+// import { rename_file_command } from "./src/jabs/commands/rename-file.command"
+// import { start_metadata_manager } from "./src/jabs/start-data-orchestrator.jab"
 
 // TODO Move fonts to assets
-import "./index.css"
+import { hunt } from "@ordo-pink/hunt"
 
-export type TAppOptions = {
-	dt_host: string
-	id_host: string
-	pb_host: string
-	au_host: string
+import { app_context } from "./app-context"
+import { create_command_palette } from "./src/command-palette/command-palette.jab"
+
+import "./index.css"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
+
+export type AppOptions = {
+	hosts: Ordo.Hosts
+	local_persistence_strategy: null
+	logger: Logger
 }
 
 // TODO Move translations from file explorer
-export const App = ({ au_host, dt_host, id_host, pb_host }: TAppOptions) =>
-	Maoka.create("div", ({ use }) => {
-		ordo_app_state.zags.update("hosts.id", () => id_host)
-		ordo_app_state.zags.update("hosts.dt", () => dt_host)
-		ordo_app_state.zags.update("hosts.pb", () => pb_host)
-		ordo_app_state.zags.update("hosts.au", () => au_host)
+export const app = ({ hosts, logger }: AppOptions) =>
+	internal.app_element(use => {
+		const hunter = hunt.begin<Ordo.Preys>()
+		const fetch = null as any
+		const translate = null as any
+		use(app_context.provide({ fetch, hosts, hunter, logger, translate }))
 
-		const { app_fid } = ordo_app_state.zags.select("constants")
+		const command_palette = use(create_command_palette)
+		// ordo_app_state.zags.update("hosts.id", () => id_host)
+		// ordo_app_state.zags.update("hosts.dt", () => dt_host)
+		// ordo_app_state.zags.update("hosts.pb", () => pb_host)
+		// ordo_app_state.zags.update("hosts.au", () => au_host)
 
-		const { repositories, source } = use(create_function_state_source)
-		const app_state = use(create_function_state(app_fid, source))
+		// const { app_fid } = ordo_app_state.zags.select("constants")
 
-		use(MaokaOrdo.Context.provide(app_state))
+		// const { repositories, source } = use(create_function_state_source)
+		// const app_state = use(create_function_state(app_fid, source))
 
-		use(MaokaJabs.set_class("app"))
-		use(create_command_palette)
-		use(move_file_command)
-		use(remove_file_command)
-		use(create_file_command)
-		use(rename_file_command)
-		use(edit_file_labels_command)
-		use(edit_file_links_command)
+		// use(MaokaOrdo.Context.provide(app_state))
 
-		use(start_metadata_manager(repositories))
+		// use(create_command_palette)
+		// use(move_file_command)
+		// use(remove_file_command)
+		// use(create_file_command)
+		// use(rename_file_command)
+		// use(edit_file_labels_command)
+		// use(edit_file_links_command)
+
+		// use(start_metadata_manager(repositories))
 
 		// TODO Render user defined functions
 		// TODO .catch
-		void Promise.any([
-			import("./src/sections/welcome").then(({ default: f }) => f(source)),
-			import("./src/sections/file-editor").then(({ default: f }) => f(source)),
-			import("@ordo-pink/function-rte")
-				.then(({ default: f }) => f(source))
-				.then(() => import("@ordo-pink/function-database"))
-				.then(({ default: f }) => f(source))
-				.then(() => import("@ordo-pink/function-board"))
-				.then(({ default: f }) => f(source)),
-		])
+		// void Promise.any([
+		// 	import("./src/sections/welcome").then(({ default: f }) => f(source)),
+		// 	import("./src/sections/file-editor").then(({ default: f }) => f(source)),
+		// 	import("@ordo-pink/function-rte")
+		// 		.then(({ default: f }) => f(source))
+		// 		.then(() => import("@ordo-pink/function-database"))
+		// 		.then(({ default: f }) => f(source))
+		// 		.then(() => import("@ordo-pink/function-board"))
+		// 		.then(({ default: f }) => f(source)),
+		// ])
 
 		// TODO Init user
 		return () => [
-			OrdoWorkspace,
-			OrdoSidebar,
-			OrdoModal,
-			OrdoNotifications,
-			OrdoContextMenu,
-			OrdoActivityBar,
-			OrdoBackgroundTaskIndicator,
-			OrdoTitleDisplay,
+			internal.command_palette_button,
+			command_palette,
+			// OrdoWorkspace,
+			// OrdoSidebar,
+			// OrdoModal,
+			// OrdoNotifications,
+			// OrdoContextMenu,
+			// OrdoActivityBar,
+			// OrdoBackgroundTaskIndicator,
+			// OrdoTitleDisplay,
 		]
 	})
+
+namespace internal {
+	export const app_element = maoka.styled.div("app")
+
+	export const command_palette_button = maoka.create("button", use => {
+		const { hunter } = use(app_context.consume)
+		use(maoka_jabs.listen("onclick", () => hunter.shoot("command_palette.show", void 0)))
+
+		return () => "Show CP"
+	})
+}

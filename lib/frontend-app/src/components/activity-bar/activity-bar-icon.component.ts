@@ -19,20 +19,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Maoka } from "@ordo-pink/maoka"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka } from "@ordo-pink/maoka"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 
 type P = Required<Pick<Ordo.Activity.Instance, "name" | "render_icon">> & {
 	current_activity_name?: Ordo.Activity.Instance["name"]
 }
-export const OrdoActivityBarIcon = ({ name, render_icon, current_activity_name }: P) =>
-	Maoka.create("span", ({ use }) => {
-		const is_current = !!current_activity_name && current_activity_name === name
+export const activity_bar_icon = maoka.styled.span<P>("activity-bar_icon", (args, use) => {
+	const is_current = !!args.current_activity_name && args.current_activity_name === args.name
 
-		use(MaokaJabs.set_class("activity-bar_icon"))
+	if (is_current) use(maoka_jabs.add_class("active"))
+	else use(maoka_jabs.remove_class("active"))
 
-		if (is_current) use(MaokaJabs.add_class("active"))
-		else use(MaokaJabs.remove_class("active"))
-
-		return async () => render_icon()
-	})
+	return args.render_icon
+})

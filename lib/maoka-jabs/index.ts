@@ -19,5 +19,5 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export * as MaokaJabs from "./src/maoka-jabs.impl"
+export * as maoka_jabs from "./src/maoka-jabs.impl"
 export * from "./src/maoka-jabs.types"

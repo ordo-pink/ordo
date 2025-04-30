@@ -20,7 +20,7 @@
  */
 
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { sweech } from "@ordo-pink/sweech"
@@ -43,22 +43,22 @@ export const Inline = ({
 			StyledText(({ element, use }) => {
 				const fsid = metadata.get_fsid()
 				const commands = use(MaokaOrdo.Jabs.get_commands)
-				const is_darwin = use(MaokaJabs.is_darwin)
+				const is_darwin = use(maoka_jabs.is_darwin)
 
-				use(MaokaJabs.set_attribute("data-block_index", String(block_index)))
-				use(MaokaJabs.set_attribute("data-inline_index", String(inline_index)))
-				if (is_editable) use(MaokaJabs.set_attribute("contenteditable", "true"))
-				use(MaokaJabs.listen("onkeydown", event => handle_keydown(event)))
-				use(MaokaJabs.listen("oninput", event => handle_input(event)))
-				use(MaokaJabs.listen("onclick", event => handle_click(event)))
+				use(maoka_jabs.set_attribute("data-block_index", String(block_index)))
+				use(maoka_jabs.set_attribute("data-inline_index", String(inline_index)))
+				if (is_editable) use(maoka_jabs.set_attribute("contenteditable", "true"))
+				use(maoka_jabs.listen("onkeydown", event => handle_keydown(event)))
+				use(maoka_jabs.listen("oninput", event => handle_input(event)))
+				use(maoka_jabs.listen("onclick", event => handle_click(event)))
 				use(RTE.Jabs.listen_for_selection_change(fsid, block_index, inline_index))
 
 				const styles = (node as TRTETextNode).styles ?? []
 
-				if (styles.includes(RTE.Constants.TextNodeStyle.BOLD)) use(MaokaJabs.add_class("text-bold"))
-				if (styles.includes(RTE.Constants.TextNodeStyle.ITALIC)) use(MaokaJabs.add_class("italic"))
-				if (styles.includes(RTE.Constants.TextNodeStyle.STRIKETHROUGH)) use(MaokaJabs.add_class("line-through"))
-				if (styles.includes(RTE.Constants.TextNodeStyle.UNDERLINE)) use(MaokaJabs.add_class("underline"))
+				if (styles.includes(RTE.Constants.TextNodeStyle.BOLD)) use(maoka_jabs.add_class("text-bold"))
+				if (styles.includes(RTE.Constants.TextNodeStyle.ITALIC)) use(maoka_jabs.add_class("italic"))
+				if (styles.includes(RTE.Constants.TextNodeStyle.STRIKETHROUGH)) use(maoka_jabs.add_class("line-through"))
+				if (styles.includes(RTE.Constants.TextNodeStyle.UNDERLINE)) use(maoka_jabs.add_class("underline"))
 
 				const handle_click = (event: MouseEvent) => {
 					const selection = window.getSelection()

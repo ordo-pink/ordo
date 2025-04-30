@@ -20,7 +20,7 @@
  */
 
 import { Maoka } from "@ordo-pink/maoka"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MetadataIcon } from "@ordo-pink/maoka-components"
 
@@ -35,9 +35,9 @@ export const FileEditorSidebarFile = (metadata: Ordo.Metadata.Instance, depth = 
 			emit("cmd.application.context_menu.show", { event, payload: metadata })
 		}
 
-		use(MaokaJabs.listen("oncontextmenu", event => handle_context_menu(event)))
+		use(maoka_jabs.listen("oncontextmenu", event => handle_context_menu(event)))
 
-		const file_editor_file_class = MaokaJabs.set_class(
+		const file_editor_file_class = maoka_jabs.set_class(
 			"flex space-x-2 items-center rounded-sm select-none",
 			"hover:bg-gradient-to-r hover:from-neutral-300 hover:to-stone-300",
 			"hover:dark:bg-gradient-to-r hover:dark:from-neutral-700 hover:dark:to-stone-700",
@@ -47,20 +47,22 @@ export const FileEditorSidebarFile = (metadata: Ordo.Metadata.Instance, depth = 
 		const get_route = use(MaokaOrdo.Jabs.get_current_route$)
 
 		use(file_editor_file_class)
-		use(MaokaJabs.set_style({ paddingLeft: `${depth + 0.5}rem`, paddingRight: "0.5rem" }))
-		use(MaokaJabs.listen("onclick", () => emit("cmd.file_editor.open_file", fsid)))
+		use(maoka_jabs.set_style({ paddingLeft: `${depth + 0.5}rem`, paddingRight: "0.5rem" }))
+		use(maoka_jabs.listen("onclick", () => emit("cmd.file_editor.open_file", fsid)))
 
 		return () => {
 			const route = get_route()
 
 			if (route?.params.fsid === fsid)
 				use(
-					MaokaJabs.add_class(
+					maoka_jabs.add_class(
 						"bg-gradient-to-tr from-pink-300 to-rose-300 dark:from-pink-900 from-pink-300 to-rose-300 dark:to-rose-900",
 					),
 				)
 			else
-				use(MaokaJabs.remove_class("bg-gradient-to-tr", "to-rose-300", "to-rose-300", "dark:from-pink-900", "dark:to-rose-900"))
+				use(
+					maoka_jabs.remove_class("bg-gradient-to-tr", "to-rose-300", "to-rose-300", "dark:from-pink-900", "dark:to-rose-900"),
+				)
 
 			return [MetadataIcon({ metadata, show_emoji_picker: false }), FileEditorFileName(metadata.get_name())]
 		}
@@ -68,7 +70,7 @@ export const FileEditorSidebarFile = (metadata: Ordo.Metadata.Instance, depth = 
 
 const FileEditorFileName = (name: string) =>
 	Maoka.create("div", ({ use }) => {
-		use(MaokaJabs.set_class(...file_editor_file_text_classes))
+		use(maoka_jabs.set_class(...file_editor_file_text_classes))
 		return () => name
 	})
 

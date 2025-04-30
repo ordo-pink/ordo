@@ -21,7 +21,7 @@
 
 import { Hotkey } from "@ordo-pink/maoka-components"
 import { Maoka } from "@ordo-pink/maoka"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 // TODO Drop dependency on app state
 import { ordo_app_state } from "@ordo-pink/frontend-app/app.state"
@@ -35,7 +35,7 @@ export const OrdoCommandPaletteItems = (
 	on_click: (index: number, location: CommandPaletteLocation) => void,
 ) =>
 	Maoka.create("div", ({ use }) => {
-		use(MaokaJabs.set_class("command-palette_items"))
+		use(maoka_jabs.set_class("command-palette_items"))
 
 		const get_items = use(
 			ordo_app_state.select_jab$(

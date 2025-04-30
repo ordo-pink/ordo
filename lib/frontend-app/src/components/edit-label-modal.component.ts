@@ -23,7 +23,7 @@ import { Dialog, Input, Select, color_class } from "@ordo-pink/maoka-components"
 import { is_non_empty_string, title_case } from "@ordo-pink/tau"
 import { LabelColor } from "@ordo-pink/core"
 import { Maoka } from "@ordo-pink/maoka"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 
@@ -60,7 +60,7 @@ export const EditLabelModal = (label: Ordo.Metadata.Label) =>
 				action_text: "Save",
 				body: () =>
 					Maoka.create("div", ({ use }) => {
-						use(MaokaJabs.set_class("flex flex-col gap-2"))
+						use(maoka_jabs.set_class("flex flex-col gap-2"))
 						return () => [
 							Input.Text({
 								autofocus: true,

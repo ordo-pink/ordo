@@ -20,19 +20,17 @@
  */
 
 import { BsMenuButtonWideFill } from "@ordo-pink/frontend-icons"
-import { Maoka } from "@ordo-pink/maoka"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
-import { MaokaStyled } from "@ordo-pink/maoka-styled"
+import { maoka } from "@ordo-pink/maoka"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { ordo_app_state } from "@ordo-pink/frontend-app/app.state"
 
-import { OrdoActivityBarIcon } from "./activity-bar-icon.component"
-import { OrdoActivityBarLink } from "./activity-bar-link.component"
-import { OrdoSidebarButton } from "../sidebar/sidebar.component"
+import { activity_bar_icon } from "./activity-bar-icon.component"
+import { activity_bar_link } from "./activity-bar-link.component"
+import { sidebar_button } from "../sidebar/sidebar.component"
 
 import "./activity-bar.css"
 
-export const OrdoActivityBar = Maoka.create("div", ({ use }) => {
-	use(MaokaJabs.set_class("activity-bar"))
+export const OrdoActivityBar = maoka.styled.div("activity-bar", use => {
 	// use(MaokaJabs.listen("oncontextmenu", event => handle_context_menu(event)))
 
 	const commands = ordo_app_state.zags.select("commands")
@@ -50,9 +48,9 @@ export const OrdoActivityBar = Maoka.create("div", ({ use }) => {
 
 		return [
 			Maoka.create("span", ({ use }) => {
-				use(MaokaJabs.set_class("activity-bar_link"))
+				use(maoka_jabs.set_class("activity-bar_link"))
 				use(
-					MaokaJabs.listen("onclick", event => {
+					maoka_jabs.listen("onclick", event => {
 						event.preventDefault()
 						event.stopPropagation()
 
@@ -61,18 +59,18 @@ export const OrdoActivityBar = Maoka.create("div", ({ use }) => {
 				)
 
 				// TODO i18n
-				return () => OrdoActivityBarIcon({ name: "Command Palette", render_icon: BsMenuButtonWideFill })
+				return () => activity_bar_icon({ name: "Command Palette", render_icon: BsMenuButtonWideFill })
 			}),
 
 			ActivityBarActivities(
 				() => () =>
 					activities.map(
 						({ name, routes, default_route, render_icon }) =>
-							render_icon && OrdoActivityBarLink({ current_activity_name, default_route, name, render_icon, routes }),
+							render_icon && activity_bar_link({ current_activity_name, default_route, name, render_icon, routes }),
 					),
 			),
 
-			OrdoSidebarButton,
+			sidebar_button,
 		]
 	}
 })

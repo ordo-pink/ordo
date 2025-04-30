@@ -21,7 +21,7 @@
 
 import { BsCaretDown, BsCaretRight } from "@ordo-pink/frontend-icons"
 import { Maoka, type TMaokaJab } from "@ordo-pink/maoka"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { Metadata } from "@ordo-pink/core"
 import { MetadataIcon } from "@ordo-pink/maoka-components"
@@ -53,7 +53,7 @@ export const FileEditorSidebarDirectory = (metadata: Ordo.Metadata.Instance, dep
 			commands.emit("cmd.application.context_menu.show", { event, payload: metadata })
 		}
 
-		use(MaokaJabs.listen("oncontextmenu", event => handle_context_menu(event)))
+		use(maoka_jabs.listen("oncontextmenu", event => handle_context_menu(event)))
 
 		return () => {
 			// Expand directory if it is an ancestor of the metadata that is identified by the fsid
@@ -111,19 +111,19 @@ const FileEditorDirectoryName = (
 
 		const commands = use(MaokaOrdo.Jabs.get_commands)
 
-		use(MaokaJabs.listen("onclick", () => commands.emit("cmd.file_editor.open_file", fsid)))
-		use(MaokaJabs.set_style({ paddingLeft: `${depth + 0.5}rem`, paddingRight: "0.5rem" }))
-		use(MaokaJabs.set_class(...file_editor_sidebar_directory_name_classes))
+		use(maoka_jabs.listen("onclick", () => commands.emit("cmd.file_editor.open_file", fsid)))
+		use(maoka_jabs.set_style({ paddingLeft: `${depth + 0.5}rem`, paddingRight: "0.5rem" }))
+		use(maoka_jabs.set_class(...file_editor_sidebar_directory_name_classes))
 
 		return () => {
 			const route = get_route()
 
-			if (route?.params.fsid === fsid) use(MaokaJabs.add_class(directory_active))
-			else use(MaokaJabs.remove_class(...directory_active.split(" ")))
+			if (route?.params.fsid === fsid) use(maoka_jabs.add_class(directory_active))
+			else use(maoka_jabs.remove_class(...directory_active.split(" ")))
 
 			return [
 				FileEditorDirectoryNameText(metadata),
-				FileEditorDirectoryNameCaret(fsid, MaokaJabs.listen("onclick", on_caret_click)),
+				FileEditorDirectoryNameCaret(fsid, maoka_jabs.listen("onclick", on_caret_click)),
 			]
 		}
 	})
@@ -145,12 +145,12 @@ const file_editor_sidebar_directory_name_text_classes = [
 
 const FileEditorDirectoryNameText = (metadata: Ordo.Metadata.Instance) =>
 	Maoka.create("div", ({ use }) => {
-		use(MaokaJabs.set_class(...file_editor_sidebar_directory_name_text_classes))
+		use(maoka_jabs.set_class(...file_editor_sidebar_directory_name_text_classes))
 
 		return () => [
 			Maoka.create("div", () => () => MetadataIcon({ metadata, show_emoji_picker: false })),
 			Maoka.create("div", ({ use }) => {
-				use(MaokaJabs.set_class("text-ellipsis line-clamp-1"))
+				use(maoka_jabs.set_class("text-ellipsis line-clamp-1"))
 				return () => metadata.get_name()
 			}),
 		]
@@ -159,7 +159,7 @@ const FileEditorDirectoryNameText = (metadata: Ordo.Metadata.Instance) =>
 const FileEditorDirectoryNameCaret = (fsid: Ordo.Metadata.FSID, click_listener: TMaokaJab) =>
 	Maoka.create("div", ({ use }) => {
 		use(click_listener)
-		use(MaokaJabs.set_class("cursor-pointer hover:scale-150 transition-all"))
+		use(maoka_jabs.set_class("cursor-pointer hover:scale-150 transition-all"))
 
 		return () => (expanded_state[fsid] ? BsCaretDown("p-1 shrink-0 size-5") : BsCaretRight("p-1 shrink-0 size-5 rotate-180"))
 	})

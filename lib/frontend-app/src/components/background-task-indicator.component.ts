@@ -28,7 +28,7 @@ import { BsCloudDownload, BsCloudUpload } from "@ordo-pink/frontend-icons"
 import { BackgroundTaskStatus } from "@ordo-pink/core"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaZAGS } from "@ordo-pink/maoka-zags"
 import { sweech } from "@ordo-pink/sweech"
 import { noop } from "@ordo-pink/tau"
@@ -46,7 +46,7 @@ export const OrdoBackgroundTaskIndicator = Maoka.create("div", ({ use }) => {
 	const get_status = use(background_task_status_state.select_jab$("status"))
 	const commands = ordo_app_state.zags.select("commands")
 
-	use(MaokaJabs.set_class("background-task-indicator"))
+	use(maoka_jabs.set_class("background-task-indicator"))
 
 	use(
 		MaokaDOM.Jabs.onmount(() => {

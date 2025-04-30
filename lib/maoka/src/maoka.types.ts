@@ -1,97 +1,125 @@
-/*
- * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
- * SPDX-License-Identifier: Unlicense
- */
+import { HTML_TAGS } from "./html-tags"
 
-// TODO: Comments
-// TODO: Full types
-export type TMaokaElement = Pick<
-	Element,
-	"setAttribute" | "getAttribute" | "appendChild" | "replaceChildren" | "dispatchEvent" | "addEventListener" | "children"
->
+export namespace Maoka {
+	export namespace Context {
+		export type Create = <$Value>() => Maoka.Context.Instance<$Value>
 
-export type TCreateIDFn = () => string
+		export type Instance<$Value> = {
+			consume: Maoka.Jab<$Value>
+			provide: (value: $Value) => Maoka.Jab
+		}
+	}
 
-export type TMaokaRootElement<$TElement = TMaokaElement> = {
-	create_id: TCreateIDFn
-	create_element: TMaokaCreateMaokaElementFn
-	refresh_queue: Map<string, { element: TMaokaElement; render: () => Promise<TMaokaElement> }>
+	export namespace DOM {
+		export type Render = (element: HTMLElement, component: Maoka.Component, create_id: () => Maoka.Id) => Promise<void>
 
-	get id(): string
-	get element(): $TElement
+		export type OnMountHandler = (() => void) | (() => () => void)
+
+		export type OnUnmountHandler = () => void
+
+		export type Node<$Element extends HTMLElement = HTMLElement> = Maoka.Node<
+			$Element & {
+				onmount?: OnMountHandler[]
+				onunmount?: OnUnmountHandler[]
+			}
+		>
+
+		export type Root<$Element extends HTMLElement = HTMLElement> = Maoka.Root<$Element> & {
+			refresh_queue: Maoka.DOM.Node[]
+		}
+
+		export type Static = {
+			render: Maoka.DOM.Render
+		}
+	}
+
+	export namespace Guards {
+		export type IsNode = <$Value>(x: any) => x is Maoka.Node<$Value>
+		export type IsComponent = (x: any) => x is Maoka.Component
+		export type IsDOMNode<$Element extends HTMLElement = HTMLElement> = (x: any) => x is Maoka.DOM.Node<$Element>
+
+		export type Static = {
+			node: Maoka.Guards.IsNode
+			component: Maoka.Guards.IsComponent
+			dom_node: Maoka.Guards.IsDOMNode
+		}
+	}
+
+	export namespace Jabs {
+		export type IfDOM = <$Element extends HTMLElement = HTMLElement, $Return = void>(
+			f: (element: Maoka.DOM.Node<$Element>) => $Return,
+		) => Maoka.Jab<$Return | void>
+
+		export type OnMount = (f: Maoka.DOM.OnMountHandler) => Maoka.Jab
+
+		export type OnUnmount = (f: Maoka.DOM.OnUnmountHandler) => Maoka.Jab
+
+		export type Refresh$ = Maoka.Jab
+
+		export type Static = {
+			if_dom: Maoka.Jabs.IfDOM
+			onmount: Maoka.Jabs.OnMount
+			onunmount: Maoka.Jabs.OnUnmount
+			refresh$: Maoka.Jabs.Refresh$
+		}
+	}
+
+	export type Id = string | number
+
+	export type Node<$Value = unknown> = {
+		id: Maoka.Id
+		kindergarten: Maoka.Kindergarten<$Value> | void
+		root: Maoka.Root<$Value>
+		value: $Value
+	}
+
+	export type Teacher = (kindergarten: Maoka.Kindergarten) => Maoka.Component
+
+	export type Child<$Value> = null | void | string | number | Maoka.Node<$Value> | Maoka.Component
+
+	export type Children<$Value> = Child<$Value> | Child<$Value>[]
+
+	export type Jab<$Return = void> = <$Value = unknown>(use: Maoka.Use, node: Maoka.Node<$Value>) => $Return
+
+	export type Use = <$Return = void>(jab: Maoka.Jab<$Return>) => $Return
+
+	export type Kindergarten<$Value = unknown> = () => Maoka.Children<$Value> | Promise<Maoka.Children<$Value>>
+
+	export type CreateId = () => Maoka.Id
+
+	export type CreateValue<$Value> = (tag: string) => $Value
+
+	export type Fn<$Value = unknown> = (
+		use: Maoka.Use,
+		node: Maoka.Node<$Value>,
+	) => Kindergarten<$Value> | Promise<Kindergarten<$Value>> | void
+
+	export type Root<$Value> = {
+		id: Maoka.Id
+		create_id: Maoka.CreateId
+		create_value: Maoka.CreateValue<$Value>
+	}
+
+	export type Component = <$Value>(root: Maoka.Root<$Value>) => Maoka.Node<$Value> | Promise<Maoka.Node<$Value>>
+
+	export type CreateComponent<$Value = unknown> = (
+		tag: string,
+		f?: Maoka.Fn<$Value>,
+	) => typeof f extends undefined ? (f: Maoka.Fn<$Value>) => Maoka.Component : Maoka.Component
+
+	export type Tags = Record<(typeof HTML_TAGS)[number], (f: Maoka.Fn) => Maoka.Component>
+
+	export type Styled<$Value = unknown> = Record<
+		(typeof HTML_TAGS)[number],
+		(classes: string) => (f: Maoka.Fn<$Value>) => Maoka.Component
+	>
+
+	export type Module = {
+		context: Maoka.Context.Create
+		create: Maoka.CreateComponent
+		dom: Maoka.DOM.Static
+		guards: Maoka.Guards.Static
+		jabs: Maoka.Jabs.Static
+		styled: Maoka.Styled
+	}
 }
-
-export type TMaokaCreateMaokaElementFn = (name: string) => TMaokaElement
-
-export type TMaokaCreateComponentFn = (name: string, callback: TMaokaCallback) => TMaokaComponent
-
-export type TMaokaComponent = {
-	(root: TMaokaRootElement): Promise<TMaokaElement>
-	id?: string
-	element?: TMaokaElement
-	refresh?: () => void
-}
-
-export type TMaokaJab<$TReturn = void> = (props: TMaokaProps) => $TReturn
-
-/**
- * A Maoka component child. If the child is a Maoka component function, it will be called using the
- * same context as the parent Maoka component. If the child is a string, it will be rendered as
- * inner text of the parent. If the child is an HTML element, it will be appended to the parent. If
- * the child is undefined, it will not be rendered as a child but the changes made with the jabs
- * will be applied.
- */
-export type TMaokaChild = TMaokaElement | TMaokaComponent | string | number | undefined | null | void
-
-/**
- * TChildren is an expected return type of a Maoka callback.
- *
- * @see TMaokaChild
- */
-export type TMaokaChildren = TMaokaChild | TMaokaChild[]
-
-/**
- * A record of jabs that are provided by Maoka directly.
- */
-export type TMaokaProps = {
-	/**
-	 * Get UUID of current Maoka component. This would probably only be useful for creating custom
-	 * jabs that accumulate a set of components to apply batch refresh calls. You would hardly ever
-	 * need this in your application code.
-	 */
-	get id(): string
-
-	/**
-	 * Returns reference to the current element.
-	 */
-	get element(): TMaokaElement
-
-	get root(): TMaokaRootElement
-
-	/**
-	 * Trigger refreshing current Maoka component. Technically, calling refresh is basically calling
-	 * the Maoka component callback function in which this `refresh` function is available inside
-	 * `use` parameter.
-	 */
-	refresh: () => void
-
-	use: <_TResult>(jab: TMaokaJab<_TResult>) => _TResult
-}
-
-/**
- * A callback function that returns children of the current Maoka component. It accepts a record of
- * jabs available within the execution context of current Maoka root. If the callback does not
- * return, the Maoka component will be rendered without children.
- *
- * @see TMaokaChildren
- */
-export type TMaokaCallback = (
-	props: TMaokaProps,
-) =>
-	| void
-	| undefined
-	| null
-	| (() => TMaokaChildren)
-	| (() => Promise<TMaokaChildren>)
-	| Promise<() => TMaokaChildren>
-	| Promise<() => Promise<TMaokaChildren>>

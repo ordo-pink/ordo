@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { MetadataLink } from "@ordo-pink/maoka-components"
@@ -119,7 +119,7 @@ const UserSessionsCard = StyledCard(({ use }) => {
 								const [, timestamp, agent] = session
 								const current_timestamp = Date.now()
 
-								use(MaokaJabs.set_attribute("title", agent))
+								use(maoka_jabs.set_attribute("title", agent))
 
 								return StyledUserSession(() => () => [
 									StyledSessionStatus(current_timestamp - timestamp < 60 * 1000),

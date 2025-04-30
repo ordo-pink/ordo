@@ -24,7 +24,7 @@ import { BsCookie } from "@ordo-pink/frontend-icons"
 import { Button } from "@ordo-pink/maoka-components"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { Result } from "@ordo-pink/result"
@@ -139,8 +139,8 @@ const HeroSectionImageLayer = (image_path: string, index: number) =>
 	Maoka.create("div", ({ use }) => {
 		const background_image = `url(${image_path})`
 
-		use(MaokaJabs.set_class(`hero-layer hero-layer_${index}`))
-		use(MaokaJabs.set_style({ backgroundImage: background_image }))
+		use(maoka_jabs.set_class(`hero-layer hero-layer_${index}`))
+		use(maoka_jabs.set_style({ backgroundImage: background_image }))
 	})
 
 const HeroSection = MaokaStyled.Tags.section("hero-section")

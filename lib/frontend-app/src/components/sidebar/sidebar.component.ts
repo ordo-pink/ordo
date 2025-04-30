@@ -23,7 +23,7 @@ import { BsArrowLeft, BsLayoutSidebarInsetReverse } from "@ordo-pink/frontend-ic
 import { CommandPaletteItemType, ContextMenuItemType } from "@ordo-pink/core"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { sweech } from "@ordo-pink/sweech"
 import { noop } from "@ordo-pink/tau"
@@ -35,7 +35,7 @@ import { sidebar$ } from "./sidebar.state"
 export const OrdoSidebar = Maoka.create("aside", ({ use, element }) => {
 	const commands = ordo_app_state.zags.select("commands")
 	const get_sidebar = use(MaokaOrdo.Jabs.happy_marriage$(sidebar$))
-	const is_mobile = use(MaokaJabs.is_mobile)
+	const is_mobile = use(maoka_jabs.is_mobile)
 
 	use(
 		MaokaDOM.Jabs.onmount(() => {
@@ -55,7 +55,7 @@ export const OrdoSidebar = Maoka.create("aside", ({ use, element }) => {
 		}),
 	)
 
-	use(MaokaJabs.listen("onclick", () => handle_click()))
+	use(maoka_jabs.listen("onclick", () => handle_click()))
 
 	const handle_click = () => {
 		if (is_mobile) commands.emit("cmd.application.sidebar.hide")
@@ -73,12 +73,12 @@ export const OrdoSidebar = Maoka.create("aside", ({ use, element }) => {
 	}
 })
 
-export const OrdoSidebarButton = Maoka.create("button", ({ use }) => {
+export const sidebar_button = Maoka.create("button", ({ use }) => {
 	const commands = ordo_app_state.zags.select("commands")
 	const get_sidebar = use(MaokaOrdo.Jabs.happy_marriage$(sidebar$))
 	const get_current_activity = use(ordo_app_state.select_jab$("functions.current_activity"))
 
-	use(MaokaJabs.listen("onclick", () => commands.emit("cmd.application.sidebar.toggle")))
+	use(maoka_jabs.listen("onclick", () => commands.emit("cmd.application.sidebar.toggle")))
 
 	return () => {
 		const activities = ordo_app_state.zags.select("functions.activities")
@@ -91,8 +91,8 @@ export const OrdoSidebarButton = Maoka.create("button", ({ use }) => {
 		const readable_name = "t.common.components.sidebar.toggle"
 
 		if (enabled) {
-			use(MaokaJabs.add_class("activity-bar_link", "activity-bar_icon"))
-			use(MaokaJabs.remove_class("size-6", "invisible"))
+			use(maoka_jabs.add_class("activity-bar_link", "activity-bar_icon"))
+			use(maoka_jabs.remove_class("size-6", "invisible"))
 
 			commands.emit("cmd.application.command_palette.add", {
 				value: () => commands.emit("cmd.application.sidebar.toggle"),
@@ -110,8 +110,8 @@ export const OrdoSidebarButton = Maoka.create("button", ({ use }) => {
 				render_icon: () => BsArrowLeft("rotate-180"),
 			})
 		} else {
-			use(MaokaJabs.remove_class("activity-bar_link", "activity-bar_icon"))
-			use(MaokaJabs.add_class("size-6", "invisible"))
+			use(maoka_jabs.remove_class("activity-bar_link", "activity-bar_icon"))
+			use(maoka_jabs.add_class("size-6", "invisible"))
 			commands.emit("cmd.application.command_palette.remove", readable_name)
 		}
 
@@ -131,7 +131,7 @@ export const OrdoSidebarButton = Maoka.create("button", ({ use }) => {
 // --- Internal ---
 
 const SidebarRenderer = Maoka.create("div", ({ use }) => {
-	use(MaokaJabs.set_class("sidebar"))
+	use(maoka_jabs.set_class("sidebar"))
 
 	const get_current_activity = use(ordo_app_state.select_jab$("functions.current_activity"))
 	const get_activities = use(ordo_app_state.select_jab$("functions.activities"))

@@ -58,14 +58,14 @@ declare global {
 		}
 	}
 
-	interface cmd {
-		database: {
-			show_sorting_modal: () => void
-			show_columns_modal: () => void
-			toggle_column: () => TColumnName
-			toggle_sorting: () => TColumnName
-		}
-	}
+	// interface cmd {
+	// 	database: {
+	// 		show_sorting_modal: () => void
+	// 		show_columns_modal: () => void
+	// 		toggle_column: () => TColumnName
+	// 		toggle_sorting: () => TColumnName
+	// 	}
+	// }
 }
 
 export default create_function(

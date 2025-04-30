@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { type TMaokaChildren } from "@ordo-pink/maoka"
 
@@ -43,12 +43,12 @@ export const ActionListItem = ({
 	on_click = () => void 0,
 }: TActionListItemProps) =>
 	Item(({ use }) => {
-		use(MaokaJabs.listen("onclick", on_click))
+		use(maoka_jabs.listen("onclick", on_click))
 
 		return () => {
-			if (is_current === true) use(MaokaJabs.add_class("active"))
-			else if (is_current === "hover") use(MaokaJabs.add_class("active-hover"))
-			else use(MaokaJabs.remove_class("active", "active-hover"))
+			if (is_current === true) use(maoka_jabs.add_class("active"))
+			else if (is_current === "hover") use(maoka_jabs.add_class("active-hover"))
+			else use(maoka_jabs.remove_class("active", "active-hover"))
 
 			return Layout(() => () => [
 				Main(() => () => [Icon(render_icon), Title(() => () => title), Info(render_info)]),

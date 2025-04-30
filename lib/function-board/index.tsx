@@ -8,7 +8,7 @@ import { ReactFlowProvider } from "@xyflow/react"
 
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { create_function } from "@ordo-pink/core"
 
 import Flow from "./src/components/board.component.tsx"
@@ -45,7 +45,7 @@ export default create_function(
 
 		const render = (params: Ordo.FileAssociation.RenderParams) =>
 			Maoka.create("div", ({ element, use }) => {
-				use(MaokaJabs.set_class("h-full"))
+				use(maoka_jabs.set_class("h-full"))
 				use(
 					MaokaDOM.Jabs.onmount(() => {
 						if (MaokaDOM.is_maoka_dom_element(element)) {

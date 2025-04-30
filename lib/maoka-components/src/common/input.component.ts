@@ -22,7 +22,7 @@
 import { CurrentUser } from "@ordo-pink/core"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { create_zags } from "@ordo-pink/zags"
 
@@ -65,25 +65,25 @@ const Text = ({
 	validation_error_message = "",
 }: TInputProps) =>
 	Maoka.create("label", ({ use }) => {
-		use(MaokaJabs.set_class("input-wrapper"))
-		use(MaokaJabs.listen("onclick", event => event.stopPropagation()))
+		use(maoka_jabs.set_class("input-wrapper"))
+		use(maoka_jabs.listen("onclick", event => event.stopPropagation()))
 		const id = crypto.randomUUID().replaceAll("-", "")
 
 		return () => [
 			Maoka.create("div", ({ use }) => {
-				use(MaokaJabs.set_class("input_label"))
+				use(maoka_jabs.set_class("input_label"))
 
 				return () => label
 			}),
 
 			Maoka.create("input", ({ element, use }) => {
-				const is_mobile = use(MaokaJabs.is_mobile)
+				const is_mobile = use(maoka_jabs.is_mobile)
 				const is_dom = use(MaokaDOM.Jabs.is_dom)
 
-				if (disabled) use(MaokaJabs.set_attribute("disabled", "true"))
+				if (disabled) use(maoka_jabs.set_attribute("disabled", "true"))
 
 				use(
-					MaokaJabs.listen("oninput", event => {
+					maoka_jabs.listen("oninput", event => {
 						const current_is_valid = is_valid$.select("value")
 
 						if (!current_is_valid) is_valid$.update("value", () => true)
@@ -93,7 +93,7 @@ const Text = ({
 				)
 
 				use(
-					MaokaJabs.listen("onchange", event => {
+					maoka_jabs.listen("onchange", event => {
 						const target = event.target as HTMLInputElement
 						const is_valid = validate(target.value)
 						const current_is_valid = is_valid$.select("value")
@@ -102,16 +102,16 @@ const Text = ({
 					}),
 				)
 
-				use(MaokaJabs.set_attribute("type", type))
-				use(MaokaJabs.set_class("input_text", custom_class))
+				use(maoka_jabs.set_attribute("type", type))
+				use(maoka_jabs.set_class("input_text", custom_class))
 
-				if (!transparent) use(MaokaJabs.add_class("non-transparent"))
-				if (autocomplete) use(MaokaJabs.set_attribute("autocomplete", autocomplete))
-				if (initial_value) use(MaokaJabs.set_attribute("value", initial_value))
-				if (placeholder) use(MaokaJabs.set_attribute("placeholder", placeholder))
+				if (!transparent) use(maoka_jabs.add_class("non-transparent"))
+				if (autocomplete) use(maoka_jabs.set_attribute("autocomplete", autocomplete))
+				if (initial_value) use(maoka_jabs.set_attribute("value", initial_value))
+				if (placeholder) use(maoka_jabs.set_attribute("placeholder", placeholder))
 
-				if (on_focus) use(MaokaJabs.listen("onfocus", on_focus))
-				if (on_blur) use(MaokaJabs.listen("onblur", on_blur))
+				if (on_focus) use(maoka_jabs.listen("onfocus", on_focus))
+				if (on_blur) use(maoka_jabs.listen("onblur", on_blur))
 
 				use(
 					MaokaDOM.Jabs.onmount(() => {
@@ -120,15 +120,15 @@ const Text = ({
 				)
 
 				if (required) {
-					use(MaokaJabs.set_attribute("required", "true"))
-					use(MaokaJabs.set_attribute("aria-invalid", "true"))
-					use(MaokaJabs.set_attribute("aria-errormessage", `error-info-${id}`))
+					use(maoka_jabs.set_attribute("required", "true"))
+					use(maoka_jabs.set_attribute("aria-invalid", "true"))
+					use(maoka_jabs.set_attribute("aria-errormessage", `error-info-${id}`))
 				}
 			}),
 
 			Maoka.create("div", ({ use }) => {
-				use(MaokaJabs.set_attribute("id", `error-info-${id}`))
-				use(MaokaJabs.set_class("input_text-error"))
+				use(maoka_jabs.set_attribute("id", `error-info-${id}`))
+				use(maoka_jabs.set_class("input_text-error"))
 
 				const get_is_valid = use(MaokaOrdo.Jabs.happy_marriage$(is_valid$, s => s.value))
 

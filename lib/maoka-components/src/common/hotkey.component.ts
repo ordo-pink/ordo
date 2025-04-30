@@ -21,7 +21,7 @@
 
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { Result } from "@ordo-pink/result"
 import { sweech } from "@ordo-pink/sweech"
@@ -49,10 +49,10 @@ export const Hotkey = (
 	},
 ) =>
 	Maoka.create("div", ({ element, use }) => {
-		use(MaokaJabs.set_class("hotkey"))
-		if (options.smol) use(MaokaJabs.add_class("smol"))
-		if (options.show_in_mobile) use(MaokaJabs.add_class("mobile"))
-		const is_darwin = use(MaokaJabs.is_darwin)
+		use(maoka_jabs.set_class("hotkey"))
+		if (options.smol) use(maoka_jabs.add_class("smol"))
+		if (options.show_in_mobile) use(maoka_jabs.add_class("mobile"))
+		const is_darwin = use(maoka_jabs.is_darwin)
 
 		const split = hotkey.split("+")
 

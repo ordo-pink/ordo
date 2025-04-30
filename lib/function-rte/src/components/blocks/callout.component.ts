@@ -29,7 +29,7 @@ import {
 	BsThreeDotsVertical,
 } from "@ordo-pink/frontend-icons"
 import { Input } from "@ordo-pink/maoka-components"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { sweech } from "@ordo-pink/sweech"
@@ -58,7 +58,7 @@ export const Callout = ({ node, block_index, metadata, is_editable, is_embedded 
 					const commands = use(MaokaOrdo.Jabs.get_commands)
 
 					use(
-						MaokaJabs.listen("onclick", event => {
+						maoka_jabs.listen("onclick", event => {
 							event.stopPropagation()
 
 							commands.emit("cmd.application.command_palette.show", {
@@ -120,7 +120,7 @@ export const Callout = ({ node, block_index, metadata, is_editable, is_embedded 
 						StyledCalloutOptions(({ use }) => {
 							const commands = use(MaokaOrdo.Jabs.get_commands)
 
-							use(MaokaJabs.listen("onclick", event => handle_click(event)))
+							use(maoka_jabs.listen("onclick", event => handle_click(event)))
 
 							const handle_click = (event: MouseEvent) => {
 								event.stopPropagation()

@@ -20,7 +20,7 @@
  */
 
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { R } from "@ordo-pink/result"
@@ -48,9 +48,9 @@ export const Block = (block_index: number, metadata: Ordo.Metadata.Instance, is_
 		const fsid = metadata.get_fsid()
 		const get_node = use(MaokaOrdo.Jabs.happy_marriage$(RTE.$, s => s.state[fsid].content[block_index]))
 
-		use(MaokaJabs.listen("onmouseover", () => handle_mouse_over()))
-		use(MaokaJabs.listen("onmouseleave", () => handle_mouse_leave()))
-		use(MaokaJabs.listen("onclick", () => handle_click()))
+		use(maoka_jabs.listen("onmouseover", () => handle_mouse_over()))
+		use(maoka_jabs.listen("onmouseleave", () => handle_mouse_leave()))
+		use(maoka_jabs.listen("onclick", () => handle_click()))
 		use(MaokaDOM.Jabs.onmount(() => handle_mount()))
 
 		const line_number = LineNumber(block_index, metadata)

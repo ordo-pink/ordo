@@ -21,7 +21,7 @@
 
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 
 import { get_readable_type } from "./utils/common"
 import { ordo_app_state } from "../../../app.state"
@@ -53,7 +53,7 @@ export const OrdoNotificationProgress = ({ id, type, duration }: P) => {
 			}),
 		)
 
-		use(MaokaJabs.set_class("notification-card_progress"))
+		use(maoka_jabs.set_class("notification-card_progress"))
 
 		return () => {
 			const progress = get_progress()
@@ -75,6 +75,6 @@ type P1 = Pick<Ordo.Notification.Instance, "type"> & { progress: number }
 const ProgressBarForeground = ({ progress, type }: P1) =>
 	Maoka.create("div", ({ use }) => {
 		if (!progress) return
-		use(MaokaJabs.set_class("notification-card_progress_foreground", get_readable_type(type)))
-		use(MaokaJabs.set_style({ width: progress.toFixed(0).concat("%") }))
+		use(maoka_jabs.set_class("notification-card_progress_foreground", get_readable_type(type)))
+		use(maoka_jabs.set_style({ width: progress.toFixed(0).concat("%") }))
 	})

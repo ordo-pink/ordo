@@ -21,7 +21,7 @@
 
 import { Maoka, TMaokaElement } from "@ordo-pink/maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { sweech } from "@ordo-pink/sweech"
@@ -32,7 +32,7 @@ import { sidebar$ } from "./sidebar/sidebar.state"
 const StyledWorkspace = MaokaStyled.Tags.main("workspace")
 
 export const OrdoWorkspace = StyledWorkspace(({ use, element }) => {
-	use(MaokaJabs.set_class("workspace"))
+	use(maoka_jabs.set_class("workspace"))
 
 	return () => [WorkspaceRenderer, SidebarPaddingContractor(element)]
 })
@@ -55,7 +55,7 @@ const SidebarPaddingContractor = (element: TMaokaElement) =>
 	})
 
 const WorkspaceRenderer = Maoka.create("div", ({ use }) => {
-	use(MaokaJabs.set_class("h-full"))
+	use(maoka_jabs.set_class("h-full"))
 	const get_current_activity = use(ordo_app_state.select_jab$("functions.current_activity"))
 	const get_activities = use(ordo_app_state.select_jab$("functions.activities"))
 

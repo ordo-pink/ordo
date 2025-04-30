@@ -21,14 +21,14 @@
 
 import { BsPlus } from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/maoka"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
 export const DatabaseTableActionsRow = (metadata: Ordo.Metadata.Instance) =>
 	Maoka.create("tr", ({ use }) => {
 		const fsid = metadata.get_fsid()
 
-		use(MaokaJabs.set_class("database_table-actions_tr"))
+		use(maoka_jabs.set_class("database_table-actions_tr"))
 
 		return () => DatabaseCreateEntryButton(fsid)
 	})
@@ -37,8 +37,8 @@ export const DatabaseTableActionsRow = (metadata: Ordo.Metadata.Instance) =>
 
 const DatabaseCreateEntryButton = (fsid: Ordo.Metadata.FSID) =>
 	Maoka.create("td", ({ use }) => {
-		use(MaokaJabs.set_class("database_table-actions_td"))
-		use(MaokaJabs.listen("onclick", () => handle_click()))
+		use(maoka_jabs.set_class("database_table-actions_td"))
+		use(maoka_jabs.listen("onclick", () => handle_click()))
 
 		const commands = use(MaokaOrdo.Jabs.get_commands)
 

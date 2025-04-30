@@ -22,7 +22,7 @@
 import { BsCaretRight } from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { R } from "@ordo-pink/result"
@@ -32,7 +32,7 @@ import { R } from "@ordo-pink/result"
 export const CurrentUserReference = Maoka.create("div", ({ use, refresh }) => {
 	let name = ""
 
-	use(MaokaJabs.set_class("flex gap-x-2 items-center text-sm"))
+	use(maoka_jabs.set_class("flex gap-x-2 items-center text-sm"))
 
 	const user_query = use(MaokaOrdo.Jabs.get_user_query)
 
@@ -61,18 +61,18 @@ const user_avatar_class = [
 ]
 
 export const UserAvatar = Maoka.create("div", ({ use }) => {
-	use(MaokaJabs.set_class(...user_avatar_class))
+	use(maoka_jabs.set_class(...user_avatar_class))
 
 	return () =>
 		Maoka.create("div", ({ use }) => {
-			use(MaokaJabs.set_class("rounded-full bg-neutral-500"))
+			use(maoka_jabs.set_class("rounded-full bg-neutral-500"))
 
 			return () => UserAvatarIcon
 		})
 })
 
 const UserAvatarIcon = Maoka.create("div", ({ use }) => {
-	use(MaokaJabs.set_class("size-3 rounded-full text-xs"))
+	use(maoka_jabs.set_class("size-3 rounded-full text-xs"))
 
 	// TODO: User icon
 	return () => BsCaretRight("size-3 white")
@@ -80,7 +80,7 @@ const UserAvatarIcon = Maoka.create("div", ({ use }) => {
 
 export const UserName = (name: string) =>
 	Maoka.create("div", ({ use }) => {
-		use(MaokaJabs.set_class(highlight_first_letter_class))
+		use(maoka_jabs.set_class(highlight_first_letter_class))
 
 		return () => name
 	})

@@ -22,7 +22,7 @@
 import { Input, Label, MetadataIcon, MetadataLink } from "@ordo-pink/maoka-components"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { R } from "@ordo-pink/result"
@@ -38,31 +38,31 @@ export const FileMetadata = (metadata: Ordo.Metadata.Instance) =>
 		const metadata_query = use(MaokaOrdo.Jabs.get_metadata_query)
 		const commands = use(MaokaOrdo.Jabs.get_commands)
 
-		use(MaokaJabs.add_class("relative p-2 pt-12 flex flex-col gap-y-1"))
+		use(maoka_jabs.add_class("relative p-2 pt-12 flex flex-col gap-y-1"))
 
 		use(
-			MaokaJabs.listen("ondragenter", () => {
-				use(MaokaJabs.add_class("bg-slate-500"))
+			maoka_jabs.listen("ondragenter", () => {
+				use(maoka_jabs.add_class("bg-slate-500"))
 			}),
 		)
 
 		use(
-			MaokaJabs.listen("ondragleave", () => {
-				use(MaokaJabs.remove_class("bg-slate-500"))
+			maoka_jabs.listen("ondragleave", () => {
+				use(maoka_jabs.remove_class("bg-slate-500"))
 			}),
 		)
 
 		use(
-			MaokaJabs.listen("ondragover", event => {
+			maoka_jabs.listen("ondragover", event => {
 				event.preventDefault()
-				use(MaokaJabs.add_class("bg-slate-500"))
+				use(maoka_jabs.add_class("bg-slate-500"))
 			}),
 		)
 
 		use(
 			MaokaDOM.Jabs.onmount(() => {
 				use(
-					MaokaJabs.listen("ondrop", event => {
+					maoka_jabs.listen("ondrop", event => {
 						event.preventDefault()
 
 						if (event.dataTransfer && event.dataTransfer.files) {
@@ -93,7 +93,7 @@ export const FileMetadata = (metadata: Ordo.Metadata.Instance) =>
 									.then(() => refresh(), noop)
 						}
 
-						use(MaokaJabs.remove_class("bg-slate-500"))
+						use(maoka_jabs.remove_class("bg-slate-500"))
 					}),
 				)
 			}),
@@ -165,8 +165,8 @@ const BackgroundImage = (metadata: Ordo.Metadata.Instance) =>
 		return () =>
 			src
 				? Maoka.create("img", ({ use }) => {
-						use(MaokaJabs.set_class("absolute top-0 left-0 right-0 bottom-0 h-full object-cover w-full -z-10"))
-						use(MaokaJabs.set_attribute("src", src))
+						use(maoka_jabs.set_class("absolute top-0 left-0 right-0 bottom-0 h-full object-cover w-full -z-10"))
+						use(maoka_jabs.set_attribute("src", src))
 						use(MaokaDOM.Jabs.onmount(() => () => URL.revokeObjectURL(src!)))
 					})
 				: void 0
@@ -178,8 +178,8 @@ const LabelsSection = (fsid: Ordo.Metadata.FSID) =>
 		const label_section =
 			"flex flex-wrap px-1 gap-1 cursor-pointer rounded-sm hover:bg-gradient-to-br hover:from-neutral-100/50 hover:to-stone-100/50 hover:dark:from-neutral-700/50 hover:dark:to-stone-700/50 py-1 min-h-7"
 
-		use(MaokaJabs.set_class(label_section))
-		use(MaokaJabs.listen("onclick", () => handle_click()))
+		use(maoka_jabs.set_class(label_section))
+		use(maoka_jabs.listen("onclick", () => handle_click()))
 
 		const commands = use(MaokaOrdo.Jabs.get_commands)
 		const get_metadata = use(MaokaOrdo.Jabs.Metadata.get_by_fsid$(fsid))
@@ -204,8 +204,8 @@ const OutgoingLinksSection = (fsid: Ordo.Metadata.FSID) =>
 		const label_section =
 			"flex px-1 flex-wrap gap-2 cursor-pointer rounded-sm hover:bg-gradient-to-br hover:from-neutral-100/50 hover:to-stone-100/50 hover:dark:from-neutral-700/50 hover:dark:to-stone-700/50 py-1 min-h-7"
 
-		use(MaokaJabs.set_class(label_section))
-		use(MaokaJabs.listen("onclick", () => handle_click()))
+		use(maoka_jabs.set_class(label_section))
+		use(maoka_jabs.listen("onclick", () => handle_click()))
 
 		const commands = use(MaokaOrdo.Jabs.get_commands)
 		const get_links = use(MaokaOrdo.Jabs.Metadata.get_outgoing_links$(fsid))

@@ -20,7 +20,7 @@
  */
 
 import { Input } from "@ordo-pink/maoka-components"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { noop } from "@ordo-pink/tau"
 
@@ -31,7 +31,7 @@ import { RTE } from "../../rte"
 export const Blockquote = ({ block_index, metadata, node, is_editable, is_embedded }: TBlockNodeParams<TRTEBlockquoteNode>) =>
 	StyledBlockquote(({ use }) => {
 		const fsid = metadata.get_fsid()
-		if (node.cite) use(MaokaJabs.set_attribute("cite", node.cite))
+		if (node.cite) use(maoka_jabs.set_attribute("cite", node.cite))
 
 		let value = node.cite
 

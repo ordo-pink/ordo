@@ -23,7 +23,7 @@ import { Dialog, Input } from "@ordo-pink/maoka-components"
 import { BsFileEarmarkPlus } from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { sweech } from "@ordo-pink/sweech"
 import { oath } from "@ordo-pink/oath"
@@ -71,7 +71,7 @@ const FileAssociationSelector = (on_select_type: (file_association: Ordo.FileAss
 		let current_type_index = 0
 		let is_expanded = false
 
-		use(MaokaJabs.set_class(select_class))
+		use(maoka_jabs.set_class(select_class))
 
 		const get_file_associations = use(MaokaOrdo.Jabs.get_file_associations$)
 
@@ -116,7 +116,7 @@ const FileAssociationSelector = (on_select_type: (file_association: Ordo.FileAss
 
 				is_expanded
 					? Maoka.create("div", ({ use }) => {
-							use(MaokaJabs.set_class("absolute top-0 left-0 right-0 bg-neutral-100 dark:bg-neutral-600 rounded-md"))
+							use(maoka_jabs.set_class("absolute top-0 left-0 right-0 bg-neutral-100 dark:bg-neutral-600 rounded-md"))
 
 							return () =>
 								file_associations.flatMap(file_association =>
@@ -135,8 +135,8 @@ const SelectItem = (
 	is_select_active = false,
 ) =>
 	Maoka.create("div", ({ use }) => {
-		use(MaokaJabs.set_class("flex gap-x-4"))
-		use(MaokaJabs.listen("onclick", () => on_click(file_association, type.name)))
+		use(maoka_jabs.set_class("flex gap-x-4"))
+		use(maoka_jabs.listen("onclick", () => on_click(file_association, type.name)))
 
 		const Icon = sweech
 			.of_true()
@@ -145,14 +145,14 @@ const SelectItem = (
 
 		return () => [
 			Maoka.create("div", ({ use }) => {
-				use(MaokaJabs.set_class("p-2 rounded-none first-of-type:rounded-t-md last-of-type:rounded-b-md"))
+				use(maoka_jabs.set_class("p-2 rounded-none first-of-type:rounded-t-md last-of-type:rounded-b-md"))
 
 				return () => {
-					if (is_select_active) use(MaokaJabs.add_class("hover:bg-neutral-300 hover:dark:bg-neutral-800"))
+					if (is_select_active) use(maoka_jabs.add_class("hover:bg-neutral-300 hover:dark:bg-neutral-800"))
 
 					return [
 						Maoka.create("div", ({ use }) => {
-							use(MaokaJabs.set_class("flex gap-x-1 items-center"))
+							use(maoka_jabs.set_class("flex gap-x-1 items-center"))
 
 							return () => [
 								Icon,
@@ -164,7 +164,7 @@ const SelectItem = (
 						}),
 
 						Maoka.create("div", ({ use }) => {
-							use(MaokaJabs.set_class("text-xs text-neutral-600 dark:text-neutral-400"))
+							use(maoka_jabs.set_class("text-xs text-neutral-600 dark:text-neutral-400"))
 							const { t } = use(MaokaOrdo.Jabs.get_translations$)
 							return () => t(type.description)
 						}),
@@ -180,7 +180,7 @@ const CreateFileModalInput = (handle_change: (event: Event) => void) =>
 
 		return () => [
 			Maoka.create("div", ({ use }) => {
-				use(MaokaJabs.set_class("font-bold text-sm"))
+				use(maoka_jabs.set_class("font-bold text-sm"))
 				return () => t("t.common.components.modals.create_file.input_label")
 			}),
 

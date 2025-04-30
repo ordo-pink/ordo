@@ -1,0 +1,27 @@
+.command-palette {
+	@apply m-4 flex size-full h-dvh max-h-96 max-w-screen-md cursor-default flex-col space-y-1 rounded-md bg-neutral-400 p-2 shadow-md dark:bg-neutral-900;
+}
+
+.command-palette_wrapper {
+	@apply fixed bottom-0 left-0 right-0 top-0 hidden items-center justify-center backdrop-blur-sm;
+}
+
+.command-palette_wrapper.active {
+	@apply flex cursor-pointer;
+}
+
+.command-palette_search {
+	@apply w-full bg-transparent shadow-none outline-none placeholder:text-neutral-500;
+}
+
+.command-palette_items {
+	@apply w-full grow overflow-y-auto;
+}
+
+.command-palette_footer {
+	@apply flex items-center justify-center text-center text-xs text-neutral-600 dark:text-neutral-400;
+}
+
+.command-palette_create-new-item-hint {
+	@apply flex w-full items-center justify-center space-x-1 text-center text-sm text-neutral-600 dark:text-neutral-400;
+}

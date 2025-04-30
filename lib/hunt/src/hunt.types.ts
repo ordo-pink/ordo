@@ -132,7 +132,9 @@ export namespace Hunt {
 	 *
 	 * Let the hunt begin!
 	 */
-	export type Begin = <$Preys extends Record<string, unknown> = Record<string, { args: any }>>() => {
+	export type Begin = <$Preys extends Record<string, unknown> = Record<string, { args: any }>>() => Hunt.Instance<$Preys>
+
+	export type Instance<$Preys extends Record<string, unknown>> = {
 		/** @see {@link Hunt.Track} */
 		track: Hunt.Track<Hunt.Pouch.ToPreys<$Preys>>
 		/** @see {@link Hunt.Shoot} */

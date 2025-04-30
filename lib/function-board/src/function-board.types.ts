@@ -15,15 +15,15 @@ declare global {
 		}
 	}
 
-	interface cmd {
-		board: {
-			context_menu: {
-				add_existing_file: () => { x: number; y: number }
-				create_node: () => { x: number; y: number; from?: string }
-				show_create_file: () => Ordo.Metadata.FSID
-			}
-		}
-	}
+	// interface cmd {
+	// 	board: {
+	// 		context_menu: {
+	// 			add_existing_file: () => { x: number; y: number }
+	// 			create_node: () => { x: number; y: number; from?: string }
+	// 			show_create_file: () => Ordo.Metadata.FSID
+	// 		}
+	// 	}
+	// }
 }
 
 export namespace Board {

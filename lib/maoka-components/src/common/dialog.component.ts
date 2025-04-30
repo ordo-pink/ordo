@@ -21,7 +21,7 @@
 
 import { Maoka, type TMaokaChildren } from "@ordo-pink/maoka"
 import { Button } from "@ordo-pink/maoka-components"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 
 import "../../maoka-components.css"
@@ -48,7 +48,7 @@ export const Dialog = ({
 	action_disabled = () => false,
 }: TDialogParams) =>
 	Maoka.create("div", ({ use }) => {
-		use(MaokaJabs.set_class("dialog", custom_class))
+		use(maoka_jabs.set_class("dialog", custom_class))
 
 		const Icon = render_icon ? Maoka.create("div", () => render_icon) : void 0
 

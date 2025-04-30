@@ -21,7 +21,7 @@
 
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { NotificationType } from "@ordo-pink/core"
 
@@ -49,7 +49,7 @@ export const OrdoNotifications = Maoka.create("div", ({ use }) => {
 		}),
 	)
 
-	use(MaokaJabs.set_class("notification-list"))
+	use(maoka_jabs.set_class("notification-list"))
 
 	const get_list = use(ordo_notifications_state.select_jab$("notifications"))
 

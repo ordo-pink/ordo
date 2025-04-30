@@ -78,20 +78,20 @@ declare global {
 		}
 	}
 
-	interface cmd {
-		rte: {
-			add_block: () => { fsid: Ordo.Metadata.FSID; block: TRTENode; block_index: number; preserve_caret_position?: boolean }
-			add_block_after_selection: () => { fsid: Ordo.Metadata.FSID; block: TRTENode }
-			add_inline: () => { fsid: Ordo.Metadata.FSID; inline: TRTENode; block_index: number; inline_index: number }
-			add_inline_after_selection: () => { inline: TRTENode; fsid: Ordo.Metadata.FSID }
-			replace_block: () => { fsid: Ordo.Metadata.FSID; block: TRTENode; block_index: number }
-			replace_inline: () => { fsid: Ordo.Metadata.FSID; inline: TRTENode; block_index: number; inline_index: number }
-			wrap_selection: () => { fsid: Ordo.Metadata.FSID; node: TRTENode }
-			remove_block: () => { fsid: Ordo.Metadata.FSID; block_index: number; preserve_caret_position?: boolean }
-			remove_inline: () => { fsid: Ordo.Metadata.FSID; block_index: number; inline_index: number }
-			show_quick_menu: () => void
-		}
-	}
+	// interface cmd {
+	// rte: {
+	// 	add_block: () => { fsid: Ordo.Metadata.FSID; block: TRTENode; block_index: number; preserve_caret_position?: boolean }
+	// 	add_block_after_selection: () => { fsid: Ordo.Metadata.FSID; block: TRTENode }
+	// 	add_inline: () => { fsid: Ordo.Metadata.FSID; inline: TRTENode; block_index: number; inline_index: number }
+	// 	add_inline_after_selection: () => { inline: TRTENode; fsid: Ordo.Metadata.FSID }
+	// 	replace_block: () => { fsid: Ordo.Metadata.FSID; block: TRTENode; block_index: number }
+	// 	replace_inline: () => { fsid: Ordo.Metadata.FSID; inline: TRTENode; block_index: number; inline_index: number }
+	// 	wrap_selection: () => { fsid: Ordo.Metadata.FSID; node: TRTENode }
+	// 	remove_block: () => { fsid: Ordo.Metadata.FSID; block_index: number; preserve_caret_position?: boolean }
+	// 	remove_inline: () => { fsid: Ordo.Metadata.FSID; block_index: number; inline_index: number }
+	// 	show_quick_menu: () => void
+	// }
+	// }
 }
 
 export default create_function(

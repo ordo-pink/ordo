@@ -20,7 +20,7 @@
  */
 
 import { Maoka } from "@ordo-pink/maoka"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 
 import { get_readable_type } from "./utils/common"
 import { ordo_app_state } from "../../../app.state"
@@ -31,10 +31,10 @@ export const OrdoNotificationHideButton = ({ id, type }: P) =>
 		const commands = ordo_app_state.zags.select("commands")
 		const readable_type = get_readable_type(type)
 
-		use(MaokaJabs.set_inner_html(BS_X))
-		use(MaokaJabs.set_class("notification-card_close", readable_type))
-		use(MaokaJabs.set_attribute("aria-label", "Close")) // TODO i18n
-		use(MaokaJabs.listen("onclick", event => handle_click(event)))
+		use(maoka_jabs.set_inner_html(BS_X))
+		use(maoka_jabs.set_class("notification-card_close", readable_type))
+		use(maoka_jabs.set_attribute("aria-label", "Close")) // TODO i18n
+		use(maoka_jabs.listen("onclick", event => handle_click(event)))
 
 		const handle_click = (event: MouseEvent) => {
 			event.preventDefault()

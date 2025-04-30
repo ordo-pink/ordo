@@ -19,114 +19,116 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { TMaokaJab, TMaokaProps } from "@ordo-pink/maoka"
-import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
+import { Maoka, maoka } from "@ordo-pink/maoka"
 import { SM_SCREEN_BREAKPOINT } from "@ordo-pink/core"
 import { lt } from "@ordo-pink/tau"
 
-import { TNoSpace } from "./maoka-jabs.types"
+import { NoSpace as NoSpace } from "./maoka-jabs.types"
+import { Zags } from "@ordo-pink/zags"
 
 export const set_attribute =
-	(key: string, value = ""): TMaokaJab =>
-	({ element }) =>
-		void element.setAttribute(key, value)
+	(key: string, value = ""): Maoka.Jab =>
+	use => {
+		use(maoka.jabs.if_dom(n => n.value.setAttribute(key, value)))
+		// TODO if_string
+	}
+
+export const marry$ =
+	<$State extends Zags.BaseState>(zags: Zags.Instance<$State>): Maoka.Jab<() => $State> =>
+	use => {
+		let value: $State
+		const divorce = zags.marry(state => {
+			value = state
+			use(maoka.jabs.refresh$)
+		})
+
+		use(maoka.jabs.onunmount(divorce))
+
+		return () => value
+	}
+
+export const cheat$ =
+	<$State extends Zags.BaseState, $DotPath extends Zags.Pouch.RecordToDotPaths<$State>>(
+		zags: Zags.Instance<$State>,
+		dot_path: $DotPath,
+	): Maoka.Jab<() => Zags.Pouch.RecordValueByDotPath<$State, $DotPath>> =>
+	use => {
+		let value: Zags.Pouch.RecordValueByDotPath<$State, $DotPath>
+
+		const divorce = zags.cheat(dot_path, state => {
+			value = state
+			use(maoka.jabs.refresh$)
+		})
+
+		use(maoka.jabs.onunmount(divorce))
+
+		return () => value
+	}
+
+export const set_id =
+	(id?: string): Maoka.Jab =>
+	(use, node) =>
+		use(set_attribute("id", id ?? String(node.id)))
 
 export const set_class =
-	(...classes: string[]): TMaokaJab =>
-	({ element }) =>
-		void element.setAttribute("class", classes.join(" "))
+	(...classes: string[]): Maoka.Jab =>
+	use =>
+		use(set_attribute("class", classes.join(" ")))
 
 export const add_class =
-	(...classes: string[]): TMaokaJab =>
-	({ element }) => {
-		if (MaokaDOM.is_maoka_dom_element(element)) {
-			element.classList.add(...classes.flatMap(cls => cls.split(" ")))
-		} else {
-			const current_classes = element.getAttribute("class") ?? ""
-
-			element.setAttribute(
-				"class",
-				current_classes
-					.split(" ")
-					.concat(classes.flatMap(cls => cls.split(" ")))
-					.join(" "),
-			)
-		}
+	(...classes: string[]): Maoka.Jab =>
+	use => {
+		use(maoka.jabs.if_dom(n => n.value.classList.add(...classes.flatMap(cls => cls.split(" ")))))
+		// TODO if_string
 	}
 
 export const remove_class =
-	<$TClass extends string>(...classes: TNoSpace<$TClass>[]): TMaokaJab =>
-	({ element }) => {
-		if (MaokaDOM.is_maoka_dom_element(element)) {
-			element.classList.remove(...classes.flatMap(cls => cls.split(" ")))
-		} else {
-			const current_classes = element.getAttribute("class") ?? ""
-
-			element.setAttribute(
-				"class",
-				current_classes
-					.split(" ")
-					.filter(cls => !classes.includes(cls as TNoSpace<$TClass>))
-					.join(" "),
-			)
-		}
+	<$TClass extends string>(...classes: NoSpace<$TClass>[]): Maoka.Jab =>
+	use => {
+		use(maoka.jabs.if_dom(n => n.value.classList.remove(...classes.flatMap(cls => cls.split(" ")))))
+		// TODO if_string
 	}
 
 export const replace_class =
-	<$TPrev extends string, $TNext extends string>(prev: TNoSpace<$TPrev>, next: TNoSpace<$TNext>): TMaokaJab =>
-	({ element }) => {
-		const current_classes = element.getAttribute("class") ?? ""
-
-		element.setAttribute("class", current_classes.replace(prev, next))
+	<$Prev extends string, $Next extends string>(prev: NoSpace<$Prev>, next: NoSpace<$Next>): Maoka.Jab =>
+	use => {
+		use(maoka.jabs.if_dom(n => n.value.classList.replace(prev, next)))
+		// TODO if_string
 	}
 
 export const set_style =
-	(str: Partial<Omit<CSSStyleDeclaration, "length" | "parentRule">>): TMaokaJab =>
-	({ element }) => {
-		if (MaokaDOM.is_maoka_dom_element(element) && element instanceof HTMLElement)
-			Object.keys(str).forEach(k => ((element.style as any)[k] = (str as any)[k]))
+	(str: Partial<Omit<CSSStyleDeclaration, "length" | "parentRule">>): Maoka.Jab =>
+	use => {
+		use(maoka.jabs.if_dom(n => Object.keys(str).forEach(k => ((n.value.style as any)[k] = (str as any)[k]))))
+		// TODO if_string
 	}
 
 export const listen =
-	<K extends keyof HTMLElement>(event: K extends `on${string}` ? K : never, f: HTMLElement[K]): TMaokaJab =>
-	({ element }) =>
-		void ((element as unknown as any)[event] = f)
+	<$Element extends HTMLElement, $Event extends keyof $Element>(
+		event: $Event extends `on${string}` ? $Event : never,
+		f: $Element[$Event],
+	): Maoka.Jab =>
+	use =>
+		use(maoka.jabs.if_dom(n => ((n.value as any)[event] = f)))
 
 export const set_inner_html =
-	(html: string): TMaokaJab =>
-	({ element }) => {
-		if (MaokaDOM.is_maoka_dom_element(element)) element.innerHTML = html
-	}
-
-export const create_context = <$TValue>() => {
-	const state = {} as Record<string, $TValue>
-
-	return {
-		provide:
-			(value: $TValue): TMaokaJab =>
-			props => {
-				if (!state[props.root.id]) state[props.root.id] = value
-			},
-
-		consume: (props: TMaokaProps) => {
-			return state[props.root.id] ?? ({} as $TValue)
-		},
-	}
-}
+	(html: string): Maoka.Jab =>
+	use =>
+		use(maoka.jabs.if_dom(n => (n.value.innerHTML = html)))
 
 const is_sm = lt(SM_SCREEN_BREAKPOINT)
 
-export const is_sm_screen$: TMaokaJab<() => boolean> = ({ use, refresh }) => {
+export const is_sm_screen$: Maoka.Jab<() => boolean> = use => {
 	let value: boolean = is_sm(window.innerWidth)
 
 	use(
-		MaokaDOM.Jabs.onmount(() => {
+		maoka.jabs.onmount(() => {
 			const handle_resize = () => {
 				const is_sm_screen = is_sm(window.innerWidth)
 
 				if (value !== is_sm_screen) {
 					value = is_sm_screen
-					refresh()
+					use(maoka.jabs.refresh$)
 				}
 			}
 
@@ -139,9 +141,9 @@ export const is_sm_screen$: TMaokaJab<() => boolean> = ({ use, refresh }) => {
 	return () => value
 }
 
-export const is_darwin: TMaokaJab<boolean> = () => navigator.appVersion.indexOf("Mac") !== -1
+export const is_darwin: Maoka.Jab<boolean> = () => navigator.appVersion.indexOf("Mac") !== -1
 
-export const is_mobile: TMaokaJab<boolean> = () =>
+export const is_mobile: Maoka.Jab<boolean> = () =>
 	["Android", "webOS", "iPhone", "iPad", "iPod", "BlackBerry", "IEMobile", "Opera Mini"].some(platform =>
 		navigator.userAgent.includes(platform),
 	)

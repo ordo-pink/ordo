@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 
@@ -29,7 +29,7 @@ export const LineNumber = (block_index: number, metadata: Ordo.Metadata.Instance
 
 		const commands = use(MaokaOrdo.Jabs.get_commands)
 
-		use(MaokaJabs.listen("oncontextmenu", event => handle_context_menu(event)))
+		use(maoka_jabs.listen("oncontextmenu", event => handle_context_menu(event)))
 
 		const handle_context_menu = (event: MouseEvent) =>
 			commands.emit("cmd.application.context_menu.show", { event, payload: { location: "rte", block_index, fsid } })

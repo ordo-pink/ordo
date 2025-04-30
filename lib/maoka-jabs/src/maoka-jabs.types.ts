@@ -22,4 +22,4 @@
 /**
  * Supplementary type that checks whether provided string does not contain spaces.
  */
-export type TNoSpace<$TStr extends string> = $TStr extends `${string} ${string}` ? never : $TStr
+export type NoSpace<$Str extends string> = $Str extends `${string} ${string}` ? never : $Str

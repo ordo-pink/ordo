@@ -23,7 +23,7 @@ import { ActionListItem } from "@ordo-pink/maoka-components"
 import { ContextMenuItemType } from "@ordo-pink/core"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 
@@ -81,8 +81,8 @@ const handle_remove: Ordo.Command.HandlerOf<"cmd.application.context_menu.remove
 	ordo_app_state.zags.update("sections.context_menu.items", items => items.filter(item => item.command === command))
 
 const OrdoContextMenuDynamic = Maoka.create("div", ({ element, use }) => {
-	use(MaokaJabs.set_class("context-menu"))
-	const is_mobile = use(MaokaJabs.is_mobile)
+	use(maoka_jabs.set_class("context-menu"))
+	const is_mobile = use(maoka_jabs.is_mobile)
 
 	const commands = ordo_app_state.zags.select("commands")
 	const get_state = use(ordo_app_state.select_jab$("sections.context_menu.state"))
@@ -156,7 +156,7 @@ const OrdoContextMenuDynamic = Maoka.create("div", ({ element, use }) => {
 		const right = fits_width ? "" : `${window.innerWidth - state.event.clientX}px`
 		const bottom = fits_height ? "" : `${window.innerHeight - state.event.clientY}px`
 
-		use(MaokaJabs.set_style({ left, top, right, bottom }))
+		use(maoka_jabs.set_style({ left, top, right, bottom }))
 
 		return [
 			...create_items.map(item => ContextMenuItem(item, state.payload, state.event)),

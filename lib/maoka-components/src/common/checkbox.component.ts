@@ -20,7 +20,7 @@
  */
 
 import { Maoka } from "@ordo-pink/maoka"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 
 import "../../maoka-components.css"
@@ -31,11 +31,11 @@ export type TCheckboxParams = {
 }
 export const Checkbox = ({ on_change, checked }: TCheckboxParams) =>
 	Maoka.create("input", ({ use }) => {
-		use(MaokaJabs.set_attribute("type", "checkbox"))
-		use(MaokaJabs.listen("onchange", on_change))
-		use(MaokaJabs.set_class("checkbox"))
+		use(maoka_jabs.set_attribute("type", "checkbox"))
+		use(maoka_jabs.listen("onchange", on_change))
+		use(maoka_jabs.set_class("checkbox"))
 
-		if (checked) use(MaokaJabs.set_attribute("checked"))
+		if (checked) use(maoka_jabs.set_attribute("checked"))
 	})
 
 export type TCheckboxInputParams = {
@@ -45,7 +45,7 @@ export type TCheckboxInputParams = {
 }
 export const CheckboxInput = ({ on_change, checked, label }: TCheckboxInputParams) =>
 	Maoka.create("label", ({ use }) => {
-		use(MaokaJabs.set_class("checkbox-label"))
+		use(maoka_jabs.set_class("checkbox-label"))
 
 		return () => [Checkbox({ on_change, checked }), LabelText(() => () => label)]
 	})

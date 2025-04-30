@@ -21,15 +21,15 @@
 
 import { BsX } from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/maoka"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 
 import { ordo_app_state } from "../../../app.state"
 
 export const ModalCloseButton = Maoka.create("button", ({ use }) => {
 	const commands = ordo_app_state.zags.select("commands")
 
-	use(MaokaJabs.set_class("modal_close-button"))
-	use(MaokaJabs.listen("onclick", event => handle_click(event)))
+	use(maoka_jabs.set_class("modal_close-button"))
+	use(maoka_jabs.listen("onclick", event => handle_click(event)))
 
 	const handle_click = (event: MouseEvent) => {
 		event.preventDefault()

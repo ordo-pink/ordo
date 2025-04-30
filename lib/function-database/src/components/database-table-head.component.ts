@@ -21,7 +21,7 @@
 
 import { BsCaretDown } from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/maoka"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { sweech } from "@ordo-pink/sweech"
@@ -44,9 +44,9 @@ const TableHeadCell = (column: Ordo.I18N.TranslationKey, is_editable: boolean) =
 	Maoka.create("th", ({ use }) => {
 		const get_db_state = use(MaokaOrdo.Jabs.happy_marriage$(database$))
 
-		use(MaokaJabs.add_class("database_table-head_cell"))
-		use(MaokaJabs.listen("onclick", () => handle_click()))
-		if (is_editable) use(MaokaJabs.add_class("clickable"))
+		use(maoka_jabs.add_class("database_table-head_cell"))
+		use(maoka_jabs.listen("onclick", () => handle_click()))
+		if (is_editable) use(maoka_jabs.add_class("clickable"))
 
 		const { t } = use(MaokaOrdo.Jabs.get_translations$)
 		const commands = use(MaokaOrdo.Jabs.get_commands)

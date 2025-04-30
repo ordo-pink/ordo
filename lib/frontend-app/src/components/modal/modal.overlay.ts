@@ -20,7 +20,7 @@
  */
 
 import { Maoka } from "@ordo-pink/maoka"
-import { MaokaJabs } from "@ordo-pink/maoka-jabs"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 
 import { Modal } from "./modal.component"
 import { ModalCloseButton } from "./close-button.component"
@@ -37,8 +37,8 @@ export const OrdoModal = Maoka.create("div", ({ element, use }) => {
 	commands.on("cmd.application.modal.show", on_modal_show)
 	commands.on("cmd.application.modal.hide", on_modal_hide)
 
-	use(MaokaJabs.set_class("modal-overlay"))
-	use(MaokaJabs.listen("onclick", event => handle_click(event)))
+	use(maoka_jabs.set_class("modal-overlay"))
+	use(maoka_jabs.listen("onclick", event => handle_click(event)))
 
 	const handle_click = (event: Event) => {
 		const state = get_modal_state()
@@ -66,11 +66,11 @@ export const OrdoModal = Maoka.create("div", ({ element, use }) => {
 
 	return () => {
 		if (get_modal_state()) {
-			use(MaokaJabs.add_class("active"))
+			use(maoka_jabs.add_class("active"))
 			return [Modal, ModalCloseButton]
 		} else if (MaokaDOM.is_maoka_dom_element(element)) element.innerHTML = ""
 
-		use(MaokaJabs.remove_class("active"))
+		use(maoka_jabs.remove_class("active"))
 	}
 })
 

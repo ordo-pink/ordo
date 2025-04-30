@@ -4,7 +4,5 @@
  */
 
 export type * from "./src/maoka.types.ts"
-
-import { create, create_root } from "./src/maoka.impl.ts"
-
-export const Maoka = { create, create_root }
+export * from "./src/html-tags.ts"
+export * from "./src/maoka.impl.ts"

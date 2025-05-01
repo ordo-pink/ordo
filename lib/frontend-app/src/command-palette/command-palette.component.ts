@@ -46,7 +46,14 @@ namespace internal {
 					current.is_multiple
 						? items_wrapper(() => [items(() => current.items.map(item)), items(() => current.pinned_items?.map(item))])
 						: items(() => current.items.map(item)),
-					styled.footer(() => () => "Footer"),
+					styled.footer(() => () => [
+						hotkey("arrowup"),
+						hotkey("arrowdown"),
+						hotkey("arrowleft"),
+						hotkey("arrowright"),
+						hotkey("enter"),
+						hotkey("escape"),
+					]),
 				]
 			}
 		})

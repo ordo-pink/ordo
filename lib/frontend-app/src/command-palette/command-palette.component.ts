@@ -30,9 +30,22 @@ namespace internal {
 			const get_current = use(maoka_jabs.cheat$(command_palette$, "current" as const))
 
 			const handle_click = (event: MouseEvent) => event.stopPropagation()
+			const handle_mount = () => {
+				const handle_esc_keydown = (event: KeyboardEvent) => {
+					if (event.code === "Escape") {
+						const { hunter } = use(app_context.consume)
+						hunter.shoot("command_palette.hide")
+					}
+				}
+
+				document.addEventListener("keydown", handle_esc_keydown)
+
+				return () => document.removeEventListener("keydown", handle_esc_keydown)
+			}
 
 			use(maoka_jabs.set_id("cp"))
 			use(maoka_jabs.listen("onclick", handle_click))
+			use(maoka.jabs.onmount(handle_mount))
 
 			return () => {
 				const current = get_current()

@@ -96,27 +96,15 @@ namespace internal {
 		maoka.create("span", use => use(maoka.jabs.if_dom(n => void render_icon(n.value))))
 
 	const search = () =>
-		form(() =>
-			styled.item_input(use => {
-				const t_search = "Search..." // TODO i18n
+		styled.item_input(use => {
+			const t_search = "Search..." // TODO i18n
 
-				const handle_mount = () => use(maoka.jabs.if_dom(n => n.value.focus()))
+			const handle_mount = () => use(maoka.jabs.if_dom(n => n.value.focus()))
 
-				use(maoka.jabs.onmount(handle_mount))
-				use(maoka_jabs.set_id("cp-input"))
-				use(maoka_jabs.set_attribute("placeholder", t_search))
-				use(maoka_jabs.set_attribute("autocomplete", "off"))
-			}),
-		)
-
-	const form: Maoka.Teacher = kindergarten =>
-		styled.item_form(use => {
-			const handle_submit = (event: Event) => event.preventDefault()
-
-			use(maoka_jabs.set_id("cp-form"))
-			use(maoka_jabs.listen("onsubmit", handle_submit))
-
-			return kindergarten
+			use(maoka.jabs.onmount(handle_mount))
+			use(maoka_jabs.set_id("cp-input"))
+			use(maoka_jabs.set_attribute("placeholder", t_search))
+			use(maoka_jabs.set_attribute("autocomplete", "off"))
 		})
 
 	const items_wrapper: Maoka.Teacher = kindergarten => styled.items_wrapper(() => kindergarten)
@@ -131,7 +119,6 @@ namespace internal {
 		export const item_title_wrapper = maoka.styled.div("command-palette_item_title-wrapper")
 		export const item_main = maoka.styled.div("command-palette_item_main")
 		export const item_footer = maoka.styled.div("command-palette_item_footer")
-		export const item_form = maoka.styled.form("command-palette_form")
 		export const item_input = maoka.styled.input("command-palette_search")
 		export const modal = maoka.styled.div("command-palette")
 		export const overlay = maoka.styled.div("command-palette_wrapper")

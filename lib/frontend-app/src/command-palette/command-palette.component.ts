@@ -29,24 +29,13 @@ namespace internal {
 	export const modal = () =>
 		styled.modal(use => {
 			const get_current = use(maoka_jabs.cheat$(command_palette$, "current" as const))
+			const { hunter } = use(app_context.consume)
 
 			const handle_click = (event: MouseEvent) => event.stopPropagation()
-			const handle_mount = () => {
-				const handle_esc_keydown = (event: KeyboardEvent) => {
-					if (event.code === "Escape") {
-						const { hunter } = use(app_context.consume)
-						hunter.shoot("command_palette.hide")
-					}
-				}
 
-				document.addEventListener("keydown", handle_esc_keydown)
-
-				return () => document.removeEventListener("keydown", handle_esc_keydown)
-			}
-
+			use(maoka_jabs.listen_global_event("keydown", e => e.code === "Escape" && hunter.shoot("command_palette.hide")))
 			use(maoka_jabs.set_id("cp"))
 			use(maoka_jabs.listen("onclick", handle_click))
-			use(maoka.jabs.onmount(handle_mount))
 
 			return () => {
 				const current = get_current()
@@ -142,47 +131,36 @@ export type HotkeyOptions = {
 
 const hotkey = (hotkey: string, options?: HotkeyOptions) =>
 	hotkey_div((use, node) => {
-		const split = hotkey.split("+")
-
 		const is_darwin = use(maoka_jabs.is_darwin)
+		if (!options?.decoration_only) use(maoka_jabs.listen_global_event("keydown", e => handle_keydown(e)))
+		if (options?.show_in_mobile) use(maoka_jabs.add_class("mobile"))
 
+		const split = hotkey.split("+")
 		const meta = is_darwin ? Key("⌥") : Key("Alt")
 		const mod = is_darwin ? Key("⌘") : Key("Ctrl")
 		const ctrl = Key("Ctrl")
 		const option = Key("⌥")
 		const shift = Key("⇧")
-
 		const symbol = split[split.length - 1].toLowerCase()
 
-		const handle_mount = () => {
-			const handle_keydown = (event: KeyboardEvent) => {
-				if (IGNORED_KEYS.includes(event.key) || options?.decoration_only) return
+		const handle_keydown = (e: KeyboardEvent) => {
+			if (IGNORED_KEYS.includes(e.key) || options?.decoration_only) return
 
-				if (options?.prevent_in_inputs) {
-					const target = event.target as HTMLElement
+			if (options?.prevent_in_inputs) {
+				const target = e.target as HTMLElement
 
-					// TODO Add textarea and div contenteditable
-					if (target.tagName === "INPUT") return
-				}
-
-				const parsed_hotkey = create_hotkey_from_event(event, is_darwin)
-
-				if (parsed_hotkey === hotkey) {
-					event.preventDefault()
-
-					if (node.value instanceof globalThis.HTMLElement) node.value.click()
-				}
+				// TODO Add textarea and div contenteditable
+				if (target.tagName === "INPUT") return
 			}
 
-			document.addEventListener("keydown", handle_keydown)
+			const parsed_hotkey = create_hotkey_from_event(e, is_darwin)
 
-			return () => {
-				document.removeEventListener("keydown", handle_keydown)
+			if (parsed_hotkey === hotkey) {
+				e.preventDefault()
+
+				if (node.value instanceof globalThis.HTMLElement) node.value.click()
 			}
 		}
-
-		if (options?.show_in_mobile) use(maoka_jabs.add_class("mobile"))
-		if (!options?.decoration_only) use(maoka.jabs.onmount(handle_mount))
 
 		return () => [
 			split.includes("ctrl") ? ctrl : void 0,

@@ -21,10 +21,22 @@
 
 import { Maoka, maoka } from "@ordo-pink/maoka"
 import { SM_SCREEN_BREAKPOINT } from "@ordo-pink/core"
+import { Zags } from "@ordo-pink/zags"
 import { lt } from "@ordo-pink/tau"
 
 import { NoSpace as NoSpace } from "./maoka-jabs.types"
-import { Zags } from "@ordo-pink/zags"
+
+export const listen_global_event =
+	<$Key extends keyof DocumentEventMap>(key: $Key, f: (event: DocumentEventMap[$Key]) => void): Maoka.Jab =>
+	use => {
+		const handle_mount = () => {
+			document.addEventListener(key, f)
+
+			return () => document.removeEventListener(key, f)
+		}
+
+		use(maoka.jabs.onmount(handle_mount))
+	}
 
 export const set_attribute =
 	(key: string, value = ""): Maoka.Jab =>

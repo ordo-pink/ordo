@@ -219,7 +219,7 @@ declare global {
 	 */
 	interface cmd {
 		command_palette: {
-			add: { args: Ordo.CommandPalette.Item }
+			add: { args: Ordo.CommandPalette.Item<() => void> }
 			remove: { args: string | number }
 			toggle: { args: void }
 			show: { args: Ordo.CommandPalette.Instance | undefined }
@@ -1152,36 +1152,44 @@ declare global {
 		}
 
 		namespace CommandPalette {
-			type Instance = {
-				items: Ordo.CommandPalette.Item[]
-				on_new_item?: (input: string) => Ordo.CommandPalette.Item
+			type Instance<$Value = any> = {
+				items: Ordo.CommandPalette.Item<$Value>[]
+				on_new_item?: (input: string) => Ordo.CommandPalette.Item<$Value>
 				is_multiple?: boolean
-				on_select: (item: Ordo.CommandPalette.Item) => void
-				on_deselect?: (item: Ordo.CommandPalette.Item) => void
-				pinned_items?: Ordo.CommandPalette.Item[]
+				on_select: (item: Ordo.CommandPalette.Item<$Value>) => void
+				on_deselect?: (item: Ordo.CommandPalette.Item<$Value>) => void
+				pinned_items?: Ordo.CommandPalette.Item<$Value>[]
 				max_items?: number
 			}
+
+			type Id = string | number
+
+			type RenderIcon = (span: HTMLSpanElement) => void | Promise<void>
+
+			type RenderCustomItemFooter = (div: HTMLDivElement) => void | Promise<void>
+
+			type RenderCustomItemInfo = (div: HTMLDivElement) => void | Promise<void>
 
 			/**
 			 * Command palette item.
 			 */
-			type Item<T = any> = {
-				id: string | number
+			type Item<$Value = any> = {
+				id: Ordo.CommandPalette.Id
 				/**
 				 * Readable name of the command palette item. Put a translation key here, if you use i18n.
 				 */
-				readable_name: Ordo.I18N.TranslationKey
+				readable_name: string
 
-				value: T
+				value: $Value
 
 				/**
 				 * Icon to be displayed for the context menu item.
 				 *
 				 * @optional
 				 */
-				render_icon?: (span: HTMLSpanElement) => void | Promise<void>
-				render_custom_footer?: (div: HTMLDivElement) => void | Promise<void>
-				render_custom_info?: (div: HTMLDivElement) => void | Promise<void>
+				render_icon?: Ordo.CommandPalette.RenderIcon
+				render_custom_footer?: Ordo.CommandPalette.RenderCustomItemFooter
+				render_custom_info?: Ordo.CommandPalette.RenderCustomItemFooter
 
 				/**
 				 * Keyboard hotkey for the context menu item. It only works while the context menu is
@@ -1191,7 +1199,7 @@ declare global {
 				 */
 				hotkey?: string
 
-				description?: Ordo.I18N.TranslationKey
+				description?: string
 
 				type?: C.CommandPaletteItemType
 			}

@@ -60,11 +60,10 @@ export const render_dom: Maoka.DOM.Render = async (root_element, component, crea
 		root.refresh_queue.push(node)
 	})
 
-	internal.mount_element_and_register_unmount(node.value)
-
 	const observer = new MutationObserver(records => {
 		for (const record of records) {
 			const added_nodes = record.addedNodes as unknown as (HTMLElement & {
+				mounted?: boolean
 				onmount?: Maoka.DOM.OnMountHandler[]
 				onunmount?: Maoka.DOM.OnUnmountHandler[]
 			})[]
@@ -203,24 +202,24 @@ namespace internal {
 	export const COMPONENT_MARK = Symbol.for("@maoka/component")
 	export const DOM_NODE_MARK = Symbol.for("@maoka/dom-node")
 
-	export const mount_element = (element: HTMLElement & { onmount?: Maoka.DOM.OnMountHandler[] }) => {
-		if (element.onmount) for (let i = 0; i < element.onmount.length; i++) element.onmount[i]()
-		if (element.children) for (let i = 0; i < element.children.length; i++) mount_element(element.children[i] as HTMLElement)
-	}
-
-	export const mount_element_and_register_unmount = (
-		element: HTMLElement & { onmount?: Maoka.DOM.OnMountHandler[]; onunmount?: Maoka.DOM.OnUnmountHandler[] },
+	export const mount_element = (
+		element: HTMLElement & {
+			mounted?: boolean
+			onunmount?: Maoka.DOM.OnUnmountHandler[]
+			onmount?: Maoka.DOM.OnMountHandler[]
+		},
 	) => {
 		if (element.onmount)
 			for (let i = 0; i < element.onmount.length; i++) {
 				const f = element.onmount[i]()
-				if (f) {
+
+				if (f && !element.mounted) {
 					if (!element.onunmount) element.onunmount = []
 					element.onunmount.push(f)
 				}
 			}
-		if (element.children)
-			for (let i = 0; i < element.children.length; i++) mount_element_and_register_unmount(element.children[i] as HTMLElement)
+		if (element.children) for (let i = 0; i < element.children.length; i++) mount_element(element.children[i] as HTMLElement)
+		if (!element.mounted) element.mounted = true
 	}
 
 	export const unmount_element = (element: HTMLElement & { onunmount?: Maoka.DOM.OnUnmountHandler[] }) => {
@@ -252,14 +251,14 @@ namespace internal {
 
 	export const render_dom_children = async (node: Maoka.Node<HTMLElement>) => {
 		if (!node.kindergarten) {
-			node.value.innerHTML = ""
+			if (node.kindergarten === null) node.value.innerHTML = ""
 			return node.value
 		}
 
 		let children = await node.kindergarten()
 
 		if (children == null) {
-			node.value.innerHTML = ""
+			if (children === null) node.value.innerHTML = ""
 			return node.value
 		}
 

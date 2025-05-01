@@ -73,7 +73,9 @@ export namespace Maoka {
 		value: $Value
 	}
 
-	export type Teacher = (kindergarten: Maoka.Kindergarten) => Maoka.Component
+	export type Teacher<$Params = void> = $Params extends void
+		? (kindergarten: Maoka.Kindergarten) => Maoka.Component
+		: (params: $Params, kindergarten: Maoka.Kindergarten) => Maoka.Component
 
 	export type Child<$Value> = null | void | string | number | Maoka.Node<$Value> | Maoka.Component
 

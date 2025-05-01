@@ -1,10 +1,12 @@
 import { Maoka, maoka } from "@ordo-pink/maoka"
+import { CommandPaletteItemType } from "@ordo-pink/core"
 
 import { app_context } from "../../app-context"
 import { command_palette } from "./command-palette.component"
 import { command_palette$ } from "./command-palette.state"
 
 import "./command-palette.style.css"
+import { BsTerminal } from "@ordo-pink/frontend-icons"
 
 export const create_command_palette: Maoka.Jab = use => {
 	use(internal.track_prey)
@@ -23,7 +25,19 @@ namespace internal {
 			const release_show = hunter.track("command_palette.show", guns.command_palette_show)
 			const release_toggle = hunter.track("command_palette.toggle", guns.command_palette_toggle)
 
+			hunter.shoot("command_palette.add", {
+				id: COMMAND_PALETTE_TOGGLE_ID,
+				readable_name: "Toggle command palette",
+				value: () => hunter.shoot("command_palette.toggle"),
+				hotkey: "mod+shift+p",
+				description: "Show or hide command palette. Hides command palette if you can see this message.",
+				type: CommandPaletteItemType.MODAL_OPENER,
+				render_icon: span => maoka.dom.render(span, BsTerminal(), () => crypto.randomUUID()),
+			})
+
 			return () => {
+				hunter.shoot("command_palette.remove", COMMAND_PALETTE_TOGGLE_ID)
+
 				release_add()
 				release_hide()
 				release_remove()
@@ -35,8 +49,10 @@ namespace internal {
 		use(maoka.jabs.onmount(handle_onmount))
 	}
 
+	const COMMAND_PALETTE_TOGGLE_ID = "command_palette.toggle"
+
 	// TODO Check how to select global items
-	const global_palette = (): Ordo.CommandPalette.Instance => ({
+	const global_palette = (): Ordo.CommandPalette.Instance<() => void> => ({
 		items: command_palette$.select("items"),
 		on_select: item => item.value(),
 	})

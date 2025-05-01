@@ -1,5 +1,5 @@
 .command-palette {
-	@apply m-4 flex size-full h-dvh max-h-96 max-w-screen-md cursor-default flex-col space-y-1 rounded-md bg-neutral-400 p-2 shadow-md dark:bg-neutral-900;
+	@apply m-4 flex size-full h-dvh max-h-96 max-w-screen-md cursor-default flex-col space-y-1 rounded-md bg-neutral-400 shadow-md dark:bg-neutral-900;
 }
 
 .command-palette_wrapper {
@@ -11,17 +11,54 @@
 }
 
 .command-palette_search {
-	@apply w-full bg-transparent shadow-none outline-none placeholder:text-neutral-500;
+	@apply w-full bg-transparent p-2 shadow-none outline-none placeholder:text-neutral-500;
+}
+
+.command-palette_items_multiple-wrapper {
+	@apply flex size-full grow justify-items-center;
 }
 
 .command-palette_items {
 	@apply w-full grow overflow-y-auto;
 }
 
+.command-palette_item {
+	@apply flex cursor-pointer flex-col px-2 py-1;
+	@apply hover:bg-neutral-400 hover:dark:bg-neutral-700;
+}
+
+.command-palette_item_main {
+	@apply flex items-center;
+}
+
+.command-palette_item_footer {
+	@apply text-xs text-neutral-500;
+}
+
+.command-palette_item_title-wrapper {
+	@apply flex flex-grow items-center gap-x-2;
+}
+
+.command-palette_item_info {
+	@apply text-xs;
+}
+
 .command-palette_footer {
-	@apply flex items-center justify-center text-center text-xs text-neutral-600 dark:text-neutral-400;
+	@apply flex items-center justify-center p-2 text-center text-xs text-neutral-600 dark:text-neutral-400;
 }
 
 .command-palette_create-new-item-hint {
 	@apply flex w-full items-center justify-center space-x-1 text-center text-sm text-neutral-600 dark:text-neutral-400;
+}
+
+.hotkey {
+	@apply hidden shrink-0 items-center justify-center space-x-1 rounded-md px-2 py-0.5 text-center text-xs text-current sm:flex;
+}
+
+.hotkey.mobile {
+	@apply flex;
+}
+
+.key-container {
+	@apply min-w-8 rounded-md border border-b-2 border-r-2 border-current px-1 py-0.5 text-current;
 }

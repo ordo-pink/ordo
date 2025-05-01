@@ -1,5 +1,5 @@
 .command-palette {
-	@apply m-4 flex size-full h-dvh max-h-96 max-w-screen-md cursor-default flex-col space-y-1 rounded-md bg-neutral-400 shadow-md dark:bg-neutral-900;
+	@apply m-4 flex size-full h-dvh max-h-96 max-w-screen-md cursor-default flex-col space-y-1 rounded-md bg-neutral-200 shadow-lg dark:bg-neutral-900;
 }
 
 .command-palette_wrapper {
@@ -10,8 +10,12 @@
 	@apply flex cursor-pointer;
 }
 
+.command-palette_search_wrapper {
+	@apply flex cursor-text items-center gap-x-2 p-2;
+}
+
 .command-palette_search {
-	@apply w-full bg-transparent p-2 shadow-none outline-none placeholder:text-neutral-500;
+	@apply w-full bg-transparent shadow-none outline-none placeholder:text-neutral-500;
 }
 
 .command-palette_items_multiple-wrapper {
@@ -24,7 +28,7 @@
 
 .command-palette_item {
 	@apply flex cursor-pointer flex-col px-2 py-1;
-	@apply hover:bg-neutral-400 hover:dark:bg-neutral-700;
+	@apply hover:bg-neutral-300 hover:dark:bg-neutral-700;
 }
 
 .command-palette_item_main {

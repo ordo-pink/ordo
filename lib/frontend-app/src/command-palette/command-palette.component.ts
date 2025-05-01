@@ -1,4 +1,5 @@
 import { Maoka, maoka } from "@ordo-pink/maoka"
+import { bs_question_circle, bs_search } from "@ordo-pink/frontend-icons"
 import { create_hotkey_from_event } from "@ordo-pink/hotkey-from-event"
 import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { sweech } from "@ordo-pink/sweech"
@@ -53,19 +54,23 @@ namespace internal {
 				if (!current) return null
 
 				return [
-					search(),
+					maoka.create("label", use => {
+						use(maoka_jabs.set_class("command-palette_search_wrapper"))
+
+						return () => [bs_search(), search()]
+					}),
 					// TODO open via route fragment and query
 					// TODO create subitems if item is found with fuzzy search but the match is not exact
 					current.is_multiple
 						? items_wrapper(() => [items(() => current.items.map(item)), items(() => current.pinned_items?.map(item))])
 						: items(() => current.items.map(item)),
 					styled.footer(() => () => [
-						hotkey("arrowup"),
-						hotkey("arrowdown"),
-						hotkey("arrowleft"),
-						hotkey("arrowright"),
+						bs_question_circle("mr-2"),
+						"Type to search. Arrows to navigate.",
 						hotkey("enter"),
+						"to select item.",
 						hotkey("escape"),
+						"to close.",
 					]),
 				]
 			}

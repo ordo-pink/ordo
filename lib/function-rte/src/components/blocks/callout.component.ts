@@ -25,7 +25,7 @@ import {
 	BsErrorCircle,
 	BsExclamationCircle,
 	BsInfoCircle,
-	BsQuestionCircle,
+	bs_question_circle,
 	BsThreeDotsVertical,
 } from "@ordo-pink/frontend-icons"
 import { Input } from "@ordo-pink/maoka-components"
@@ -190,7 +190,7 @@ const get_callout_icon = (type: CalloutType, custom_class?: string) =>
 	sweech
 		.match(type)
 		.case(CalloutType.INFO, () => BsInfoCircle("text-sky-500".concat(custom_class ? ` ${custom_class}` : "")))
-		.case(CalloutType.QUESTION, () => BsQuestionCircle("text-violet-500".concat(custom_class ? ` ${custom_class}` : "")))
+		.case(CalloutType.QUESTION, () => bs_question_circle("text-violet-500".concat(custom_class ? ` ${custom_class}` : "")))
 		.case(CalloutType.RRR, () => BsErrorCircle("text-rose-500".concat(custom_class ? ` ${custom_class}` : "")))
 		.case(CalloutType.SUCCESS, () => BsCheckCircle("text-emerald-500".concat(custom_class ? ` ${custom_class}` : "")))
 		.case(CalloutType.WARN, () => BsExclamationCircle("text-amber-500".concat(custom_class ? ` ${custom_class}` : "")))

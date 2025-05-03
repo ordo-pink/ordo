@@ -1,4 +1,4 @@
-import { Maoka, maoka } from "@ordo-pink/maoka"
+import { Maoka, maoka_dom } from "@ordo-pink/maoka"
 import { CommandPaletteItemType } from "@ordo-pink/core"
 
 import { app_context } from "../../app-context"
@@ -32,7 +32,7 @@ namespace internal {
 				hotkey: "mod+shift+p",
 				description: "Show or hide command palette. Hides command palette if you can see this message.",
 				type: CommandPaletteItemType.MODAL_OPENER,
-				render_icon: span => maoka.dom.render(span, BsTerminal(), () => crypto.randomUUID()),
+				render_icon: span => maoka_dom.render(span, BsTerminal(), () => crypto.randomUUID()),
 			})
 
 			return () => {
@@ -46,7 +46,7 @@ namespace internal {
 			}
 		}
 
-		use(maoka.jabs.onmount(handle_onmount))
+		use(maoka_dom.jabs.onmount(handle_onmount))
 	}
 
 	const COMMAND_PALETTE_TOGGLE_ID = "command_palette.toggle"

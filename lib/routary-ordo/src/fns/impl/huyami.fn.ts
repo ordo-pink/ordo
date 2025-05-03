@@ -5,7 +5,7 @@
 
 import { RoutaryOrdo } from "../../routary-ordo.types"
 
-const ignore_debug_value = Symbol.for("ignore_debug_value")
+const ignore_debug_value = Symbol("ignore_debug_value")
 const default_debug_value_callback = () => ignore_debug_value
 
 export const huyami =

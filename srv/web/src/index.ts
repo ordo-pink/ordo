@@ -20,13 +20,26 @@
  */
 
 import { app } from "@ordo-pink/frontend-app"
-import { maoka } from "@ordo-pink/maoka"
+import { console_logger } from "@ordo-pink/logger"
+import { maoka_dom } from "@ordo-pink/maoka"
 
 const body = document.querySelector("body")!
 
-const id_host = import.meta.env.VITE_ORDO_ID_HOST
-const dt_host = import.meta.env.VITE_ORDO_DT_HOST
-const pb_host = import.meta.env.VITE_ORDO_PB_HOST
-const au_host = import.meta.env.VITE_ORDO_AU_HOST
+const hosts: Ordo.Hosts = {
+	id: import.meta.env.VITE_ORDO_ID_HOST,
+	dt: import.meta.env.VITE_ORDO_DT_HOST,
+	pb: import.meta.env.VITE_ORDO_PB_HOST,
+	au: import.meta.env.VITE_ORDO_AU_HOST,
+	fn: import.meta.env.VITE_ORDO_FN_HOST,
+	web: import.meta.env.VITE_ORDO_WEB_HOST,
+}
 
-void maoka.dom.render(body, app({ id_host, dt_host, pb_host, au_host }), () => crypto.randomUUID())
+void maoka_dom.render(
+	body,
+	app({
+		hosts,
+		logger: console_logger,
+		local_persistence_strategy: null as any,
+	}),
+	() => crypto.randomUUID(),
+)

@@ -15,7 +15,6 @@ test.describe("deep_equals", () => {
 	test.it("should return true if primitives are equal", () => {
 		test.expect(deep_equals(1, 1)).toBeTrue()
 		test.expect(deep_equals("test", "test")).toBeTrue()
-		test.expect(deep_equals(Symbol.for("1"), Symbol.for("1"))).toBeTrue()
 		test.expect(deep_equals(null, null)).toBeTrue()
 		test.expect(deep_equals(undefined, undefined)).toBeTrue()
 		test.expect(deep_equals(true, true)).toBeTrue()
@@ -30,6 +29,7 @@ test.describe("deep_equals", () => {
 		test.expect(deep_equals(1, 1n)).toBeFalse()
 		test.expect(deep_equals(true, false)).toBeFalse()
 		test.expect(deep_equals("", 0)).toBeFalse()
+		test.expect(deep_equals(Symbol("1"), Symbol("1"))).toBeFalse()
 	})
 
 	test.it("should return true if objects are equal", () => {

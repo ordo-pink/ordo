@@ -1,4 +1,4 @@
-import { Maoka, maoka } from "@ordo-pink/maoka"
+import { Maoka, maoka, maoka_dom, maoka_styled } from "@ordo-pink/maoka"
 import { bs_question_circle, bs_search } from "@ordo-pink/frontend-icons"
 import { create_hotkey_from_event } from "@ordo-pink/hotkey-from-event"
 import { maoka_jabs } from "@ordo-pink/maoka-jabs"
@@ -21,7 +21,7 @@ namespace internal {
 			const handle_click = () => hunter.shoot("command_palette.hide")
 			const handle_mount = () => command_palette$.cheat("current", current => (current ? handle_show() : handle_hide()))
 
-			use(maoka.jabs.onmount(handle_mount))
+			use(maoka_dom.jabs.onmount(handle_mount))
 			use(maoka_jabs.listen("onclick", handle_click))
 
 			return kindergarten
@@ -45,8 +45,8 @@ namespace internal {
 
 				return [
 					// TODO clean up here
-					// TODO fix maoka.styled type inference for fn provision
-					// TODO allow to return kindergarten directly in maoka.styled
+					// TODO fix maoka_styled type inference for fn provision
+					// TODO allow to return kindergarten directly in maoka_styled
 					maoka.create("label", use => {
 						use(maoka_jabs.set_class("command-palette_search_wrapper"))
 
@@ -92,15 +92,15 @@ namespace internal {
 	const item_footer: Maoka.Teacher = kindergarten => styled.item_footer(() => kindergarten)
 
 	const item_icon_span = (render_icon: Ordo.CommandPalette.RenderIcon) =>
-		maoka.create("span", use => use(maoka.jabs.if_dom(n => void render_icon(n.value))))
+		maoka.create("span", use => use(maoka_dom.jabs.if_dom(n => void render_icon(n.value))))
 
 	const search = () =>
 		styled.item_input(use => {
 			const t_search = "Search..." // TODO i18n
 
-			const handle_mount = () => use(maoka.jabs.if_dom(n => n.value.focus()))
+			const handle_mount = () => use(maoka_dom.jabs.if_dom(n => n.value.focus()))
 
-			use(maoka.jabs.onmount(handle_mount))
+			use(maoka_dom.jabs.onmount(handle_mount))
 			use(maoka_jabs.set_id("cp-input"))
 			use(maoka_jabs.set_attribute("placeholder", t_search))
 			use(maoka_jabs.set_attribute("autocomplete", "off"))
@@ -111,17 +111,17 @@ namespace internal {
 	const items: Maoka.Teacher = kindergarten => styled.items(() => kindergarten)
 
 	namespace styled {
-		export const items_wrapper = maoka.styled.div("command-palette_items_multiple-wrapper")
-		export const items = maoka.styled.div("command-palette_items")
-		export const item = maoka.styled.div("command-palette_item")
-		export const item_info = maoka.styled.div("command-palette_item_info")
-		export const item_title_wrapper = maoka.styled.div("command-palette_item_title-wrapper")
-		export const item_main = maoka.styled.div("command-palette_item_main")
-		export const item_footer = maoka.styled.div("command-palette_item_footer")
-		export const item_input = maoka.styled.input("command-palette_search")
-		export const modal = maoka.styled.div("command-palette")
-		export const overlay = maoka.styled.div("command-palette_wrapper")
-		export const footer = maoka.styled.div("command-palette_footer")
+		export const items_wrapper = maoka_styled.div("command-palette_items_multiple-wrapper")
+		export const items = maoka_styled.div("command-palette_items")
+		export const item = maoka_styled.div("command-palette_item")
+		export const item_info = maoka_styled.div("command-palette_item_info")
+		export const item_title_wrapper = maoka_styled.div("command-palette_item_title-wrapper")
+		export const item_main = maoka_styled.div("command-palette_item_main")
+		export const item_footer = maoka_styled.div("command-palette_item_footer")
+		export const item_input = maoka_styled.input("command-palette_search")
+		export const modal = maoka_styled.div("command-palette")
+		export const overlay = maoka_styled.div("command-palette_wrapper")
+		export const footer = maoka_styled.div("command-palette_footer")
 	}
 }
 
@@ -178,11 +178,11 @@ const hotkey = (hotkey: string, options?: HotkeyOptions) =>
 		]
 	})
 
-const hotkey_div = maoka.styled.div("hotkey")
+const hotkey_div = maoka_styled.div("hotkey")
 
 const IGNORED_KEYS = ["Control", "Shift", "Alt", "Meta"]
 
-const KeyContainer = maoka.styled.span("key-container")
+const KeyContainer = maoka_styled.span("key-container")
 
 const Key = (key: string) =>
 	KeyContainer(

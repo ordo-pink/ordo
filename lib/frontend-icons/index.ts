@@ -3,22 +3,15 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { maoka } from "@ordo-pink/maoka"
+import { maoka, maoka_dom } from "@ordo-pink/maoka"
 
 const icon =
 	(children: string) =>
 	(cls: string = "") =>
-		maoka.create("span", use => {
-			use(
-				maoka.jabs.if_dom(
-					n =>
-						(n.value.innerHTML = `<svg stroke="currentColor" class="${cls}" fill="currentColor" stroke-width="0" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">${children}</svg>`),
-				),
-			)
+		maoka.create("span", use => use(maoka_dom.jabs.if_dom(n => void (n.value.innerHTML = create_svg(children, cls)))))
 
-			// return () =>
-			// 	`<svg stroke="currentColor" class="${cls}" fill="currentColor" stroke-width="0" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">${children}</svg>`
-		})
+const create_svg = (children: string, cls: string) =>
+	`<svg stroke="currentColor" class="${cls}" fill="currentColor" stroke-width="0" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">${children}</svg>`
 
 export const bs_search =
 	icon(`<path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0">

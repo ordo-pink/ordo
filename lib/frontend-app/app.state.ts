@@ -30,7 +30,7 @@ const is_dev = !!import.meta.env.DEV // && import.meta.env.DEV === "true"
 const app_name = "pink.ordo.app" // TODO Take from env
 const version = "v0.8.0" // TODO Take from env
 const hosts = {} as Ordo.Hosts // TODO Take from env
-const app_fid = Symbol.for(app_name)
+const app_fid = Symbol(app_name)
 const app_fn = { fid: app_fid, name: app_name, permissions: { commands: [], queries: [] } }
 
 export const ordo_app_state = MaokaZAGS.Of<TOrdoState>({

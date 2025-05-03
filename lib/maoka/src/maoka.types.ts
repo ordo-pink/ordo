@@ -10,58 +10,13 @@ export namespace Maoka {
 		}
 	}
 
-	export namespace DOM {
-		export type Render = (element: HTMLElement, component: Maoka.Component, create_id: () => Maoka.Id) => Promise<void>
-
-		export type OnMountHandler = (() => void) | (() => () => void)
-
-		export type OnUnmountHandler = () => void
-
-		export type Node<$Element extends HTMLElement = HTMLElement> = Maoka.Node<
-			$Element & {
-				mounted?: boolean
-				onmount?: OnMountHandler[]
-				onunmount?: OnUnmountHandler[]
-			}
-		>
-
-		export type Root<$Element extends HTMLElement = HTMLElement> = Maoka.Root<$Element> & {
-			refresh_queue: Maoka.DOM.Node[]
-		}
-
-		export type Static = {
-			render: Maoka.DOM.Render
-		}
-	}
-
 	export namespace Guards {
-		export type IsNode = <$Value = unknown>(x: any) => x is Maoka.Node<$Value>
+		export type IsNode<$Value = unknown> = (x: any) => x is Maoka.Node<$Value>
 		export type IsComponent = (x: any) => x is Maoka.Component
-		export type IsDOMNode<$Element extends HTMLElement = HTMLElement> = (x: any) => x is Maoka.DOM.Node<$Element>
 
-		export type Static = {
+		export type Module = {
 			node: Maoka.Guards.IsNode
 			component: Maoka.Guards.IsComponent
-			dom_node: Maoka.Guards.IsDOMNode
-		}
-	}
-
-	export namespace Jabs {
-		export type IfDOM = <$Element extends HTMLElement = HTMLElement, $Return = void>(
-			f: (element: Maoka.DOM.Node<$Element>) => $Return,
-		) => Maoka.Jab<$Return | void>
-
-		export type OnMount = (f: Maoka.DOM.OnMountHandler) => Maoka.Jab
-
-		export type OnUnmount = (f: Maoka.DOM.OnUnmountHandler) => Maoka.Jab
-
-		export type Refresh$ = Maoka.Jab
-
-		export type Static = {
-			if_dom: Maoka.Jabs.IfDOM
-			onmount: Maoka.Jabs.OnMount
-			onunmount: Maoka.Jabs.OnUnmount
-			refresh$: Maoka.Jabs.Refresh$
 		}
 	}
 
@@ -112,17 +67,71 @@ export namespace Maoka {
 
 	export type Tags = Record<(typeof HTML_TAGS)[number], (f: Maoka.Fn) => Maoka.Component>
 
-	export type Styled<$Value = unknown> = Record<
-		(typeof HTML_TAGS)[number],
-		(classes: string) => (f: Maoka.Fn<$Value>) => Maoka.Component
-	>
-
 	export type Module = {
 		context: Maoka.Context.Create
 		create: Maoka.CreateComponent
-		dom: Maoka.DOM.Static
-		guards: Maoka.Guards.Static
-		jabs: Maoka.Jabs.Static
-		styled: Maoka.Styled
+		guards: Maoka.Guards.Module
 	}
+}
+
+export namespace MaokaDOM {
+	export type Render = (element: HTMLElement, component: Maoka.Component, create_id: () => Maoka.Id) => Promise<void>
+
+	export type OnMountHandler = (() => void) | (() => () => void)
+
+	export type OnUnmountHandler = () => void
+
+	export namespace Jabs {
+		export type IfDOM = <$Element extends HTMLElement = HTMLElement, $Return = void>(
+			f: (element: MaokaDOM.Node<$Element>) => $Return,
+		) => Maoka.Jab<$Return | void>
+
+		export type OnMount = (f: (node: MaokaDOM.Node) => void | (() => void)) => Maoka.Jab
+
+		export type OnUnmount = (f: (node: MaokaDOM.Node) => void) => Maoka.Jab
+
+		export type Refresh$ = Maoka.Jab
+
+		export type Static = {
+			if_dom: MaokaDOM.Jabs.IfDOM
+			onmount: MaokaDOM.Jabs.OnMount
+			onunmount: MaokaDOM.Jabs.OnUnmount
+			refresh$: MaokaDOM.Jabs.Refresh$
+		}
+	}
+
+	export namespace Guards {
+		export type IsNode = <$Value = unknown>(x: any) => x is Maoka.Node<$Value>
+		export type IsComponent = (x: any) => x is Maoka.Component
+		export type IsDOMNode<$Element extends HTMLElement = HTMLElement> = (x: any) => x is MaokaDOM.Node<$Element>
+
+		export type Static = {
+			dom_node: MaokaDOM.Guards.IsDOMNode
+		}
+	}
+
+	export type Node<$Element extends HTMLElement = HTMLElement> = Maoka.Node<
+		$Element & {
+			mounted?: boolean
+			onmount?: OnMountHandler[]
+			onunmount?: OnUnmountHandler[]
+		}
+	>
+
+	export type Root<$Element extends HTMLElement = HTMLElement> = Maoka.Root<$Element> & {
+		refresh_queue: MaokaDOM.Node[]
+	}
+
+	export type Module = {
+		guards: MaokaDOM.Guards.Static
+		jabs: MaokaDOM.Jabs.Static
+		render: MaokaDOM.Render
+	}
+}
+
+export namespace MaokaStyled {
+	export type Instance<$Value = unknown> = Record<
+		(typeof HTML_TAGS)[number],
+		(classes: string) => (f: Maoka.Fn<$Value>) => Maoka.Component
+	>
 }

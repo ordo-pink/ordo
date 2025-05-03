@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Maoka, maoka } from "@ordo-pink/maoka"
+import { Maoka, maoka_dom } from "@ordo-pink/maoka"
 import { SM_SCREEN_BREAKPOINT } from "@ordo-pink/core"
 import { Zags } from "@ordo-pink/zags"
 import { lt } from "@ordo-pink/tau"
@@ -35,13 +35,13 @@ export const listen_global_event =
 			return () => document.removeEventListener(key, f)
 		}
 
-		use(maoka.jabs.onmount(handle_mount))
+		use(maoka_dom.jabs.onmount(handle_mount))
 	}
 
 export const set_attribute =
 	(key: string, value = ""): Maoka.Jab =>
 	use => {
-		use(maoka.jabs.if_dom(n => n.value.setAttribute(key, value)))
+		use(maoka_dom.jabs.if_dom(n => n.value.setAttribute(key, value)))
 		// TODO if_string
 	}
 
@@ -51,10 +51,10 @@ export const marry$ =
 		let value: $State
 		const divorce = zags.marry(state => {
 			value = state
-			use(maoka.jabs.refresh$)
+			use(maoka_dom.jabs.refresh$)
 		})
 
-		use(maoka.jabs.onunmount(divorce))
+		use(maoka_dom.jabs.onunmount(divorce))
 
 		return () => value
 	}
@@ -69,10 +69,10 @@ export const cheat$ =
 
 		const divorce = zags.cheat(dot_path, state => {
 			value = state
-			use(maoka.jabs.refresh$)
+			use(maoka_dom.jabs.refresh$)
 		})
 
-		use(maoka.jabs.onunmount(divorce))
+		use(maoka_dom.jabs.onunmount(divorce))
 
 		return () => value
 	}
@@ -90,28 +90,28 @@ export const set_class =
 export const add_class =
 	(...classes: string[]): Maoka.Jab =>
 	use => {
-		use(maoka.jabs.if_dom(n => n.value.classList.add(...classes.flatMap(cls => cls.split(" ")))))
+		use(maoka_dom.jabs.if_dom(n => n.value.classList.add(...classes.flatMap(cls => cls.split(" ")))))
 		// TODO if_string
 	}
 
 export const remove_class =
 	<$TClass extends string>(...classes: NoSpace<$TClass>[]): Maoka.Jab =>
 	use => {
-		use(maoka.jabs.if_dom(n => n.value.classList.remove(...classes.flatMap(cls => cls.split(" ")))))
+		use(maoka_dom.jabs.if_dom(n => n.value.classList.remove(...classes.flatMap(cls => cls.split(" ")))))
 		// TODO if_string
 	}
 
 export const replace_class =
 	<$Prev extends string, $Next extends string>(prev: NoSpace<$Prev>, next: NoSpace<$Next>): Maoka.Jab =>
 	use => {
-		use(maoka.jabs.if_dom(n => n.value.classList.replace(prev, next)))
+		use(maoka_dom.jabs.if_dom(n => n.value.classList.replace(prev, next)))
 		// TODO if_string
 	}
 
 export const set_style =
 	(str: Partial<Omit<CSSStyleDeclaration, "length" | "parentRule">>): Maoka.Jab =>
 	use => {
-		use(maoka.jabs.if_dom(n => Object.keys(str).forEach(k => ((n.value.style as any)[k] = (str as any)[k]))))
+		use(maoka_dom.jabs.if_dom(n => Object.keys(str).forEach(k => ((n.value.style as any)[k] = (str as any)[k]))))
 		// TODO if_string
 	}
 
@@ -121,12 +121,12 @@ export const listen =
 		f: $Element[$Event],
 	): Maoka.Jab =>
 	use =>
-		use(maoka.jabs.if_dom(n => ((n.value as any)[event] = f)))
+		use(maoka_dom.jabs.if_dom(n => ((n.value as any)[event] = f)))
 
 export const set_inner_html =
 	(html: string): Maoka.Jab =>
 	use =>
-		use(maoka.jabs.if_dom(n => (n.value.innerHTML = html)))
+		use(maoka_dom.jabs.if_dom(n => (n.value.innerHTML = html)))
 
 const is_sm = lt(SM_SCREEN_BREAKPOINT)
 
@@ -134,13 +134,13 @@ export const is_sm_screen$: Maoka.Jab<() => boolean> = use => {
 	let value: boolean = is_sm(window.innerWidth)
 
 	use(
-		maoka.jabs.onmount(() => {
+		maoka_dom.jabs.onmount(() => {
 			const handle_resize = () => {
 				const is_sm_screen = is_sm(window.innerWidth)
 
 				if (value !== is_sm_screen) {
 					value = is_sm_screen
-					use(maoka.jabs.refresh$)
+					use(maoka_dom.jabs.refresh$)
 				}
 			}
 

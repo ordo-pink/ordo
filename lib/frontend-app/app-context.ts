@@ -1,3 +1,3 @@
-import { maoka } from "@ordo-pink/maoka"
+import { maoka_context } from "@ordo-pink/maoka"
 
-export const app_context = maoka.context<Ordo.State>()
+export const app_context = maoka_context.create<Ordo.State>()

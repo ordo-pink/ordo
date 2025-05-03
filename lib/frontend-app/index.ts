@@ -54,6 +54,7 @@ import { create_command_palette } from "./src/command-palette/command-palette.ja
 
 import "./index.css"
 import { maoka_jabs } from "@ordo-pink/maoka-jabs"
+import { maoka_styled } from "@ordo-pink/maoka/src/maoka-styled.impl"
 
 export type AppOptions = {
 	hosts: Ordo.Hosts
@@ -121,7 +122,7 @@ export const app = ({ hosts, logger }: AppOptions) =>
 	})
 
 namespace internal {
-	export const app_element = maoka.styled.div("app")
+	export const app_element = maoka_styled.div("app")
 
 	export const command_palette_button = maoka.create("button", use => {
 		const { hunter } = use(app_context.consume)

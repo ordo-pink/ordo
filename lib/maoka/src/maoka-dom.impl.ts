@@ -10,27 +10,33 @@ export namespace maoka_dom {
 	}
 
 	export namespace jabs {
-		export const if_dom: MaokaDOM.Jabs.IfDOM = f => (_, node) => {
-			if (guards.is_dom_node(node)) return f(node as any)
-		}
+		export const if_dom: MaokaDOM.Jabs.IfDOM =
+			f =>
+			({ node }) => {
+				if (guards.is_dom_node(node)) return f(node as any)
+			}
 
-		export const onmount: MaokaDOM.Jabs.OnMount = f => use =>
-			use(
-				if_dom(dom_node => {
-					if (!dom_node.value.onmount) dom_node.value.onmount = []
-					dom_node.value.onmount.push(() => f(dom_node))
-				}),
-			)
+		export const onmount: MaokaDOM.Jabs.OnMount =
+			f =>
+			({ use }) =>
+				use(
+					if_dom(dom_node => {
+						if (!dom_node.value.onmount) dom_node.value.onmount = []
+						dom_node.value.onmount.push(() => f(dom_node))
+					}),
+				)
 
-		export const onunmount: MaokaDOM.Jabs.OnUnmount = f => use =>
-			use(
-				if_dom(dom_node => {
-					if (!dom_node.value.onunmount) dom_node.value.onunmount = []
-					dom_node.value.onunmount.push(() => f(dom_node))
-				}),
-			)
+		export const onunmount: MaokaDOM.Jabs.OnUnmount =
+			f =>
+			({ use }) =>
+				use(
+					if_dom(dom_node => {
+						if (!dom_node.value.onunmount) dom_node.value.onunmount = []
+						dom_node.value.onunmount.push(() => f(dom_node))
+					}),
+				)
 
-		export const refresh$: MaokaDOM.Jabs.Refresh$ = use =>
+		export const refresh$: MaokaDOM.Jabs.Refresh$ = ({ use }) =>
 			use(if_dom(n => n.value.dispatchEvent(new CustomEvent("refresh$", { detail: n, bubbles: true }))))
 	}
 
@@ -45,6 +51,7 @@ export namespace maoka_dom {
 			id: create_id(),
 			refresh_queue: [],
 		}
+
 		const node = (await component(root)) as MaokaDOM.Node
 
 		const request_idle_callback = globalThis.requestIdleCallback ?? setTimeout

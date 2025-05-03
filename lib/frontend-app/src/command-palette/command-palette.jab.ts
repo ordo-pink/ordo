@@ -1,21 +1,21 @@
 import { Maoka, maoka_dom } from "@ordo-pink/maoka"
 import { CommandPaletteItemType } from "@ordo-pink/core"
+import { bs_terminal } from "@ordo-pink/frontend-icons"
 
 import { app_context } from "../../app-context"
 import { command_palette } from "./command-palette.component"
 import { command_palette$ } from "./command-palette.state"
 
 import "./command-palette.style.css"
-import { BsTerminal } from "@ordo-pink/frontend-icons"
 
-export const create_command_palette: Maoka.Jab = use => {
+export const create_command_palette: Maoka.Jab = ({ use }) => {
 	use(internal.track_prey)
 
 	return command_palette()
 }
 
 namespace internal {
-	export const track_prey: Maoka.Jab = use => {
+	export const track_prey: Maoka.Jab = ({ use }) => {
 		const { hunter } = use(app_context.consume)
 
 		const handle_onmount = () => {
@@ -32,7 +32,7 @@ namespace internal {
 				hotkey: "mod+shift+p",
 				description: "Show or hide command palette. Hides command palette if you can see this message.",
 				type: CommandPaletteItemType.MODAL_OPENER,
-				render_icon: span => maoka_dom.render(span, BsTerminal(), () => crypto.randomUUID()),
+				render_icon: span => maoka_dom.render(span, bs_terminal({}), () => crypto.randomUUID()),
 			})
 
 			return () => {

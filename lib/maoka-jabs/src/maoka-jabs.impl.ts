@@ -28,7 +28,7 @@ import { NoSpace as NoSpace } from "./maoka-jabs.types"
 
 export const listen_global_event =
 	<$Key extends keyof DocumentEventMap>(key: $Key, f: (event: DocumentEventMap[$Key]) => void): Maoka.Jab =>
-	use => {
+	({ use }) => {
 		const handle_mount = () => {
 			document.addEventListener(key, f)
 
@@ -40,14 +40,14 @@ export const listen_global_event =
 
 export const set_attribute =
 	(key: string, value = ""): Maoka.Jab =>
-	use => {
+	({ use }) => {
 		use(maoka_dom.jabs.if_dom(n => n.value.setAttribute(key, value)))
 		// TODO if_string
 	}
 
 export const marry$ =
 	<$State extends Zags.BaseState>(zags: Zags.Instance<$State>): Maoka.Jab<() => $State> =>
-	use => {
+	({ use }) => {
 		let value: $State
 		const divorce = zags.marry(state => {
 			value = state
@@ -64,7 +64,7 @@ export const cheat$ =
 		zags: Zags.Instance<$State>,
 		dot_path: $DotPath,
 	): Maoka.Jab<() => Zags.Pouch.RecordValueByDotPath<$State, $DotPath>> =>
-	use => {
+	({ use }) => {
 		let value: Zags.Pouch.RecordValueByDotPath<$State, $DotPath>
 
 		const divorce = zags.cheat(dot_path, state => {
@@ -79,38 +79,38 @@ export const cheat$ =
 
 export const set_id =
 	(id?: string): Maoka.Jab =>
-	(use, node) =>
+	({ use, node }) =>
 		use(set_attribute("id", id ?? String(node.id)))
 
 export const set_class =
 	(...classes: string[]): Maoka.Jab =>
-	use =>
+	({ use }) =>
 		use(set_attribute("class", classes.join(" ")))
 
 export const add_class =
 	(...classes: string[]): Maoka.Jab =>
-	use => {
+	({ use }) => {
 		use(maoka_dom.jabs.if_dom(n => n.value.classList.add(...classes.flatMap(cls => cls.split(" ")))))
 		// TODO if_string
 	}
 
 export const remove_class =
 	<$TClass extends string>(...classes: NoSpace<$TClass>[]): Maoka.Jab =>
-	use => {
+	({ use }) => {
 		use(maoka_dom.jabs.if_dom(n => n.value.classList.remove(...classes.flatMap(cls => cls.split(" ")))))
 		// TODO if_string
 	}
 
 export const replace_class =
 	<$Prev extends string, $Next extends string>(prev: NoSpace<$Prev>, next: NoSpace<$Next>): Maoka.Jab =>
-	use => {
+	({ use }) => {
 		use(maoka_dom.jabs.if_dom(n => n.value.classList.replace(prev, next)))
 		// TODO if_string
 	}
 
 export const set_style =
 	(str: Partial<Omit<CSSStyleDeclaration, "length" | "parentRule">>): Maoka.Jab =>
-	use => {
+	({ use }) => {
 		use(maoka_dom.jabs.if_dom(n => Object.keys(str).forEach(k => ((n.value.style as any)[k] = (str as any)[k]))))
 		// TODO if_string
 	}
@@ -120,17 +120,17 @@ export const listen =
 		event: $Event extends `on${string}` ? $Event : never,
 		f: $Element[$Event],
 	): Maoka.Jab =>
-	use =>
+	({ use }) =>
 		use(maoka_dom.jabs.if_dom(n => ((n.value as any)[event] = f)))
 
 export const set_inner_html =
 	(html: string): Maoka.Jab =>
-	use =>
+	({ use }) =>
 		use(maoka_dom.jabs.if_dom(n => (n.value.innerHTML = html)))
 
 const is_sm = lt(SM_SCREEN_BREAKPOINT)
 
-export const is_sm_screen$: Maoka.Jab<() => boolean> = use => {
+export const is_sm_screen$: Maoka.Jab<() => boolean> = ({ use }) => {
 	let value: boolean = is_sm(window.innerWidth)
 
 	use(

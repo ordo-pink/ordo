@@ -62,66 +62,65 @@ export type AppOptions = {
 }
 
 // TODO Move translations from file explorer
-export const app = ({ hosts, logger }: AppOptions) =>
-	maoka.create("div", use => {
-		const hunter = hunt.begin<Ordo.Preys>()
-		const fetch = null as any
-		const translate = null as any
-		use(app_context.provide({ fetch, hosts, hunter, logger, translate }))
+export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
+	const hunter = hunt.begin<Ordo.Preys>()
+	const fetch = null as any
+	const translate = null as any
+	use(app_context.provide({ fetch, hosts, hunter, logger, translate }))
 
-		const command_palette = use(create_command_palette)
-		// ordo_app_state.zags.update("hosts.id", () => id_host)
-		// ordo_app_state.zags.update("hosts.dt", () => dt_host)
-		// ordo_app_state.zags.update("hosts.pb", () => pb_host)
-		// ordo_app_state.zags.update("hosts.au", () => au_host)
+	const command_palette = use(create_command_palette)
+	// ordo_app_state.zags.update("hosts.id", () => id_host)
+	// ordo_app_state.zags.update("hosts.dt", () => dt_host)
+	// ordo_app_state.zags.update("hosts.pb", () => pb_host)
+	// ordo_app_state.zags.update("hosts.au", () => au_host)
 
-		// const { app_fid } = ordo_app_state.zags.select("constants")
+	// const { app_fid } = ordo_app_state.zags.select("constants")
 
-		// const { repositories, source } = use(create_function_state_source)
-		// const app_state = use(create_function_state(app_fid, source))
+	// const { repositories, source } = use(create_function_state_source)
+	// const app_state = use(create_function_state(app_fid, source))
 
-		// use(MaokaOrdo.Context.provide(app_state))
+	// use(MaokaOrdo.Context.provide(app_state))
 
-		// use(create_command_palette)
-		// use(move_file_command)
-		// use(remove_file_command)
-		// use(create_file_command)
-		// use(rename_file_command)
-		// use(edit_file_labels_command)
-		// use(edit_file_links_command)
+	// use(create_command_palette)
+	// use(move_file_command)
+	// use(remove_file_command)
+	// use(create_file_command)
+	// use(rename_file_command)
+	// use(edit_file_labels_command)
+	// use(edit_file_links_command)
 
-		// use(start_metadata_manager(repositories))
+	// use(start_metadata_manager(repositories))
 
-		// TODO Render user defined functions
-		// TODO .catch
-		// void Promise.any([
-		// 	import("./src/sections/welcome").then(({ default: f }) => f(source)),
-		// 	import("./src/sections/file-editor").then(({ default: f }) => f(source)),
-		// 	import("@ordo-pink/function-rte")
-		// 		.then(({ default: f }) => f(source))
-		// 		.then(() => import("@ordo-pink/function-database"))
-		// 		.then(({ default: f }) => f(source))
-		// 		.then(() => import("@ordo-pink/function-board"))
-		// 		.then(({ default: f }) => f(source)),
-		// ])
+	// TODO Render user defined functions
+	// TODO .catch
+	// void Promise.any([
+	// 	import("./src/sections/welcome").then(({ default: f }) => f(source)),
+	// 	import("./src/sections/file-editor").then(({ default: f }) => f(source)),
+	// 	import("@ordo-pink/function-rte")
+	// 		.then(({ default: f }) => f(source))
+	// 		.then(() => import("@ordo-pink/function-database"))
+	// 		.then(({ default: f }) => f(source))
+	// 		.then(() => import("@ordo-pink/function-board"))
+	// 		.then(({ default: f }) => f(source)),
+	// ])
 
-		// TODO Init user
-		return () => [
-			internal.command_palette_button,
-			command_palette,
-			// OrdoWorkspace,
-			// OrdoSidebar,
-			// OrdoModal,
-			// OrdoNotifications,
-			// OrdoContextMenu,
-			// OrdoActivityBar,
-			// OrdoBackgroundTaskIndicator,
-			// OrdoTitleDisplay,
-		]
-	})
+	// TODO Init user
+	return () => [
+		internal.command_palette_button({}),
+		command_palette,
+		// OrdoWorkspace,
+		// OrdoSidebar,
+		// OrdoModal,
+		// OrdoNotifications,
+		// OrdoContextMenu,
+		// OrdoActivityBar,
+		// OrdoBackgroundTaskIndicator,
+		// OrdoTitleDisplay,
+	]
+})
 
 namespace internal {
-	export const command_palette_button = maoka.create("button", use => {
+	export const command_palette_button = maoka.create("button", ({ use }) => {
 		const { hunter } = use(app_context.consume)
 		use(maoka_jabs.listen("onclick", () => hunter.shoot("command_palette.show", void 0)))
 

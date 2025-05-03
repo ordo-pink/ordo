@@ -7,9 +7,9 @@ export namespace maoka_context {
 		return {
 			provide:
 				(value: $Value): Maoka.Jab =>
-				(_, node) =>
+				({ node }) =>
 					void (state[node.root.id] = value),
-			consume: (_, node) => state[node.root.id],
+			consume: ({ node }) => state[node.root.id],
 		}
 	}
 }

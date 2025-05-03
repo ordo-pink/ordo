@@ -14,32 +14,25 @@ export namespace maoka {
 		node: (x: any): x is Maoka.Node => !!x && typeof x === "object" && x[NODE_MARK],
 	}
 
-	export const create: Maoka.CreateComponent = (tag, callback?) => {
-		if (!callback) return callback => internal.create(tag, callback as any)
-		return internal.create(tag, callback) as any
-	}
-
-	namespace internal {
-		export const create = (tag: string, callback: Maoka.Fn): Maoka.Component => {
-			const component = async (root: Maoka.Root) => {
-				const value = root.create_value(tag)
-				const node: Maoka.Node = {
-					id: root.create_id(),
-					kindergarten: () => null,
-					value,
-					[NODE_MARK as any]: true,
-					root,
-				}
-				const use: Maoka.Use = jab => jab(use, node)
-
-				node.kindergarten = await callback(use, node)
-
-				return node
+	export const create: Maoka.CreateComponent = (tag, callback) => (args: Maoka.Args<any>) => {
+		const component = async (root: Maoka.Root) => {
+			const value = root.create_value(tag)
+			const node: Maoka.Node = {
+				id: root.create_id(),
+				kindergarten: () => null,
+				value,
+				[NODE_MARK as any]: true,
+				root,
 			}
+			const use: Maoka.Use = jab => jab({ use, node })
 
-			component[COMPONENT_MARK] = true as const
+			node.kindergarten = await callback({ ...args, use, node })
 
-			return component as any
+			return node
 		}
+
+		component[COMPONENT_MARK] = true as const
+
+		return component as any
 	}
 }

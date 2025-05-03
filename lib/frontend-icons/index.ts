@@ -5,12 +5,12 @@
 
 import { maoka, maoka_dom } from "@ordo-pink/maoka"
 
-const icon =
-	(children: string) =>
-	(cls: string = "") =>
-		maoka.create("span", use => use(maoka_dom.jabs.if_dom(n => void (n.value.innerHTML = create_svg(children, cls)))))
+const icon = (children: string) =>
+	maoka.create<{ classes?: string }>("span", ({ classes, use }) =>
+		use(maoka_dom.jabs.if_dom(n => void (n.value.innerHTML = create_svg(children, classes)))),
+	)
 
-const create_svg = (children: string, cls: string) =>
+const create_svg = (children: string, cls = "") =>
 	`<svg stroke="currentColor" class="${cls}" fill="currentColor" stroke-width="0" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">${children}</svg>`
 
 export const bs_search =
@@ -104,7 +104,7 @@ export const BsCollection =
 	icon(`<path d="M2.5 3.5a.5.5 0 0 1 0-1h11a.5.5 0 0 1 0 1h-11zm2-2a.5.5 0 0 1 0-1h7a.5.5 0 0 1 0 1h-7zM0 13a1.5 1.5 0 0 0 1.5 1.5h13A1.5 1.5 0 0 0 16 13V6a1.5 1.5 0 0 0-1.5-1.5h-13A1.5 1.5 0 0 0 0 6v7zm1.5.5A.5.5 0 0 1 1 13V6a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5h-13z"></path>
 `)
 
-export const BsTerminal =
+export const bs_terminal =
 	icon(`<path d="M6 9a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3A.5.5 0 0 1 6 9M3.854 4.146a.5.5 0 1 0-.708.708L4.793 6.5 3.146 8.146a.5.5 0 1 0 .708.708l2-2a.5.5 0 0 0 0-.708z"></path>
 <path d="M2 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2zm12 1a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"></path>`)
 

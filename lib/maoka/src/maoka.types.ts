@@ -29,15 +29,11 @@ export namespace Maoka {
 		value: $Value
 	}
 
-	export type Teacher<$Params = void> = $Params extends void
-		? (kindergarten: Maoka.Kindergarten) => Maoka.Component
-		: (params: $Params, kindergarten: Maoka.Kindergarten) => Maoka.Component
-
 	export type Child = null | void | string | number | Maoka.Node | Maoka.Component
 
 	export type Children = Child | Child[]
 
-	export type Jab<$Return = void> = (use: Maoka.Use, node: Maoka.Node) => $Return
+	export type Jab<$Return = void> = (args: Maoka.Args) => $Return
 
 	export type Use = <$Return = void>(jab: Maoka.Jab<$Return>) => $Return
 
@@ -47,7 +43,19 @@ export namespace Maoka {
 
 	export type CreateValue<$Value = unknown> = (tag: string) => $Value
 
-	export type Fn = (use: Maoka.Use, node: Maoka.Node) => Kindergarten | Promise<Kindergarten> | void
+	export type BaseArgs = Record<string, unknown> & {
+		kindergarten?: Maoka.Kindergarten
+	}
+
+	export type Args<$Args extends Maoka.BaseArgs = Maoka.BaseArgs> = $Args & {
+		use: Maoka.Use
+		node: Maoka.Node
+		kindergarten?: Kindergarten
+	}
+
+	export type Fn<$Args extends Maoka.BaseArgs = Maoka.BaseArgs> = (
+		args: Maoka.Args<$Args>,
+	) => Kindergarten | Promise<Kindergarten> | void
 
 	export type Root<$Value = unknown> = {
 		id: Maoka.Id
@@ -57,10 +65,10 @@ export namespace Maoka {
 
 	export type Component = (root: Maoka.Root) => Maoka.Node | Promise<Maoka.Node>
 
-	export type CreateComponent = (
+	export type CreateComponent = <$Args extends Maoka.BaseArgs = Maoka.BaseArgs>(
 		tag: string,
-		f?: Maoka.Fn,
-	) => typeof f extends undefined ? (f: Maoka.Fn) => Maoka.Component : Maoka.Component
+		f: Maoka.Fn<Args<$Args>>,
+	) => (args: $Args) => Maoka.Component
 
 	export type Tags = Record<(typeof HTML_TAGS)[number], (f: Maoka.Fn) => Maoka.Component>
 

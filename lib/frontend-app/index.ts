@@ -48,13 +48,12 @@ import { maoka } from "@ordo-pink/maoka"
 
 // TODO Move fonts to assets
 import { hunt } from "@ordo-pink/hunt"
+import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 
 import { app_context } from "./app-context"
 import { create_command_palette } from "./src/command-palette/command-palette.jab"
 
 import "./index.css"
-import { maoka_jabs } from "@ordo-pink/maoka-jabs"
-import { maoka_styled } from "@ordo-pink/maoka/src/maoka-styled.impl"
 
 export type AppOptions = {
 	hosts: Ordo.Hosts
@@ -64,7 +63,7 @@ export type AppOptions = {
 
 // TODO Move translations from file explorer
 export const app = ({ hosts, logger }: AppOptions) =>
-	internal.app_element(use => {
+	maoka.create("div", use => {
 		const hunter = hunt.begin<Ordo.Preys>()
 		const fetch = null as any
 		const translate = null as any
@@ -122,8 +121,6 @@ export const app = ({ hosts, logger }: AppOptions) =>
 	})
 
 namespace internal {
-	export const app_element = maoka_styled.div("app")
-
 	export const command_palette_button = maoka.create("button", use => {
 		const { hunter } = use(app_context.consume)
 		use(maoka_jabs.listen("onclick", () => hunter.shoot("command_palette.show", void 0)))

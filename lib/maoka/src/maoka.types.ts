@@ -125,7 +125,3 @@ export namespace MaokaDOM {
 		render: MaokaDOM.Render
 	}
 }
-
-export namespace MaokaStyled {
-	export type Instance = Record<(typeof HTML_TAGS)[number], (classes: string) => (f: Maoka.Fn) => Maoka.Component>
-}

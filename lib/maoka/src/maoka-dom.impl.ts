@@ -178,7 +178,8 @@ export namespace maoka_dom {
 				else console.error("Unsupported child", child)
 			}
 
-			node.value.replaceChildren(...nodes)
+			if (!nodes.length) node.value.innerHTML = ""
+			else node.value.replaceChildren(...nodes)
 
 			return node.value
 		}

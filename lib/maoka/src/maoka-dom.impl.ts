@@ -45,7 +45,7 @@ export namespace maoka_dom {
 			id: create_id(),
 			refresh_queue: [],
 		}
-		const node = await component(root)
+		const node = (await component(root)) as MaokaDOM.Node
 
 		const request_idle_callback = globalThis.requestIdleCallback ?? setTimeout
 
@@ -172,8 +172,8 @@ export namespace maoka_dom {
 
 				if (typeof child === "string") nodes.push(child)
 				else if (typeof child === "number") nodes.push(String(child))
-				else if (maoka.guards.node(child)) nodes.push(await render_dom_children(child))
-				else if (maoka.guards.component(child)) nodes.push(await render_dom_children(await child(node.root)))
+				else if (maoka_dom.guards.is_dom_node(child)) nodes.push(await render_dom_children(child))
+				else if (maoka.guards.component(child)) nodes.push(await render_dom_children((await child(node.root)) as any))
 				else if (!child) continue
 				else console.error("Unsupported child", child)
 			}

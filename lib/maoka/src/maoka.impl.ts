@@ -11,19 +11,19 @@ export namespace maoka {
 
 	export const guards: Maoka.Guards.Module = {
 		component: (x): x is Maoka.Component => !!x && typeof x === "function" && x[COMPONENT_MARK],
-		node: <$Value>(x: any): x is Maoka.Node<$Value> => !!x && typeof x === "object" && x[NODE_MARK],
+		node: (x: any): x is Maoka.Node => !!x && typeof x === "object" && x[NODE_MARK],
 	}
 
-	export const create: Maoka.CreateComponent = (tag: string, callback?) => {
+	export const create: Maoka.CreateComponent = (tag, callback?) => {
 		if (!callback) return callback => internal.create(tag, callback as any)
 		return internal.create(tag, callback) as any
 	}
 
 	namespace internal {
-		export const create = <$Value>(tag: string, callback: Maoka.Fn<$Value>): Maoka.Component => {
-			const component = async (root: Maoka.Root<$Value>) => {
+		export const create = (tag: string, callback: Maoka.Fn): Maoka.Component => {
+			const component = async (root: Maoka.Root) => {
 				const value = root.create_value(tag)
-				const node: Maoka.Node<$Value> = {
+				const node: Maoka.Node = {
 					id: root.create_id(),
 					kindergarten: () => null,
 					value,

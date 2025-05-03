@@ -19,6 +19,7 @@ export namespace Maoka {
 
 		export type Node<$Element extends HTMLElement = HTMLElement> = Maoka.Node<
 			$Element & {
+				mounted?: boolean
 				onmount?: OnMountHandler[]
 				onunmount?: OnUnmountHandler[]
 			}
@@ -34,7 +35,7 @@ export namespace Maoka {
 	}
 
 	export namespace Guards {
-		export type IsNode = <$Value>(x: any) => x is Maoka.Node<$Value>
+		export type IsNode = <$Value = unknown>(x: any) => x is Maoka.Node<$Value>
 		export type IsComponent = (x: any) => x is Maoka.Component
 		export type IsDOMNode<$Element extends HTMLElement = HTMLElement> = (x: any) => x is Maoka.DOM.Node<$Element>
 
@@ -77,9 +78,9 @@ export namespace Maoka {
 		? (kindergarten: Maoka.Kindergarten) => Maoka.Component
 		: (params: $Params, kindergarten: Maoka.Kindergarten) => Maoka.Component
 
-	export type Child<$Value> = null | void | string | number | Maoka.Node<$Value> | Maoka.Component
+	export type Child<$Value = unknown> = null | void | string | number | Maoka.Node<$Value> | Maoka.Component
 
-	export type Children<$Value> = Child<$Value> | Child<$Value>[]
+	export type Children<$Value = unknown> = Child<$Value> | Child<$Value>[]
 
 	export type Jab<$Return = void> = <$Value = unknown>(use: Maoka.Use, node: Maoka.Node<$Value>) => $Return
 
@@ -89,20 +90,20 @@ export namespace Maoka {
 
 	export type CreateId = () => Maoka.Id
 
-	export type CreateValue<$Value> = (tag: string) => $Value
+	export type CreateValue<$Value = unknown> = (tag: string) => $Value
 
 	export type Fn<$Value = unknown> = (
 		use: Maoka.Use,
 		node: Maoka.Node<$Value>,
 	) => Kindergarten<$Value> | Promise<Kindergarten<$Value>> | void
 
-	export type Root<$Value> = {
+	export type Root<$Value = unknown> = {
 		id: Maoka.Id
 		create_id: Maoka.CreateId
 		create_value: Maoka.CreateValue<$Value>
 	}
 
-	export type Component = <$Value>(root: Maoka.Root<$Value>) => Maoka.Node<$Value> | Promise<Maoka.Node<$Value>>
+	export type Component = <$Value = unknown>(root: Maoka.Root<$Value>) => Maoka.Node<$Value> | Promise<Maoka.Node<$Value>>
 
 	export type CreateComponent<$Value = unknown> = (
 		tag: string,

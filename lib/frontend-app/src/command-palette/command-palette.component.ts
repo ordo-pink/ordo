@@ -10,6 +10,7 @@ import { command_palette$ } from "./command-palette.state"
 
 export const command_palette = () => internal.overlay(internal.modal)
 
+// TODO Move accepting args to maoka
 namespace internal {
 	export const overlay: Maoka.Teacher = kindergarten =>
 		styled.overlay(use => {
@@ -43,6 +44,9 @@ namespace internal {
 				if (!current) return null
 
 				return [
+					// TODO clean up here
+					// TODO fix maoka.styled type inference for fn provision
+					// TODO allow to return kindergarten directly in maoka.styled
 					maoka.create("label", use => {
 						use(maoka_jabs.set_class("command-palette_search_wrapper"))
 
@@ -53,6 +57,7 @@ namespace internal {
 					current.is_multiple
 						? items_wrapper(() => [items(() => current.items.map(item)), items(() => current.pinned_items?.map(item))])
 						: items(() => current.items.map(item)),
+					// TODO clean up here
 					styled.footer(() => () => [
 						bs_question_circle("mr-2"),
 						"Type to search. Arrows to navigate.",

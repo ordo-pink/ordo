@@ -23,7 +23,7 @@ import { Maoka } from "@ordo-pink/maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
-import { NotificationType } from "@ordo-pink/core"
+import { NOTIFICATION_TYPE } from "@ordo-pink/core"
 
 import { OrdoNotification } from "./notification.component"
 import { ordo_app_state } from "../../../app.state"
@@ -93,7 +93,7 @@ const handle_notification_show: Ordo.Command.HandlerOf<"cmd.application.notifica
 		{
 			title: payload.title,
 			id: payload.id ?? crypto.randomUUID(),
-			type: payload.type ?? NotificationType.DEFAULT,
+			type: payload.type ?? NOTIFICATION_TYPE.DEFAULT,
 			duration: payload.duration,
 			message: payload.message,
 			on_click: payload.on_click,

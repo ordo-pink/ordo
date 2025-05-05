@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { CurrentUser, CurrentUserKeys, METADATA_CONTENT_FSID, Metadata, rrr } from "@ordo-pink/core"
+import { current_user, CURRENT_USER_KEYS, METADATA_CONTENT_FSID, Metadata, rrr } from "@ordo-pink/core"
 import { Routary, routary } from "@ordo-pink/routary"
 import {
 	create_response,
@@ -37,7 +37,7 @@ export const create_backend_server_pb = (chamber: TPBFuel) =>
 								.from_promise(() => fetch(`${intake.id_host}/users/handle/${handle}`))
 								.pipe(oath.ops.chain(res => oath.from_promise(() => res.json())))
 								.pipe(oath.ops.chain(res => oath.if(res.success, { on_true: () => res.payload as Ordo.User.Public.DTO })))
-								.pipe(oath.ops.map(user => ({ uid: user[CurrentUserKeys.UID], fsid })))
+								.pipe(oath.ops.map(user => ({ uid: user[CURRENT_USER_KEYS.UID], fsid })))
 								.pipe(oath.ops.rmap(() => rrr.codes.enoent("User not found"))),
 						),
 					)
@@ -89,7 +89,7 @@ const validate_request_params = (intake: Routary.Intake<TPBContext>) =>
 		.all([
 			oath.if(Metadata.Validations.is_fsid(intake.params.fsid)).pipe(oath.ops.rmap(() => rrr.codes.einval("Invalid FSID"))),
 			oath
-				.if(CurrentUser.Validations.is_handle(intake.params.handle))
+				.if(current_user.validations.is_handle(intake.params.handle))
 				.pipe(oath.ops.rmap(() => rrr.codes.einval("Invalid handle"))),
 		])
 		.pipe(oath.ops.map(() => intake))

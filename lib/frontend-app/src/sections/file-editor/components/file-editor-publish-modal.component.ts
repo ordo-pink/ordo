@@ -23,7 +23,7 @@ import { /* CheckboxInput, */ Dialog } from "@ordo-pink/maoka-components"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
-import { NotificationType } from "@ordo-pink/core"
+import { NOTIFICATION_TYPE } from "@ordo-pink/core"
 // import { Result } from "@ordo-pink/result"
 import { oath } from "@ordo-pink/oath"
 
@@ -53,7 +53,7 @@ export const PublishMetadataModal = (fsid: Ordo.Metadata.FSID) =>
 								message: rrr.message as Ordo.I18N.TranslationKey,
 								duration: 15,
 								title: `t.common.error.${rrr.key.toLocaleLowerCase()}` as any,
-								type: NotificationType.RRR,
+								type: NOTIFICATION_TYPE.RRR,
 							})
 						}),
 					),

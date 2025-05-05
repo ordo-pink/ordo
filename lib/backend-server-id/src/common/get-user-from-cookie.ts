@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { CurrentUser, rrr } from "@ordo-pink/core"
+import { current_user, rrr } from "@ordo-pink/core"
 import { type Routary } from "@ordo-pink/routary"
 import { huyami } from "@ordo-pink/routary-ordo"
 import { oath } from "@ordo-pink/oath"
@@ -36,8 +36,8 @@ export const get_user_from_cookie = (intake: Routary.Intake<TIDContext>) => {
 			oath.ops.chain(([uid, sid]) =>
 				oath
 					.merge({
-						uid: oath.if(CurrentUser.Validations.is_uid(uid), { on_true: () => uid as Ordo.User.UID }),
-						sid: oath.if(CurrentUser.Validations.is_uid(sid), { on_true: () => sid as Ordo.User.SessionID }),
+						uid: oath.if(current_user.validations.is_uid(uid), { on_true: () => uid as Ordo.User.UID }),
+						sid: oath.if(current_user.validations.is_uid(sid), { on_true: () => sid as Ordo.User.SessionID }),
 					})
 					.pipe(oath.ops.tap(debug("Cookie extracted", ({ uid }) => uid)))
 					.pipe(

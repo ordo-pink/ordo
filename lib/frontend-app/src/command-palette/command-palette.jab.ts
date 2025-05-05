@@ -20,7 +20,7 @@
  */
 
 import { Maoka, maoka_dom } from "@ordo-pink/maoka"
-import { CommandPaletteItemType } from "@ordo-pink/core"
+import { COMMAND_PALETTE_ITEM_TYPE } from "@ordo-pink/core"
 import { bs_terminal } from "@ordo-pink/frontend-icons"
 
 import { app_context } from "../../app-context"
@@ -54,7 +54,7 @@ namespace internal {
 				value: () => hunter.shoot("command_palette.toggle"),
 				hotkey: "mod+shift+p",
 				description: "Show or hide command palette. Hides command palette if you can see this message.",
-				type: CommandPaletteItemType.MODAL_OPENER,
+				type: COMMAND_PALETTE_ITEM_TYPE.MODAL_OPENER,
 				render_icon: span => maoka_dom.render(span, bs_terminal({}), () => crypto.randomUUID()),
 			})
 

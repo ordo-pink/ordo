@@ -20,7 +20,7 @@
  */
 
 import { BsBoxArrowInRight, BsBoxArrowRight } from "@ordo-pink/frontend-icons"
-import { CommandPaletteItemType, CurrentUser, rrr } from "@ordo-pink/core"
+import { COMMAND_PALETTE_ITEM_TYPE, current_user, rrr } from "@ordo-pink/core"
 import { /* CheckboxInput, */ Dialog, Input } from "@ordo-pink/maoka-components"
 import { call_once, noop } from "@ordo-pink/tau"
 import { Maoka } from "@ordo-pink/maoka"
@@ -71,7 +71,7 @@ export const init_user = call_once(() => {
 		.from_promise(() => fetch(`${hosts.id}/session`, init))
 		.pipe(oath.ops.and(res => res.json()))
 		.pipe(oath.ops.and(res => oath.if(res.success, { on_true: () => res.payload as Ordo.User.Current.DTO })))
-		.pipe(oath.ops.and(dto => CurrentUser.FromDTO(dto)))
+		.pipe(oath.ops.and(dto => current_user.from_dto(dto)))
 		.pipe(oath.ops.and(user => ordo_app_state.zags.update("user", () => user)))
 		.cata(oath.catas.to_promise())
 		.catch(noop)
@@ -84,7 +84,7 @@ export const init_user = call_once(() => {
 			commands.emit("cmd.application.command_palette.add", {
 				readable_name: "t.auth.leave",
 				value: handle_sign_out,
-				type: CommandPaletteItemType.DESTRUCTIVE_ACTION,
+				type: COMMAND_PALETTE_ITEM_TYPE.DESTRUCTIVE_ACTION,
 				render_icon: BsBoxArrowRight,
 			})
 		} else {
@@ -92,7 +92,7 @@ export const init_user = call_once(() => {
 			commands.on("cmd.auth.show_validate_code_modal", handle_show_validate_code)
 			commands.emit("cmd.application.command_palette.add", {
 				readable_name: "t.auth.join",
-				type: CommandPaletteItemType.MODAL_OPENER,
+				type: COMMAND_PALETTE_ITEM_TYPE.MODAL_OPENER,
 				value: handle_show_request_code,
 				render_icon: BsBoxArrowInRight,
 			})
@@ -143,7 +143,7 @@ const RequestCodeModal = Maoka.create("div", ({ use }) => {
 	const t_checkbox_label =
 		"I consent to the fact that you'll store stuff on my computer, and I don't mind as long as you don't share it." // TODO i18n
 
-	const validate = CurrentUser.Validations.is_email
+	const validate = current_user.validations.is_email
 
 	const handle_input = (event: Event) => {
 		const target = event.target as HTMLInputElement
@@ -240,7 +240,7 @@ const ValidateCodeModal = (email: Ordo.User.Email) =>
 						.pipe(oath.ops.and(init => oath.from_promise(() => fetch(`${au_host}/verify-code`, init))))
 						.pipe(oath.ops.and(res => res.json()))
 						.pipe(oath.ops.and(res => oath.if(res.success, { on_true: () => res.payload })))
-						.pipe(oath.ops.and(user => ordo_app_state.zags.update("user", () => CurrentUser.FromDTO(user))))
+						.pipe(oath.ops.and(user => ordo_app_state.zags.update("user", () => current_user.from_dto(user))))
 						.pipe(oath.ops.and(() => commands.emit("cmd.application.modal.hide")))
 						.cata(oath.catas.to_promise()),
 				action_text: "Join",

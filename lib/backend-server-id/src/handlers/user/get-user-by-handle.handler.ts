@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { PublicUser } from "@ordo-pink/core"
+import { public_user } from "@ordo-pink/core"
 import { type Routary } from "@ordo-pink/routary"
 import { default_handler } from "@ordo-pink/routary-ordo"
 import { oath } from "@ordo-pink/oath"
@@ -42,9 +42,9 @@ export const handle_get_user_by_handle = default_handler<TIDContext>(intake =>
 
 type I = Routary.Intake<TIDContext>
 
-const is_handle = PublicUser.Validations.is_handle
+const is_handle = public_user.validations.is_handle
 
-const serialize_to_public_user = PublicUser.Serialize
+const serialize_to_public_user = public_user.serialize
 
 const validate_user_handle = (intake: I) => (handle?: string) =>
 	oath.if(is_handle(handle), { on_false: () => invalid_handle_rrr(handle!, intake), on_true: () => handle as Ordo.User.Handle })

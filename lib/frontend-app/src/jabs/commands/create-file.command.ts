@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { CommandPaletteItemType, ContextMenuItemType, Metadata } from "@ordo-pink/core"
+import { COMMAND_PALETTE_ITEM_TYPE, CONTEXT_MENU_ITEM_TYPE, Metadata } from "@ordo-pink/core"
 import { BsFileEarmarkPlus } from "@ordo-pink/frontend-icons"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
@@ -43,12 +43,12 @@ export const create_file_command: TMaokaJab = ({ use }) => {
 		readable_name: "t.common.components.modals.create_file.title",
 		should_show: ({ payload }) => Metadata.Validations.is_metadata(payload) || payload === "root",
 		payload_creator: ({ payload }) => (Metadata.Validations.is_metadata(payload) ? payload.get_fsid() : null),
-		type: ContextMenuItemType.CREATE,
+		type: CONTEXT_MENU_ITEM_TYPE.CREATE,
 	})
 
 	state.commands.emit("cmd.application.command_palette.add", {
 		value: () => state.commands.emit("cmd.metadata.show_create_modal", null),
-		type: CommandPaletteItemType.FILE_CREATOR,
+		type: COMMAND_PALETTE_ITEM_TYPE.FILE_CREATOR,
 		hotkey: "mod+shift+c",
 		readable_name: "t.common.components.modals.create_file.title",
 		render_icon: BsFileEarmarkPlus,

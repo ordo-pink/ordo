@@ -20,7 +20,7 @@
  */
 
 import { BsFilesAlt, BsSlash } from "@ordo-pink/frontend-icons"
-import { ContextMenuItemType, Metadata } from "@ordo-pink/core"
+import { CONTEXT_MENU_ITEM_TYPE, Metadata } from "@ordo-pink/core"
 import { R, type TResult } from "@ordo-pink/result"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
@@ -53,7 +53,7 @@ export const move_file_command: TMaokaJab = ({ use }) => {
 		readable_name: "t.common.components.modals.move.title",
 		render_icon: BsFilesAlt,
 		should_show: ({ payload }) => Metadata.Validations.is_metadata(payload),
-		type: ContextMenuItemType.UPDATE,
+		type: CONTEXT_MENU_ITEM_TYPE.UPDATE,
 	})
 
 	// TODO Command palette item if there is currently selected metadata

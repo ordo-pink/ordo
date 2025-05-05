@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { CurrentUser, CurrentUserKeys, METADATA_CONTENT_FSID, Metadata, rrr } from "@ordo-pink/core"
+import { current_user, CURRENT_USER_KEYS, METADATA_CONTENT_FSID, Metadata, rrr } from "@ordo-pink/core"
 import { Routary, routary } from "@ordo-pink/routary"
 import {
 	create_response,
@@ -134,7 +134,7 @@ export const validate_request_params = (intake: Routary.Intake<TDTContext>) =>
 	oath
 		.all([
 			oath.if(Metadata.Validations.is_fsid(intake.params.fsid)).pipe(oath.ops.rmap(() => rrr.codes.einval("Invalid FSID"))),
-			oath.if(CurrentUser.Validations.is_uid(intake.params.uid)).pipe(oath.ops.rmap(() => rrr.codes.einval("Invalid UID"))),
+			oath.if(current_user.validations.is_uid(intake.params.uid)).pipe(oath.ops.rmap(() => rrr.codes.einval("Invalid UID"))),
 		])
 		.pipe(oath.ops.map(() => intake))
 
@@ -145,13 +145,13 @@ export const authenticate = (intake: Routary.Intake<TDTContext>) =>
 		.pipe(oath.ops.chain(init => oath.from_promise(() => fetch(`${intake.id_host}/session`, init))))
 		.pipe(oath.ops.chain(res => oath.from_promise(() => res.json())))
 		.pipe(oath.ops.chain(body => oath.if(body?.success, { on_true: () => body.payload })))
-		.pipe(oath.ops.chain(x => oath.if(CurrentUser.Validations.is_dto(x), { on_true: () => x as Ordo.User.Current.DTO })))
+		.pipe(oath.ops.chain(x => oath.if(current_user.validations.is_dto(x), { on_true: () => x as Ordo.User.Current.DTO })))
 		.pipe(oath.ops.rmap(e => rrr.codes.eacces("Unauthorized", e)))
 
 // TODO checking permissions for editing files of other users
 export const check_authorization = (intake: Routary.Intake<TDTContext>) => (user: Ordo.User.Current.DTO) =>
 	oath
-		.if(user[CurrentUserKeys.UID] === intake.params.uid)
+		.if(user[CURRENT_USER_KEYS.UID] === intake.params.uid)
 		.pipe(oath.ops.map(() => user))
 		.pipe(oath.ops.rmap(() => rrr.codes.eperm("Permission denied")))
 
@@ -190,17 +190,17 @@ export const validate_file_size_limit = (intake: Routary.Intake<TDTContext>) => 
 		.from_nullable(intake.req.headers.get("content-length"))
 		.pipe(oath.ops.map(file_size => Number.parseInt(file_size, 10)))
 		.pipe(oath.ops.chain(file_size => oath.if(is_finite_non_negative_int(file_size), { on_true: () => file_size })))
-		.pipe(oath.ops.chain(file_size => oath.if(CurrentUser.FromDTO(user).can_upload(file_size))))
+		.pipe(oath.ops.chain(file_size => oath.if(current_user.from_dto(user).can_upload(file_size))))
 		.pipe(oath.ops.rmap(() => rrr.codes.efbig("File too big")))
 
 // TODO check if attemted to create a file in other user's space
 export const check_can_create_files = (intake: Routary.Intake<TDTContext>) => (user: Ordo.User.Current.DTO) =>
 	intake.data_persistence_strategy
-		.read(user[CurrentUserKeys.UID], METADATA_CONTENT_FSID)
+		.read(user[CURRENT_USER_KEYS.UID], METADATA_CONTENT_FSID)
 		.pipe(oath.ops.chain(stream => oath.from_promise(() => new Response(stream).json())))
 		.pipe(oath.ops.map(metadata => metadata.length))
 		.pipe(oath.ops.fix(() => 0))
-		.pipe(oath.ops.map(total_files => CurrentUser.FromDTO(user).can_create_files(total_files)))
+		.pipe(oath.ops.map(total_files => current_user.from_dto(user).can_create_files(total_files)))
 		.pipe(oath.ops.chain(can_create => oath.if(can_create)))
 		.pipe(oath.ops.map(() => user))
 		.pipe(oath.ops.rmap(() => rrr.codes.enospc("Too many files")))

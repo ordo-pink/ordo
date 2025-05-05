@@ -225,6 +225,11 @@ declare global {
 			show: { args: Ordo.CommandPalette.Instance | undefined }
 			hide: { args: void }
 		}
+		auth: {
+			show_request_code_modal: { args: void }
+			show_verify_code_modal: { args: void }
+			sign_out: { args: void }
+		}
 		// application: {
 		// 	set_title: () => Ordo.I18N.TranslationKey
 		// 	add_translations: () => {
@@ -342,14 +347,14 @@ declare global {
 	 * ```
 	 */
 	namespace Ordo {
-		type Rrr<$TKey extends keyof typeof C.ErrorType = keyof typeof C.ErrorType> = {
+		type Rrr<$TKey extends keyof typeof C.ERROR_TYPE = keyof typeof C.ERROR_TYPE> = {
 			key: $TKey
-			code: (typeof C.ErrorType)[$TKey]
+			code: (typeof C.ERROR_TYPE)[$TKey]
 			message: string
 			debug?: any
 		}
 
-		type Preys = Pick<cmd, "command_palette">
+		type Preys = Pick<cmd, keyof cmd>
 
 		type Hunter = Hunt.Instance<Preys>
 
@@ -474,7 +479,7 @@ declare global {
 				 *
 				 * @see {@link AchievementCategory}
 				 */
-				category: C.AchievementCategory
+				category: C.ACHIEVEMENT_CATEGORY
 			}
 
 			/**
@@ -605,46 +610,46 @@ declare global {
 				}
 
 				type Validations = TValidations<{
-					[$TKey in keyof typeof C.CurrentUserKeys]: (
+					[$TKey in keyof typeof C.CURRENT_USER_KEYS]: (
 						x: unknown,
-					) => x is Ordo.User.Current.DTO[(typeof C.CurrentUserKeys)[$TKey]]
+					) => x is Ordo.User.Current.DTO[(typeof C.CURRENT_USER_KEYS)[$TKey]]
 				}> & {
 					is_dto: (x: unknown) => x is Ordo.User.Current.DTO
 				}
 
 				type Static = {
-					FromDTO: (dto: Ordo.DTOLike<Ordo.User.Current.DTO>) => Ordo.User.Current.Instance
-					Create: (
+					from_dto: (dto: Ordo.DTOLike<Ordo.User.Current.DTO>) => Ordo.User.Current.Instance
+					new: (
 						email: Ordo.User.Email,
 						file_limit: number,
 						max_upload_size: number,
 						max_functions: number,
-						subscription?: C.UserSubscription,
+						subscription?: C.USER_SUBSCRIPTION,
 					) => Ordo.User.Current.Instance
-					Serialize: (dto: Ordo.DTOLike<Ordo.User.Current.DTO>) => Ordo.User.Current.DTO
-					Validations: Ordo.User.Current.Validations
+					serialize: (dto: Ordo.DTOLike<Ordo.User.Current.DTO>) => Ordo.User.Current.DTO
+					validations: Ordo.User.Current.Validations
 				}
 			}
 
 			namespace Public {
-				type DTO = [Ordo.User.UID, Ordo.User.Handle, number, C.UserSubscription, string?, string?]
+				type DTO = [Ordo.User.UID, Ordo.User.Handle, number, C.USER_SUBSCRIPTION, string?, string?]
 
 				type Validations = TValidations<{
-					[$TKey in keyof typeof C.PublicUserKeys]: Ordo.User.Current.DTO[(typeof C.PublicUserKeys)[$TKey]]
+					[$TKey in keyof typeof C.PUBLIC_USER_KEYS]: Ordo.User.Current.DTO[(typeof C.PUBLIC_USER_KEYS)[$TKey]]
 				}> & {
 					is_dto: (x: unknown) => x is Ordo.User.Public.DTO
 				}
 
 				type Static = {
-					FromDTO: (dto: Ordo.User.Public.DTO) => Ordo.User.Public.Instance
-					Serialize: <$TDTO extends [...Ordo.User.Public.DTO, ...any]>(dto: $TDTO) => Ordo.User.Public.DTO
-					Validations: Ordo.User.Public.Validations
+					from_dto: (dto: Ordo.User.Public.DTO) => Ordo.User.Public.Instance
+					serialize: <$TDTO extends [...Ordo.User.Public.DTO, ...any]>(dto: $TDTO) => Ordo.User.Public.DTO
+					validations: Ordo.User.Public.Validations
 				}
 
 				type Instance = {
 					get_uid: () => Ordo.User.UID
 					get_created_at: () => Date
-					get_subscription: () => C.UserSubscription
+					get_subscription: () => C.USER_SUBSCRIPTION
 					get_handle: () => Handle
 					get_first_name: () => string
 					get_last_name: () => string
@@ -808,7 +813,7 @@ declare global {
 				are_links: (x: unknown) => boolean
 			}
 
-			type Label = { name: string; color: C.LabelColor }
+			type Label = { name: string; color: C.LABEL_COLOR }
 
 			type RepositoryStatic = {
 				Of: (metadata$: Zags.Instance<{ items: Ordo.Metadata.Instance[] | null }>) => Repository
@@ -1039,7 +1044,7 @@ declare global {
 		namespace Notification {
 			type Instance = {
 				id: string
-				type: C.NotificationType
+				type: C.NOTIFICATION_TYPE
 				title?: Ordo.I18N.TranslationKey
 				message: Ordo.I18N.TranslationKey
 				render_icon?: (div: HTMLDivElement) => void
@@ -1065,7 +1070,7 @@ declare global {
 				/**
 				 * @see ItemType
 				 */
-				type: C.ContextMenuItemType
+				type: C.CONTEXT_MENU_ITEM_TYPE
 
 				on_select: () => void | Promise<void>
 
@@ -1201,7 +1206,7 @@ declare global {
 
 				description?: string
 
-				type?: C.CommandPaletteItemType
+				type?: C.COMMAND_PALETTE_ITEM_TYPE
 			}
 		}
 	}

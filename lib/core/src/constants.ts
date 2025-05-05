@@ -27,14 +27,14 @@ export const METADATA_CONTENT_FSID = "b68678af-6776-47c0-a0b8-4b6535664b8c"
 export const ACTIVITY_BAR_WIDTH = 48
 export const SIDEBAR_WORKSPACE_GUTTER_WIDTH = 10
 
-export enum BackgroundTaskStatus {
+export enum BACKGROUND_TASK_STATUS {
 	NONE,
 	SAVING,
 	LOADING,
 	length,
 }
 
-export enum PublicUserKeys {
+export enum PUBLIC_USER_KEYS {
 	// Public User
 	UID,
 	HANDLE,
@@ -44,7 +44,7 @@ export enum PublicUserKeys {
 	LAST_NAME,
 }
 
-export enum CurrentUserKeys {
+export enum CURRENT_USER_KEYS {
 	UID,
 	HANDLE,
 	CREATED_AT,
@@ -59,7 +59,7 @@ export enum CurrentUserKeys {
 	SESSIONS,
 }
 
-export enum LabelColor {
+export enum LABEL_COLOR {
 	DEFAULT,
 	RED,
 	ORANGE,
@@ -81,7 +81,7 @@ export enum LabelColor {
 	length,
 }
 
-export enum AchievementCategory {
+export enum ACHIEVEMENT_CATEGORY {
 	EDUCATION,
 	COLLECTION,
 	CHALLENGE,
@@ -89,7 +89,7 @@ export enum AchievementCategory {
 	length,
 }
 
-export enum UserSubscription {
+export enum USER_SUBSCRIPTION {
 	FREE,
 	PERSONAL,
 	TEAM,
@@ -98,7 +98,7 @@ export enum UserSubscription {
 	length,
 }
 
-export enum NotificationType {
+export enum NOTIFICATION_TYPE {
 	DEFAULT,
 	SUCCESS,
 	INFO,
@@ -114,7 +114,7 @@ export enum NotificationType {
  * 1. Grouping items in the context menu.
  * 2. Given type can be hidden when showing context menu.
  */
-export enum ContextMenuItemType {
+export enum CONTEXT_MENU_ITEM_TYPE {
 	CREATE,
 	READ,
 	UPDATE,
@@ -122,7 +122,7 @@ export enum ContextMenuItemType {
 	length,
 }
 
-export enum ErrorType {
+export enum ERROR_TYPE {
 	EPERM = 1, // Permission denied
 	ENOENT, // Not found
 	EINTR, // Interrupted
@@ -140,7 +140,7 @@ export enum ErrorType {
 
 export const SM_SCREEN_BREAKPOINT = 640
 
-export enum CommandPaletteItemType {
+export enum COMMAND_PALETTE_ITEM_TYPE {
 	PAGE_OPENER,
 	MODAL_OPENER,
 	FILE_CREATOR,

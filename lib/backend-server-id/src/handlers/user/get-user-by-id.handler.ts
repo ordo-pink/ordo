@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { PublicUser } from "@ordo-pink/core"
+import { public_user } from "@ordo-pink/core"
 import { type Routary } from "@ordo-pink/routary"
 import { default_handler } from "@ordo-pink/routary-ordo"
 import { oath } from "@ordo-pink/oath"
@@ -42,10 +42,13 @@ export const handle_get_user_by_id = default_handler<TIDContext>(intake =>
 
 type I = Routary.Intake<TIDContext>
 
-const serialize_to_public_user = PublicUser.Serialize
+const serialize_to_public_user = public_user.serialize
 
 const validate_user_id = (intake: I) => (id: unknown) =>
-	oath.if(PublicUser.Validations.is_uid(id), { on_true: () => id as Ordo.User.UID, on_false: () => invalid_id_rrr(id, intake) })
+	oath.if(public_user.validations.is_uid(id), {
+		on_true: () => id as Ordo.User.UID,
+		on_false: () => invalid_id_rrr(id, intake),
+	})
 
 const get_by_id = (intake: I) => (id: Ordo.User.UID) =>
 	intake.persistence_strategy_user.read(id).pipe(oath.ops.rmap(rrr => ({ rrr, intake })))

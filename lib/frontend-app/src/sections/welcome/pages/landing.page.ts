@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { LabelColor, NotificationType } from "@ordo-pink/core"
+import { LABEL_COLOR, NOTIFICATION_TYPE } from "@ordo-pink/core"
 import { BsCookie } from "@ordo-pink/frontend-icons"
 import { Button } from "@ordo-pink/maoka-components"
 import { Maoka } from "@ordo-pink/maoka"
@@ -177,7 +177,7 @@ const show_cookie_modal = (emit: Ordo.Command.EmitFn) => {
 	emit("cmd.application.notification.show", {
 		title: "t.welcome.landing_page.cookie_banner.title",
 		message: "t.welcome.landing_page.cookie_banner.message",
-		type: NotificationType.WARN,
+		type: NOTIFICATION_TYPE.WARN,
 		duration: 15,
 		render_icon: span => void MaokaDOM.render(span, BsCookie("size-5"), () => crypto.randomUUID()),
 	})
@@ -186,7 +186,7 @@ const show_cookie_modal = (emit: Ordo.Command.EmitFn) => {
 }
 
 const create_tutorial_files = (emit: Ordo.Command.EmitFn, metadata_query: Ordo.Metadata.Query) => {
-	const labels = [{ name: "🎉 Intro", color: LabelColor.PURPLE }]
+	const labels = [{ name: "🎉 Intro", color: LABEL_COLOR.PURPLE }]
 	const last_file_content =
 		// eslint-disable-next-line quotes
 		'[{"type":"p","children":[{"type":"text","value":"Hello, friend."}]},{"type":"p","children":[{"type":"text","value":""}]},{"type":"p","children":[{"type":"text","value":"This is basically the end of the road so far. But there is way more for us to go."}]},{"type":"p","children":[{"type":"text","value":"Keep in mind, that ORDO is local first, and all the stuff you have here is stored on your computer. Don\'t wipe it out with cleaners."}]},{"type":"p","children":[{"type":"text","value":"We\'ll soon add a way to sync between your devices but for now it is what it is. Enjoy!"}]},{"type":"p","children":[{"type":"text","value":""}]},{"type":"p","children":[{"type":"text","value":"To reach out to us, ping @ordo_pink on X or drop us an email hello@ordo.pink. Yes, as you can see, links are not supported yet. So as Ctrl + A."}]},{"type":"p","children":[{"type":"text","value":""}]},{"type":"p","children":[{"type":"text","value":"Cheers! 🍻"}]},{"type":"p","children":[{"type":"text","value":""}]},{"type":"p","children":[{"type":"text","value":"(To remove this tutorial, simply right-click on the `Start here!` file and then `Remove file`. It will cascade delete the others inside)"}]}]'
@@ -206,7 +206,7 @@ const create_tutorial_files = (emit: Ordo.Command.EmitFn, metadata_query: Ordo.M
 	emit("cmd.metadata.create", {
 		name: "Click on a label to edit its options",
 		parent,
-		labels: [...labels, { name: "BORING", color: LabelColor.DEFAULT }],
+		labels: [...labels, { name: "BORING", color: LABEL_COLOR.DEFAULT }],
 	})
 	emit("cmd.metadata.create", { name: "Create a new file by clicking +New", parent, labels })
 	emit("cmd.metadata.create", { name: "Click on this text to open file content", parent, labels })

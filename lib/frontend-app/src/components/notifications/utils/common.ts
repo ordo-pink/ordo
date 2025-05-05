@@ -19,15 +19,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { NotificationType } from "@ordo-pink/core"
+import { NOTIFICATION_TYPE } from "@ordo-pink/core"
 import { sweech } from "@ordo-pink/sweech"
 
 export const get_readable_type = (type: Ordo.Notification.Instance["type"]) =>
 	sweech
 		.match(type)
-		.case(NotificationType.INFO, () => "info")
-		.case(NotificationType.QUESTION, () => "question")
-		.case(NotificationType.RRR, () => "rrr")
-		.case(NotificationType.SUCCESS, () => "success")
-		.case(NotificationType.WARN, () => "warn")
+		.case(NOTIFICATION_TYPE.INFO, () => "info")
+		.case(NOTIFICATION_TYPE.QUESTION, () => "question")
+		.case(NOTIFICATION_TYPE.RRR, () => "rrr")
+		.case(NOTIFICATION_TYPE.SUCCESS, () => "success")
+		.case(NOTIFICATION_TYPE.WARN, () => "warn")
 		.default(() => "default")

@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { ContextMenuItemType, LabelColor, Metadata } from "@ordo-pink/core"
+import { CONTEXT_MENU_ITEM_TYPE, LABEL_COLOR, Metadata } from "@ordo-pink/core"
 import { BsTags } from "@ordo-pink/frontend-icons"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
@@ -68,8 +68,8 @@ export const edit_file_labels_command: TMaokaJab = ({ use }) => {
 			on_deselect: item => state.commands.emit("cmd.metadata.remove_labels", { fsid, labels: [item.value] }),
 			on_new_item: name => ({
 				readable_name: name as Ordo.I18N.TranslationKey,
-				value: { name, color: LabelColor.DEFAULT },
-				render_custom_info: () => LabelCircle(LabelColor.DEFAULT),
+				value: { name, color: LABEL_COLOR.DEFAULT },
+				render_custom_info: () => LabelCircle(LABEL_COLOR.DEFAULT),
 			}),
 			items: available_labels.map(label => ({
 				value: label,
@@ -93,7 +93,7 @@ export const edit_file_labels_command: TMaokaJab = ({ use }) => {
 		readable_name: "t.common.metadata.show_edit_labels_palette", // TODO
 		should_show: ({ payload }) => Metadata.Validations.is_metadata(payload),
 		payload_creator: ({ payload }) => (Metadata.Validations.is_metadata(payload) ? payload.get_fsid() : null),
-		type: ContextMenuItemType.UPDATE,
+		type: CONTEXT_MENU_ITEM_TYPE.UPDATE,
 	})
 
 	use(
@@ -105,4 +105,4 @@ export const edit_file_labels_command: TMaokaJab = ({ use }) => {
 	)
 }
 
-const LabelCircle = (color: LabelColor) => MaokaStyled.Tags.div(`label ${color_class[color]} size-3 !rounded-full`)(() => {})
+const LabelCircle = (color: LABEL_COLOR) => MaokaStyled.Tags.div(`label ${color_class[color]} size-3 !rounded-full`)(() => {})

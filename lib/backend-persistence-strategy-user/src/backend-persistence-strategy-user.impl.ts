@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { CurrentUser, rrr } from "@ordo-pink/core"
+import { current_user, rrr } from "@ordo-pink/core"
 import { keys_of, undef } from "@ordo-pink/tau"
 import { oath } from "@ordo-pink/oath"
 
@@ -127,7 +127,7 @@ export const create_persistence_strategy_user: PersistenceStrategyUser = persist
 					oath.from_promise(() => Bun.readableStreamToJSON(s)).pipe(oath.ops.rmap(to_rrr("Could not get user"))),
 				),
 			)
-			.pipe(oath.ops.map(dto => CurrentUser.FromDTO(dto))),
+			.pipe(oath.ops.map(dto => current_user.from_dto(dto))),
 	delete: () => oath.reject(rrr.codes.eio("Not implemented")),
 
 	update: (id, u) =>

@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { CurrentUser } from "@ordo-pink/core"
+import { current_user } from "@ordo-pink/core"
 import { type Routary } from "@ordo-pink/routary"
 
 import { email_missing_rrr, invalid_email_rrr } from "../rrrs/invalid-user-email.rrr"
@@ -38,4 +38,4 @@ export const extract_body_email = (intake: Routary.Intake<TIDContext>) => (reque
 
 // --- Internal ---
 
-const is_email = CurrentUser.Validations.is_email
+const is_email = current_user.validations.is_email

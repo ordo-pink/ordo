@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { CurrentUser, CurrentUserKeys } from "@ordo-pink/core"
+import { current_user, CURRENT_USER_KEYS } from "@ordo-pink/core"
 import { default_handler } from "@ordo-pink/routary-ordo"
 import { oath } from "@ordo-pink/oath"
 
@@ -36,16 +36,16 @@ export const handle_refresh_session = default_handler<TIDContext>(intake => {
 					.pipe(oath.ops.map(user => user.to_dto()))
 					.pipe(
 						oath.ops.map(dto => {
-							const index = dto[CurrentUserKeys.SESSIONS].findIndex(session => session[0] === sid)
-							const session = dto[CurrentUserKeys.SESSIONS][index]
+							const index = dto[CURRENT_USER_KEYS.SESSIONS].findIndex(session => session[0] === sid)
+							const session = dto[CURRENT_USER_KEYS.SESSIONS][index]
 
-							dto[CurrentUserKeys.SESSIONS] = dto[CurrentUserKeys.SESSIONS].toSpliced(index, 1, [
+							dto[CURRENT_USER_KEYS.SESSIONS] = dto[CURRENT_USER_KEYS.SESSIONS].toSpliced(index, 1, [
 								session[0],
 								Date.now(),
 								session[2],
 							])
 
-							return { user: CurrentUser.FromDTO(dto), session }
+							return { user: current_user.from_dto(dto), session }
 						}),
 					),
 			),
@@ -60,7 +60,7 @@ export const handle_refresh_session = default_handler<TIDContext>(intake => {
 			),
 		)
 		.pipe(oath.ops.map(({ user }) => user.to_dto()))
-		.pipe(oath.ops.map(CurrentUser.Serialize))
+		.pipe(oath.ops.map(current_user.serialize))
 		.pipe(oath.ops.map(dto => void (intake.payload = dto)))
 		.pipe(oath.ops.map(() => intake))
 })

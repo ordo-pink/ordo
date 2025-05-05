@@ -17,7 +17,7 @@ import "@xyflow/react/dist/base.css"
 
 import { is_object, noop } from "@ordo-pink/tau"
 import { BsFileEarmarkPlus } from "@ordo-pink/frontend-icons"
-import { ContextMenuItemType } from "@ordo-pink/core"
+import { CONTEXT_MENU_ITEM_TYPE } from "@ordo-pink/core"
 import { R } from "@ordo-pink/result"
 import { oath } from "@ordo-pink/oath"
 
@@ -52,7 +52,7 @@ export default function Board({ content, metadata }: Ordo.FileAssociation.Render
 			command: "cmd.board.context_menu.create_node",
 			readable_name: "Create Text Note" as any, // TODO i18n
 			should_show: ({ payload }) => is_object(payload) && payload.location === "pink.ordo.board" && payload.element === "board",
-			type: ContextMenuItemType.CREATE,
+			type: CONTEXT_MENU_ITEM_TYPE.CREATE,
 			render_icon: BsFileEarmarkPlus,
 			payload_creator: ({ event }) => screenToFlowPosition({ x: event.clientX, y: event.clientY }),
 		})
@@ -61,7 +61,7 @@ export default function Board({ content, metadata }: Ordo.FileAssociation.Render
 			command: "cmd.board.context_menu.add_existing_file",
 			readable_name: "Add Existing File..." as any, // TODO i18n
 			should_show: ({ payload }) => is_object(payload) && payload.location === "pink.ordo.board" && payload.element === "board",
-			type: ContextMenuItemType.CREATE,
+			type: CONTEXT_MENU_ITEM_TYPE.CREATE,
 			render_icon: BsFileEarmarkPlus,
 			payload_creator: ({ event }) => screenToFlowPosition({ x: event.clientX, y: event.clientY }),
 		})

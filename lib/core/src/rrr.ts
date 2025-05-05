@@ -20,7 +20,7 @@
  */
 
 import { is_finite_non_negative_int, is_object, lt } from "@ordo-pink/tau"
-import { ErrorType } from "@ordo-pink/core"
+import { ERROR_TYPE } from "@ordo-pink/core"
 
 const eperm = (message: string, ...debug: any[]) => compose_rrr(message)("EPERM", ...debug)
 const enoent = (message: string, ...debug: any[]) => compose_rrr(message)("ENOENT", ...debug)
@@ -37,15 +37,15 @@ const enospc = (message: string, ...debug: any[]) => compose_rrr(message)("ENOSP
 
 const compose_rrr =
 	(message: string) =>
-	<$TKey extends keyof typeof ErrorType>(key: $TKey, ...debug: any[]): Ordo.Rrr<$TKey> => ({
-		code: ErrorType[key] as const,
+	<$TKey extends keyof typeof ERROR_TYPE>(key: $TKey, ...debug: any[]): Ordo.Rrr<$TKey> => ({
+		code: ERROR_TYPE[key] as const,
 		debug,
 		key,
 		message,
 	})
 
 export const rrr = {
-	type: ErrorType,
+	type: ERROR_TYPE,
 	is_rrr: (e: unknown): e is Ordo.Rrr => {
 		const x = e as Ordo.Rrr
 		return is_object(x) && is_finite_non_negative_int(x.code) && lt(rrr.type.length)(x.code)

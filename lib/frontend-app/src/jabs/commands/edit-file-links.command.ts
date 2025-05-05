@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { ContextMenuItemType, Metadata } from "@ordo-pink/core"
+import { CONTEXT_MENU_ITEM_TYPE, Metadata } from "@ordo-pink/core"
 import { BsLink } from "@ordo-pink/frontend-icons"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
@@ -91,7 +91,7 @@ export const edit_file_links_command: TMaokaJab = ({ use }) => {
 		readable_name: "t.common.metadata.show_edit_links_palette",
 		should_show: ({ payload }) => Metadata.Validations.is_metadata(payload),
 		payload_creator: ({ payload }) => (Metadata.Validations.is_metadata(payload) ? payload.get_fsid() : null),
-		type: ContextMenuItemType.UPDATE,
+		type: CONTEXT_MENU_ITEM_TYPE.UPDATE,
 	})
 
 	use(

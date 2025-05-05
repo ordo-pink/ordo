@@ -20,7 +20,7 @@
  */
 
 import * as tau from "@ordo-pink/tau"
-import { CurrentUser, CurrentUserKeys, rrr } from "@ordo-pink/core"
+import { current_user, CURRENT_USER_KEYS, rrr } from "@ordo-pink/core"
 import { Oath, oath } from "@ordo-pink/oath"
 import { default_handler, huyami } from "@ordo-pink/routary-ordo"
 
@@ -45,7 +45,7 @@ export const handle_verify_code = default_handler<BackendAuth.Fuel>(intake => {
 		.pipe(oath.ops.chain(persist_session_id(intake)))
 		.pipe(oath.ops.tap(debug("User session persisted")))
 		.pipe(oath.ops.tap(set_cookie(intake)))
-		.pipe(oath.ops.map(({ user }) => void (intake.payload = CurrentUser.Serialize(user.to_dto()))))
+		.pipe(oath.ops.map(({ user }) => void (intake.payload = current_user.serialize(user.to_dto()))))
 		.pipe(oath.ops.map(() => intake))
 		.pipe(oath.ops.rtap(() => intake.headers.delete("Set-Cookie")))
 		.pipe(oath.ops.rmap(rrr => ({ rrr, intake })))
@@ -53,7 +53,7 @@ export const handle_verify_code = default_handler<BackendAuth.Fuel>(intake => {
 
 // --- Internal ---
 
-const is_email = CurrentUser.Validations.is_email
+const is_email = current_user.validations.is_email
 const is_code = (x: unknown): x is number => tau.is_finite_non_negative_int(x)
 
 // TODO Move to lib
@@ -102,7 +102,7 @@ const send_email =
 const create_user = (email: Ordo.User.Email) => (intake: BackendAuth.Intake) =>
 	oath
 		.of(intake.defaults)
-		.pipe(oath.ops.map(d => CurrentUser.Create(email, d.file_limit, d.max_upload_size, d.max_functions)))
+		.pipe(oath.ops.map(d => current_user.new(email, d.file_limit, d.max_upload_size, d.max_functions)))
 		.pipe(oath.ops.chain(intake.persistence_strategy_user.create))
 
 const get_or_create_user = (intake: BackendAuth.Intake) => (email: Ordo.User.Email) =>
@@ -129,8 +129,8 @@ type P2 = { sid: Ordo.User.Session; user: Ordo.User.Current.Instance }
 const persist_session_id = (intake: BackendAuth.Intake) => (params: P2) =>
 	oath
 		.of(params.user.to_dto())
-		.pipe(oath.ops.tap(dto => void (dto[CurrentUserKeys.SESSIONS] = [...dto[CurrentUserKeys.SESSIONS], params.sid])))
-		.pipe(oath.ops.chain(dto => intake.persistence_strategy_user.update(params.user.get_uid(), CurrentUser.FromDTO(dto))))
+		.pipe(oath.ops.tap(dto => void (dto[CURRENT_USER_KEYS.SESSIONS] = [...dto[CURRENT_USER_KEYS.SESSIONS], params.sid])))
+		.pipe(oath.ops.chain(dto => intake.persistence_strategy_user.update(params.user.get_uid(), current_user.from_dto(dto))))
 		.pipe(oath.ops.chain(user => intake.reference_mapping_user.refresh(user.get_uid())))
 		.pipe(oath.ops.map(() => params))
 

@@ -21,7 +21,7 @@
 
 import { afterEach, describe, expect, test } from "bun:test"
 
-import { CurrentUser, CurrentUserKeys, rrr } from "@ordo-pink/core"
+import { current_user, CURRENT_USER_KEYS, rrr } from "@ordo-pink/core"
 import { oath } from "@ordo-pink/oath"
 
 import { USER_FILE_FSID, create_persistence_strategy_user } from "./backend-persistence-strategy-user.impl"
@@ -52,7 +52,7 @@ const persistence_strategy_data: OrdoBackend.Data.PersistenceStrategy = {
 
 const user_storage = create_persistence_strategy_user(persistence_strategy_data)
 
-const test_user = CurrentUser.Create("test@test.com", 1, 1, 1)
+const test_user = current_user.new("test@test.com", 1, 1, 1)
 
 describe("persistence_strategy_user", () => {
 	afterEach(() => {
@@ -108,8 +108,8 @@ describe("persistence_strategy_user", () => {
 			await user_storage.create(test_user).cata(oath.catas.to_promise())
 			const dto = test_user.to_dto()
 			const new_email = "test1@email.com"
-			dto[CurrentUserKeys.EMAIL] = new_email
-			await user_storage.update(test_user.get_uid(), CurrentUser.FromDTO(dto)).cata(oath.catas.to_promise())
+			dto[CURRENT_USER_KEYS.EMAIL] = new_email
+			await user_storage.update(test_user.get_uid(), current_user.from_dto(dto)).cata(oath.catas.to_promise())
 			const updated_user = await user_storage.read(test_user.get_uid()).cata(oath.catas.to_promise())
 			expect(updated_user.get_email()).toEqual(new_email)
 		})
@@ -137,7 +137,7 @@ describe("persistence_strategy_user", () => {
 		})
 
 		test("should resolve with true if user exists", async () => {
-			const user = CurrentUser.Create("test@test.com", 1, 1, 1)
+			const user = current_user.new("test@test.com", 1, 1, 1)
 			await user_storage.create(user).cata(oath.catas.to_promise())
 			expect(await user_storage.exists(user.get_uid()).cata(oath.catas.to_promise())).toBeTrue()
 		})

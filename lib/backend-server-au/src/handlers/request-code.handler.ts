@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { CurrentUser, rrr } from "@ordo-pink/core"
+import { current_user, rrr } from "@ordo-pink/core"
 import { Oath, oath } from "@ordo-pink/oath"
 import { default_handler, huyami } from "@ordo-pink/routary-ordo"
 
@@ -44,7 +44,7 @@ export const handle_request_code = default_handler<BackendAuth.Fuel>(intake => {
 
 // --- Internal ---
 
-const is_email = CurrentUser.Validations.is_email
+const is_email = current_user.validations.is_email
 
 // TODO Move to lib
 

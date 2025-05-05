@@ -20,7 +20,7 @@
  */
 
 import { BsArrowLeft, BsLayoutSidebarInsetReverse } from "@ordo-pink/frontend-icons"
-import { CommandPaletteItemType, ContextMenuItemType } from "@ordo-pink/core"
+import { COMMAND_PALETTE_ITEM_TYPE, CONTEXT_MENU_ITEM_TYPE } from "@ordo-pink/core"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { maoka_jabs } from "@ordo-pink/maoka-jabs"
@@ -97,7 +97,7 @@ export const sidebar_button = Maoka.create("button", ({ use }) => {
 			commands.emit("cmd.application.command_palette.add", {
 				value: () => commands.emit("cmd.application.sidebar.toggle"),
 				hotkey: "mod+b",
-				type: CommandPaletteItemType.COMMON_ACTION,
+				type: COMMAND_PALETTE_ITEM_TYPE.COMMON_ACTION,
 				readable_name,
 				render_icon: BsLayoutSidebarInsetReverse,
 			})
@@ -105,7 +105,7 @@ export const sidebar_button = Maoka.create("button", ({ use }) => {
 			commands.emit("cmd.application.context_menu.add", {
 				command: "cmd.application.sidebar.hide",
 				readable_name: "t.common.components.sidebar.hide",
-				type: ContextMenuItemType.UPDATE,
+				type: CONTEXT_MENU_ITEM_TYPE.UPDATE,
 				should_show: ({ event }) => MaokaDOM.is_maoka_dom_element(event.target) && !!event.target.closest(".sidebar"),
 				render_icon: () => BsArrowLeft("rotate-180"),
 			})

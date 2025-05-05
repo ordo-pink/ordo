@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { NotificationType, rrr } from "@ordo-pink/core"
+import { NOTIFICATION_TYPE, rrr } from "@ordo-pink/core"
 import { Result } from "@ordo-pink/result"
 import { call_once } from "@ordo-pink/tau"
 import { console_logger } from "@ordo-pink/logger"
@@ -53,7 +53,7 @@ export const init_metadata: TInitMetadataFn = call_once(content_repository => {
 			message: rrr.message as Ordo.I18N.TranslationKey,
 			duration: 15,
 			title: `t.common.error.${rrr.key.toLocaleLowerCase()}` as any,
-			type: NotificationType.RRR,
+			type: NOTIFICATION_TYPE.RRR,
 		})
 
 		throw rrr

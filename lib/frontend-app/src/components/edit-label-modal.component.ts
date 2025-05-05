@@ -21,7 +21,7 @@
 
 import { Dialog, Input, Select, color_class } from "@ordo-pink/maoka-components"
 import { is_non_empty_string, title_case } from "@ordo-pink/tau"
-import { LabelColor } from "@ordo-pink/core"
+import { LABEL_COLOR } from "@ordo-pink/core"
 import { Maoka } from "@ordo-pink/maoka"
 import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
@@ -38,8 +38,8 @@ export const EditLabelModal = (label: Ordo.Metadata.Label) =>
 		let color = initial_color
 
 		const color_items = color_class.slice(0, -1).map((_, i) => ({
-			title: title_case(LabelColor[i]),
-			value: i as LabelColor,
+			title: title_case(LABEL_COLOR[i]),
+			value: i as LABEL_COLOR,
 			render_info: () => LabelCircle(i),
 		}))
 
@@ -88,4 +88,4 @@ export const EditLabelModal = (label: Ordo.Metadata.Label) =>
 			})
 	})
 
-const LabelCircle = (color: LabelColor) => MaokaStyled.Tags.div(`label ${color_class[color]} size-3 !rounded-full`)(() => {})
+const LabelCircle = (color: LABEL_COLOR) => MaokaStyled.Tags.div(`label ${color_class[color]} size-3 !rounded-full`)(() => {})

@@ -25,7 +25,7 @@
  */
 
 import { BsCloudDownload, BsCloudUpload } from "@ordo-pink/frontend-icons"
-import { BackgroundTaskStatus } from "@ordo-pink/core"
+import { BACKGROUND_TASK_STATUS } from "@ordo-pink/core"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { maoka_jabs } from "@ordo-pink/maoka-jabs"
@@ -35,12 +35,12 @@ import { noop } from "@ordo-pink/tau"
 
 import { ordo_app_state } from "../../app.state"
 
-const background_task_status_state = MaokaZAGS.Of({ status: BackgroundTaskStatus.NONE })
+const background_task_status_state = MaokaZAGS.Of({ status: BACKGROUND_TASK_STATUS.NONE })
 
-const handle_set_status = (status: BackgroundTaskStatus) => background_task_status_state.zags.update("status", () => status)
-const handle_start_loading = () => background_task_status_state.zags.update("status", () => BackgroundTaskStatus.LOADING)
-const handle_start_saving = () => background_task_status_state.zags.update("status", () => BackgroundTaskStatus.SAVING)
-const handle_reset_status = () => background_task_status_state.zags.update("status", () => BackgroundTaskStatus.NONE)
+const handle_set_status = (status: BACKGROUND_TASK_STATUS) => background_task_status_state.zags.update("status", () => status)
+const handle_start_loading = () => background_task_status_state.zags.update("status", () => BACKGROUND_TASK_STATUS.LOADING)
+const handle_start_saving = () => background_task_status_state.zags.update("status", () => BACKGROUND_TASK_STATUS.SAVING)
+const handle_reset_status = () => background_task_status_state.zags.update("status", () => BACKGROUND_TASK_STATUS.NONE)
 
 export const OrdoBackgroundTaskIndicator = Maoka.create("div", ({ use }) => {
 	const get_status = use(background_task_status_state.select_jab$("status"))
@@ -69,8 +69,8 @@ export const OrdoBackgroundTaskIndicator = Maoka.create("div", ({ use }) => {
 
 		return sweech
 			.match(status)
-			.case(BackgroundTaskStatus.LOADING, () => BsCloudDownload())
-			.case(BackgroundTaskStatus.SAVING, () => BsCloudUpload())
+			.case(BACKGROUND_TASK_STATUS.LOADING, () => BsCloudDownload())
+			.case(BACKGROUND_TASK_STATUS.SAVING, () => BsCloudUpload())
 			.default(() => NoIcon)
 	}
 })

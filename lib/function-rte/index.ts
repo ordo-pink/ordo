@@ -32,7 +32,7 @@ import {
 	BsTypeH5,
 	BsTypeH6,
 } from "@ordo-pink/frontend-icons"
-import { ContextMenuItemType, create_function } from "@ordo-pink/core"
+import { CONTEXT_MENU_ITEM_TYPE, create_function } from "@ordo-pink/core"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStr } from "@ordo-pink/maoka-render-string"
 import { TWO_LETTER_LOCALE } from "@ordo-pink/locale"
@@ -149,7 +149,7 @@ export default create_function(
 			readable_name: "t.rte.commands.turn_to_h1",
 			should_show: RTE.Guards.is_rte_context_menu_payload,
 			render_icon: BsTypeH1,
-			type: ContextMenuItemType.UPDATE,
+			type: CONTEXT_MENU_ITEM_TYPE.UPDATE,
 			payload_creator: ({ payload }) => ({
 				fsid: payload.fsid,
 				block_index: payload.block_index,
@@ -162,7 +162,7 @@ export default create_function(
 			readable_name: "t.rte.commands.turn_to_h2",
 			should_show: RTE.Guards.is_rte_context_menu_payload,
 			render_icon: BsTypeH2,
-			type: ContextMenuItemType.UPDATE,
+			type: CONTEXT_MENU_ITEM_TYPE.UPDATE,
 			payload_creator: ({ payload }) => ({
 				fsid: payload.fsid,
 				block_index: payload.block_index,
@@ -175,7 +175,7 @@ export default create_function(
 			readable_name: "t.rte.commands.turn_to_h3",
 			should_show: RTE.Guards.is_rte_context_menu_payload,
 			render_icon: BsTypeH3,
-			type: ContextMenuItemType.UPDATE,
+			type: CONTEXT_MENU_ITEM_TYPE.UPDATE,
 			payload_creator: ({ payload }) => ({
 				fsid: payload.fsid,
 				block_index: payload.block_index,
@@ -188,7 +188,7 @@ export default create_function(
 			readable_name: "t.rte.commands.turn_to_h4",
 			should_show: RTE.Guards.is_rte_context_menu_payload,
 			render_icon: BsTypeH4,
-			type: ContextMenuItemType.UPDATE,
+			type: CONTEXT_MENU_ITEM_TYPE.UPDATE,
 			payload_creator: ({ payload }) => ({
 				fsid: payload.fsid,
 				block_index: payload.block_index,
@@ -201,7 +201,7 @@ export default create_function(
 			readable_name: "t.rte.commands.turn_to_h5",
 			should_show: RTE.Guards.is_rte_context_menu_payload,
 			render_icon: BsTypeH5,
-			type: ContextMenuItemType.UPDATE,
+			type: CONTEXT_MENU_ITEM_TYPE.UPDATE,
 			payload_creator: ({ payload }) => ({
 				fsid: payload.fsid,
 				block_index: payload.block_index,
@@ -214,7 +214,7 @@ export default create_function(
 			readable_name: "t.rte.commands.turn_to_h6",
 			should_show: RTE.Guards.is_rte_context_menu_payload,
 			render_icon: BsTypeH6,
-			type: ContextMenuItemType.UPDATE,
+			type: CONTEXT_MENU_ITEM_TYPE.UPDATE,
 			payload_creator: ({ payload }) => ({
 				fsid: payload.fsid,
 				block_index: payload.block_index,
@@ -227,7 +227,7 @@ export default create_function(
 			readable_name: "t.rte.commands.turn_to_blockquote",
 			should_show: RTE.Guards.is_rte_context_menu_payload,
 			render_icon: BsQuote,
-			type: ContextMenuItemType.UPDATE,
+			type: CONTEXT_MENU_ITEM_TYPE.UPDATE,
 			payload_creator: ({ payload }) => ({ fsid: payload.fsid, block_index: payload.block_index, block: { type: "bq" } }),
 		})
 
@@ -236,7 +236,7 @@ export default create_function(
 			readable_name: "t.rte.commands.turn_to_paragraph",
 			should_show: RTE.Guards.is_rte_context_menu_payload,
 			render_icon: BsType,
-			type: ContextMenuItemType.UPDATE,
+			type: CONTEXT_MENU_ITEM_TYPE.UPDATE,
 			payload_creator: ({ payload }) => ({ fsid: payload.fsid, block_index: payload.block_index, block: { type: "p" } }),
 		})
 
@@ -245,7 +245,7 @@ export default create_function(
 			readable_name: "t.rte.commands.turn_to_incoming_links",
 			should_show: RTE.Guards.is_rte_context_menu_payload,
 			render_icon: BsBoxArrowInUpLeft,
-			type: ContextMenuItemType.UPDATE,
+			type: CONTEXT_MENU_ITEM_TYPE.UPDATE,
 			payload_creator: ({ payload }) => ({
 				fsid: payload.fsid,
 				block_index: payload.block_index,
@@ -258,7 +258,7 @@ export default create_function(
 			readable_name: "t.rte.commands.turn_to_callout",
 			should_show: RTE.Guards.is_rte_context_menu_payload,
 			render_icon: BsInfoCircle,
-			type: ContextMenuItemType.UPDATE,
+			type: CONTEXT_MENU_ITEM_TYPE.UPDATE,
 			payload_creator: ({ payload }) => ({
 				fsid: payload.fsid,
 				block_index: payload.block_index,
@@ -271,7 +271,7 @@ export default create_function(
 			readable_name: "t.rte.commands.turn_to_embed",
 			should_show: RTE.Guards.is_rte_context_menu_payload,
 			render_icon: BsBoxArrowInUpLeft,
-			type: ContextMenuItemType.UPDATE,
+			type: CONTEXT_MENU_ITEM_TYPE.UPDATE,
 			payload_creator: ({ payload }) => ({ fsid: payload.fsid, block_index: payload.block_index, block: { type: "embed" } }),
 		})
 

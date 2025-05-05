@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { CurrentUser } from "@ordo-pink/core"
+import { current_user } from "@ordo-pink/core"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { maoka_jabs } from "@ordo-pink/maoka-jabs"
@@ -152,7 +152,7 @@ export const Email = ({
 	placeholder,
 	required = true,
 	type = "email",
-	validate = CurrentUser.Validations.is_email,
+	validate = current_user.validations.is_email,
 	validation_error_message = "WHOOPS",
 }: TInputProps) =>
 	Text({

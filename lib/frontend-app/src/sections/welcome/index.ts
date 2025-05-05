@@ -20,7 +20,7 @@
  */
 
 import { BsCollection, BsEnvelopeAt, BsQuestionOctagon, BsSendCheck } from "@ordo-pink/frontend-icons"
-import { CommandPaletteItemType, create_function } from "@ordo-pink/core"
+import { COMMAND_PALETTE_ITEM_TYPE, create_function } from "@ordo-pink/core"
 import { TWO_LETTER_LOCALE } from "@ordo-pink/locale"
 
 import { WelcomeWorkspace } from "./welcome.workspace"
@@ -99,7 +99,7 @@ export default create_function(
 		commands.emit("cmd.application.command_palette.add", {
 			readable_name: "t.welcome.go_to_welcome_page",
 			value: () => commands.emit("cmd.welcome.go_to_welcome_page"),
-			type: CommandPaletteItemType.PAGE_OPENER,
+			type: COMMAND_PALETTE_ITEM_TYPE.PAGE_OPENER,
 			hotkey: "mod+shift+h",
 			render_icon: BsCollection,
 		})
@@ -127,7 +127,7 @@ export default create_function(
 		commands.emit("cmd.application.command_palette.add", {
 			readable_name: "t.welcome.command_palette.support.open_support_palette",
 			value: () => commands.emit("cmd.welcome.open_support_palette"),
-			type: CommandPaletteItemType.PAGE_OPENER,
+			type: COMMAND_PALETTE_ITEM_TYPE.PAGE_OPENER,
 			hotkey: "mod+h", // TODO: Should work with mod+/
 			render_icon: BsQuestionOctagon,
 		})

@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { ContextMenuItemType } from "@ordo-pink/core"
+import { CONTEXT_MENU_ITEM_TYPE } from "@ordo-pink/core"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { type TMaokaJab } from "@ordo-pink/maoka"
 
@@ -38,7 +38,7 @@ export const show_columns_jab =
 			readable_name: "t.database.columns_modal.context_menu",
 			should_show: is_database_context_menu_payload,
 			payload_creator: () => ({ metadata, state: get_db_state() }),
-			type: ContextMenuItemType.READ,
+			type: CONTEXT_MENU_ITEM_TYPE.READ,
 		})
 
 		commands.on("cmd.database.show_columns_modal", () =>

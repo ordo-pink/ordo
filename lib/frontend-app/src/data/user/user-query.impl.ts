@@ -24,7 +24,7 @@ import { create_zags } from "@ordo-pink/zags"
 import { oath } from "@ordo-pink/oath"
 import { rrr } from "@ordo-pink/core"
 
-import { CurrentUser, PublicUser } from "../../../../core/src/user.impl"
+import { current_user, public_user } from "../../../../core/src/user.impl"
 import { ordo_app_state } from "../../../app.state"
 
 const user_cache: Record<string, Ordo.User.Public.DTO> = {}
@@ -54,7 +54,7 @@ export const UserQuery: Ordo.User.QueryStatic = {
 					.pipe(
 						oath.ops.and(() =>
 							oath
-								.if(CurrentUser.Validations.is_uid(id))
+								.if(current_user.validations.is_uid(id))
 								.pipe(oath.ops.and(() => id))
 								.pipe(oath.ops.rmap(() => rrr.codes.einval("Invalid user id"))),
 						),
@@ -74,7 +74,7 @@ export const UserQuery: Ordo.User.QueryStatic = {
 									.pipe(oath.ops.tap(dto => void (user_cache[dto.id] = dto))),
 						),
 					)
-					.pipe(oath.ops.and(PublicUser.FromDTO)),
+					.pipe(oath.ops.and(public_user.from_dto)),
 
 			get_by_handle: handle =>
 				check_permission("user.get_by_id")
@@ -82,7 +82,7 @@ export const UserQuery: Ordo.User.QueryStatic = {
 					.pipe(
 						oath.ops.and(() =>
 							oath
-								.if(CurrentUser.Validations.is_handle(handle))
+								.if(current_user.validations.is_handle(handle))
 								.pipe(oath.ops.and(() => handle))
 								.pipe(oath.ops.rmap(() => rrr.codes.einval("Invalid user handle"))),
 						),
@@ -102,7 +102,7 @@ export const UserQuery: Ordo.User.QueryStatic = {
 									.pipe(oath.ops.tap(dto => void (user_cache[dto.handle] = dto))),
 						),
 					)
-					.pipe(oath.ops.and(PublicUser.FromDTO)),
+					.pipe(oath.ops.and(public_user.from_dto)),
 
 			get $() {
 				return version_zags

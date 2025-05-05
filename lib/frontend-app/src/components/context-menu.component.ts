@@ -20,7 +20,7 @@
  */
 
 import { ActionListItem } from "@ordo-pink/maoka-components"
-import { ContextMenuItemType } from "@ordo-pink/core"
+import { CONTEXT_MENU_ITEM_TYPE } from "@ordo-pink/core"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { maoka_jabs } from "@ordo-pink/maoka-jabs"
@@ -109,10 +109,10 @@ const OrdoContextMenuDynamic = Maoka.create("div", ({ element, use }) => {
 
 		const all_items = state.structure.filter(
 			item =>
-				((item.type === ContextMenuItemType.CREATE && !state.hide_create_items) ||
-					(item.type === ContextMenuItemType.UPDATE && !state.hide_update_items) ||
-					(item.type === ContextMenuItemType.READ && !state.hide_read_items) ||
-					(item.type === ContextMenuItemType.DELETE && !state.hide_delete_items)) &&
+				((item.type === CONTEXT_MENU_ITEM_TYPE.CREATE && !state.hide_create_items) ||
+					(item.type === CONTEXT_MENU_ITEM_TYPE.UPDATE && !state.hide_update_items) ||
+					(item.type === CONTEXT_MENU_ITEM_TYPE.READ && !state.hide_read_items) ||
+					(item.type === CONTEXT_MENU_ITEM_TYPE.DELETE && !state.hide_delete_items)) &&
 				item.should_show({ event: state.event, payload: state.payload }),
 		)
 
@@ -121,10 +121,10 @@ const OrdoContextMenuDynamic = Maoka.create("div", ({ element, use }) => {
 			state.event.preventDefault()
 		}
 
-		const create_items = all_items.filter(item => item.type === ContextMenuItemType.CREATE)
-		const read_items = all_items.filter(item => item.type === ContextMenuItemType.READ)
-		const update_items = all_items.filter(item => item.type === ContextMenuItemType.UPDATE)
-		const delete_items = all_items.filter(item => item.type === ContextMenuItemType.DELETE)
+		const create_items = all_items.filter(item => item.type === CONTEXT_MENU_ITEM_TYPE.CREATE)
+		const read_items = all_items.filter(item => item.type === CONTEXT_MENU_ITEM_TYPE.READ)
+		const update_items = all_items.filter(item => item.type === CONTEXT_MENU_ITEM_TYPE.UPDATE)
+		const delete_items = all_items.filter(item => item.type === CONTEXT_MENU_ITEM_TYPE.DELETE)
 
 		if (is_mobile) {
 			commands.emit("cmd.application.command_palette.show", {

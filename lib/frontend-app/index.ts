@@ -53,6 +53,7 @@ import { app_context } from "./app-context"
 import { create_command_palette } from "./src/command-palette"
 
 import "./index.css"
+import { auth_jab } from "./src/auth"
 
 export type AppOptions = {
 	hosts: Ordo.Hosts
@@ -63,9 +64,10 @@ export type AppOptions = {
 // TODO Move translations from file explorer
 export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
 	const hunter = hunt.begin<Ordo.Preys>()
-	const fetch = null as any
-	const translate = null as any
+	const fetch = window.fetch // TODO Replace with patched fetch
+	const translate = null as any // TODO
 	use(app_context.provide({ fetch, hosts, hunter, logger, translate }))
+	use(auth_jab)
 
 	const command_palette = use(create_command_palette)
 	// ordo_app_state.zags.update("hosts.id", () => id_host)

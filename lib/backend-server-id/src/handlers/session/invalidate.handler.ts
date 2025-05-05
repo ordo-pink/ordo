@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { CurrentUser, CurrentUserKeys } from "@ordo-pink/core"
+import { current_user, CURRENT_USER_KEYS } from "@ordo-pink/core"
 import { default_handler } from "@ordo-pink/routary-ordo"
 import { oath } from "@ordo-pink/oath"
 
@@ -36,10 +36,10 @@ export const handle_invalidate_session = default_handler<TIDContext>(intake => {
 					.of(user.to_dto())
 					.pipe(
 						oath.ops.chain(dto => {
-							const sessions = dto[CurrentUserKeys.SESSIONS].filter(session => session[0] !== sid)
-							dto[CurrentUserKeys.SESSIONS] = sessions
+							const sessions = dto[CURRENT_USER_KEYS.SESSIONS].filter(session => session[0] !== sid)
+							dto[CURRENT_USER_KEYS.SESSIONS] = sessions
 
-							return intake.persistence_strategy_user.update(uid, CurrentUser.FromDTO(dto))
+							return intake.persistence_strategy_user.update(uid, current_user.from_dto(dto))
 						}),
 					)
 					.pipe(oath.ops.rmap(rrr => ({ rrr, intake })))
@@ -48,7 +48,7 @@ export const handle_invalidate_session = default_handler<TIDContext>(intake => {
 		)
 		.pipe(oath.ops.tap(p => intake.headers.set("Set-Cookie", `${p.uid}=${p.sid}; Expires=${new Date().toISOString()}`)))
 		.pipe(oath.ops.map(({ user }) => user.to_dto()))
-		.pipe(oath.ops.map(CurrentUser.Serialize))
+		.pipe(oath.ops.map(current_user.serialize))
 		.pipe(oath.ops.tap(dto => void (intake.payload = dto)))
 		.pipe(oath.ops.map(() => intake))
 })

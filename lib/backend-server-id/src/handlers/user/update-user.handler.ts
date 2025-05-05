@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { CurrentUser, CurrentUserKeys } from "@ordo-pink/core"
+import { current_user, CURRENT_USER_KEYS } from "@ordo-pink/core"
 import { default_handler, extract_json_body } from "@ordo-pink/routary-ordo"
 import { type Routary } from "@ordo-pink/routary"
 import { oath } from "@ordo-pink/oath"
@@ -44,7 +44,7 @@ export const handle_update_user = default_handler<TIDContext>(intake =>
 
 // --- Internal ---
 
-const { is_email, is_handle, is_installed_functions, is_first_name, is_last_name } = CurrentUser.Validations
+const { is_email, is_handle, is_installed_functions, is_first_name, is_last_name } = current_user.validations
 
 type I = Routary.Intake<TIDContext>
 
@@ -105,22 +105,22 @@ const get_current_user = (i: I) => (updated_user: Partial<Ordo.User.Current.DTO>
 		.pipe(oath.ops.map(user => ({ user, updated_user })))
 
 const update_user = (id: Ordo.User.UID, intake: I) => (user: Ordo.User.Current.DTO) =>
-	intake.persistence_strategy_user.update(id, CurrentUser.FromDTO(user)).pipe(oath.ops.rmap(rrr => ({ rrr, intake })))
+	intake.persistence_strategy_user.update(id, current_user.from_dto(user)).pipe(oath.ops.rmap(rrr => ({ rrr, intake })))
 
 const merge_users = (users: {
 	user: Ordo.User.Current.Instance
 	updated_user: Partial<Ordo.User.Current.DTO>
 }): Ordo.User.Current.DTO => [
-	users.user.to_dto()[CurrentUserKeys.UID],
-	users.updated_user[CurrentUserKeys.HANDLE] ?? users.user.to_dto()[CurrentUserKeys.HANDLE],
-	users.user.to_dto()[CurrentUserKeys.CREATED_AT],
-	users.user.to_dto()[CurrentUserKeys.SUBSCRIPTION],
-	users.updated_user[CurrentUserKeys.FIRST_NAME] ?? users.user.to_dto()[CurrentUserKeys.FIRST_NAME],
-	users.updated_user[CurrentUserKeys.LAST_NAME] ?? users.user.to_dto()[CurrentUserKeys.LAST_NAME],
-	users.updated_user[CurrentUserKeys.EMAIL] ?? users.user.to_dto()[CurrentUserKeys.EMAIL],
-	users.user.to_dto()[CurrentUserKeys.FILE_LIMIT],
-	users.updated_user[CurrentUserKeys.INSTALLED_FUNCTIONS] ?? users.user.to_dto()[CurrentUserKeys.INSTALLED_FUNCTIONS],
-	users.user.to_dto()[CurrentUserKeys.MAX_FUNCTIONS],
-	users.user.to_dto()[CurrentUserKeys.MAX_UPLOAD_SIZE],
-	users.user.to_dto()[CurrentUserKeys.SESSIONS],
+	users.user.to_dto()[CURRENT_USER_KEYS.UID],
+	users.updated_user[CURRENT_USER_KEYS.HANDLE] ?? users.user.to_dto()[CURRENT_USER_KEYS.HANDLE],
+	users.user.to_dto()[CURRENT_USER_KEYS.CREATED_AT],
+	users.user.to_dto()[CURRENT_USER_KEYS.SUBSCRIPTION],
+	users.updated_user[CURRENT_USER_KEYS.FIRST_NAME] ?? users.user.to_dto()[CURRENT_USER_KEYS.FIRST_NAME],
+	users.updated_user[CURRENT_USER_KEYS.LAST_NAME] ?? users.user.to_dto()[CURRENT_USER_KEYS.LAST_NAME],
+	users.updated_user[CURRENT_USER_KEYS.EMAIL] ?? users.user.to_dto()[CURRENT_USER_KEYS.EMAIL],
+	users.user.to_dto()[CURRENT_USER_KEYS.FILE_LIMIT],
+	users.updated_user[CURRENT_USER_KEYS.INSTALLED_FUNCTIONS] ?? users.user.to_dto()[CURRENT_USER_KEYS.INSTALLED_FUNCTIONS],
+	users.user.to_dto()[CURRENT_USER_KEYS.MAX_FUNCTIONS],
+	users.user.to_dto()[CURRENT_USER_KEYS.MAX_UPLOAD_SIZE],
+	users.user.to_dto()[CURRENT_USER_KEYS.SESSIONS],
 ]

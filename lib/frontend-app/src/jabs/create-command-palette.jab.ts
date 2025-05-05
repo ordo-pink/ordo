@@ -20,7 +20,7 @@
  */
 
 import { BsMenuButtonWideFill } from "@ordo-pink/frontend-icons"
-import { CommandPaletteItemType } from "@ordo-pink/core"
+import { COMMAND_PALETTE_ITEM_TYPE } from "@ordo-pink/core"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { type TMaokaJab } from "@ordo-pink/maoka"
@@ -42,7 +42,7 @@ export const create_command_palette: TMaokaJab = ({ use }) => {
 	commands.emit("cmd.application.command_palette.add", {
 		value: () => commands.emit("cmd.application.command_palette.toggle"),
 		readable_name: "t.common.components.command_palette.reset",
-		type: CommandPaletteItemType.COMMON_ACTION,
+		type: COMMAND_PALETTE_ITEM_TYPE.COMMON_ACTION,
 		hotkey: "mod+shift+p",
 		render_icon: BsMenuButtonWideFill,
 	})

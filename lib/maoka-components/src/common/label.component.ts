@@ -20,7 +20,7 @@
  */
 
 import { BsX } from "@ordo-pink/frontend-icons"
-import { LabelColor } from "@ordo-pink/core"
+import { LABEL_COLOR } from "@ordo-pink/core"
 import { Maoka } from "@ordo-pink/maoka"
 import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
@@ -33,7 +33,7 @@ export const Label = (label: Ordo.Metadata.Label, emit: Ordo.Command.EmitFn, met
 		if (!label) return
 
 		const readable_name = is_string(label) ? label : label.name
-		const color = is_string(label) ? LabelColor.DEFAULT : label.color
+		const color = is_string(label) ? LABEL_COLOR.DEFAULT : label.color
 
 		use(maoka_jabs.set_class(`label ${color_class[color]}`))
 		use(maoka_jabs.listen("onclick", event => handle_click(event)))

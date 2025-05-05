@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { CurrentUser } from "@ordo-pink/core"
+import { current_user } from "@ordo-pink/core"
 import { default_handler } from "@ordo-pink/routary-ordo"
 import { oath } from "@ordo-pink/oath"
 
@@ -29,7 +29,7 @@ import { get_user_from_cookie } from "../../common/get-user-from-cookie"
 export const handle_get_session = default_handler<TIDContext>(intake => {
 	return get_user_from_cookie(intake)
 		.pipe(oath.ops.map(({ user }) => user.to_dto()))
-		.pipe(oath.ops.map(CurrentUser.Serialize))
+		.pipe(oath.ops.map(current_user.serialize))
 		.pipe(oath.ops.map(dto => void (intake.payload = dto)))
 		.pipe(oath.ops.map(() => intake))
 })

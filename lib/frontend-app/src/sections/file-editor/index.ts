@@ -20,7 +20,7 @@
  */
 
 import { BsBoxArrowUp, BsCloudMinus, BsCloudPlus, BsLayoutTextWindow } from "@ordo-pink/frontend-icons"
-import { CommandPaletteItemType, ContextMenuItemType, Metadata, create_function, rrr } from "@ordo-pink/core"
+import { COMMAND_PALETTE_ITEM_TYPE, CONTEXT_MENU_ITEM_TYPE, Metadata, create_function, rrr } from "@ordo-pink/core"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { MetadataIcon } from "@ordo-pink/maoka-components"
 import { R } from "@ordo-pink/result"
@@ -100,7 +100,7 @@ export default create_function(
 		cmd.emit("cmd.application.command_palette.add", {
 			value: () => cmd.emit("cmd.file_editor.open"),
 			readable_name: "t.file_editor.command_palette.open",
-			type: CommandPaletteItemType.PAGE_OPENER,
+			type: COMMAND_PALETTE_ITEM_TYPE.PAGE_OPENER,
 			hotkey: "mod+e",
 			render_icon: BsLayoutTextWindow,
 		})
@@ -148,7 +148,7 @@ export default create_function(
 			readable_name: "Publish..." as any, // TODO i18n
 			render_icon: BsCloudPlus,
 			should_show: ({ payload }) => Metadata.Validations.is_metadata(payload) && !payload.get_property("public_id"),
-			type: ContextMenuItemType.CREATE,
+			type: CONTEXT_MENU_ITEM_TYPE.CREATE,
 		})
 
 		cmd.emit("cmd.application.context_menu.add", {
@@ -157,7 +157,7 @@ export default create_function(
 			readable_name: "Open published page" as any, // TODO i18n
 			render_icon: BsBoxArrowUp,
 			should_show: ({ payload }) => Metadata.Validations.is_metadata(payload) && !!payload.get_property("public_id"),
-			type: ContextMenuItemType.READ,
+			type: CONTEXT_MENU_ITEM_TYPE.READ,
 		})
 
 		cmd.emit("cmd.application.context_menu.add", {
@@ -166,7 +166,7 @@ export default create_function(
 			readable_name: "Unpublish" as any, // TODO i18n
 			render_icon: BsCloudMinus,
 			should_show: ({ payload }) => Metadata.Validations.is_metadata(payload) && !!payload.get_property("public_id"),
-			type: ContextMenuItemType.DELETE,
+			type: CONTEXT_MENU_ITEM_TYPE.DELETE,
 		})
 
 		cmd.on("cmd.metadata.publish", fsid => {
@@ -257,7 +257,7 @@ export default create_function(
 						}),
 					),
 				),
-			type: CommandPaletteItemType.PAGE_OPENER,
+			type: COMMAND_PALETTE_ITEM_TYPE.PAGE_OPENER,
 			readable_name: "t.file_editor.command_palette.open_file",
 			hotkey: "mod+p",
 			render_icon: BsLayoutTextWindow,

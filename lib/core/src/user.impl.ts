@@ -19,90 +19,90 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import * as TAU from "@ordo-pink/tau"
+import * as tau from "@ordo-pink/tau"
 import { sweech } from "@ordo-pink/sweech"
 
-import { CurrentUserKeys, PublicUserKeys, UserSubscription } from "./constants"
+import { CURRENT_USER_KEYS, PUBLIC_USER_KEYS, USER_SUBSCRIPTION } from "./constants"
 
 const can_user_add_function = (dto: Ordo.DTOLike<Ordo.User.Current.DTO>) => () =>
-	dto[CurrentUserKeys.INSTALLED_FUNCTIONS].length < dto[CurrentUserKeys.MAX_FUNCTIONS]
+	dto[CURRENT_USER_KEYS.INSTALLED_FUNCTIONS].length < dto[CURRENT_USER_KEYS.MAX_FUNCTIONS]
 
 const can_user_create_files = (dto: Ordo.DTOLike<Ordo.User.Current.DTO>) => (files: number) =>
-	files <= dto[CurrentUserKeys.FILE_LIMIT]
+	files <= dto[CURRENT_USER_KEYS.FILE_LIMIT]
 
 const can_user_upload = (dto: Ordo.DTOLike<Ordo.User.Current.DTO>) => (bytes: number) =>
-	bytes <= dto[CurrentUserKeys.MAX_UPLOAD_SIZE] * 1024 * 1024
+	bytes <= dto[CURRENT_USER_KEYS.MAX_UPLOAD_SIZE] * 1024 * 1024
 
-const get_user_created_at = (dto: Ordo.DTOLike<Ordo.User.Public.DTO>) => () => new Date(dto[PublicUserKeys.CREATED_AT])
+const get_user_created_at = (dto: Ordo.DTOLike<Ordo.User.Public.DTO>) => () => new Date(dto[PUBLIC_USER_KEYS.CREATED_AT])
 
-const get_user_email = (dto: Ordo.DTOLike<Ordo.User.Current.DTO>) => () => dto[CurrentUserKeys.EMAIL]
+const get_user_email = (dto: Ordo.DTOLike<Ordo.User.Current.DTO>) => () => dto[CURRENT_USER_KEYS.EMAIL]
 
-const get_user_file_limit = (dto: Ordo.DTOLike<Ordo.User.Current.DTO>) => () => dto[CurrentUserKeys.FILE_LIMIT]
+const get_user_file_limit = (dto: Ordo.DTOLike<Ordo.User.Current.DTO>) => () => dto[CURRENT_USER_KEYS.FILE_LIMIT]
 
-const get_user_first_name = (dto: Ordo.DTOLike<Ordo.User.Public.DTO>) => () => dto[PublicUserKeys.FIRST_NAME] ?? ""
+const get_user_first_name = (dto: Ordo.DTOLike<Ordo.User.Public.DTO>) => () => dto[PUBLIC_USER_KEYS.FIRST_NAME] ?? ""
 
 const get_user_full_name = (dto: Ordo.DTOLike<Ordo.User.Public.DTO>) => () =>
 	sweech
 		.of_true()
 		.case(
-			!!dto[PublicUserKeys.FIRST_NAME] && !!dto[PublicUserKeys.LAST_NAME],
-			() => `${dto[PublicUserKeys.FIRST_NAME]} ${dto[PublicUserKeys.LAST_NAME]}`,
+			!!dto[PUBLIC_USER_KEYS.FIRST_NAME] && !!dto[PUBLIC_USER_KEYS.LAST_NAME],
+			() => `${dto[PUBLIC_USER_KEYS.FIRST_NAME]} ${dto[PUBLIC_USER_KEYS.LAST_NAME]}`,
 		)
-		.case(!!dto[PublicUserKeys.FIRST_NAME], () => dto[PublicUserKeys.FIRST_NAME]!)
-		.default(() => dto[PublicUserKeys.LAST_NAME]!)
+		.case(!!dto[PUBLIC_USER_KEYS.FIRST_NAME], () => dto[PUBLIC_USER_KEYS.FIRST_NAME]!)
+		.default(() => dto[PUBLIC_USER_KEYS.LAST_NAME]!)
 
 const get_user_readable_name = (dto: Ordo.DTOLike<Ordo.User.Public.DTO>) => () =>
-	get_user_full_name(dto)() ?? dto[PublicUserKeys.HANDLE].slice(1)
+	get_user_full_name(dto)() ?? dto[PUBLIC_USER_KEYS.HANDLE].slice(1)
 
-const get_user_handle = (dto: Ordo.DTOLike<Ordo.User.Public.DTO>) => () => dto[PublicUserKeys.HANDLE]
+const get_user_handle = (dto: Ordo.DTOLike<Ordo.User.Public.DTO>) => () => dto[PUBLIC_USER_KEYS.HANDLE]
 
-const get_user_id = (dto: Ordo.DTOLike<Ordo.User.Public.DTO>) => () => dto[PublicUserKeys.UID]
+const get_user_id = (dto: Ordo.DTOLike<Ordo.User.Public.DTO>) => () => dto[PUBLIC_USER_KEYS.UID]
 
 const get_user_installed_functions = (dto: Ordo.DTOLike<Ordo.User.Current.DTO>) => () =>
-	dto[CurrentUserKeys.INSTALLED_FUNCTIONS]
+	dto[CURRENT_USER_KEYS.INSTALLED_FUNCTIONS]
 
-const get_user_last_name = (dto: Ordo.DTOLike<Ordo.User.Public.DTO>) => () => dto[PublicUserKeys.LAST_NAME] ?? ""
+const get_user_last_name = (dto: Ordo.DTOLike<Ordo.User.Public.DTO>) => () => dto[PUBLIC_USER_KEYS.LAST_NAME] ?? ""
 
-const get_user_max_functions = (dto: Ordo.DTOLike<Ordo.User.Current.DTO>) => () => dto[CurrentUserKeys.MAX_FUNCTIONS]
+const get_user_max_functions = (dto: Ordo.DTOLike<Ordo.User.Current.DTO>) => () => dto[CURRENT_USER_KEYS.MAX_FUNCTIONS]
 
-const get_user_max_upload_size = (dto: Ordo.DTOLike<Ordo.User.Current.DTO>) => () => dto[CurrentUserKeys.MAX_UPLOAD_SIZE]
+const get_user_max_upload_size = (dto: Ordo.DTOLike<Ordo.User.Current.DTO>) => () => dto[CURRENT_USER_KEYS.MAX_UPLOAD_SIZE]
 
-const get_user_subscription = (dto: Ordo.DTOLike<Ordo.User.Public.DTO>) => () => dto[PublicUserKeys.SUBSCRIPTION]
+const get_user_subscription = (dto: Ordo.DTOLike<Ordo.User.Public.DTO>) => () => dto[PUBLIC_USER_KEYS.SUBSCRIPTION]
 
 const is_user_newer_than = (dto: Ordo.DTOLike<Ordo.User.Public.DTO>) => (date: Date) => get_user_created_at(dto)() < date
 
 const is_user_older_than = (dto: Ordo.DTOLike<Ordo.User.Public.DTO>) => (date: Date) => get_user_created_at(dto)() > date
 
 const is_user_subscription_paid = (dto: Ordo.DTOLike<Ordo.User.Public.DTO>) => () =>
-	dto[PublicUserKeys.SUBSCRIPTION] > UserSubscription.FREE
+	dto[PUBLIC_USER_KEYS.SUBSCRIPTION] > USER_SUBSCRIPTION.FREE
 
-export const CurrentUserValidations: Ordo.User.Current.Validations = {
-	is_created_at: (x): x is Ordo.User.Current.DTO[CurrentUserKeys.CREATED_AT] => TAU.is_number(x),
-	is_first_name: (x): x is Ordo.User.Current.DTO[CurrentUserKeys.FIRST_NAME] => TAU.is_undefined(x) || TAU.is_string(x),
-	is_handle: (x): x is Ordo.User.Current.DTO[CurrentUserKeys.HANDLE] => TAU.is_non_empty_string(x) && x.startsWith("@"),
-	is_uid: (x): x is Ordo.User.Current.DTO[CurrentUserKeys.UID] => TAU.is_uuid(x),
-	is_last_name: (x): x is Ordo.User.Current.DTO[CurrentUserKeys.LAST_NAME] => TAU.is_undefined(x) || TAU.is_string(x),
-	is_subscription: (x): x is Ordo.User.Current.DTO[CurrentUserKeys.SUBSCRIPTION] =>
-		TAU.is_number(x) && TAU.gte(0)(x) && TAU.lt(UserSubscription.length)(x),
-	is_email: (x): x is Ordo.User.Current.DTO[CurrentUserKeys.EMAIL] =>
-		TAU.is_string(x) &&
+export const current_user_validations: Ordo.User.Current.Validations = {
+	is_created_at: (x): x is Ordo.User.Current.DTO[CURRENT_USER_KEYS.CREATED_AT] => tau.is_number(x),
+	is_first_name: (x): x is Ordo.User.Current.DTO[CURRENT_USER_KEYS.FIRST_NAME] => tau.is_undefined(x) || tau.is_string(x),
+	is_handle: (x): x is Ordo.User.Current.DTO[CURRENT_USER_KEYS.HANDLE] => tau.is_non_empty_string(x) && x.startsWith("@"),
+	is_uid: (x): x is Ordo.User.Current.DTO[CURRENT_USER_KEYS.UID] => tau.is_uuid(x),
+	is_last_name: (x): x is Ordo.User.Current.DTO[CURRENT_USER_KEYS.LAST_NAME] => tau.is_undefined(x) || tau.is_string(x),
+	is_subscription: (x): x is Ordo.User.Current.DTO[CURRENT_USER_KEYS.SUBSCRIPTION] =>
+		tau.is_number(x) && tau.gte(0)(x) && tau.lt(USER_SUBSCRIPTION.length)(x),
+	is_email: (x): x is Ordo.User.Current.DTO[CURRENT_USER_KEYS.EMAIL] =>
+		tau.is_string(x) &&
 		// eslint-disable-next-line no-useless-escape
 		/^[a-z0-9!#$%&'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+\/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/i.test(
 			x,
 		),
-	is_file_limit: (x): x is Ordo.User.Current.DTO[CurrentUserKeys.FILE_LIMIT] => TAU.is_positive_number(x),
-	is_installed_functions: (x): x is Ordo.User.Current.DTO[CurrentUserKeys.INSTALLED_FUNCTIONS] =>
-		TAU.is_array(x) && TAU.check_all(TAU.is_non_empty_string, x),
-	is_max_functions: (x): x is Ordo.User.Current.DTO[CurrentUserKeys.MAX_FUNCTIONS] => TAU.is_finite_non_negative_int(x),
-	is_max_upload_size: (x): x is Ordo.User.Current.DTO[CurrentUserKeys.MAX_UPLOAD_SIZE] => TAU.is_non_negative_number(x),
-	is_sessions: (x): x is Ordo.User.Current.DTO[CurrentUserKeys.SESSIONS] => {
-		if (!TAU.is_array(x)) return false
+	is_file_limit: (x): x is Ordo.User.Current.DTO[CURRENT_USER_KEYS.FILE_LIMIT] => tau.is_positive_number(x),
+	is_installed_functions: (x): x is Ordo.User.Current.DTO[CURRENT_USER_KEYS.INSTALLED_FUNCTIONS] =>
+		tau.is_array(x) && tau.check_all(tau.is_non_empty_string, x),
+	is_max_functions: (x): x is Ordo.User.Current.DTO[CURRENT_USER_KEYS.MAX_FUNCTIONS] => tau.is_finite_non_negative_int(x),
+	is_max_upload_size: (x): x is Ordo.User.Current.DTO[CURRENT_USER_KEYS.MAX_UPLOAD_SIZE] => tau.is_non_negative_number(x),
+	is_sessions: (x): x is Ordo.User.Current.DTO[CURRENT_USER_KEYS.SESSIONS] => {
+		if (!tau.is_array(x)) return false
 
-		for (const [sid, cat, dsc] of x as Ordo.User.Current.DTO[CurrentUserKeys.SESSIONS]) {
+		for (const [sid, cat, dsc] of x as Ordo.User.Current.DTO[CURRENT_USER_KEYS.SESSIONS]) {
 			if (
-				!TAU.is_uuid(sid) ||
-				!TAU.is_finite_non_negative_int(cat) ||
-				(!TAU.is_undefined(dsc) && !TAU.is_non_empty_string(dsc))
+				!tau.is_uuid(sid) ||
+				!tau.is_finite_non_negative_int(cat) ||
+				(!tau.is_undefined(dsc) && !tau.is_non_empty_string(dsc))
 			)
 				return false
 		}
@@ -113,34 +113,34 @@ export const CurrentUserValidations: Ordo.User.Current.Validations = {
 		const y = x as Ordo.User.Current.DTO
 
 		return (
-			TAU.is_array(y) &&
-			CurrentUser.Validations.is_created_at(y[PublicUserKeys.CREATED_AT]) &&
-			CurrentUser.Validations.is_first_name(y[PublicUserKeys.FIRST_NAME]) &&
-			CurrentUser.Validations.is_handle(y[PublicUserKeys.HANDLE]) &&
-			CurrentUser.Validations.is_uid(y[PublicUserKeys.UID]) &&
-			CurrentUser.Validations.is_last_name(y[PublicUserKeys.LAST_NAME]) &&
-			CurrentUser.Validations.is_subscription(y[PublicUserKeys.SUBSCRIPTION]) &&
-			CurrentUser.Validations.is_email(y[CurrentUserKeys.EMAIL]) &&
-			CurrentUser.Validations.is_file_limit(y[CurrentUserKeys.FILE_LIMIT]) &&
-			CurrentUser.Validations.is_installed_functions(y[CurrentUserKeys.INSTALLED_FUNCTIONS]) &&
-			CurrentUser.Validations.is_max_functions(y[CurrentUserKeys.MAX_FUNCTIONS]) &&
-			CurrentUser.Validations.is_max_upload_size(y[CurrentUserKeys.MAX_UPLOAD_SIZE])
+			tau.is_array(y) &&
+			current_user.validations.is_created_at(y[PUBLIC_USER_KEYS.CREATED_AT]) &&
+			current_user.validations.is_first_name(y[PUBLIC_USER_KEYS.FIRST_NAME]) &&
+			current_user.validations.is_handle(y[PUBLIC_USER_KEYS.HANDLE]) &&
+			current_user.validations.is_uid(y[PUBLIC_USER_KEYS.UID]) &&
+			current_user.validations.is_last_name(y[PUBLIC_USER_KEYS.LAST_NAME]) &&
+			current_user.validations.is_subscription(y[PUBLIC_USER_KEYS.SUBSCRIPTION]) &&
+			current_user.validations.is_email(y[CURRENT_USER_KEYS.EMAIL]) &&
+			current_user.validations.is_file_limit(y[CURRENT_USER_KEYS.FILE_LIMIT]) &&
+			current_user.validations.is_installed_functions(y[CURRENT_USER_KEYS.INSTALLED_FUNCTIONS]) &&
+			current_user.validations.is_max_functions(y[CURRENT_USER_KEYS.MAX_FUNCTIONS]) &&
+			current_user.validations.is_max_upload_size(y[CURRENT_USER_KEYS.MAX_UPLOAD_SIZE])
 		)
 	},
 }
 
-export const CurrentUser: Ordo.User.Current.Static = {
-	Validations: CurrentUserValidations,
-	Serialize: dto => [
-		...PublicUser.Serialize(dto),
-		dto[CurrentUserKeys.EMAIL],
-		dto[CurrentUserKeys.FILE_LIMIT],
-		dto[CurrentUserKeys.INSTALLED_FUNCTIONS],
-		dto[CurrentUserKeys.MAX_FUNCTIONS],
-		dto[CurrentUserKeys.MAX_UPLOAD_SIZE],
-		dto[CurrentUserKeys.SESSIONS],
+export const current_user: Ordo.User.Current.Static = {
+	validations: current_user_validations,
+	serialize: dto => [
+		...public_user.serialize(dto),
+		dto[CURRENT_USER_KEYS.EMAIL],
+		dto[CURRENT_USER_KEYS.FILE_LIMIT],
+		dto[CURRENT_USER_KEYS.INSTALLED_FUNCTIONS],
+		dto[CURRENT_USER_KEYS.MAX_FUNCTIONS],
+		dto[CURRENT_USER_KEYS.MAX_UPLOAD_SIZE],
+		dto[CURRENT_USER_KEYS.SESSIONS],
 	],
-	FromDTO: dto => ({
+	from_dto: dto => ({
 		can_add_function: can_user_add_function(dto),
 		can_create_files: can_user_create_files(dto),
 		can_upload: can_user_upload(dto),
@@ -155,7 +155,7 @@ export const CurrentUser: Ordo.User.Current.Static = {
 		get_max_functions: get_user_max_functions(dto),
 		get_max_upload_size: get_user_max_upload_size(dto),
 		get_readable_name: get_user_readable_name(dto),
-		get_sessions: () => dto[CurrentUserKeys.SESSIONS],
+		get_sessions: () => dto[CURRENT_USER_KEYS.SESSIONS],
 		get_subscription: get_user_subscription(dto),
 		get_uid: get_user_id(dto),
 		is_newer_than: is_user_newer_than(dto),
@@ -163,72 +163,72 @@ export const CurrentUser: Ordo.User.Current.Static = {
 		is_paid: is_user_subscription_paid(dto),
 		to_dto: () =>
 			[
-				...PublicUser.Serialize(dto),
-				dto[CurrentUserKeys.EMAIL],
-				dto[CurrentUserKeys.FILE_LIMIT],
-				dto[CurrentUserKeys.INSTALLED_FUNCTIONS],
-				dto[CurrentUserKeys.MAX_FUNCTIONS],
-				dto[CurrentUserKeys.MAX_UPLOAD_SIZE],
-				dto[CurrentUserKeys.SESSIONS],
+				...public_user.serialize(dto),
+				dto[CURRENT_USER_KEYS.EMAIL],
+				dto[CURRENT_USER_KEYS.FILE_LIMIT],
+				dto[CURRENT_USER_KEYS.INSTALLED_FUNCTIONS],
+				dto[CURRENT_USER_KEYS.MAX_FUNCTIONS],
+				dto[CURRENT_USER_KEYS.MAX_UPLOAD_SIZE],
+				dto[CURRENT_USER_KEYS.SESSIONS],
 			] as const,
 	}),
-	Create: (email, file_limit, max_upload_size, max_functions, subscription = UserSubscription.FREE) => {
+	new: (email, file_limit, max_upload_size, max_functions, subscription = USER_SUBSCRIPTION.FREE) => {
 		const uid = crypto.randomUUID()
 		const handle = `@${email.split("@")[0].replaceAll(".", "_").replaceAll("/", "")}${uid.split("-")[0]}` as Ordo.User.Handle
 
-		const user = []
+		const user = [] as unknown as Ordo.User.Current.DTO
 
-		user[CurrentUserKeys.UID] = uid
-		user[CurrentUserKeys.HANDLE] = handle
-		user[CurrentUserKeys.CREATED_AT] = Date.now()
-		user[CurrentUserKeys.SUBSCRIPTION] = subscription
-		user[CurrentUserKeys.FIRST_NAME] = 0
-		user[CurrentUserKeys.LAST_NAME] = 0
-		user[CurrentUserKeys.EMAIL] = email
-		user[CurrentUserKeys.FILE_LIMIT] = file_limit
-		user[CurrentUserKeys.INSTALLED_FUNCTIONS] = []
-		user[CurrentUserKeys.MAX_FUNCTIONS] = max_functions
-		user[CurrentUserKeys.MAX_UPLOAD_SIZE] = max_upload_size
-		user[CurrentUserKeys.SESSIONS] = []
+		user[CURRENT_USER_KEYS.UID] = uid
+		user[CURRENT_USER_KEYS.HANDLE] = handle
+		user[CURRENT_USER_KEYS.CREATED_AT] = Date.now()
+		user[CURRENT_USER_KEYS.SUBSCRIPTION] = subscription
+		user[CURRENT_USER_KEYS.FIRST_NAME] = ""
+		user[CURRENT_USER_KEYS.LAST_NAME] = ""
+		user[CURRENT_USER_KEYS.EMAIL] = email
+		user[CURRENT_USER_KEYS.FILE_LIMIT] = file_limit
+		user[CURRENT_USER_KEYS.INSTALLED_FUNCTIONS] = []
+		user[CURRENT_USER_KEYS.MAX_FUNCTIONS] = max_functions
+		user[CURRENT_USER_KEYS.MAX_UPLOAD_SIZE] = max_upload_size
+		user[CURRENT_USER_KEYS.SESSIONS] = []
 
-		return CurrentUser.FromDTO(user as Ordo.User.Current.DTO)
+		return current_user.from_dto(user as Ordo.User.Current.DTO)
 	},
 }
 
-export const PublicUserValidations: Ordo.User.Public.Validations = {
-	is_created_at: (x): x is Ordo.User.Public.DTO[PublicUserKeys.CREATED_AT] => TAU.is_date(x),
-	is_first_name: (x): x is Ordo.User.Public.DTO[PublicUserKeys.FIRST_NAME] => TAU.is_undefined(x) || TAU.is_string(x),
-	is_handle: (x): x is Ordo.User.Public.DTO[PublicUserKeys.HANDLE] => TAU.is_non_empty_string(x) && x.startsWith("@"),
-	is_uid: (x): x is Ordo.User.Public.DTO[PublicUserKeys.UID] => TAU.is_uuid(x),
-	is_last_name: (x): x is Ordo.User.Public.DTO[PublicUserKeys.LAST_NAME] => TAU.is_undefined(x) || TAU.is_string(x),
-	is_subscription: (x): x is Ordo.User.Public.DTO[PublicUserKeys.SUBSCRIPTION] =>
-		TAU.is_number(x) && TAU.gte(0)(x) && TAU.lt(UserSubscription.length)(x),
+export const public_user_validations: Ordo.User.Public.Validations = {
+	is_created_at: (x): x is Ordo.User.Public.DTO[PUBLIC_USER_KEYS.CREATED_AT] => tau.is_date(x),
+	is_first_name: (x): x is Ordo.User.Public.DTO[PUBLIC_USER_KEYS.FIRST_NAME] => tau.is_undefined(x) || tau.is_string(x),
+	is_handle: (x): x is Ordo.User.Public.DTO[PUBLIC_USER_KEYS.HANDLE] => tau.is_non_empty_string(x) && x.startsWith("@"),
+	is_uid: (x): x is Ordo.User.Public.DTO[PUBLIC_USER_KEYS.UID] => tau.is_uuid(x),
+	is_last_name: (x): x is Ordo.User.Public.DTO[PUBLIC_USER_KEYS.LAST_NAME] => tau.is_undefined(x) || tau.is_string(x),
+	is_subscription: (x): x is Ordo.User.Public.DTO[PUBLIC_USER_KEYS.SUBSCRIPTION] =>
+		tau.is_number(x) && tau.gte(0)(x) && tau.lt(USER_SUBSCRIPTION.length)(x),
 	is_dto: (x): x is Ordo.User.Public.DTO => {
 		const y = x as Ordo.User.Public.DTO
 
 		return (
-			TAU.is_array(y) &&
-			PublicUser.Validations.is_created_at(y[PublicUserKeys.CREATED_AT]) &&
-			PublicUser.Validations.is_first_name(y[PublicUserKeys.FIRST_NAME]) &&
-			PublicUser.Validations.is_handle(y[PublicUserKeys.HANDLE]) &&
-			PublicUser.Validations.is_uid(y[PublicUserKeys.UID]) &&
-			PublicUser.Validations.is_last_name(y[PublicUserKeys.LAST_NAME]) &&
-			PublicUser.Validations.is_subscription(y[PublicUserKeys.SUBSCRIPTION])
+			tau.is_array(y) &&
+			public_user.validations.is_created_at(y[PUBLIC_USER_KEYS.CREATED_AT]) &&
+			public_user.validations.is_first_name(y[PUBLIC_USER_KEYS.FIRST_NAME]) &&
+			public_user.validations.is_handle(y[PUBLIC_USER_KEYS.HANDLE]) &&
+			public_user.validations.is_uid(y[PUBLIC_USER_KEYS.UID]) &&
+			public_user.validations.is_last_name(y[PUBLIC_USER_KEYS.LAST_NAME]) &&
+			public_user.validations.is_subscription(y[PUBLIC_USER_KEYS.SUBSCRIPTION])
 		)
 	},
 }
 
-export const PublicUser: Ordo.User.Public.Static = {
-	Validations: PublicUserValidations,
-	Serialize: dto => [
-		dto[PublicUserKeys.UID],
-		dto[PublicUserKeys.HANDLE],
-		dto[PublicUserKeys.CREATED_AT],
-		dto[PublicUserKeys.SUBSCRIPTION],
-		dto[PublicUserKeys.FIRST_NAME],
-		dto[PublicUserKeys.LAST_NAME],
+export const public_user: Ordo.User.Public.Static = {
+	validations: public_user_validations,
+	serialize: dto => [
+		dto[PUBLIC_USER_KEYS.UID],
+		dto[PUBLIC_USER_KEYS.HANDLE],
+		dto[PUBLIC_USER_KEYS.CREATED_AT],
+		dto[PUBLIC_USER_KEYS.SUBSCRIPTION],
+		dto[PUBLIC_USER_KEYS.FIRST_NAME],
+		dto[PUBLIC_USER_KEYS.LAST_NAME],
 	],
-	FromDTO: dto => ({
+	from_dto: dto => ({
 		get_created_at: get_user_created_at(dto),
 		get_first_name: get_user_first_name(dto),
 		get_full_name: get_user_full_name(dto),
@@ -240,6 +240,6 @@ export const PublicUser: Ordo.User.Public.Static = {
 		is_newer_than: is_user_newer_than(dto),
 		is_older_than: is_user_older_than(dto),
 		is_paid: is_user_subscription_paid(dto),
-		to_dto: () => PublicUser.Serialize(dto),
+		to_dto: () => public_user.serialize(dto),
 	}),
 }

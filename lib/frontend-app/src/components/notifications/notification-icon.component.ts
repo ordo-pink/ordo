@@ -28,7 +28,7 @@ import {
 	bs_question_circle,
 } from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/maoka"
-import { NotificationType } from "@ordo-pink/core"
+import { NOTIFICATION_TYPE } from "@ordo-pink/core"
 import { sweech } from "@ordo-pink/sweech"
 
 type P = Pick<Ordo.Notification.Instance, "render_icon" | "type">
@@ -39,10 +39,10 @@ export const OrdoNotificationIcon = ({ render_icon, type }: P) =>
 			return () =>
 				sweech
 					.match(type)
-					.case(NotificationType.INFO, () => BsInfoCircle("text-sky-500"))
-					.case(NotificationType.QUESTION, () => bs_question_circle("text-violet-500"))
-					.case(NotificationType.RRR, () => BsErrorCircle("text-rose-500"))
-					.case(NotificationType.SUCCESS, () => BsCheckCircle("text-emerald-500"))
-					.case(NotificationType.WARN, () => BsExclamationCircle("text-amber-500"))
+					.case(NOTIFICATION_TYPE.INFO, () => BsInfoCircle("text-sky-500"))
+					.case(NOTIFICATION_TYPE.QUESTION, () => bs_question_circle("text-violet-500"))
+					.case(NOTIFICATION_TYPE.RRR, () => BsErrorCircle("text-rose-500"))
+					.case(NOTIFICATION_TYPE.SUCCESS, () => BsCheckCircle("text-emerald-500"))
+					.case(NOTIFICATION_TYPE.WARN, () => BsExclamationCircle("text-amber-500"))
 					.default(() => BsCircle("text-neutral-500"))
 	})

@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { CurrentUserKeys } from "@ordo-pink/core"
+import { CURRENT_USER_KEYS } from "@ordo-pink/core"
 import type { Logger } from "@ordo-pink/logger"
 import type { Oath } from "@ordo-pink/oath"
 import { Routary } from "@ordo-pink/routary"
@@ -32,7 +32,7 @@ export namespace BackendAuth {
 	/**
 	 * User email type alias.
 	 */
-	export type Email = Ordo.User.Current.DTO[CurrentUserKeys.EMAIL]
+	export type Email = Ordo.User.Current.DTO[CURRENT_USER_KEYS.EMAIL]
 
 	/**
 	 * User authentication code type alias.

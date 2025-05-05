@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { CurrentUser } from "@ordo-pink/core"
+import { current_user } from "@ordo-pink/core"
 import { type Routary } from "@ordo-pink/routary"
 import { oath } from "@ordo-pink/oath"
 
@@ -32,4 +32,4 @@ export const check_if_id_param_is_valid = (intake: Routary.Intake<TIDContext>) =
 		.pipe(id => oath.if(is_uid(id)))
 		.pipe(oath.ops.rmap(() => invalid_id_rrr(intake.params.user_id, intake)))
 
-const { is_uid } = CurrentUser.Validations
+const { is_uid } = current_user.validations

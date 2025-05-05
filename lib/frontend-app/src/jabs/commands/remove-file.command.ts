@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { ContextMenuItemType, Metadata } from "@ordo-pink/core"
+import { CONTEXT_MENU_ITEM_TYPE, Metadata } from "@ordo-pink/core"
 import { BsFileEarmarkMinus } from "@ordo-pink/frontend-icons"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
@@ -44,7 +44,7 @@ export const remove_file_command: TMaokaJab = ({ use }) => {
 		readable_name: "t.common.components.modals.remove_file.title",
 		render_icon: BsFileEarmarkMinus,
 		should_show: ({ payload }) => Metadata.Validations.is_metadata(payload),
-		type: ContextMenuItemType.DELETE,
+		type: CONTEXT_MENU_ITEM_TYPE.DELETE,
 	})
 
 	// TODO Command palette item if there is currently selected metadata

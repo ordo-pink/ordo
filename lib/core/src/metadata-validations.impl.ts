@@ -20,7 +20,7 @@
  */
 
 import * as TAU from "@ordo-pink/tau"
-import { LabelColor } from "./constants"
+import { LABEL_COLOR } from "./constants"
 
 export const are_labels = (labels: unknown): labels is Ordo.Metadata.Label[] =>
 	Array.isArray(labels) && TAU.check_all(is_label, labels)
@@ -56,7 +56,7 @@ export const is_label = (label: unknown): label is TAU.Unpack<Ordo.Metadata.Labe
 
 	if (TAU.is_non_empty_string(label)) return true
 
-	return TAU.is_object(y) && TAU.is_non_empty_string(y.name) && TAU.lt(LabelColor.length)(y.color)
+	return TAU.is_object(y) && TAU.is_non_empty_string(y.name) && TAU.lt(LABEL_COLOR.length)(y.color)
 }
 
 export const is_is_deleted = (x: unknown): x is boolean | undefined => TAU.is_bool(x) || TAU.is_undefined(x)

@@ -31,6 +31,11 @@
 	@apply hover:bg-neutral-300 hover:dark:bg-neutral-700;
 }
 
+.command-palette_item.active {
+	@apply bg-gradient-to-r from-pink-300 via-purple-300 to-violet-300 dark:from-blue-950/50 dark:via-purple-950/50 dark:to-violet-950/50;
+	@apply hover:from-pink-300/30 hover:via-pink-300/30 hover:to-violet-300/30 dark:hover:from-blue-950/20 dark:hover:via-purple-950/20 dark:hover:to-violet-950/20;
+}
+
 .command-palette_item_main {
 	@apply flex items-center;
 }

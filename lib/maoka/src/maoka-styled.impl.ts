@@ -13,12 +13,12 @@ export const maoka_styled = HTML_TAGS.reduce(
 		...acc,
 		[tag]:
 			<$Args extends Maoka.BaseArgs | void = void>(
-				classes: string,
+				classes?: string,
 				f?: (args: Maoka.Args<$Args> | Maoka.Kindergarten) => void,
 			) =>
 			(args: $Args) =>
 				maoka.create<$Args>(tag, args => {
-					args.use(maoka_dom.jabs.if_dom(n => n.value.setAttribute("class", classes)))
+					if (classes) args.use(maoka_dom.jabs.if_dom(n => n.value.setAttribute("class", classes)))
 					f && f(args as any)
 					return args.kindergarten
 				})(args),
@@ -26,7 +26,7 @@ export const maoka_styled = HTML_TAGS.reduce(
 	{} as Record<
 		(typeof HTML_TAGS)[number],
 		<$Args extends Maoka.BaseArgs | void = void>(
-			classes: string,
+			classes?: string,
 			f?: (args: Maoka.Args<$Args>) => void,
 		) => (args: $Args | Maoka.Kindergarten) => Maoka.Component
 	>,

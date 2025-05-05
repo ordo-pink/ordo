@@ -48,10 +48,9 @@ import { maoka } from "@ordo-pink/maoka"
 
 // TODO Move fonts to assets
 import { hunt } from "@ordo-pink/hunt"
-import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 
 import { app_context } from "./app-context"
-import { create_command_palette } from "./src/command-palette/command-palette.jab"
+import { create_command_palette } from "./src/command-palette"
 
 import "./index.css"
 
@@ -106,8 +105,7 @@ export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
 
 	// TODO Init user
 	return () => [
-		internal.command_palette_button(),
-		command_palette,
+		command_palette(),
 		// OrdoWorkspace,
 		// OrdoSidebar,
 		// OrdoModal,
@@ -118,12 +116,3 @@ export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
 		// OrdoTitleDisplay,
 	]
 })
-
-namespace internal {
-	export const command_palette_button = maoka.create("button", ({ use }) => {
-		const { hunter } = use(app_context.consume)
-		use(maoka_jabs.listen("onclick", () => hunter.shoot("command_palette.show", void 0)))
-
-		return () => "Show CP"
-	})
-}

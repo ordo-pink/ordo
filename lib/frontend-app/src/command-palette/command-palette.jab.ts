@@ -24,19 +24,20 @@ import { CommandPaletteItemType } from "@ordo-pink/core"
 import { bs_terminal } from "@ordo-pink/frontend-icons"
 
 import { app_context } from "../../app-context"
-import { command_palette } from "./command-palette.component"
 import { command_palette$ } from "./command-palette.state"
+import { modal } from "./components/modal.component"
+import { overlay } from "./components/overlay.component"
 
 import "./command-palette.style.css"
 
-export const create_command_palette: Maoka.Jab = ({ use }) => {
-	use(internal.track_prey)
+export const create_command_palette: Maoka.Jab<() => Maoka.Component> = ({ use }) => {
+	use(internal.track_prey_jab)
 
-	return command_palette()
+	return () => overlay(() => modal())
 }
 
 namespace internal {
-	export const track_prey: Maoka.Jab = ({ use }) => {
+	export const track_prey_jab: Maoka.Jab = ({ use }) => {
 		const { hunter } = use(app_context.consume)
 
 		const handle_onmount = () => {

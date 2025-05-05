@@ -19,6 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+export * from "./src/components/hotkey.component"
 export * from "./src/types"
 export * from "./src/constants"
 export * from "./src/create-function"

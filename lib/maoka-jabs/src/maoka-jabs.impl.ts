@@ -128,9 +128,9 @@ export const set_inner_html =
 	({ use }) =>
 		use(maoka_dom.jabs.if_dom(n => (n.value.innerHTML = html)))
 
-const is_sm = lt(SM_SCREEN_BREAKPOINT)
-
 export const is_sm_screen$: Maoka.Jab<() => boolean> = ({ use }) => {
+	const is_sm = lt(SM_SCREEN_BREAKPOINT)
+
 	let value: boolean = is_sm(window.innerWidth)
 
 	use(

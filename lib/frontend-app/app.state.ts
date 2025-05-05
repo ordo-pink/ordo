@@ -110,7 +110,7 @@ type TContextMenu = { items: Ordo.ContextMenu.Item[]; state?: Ordo.ContextMenu.I
 type TSections = {
 	context_menu: TContextMenu
 	command_palette: TCommandPaletteSection
-	modal?: Ordo.Modal.Instance
+	modal?: Ordo.Modal.Params
 }
 
 type TQueries = { user: Ordo.User.Query; metadata: Ordo.Metadata.Query; content: Ordo.Content.Query }

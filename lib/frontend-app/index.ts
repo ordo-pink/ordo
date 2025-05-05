@@ -50,10 +50,11 @@ import { maoka } from "@ordo-pink/maoka"
 import { hunt } from "@ordo-pink/hunt"
 
 import { app_context } from "./app-context"
-import { create_command_palette } from "./src/command-palette"
+import { create_command_palette_jab } from "./src/command-palette"
 
 import "./index.css"
 import { auth_jab } from "./src/auth"
+import { create_modal_jab } from "./src/modal"
 
 export type AppOptions = {
 	hosts: Ordo.Hosts
@@ -69,7 +70,10 @@ export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
 	use(app_context.provide({ fetch, hosts, hunter, logger, translate }))
 	use(auth_jab)
 
-	const command_palette = use(create_command_palette)
+	const command_palette = use(create_command_palette_jab)
+	const modal = use(create_modal_jab)
+
+	hunter.shoot("modal.show", { render: () => void 0 })
 	// ordo_app_state.zags.update("hosts.id", () => id_host)
 	// ordo_app_state.zags.update("hosts.dt", () => dt_host)
 	// ordo_app_state.zags.update("hosts.pb", () => pb_host)
@@ -107,6 +111,7 @@ export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
 
 	// TODO Init user
 	return () => [
+		modal(),
 		command_palette(),
 		// OrdoWorkspace,
 		// OrdoSidebar,

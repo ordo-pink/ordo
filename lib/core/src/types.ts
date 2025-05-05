@@ -230,6 +230,10 @@ declare global {
 			show_verify_code_modal: { args: void }
 			sign_out: { args: void }
 		}
+		modal: {
+			show: { args: Ordo.Modal.Params }
+			hide: { args: void }
+		}
 		// application: {
 		// 	set_title: () => Ordo.I18N.TranslationKey
 		// 	add_translations: () => {
@@ -1020,7 +1024,7 @@ declare global {
 		}
 
 		namespace Modal {
-			type Instance = { onunmount?: () => void; render: (div: HTMLDivElement) => void | Promise<void> }
+			type Params = { onunmount?: () => void; render: (div: HTMLDivElement) => void | Promise<void> }
 		}
 
 		namespace Router {

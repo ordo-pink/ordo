@@ -1,0 +1,7 @@
+.modal_wrapper {
+	@apply fixed bottom-0 left-0 right-0 top-0 hidden items-center justify-center backdrop-blur-sm;
+}
+
+.modal_wrapper.active {
+	@apply flex cursor-pointer;
+}

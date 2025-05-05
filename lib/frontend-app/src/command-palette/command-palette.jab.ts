@@ -23,15 +23,13 @@ import { Maoka, maoka_dom } from "@ordo-pink/maoka"
 import { COMMAND_PALETTE_ITEM_TYPE } from "@ordo-pink/core"
 import { bs_terminal } from "@ordo-pink/frontend-icons"
 
+import { COMMAND_PALETTE_SECTION } from "./command-palette.contants"
 import { app_context } from "../../app-context"
 import { command_palette$ } from "./command-palette.state"
 import { modal } from "./components/modal.component"
 import { overlay } from "./components/overlay.component"
 
-import "./command-palette.style.css"
-import { COMMAND_PALETTE_SECTION } from "./command-palette.contants"
-
-export const create_command_palette: Maoka.Jab<() => Maoka.Component> = ({ use }) => {
+export const create_command_palette_jab: Maoka.Jab<() => Maoka.Component> = ({ use }) => {
 	use(internal.track_prey_jab)
 
 	return () => overlay(() => modal())

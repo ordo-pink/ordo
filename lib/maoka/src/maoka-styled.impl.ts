@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ */
+
 import { HTML_TAGS } from "./html-tags"
 import { Maoka } from "./maoka.types"
 import { maoka } from "./maoka.impl"

@@ -29,6 +29,7 @@ import { modal } from "./components/modal.component"
 import { overlay } from "./components/overlay.component"
 
 import "./command-palette.style.css"
+import { COMMAND_PALETTE_SECTION } from "./command-palette.contants"
 
 export const create_command_palette: Maoka.Jab<() => Maoka.Component> = ({ use }) => {
 	use(internal.track_prey_jab)
@@ -84,7 +85,12 @@ namespace internal {
 			command_palette$.update("items", items => [...items, item])
 
 		export const command_palette_hide: Ordo.GunFor<"command_palette.hide"> = () =>
-			command_palette$.update("current", () => void 0)
+			command_palette$.each({
+				current: () => void 0,
+				index: () => 0,
+				location: () => COMMAND_PALETTE_SECTION.ITEMS,
+				search_value: () => "",
+			})
 
 		export const command_palette_remove: Ordo.GunFor<"command_palette.remove"> = id =>
 			command_palette$.update("items", items => items.filter(i => i.id === id))

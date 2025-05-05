@@ -1,18 +1,18 @@
-import { maoka, maoka_dom, maoka_styled } from "@ordo-pink/maoka"
+import { maoka, maoka_styled } from "@ordo-pink/maoka"
 import { bs_question_circle } from "@ordo-pink/frontend-icons"
 import { create_hotkey_from_event } from "@ordo-pink/hotkey-from-event"
 import { hotkey } from "@ordo-pink/core"
 import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 
+import { COMMAND_PALETTE_SECTION } from "../command-palette.contants"
 import { app_context } from "../../../app-context"
 import { command_palette$ } from "../command-palette.state"
-import { command_palette_item } from "./item.component"
+import { command_palette_items } from "./items.component"
 import { command_palette_search } from "./search.component"
 
+// TODO open via route fragment and query
+// TODO create subitems if item is found with fuzzy search but the match is not exact
 export const modal = maoka.create("div", ({ use }) => {
-	let current_item_index = 0
-	let current_location: internal.LOCATION = internal.LOCATION.ITEMS
-
 	const is_darwin = use(maoka_jabs.is_darwin)
 	const { hunter } = use(app_context.consume)
 	const get_current = use(maoka_jabs.cheat$(command_palette$, "current" as const))
@@ -28,27 +28,16 @@ export const modal = maoka.create("div", ({ use }) => {
 		const parsed_hotkey = create_hotkey_from_event(event, is_darwin)
 
 		if (current) {
-			if (current.is_multiple && event.code === "Tab") {
-				current_location =
-					current_location === internal.LOCATION.ITEMS ? internal.LOCATION.PINNED_ITEMS : internal.LOCATION.ITEMS
-				use(maoka_dom.jabs.refresh$)
-				return
-			}
-
-			if (event.code === "ArrowDown") {
-				current_item_index = current_item_index === current.items.length - 1 ? 0 : current_item_index + 1
-				use(maoka_dom.jabs.refresh$)
-				return
-			}
-
-			if (event.code === "ArrowUp") {
-				current_item_index = current_item_index === 0 ? current.items.length - 1 : current_item_index - 1
-				use(maoka_dom.jabs.refresh$)
-				return
-			}
-
-			if (event.code === "Enter") {
-				current.on_select(current.items[current_item_index])
+			if (current.is_multiple && event.code === "Tab")
+				return command_palette$.update("location", l =>
+					l === COMMAND_PALETTE_SECTION.ITEMS ? COMMAND_PALETTE_SECTION.PINNED_ITEMS : COMMAND_PALETTE_SECTION.ITEMS,
+				)
+			else if (event.code === "ArrowDown")
+				return command_palette$.update("index", i => (i === current.items.length - 1 ? 0 : i + 1))
+			else if (event.code === "ArrowUp")
+				return command_palette$.update("index", i => (i === 0 ? current.items.length - 1 : i - 1))
+			else if (event.code === "Enter") {
+				current.on_select(current.items[command_palette$.select("index")])
 				hunter.shoot("command_palette.hide")
 			}
 
@@ -88,35 +77,9 @@ export const modal = maoka.create("div", ({ use }) => {
 
 		return [
 			command_palette_search(),
-			// TODO open via route fragment and query
-			// TODO create subitems if item is found with fuzzy search but the match is not exact
-			current.is_multiple
-				? internal.items_wrapper(() => [
-						internal.items(() =>
-							current.items.map((item, index) =>
-								command_palette_item({
-									item,
-									active: current_location === internal.LOCATION.ITEMS && index === current_item_index,
-								}),
-							),
-						),
-						internal.items(() =>
-							current.pinned_items?.map((item, index) =>
-								command_palette_item({
-									item,
-									active: current_location === internal.LOCATION.PINNED_ITEMS && index === current_item_index,
-								}),
-							),
-						),
-					])
-				: internal.items(() =>
-						current.items.map((item, index) =>
-							command_palette_item({
-								item,
-								active: current_location === internal.LOCATION.ITEMS && index === current_item_index,
-							}),
-						),
-					),
+
+			command_palette_items(),
+
 			internal.footer(() => [
 				bs_question_circle({ classes: "mr-2" }),
 				internal.text_span(() => "Type to search. Arrows to navigate."),
@@ -130,15 +93,7 @@ export const modal = maoka.create("div", ({ use }) => {
 })
 
 namespace internal {
-	export enum LOCATION {
-		ITEMS,
-		PINNED_ITEMS,
-	}
-
 	export const IGNORED_KEYS = ["Control", "Shift", "Alt", "Meta"]
-
 	export const text_span = maoka_styled.span()
 	export const footer = maoka_styled.div("command-palette_footer")
-	export const items_wrapper = maoka_styled.div("command-palette_items_multiple-wrapper")
-	export const items = maoka_styled.div("command-palette_items")
 }

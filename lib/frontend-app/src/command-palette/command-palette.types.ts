@@ -19,6 +19,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { COMMAND_PALETTE_SECTION } from "./command-palette.contants"
+
 export namespace CommandPalette {
-	export type State = { current?: Ordo.CommandPalette.Instance; items: Ordo.CommandPalette.Item[] }
+	export type State = {
+		current?: Ordo.CommandPalette.Instance
+		items: Ordo.CommandPalette.Item[]
+		location: COMMAND_PALETTE_SECTION
+		index: number
+		search_value: string
+	}
 }

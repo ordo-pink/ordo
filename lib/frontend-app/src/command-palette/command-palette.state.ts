@@ -21,6 +21,12 @@
 
 import { create_zags } from "@ordo-pink/zags"
 
+import { COMMAND_PALETTE_SECTION } from "./command-palette.contants"
 import { CommandPalette } from "./command-palette.types"
 
-export const command_palette$ = create_zags<CommandPalette.State>({ items: [] })
+export const command_palette$ = create_zags<CommandPalette.State>({
+	index: 0,
+	items: [],
+	location: COMMAND_PALETTE_SECTION.ITEMS,
+	search_value: "",
+})

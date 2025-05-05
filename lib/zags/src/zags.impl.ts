@@ -9,9 +9,44 @@ import { Zags } from "./zags.types.ts"
 
 /** @see {@link Zags.Module} */
 export const create_zags: Zags.Module = (state, partners = []) => ({
-	cheat: internal.cheat(state, partners),
-	divorce: internal.divorce(partners),
-	marry: internal.marry(state, partners),
+	cheat: (path, f) => {
+		let value: any
+
+		const wrapped_f = (state: any, is_update: boolean) => {
+			const keys = (path as string).split(".")
+			const location: Record<string, any> = keys.slice(0, -1).reduce((acc, key) => acc[key], state)
+			const current_value = location[keys[keys.length - 1]]
+
+			if (!deep_equals(current_value, value)) {
+				value = current_value
+				f(value, is_update)
+			}
+		}
+
+		partners.push(wrapped_f)
+		wrapped_f(state, false)
+
+		return () => {
+			const index = partners.indexOf(wrapped_f)
+
+			if (index >= 0) partners.splice(index, 1)
+		}
+	},
+	divorce: f => {
+		const index = partners.indexOf(f)
+
+		if (index >= 0) partners.splice(index, 1)
+	},
+	marry: f => {
+		partners.push(f)
+		f(state, false)
+
+		return () => {
+			const index = partners.indexOf(f)
+
+			if (index >= 0) partners.splice(index, 1)
+		}
+	},
 	select: path => {
 		const keys = (path as string).split(".")
 		const location: Record<string, any> = keys.slice(0, -1).reduce((acc, key) => (acc as any)[key], state)
@@ -67,53 +102,3 @@ export const create_zags: Zags.Module = (state, partners = []) => ({
 		}
 	},
 })
-
-/** @ignore */
-namespace internal {
-	export const cheat =
-		<$State extends Zags.BaseState>(state: $State, partners: Zags.Partner<$State>[]): Zags.Cheat<$State> =>
-		(path, f) => {
-			let value: any
-
-			const wrapped_f = (state: any, is_update: boolean) => {
-				const keys = (path as string).split(".")
-				const location: Record<string, any> = keys.slice(0, -1).reduce((acc, key) => acc[key], state)
-				const current_value = location[keys[keys.length - 1]]
-
-				if (!deep_equals(current_value, value)) {
-					value = current_value
-					f(value, is_update)
-				}
-			}
-
-			partners.push(wrapped_f)
-			wrapped_f(state, false)
-
-			return () => {
-				const index = partners.indexOf(wrapped_f)
-
-				if (index >= 0) partners.splice(index, 1)
-			}
-		}
-
-	export const divorce =
-		<$State extends Zags.BaseState>(partners: Zags.Partner<$State>[]): Zags.Divorce<$State> =>
-		f => {
-			const index = partners.indexOf(f)
-
-			if (index >= 0) partners.splice(index, 1)
-		}
-
-	export const marry =
-		<$State extends Zags.BaseState>(state: $State, partners: Zags.Partner<$State>[]): Zags.Marry<$State> =>
-		f => {
-			partners.push(f)
-			f(state, false)
-
-			return () => {
-				const index = partners.indexOf(f)
-
-				if (index >= 0) partners.splice(index, 1)
-			}
-		}
-}

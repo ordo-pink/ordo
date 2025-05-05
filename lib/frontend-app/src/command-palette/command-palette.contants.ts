@@ -1,0 +1,4 @@
+export enum COMMAND_PALETTE_SECTION {
+	ITEMS,
+	PINNED_ITEMS,
+}

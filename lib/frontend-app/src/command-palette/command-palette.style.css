@@ -36,6 +36,10 @@
 	@apply hover:from-pink-300/30 hover:via-pink-300/30 hover:to-violet-300/30 dark:hover:from-blue-950/20 dark:hover:via-purple-950/20 dark:hover:to-violet-950/20;
 }
 
+.command-palette_items_nothing-found {
+	@apply w-full px-2 text-center text-sm text-neutral-500;
+}
+
 .command-palette_item_main {
 	@apply flex items-center;
 }

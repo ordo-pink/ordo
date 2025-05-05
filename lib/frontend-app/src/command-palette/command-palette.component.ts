@@ -1,9 +1,9 @@
 import { bs_question_circle, bs_search } from "@ordo-pink/frontend-icons"
-import { is_string, title_case } from "@ordo-pink/tau"
-import { maoka, maoka_dom } from "@ordo-pink/maoka"
+import { maoka, maoka_dom, maoka_styled } from "@ordo-pink/maoka"
 import { create_hotkey_from_event } from "@ordo-pink/hotkey-from-event"
 import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { sweech } from "@ordo-pink/sweech"
+import { title_case } from "@ordo-pink/tau"
 
 import { app_context } from "../../app-context"
 import { command_palette$ } from "./command-palette.state"
@@ -20,22 +20,54 @@ namespace internal {
 		const handle_mount = () => command_palette$.cheat("current", current => (current ? handle_show() : handle_hide()))
 
 		use(maoka_jabs.set_class("command-palette_wrapper"))
-		use(maoka_dom.jabs.onmount(handle_mount))
 		use(maoka_jabs.listen("onclick", handle_click))
+		use(maoka_dom.jabs.onmount(handle_mount))
 
 		return kindergarten
 	})
 
 	export const modal = maoka.create("div", ({ use }) => {
-		const get_current = use(maoka_jabs.cheat$(command_palette$, "current" as const))
+		const is_darwin = use(maoka_jabs.is_darwin)
 		const { hunter } = use(app_context.consume)
+		const get_current = use(maoka_jabs.cheat$(command_palette$, "current" as const))
 
 		const handle_click = (event: MouseEvent) => event.stopPropagation()
+		const handle_global_keydown = (e: KeyboardEvent) => {
+			if (e.code === "Escape") return void hunter.shoot("command_palette.hide")
+			if (IGNORED_KEYS.includes(e.key)) return
 
-		use(maoka_jabs.set_class("command-palette"))
-		use(maoka_jabs.listen_global_event("keydown", e => e.code === "Escape" && hunter.shoot("command_palette.hide")))
+			const parsed_hotkey = create_hotkey_from_event(e, is_darwin)
+			const current = get_current()
+
+			if (current) {
+				for (let i = 0; i < current.items.length; i++) {
+					const item = current.items[i]
+
+					if (parsed_hotkey === item.hotkey) {
+						e.preventDefault()
+						current.on_select(item)
+						break
+					}
+				}
+			} else {
+				const global_items = command_palette$.select("items")
+
+				for (let i = 0; i < global_items.length; i++) {
+					const item = global_items[i]
+
+					if (parsed_hotkey === item.hotkey) {
+						e.preventDefault()
+						item.value()
+						break
+					}
+				}
+			}
+		}
+
 		use(maoka_jabs.set_id("cp"))
+		use(maoka_jabs.set_class("command-palette"))
 		use(maoka_jabs.listen("onclick", handle_click))
+		use(maoka_jabs.listen_global_event("keydown", handle_global_keydown))
 
 		return () => {
 			const current = get_current()
@@ -79,8 +111,8 @@ namespace internal {
 	const list_item = maoka.create<{ item: Ordo.CommandPalette.Item }>("div", ({ item, use }) => {
 		const handle_click = () => item.value()
 
-		use(maoka_jabs.set_class("command-palette_item"))
 		use(maoka_jabs.set_id(String(item.id)))
+		use(maoka_jabs.set_class("command-palette_item"))
 		use(maoka_jabs.set_attribute("title", item.description))
 		use(maoka_jabs.listen("onclick", handle_click))
 
@@ -88,62 +120,34 @@ namespace internal {
 			// TODO Shortcut for providing kindergarten directly
 			item_main({
 				kindergarten: () => [
-					maoka.create("div", ({ use }) => {
-						use(maoka_jabs.set_class("command-palette_item_title-wrapper"))
-
-						return () => [item.render_icon && item_icon_span({ render: item.render_icon }), item.readable_name]
-					})({}),
-					item.hotkey &&
-						maoka.create("div", ({ use }) => {
-							use(maoka_jabs.set_class("command-palette_item_info"))
-
-							return () => hotkey({ hotkey: item.hotkey!, decoration_only: true })
-						})({}),
+					item_title({ kindergarten: () => [item.render_icon && item_icon({ render: item.render_icon }), item.readable_name] }),
+					item.hotkey && item_info({ kindergarten: () => hotkey({ hotkey: item.hotkey!, decoration_only: true }) }),
 				],
 			}),
 			item_footer({ kindergarten: () => item.description }),
 		]
 	})
 
-	// TODO Styled
-	const item_main = maoka.create("div", ({ kindergarten, use }) => {
-		use(maoka_jabs.set_class("command-palette_item_main"))
-
-		return kindergarten
-	})
-
-	const item_footer = maoka.create("div", ({ kindergarten, use }) => {
-		use(maoka_jabs.set_class("command-palette_item_footer"))
-
-		return kindergarten
-	})
-
-	const item_icon_span = maoka.create<{ render: Ordo.CommandPalette.RenderIcon }>("span", ({ render, use }) =>
-		use(maoka_dom.jabs.if_dom(n => void render(n.value))),
+	const item_title = maoka_styled.div("command-palette_item_title-wrapper")
+	const item_info = maoka_styled.div("command-palette_item_info")
+	const item_main = maoka_styled.div("command-palette_item_main")
+	const items_wrapper = maoka_styled.div("command-palette_items_multiple-wrapper")
+	const items = maoka_styled.div("command-palette_items")
+	const item_footer = maoka_styled.div("command-palette_item_footer")
+	const item_icon = maoka_styled.span<{ render: Ordo.CommandPalette.RenderIcon }>(
+		"command-palette_item_icon",
+		({ render, use }) => use(maoka_dom.jabs.if_dom(n => void render(n.value))),
 	)
 
-	const search = maoka.create("input", ({ use }) => {
+	const search = maoka_styled.input("command-palette_search", ({ use }) => {
 		const t_search = "Search..." // TODO i18n
 
 		const handle_mount = () => use(maoka_dom.jabs.if_dom(n => n.value.focus()))
 
-		use(maoka_jabs.set_class("command-palette_search"))
-		use(maoka_dom.jabs.onmount(handle_mount))
 		use(maoka_jabs.set_id("cp-input"))
 		use(maoka_jabs.set_attribute("placeholder", t_search))
 		use(maoka_jabs.set_attribute("autocomplete", "off"))
-	})
-
-	const items_wrapper = maoka.create("div", ({ kindergarten, use }) => {
-		use(maoka_jabs.set_class("command-palette_items_multiple-wrapper"))
-
-		return kindergarten
-	})
-
-	const items = maoka.create("div", ({ kindergarten, use }) => {
-		use(maoka_jabs.set_class("command-palette_items"))
-
-		return kindergarten
+		use(maoka_dom.jabs.onmount(handle_mount))
 	})
 }
 
@@ -163,15 +167,15 @@ const hotkey = maoka.create<HotkeyOptions>(
 		const is_darwin = use(maoka_jabs.is_darwin)
 
 		use(maoka_jabs.set_class("hotkey"))
-		if (!decoration_only) use(maoka_jabs.listen_global_event("keydown", e => handle_keydown(e)))
 		if (show_in_mobile) use(maoka_jabs.add_class("mobile"))
+		if (!decoration_only) use(maoka_jabs.listen_global_event("keydown", e => handle_keydown(e)))
 
 		const split = hotkey.split("+")
-		const meta = is_darwin ? Key({ kindergarten: () => "⌥" }) : Key({ kindergarten: () => "Alt" })
-		const mod = is_darwin ? Key({ kindergarten: () => "⌘" }) : Key({ kindergarten: () => "Ctrl" })
-		const ctrl = Key({ kindergarten: () => "Ctrl" })
-		const option = Key({ kindergarten: () => "⌥" })
-		const shift = Key({ kindergarten: () => "⇧" })
+		const meta = is_darwin ? Key({ key: "⌥" }) : Key({ key: "Alt" })
+		const mod = is_darwin ? Key({ key: "⌘" }) : Key({ key: "Ctrl" })
+		const ctrl = Key({ key: "Ctrl" })
+		const option = Key({ key: "⌥" })
+		const shift = Key({ key: "⇧" })
 		const symbol = split[split.length - 1].toLowerCase()
 
 		const handle_keydown = (e: KeyboardEvent) => {
@@ -199,17 +203,15 @@ const hotkey = maoka.create<HotkeyOptions>(
 			split.includes("mod") ? mod : void 0,
 			split.includes("shift") ? shift : void 0,
 
-			Key({ kindergarten: () => symbol }),
+			Key({ key: symbol }),
 		]
 	},
 )
 
 const IGNORED_KEYS = ["Control", "Shift", "Alt", "Meta"]
 
-const Key = maoka.create("span", ({ use, kindergarten }) => {
+const Key = maoka.create<{ key: string }>("span", ({ use, key }) => {
 	use(maoka_jabs.set_class("key-container"))
-
-	const key = kindergarten?.() ?? ""
 
 	return () =>
 		sweech
@@ -222,6 +224,5 @@ const Key = maoka.create("span", ({ use, kindergarten }) => {
 			.case("arrowright", () => "→")
 			.case("arrowup", () => "↑")
 			.case("arrowdown", () => "↓")
-			.case(is_string, () => title_case(key as string))
-			.default(() => key)
+			.default(() => title_case(key))
 })

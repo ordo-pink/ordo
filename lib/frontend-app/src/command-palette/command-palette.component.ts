@@ -8,7 +8,7 @@ import { title_case } from "@ordo-pink/tau"
 import { app_context } from "../../app-context"
 import { command_palette$ } from "./command-palette.state"
 
-export const command_palette = () => internal.overlay({ kindergarten: () => internal.modal({}) })
+export const command_palette = () => internal.overlay(internal.modal)
 
 namespace internal {
 	export const overlay = maoka.create("div", ({ kindergarten, use }) => {
@@ -76,34 +76,23 @@ namespace internal {
 
 			return [
 				// TODO clean up here
-				maoka.create("label", ({ use }) => {
-					use(maoka_jabs.set_class("command-palette_search_wrapper"))
-
-					return () => [bs_search({}), search({})]
-				})({}),
+				search_label(() => [bs_search({ classes: "" }), search()]),
 				// TODO open via route fragment and query
 				// TODO create subitems if item is found with fuzzy search but the match is not exact
 				current.is_multiple
-					? items_wrapper({
-							kindergarten: () => [
-								items({ kindergarten: () => current.items.map(item => list_item({ item })) }),
-								items({ kindergarten: () => current.pinned_items?.map(item => list_item({ item })) }),
-							],
-						})
-					: items({ kindergarten: () => current.items.map(item => list_item({ item })) }),
-				// TODO clean up here
-				maoka.create("div", ({ use }) => {
-					use(maoka_jabs.set_class("command-palette_footer"))
-
-					return () => [
-						bs_question_circle({ classes: "mr-2" }),
-						"Type to search. Arrows to navigate.",
-						hotkey({ hotkey: "enter", decoration_only: true }),
-						"to select item.",
-						hotkey({ hotkey: "escape", decoration_only: true }),
-						"to close.",
-					]
-				})({}), // TODO Automatically provide empty args?
+					? items_wrapper(() => [
+							items(() => current.items.map(item => list_item({ item }))),
+							items(() => current.pinned_items?.map(item => list_item({ item }))),
+						])
+					: items(() => current.items.map(item => list_item({ item }))),
+				footer(() => [
+					bs_question_circle({ classes: "mr-2" }),
+					text_span(() => "Type to search. Arrows to navigate."),
+					hotkey({ hotkey: "enter", decoration_only: true }),
+					text_span(() => "to select item."),
+					hotkey({ hotkey: "escape", decoration_only: true }),
+					text_span(() => "to close."),
+				]),
 			]
 		}
 	})
@@ -118,16 +107,17 @@ namespace internal {
 
 		return () => [
 			// TODO Shortcut for providing kindergarten directly
-			item_main({
-				kindergarten: () => [
-					item_title({ kindergarten: () => [item.render_icon && item_icon({ render: item.render_icon }), item.readable_name] }),
-					item.hotkey && item_info({ kindergarten: () => hotkey({ hotkey: item.hotkey!, decoration_only: true }) }),
-				],
-			}),
-			item_footer({ kindergarten: () => item.description }),
+			item_main(() => [
+				item_title(() => [item.render_icon && item_icon({ render: item.render_icon }), item.readable_name]),
+				item.hotkey && item_info(() => hotkey({ hotkey: item.hotkey!, decoration_only: true })),
+			]),
+			item_footer(() => item.description),
 		]
 	})
 
+	const search_label = maoka_styled.label("command-palette_search_wrapper")
+	const text_span = maoka_styled.span("")
+	const footer = maoka_styled.div("command-palette_footer")
 	const item_title = maoka_styled.div("command-palette_item_title-wrapper")
 	const item_info = maoka_styled.div("command-palette_item_info")
 	const item_main = maoka_styled.div("command-palette_item_main")
@@ -139,7 +129,7 @@ namespace internal {
 		({ render, use }) => use(maoka_dom.jabs.if_dom(n => void render(n.value))),
 	)
 
-	const search = maoka_styled.input("command-palette_search", ({ use }) => {
+	const search = maoka_styled.input<void>("command-palette_search", ({ use }) => {
 		const t_search = "Search..." // TODO i18n
 
 		const handle_mount = () => use(maoka_dom.jabs.if_dom(n => n.value.focus()))
@@ -171,11 +161,11 @@ const hotkey = maoka.create<HotkeyOptions>(
 		if (!decoration_only) use(maoka_jabs.listen_global_event("keydown", e => handle_keydown(e)))
 
 		const split = hotkey.split("+")
-		const meta = is_darwin ? Key({ key: "⌥" }) : Key({ key: "Alt" })
-		const mod = is_darwin ? Key({ key: "⌘" }) : Key({ key: "Ctrl" })
-		const ctrl = Key({ key: "Ctrl" })
-		const option = Key({ key: "⌥" })
-		const shift = Key({ key: "⇧" })
+		const meta = is_darwin ? hotkey_button({ key: "⌥" }) : hotkey_button({ key: "Alt" })
+		const mod = is_darwin ? hotkey_button({ key: "⌘" }) : hotkey_button({ key: "Ctrl" })
+		const ctrl = hotkey_button({ key: "Ctrl" })
+		const option = hotkey_button({ key: "⌥" })
+		const shift = hotkey_button({ key: "⇧" })
 		const symbol = split[split.length - 1].toLowerCase()
 
 		const handle_keydown = (e: KeyboardEvent) => {
@@ -203,14 +193,14 @@ const hotkey = maoka.create<HotkeyOptions>(
 			split.includes("mod") ? mod : void 0,
 			split.includes("shift") ? shift : void 0,
 
-			Key({ key: symbol }),
+			hotkey_button({ key: symbol }),
 		]
 	},
 )
 
 const IGNORED_KEYS = ["Control", "Shift", "Alt", "Meta"]
 
-const Key = maoka.create<{ key: string }>("span", ({ use, key }) => {
+const hotkey_button = maoka.create<{ key: string }>("span", ({ use, key }) => {
 	use(maoka_jabs.set_class("key-container"))
 
 	return () =>

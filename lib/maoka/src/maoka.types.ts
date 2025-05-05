@@ -47,13 +47,19 @@ export namespace Maoka {
 		kindergarten?: Maoka.Kindergarten
 	}
 
-	export type Args<$Args extends Maoka.BaseArgs = Maoka.BaseArgs> = $Args & {
-		use: Maoka.Use
-		node: Maoka.Node
-		kindergarten?: Kindergarten
-	}
+	export type Args<$Args extends Maoka.BaseArgs | void = void> = $Args extends void
+		? {
+				use: Maoka.Use
+				node: Maoka.Node
+				kindergarten?: Kindergarten
+			}
+		: $Args & {
+				use: Maoka.Use
+				node: Maoka.Node
+				kindergarten?: Kindergarten
+			}
 
-	export type Fn<$Args extends Maoka.BaseArgs = Maoka.BaseArgs> = (
+	export type Fn<$Args extends Maoka.BaseArgs | void = void> = (
 		args: Maoka.Args<$Args>,
 	) => Kindergarten | Promise<Kindergarten> | void
 
@@ -65,10 +71,10 @@ export namespace Maoka {
 
 	export type Component = (root: Maoka.Root) => Maoka.Node | Promise<Maoka.Node>
 
-	export type CreateComponent = <$Args extends Maoka.BaseArgs = Maoka.BaseArgs>(
+	export type CreateComponent = <$Args extends Maoka.BaseArgs | void = void>(
 		tag: string,
 		f: Maoka.Fn<Args<$Args>>,
-	) => (args: $Args) => Maoka.Component
+	) => (args: $Args | Maoka.Kindergarten) => Maoka.Component
 
 	export type Tags = Record<(typeof HTML_TAGS)[number], (f: Maoka.Fn) => Maoka.Component>
 

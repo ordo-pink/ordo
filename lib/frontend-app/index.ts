@@ -106,7 +106,7 @@ export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
 
 	// TODO Init user
 	return () => [
-		internal.command_palette_button({}),
+		internal.command_palette_button(),
 		command_palette,
 		// OrdoWorkspace,
 		// OrdoSidebar,

@@ -14,7 +14,7 @@ export namespace maoka {
 		node: (x: any): x is Maoka.Node => !!x && typeof x === "object" && x[NODE_MARK],
 	}
 
-	export const create: Maoka.CreateComponent = (tag, callback) => (args: Maoka.Args<any>) => {
+	export const create: Maoka.CreateComponent = (tag, callback) => args => {
 		const component = async (root: Maoka.Root) => {
 			const value = root.create_value(tag)
 			const node: Maoka.Node = {
@@ -26,7 +26,10 @@ export namespace maoka {
 			}
 			const use: Maoka.Use = jab => jab({ use, node })
 
-			node.kindergarten = await callback({ ...args, use, node })
+			node.kindergarten =
+				typeof args === "function"
+					? await callback({ kindergarten: args, use, node } as any)
+					: await callback({ ...args, use, node } as any)
 
 			return node
 		}

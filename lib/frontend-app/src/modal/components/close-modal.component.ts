@@ -10,6 +10,7 @@ export const close_modal = maoka.create("div", ({ use }) => {
 
 	const handle_global_esc = (event: KeyboardEvent) => {
 		if (event.code !== "Escape" || !modal$.select("instance")) return
+		event.stopImmediatePropagation()
 		hunter.shoot("modal.hide")
 	}
 

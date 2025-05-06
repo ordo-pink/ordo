@@ -70,8 +70,8 @@ export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
 	use(app_context.provide({ fetch, hosts, hunter, logger, translate }))
 	use(auth_jab)
 
-	const command_palette = use(create_command_palette_jab)
 	const modal = use(create_modal_jab)
+	const command_palette = use(create_command_palette_jab)
 
 	// ordo_app_state.zags.update("hosts.id", () => id_host)
 	// ordo_app_state.zags.update("hosts.dt", () => dt_host)

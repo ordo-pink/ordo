@@ -1,0 +1,7 @@
+.auth_join-modal {
+	@apply flex flex-col gap-y-2 p-4;
+}
+
+.auth_join-modal_title {
+	@apply text-2xl font-bold;
+}

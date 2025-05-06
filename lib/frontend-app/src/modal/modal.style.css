@@ -1,5 +1,5 @@
 .modal_wrapper {
-	@apply fixed bottom-0 left-0 right-0 top-0 hidden items-center justify-center backdrop-blur-sm;
+	@apply fixed bottom-0 left-0 right-0 top-0 z-50 hidden items-center justify-center backdrop-blur-sm;
 }
 
 .modal_wrapper.active {
@@ -7,7 +7,7 @@
 }
 
 .modal {
-	@apply m-4 cursor-default bg-neutral-200 shadow-lg dark:bg-neutral-900;
+	@apply m-4 cursor-default rounded-md bg-neutral-100 shadow-lg dark:bg-neutral-950;
 }
 
 .modal.sm {

@@ -45,7 +45,6 @@ export const modal = maoka.create("div", ({ use }) => {
 				return command_palette$.update("index", i => (i <= 0 ? filtered_items.length - 1 : i - 1))
 			} else if (event.code === "Enter") {
 				current.on_select(filtered_items[command_palette$.select("index")])
-				hunter.shoot("command_palette.hide")
 			}
 
 			for (let i = 0; i < current.items.length; i++) {

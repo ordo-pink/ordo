@@ -9,6 +9,8 @@ import { app_context } from "../../app-context"
 import { auth$ } from "./auth.state"
 import { join_modal } from "./components/join.component"
 
+import "./auth.styles.css"
+
 export const auth_jab: Maoka.Jab = ({ use }) => {
 	use(internal.refresh_session_jab)
 }
@@ -22,7 +24,7 @@ namespace internal {
 		const handle_mount = () => {
 			const release_join = hunter.track("auth.show_request_code_modal", () => {
 				hunter.shoot("modal.show", {
-					size: MODAL_SIZE.MD,
+					size: MODAL_SIZE.SM,
 					render: div => maoka_dom.render(div, join_modal(), node.root.create_id),
 				})
 			})
@@ -34,6 +36,7 @@ namespace internal {
 				value: () => hunter.shoot("auth.show_request_code_modal"),
 				description: "Sign up/sign in. Make sure you enter email correcly - we'll send a code there.",
 				type: COMMAND_PALETTE_ITEM_TYPE.MODAL_OPENER,
+				hotkey: "mod+j",
 			})
 
 			const refresh_session0 = oath

@@ -1,5 +1,5 @@
 .command-palette {
-	@apply m-4 flex size-full h-dvh max-h-96 max-w-screen-md cursor-default flex-col space-y-1 rounded-md bg-neutral-200 shadow-lg dark:bg-neutral-900;
+	@apply z-40 m-4 flex size-full h-dvh max-h-96 max-w-screen-md cursor-default flex-col space-y-1 rounded-md bg-neutral-200 shadow-lg dark:bg-neutral-900;
 }
 
 .command-palette_wrapper {

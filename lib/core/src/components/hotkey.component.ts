@@ -4,6 +4,8 @@ import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { sweech } from "@ordo-pink/sweech"
 import { title_case } from "@ordo-pink/tau"
 
+import "./hotkey.styles.css"
+
 export type HotkeyOptions = {
 	hotkey: string
 	prevent_in_inputs?: boolean

@@ -10,6 +10,7 @@ import { auth$ } from "./auth.state"
 import { join_modal } from "./components/join.component"
 
 import "./auth.styles.css"
+import { verify_code_modal } from "./components/verify-code.component"
 
 export const auth_jab: Maoka.Jab = ({ use }) => {
 	use(internal.refresh_session_jab)
@@ -19,13 +20,21 @@ namespace internal {
 	const COMMAND_PALETTE_JOIN_ID = "auth.join"
 
 	export const refresh_session_jab: Maoka.Jab = ({ use, node }) => {
-		const { fetch, hosts, hunter } = use(app_context.consume)
+		const state = use(app_context.consume)
+		const { fetch, hosts, hunter } = state
 
 		const handle_mount = () => {
 			const release_join = hunter.track("auth.show_request_code_modal", () => {
 				hunter.shoot("modal.show", {
 					size: MODAL_SIZE.SM,
-					render: div => maoka_dom.render(div, join_modal(), node.root.create_id),
+					render: div => maoka_dom.render(div, join_modal(state), node.root.create_id),
+				})
+			})
+
+			const release_verify = hunter.track("auth.show_verify_code_modal", () => {
+				hunter.shoot("modal.show", {
+					size: MODAL_SIZE.SM,
+					render: div => maoka_dom.render(div, verify_code_modal(state), node.root.create_id),
 				})
 			})
 
@@ -55,6 +64,7 @@ namespace internal {
 				refresh_session0.cancel("Root component refreshed")
 				hunter.shoot("command_palette.remove", COMMAND_PALETTE_JOIN_ID)
 				release_join()
+				release_verify()
 			}
 		}
 

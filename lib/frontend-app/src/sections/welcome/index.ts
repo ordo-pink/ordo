@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { BsCollection, BsEnvelopeAt, BsQuestionOctagon, BsSendCheck } from "@ordo-pink/frontend-icons"
+import { BsCollection, bs_envelope_at, BsQuestionOctagon, BsSendCheck } from "@ordo-pink/frontend-icons"
 import { COMMAND_PALETTE_ITEM_TYPE, create_function } from "@ordo-pink/core"
 import { TWO_LETTER_LOCALE } from "@ordo-pink/locale"
 
@@ -112,7 +112,7 @@ export default create_function(
 						readable_name: "t.welcome.command_palette.support.email",
 						value: "cmd.welcome.go_to_email_support",
 						hotkey: "1",
-						render_icon: BsEnvelopeAt,
+						render_icon: bs_envelope_at,
 					},
 					{
 						readable_name: "t.welcome.command_palette.support.messenger",

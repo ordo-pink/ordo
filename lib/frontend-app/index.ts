@@ -68,6 +68,7 @@ export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
 	const fetch = window.fetch // TODO Replace with patched fetch
 	const translate = null as any // TODO
 	use(app_context.provide({ fetch, hosts, hunter, logger, translate }))
+
 	use(auth_jab)
 
 	const modal = use(create_modal_jab)

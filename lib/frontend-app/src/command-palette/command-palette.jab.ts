@@ -80,7 +80,7 @@ namespace internal {
 
 	namespace guns {
 		export const command_palette_add: Ordo.GunFor<"command_palette.add"> = item =>
-			command_palette$.update("items", items => [...items, item])
+			command_palette$.update("items", items => (items.some(i => i.id === item.id) ? items : [...items, item]))
 
 		export const command_palette_hide: Ordo.GunFor<"command_palette.hide"> = () =>
 			command_palette$.each({

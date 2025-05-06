@@ -10,18 +10,24 @@ export const modal = maoka.create("div", ({ use }) => {
 
 	const get_modal_instance = use(maoka_jabs.cheat$(modal$, "instance"))
 
+	const handle_click = (event: MouseEvent) => event.stopPropagation()
+
 	use(maoka_jabs.set_class("modal"))
+	use(maoka_jabs.listen("onclick", handle_click))
 
 	return () => {
 		const modal_instance = get_modal_instance()
 
-		if (onunmount) onunmount()
+		if (onunmount) {
+			onunmount()
+			onunmount = undefined
+		}
 
-		if (modal_instance) {
-			if (modal_instance.onunmount) onunmount = modal_instance.onunmount
-			if (modal_instance.size != null) use(maoka_jabs.add_class(internal.modal_size_to_class(modal_instance.size)))
-			void use(maoka_dom.jabs.if_dom(n => modal_instance.render(n.value as HTMLDivElement)))
-		} else return null
+		if (!modal_instance) return null
+
+		if (modal_instance.onunmount) onunmount = modal_instance.onunmount
+		if (modal_instance.size != null) use(maoka_jabs.add_class(internal.modal_size_to_class(modal_instance.size)))
+		void use(maoka_dom.jabs.if_dom(n => modal_instance.render(n.value as HTMLDivElement)))
 	}
 })
 

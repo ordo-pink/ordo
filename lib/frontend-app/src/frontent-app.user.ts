@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { BsBoxArrowInRight, BsBoxArrowRight } from "@ordo-pink/frontend-icons"
+import { bs_box_arrow_in_right, BsBoxArrowRight } from "@ordo-pink/frontend-icons"
 import { COMMAND_PALETTE_ITEM_TYPE, current_user, rrr } from "@ordo-pink/core"
 import { /* CheckboxInput, */ Dialog, Input } from "@ordo-pink/maoka-components"
 import { call_once, noop } from "@ordo-pink/tau"
@@ -94,7 +94,7 @@ export const init_user = call_once(() => {
 				readable_name: "t.auth.join",
 				type: COMMAND_PALETTE_ITEM_TYPE.MODAL_OPENER,
 				value: handle_show_request_code,
-				render_icon: BsBoxArrowInRight,
+				render_icon: bs_box_arrow_in_right,
 			})
 		}
 	})

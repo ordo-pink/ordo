@@ -73,7 +73,6 @@ export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
 	const command_palette = use(create_command_palette_jab)
 	const modal = use(create_modal_jab)
 
-	hunter.shoot("modal.show", { render: () => void 0 })
 	// ordo_app_state.zags.update("hosts.id", () => id_host)
 	// ordo_app_state.zags.update("hosts.dt", () => dt_host)
 	// ordo_app_state.zags.update("hosts.pb", () => pb_host)

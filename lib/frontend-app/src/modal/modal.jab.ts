@@ -1,13 +1,15 @@
 import { Maoka, maoka_dom } from "@ordo-pink/maoka"
 
 import { app_context } from "../../app-context"
+import { close_modal } from "./components/close-modal.component"
+import { modal } from "./components/modal.component"
 import { modal$ } from "./modal.state"
 import { overlay } from "./components/overlay.component"
 
 export const create_modal_jab: Maoka.Jab<() => Maoka.Component> = ({ use }) => {
 	use(internal.track_prey_jab)
 
-	return () => overlay(() => "HELLO")
+	return () => overlay(() => [modal(), close_modal()])
 }
 
 namespace internal {

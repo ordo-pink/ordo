@@ -27,6 +27,7 @@ import type { Zags } from "@ordo-pink/zags"
 
 import type * as C from "./constants"
 import { Hunt } from "@ordo-pink/hunt"
+import { MODAL_SIZE } from "./constants"
 
 export type TDropIsPrefix<T extends string> = T extends `is_${infer U}` ? U : never
 
@@ -1024,7 +1025,7 @@ declare global {
 		}
 
 		namespace Modal {
-			type Params = { onunmount?: () => void; render: (div: HTMLDivElement) => void | Promise<void> }
+			type Params = { onunmount?: () => void; render: (div: HTMLDivElement) => void | Promise<void>; size?: MODAL_SIZE }
 		}
 
 		namespace Router {

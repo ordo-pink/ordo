@@ -150,3 +150,11 @@ export enum COMMAND_PALETTE_ITEM_TYPE {
 	DESTRUCTIVE_ACTION,
 	length,
 }
+
+export enum MODAL_SIZE {
+	SM,
+	MD,
+	LG,
+	XL,
+	XXL,
+}

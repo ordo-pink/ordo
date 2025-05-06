@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { BsX } from "@ordo-pink/frontend-icons"
+import { bs_x } from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/maoka"
 import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 
@@ -36,5 +36,5 @@ export const ModalCloseButton = Maoka.create("button", ({ use }) => {
 		commands.emit("cmd.application.modal.hide")
 	}
 
-	return BsX
+	return bs_x
 })

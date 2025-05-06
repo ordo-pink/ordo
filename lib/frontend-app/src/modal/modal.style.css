@@ -5,3 +5,32 @@
 .modal_wrapper.active {
 	@apply flex cursor-pointer;
 }
+
+.modal {
+	@apply m-4 cursor-default bg-neutral-200 shadow-lg dark:bg-neutral-900;
+}
+
+.modal.sm {
+	@apply w-full max-w-screen-sm;
+}
+
+.modal.md {
+	@apply w-full max-w-screen-md;
+}
+
+.modal.lg {
+	@apply w-full max-w-screen-lg;
+}
+
+.modal.xl {
+	@apply w-full max-w-screen-xl;
+}
+
+.modal.2xl {
+	@apply w-full max-w-screen-2xl;
+}
+
+.modal_close {
+	@apply fixed right-2 top-2 text-3xl;
+	@apply transition-colors hover:text-pink-500;
+}

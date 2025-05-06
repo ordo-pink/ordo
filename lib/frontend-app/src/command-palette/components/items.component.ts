@@ -1,7 +1,7 @@
 import { maoka, maoka_styled } from "@ordo-pink/maoka"
 import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 
-import { COMMAND_PALETTE_SECTION } from "../command-palette.contants"
+import { COMMAND_PALETTE_SECTION, FUZZY_CHECK_RATIO } from "../command-palette.contants"
 import { command_palette$ } from "../command-palette.state"
 import { command_palette_item } from "./item.component"
 import { fuzzy_check } from "@ordo-pink/tau"
@@ -16,7 +16,7 @@ export const command_palette_items = maoka.create("div", ({ use }) => {
 
 		if (!state.current) return null
 
-		const visible_items = state.current.items.filter(i => fuzzy_check(i.readable_name, state.search_value, 0.7))
+		const visible_items = state.current.items.filter(i => fuzzy_check(i.readable_name, state.search_value, FUZZY_CHECK_RATIO))
 
 		if (!visible_items.length)
 			return internal.nothing_found_div(() => `Nothing matches the search term "${state.search_value}"`)

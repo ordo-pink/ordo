@@ -2,3 +2,5 @@ export enum COMMAND_PALETTE_SECTION {
 	ITEMS,
 	PINNED_ITEMS,
 }
+
+export const FUZZY_CHECK_RATIO = 0.7

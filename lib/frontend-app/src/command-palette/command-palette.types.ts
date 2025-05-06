@@ -24,6 +24,7 @@ import { COMMAND_PALETTE_SECTION } from "./command-palette.contants"
 export namespace CommandPalette {
 	export type State = {
 		current?: Ordo.CommandPalette.Instance
+		visible_items?: Ordo.CommandPalette.Item[]
 		items: Ordo.CommandPalette.Item[]
 		location: COMMAND_PALETTE_SECTION
 		index: number

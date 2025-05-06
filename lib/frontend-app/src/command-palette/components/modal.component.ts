@@ -4,11 +4,12 @@ import { create_hotkey_from_event } from "@ordo-pink/hotkey-from-event"
 import { hotkey } from "@ordo-pink/core"
 import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 
-import { COMMAND_PALETTE_SECTION } from "../command-palette.contants"
+import { COMMAND_PALETTE_SECTION, FUZZY_CHECK_RATIO } from "../command-palette.contants"
 import { app_context } from "../../../app-context"
 import { command_palette$ } from "../command-palette.state"
 import { command_palette_items } from "./items.component"
 import { command_palette_search } from "./search.component"
+import { fuzzy_check } from "@ordo-pink/tau"
 
 // TODO open via route fragment and query
 // TODO create subitems if item is found with fuzzy search but the match is not exact
@@ -28,16 +29,22 @@ export const modal = maoka.create("div", ({ use }) => {
 		const parsed_hotkey = create_hotkey_from_event(event, is_darwin)
 
 		if (current) {
+			const filtered_items = current.items.filter(i =>
+				fuzzy_check(i.readable_name, command_palette$.select("search_value"), FUZZY_CHECK_RATIO),
+			)
+
 			if (current.is_multiple && event.code === "Tab")
 				return command_palette$.update("location", l =>
 					l === COMMAND_PALETTE_SECTION.ITEMS ? COMMAND_PALETTE_SECTION.PINNED_ITEMS : COMMAND_PALETTE_SECTION.ITEMS,
 				)
-			else if (event.code === "ArrowDown")
-				return command_palette$.update("index", i => (i === current.items.length - 1 ? 0 : i + 1))
-			else if (event.code === "ArrowUp")
-				return command_palette$.update("index", i => (i === 0 ? current.items.length - 1 : i - 1))
-			else if (event.code === "Enter") {
-				current.on_select(current.items[command_palette$.select("index")])
+			else if (event.code === "ArrowDown") {
+				event.preventDefault()
+				return command_palette$.update("index", i => (i >= filtered_items.length - 1 ? 0 : i + 1))
+			} else if (event.code === "ArrowUp") {
+				event.preventDefault()
+				return command_palette$.update("index", i => (i <= 0 ? filtered_items.length - 1 : i - 1))
+			} else if (event.code === "Enter") {
+				current.on_select(filtered_items[command_palette$.select("index")])
 				hunter.shoot("command_palette.hide")
 			}
 

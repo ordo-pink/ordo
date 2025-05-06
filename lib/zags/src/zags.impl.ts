@@ -17,7 +17,7 @@ export const create_zags: Zags.Module = (state, partners = []) => ({
 			const location: Record<string, any> = keys.slice(0, -1).reduce((acc, key) => acc[key], state)
 			const current_value = location[keys[keys.length - 1]]
 
-			if (!deep_equals(current_value, value)) {
+			if (!is_update || !deep_equals(current_value, value)) {
 				value = current_value
 				f(value, is_update)
 			}

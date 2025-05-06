@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { bs_box_arrow_in_right, BsBoxArrowRight } from "@ordo-pink/frontend-icons"
+import { bs_box_arrow_in_right, bs_box_arrow_right } from "@ordo-pink/frontend-icons"
 import { COMMAND_PALETTE_ITEM_TYPE, current_user, rrr } from "@ordo-pink/core"
 import { /* CheckboxInput, */ Dialog, Input } from "@ordo-pink/maoka-components"
 import { call_once, noop } from "@ordo-pink/tau"
@@ -85,7 +85,7 @@ export const init_user = call_once(() => {
 				readable_name: "t.auth.leave",
 				value: handle_sign_out,
 				type: COMMAND_PALETTE_ITEM_TYPE.DESTRUCTIVE_ACTION,
-				render_icon: BsBoxArrowRight,
+				render_icon: bs_box_arrow_right,
 			})
 		} else {
 			commands.on("cmd.auth.show_request_code_modal", handle_show_request_code)

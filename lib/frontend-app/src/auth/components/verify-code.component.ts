@@ -1,6 +1,7 @@
+import { button, current_user } from "@ordo-pink/core"
 import { maoka, maoka_dom, maoka_styled } from "@ordo-pink/maoka"
 import { bs_question_circle } from "@ordo-pink/frontend-icons"
-import { button } from "@ordo-pink/core"
+import { get_device_info } from "@ordo-pink/get-device-info"
 import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { noop } from "@ordo-pink/tau"
 import { oath } from "@ordo-pink/oath"
@@ -12,34 +13,29 @@ export const verify_code_modal = maoka.create<Ordo.State>("div", ({ fetch, hosts
 
 	const handle_cancel_click = () => void hunter.shoot("modal.hide")
 
-	const handle_mount = () => {
-		const divorce_code = auth$.cheat("code", code => {
-			if (code.length !== 6) return
+	const handle_ok_click = () => {
+		const { code, email } = auth$.unwrap()
 
-			const email = auth$.select("email")
-
-			oath
-				.of(new Headers())
-				.pipe(oath.ops.tap(h => h.append("Content-Type", "application/json")))
-				.pipe(oath.ops.map(headers => ({ headers, method: "POST", credentials: "include" as const })))
-				.pipe(oath.ops.map(init => ({ ...init, body: JSON.stringify({ code: Number(code), email }) })))
-				// TODO Show loader
-				.pipe(oath.ops.chain(init => oath.from_promise(() => fetch(`${hosts.au}/verify-code`, init))))
-				.pipe(oath.ops.and(res => res.json()))
-				.pipe(oath.ops.chain(res => oath.if(res.success, { on_true: () => res.payload })))
-				.pipe(oath.ops.tap(user => auth$.each({ email: () => "", code: () => "", user: () => user })))
-				.pipe(oath.ops.tap(() => hunter.shoot("modal.hide")))
-				.cata(oath.catas.to_promise())
-				// TODO Send success notification
-				.catch(noop) // TODO Show error
-		})
-
-		return () => {
-			divorce_code()
+		if (code.length !== 6 || email.length < 5 || email.length > 255 || !current_user.validations.is_email(email)) {
+			return // TODO Show error
 		}
-	}
 
-	use(maoka_dom.jabs.onmount(handle_mount))
+		// TODO Use proper session ids
+
+		oath
+			.of(new Headers())
+			.pipe(oath.ops.tap(h => h.append("X-Device", get_device_info(navigator))))
+			.pipe(oath.ops.tap(h => h.append("Content-Type", "application/json")))
+			.pipe(oath.ops.map(headers => ({ headers, method: "POST", credentials: "include" as const })))
+			.pipe(oath.ops.map(init => ({ ...init, body: JSON.stringify({ code: Number(code), email }) })))
+			.pipe(oath.ops.chain(init => oath.from_promise(() => fetch(`${hosts.au}/verify-code`, init))))
+			.pipe(oath.ops.and(res => res.json()))
+			.pipe(oath.ops.chain(res => oath.if(res.success, { on_true: () => res.payload })))
+			.pipe(oath.ops.tap(user => auth$.each({ email: () => "", code: () => "", user: () => user })))
+			.pipe(oath.ops.tap(() => hunter.shoot("modal.hide")))
+			.cata(oath.catas.to_promise())
+			.catch(noop) // TODO Show error
+	}
 
 	return () => [
 		internal.title(() => "Join ORDO"),
@@ -47,6 +43,7 @@ export const verify_code_modal = maoka.create<Ordo.State>("div", ({ fetch, hosts
 		internal.code_input(),
 		internal.button_section(() => [
 			button.neutral({ on_click: () => handle_cancel_click(), kindergarten: () => "Cancel", hotkey: "escape" }),
+			button.primary({ on_click: () => handle_ok_click(), kindergarten: () => "Submit", hotkey: "enter" }),
 		]),
 	]
 })

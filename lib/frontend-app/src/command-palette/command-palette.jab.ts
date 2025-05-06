@@ -91,7 +91,7 @@ namespace internal {
 			})
 
 		export const command_palette_remove: Ordo.GunFor<"command_palette.remove"> = id =>
-			command_palette$.update("items", items => items.filter(i => i.id === id))
+			command_palette$.update("items", items => items.filter(i => i.id !== id))
 
 		export const command_palette_show: Ordo.GunFor<"command_palette.show"> = new_current => {
 			command_palette$.update("current", () => new_current ?? global_palette())

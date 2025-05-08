@@ -20,7 +20,7 @@
  */
 
 import * as tau from "@ordo-pink/tau"
-import { current_user, CURRENT_USER_KEYS, rrr } from "@ordo-pink/core"
+import { CURRENT_USER_KEYS, current_user, rrr } from "@ordo-pink/core"
 import { Oath, oath } from "@ordo-pink/oath"
 import { default_handler, huyami } from "@ordo-pink/routary-ordo"
 
@@ -122,14 +122,14 @@ const get_or_create_user = (intake: BackendAuth.Intake) => (email: Ordo.User.Ema
 const create_session_id = (intake: BackendAuth.Intake) => (user: Ordo.User.Current.Instance) =>
 	oath
 		.try(() => [crypto.randomUUID(), Date.now(), `${intake.req.headers.get("X-Device")}`] as Ordo.User.Session)
-		.pipe(oath.ops.map(sid => ({ sid, user })))
+		.pipe(oath.ops.map(session => ({ session, user })))
 		.pipe(oath.ops.rmap(error => rrr.codes.eio("Failed to create session", error)))
 
-type P2 = { sid: Ordo.User.Session; user: Ordo.User.Current.Instance }
+type P2 = { session: Ordo.User.Session; user: Ordo.User.Current.Instance }
 const persist_session_id = (intake: BackendAuth.Intake) => (params: P2) =>
 	oath
 		.of(params.user.to_dto())
-		.pipe(oath.ops.tap(dto => void (dto[CURRENT_USER_KEYS.SESSIONS] = [...dto[CURRENT_USER_KEYS.SESSIONS], params.sid])))
+		.pipe(oath.ops.tap(dto => void (dto[CURRENT_USER_KEYS.SESSIONS] = [...dto[CURRENT_USER_KEYS.SESSIONS], params.session])))
 		.pipe(oath.ops.chain(dto => intake.persistence_strategy_user.update(params.user.get_uid(), current_user.from_dto(dto))))
 		.pipe(oath.ops.chain(user => intake.reference_mapping_user.refresh(user.get_uid())))
 		.pipe(oath.ops.map(() => params))
@@ -137,5 +137,5 @@ const persist_session_id = (intake: BackendAuth.Intake) => (params: P2) =>
 const set_cookie = (intake: BackendAuth.Intake) => (params: P2) =>
 	intake.headers.set(
 		"Set-Cookie",
-		`${params.user.get_uid()}=${params.sid[0]}; Secure; HttpOnly; SameSite=Strict; Path=/; Max-Age=${intake.session_lifetime_s}`,
+		`${params.user.get_uid()}=${params.session[0]}; Secure; HttpOnly; SameSite=Strict; Path=/; Max-Age=${intake.session_lifetime_s}`,
 	)

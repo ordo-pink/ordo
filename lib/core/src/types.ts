@@ -28,6 +28,7 @@ import type { Zags } from "@ordo-pink/zags"
 import type * as C from "./constants"
 import { Hunt } from "@ordo-pink/hunt"
 import { MODAL_SIZE } from "./constants"
+import { RoutaryBrowser } from "@ordo-pink/routary-browser"
 
 export type TDropIsPrefix<T extends string> = T extends `is_${infer U}` ? U : never
 
@@ -369,6 +370,7 @@ declare global {
 			translate: Ordo.I18N.TranslateFn
 			logger: Logger
 			hunter: Ordo.Hunter
+			rotor: RoutaryBrowser.Instance
 			// TODO: zags: Ordo.Rings
 		}
 

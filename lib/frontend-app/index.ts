@@ -55,6 +55,7 @@ import { create_command_palette_jab } from "./src/command-palette"
 import "./index.css"
 import { auth_jab } from "./src/auth"
 import { create_modal_jab } from "./src/modal"
+import { create_routary_browser } from "@ordo-pink/routary-browser"
 
 export type AppOptions = {
 	hosts: Ordo.Hosts
@@ -67,7 +68,8 @@ export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
 	const hunter = hunt.begin<Ordo.Preys>()
 	const fetch = window.fetch // TODO Replace with patched fetch
 	const translate = null as any // TODO
-	use(app_context.provide({ fetch, hosts, hunter, logger, translate }))
+	const rotor = create_routary_browser()
+	use(app_context.provide({ fetch, hosts, hunter, logger, rotor, translate }))
 
 	use(auth_jab)
 

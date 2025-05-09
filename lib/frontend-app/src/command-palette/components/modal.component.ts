@@ -14,9 +14,11 @@ import { fuzzy_check } from "@ordo-pink/tau"
 // TODO open via route fragment and query
 // TODO create subitems if item is found with fuzzy search but the match is not exact
 export const modal = maoka.create("div", ({ use }) => {
+	const { hunter, rotor } = use(app_context.consume)
+
 	const is_darwin = use(maoka_jabs.is_darwin)
-	const { hunter } = use(app_context.consume)
 	const get_current = use(maoka_jabs.cheat$(command_palette$, "current" as const))
+	const get_hash = use(maoka_jabs.cheat$(rotor, "hash" as const))
 
 	const handle_click = (event: MouseEvent) => event.stopPropagation()
 	const handle_global_keydown = (event: KeyboardEvent) => {
@@ -77,9 +79,10 @@ export const modal = maoka.create("div", ({ use }) => {
 	use(maoka_jabs.listen_global_event("keydown", handle_global_keydown))
 
 	return () => {
+		const hash = get_hash()
 		const current = get_current()
 
-		if (!current) return null
+		if (!hash || !current) return null
 
 		return [
 			command_palette_search(),

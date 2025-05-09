@@ -19,8 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { current_user, rrr } from "@ordo-pink/core"
 import { Oath, oath } from "@ordo-pink/oath"
+import { current_user, rrr } from "@ordo-pink/core"
 import { default_handler, huyami } from "@ordo-pink/routary-ordo"
 
 import * as fns from "../fns"

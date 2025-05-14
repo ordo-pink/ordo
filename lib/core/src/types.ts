@@ -236,6 +236,12 @@ declare global {
 			show: { args: Ordo.Modal.Params }
 			hide: { args: void }
 		}
+		router: {
+			set_hash: { args: string }
+			set_href: { args: string }
+			set_pathname: { args: string }
+			set_search: { args: string | Record<string, string> }
+		}
 		// application: {
 		// 	set_title: () => Ordo.I18N.TranslationKey
 		// 	add_translations: () => {
@@ -370,7 +376,7 @@ declare global {
 			translate: Ordo.I18N.TranslateFn
 			logger: Logger
 			hunter: Ordo.Hunter
-			rotor: RoutaryBrowser.Instance
+			rotor$: RoutaryBrowser.Instance["$"]
 			// TODO: zags: Ordo.Rings
 		}
 

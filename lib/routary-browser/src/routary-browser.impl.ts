@@ -6,46 +6,36 @@
 import { create_zags } from "@ordo-pink/zags"
 
 import { RoutaryBrowser } from "./routary-browser.types"
-import { call_once } from "@ordo-pink/tau"
 
-export const create_routary_browser: RoutaryBrowser.Module = call_once(() => {
-	let href: string | undefined
+export const create_routary_browser: RoutaryBrowser.Module = window => {
+	if (!window || !window.location) throw new Error("Cannot create routary_browser in non-browser environment")
 
-	const rotor$ = create_zags<RoutaryBrowser.State>({
-		hash: "",
-		hostname: "",
-		href: "",
-		origin: "",
-		pathname: "",
-		port: "",
-		protocol: "",
-		search: "",
+	const hash = window.location.hash.startsWith("#") ? window.location.hash.slice(1) : window.location.hash
+	const search = window.location.search.startsWith("?") ? window.location.search.slice(1) : window.location.search
+
+	internal.rotor$.replace(() => ({ hash, pathname: window.location.pathname, search }))
+
+	const destroy = internal.rotor$.marry((state, is_update) => {
+		if (!is_update) return
+
+		const url = ""
+			.concat(state.pathname.startsWith("/") ? state.pathname : `/${state.pathname}`)
+			.concat(state.search ? `?${state.search}` : "")
+			.concat(state.hash ? `#${state.hash}` : "")
+
+		window.history.pushState({}, "", url)
 	})
 
-	const next_tick = globalThis.requestIdleCallback ?? setTimeout
-
-	const handle_idle_callback = () => {
-		const new_href = window.location.href
-
-		if (href !== new_href) {
-			href = new_href
-
-			rotor$.each({
-				hash: () => window.location.hash,
-				hostname: () => window.location.hostname,
-				href: () => window.location.href,
-				origin: () => window.location.origin,
-				pathname: () => window.location.pathname,
-				port: () => window.location.port,
-				protocol: () => window.location.protocol,
-				search: () => window.location.search,
-			})
-		}
-
-		next_tick(handle_idle_callback)
+	return {
+		$: internal.rotor$,
+		destroy,
+		set_hash: hash => internal.rotor$.update("hash", () => hash),
+		set_pathname: pathname => internal.rotor$.update("pathname", () => pathname),
+		set_search: search => internal.rotor$.update("search", () => search),
+		set_search_params: params => internal.rotor$.update("search", () => new URLSearchParams(params).toString()),
 	}
+}
 
-	handle_idle_callback()
-
-	return rotor$
-})
+namespace internal {
+	export const rotor$ = create_zags<RoutaryBrowser.State>(RoutaryBrowser.DEFAULT_STATE)
+}

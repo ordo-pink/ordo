@@ -19,8 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Logger } from "@ordo-pink/logger"
-import { maoka } from "@ordo-pink/maoka"
+import { maoka, maoka_dom } from "@ordo-pink/maoka"
+import type { Logger } from "@ordo-pink/logger"
 
 // import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 // import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
@@ -47,15 +47,17 @@ import { maoka } from "@ordo-pink/maoka"
 // import { start_metadata_manager } from "./src/jabs/start-data-orchestrator.jab"
 
 // TODO Move fonts to assets
+
+import { LOCALE, create_i18n } from "@ordo-pink/i18n"
+import { context } from "@ordo-pink/sdk-maoka"
+import { create_routary_browser } from "@ordo-pink/routary-browser"
 import { hunt } from "@ordo-pink/hunt"
 
-import { app_context } from "./app-context"
+import { auth_jab } from "./src/auth"
 import { create_command_palette_jab } from "./src/command-palette"
+import { create_modal_jab } from "./src/modal"
 
 import "./index.css"
-import { auth_jab } from "./src/auth"
-import { create_modal_jab } from "./src/modal"
-import { create_routary_browser } from "@ordo-pink/routary-browser"
 
 export type AppOptions = {
 	hosts: Ordo.Hosts
@@ -63,65 +65,30 @@ export type AppOptions = {
 	logger: Logger
 }
 
-// TODO Move translations from file explorer
 export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
 	const hunter = hunt.begin<Ordo.Preys>()
 	const fetch = window.fetch // TODO Replace with patched fetch
-	const translate = null as any // TODO
-	const rotor = create_routary_browser()
-	use(app_context.provide({ fetch, hosts, hunter, logger, rotor, translate }))
+	const rotor = create_routary_browser(window)
+	const i18n = create_i18n<Pick<t, keyof t>>(LOCALE.ENGLISH)
+
+	use(context.provide({ fetch, hosts: Object.freeze(hosts), hunter, logger, rotor$: rotor.$, i18n$: i18n.$ }))
 
 	use(auth_jab)
 
 	const modal = use(create_modal_jab)
 	const command_palette = use(create_command_palette_jab)
 
-	// ordo_app_state.zags.update("hosts.id", () => id_host)
-	// ordo_app_state.zags.update("hosts.dt", () => dt_host)
-	// ordo_app_state.zags.update("hosts.pb", () => pb_host)
-	// ordo_app_state.zags.update("hosts.au", () => au_host)
+	const handle_mount = () => {
+		const release_add_translations = hunter.track("i18n.add_translations", ({ locale, values }) => i18n.add(locale, values))
+		const release_set_locale = hunter.track("i18n.set_locale", locale => i18n.set_locale(locale))
 
-	// const { app_fid } = ordo_app_state.zags.select("constants")
+		return () => {
+			release_add_translations()
+			release_set_locale()
+		}
+	}
 
-	// const { repositories, source } = use(create_function_state_source)
-	// const app_state = use(create_function_state(app_fid, source))
+	use(maoka_dom.jabs.onmount(handle_mount))
 
-	// use(MaokaOrdo.Context.provide(app_state))
-
-	// use(create_command_palette)
-	// use(move_file_command)
-	// use(remove_file_command)
-	// use(create_file_command)
-	// use(rename_file_command)
-	// use(edit_file_labels_command)
-	// use(edit_file_links_command)
-
-	// use(start_metadata_manager(repositories))
-
-	// TODO Render user defined functions
-	// TODO .catch
-	// void Promise.any([
-	// 	import("./src/sections/welcome").then(({ default: f }) => f(source)),
-	// 	import("./src/sections/file-editor").then(({ default: f }) => f(source)),
-	// 	import("@ordo-pink/function-rte")
-	// 		.then(({ default: f }) => f(source))
-	// 		.then(() => import("@ordo-pink/function-database"))
-	// 		.then(({ default: f }) => f(source))
-	// 		.then(() => import("@ordo-pink/function-board"))
-	// 		.then(({ default: f }) => f(source)),
-	// ])
-
-	// TODO Init user
-	return () => [
-		modal(),
-		command_palette(),
-		// OrdoWorkspace,
-		// OrdoSidebar,
-		// OrdoModal,
-		// OrdoNotifications,
-		// OrdoContextMenu,
-		// OrdoActivityBar,
-		// OrdoBackgroundTaskIndicator,
-		// OrdoTitleDisplay,
-	]
+	return () => [modal(), command_palette()]
 })

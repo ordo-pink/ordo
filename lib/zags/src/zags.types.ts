@@ -102,7 +102,7 @@ export namespace Zags {
 	 *
 	 * @returns drop_affair function to unsubscribe from state updates.
 	 */
-	export type Cheat<$State extends Zags.BaseState> = <$DotPath extends Zags.Pouch.RecordToDotPaths<$State>>(
+	export type Cheat<$State extends Zags.BaseState> = <const $DotPath extends Zags.Pouch.RecordToDotPaths<$State>>(
 		/**
 		 * Dot-separated path to the entity to cheat with.
 		 */

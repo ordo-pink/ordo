@@ -7,5 +7,5 @@
 }
 
 .key-container {
-	@apply min-w-8 rounded-md border border-b-2 border-r-2 border-current px-1 py-0.5 text-current;
+	@apply min-w-8 rounded-md border border-b-2 border-r-2 border-current px-1 py-0.5 font-sans text-current;
 }

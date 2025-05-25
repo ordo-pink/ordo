@@ -19,16 +19,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type { Hunt } from "@ordo-pink/hunt"
 import type { Logger } from "@ordo-pink/logger"
 import type { Oath } from "@ordo-pink/oath"
+import type { RoutaryBrowser } from "@ordo-pink/routary-browser"
 import type { TResult } from "@ordo-pink/result"
 import type { TWO_LETTER_LOCALE } from "@ordo-pink/locale"
 import type { Zags } from "@ordo-pink/zags"
 
 import type * as C from "./constants"
-import { Hunt } from "@ordo-pink/hunt"
-import { MODAL_SIZE } from "./constants"
-import { RoutaryBrowser } from "@ordo-pink/routary-browser"
+import type { ClientSDK } from "@ordo-pink/sdk-ts"
 
 export type TDropIsPrefix<T extends string> = T extends `is_${infer U}` ? U : never
 
@@ -83,112 +83,112 @@ declare global {
 	 * t("t.my_function.we_use_snake_case.to_annoy_javascript_people")
 	 * ```
 	 */
-	interface t {
-		common: {
-			ok: () => string
-			cancel: () => string
-			search: () => string
-			yes: () => string
-			no: () => string
-			apply: () => string
-			save: () => string
-			load: () => string
-			error: {
-				eexist: () => string
-			}
-			state: {
-				loading: () => string
-				saving: () => string
-			}
-			urls: {
-				twitter_x: () => string
-				support_email: () => string
-				support_messenger: () => string
-				contact_us: () => string
-			}
-			metadata: {
-				show_edit_labels_palette: () => string
-				show_edit_label_modal: () => string
-				show_edit_links_palette: () => string
-			}
-			components: {
-				modals: {
-					create_file: {
-						title: () => string
-						input_placeholder: () => string
-						input_label: () => string
-					}
-					move: {
-						title: () => string
-						move_to_root: () => string
-					}
-					remove_file: {
-						title: () => string
-						message: () => string
-					}
-					rename_file: {
-						title: () => string
-						input_label: () => string
-					}
-				}
-				command_palette: {
-					search_placeholder: () => string
-					hide: () => string
-					reset: () => string
-					exit_key_hint: () => string
-				}
-				sidebar: {
-					toggle: () => string
-					hide: () => string
-					show: () => string
-				}
-				notifications: {
-					pending_notifications: () => string
-				}
-			}
-		}
-		file_editor: {
-			command_palette: {
-				open: () => string
-				open_file: () => string
-			}
-		}
-		welcome: {
-			go_to_welcome_page: () => string
-			command_palette: {
-				support: {
-					open_support_palette: () => string
-					email: () => string
-					messenger: () => string
-				}
-			}
-			start_page: {
-				title: () => string
-				news_widget: {
-					title: () => string
-				}
-			}
-			landing_page: {
-				title: () => string
-				cookie_banner: {
-					title: () => string
-					message: () => string
-				}
-				sections: {
-					hero: {
-						beta_started_announcement: () => string
-						learn_more: () => string
-						try_now_button: () => string
-						sign_up: () => string
-					}
-				}
-			}
-		}
-		auth: {
-			leave: () => string
-			join: () => string
-		}
-	}
+	// interface t {
+	// 	common: {
+	// 		ok: () => string
+	// 		cancel: () => string
+	// 		search: () => string
+	// 		yes: () => string
+	// 		no: () => string
+	// 		apply: () => string
+	// 		save: () => string
+	// 		load: () => string
+	// 		error: {
+	// 			eexist: () => string
+	// 		}
+	// 		state: {
+	// 			loading: () => string
+	// 			saving: () => string
+	// 		}
+	// 		urls: {
+	// 			twitter_x: () => string
+	// 			support_email: () => string
+	// 			support_messenger: () => string
+	// 			contact_us: () => string
+	// 		}
+	// 		metadata: {
+	// 			show_edit_labels_palette: () => string
+	// 			show_edit_label_modal: () => string
+	// 			show_edit_links_palette: () => string
+	// 		}
+	// 		components: {
+	// 			modals: {
+	// 				create_file: {
+	// 					title: () => string
+	// 					input_placeholder: () => string
+	// 					input_label: () => string
+	// 				}
+	// 				move: {
+	// 					title: () => string
+	// 					move_to_root: () => string
+	// 				}
+	// 				remove_file: {
+	// 					title: () => string
+	// 					message: () => string
+	// 				}
+	// 				rename_file: {
+	// 					title: () => string
+	// 					input_label: () => string
+	// 				}
+	// 			}
+	// 			command_palette: {
+	// 				search_placeholder: () => string
+	// 				hide: () => string
+	// 				reset: () => string
+	// 				exit_key_hint: () => string
+	// 			}
+	// 			sidebar: {
+	// 				toggle: () => string
+	// 				hide: () => string
+	// 				show: () => string
+	// 			}
+	// 			notifications: {
+	// 				pending_notifications: () => string
+	// 			}
+	// 		}
+	// 	}
+	// 	file_editor: {
+	// 		command_palette: {
+	// 			open: () => string
+	// 			open_file: () => string
+	// 		}
+	// 	}
+	// 	welcome: {
+	// 		go_to_welcome_page: () => string
+	// 		command_palette: {
+	// 			support: {
+	// 				open_support_palette: () => string
+	// 				email: () => string
+	// 				messenger: () => string
+	// 			}
+	// 		}
+	// 		start_page: {
+	// 			title: () => string
+	// 			news_widget: {
+	// 				title: () => string
+	// 			}
+	// 		}
+	// 		landing_page: {
+	// 			title: () => string
+	// 			cookie_banner: {
+	// 				title: () => string
+	// 				message: () => string
+	// 			}
+	// 			sections: {
+	// 				hero: {
+	// 					beta_started_announcement: () => string
+	// 					learn_more: () => string
+	// 					try_now_button: () => string
+	// 					sign_up: () => string
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// 	auth: {
+	// 		leave: () => string
+	// 		join: () => string
+	// 	}
+	// }
 
 	/**
 	 * This global interface provides support for autocompletion of command names
@@ -220,28 +220,28 @@ declare global {
 	 * ```
 	 */
 	interface cmd {
-		command_palette: {
-			add: { args: Ordo.CommandPalette.Item<() => void> }
-			remove: { args: string | number }
-			toggle: { args: void }
-			show: { args: Ordo.CommandPalette.Instance | undefined }
-			hide: { args: void }
-		}
-		auth: {
-			show_request_code_modal: { args: void }
-			show_verify_code_modal: { args: void }
-			sign_out: { args: void }
-		}
-		modal: {
-			show: { args: Ordo.Modal.Params }
-			hide: { args: void }
-		}
-		router: {
-			set_hash: { args: string }
-			set_href: { args: string }
-			set_pathname: { args: string }
-			set_search: { args: string | Record<string, string> }
-		}
+		// command_palette: {
+		// 	add: { args: Ordo.CommandPalette.Item<() => void> }
+		// 	remove: { args: string | number }
+		// 	toggle: { args: void }
+		// 	show: { args: Ordo.CommandPalette.Instance | undefined }
+		// 	hide: { args: void }
+		// }
+		// auth: {
+		// 	show_request_code_modal: { args: void }
+		// 	show_verify_code_modal: { args: void }
+		// 	sign_out: { args: void }
+		// }
+		// modal: {
+		// 	show: { args: Ordo.Modal.Params }
+		// 	hide: { args: void }
+		// }
+		// router: {
+		// 	set_hash: { args: string }
+		// 	set_href: { args: string }
+		// 	set_pathname: { args: string }
+		// 	set_search: { args: string | Record<string, string> }
+		// }
 		// application: {
 		// 	set_title: () => Ordo.I18N.TranslationKey
 		// 	add_translations: () => {
@@ -265,7 +265,6 @@ declare global {
 		// 		show: () => Omit<Ordo.ContextMenu.Instance, "structure">
 		// 		hide: () => void
 		// 	}
-
 		// 	sidebar: {
 		// 		enable: () => void
 		// 		disable: () => void
@@ -543,10 +542,7 @@ declare global {
 			type TranslationKeys = TFlattenRecord<TRecordToKVUnion<t, "t">>
 			type TranslationKey = keyof TranslationKeys
 			type Translations = Record<TWO_LETTER_LOCALE, Record<TranslationKey, string>>
-			type TranslateFn = {
-				(key: Ordo.I18N.TranslationKey, default_value?: string): string
-				$: Zags.Instance<{ version: number }>
-			}
+			type TranslateFn = (key: Ordo.I18N.TranslationKey, default_value?: string) => string
 		}
 
 		namespace Activity {
@@ -1033,7 +1029,7 @@ declare global {
 		}
 
 		namespace Modal {
-			type Params = { onunmount?: () => void; render: (div: HTMLDivElement) => void | Promise<void>; size?: MODAL_SIZE }
+			type Params = { onunmount?: () => void; render: (div: HTMLDivElement) => void | Promise<void>; size?: C.MODAL_SIZE }
 		}
 
 		namespace Router {
@@ -1196,7 +1192,7 @@ declare global {
 				/**
 				 * Readable name of the command palette item. Put a translation key here, if you use i18n.
 				 */
-				readable_name: string
+				readable_name: ClientSDK.Translations.Key
 
 				value: $Value
 
@@ -1217,7 +1213,7 @@ declare global {
 				 */
 				hotkey?: string
 
-				description?: string
+				description?: ClientSDK.Translations.Key
 
 				type?: C.COMMAND_PALETTE_ITEM_TYPE
 			}

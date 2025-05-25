@@ -19,13 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export const OK = "OK" as const
-
 export const LIB_DIRECTORY_FSID = "1de21bf3-2277-4d3a-bbd3-d120eb8a49d0"
 export const METADATA_CONTENT_FSID = "b68678af-6776-47c0-a0b8-4b6535664b8c"
-
-export const ACTIVITY_BAR_WIDTH = 48
-export const SIDEBAR_WORKSPACE_GUTTER_WIDTH = 10
 
 export enum BACKGROUND_TASK_STATUS {
 	NONE,

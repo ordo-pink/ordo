@@ -1,24 +1,22 @@
+import { components, context } from "@ordo-pink/sdk-maoka"
 import { maoka, maoka_styled } from "@ordo-pink/maoka"
 import { bs_question_circle } from "@ordo-pink/frontend-icons"
 import { create_hotkey_from_event } from "@ordo-pink/hotkey-from-event"
-import { hotkey } from "@ordo-pink/core"
+import { fuzzy_check } from "@ordo-pink/tau"
 import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 
 import { COMMAND_PALETTE_SECTION, FUZZY_CHECK_RATIO } from "../command-palette.contants"
-import { app_context } from "../../../app-context"
 import { command_palette$ } from "../command-palette.state"
 import { command_palette_items } from "./items.component"
 import { command_palette_search } from "./search.component"
-import { fuzzy_check } from "@ordo-pink/tau"
 
 // TODO open via route fragment and query
 // TODO create subitems if item is found with fuzzy search but the match is not exact
-export const modal = maoka.create("div", ({ use }) => {
-	const { hunter, rotor } = use(app_context.consume)
+export const command_palette_modal = maoka.create("div", ({ use }) => {
+	const { hunter } = use(context.consume)
 
 	const is_darwin = use(maoka_jabs.is_darwin)
 	const get_current = use(maoka_jabs.cheat$(command_palette$, "current" as const))
-	const get_hash = use(maoka_jabs.cheat$(rotor, "hash" as const))
 
 	const handle_click = (event: MouseEvent) => event.stopPropagation()
 	const handle_global_keydown = (event: KeyboardEvent) => {
@@ -79,25 +77,24 @@ export const modal = maoka.create("div", ({ use }) => {
 	use(maoka_jabs.listen_global_event("keydown", handle_global_keydown))
 
 	return () => {
-		const hash = get_hash()
-		const current = get_current()
+		const current = get_current() ?? null
 
-		if (!hash || !current) return null
+		return (
+			current && [
+				command_palette_search(),
 
-		return [
-			command_palette_search(),
+				command_palette_items(),
 
-			command_palette_items(),
-
-			internal.footer(() => [
-				bs_question_circle({ classes: "mr-2" }),
-				internal.text_span(() => "Type to search. Arrows to navigate."),
-				hotkey({ hotkey: "enter", decoration_only: true }),
-				internal.text_span(() => "to select item."),
-				hotkey({ hotkey: "escape", decoration_only: true }),
-				internal.text_span(() => "to close."),
-			]),
-		]
+				internal.footer(() => [
+					bs_question_circle({ classes: "mr-2" }),
+					internal.text_span(() => "Type to search. Arrows to navigate."),
+					components.hotkey({ hotkey: "enter", decoration_only: true }),
+					internal.text_span(() => "to select item."),
+					components.hotkey({ hotkey: "escape", decoration_only: true }),
+					internal.text_span(() => "to close."),
+				]),
+			]
+		)
 	}
 })
 

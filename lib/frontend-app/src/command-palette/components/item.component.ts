@@ -1,11 +1,13 @@
+import { components, jabs } from "@ordo-pink/sdk-maoka"
 import { maoka, maoka_dom, maoka_styled } from "@ordo-pink/maoka"
-import { hotkey } from "@ordo-pink/core"
 import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 
 export const command_palette_item = maoka.create<{ item: Ordo.CommandPalette.Item; active: boolean }>(
 	"div",
 	({ active, item, use }) => {
 		const handle_click = () => item.value()
+		const t_name = use(jabs.translate$(item.readable_name))
+		const t_description = use(jabs.translate$(item.description))
 
 		use(maoka_jabs.set_id(String(item.id)))
 		use(maoka_jabs.set_class("command-palette_item"))
@@ -16,12 +18,11 @@ export const command_palette_item = maoka.create<{ item: Ordo.CommandPalette.Ite
 		else use(maoka_jabs.remove_class("active"))
 
 		return () => [
-			// TODO Shortcut for providing kindergarten directly
 			item_main(() => [
-				item_title(() => [item.render_icon && item_icon({ render: item.render_icon }), item.readable_name]),
-				item.hotkey && item_info(() => hotkey({ hotkey: item.hotkey!, decoration_only: true })),
+				item_title(() => [item.render_icon && item_icon({ render: item.render_icon }), t_name()]),
+				item.hotkey && item_info(() => components.hotkey({ hotkey: item.hotkey!, decoration_only: true })),
 			]),
-			item_footer(() => item.description),
+			item_footer(() => t_description()),
 		]
 	},
 )

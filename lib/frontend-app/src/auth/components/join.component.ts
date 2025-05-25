@@ -1,18 +1,26 @@
-import { button, current_user } from "@ordo-pink/core"
 import { maoka, maoka_dom, maoka_styled } from "@ordo-pink/maoka"
 import { bs_envelope_at } from "@ordo-pink/frontend-icons"
+import { current_user } from "@ordo-pink/core"
 import { maoka_jabs } from "@ordo-pink/maoka-jabs"
+import { maoka_sdk } from "@ordo-pink/sdk-maoka"
 import { noop } from "@ordo-pink/tau"
 import { oath } from "@ordo-pink/oath"
 
 import { auth$ } from "../auth.state"
 
-export const join_modal = maoka.create<Ordo.State>("div", ({ fetch, hosts, hunter, use }) => {
+export const join_modal = maoka.create("div", ({ use }) => {
 	use(maoka_jabs.set_class("auth_join-modal"))
 
-	const handle_cancel_click = () => void hunter.shoot("modal.hide")
+	const { hosts, hunter } = use(maoka_sdk.context.consume)
 
-	const handle_ok_click = () => {
+	const t_title = use(maoka_sdk.jabs.translate$("auth_modals_join_title"))
+	const t_hint = use(maoka_sdk.jabs.translate$("auth_modals_join_title"))
+	const t_join = use(maoka_sdk.jabs.translate$("auth_modals_join_join"))
+	const t_cancel = use(maoka_sdk.jabs.translate$("auth_common_cancel"))
+
+	const on_cancel_click = () => void hunter.shoot("modal.hide")
+
+	const on_ok_click = () => {
 		const email = auth$.select("email")
 
 		if (email.length < 5 || email.length > 255 || !current_user.validations.is_email(email)) {
@@ -32,45 +40,45 @@ export const join_modal = maoka.create<Ordo.State>("div", ({ fetch, hosts, hunte
 	}
 
 	return () => [
-		internal.title(() => "Join ORDO"),
-		internal.hint(() => "Make sure you enter your email correctly. We'll send you a code that will let you in."),
-		internal.email_input(),
-		internal.button_section(() => [
-			button.neutral({ on_click: () => handle_cancel_click(), kindergarten: () => "Cancel", hotkey: "escape" }),
-			button.primary({ on_click: () => handle_ok_click(), kindergarten: () => "Join", hotkey: "enter" }),
+		title(t_title),
+		hint(t_hint),
+		email_input(),
+		button_section(() => [
+			maoka_sdk.components.button.neutral({ hotkey: "escape", kindergarten: t_cancel, on_click: on_cancel_click }),
+			maoka_sdk.components.button.primary({ hotkey: "enter", kindergarten: t_join, on_click: on_ok_click }),
 		]),
 	]
 })
 
-namespace internal {
-	export const title = maoka_styled.h1("auth_join-modal_title")
+// --- Internal ---
 
-	export const button_section = maoka_styled.div("auth_join-modal_actions")
+const title = maoka_styled.h1("auth_join-modal_title")
 
-	export const hint = maoka_styled.p()
+const button_section = maoka_styled.div("auth_join-modal_actions")
 
-	export const email_input = maoka.create("label", ({ use }) => {
-		use(maoka_jabs.set_class("auth_join-modal_email_wrapper"))
+const hint = maoka_styled.p()
 
-		return () => [bs_envelope_at({}), search()]
-	})
+const email_input = maoka.create("label", ({ use }) => {
+	use(maoka_jabs.set_class("auth_join-modal_email_wrapper"))
 
-	const search = maoka_styled.input("auth_join-modal_email", ({ use }) => {
-		const t_placeholer = "are@you.kidding" // TODO i18n
-		const value = auth$.select("email")
+	return () => [bs_envelope_at({}), search()]
+})
 
-		const handle_mount = () => use(maoka_dom.jabs.if_dom(n => n.value.focus()))
-		const handle_input = (event: Event) => {
-			const target = event.target as HTMLInputElement
-			auth$.update("email", () => target.value)
-		}
+const search = maoka_styled.input("auth_join-modal_email", ({ use }) => {
+	const t_placeholer = "are@you.kidding" // TODO i18n
+	const value = auth$.select("email")
 
-		use(maoka_jabs.set_id("email-input"))
-		use(maoka_jabs.set_attribute("type", "email"))
-		use(maoka_jabs.set_attribute("placeholder", t_placeholer))
-		use(maoka_jabs.listen("oninput", handle_input))
-		use(maoka_dom.jabs.onmount(handle_mount))
+	const handle_mount = () => use(maoka_dom.jabs.if_dom(n => n.value.focus()))
+	const handle_input = (event: Event) => {
+		const target = event.target as HTMLInputElement
+		auth$.update("email", () => target.value)
+	}
 
-		if (value) use(maoka_jabs.set_attribute("value", value))
-	})
-}
+	use(maoka_jabs.set_id("email-input"))
+	use(maoka_jabs.set_attribute("type", "email"))
+	use(maoka_jabs.set_attribute("placeholder", t_placeholer))
+	use(maoka_jabs.listen("oninput", handle_input))
+	use(maoka_dom.jabs.onmount(handle_mount))
+
+	if (value) use(maoka_jabs.set_attribute("value", value))
+})

@@ -1,12 +1,13 @@
+import * as maoka_sdk from "@ordo-pink/sdk-maoka"
+
 import { bs_x } from "@ordo-pink/frontend-icons"
 import { maoka } from "@ordo-pink/maoka"
 import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 
-import { app_context } from "../../../app-context"
 import { modal$ } from "../modal.state"
 
 export const close_modal = maoka.create("div", ({ use }) => {
-	const { hunter } = use(app_context.consume)
+	const { hunter } = use(maoka_sdk.context.consume)
 
 	const handle_global_esc = (event: KeyboardEvent) => {
 		if (event.code !== "Escape" || !modal$.select("instance")) return

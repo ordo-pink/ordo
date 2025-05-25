@@ -1,15 +1,23 @@
-import { button, current_user } from "@ordo-pink/core"
 import { maoka, maoka_dom, maoka_styled } from "@ordo-pink/maoka"
 import { bs_question_circle } from "@ordo-pink/frontend-icons"
+import { current_user } from "@ordo-pink/core"
 import { get_device_info } from "@ordo-pink/get-device-info"
 import { maoka_jabs } from "@ordo-pink/maoka-jabs"
+import { maoka_sdk } from "@ordo-pink/sdk-maoka"
 import { noop } from "@ordo-pink/tau"
 import { oath } from "@ordo-pink/oath"
 
 import { auth$ } from "../auth.state"
 
-export const verify_code_modal = maoka.create<Ordo.State>("div", ({ fetch, hosts, hunter, use }) => {
+export const verify_code_modal = maoka.create("div", ({ use }) => {
+	const { fetch, hosts, hunter } = use(maoka_sdk.context.consume)
+
 	use(maoka_jabs.set_class("auth_join-modal"))
+
+	const t_title = use(maoka_sdk.jabs.translate$("auth_modals_verify_title"))
+	const t_hint = use(maoka_sdk.jabs.translate$("auth_modals_verify_hint"))
+	const t_submit = use(maoka_sdk.jabs.translate$("auth_modals_verify_submit"))
+	const t_cancel = use(maoka_sdk.jabs.translate$("auth_common_cancel"))
 
 	const handle_cancel_click = () => void hunter.shoot("modal.hide")
 
@@ -38,45 +46,45 @@ export const verify_code_modal = maoka.create<Ordo.State>("div", ({ fetch, hosts
 	}
 
 	return () => [
-		internal.title(() => "Join ORDO"),
-		internal.hint(() => "Make sure you enter your email correctly. We'll send you a code that will let you in."),
-		internal.code_input(),
-		internal.button_section(() => [
-			button.neutral({ on_click: () => handle_cancel_click(), kindergarten: () => "Cancel", hotkey: "escape" }),
-			button.primary({ on_click: () => handle_ok_click(), kindergarten: () => "Submit", hotkey: "enter" }),
+		title(t_title),
+		hint(t_hint),
+		code_input(),
+		button_section(() => [
+			maoka_sdk.components.button.neutral({ hotkey: "escape", kindergarten: t_cancel, on_click: handle_cancel_click }),
+			maoka_sdk.components.button.primary({ hotkey: "enter", kindergarten: t_submit, on_click: handle_ok_click }),
 		]),
 	]
 })
 
-namespace internal {
-	export const title = maoka_styled.h1("auth_join-modal_title")
+// --- Internal ---
 
-	export const button_section = maoka_styled.div("auth_join-modal_actions")
+const title = maoka_styled.h1("auth_join-modal_title")
 
-	export const hint = maoka_styled.p()
+const button_section = maoka_styled.div("auth_join-modal_actions")
 
-	export const code_input = maoka.create("label", ({ use }) => {
-		use(maoka_jabs.set_class("auth_join-modal_email_wrapper"))
+const hint = maoka_styled.p()
 
-		return () => [bs_question_circle({}), input()]
-	})
+const code_input = maoka.create("label", ({ use }) => {
+	use(maoka_jabs.set_class("auth_join-modal_email_wrapper"))
 
-	const input = maoka_styled.input("auth_join-modal_email", ({ use }) => {
-		const t_placeholer = "123456" // TODO i18n
-		const value = auth$.select("code")
+	return () => [bs_question_circle({}), input()]
+})
 
-		const handle_mount = () => use(maoka_dom.jabs.if_dom(n => n.value.focus()))
-		const handle_input = (event: Event) => {
-			const target = event.target as HTMLInputElement
-			auth$.update("code", () => target.value)
-		}
+const input = maoka_styled.input("auth_join-modal_email", ({ use }) => {
+	const t_placeholer = "123456" // TODO i18n
+	const value = auth$.select("code")
 
-		use(maoka_jabs.set_id("code-input"))
-		use(maoka_jabs.set_attribute("type", "number"))
-		use(maoka_jabs.set_attribute("placeholder", t_placeholer))
-		use(maoka_jabs.listen("oninput", handle_input))
-		use(maoka_dom.jabs.onmount(handle_mount))
+	const handle_mount = () => use(maoka_dom.jabs.if_dom(n => n.value.focus()))
+	const handle_input = (event: Event) => {
+		const target = event.target as HTMLInputElement
+		auth$.update("code", () => target.value)
+	}
 
-		if (value) use(maoka_jabs.set_attribute("value", value))
-	})
-}
+	use(maoka_jabs.set_id("code-input"))
+	use(maoka_jabs.set_attribute("type", "number"))
+	use(maoka_jabs.set_attribute("placeholder", t_placeholer))
+	use(maoka_jabs.listen("oninput", handle_input))
+	use(maoka_dom.jabs.onmount(handle_mount))
+
+	if (value) use(maoka_jabs.set_attribute("value", value))
+})

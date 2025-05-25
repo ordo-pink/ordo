@@ -1,11 +1,12 @@
+import * as maoka_sdk from "@ordo-pink/sdk-maoka"
+
 import { maoka, maoka_dom } from "@ordo-pink/maoka"
 import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 
-import { app_context } from "../../../app-context"
 import { modal$ } from "../modal.state"
 
 export const overlay = maoka.create("div", ({ kindergarten, use }) => {
-	const { hunter } = use(app_context.consume)
+	const { hunter } = use(maoka_sdk.context.consume)
 
 	const handle_show = () => use(maoka_jabs.add_class("active"))
 	const handle_hide = () => use(maoka_jabs.remove_class("active"))

@@ -19,13 +19,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { LOCALE } from "@ordo-pink/i18n"
 import { sweech } from "@ordo-pink/sweech"
-import { TWO_LETTER_LOCALE } from "@ordo-pink/locale"
 
 // TODO Email body creation
 
-export const create_user_authenticated_email_body = (lang: TWO_LETTER_LOCALE, request_ip: string) =>
+export const create_user_authenticated_email_body = (lang: LOCALE, request_ip: string) =>
 	sweech
 		.match(lang)
-		.case(TWO_LETTER_LOCALE.RUSSIAN, () => request_ip)
+		.case(LOCALE.RUSSIAN, () => request_ip)
 		.default(() => request_ip)

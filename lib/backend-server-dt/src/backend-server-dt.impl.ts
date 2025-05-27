@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { current_user, CURRENT_USER_KEYS, METADATA_CONTENT_FSID, Metadata, rrr } from "@ordo-pink/core"
+import { CURRENT_USER_KEYS, METADATA_CONTENT_FSID, Metadata, current_user, rrr } from "@ordo-pink/core"
 import { Routary, routary } from "@ordo-pink/routary"
 import {
 	create_response,
@@ -14,19 +14,19 @@ import {
 	status_from_rrr,
 	stop_response_timer,
 } from "@ordo-pink/routary-ordo"
-import { TWO_LETTER_LOCALE } from "@ordo-pink/locale"
+import { LOCALE } from "@ordo-pink/i18n"
 import { is_finite_non_negative_int } from "@ordo-pink/tau"
 import { oath } from "@ordo-pink/oath"
 import { rickroll } from "@ordo-pink/rickroll"
 import { routary_cors } from "@ordo-pink/routary-cors"
 
-import { type TDTFuel, type TDTContext } from "./backend-server-dt.types"
+import type { TDTContext, TDTFuel } from "./backend-server-dt.types"
 
 // TODO Extract colonoscope from Routary
 // TODO WebSocket for dt-dt and dt-web notifications
 export const create_backend_server_dt = (chamber: TDTFuel) =>
 	routary
-		.http<TDTContext>({ ...chamber, headers: new Headers(), status: 200, request_language: TWO_LETTER_LOCALE.ENGLISH })
+		.http<TDTContext>({ ...chamber, headers: new Headers(), status: 200, request_language: LOCALE.ENGLISH })
 		.head("/:uid/:fsid", intake => {
 			return oath
 				.of(intake)

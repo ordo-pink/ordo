@@ -19,12 +19,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { TWO_LETTER_LOCALE } from "@ordo-pink/locale"
+import { LOCALE } from "@ordo-pink/i18n"
 import { rickroll } from "@ordo-pink/rickroll"
 import { routary } from "@ordo-pink/routary"
 import { routary_cors } from "@ordo-pink/routary-cors"
 
-import { type TIDFuel, type TIDContext } from "./backend-server-id.types"
+import { type TIDContext, type TIDFuel } from "./backend-server-id.types"
 import { handle_get_session } from "./handlers/session/get-session.handler"
 import { handle_get_user_by_handle } from "./handlers/user/get-user-by-handle.handler"
 import { handle_get_user_by_id } from "./handlers/user/get-user-by-id.handler"
@@ -36,7 +36,7 @@ import { handle_refresh_session } from "./handlers/session/refresh-session.handl
 // TODO Custom handlers for updating email & handle + disallow editing them in PATCH
 export const create_backend_server_id = (chamber: TIDFuel) =>
 	routary
-		.http<TIDContext>({ ...chamber, status: 200, headers: new Headers(), request_language: TWO_LETTER_LOCALE.ENGLISH })
+		.http<TIDContext>({ ...chamber, status: 200, headers: new Headers(), request_language: LOCALE.ENGLISH })
 		.get("/session", handle_get_session)
 		.post("/session", handle_refresh_session)
 		.delete("/session", handle_invalidate_session)

@@ -19,11 +19,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { LOCALE } from "@ordo-pink/i18n"
 import { sweech } from "@ordo-pink/sweech"
-import { TWO_LETTER_LOCALE } from "@ordo-pink/locale"
 
-export const create_request_code_email_subject = (lang: TWO_LETTER_LOCALE) =>
+export const create_request_code_email_subject = (lang: LOCALE) =>
 	sweech
 		.match(lang)
-		.case(TWO_LETTER_LOCALE.RUSSIAN, () => "Добро пожаловать в ORDO!")
+		.case(LOCALE.RUSSIAN, () => "Добро пожаловать в ORDO!")
 		.default(() => "Welcome to ORDO!")

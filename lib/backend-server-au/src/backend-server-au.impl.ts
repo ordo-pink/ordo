@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { TWO_LETTER_LOCALE } from "@ordo-pink/locale"
+import { LOCALE } from "@ordo-pink/i18n"
 import { rickroll } from "@ordo-pink/rickroll"
 import { routary } from "@ordo-pink/routary"
 import { routary_cors } from "@ordo-pink/routary-cors"
@@ -44,7 +44,7 @@ export const create_backend_server_au = (params: BackendAuth.Params) => {
 	interval.unref()
 
 	return routary
-		.http({ ...params, status: 200, headers: new Headers(), request_language: TWO_LETTER_LOCALE.ENGLISH })
+		.http({ ...params, status: 200, headers: new Headers(), request_language: LOCALE.ENGLISH })
 		.post("/request-code", handle_request_code)
 		.post("/verify-code", handle_verify_code)
 		.get("/healthcheck", () => new Response("OK")) // TODO Extract to lib

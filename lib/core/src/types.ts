@@ -20,11 +20,11 @@
  */
 
 import type { Hunt } from "@ordo-pink/hunt"
+import type { LOCALE } from "@ordo-pink/i18n"
 import type { Logger } from "@ordo-pink/logger"
 import type { Oath } from "@ordo-pink/oath"
 import type { RoutaryBrowser } from "@ordo-pink/routary-browser"
 import type { TResult } from "@ordo-pink/result"
-import type { TWO_LETTER_LOCALE } from "@ordo-pink/locale"
 import type { Zags } from "@ordo-pink/zags"
 
 import type * as C from "./constants"
@@ -541,7 +541,7 @@ declare global {
 		namespace I18N {
 			type TranslationKeys = TFlattenRecord<TRecordToKVUnion<t, "t">>
 			type TranslationKey = keyof TranslationKeys
-			type Translations = Record<TWO_LETTER_LOCALE, Record<TranslationKey, string>>
+			type Translations = Record<LOCALE, Record<TranslationKey, string>>
 			type TranslateFn = (key: Ordo.I18N.TranslationKey, default_value?: string) => string
 		}
 

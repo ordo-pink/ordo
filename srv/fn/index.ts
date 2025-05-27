@@ -1,6 +1,6 @@
 import { RoutaryOrdo, default_handler } from "@ordo-pink/routary-ordo"
+import { LOCALE } from "@ordo-pink/i18n"
 import { Logger } from "@ordo-pink/logger"
-import { TWO_LETTER_LOCALE } from "@ordo-pink/locale"
 import { console_logger } from "@ordo-pink/logger"
 import { oath } from "@ordo-pink/oath"
 import { rickroll } from "@ordo-pink/rickroll"
@@ -18,7 +18,7 @@ const logger: Logger = {
 }
 
 const rotor = routary
-	.http<RoutaryOrdo.Fuel>({ logger, status: 200, headers: new Headers(), request_language: TWO_LETTER_LOCALE.ENGLISH })
+	.http<RoutaryOrdo.Fuel>({ logger, status: 200, headers: new Headers(), request_language: LOCALE.ENGLISH })
 	.get(
 		"/",
 		default_handler(intake => oath.of(intake).pipe(oath.ops.tap(intake => void (intake.payload = "list")))),

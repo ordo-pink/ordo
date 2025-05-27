@@ -19,15 +19,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { LOCALE } from "@ordo-pink/i18n"
 import { sweech } from "@ordo-pink/sweech"
-import { TWO_LETTER_LOCALE } from "@ordo-pink/locale"
 
 import { BackendAuth } from "../../backend-server-au.types"
 
 // TODO Email body creation
 
-export const create_request_code_email_body = (lang: TWO_LETTER_LOCALE, code: BackendAuth.Code) =>
+export const create_request_code_email_body = (lang: LOCALE, code: BackendAuth.Code) =>
 	sweech
 		.match(lang)
-		.case(TWO_LETTER_LOCALE.RUSSIAN, () => code)
+		.case(LOCALE.RUSSIAN, () => code)
 		.default(() => code)

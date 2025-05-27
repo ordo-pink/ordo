@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: Unlicense
  */
 
+import type { LOCALE } from "@ordo-pink/i18n"
 import type { Logger } from "@ordo-pink/logger"
 import type { Oath } from "@ordo-pink/oath"
 import type { Routary } from "@ordo-pink/routary"
-import type { TWO_LETTER_LOCALE } from "@ordo-pink/locale"
 
 export module RoutaryOrdo {
 	export type Fuel = {
@@ -15,7 +15,7 @@ export module RoutaryOrdo {
 		payload?: unknown
 		request_id?: string
 		request_ip?: string
-		request_language: TWO_LETTER_LOCALE
+		request_language: LOCALE
 		response_time?: number
 		stop_response_timer?: ResponseTimer
 		status: number

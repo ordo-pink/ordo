@@ -1,6 +1,10 @@
-import type { Core } from "./core.types"
+import type { Core } from "../sdk-core.types"
 import type { User } from "./user.types"
 import type { data } from "./data.impl"
+import type { Identifiable } from "./mixins/identifiable/identifiable.types"
+import type { Timestampable } from "./mixins/time-trackable/timestampable.types"
+import type { Authored } from "./mixins/authored/authored.types"
+import type { Transferable } from "../mixins/transferable.mixin"
 
 export namespace Data {
 	export type ID = Core.Model.Identifiable.ID
@@ -92,24 +96,25 @@ export namespace Data {
 		}
 
 		export type DTO = [
-			...Core.Model.Identifiable.DTO,
-			...Core.Model.TimeTrackable.DTO<true>,
-			...Core.Model.AuthorTrackable.DTO<true>,
+			...Identifiable.DTO,
+			...Timestampable.DTO<"with_updates">,
+			...Authored.DTO<"with_updates">,
 			...Accessible.DTO,
 			...Familiar.DTO,
 			...Taggable.DTO,
 			...Linkable.DTO,
 		]
 
-		export type Instance = Core.Model.Instance<
-			Core.Model.Identifiable.Instance &
-				Core.Model.TimeTrackable.Instance<true> &
-				Core.Model.AuthorTrackable.Instance<true> &
-				Accessible.Instance &
-				Familiar.Instance &
-				Taggable.Instance &
-				Linkable.Instance &
-				Core.Model.Transferable.Instance<DTO>
+		type IdentifiableInstance = Identifiable.Interface["Instance"]
+		type TimestampableInstance = Timestampable.Interface<"with_updates">["Instance"]
+		type AuthoredInstance = Authored.Interface<"with_updates">["Instance"]
+
+		export type Instance = Core.Util.Prettify<
+			IdentifiableInstance & TimestampableInstance & AuthoredInstance & Transferable.Instance<DTO> //&
+			// Accessible.Instance &
+			// Familiar.Instance &
+			// Taggable.Instance &
+			// Linkable.Instance
 		>
 
 		export type Validations = Core.Util.Prettify<

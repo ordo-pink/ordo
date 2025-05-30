@@ -1,25 +1,25 @@
 import { describe, expect, it } from "bun:test"
 
-import { user } from "./user.impl"
+import { current_user, public_user } from "./user.impl"
 
 describe("user", () => {
 	describe("other", () => {
 		describe("create_id", () => {
 			it("should create an identifier", () => {
-				expect(user.other.create_id()).toBeTypeOf("string")
-				expect(user.other.validations.is_id(user.other.create_id())).toBeTrue()
+				expect(public_user.create_id()).toBeTypeOf("string")
+				expect(public_user.validations.is_id(public_user.create_id())).toBeTrue()
 			})
 		})
 
 		describe("create_timestamp", () => {
 			it("should create a timestamp", () => {
-				expect(user.other.create_timestamp()).toBeTypeOf("number")
-				expect(user.other.validations.is_timestamp(user.other.create_timestamp())).toBeTrue()
+				expect(public_user.create_timestamp()).toBeTypeOf("number")
+				expect(public_user.validations.is_timestamp(public_user.create_timestamp())).toBeTrue()
 			})
 		})
 
 		describe("validations", () => {
-			const { is_dto, is_handle, is_id, is_name, is_subscription, is_timestamp } = user.other.validations
+			const { is_dto, is_handle, is_id, is_name, is_subscription, is_timestamp } = public_user.validations
 
 			it("is_id should verify UUID", () => {
 				expect(is_id(crypto.randomUUID())).toBeTrue()
@@ -60,6 +60,23 @@ describe("user", () => {
 			// TODO is_dto
 		})
 
-		// TODO instance
+		describe("instance", () => {
+			const id = public_user.create_id()
+			const created_at = public_user.create_timestamp()
+			const handle = "@test"
+			const subscription = public_user.get_default_subscription()
+			const name = "Test Testfield"
+
+			const user = public_user.from_dto(id, created_at, handle, subscription, name)
+
+			it("should return valid id", () => {
+				expect(user.get_id()).toBe(id)
+			})
+
+			it("should have valid id", () => {
+				expect(user.has_id(id)).toBeTrue()
+				expect(user.has_id(crypto.randomUUID())).toBeFalse()
+			})
+		})
 	})
 })

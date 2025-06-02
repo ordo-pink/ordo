@@ -19,10 +19,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Oath, oath } from "@ordo-pink/oath"
-import { TOption } from "@ordo-pink/option"
-import { TResult } from "@ordo-pink/result"
-
 import type * as Types from "./types.ts"
 
 export const UUIDv4_RX = /^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i
@@ -158,14 +154,6 @@ export const thunk =
 	<$T>(value: $T) =>
 	() =>
 		value
-
-export const from_option0 =
-	<$TOnNone>(on_none: () => $TOnNone) =>
-	<$TSome>(option: TOption<$TSome>): Oath.Instance<$TSome, $TOnNone> =>
-		option.cata({ Some: value => oath.of(value), None: () => oath.reject(on_none()) })
-
-export const from_result0 = <$TOk, $TErr>(result: TResult<$TOk, $TErr>): Oath.Instance<$TOk, $TErr> =>
-	result.cata({ Ok: oath.of, Err: oath.reject })
 
 export const fuzzy_check = (source: string, target: string, ratio: number) => {
 	const clean_source = source.trim().toLowerCase()

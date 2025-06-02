@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { die, run_async_command } from "@ordo-pink/binutil"
+import { die, run_async_command } from "@ordo-pink/cmd-runner"
 import { oath } from "@ordo-pink/oath"
 
 void run_async_command("opt/bun run --watch srv/dt/index.ts", {

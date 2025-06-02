@@ -19,11 +19,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type { Server } from "@ordo-pink/sdk-server"
+import type { User } from "@ordo-pink/sdk-core"
+
 export namespace EmailStrategyRusender {
 	export type Params = {
 		api_key: string
-		from: { email: Ordo.User.Email; name: string }
+		from: { email: User.Email; name: string }
 	}
 
-	export type CreateEmailStrategyRusender = (params: EmailStrategyRusender.Params) => OrdoBackend.Notification.EmailStrategy
+	export type CreateEmailStrategyRusender = (params: EmailStrategyRusender.Params) => Server.Notification.EmailStrategy
 }

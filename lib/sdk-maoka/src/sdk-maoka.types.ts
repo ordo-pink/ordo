@@ -3,14 +3,14 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { ClientSDK } from "@ordo-pink/sdk-ts"
+import { Client } from "@ordo-pink/sdk-client"
 import { Maoka } from "@ordo-pink/maoka"
 
 export namespace MaokaSDK {
-	export type Context = Maoka.Context.Instance<ClientSDK.F.State>
+	export type Context = Maoka.Context.Instance<Client.F.State>
 
 	export namespace Jabs {
-		export type Translate$ = (key?: ClientSDK.Translations.Key) => Maoka.Jab<(default_value?: string) => string>
+		export type Translate$ = (key?: Client.Translations.Key) => Maoka.Jab<(default_value?: string) => string>
 	}
 
 	export namespace Components {

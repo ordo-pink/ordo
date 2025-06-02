@@ -1,11 +1,11 @@
-import { type TCommandRecord } from "@ordo-pink/binutil"
+import type { CommandHandler } from "@ordo-pink/cmd-handler"
 import { build_command } from "@ordo-pink/cmd-build"
-import { init_command } from "@ordo-pink/cmd-init"
-import { mklib_command } from "@ordo-pink/cmd-mklib"
-import { run_command } from "@ordo-pink/cmd-run"
-import { spdx_command } from "@ordo-pink/cmd-spdx"
+import { init_command } from "@ordo-pink/command-init"
+import { mklib_command } from "@ordo-pink/command-mklib"
+import { run_command } from "@ordo-pink/command-run"
+import { spdx_command } from "@ordo-pink/command-spdx"
 
-const commands: TCommandRecord = {
+const commands: CommandHandler.Commands = {
 	...build_command,
 	...init_command,
 	...mklib_command,

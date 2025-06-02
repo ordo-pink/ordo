@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Result } from "@ordo-pink/result"
+import { result } from "@ordo-pink/result"
 import { create_zags } from "@ordo-pink/zags"
 import { oath } from "@ordo-pink/oath"
 import { rrr } from "@ordo-pink/core"
@@ -40,13 +40,13 @@ export const UserQuery: Ordo.User.QueryStatic = {
 		return {
 			is_authenticated: () =>
 				check_permission("user.is_authenticated")
-					.pipe(Result.ops.map(() => ordo_app_state.zags.select("user")))
-					.pipe(Result.ops.map(user => !!user))
-					.cata(Result.catas.or_else(() => false)),
+					.pipe(result.ops.map(() => ordo_app_state.zags.select("user")))
+					.pipe(result.ops.map(user => !!user))
+					.cata(result.catas.or_else(() => false)),
 
 			// TODO Allow user null
 			get_current: () =>
-				check_permission("user.get_current").pipe(Result.ops.chain(() => Result.Ok(ordo_app_state.zags.select("user")))),
+				check_permission("user.get_current").pipe(result.ops.chain(() => result.Ok(ordo_app_state.zags.select("user")))),
 
 			get_by_id: id =>
 				check_permission("user.get_by_id")

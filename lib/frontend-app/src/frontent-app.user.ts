@@ -26,7 +26,7 @@ import { call_once, noop } from "@ordo-pink/tau"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
-import { Result } from "@ordo-pink/result"
+import { result } from "@ordo-pink/result"
 import { console_logger } from "@ordo-pink/logger"
 import { get_device_info } from "@ordo-pink/get-device-info"
 import { oath } from "@ordo-pink/oath"
@@ -99,7 +99,7 @@ export const init_user = call_once(() => {
 		}
 	})
 
-	const user_query = UserQuery.Of(() => Result.Ok(void 0))
+	const user_query = UserQuery.Of(() => result.Ok(void 0))
 
 	ordo_app_state.zags.update("queries.user", () => user_query)
 
@@ -108,7 +108,7 @@ export const init_user = call_once(() => {
 	return {
 		get_user_query: (fid: symbol) =>
 			UserQuery.Of(permission =>
-				Result.If(known_functions.has_permissions(fid, { queries: [permission] }), {
+				result.If(known_functions.has_permissions(fid, { queries: [permission] }), {
 					F: () => {
 						const e = rrr.codes.eperm(`UserQuery permission RRR. Did you forget to request query permission '${permission}'?`)
 						console_logger.error(e.message)

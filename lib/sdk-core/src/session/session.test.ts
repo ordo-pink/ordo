@@ -8,4 +8,6 @@ describe("session", () => {
 	it("should have valid id", () => {
 		expect(session.validations.is_id(s.get_id())).toBeTrue()
 	})
+
+	// TODO tests
 })

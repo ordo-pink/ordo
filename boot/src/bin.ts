@@ -1,7 +1,7 @@
-import { get_opts } from "@ordo-pink/binutil"
 import { oath } from "@ordo-pink/oath"
 
 import commands from "./cmd"
+import { get_opts } from "@ordo-pink/cmd-get-opts"
 
 const all_args = process.argv.slice(2)
 

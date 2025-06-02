@@ -19,38 +19,29 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { CURRENT_USER_KEYS } from "@ordo-pink/core"
-import type { Logger } from "@ordo-pink/logger"
+import type { Logger, Rrr, User } from "@ordo-pink/sdk-core"
 import type { Oath } from "@ordo-pink/oath"
-import { Routary } from "@ordo-pink/routary"
+import type { Routary } from "@ordo-pink/routary"
 import type { RoutaryOrdo } from "@ordo-pink/routary-ordo"
+import type { Server } from "@ordo-pink/sdk-server"
 
 /**
  * BackendAuth implements a backend for user authentication.
  */
 export namespace BackendAuth {
-	/**
-	 * User email type alias.
-	 */
-	export type Email = Ordo.User.Current.DTO[CURRENT_USER_KEYS.EMAIL]
-
-	/**
-	 * User authentication code type alias.
-	 */
+	/** User authentication code. */
 	export type Code = string
 
-	/**
-	 * Hashed user authentication code type alias.
-	 */
+	/** Hashed user authentication code type alias. */
 	export type CodeHash = string
 
 	export type CodeStrategy = {
-		hash: (code: BackendAuth.Code) => Oath.Instance<string, Ordo.Rrr<"EIO">>
-		generate: () => Oath.Instance<string, Ordo.Rrr<"EIO">>
-		verify: (hash: BackendAuth.CodeHash, code: BackendAuth.Code) => Oath.Instance<boolean, Ordo.Rrr<"EIO">>
+		hash: (code: BackendAuth.Code) => Oath.Instance<string, Rrr.Instance<"EIO">>
+		generate: () => Oath.Instance<string, Rrr.Instance<"EIO">>
+		verify: (hash: BackendAuth.CodeHash, code: BackendAuth.Code) => Oath.Instance<boolean, Rrr.Instance<"EIO">>
 	}
 
-	export type Storage = Map<BackendAuth.Email, { hash: BackendAuth.CodeHash; timestamp: number }>
+	export type Storage = Map<User.Email, { hash: BackendAuth.CodeHash; timestamp: number }>
 
 	export type Params = {
 		allow_origin: string[]
@@ -58,14 +49,14 @@ export namespace BackendAuth {
 		code_lifetime_ms: number
 		code_strategy: BackendAuth.CodeStrategy
 		create_request_id: () => string
-		data_persistence_strategy: OrdoBackend.Data.PersistenceStrategy
+		data_persistence_strategy: Server.Data.PersistenceStrategy
 		defaults: { file_limit: number; max_upload_size: number; max_functions: number }
-		email_strategy: OrdoBackend.Notification.EmailStrategy
+		email_strategy: Server.Notification.EmailStrategy
 		logger: Logger
 		port: number
 		session_lifetime_s: number
-		reference_mapping_user: OrdoBackend.User.ReferenceMapping
-		persistence_strategy_user: OrdoBackend.User.PersistenceStrategy
+		reference_mapping_user: Server.User.ReferenceMapping
+		persistence_strategy_user: Server.User.PersistenceStrategy
 	}
 
 	export type Fuel = RoutaryOrdo.Fuel & Params

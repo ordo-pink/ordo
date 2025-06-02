@@ -1,0 +1,100 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ *
+ * Ordo.pink is an all-in-one team workspace.
+ * Copyright (C) 2024  谢尔盖 ||↓ and the Ordo.pink contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+import node_fs from "node:fs"
+import node_path from "node:path"
+
+import { type License, get_license, get_spdx_record } from "@ordo-pink/cmd-license"
+import type { CommandHandler } from "@ordo-pink/cmd-handler"
+import { create_progress } from "@ordo-pink/cmd-progress"
+import { oath } from "@ordo-pink/oath"
+
+const unlicense = get_license("Unlicense")
+const progress = create_progress("Adding missing SPDX records")
+
+export const handle_spdx: CommandHandler.Fn = async opts => {
+	const noemit = !!opts.long_options["no-emit"] || !!opts.short_options["n"]
+	const bail = !!opts.long_options["--bail"] || !!opts.short_options["b"]
+	const unlicense = !!opts.long_options["--unlicense"] || !!opts.short_options["U"]
+
+	await oath
+		.all([...(await create_licenses("lib", noemit, bail)), ...(await create_licenses("srv", noemit, bail))])
+		.pipe(oath.ops.chain(xs => oath.all(xs.flatMap(x => x))))
+		.pipe(
+			oath.ops.map(xs => (noemit && !bail ? (xs.some(x => !x) ? process.exit(1) : xs.filter(Boolean)) : xs.filter(Boolean))),
+		)
+		.cata({ reject: () => process.exit(1), resolve: () => void 0 })
+
+	progress.finish()
+}
+
+// --- Internal ---
+
+const create_licenses = async (space: "lib" | "srv", noemit = false, bail = false) => {
+	const entries = await node_fs.promises.readdir(space)
+
+	return entries.map(async entry => {
+		const entry_path = node_path.join(space, entry)
+		const license_path = node_path.join(entry_path, "license")
+		const license_exists = await node_fs.promises.exists(license_path)
+
+		if (!license_exists) {
+			if (noemit) {
+				progress.break(`ERROR: Missing license file: ${entry_path}`)
+				if (bail) process.exit(1)
+				return false
+			}
+
+			const license = get_license(unlicense ? "Unlicense" : "AGPL-3.0-only")
+
+			await node_fs.promises.writeFile(license_path, license, "utf-8")
+		}
+
+		const license_content = await node_fs.promises.readFile(license_path, "utf-8")
+		const license: License.Type = license_content === unlicense ? "Unlicense" : "AGPL-3.0-only"
+		const spdx = get_spdx_record(license)
+
+		const files = await node_fs.promises.readdir(entry_path, { recursive: true })
+
+		return files.map(async file => {
+			if (!file.endsWith(".ts") || file.includes("node_modules")) return
+
+			const file_path = node_path.join(entry_path, file)
+			const file_content = await node_fs.promises.readFile(file_path, "utf-8")
+			const spdx_2024 = spdx.replaceAll("2025", "2024")
+
+			// TODO Find a better solution by 2026
+			if (!file_content.startsWith(spdx) && !file_content.startsWith(spdx_2024)) {
+				const updated_content = `${spdx}\n${file_content}`
+
+				if (noemit) {
+					progress.break(`ERROR: SPDX record missing or invalid: ${file_path}`)
+					if (bail) process.exit(1)
+					return false
+				} else {
+					await node_fs.promises.writeFile(file_path, updated_content, "utf-8")
+					progress.inc()
+					return true
+				}
+			}
+		})
+	})
+}

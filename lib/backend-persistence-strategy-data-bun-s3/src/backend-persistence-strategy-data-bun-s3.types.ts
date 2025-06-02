@@ -3,14 +3,10 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-export namespace PersistenceStrategyDataBunS3 {
-	export type Params = {
-		access_key: string
-		secret_key: string
-		region: string
-		bucket: string
-		endpoint?: string
-	}
+import type { Server } from "@ordo-pink/sdk-server"
 
-	export type Create = (params: PersistenceStrategyDataBunS3.Params) => OrdoBackend.Data.PersistenceStrategy
+export namespace PersistenceStrategyDataBunS3 {
+	export type Params = { access_key: string; secret_key: string; region: string; bucket: string; endpoint?: string }
+
+	export type Create = (params: PersistenceStrategyDataBunS3.Params) => Server.Data.PersistenceStrategy
 }

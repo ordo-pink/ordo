@@ -27,7 +27,7 @@ import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
-import { Result } from "@ordo-pink/result"
+import { result } from "@ordo-pink/result"
 import { T } from "@ordo-pink/tau"
 
 import hero_layer_0 from "../static/index-hero-layer-0.png"
@@ -196,9 +196,9 @@ const create_tutorial_files = (emit: Ordo.Command.EmitFn, metadata_query: Ordo.M
 
 	const parent = metadata_query
 		.get_by_name("Start here!", null)
-		.pipe(Result.ops.chain(Result.FromNullable))
-		.pipe(Result.ops.map(x => x.get_fsid()))
-		.cata(Result.catas.or_else(() => null))
+		.pipe(result.ops.chain(result.FromNullable))
+		.pipe(result.ops.map(x => x.get_fsid()))
+		.cata(result.catas.or_else(() => null))
 
 	emit("cmd.metadata.create", { name: "Join ORDO", parent, props: { emoji_icon: "✅" }, labels })
 	emit("cmd.metadata.create", { name: "Try changing emoji to `check`", parent, labels, props: { emoji_icon: "👆" } })
@@ -213,9 +213,9 @@ const create_tutorial_files = (emit: Ordo.Command.EmitFn, metadata_query: Ordo.M
 
 	const last_file_fsid = metadata_query
 		.get_by_name("Click on this text to open file content", parent)
-		.pipe(Result.ops.chain(Result.FromNullable))
-		.pipe(Result.ops.map(x => x.get_fsid()))
-		.cata(Result.catas.or_else(() => null as never))
+		.pipe(result.ops.chain(result.FromNullable))
+		.pipe(result.ops.map(x => x.get_fsid()))
+		.cata(result.catas.or_else(() => null as never))
 
 	emit("cmd.content.set", { fsid: last_file_fsid, content: last_file_ab, content_type: "text/ordo" })
 }

@@ -1,0 +1,71 @@
+export const SM_SCREEN_BREAKPOINT = 640
+
+export namespace MODAL {
+	export enum SIZE {
+		SM,
+		MD,
+		LG,
+		XL,
+		XXL,
+	}
+}
+
+export namespace COMMAND_PALETTE {
+	export enum ITEM_TYPE {
+		PAGE_OPENER,
+		MODAL_OPENER,
+		FILE_CREATOR,
+		AUTOMATION_ACTION,
+		COMMON_ACTION,
+		INFORMATION,
+		DESTRUCTIVE_ACTION,
+		length,
+	}
+}
+
+export namespace ACHIEVEMENT {
+	export enum CATEGORY {
+		EDUCATION,
+		COLLECTION,
+		CHALLENGE,
+		LEGACY,
+		length,
+	}
+}
+
+export namespace CONTEXT_MENU {
+	/**
+	 * Context menu item type. This impacts two things:
+	 *
+	 * 1. Grouping items in the context menu.
+	 * 2. Given type can be hidden when showing context menu.
+	 */
+	export enum ITEM_TYPE {
+		CREATE,
+		READ,
+		UPDATE,
+		DELETE,
+		length,
+	}
+}
+
+export namespace BACKGROUND_TASK {
+	export enum STATUS {
+		NONE,
+		SAVING,
+		LOADING,
+		length,
+	}
+}
+
+export namespace NOTIFICATION {
+	export enum TYPE {
+		DEFAULT,
+		SUCCESS,
+		INFO,
+		WARN,
+		QUESTION,
+		RRR,
+		length,
+	}
+}

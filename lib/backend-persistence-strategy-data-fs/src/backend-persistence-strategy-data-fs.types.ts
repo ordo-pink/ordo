@@ -3,8 +3,10 @@
  * SPDX-License-Identifier: Unlicense
  */
 
+import type { Server } from "@ordo-pink/sdk-server"
+
 export namespace PersistenceStrategyDataFS {
 	export type Params = { root: string }
 
-	export type Create = (params: PersistenceStrategyDataFS.Params) => OrdoBackend.Data.PersistenceStrategy
+	export type Create = (params: PersistenceStrategyDataFS.Params) => Server.Data.PersistenceStrategy
 }

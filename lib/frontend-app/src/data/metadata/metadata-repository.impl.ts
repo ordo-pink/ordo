@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Result } from "@ordo-pink/result"
+import { result } from "@ordo-pink/result"
 import { create_zags } from "@ordo-pink/zags"
 
 import { rrr } from "../../../../core/src/rrr"
@@ -32,16 +32,18 @@ export const MetadataRepository: Ordo.Metadata.RepositoryStatic = {
 
 		return {
 			get: () =>
-				Result.Try(() => metadata$.select("items"))
-					.pipe(Result.ops.chain(Result.FromNullable))
-					.pipe(Result.ops.err_map(() => rrr.codes.eagain("Loading"))),
+				result
+					.Try(() => metadata$.select("items"))
+					.pipe(result.ops.chain(result.FromNullable))
+					.pipe(result.ops.err_map(() => rrr.codes.eagain("Loading"))),
 
 			put: metadata =>
-				Result.FromNullable(metadata)
-					.pipe(Result.ops.chain(() => Result.If(Array.isArray(metadata), { T: () => metadata }))) // TODO: Add validations
-					.pipe(Result.ops.map(metadata => metadata.map(i => i.to_dto())))
-					.pipe(Result.ops.chain(() => Result.Try(() => metadata$.update("items", () => metadata), console.error)))
-					.pipe(Result.ops.err_map(() => rrr.codes.einval("MetadataRepository could not put metadata", metadata))),
+				result
+					.FromNullable(metadata)
+					.pipe(result.ops.chain(() => result.If(Array.isArray(metadata), { T: () => metadata }))) // TODO: Add validations
+					.pipe(result.ops.map(metadata => metadata.map(i => i.to_dto())))
+					.pipe(result.ops.chain(() => result.Try(() => metadata$.update("items", () => metadata), console.error)))
+					.pipe(result.ops.err_map(() => rrr.codes.einval("MetadataRepository could not put metadata", metadata))),
 
 			get $() {
 				return version_zags

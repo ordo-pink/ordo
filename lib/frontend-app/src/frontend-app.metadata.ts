@@ -20,7 +20,7 @@
  */
 
 import { NOTIFICATION_TYPE, rrr } from "@ordo-pink/core"
-import { Result } from "@ordo-pink/result"
+import { result } from "@ordo-pink/result"
 import { call_once } from "@ordo-pink/tau"
 import { console_logger } from "@ordo-pink/logger"
 import { create_zags } from "@ordo-pink/zags"
@@ -43,7 +43,7 @@ export const init_metadata: TInitMetadataFn = call_once(content_repository => {
 	const metadata_repository = MetadataRepository.Of(metadata_zags)
 	// const remote_metadata_repository = CacheMetadataRepository.Of(hosts.dt, fetch)
 
-	const app_metadata_query = MetadataQuery.Of(metadata_repository, () => Result.Ok(void 0))
+	const app_metadata_query = MetadataQuery.Of(metadata_repository, () => result.Ok(void 0))
 	const metadata_command = MetadataCommand.Of(metadata_repository, app_metadata_query, queries.user)
 
 	const alert_rrr = (rrr: Ordo.Rrr) => {
@@ -60,33 +60,33 @@ export const init_metadata: TInitMetadataFn = call_once(content_repository => {
 	}
 
 	commands.on("cmd.metadata.add_labels", ({ fsid, labels }) =>
-		metadata_command.add_labels(fsid, ...labels).cata(Result.catas.or_else(alert_rrr)),
+		metadata_command.add_labels(fsid, ...labels).cata(result.catas.or_else(alert_rrr)),
 	)
 
 	// TODO Use metadata_commands directly for changing size
 	commands.on("cmd.metadata.set_size", ({ fsid, size }) =>
-		metadata_command.set_size(fsid, size).cata(Result.catas.or_else(alert_rrr)),
+		metadata_command.set_size(fsid, size).cata(result.catas.or_else(alert_rrr)),
 	)
 
 	commands.on("cmd.metadata.remove_labels", ({ fsid, labels }) =>
-		metadata_command.remove_labels(fsid, ...labels).cata(Result.catas.or_else(alert_rrr)),
+		metadata_command.remove_labels(fsid, ...labels).cata(result.catas.or_else(alert_rrr)),
 	)
 
 	commands.on("cmd.metadata.set_property", ({ fsid, key, value }) =>
-		metadata_command.set_property(fsid, key, value).cata(Result.catas.or_else(alert_rrr)),
+		metadata_command.set_property(fsid, key, value).cata(result.catas.or_else(alert_rrr)),
 	)
 
 	commands.on("cmd.metadata.create", params => {
-		metadata_command.create(params).cata(Result.catas.or_else(alert_rrr))
+		metadata_command.create(params).cata(result.catas.or_else(alert_rrr))
 	})
 
 	commands.on("cmd.metadata.move", ({ fsid, new_parent }) =>
-		metadata_command.set_parent(fsid, new_parent).cata(Result.catas.or_else(alert_rrr)),
+		metadata_command.set_parent(fsid, new_parent).cata(result.catas.or_else(alert_rrr)),
 	)
 
 	commands.on("cmd.metadata.remove", fsid => {
-		const user = queries.user.get_current().cata(Result.catas.or_else(() => null))
-		metadata_command.remove(fsid).cata(Result.catas.or_else(alert_rrr))
+		const user = queries.user.get_current().cata(result.catas.or_else(() => null))
+		metadata_command.remove(fsid).cata(result.catas.or_else(alert_rrr))
 		content_repository
 			.remove(user?.get_uid() ?? null, fsid)
 			.cata(oath.catas.to_promise())
@@ -94,24 +94,24 @@ export const init_metadata: TInitMetadataFn = call_once(content_repository => {
 	})
 
 	commands.on("cmd.metadata.add_links", ({ fsid, links }) =>
-		metadata_command.add_links(fsid, ...links).cata(Result.catas.or_else(alert_rrr)),
+		metadata_command.add_links(fsid, ...links).cata(result.catas.or_else(alert_rrr)),
 	)
 
 	commands.on("cmd.metadata.remove_links", ({ fsid, links }) =>
-		metadata_command.remove_links(fsid, ...links).cata(Result.catas.or_else(alert_rrr)),
+		metadata_command.remove_links(fsid, ...links).cata(result.catas.or_else(alert_rrr)),
 	)
 
 	commands.on("cmd.metadata.rename", ({ fsid, new_name }) =>
-		metadata_command.set_name(fsid, new_name).cata(Result.catas.or_else(alert_rrr)),
+		metadata_command.set_name(fsid, new_name).cata(result.catas.or_else(alert_rrr)),
 	)
 
 	commands.on("cmd.metadata.edit_label", ({ old_label, new_label }) =>
-		metadata_command.update_label(old_label, new_label).cata(Result.catas.or_else(alert_rrr)),
+		metadata_command.update_label(old_label, new_label).cata(result.catas.or_else(alert_rrr)),
 	)
 
 	const get_metadata_query = (fid: symbol) =>
 		MetadataQuery.Of(metadata_repository, permission =>
-			Result.If(known_functions.has_permissions(fid, { queries: [permission] }), {
+			result.If(known_functions.has_permissions(fid, { queries: [permission] }), {
 				F: () => {
 					const e = rrr.codes.eperm(`MetadataQuery permission RRR. Did you forget to request query permission '${permission}'?`)
 					console_logger.error(e.message)

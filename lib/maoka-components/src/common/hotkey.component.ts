@@ -23,7 +23,7 @@ import { Maoka } from "@ordo-pink/maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
-import { Result } from "@ordo-pink/result"
+import { result } from "@ordo-pink/result"
 import { sweech } from "@ordo-pink/sweech"
 import { create_hotkey_from_event } from "@ordo-pink/hotkey-from-event"
 import { title_case } from "@ordo-pink/tau"
@@ -94,11 +94,11 @@ export const Hotkey = (
 		)
 
 		return () => [
-			Result.If(split.includes("ctrl")).cata(Result.catas.if_ok(() => ctrl)),
-			Result.If(split.includes("meta")).cata(Result.catas.if_ok(() => meta)),
-			Result.If(split.includes("option")).cata(Result.catas.if_ok(() => option)),
-			Result.If(split.includes("mod")).cata(Result.catas.if_ok(() => mod)),
-			Result.If(split.includes("shift")).cata(Result.catas.if_ok(() => shift)),
+			result.If(split.includes("ctrl")).cata(result.catas.if_ok(() => ctrl)),
+			result.If(split.includes("meta")).cata(result.catas.if_ok(() => meta)),
+			result.If(split.includes("option")).cata(result.catas.if_ok(() => option)),
+			result.If(split.includes("mod")).cata(result.catas.if_ok(() => mod)),
+			result.If(split.includes("shift")).cata(result.catas.if_ok(() => shift)),
 
 			Key(symbol),
 		]

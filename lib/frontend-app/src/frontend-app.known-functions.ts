@@ -20,8 +20,7 @@
  */
 
 import * as tau from "@ordo-pink/tau"
-import { Result, type TResult } from "@ordo-pink/result"
-import { Option } from "@ordo-pink/option"
+import { type Result, result } from "@ordo-pink/result"
 import { ordo_app_state } from "../app.state"
 
 // TODO: Extend query list :: data, etc.
@@ -30,15 +29,15 @@ export const init_known_functions = tau.call_once((): OrdoInternal.KnownFunction
 
 	const known_functions: OrdoInternal.KnownFunction[] = [app_fn]
 
-	const find_by_fid = (fid: symbol | null) => Result.FromNullable(known_functions.find(f => f.fid === fid))
+	const find_by_fid = (fid: symbol | null) => result.FromNullable(known_functions.find(f => f.fid === fid))
 
-	const find_by_name = (name: string | null) => Result.FromNullable(known_functions.find(f => f.name === name))
+	const find_by_name = (name: string | null) => result.FromNullable(known_functions.find(f => f.name === name))
 
 	const check_name_is_not_taken = (name: string): TResult<string, false> =>
-		Result.If(!known_functions.some(has_name(name)), { T: () => name })
+		result.If(!known_functions.some(has_name(name)), { T: () => name })
 
 	const save = (func: OrdoInternal.KnownFunction): TResult<OrdoInternal.KnownFunction, unknown> =>
-		Result.Ok(func).pipe(Result.ops.tap(() => known_functions.push(func)))
+		result.Ok(func).pipe(result.ops.tap(() => known_functions.push(func)))
 
 	const get_index = (func: OrdoInternal.KnownFunction) => known_functions.indexOf(func)
 
@@ -50,28 +49,29 @@ export const init_known_functions = tau.call_once((): OrdoInternal.KnownFunction
 		validate: (fid: symbol | null) => find_by_fid(fid).cata({ Err: tau.F, Ok: tau.T }),
 		exchange: (fid: symbol | null) =>
 			find_by_fid(fid)
-				.pipe(Result.ops.map(pick_known_f_name))
+				.pipe(result.ops.map(pick_known_f_name))
 				.cata({ Err: () => Option.None(), Ok: name => Option.Some(name) }),
 		is_internal: (fid: symbol | null) => is_internal(fid),
 		has_permissions: (fid: symbol | null, permissions: Partial<Ordo.CreateFunction.Permissions>) =>
 			is_internal(fid) ||
 			find_by_fid(fid)
-				.pipe(Result.ops.map(tau.prop("permissions")))
-				.pipe(Result.ops.chain(validate_checked_permissions(permissions)))
-				.pipe(Result.ops.map(check_permissions(permissions)))
+				.pipe(result.ops.map(tau.prop("permissions")))
+				.pipe(result.ops.chain(validate_checked_permissions(permissions)))
+				.pipe(result.ops.map(check_permissions(permissions)))
 				.cata({ Err: tau.F, Ok: x => x }),
 		register: (name: string | null, permissions: Ordo.CreateFunction.Permissions) =>
-			Result.FromNullable(name)
-				.pipe(Result.ops.chain(check_is_valid_permissions(permissions)))
-				.pipe(Result.ops.chain(check_is_valid_name))
-				.pipe(Result.ops.chain(check_name_is_not_taken))
-				.pipe(Result.ops.map(create_known_f_from_name(permissions)))
-				.pipe(Result.ops.chain(save))
+			result
+				.FromNullable(name)
+				.pipe(result.ops.chain(check_is_valid_permissions(permissions)))
+				.pipe(result.ops.chain(check_is_valid_name))
+				.pipe(result.ops.chain(check_name_is_not_taken))
+				.pipe(result.ops.map(create_known_f_from_name(permissions)))
+				.pipe(result.ops.chain(save))
 				.cata({ Err: tau.N, Ok: pick_known_f_id }),
 		unregister: (name: string | null) =>
 			find_by_name(name)
-				.pipe(Result.ops.map(get_index))
-				.pipe(Result.ops.map(remove_known_f_by_index))
+				.pipe(result.ops.map(get_index))
+				.pipe(result.ops.map(remove_known_f_by_index))
 				.cata({ Err: tau.F, Ok: tau.T }),
 	}
 
@@ -82,10 +82,10 @@ export const init_known_functions = tau.call_once((): OrdoInternal.KnownFunction
 
 // --- Internal ---
 
-const check_is_valid_name = (name: string) => Result.If(tau.is_non_empty_string(name), { T: () => name })
+const check_is_valid_name = (name: string) => result.If(tau.is_non_empty_string(name), { T: () => name })
 
 const check_is_valid_permissions = (permissions: Ordo.CreateFunction.Permissions) => (name: string) =>
-	Result.If(tau.is_object(permissions) && tau.is_array(permissions.commands) && tau.is_array(permissions.queries), {
+	result.If(tau.is_object(permissions) && tau.is_array(permissions.commands) && tau.is_array(permissions.queries), {
 		T: () => name,
 	})
 
@@ -113,7 +113,7 @@ const check_permissions =
 
 const validate_checked_permissions =
 	(permissions: Partial<Ordo.CreateFunction.Permissions>) => (granted_permissions: Ordo.CreateFunction.Permissions) =>
-		Result.If(
+		result.If(
 			tau.is_object(permissions) &&
 				((Array.isArray(permissions.commands) && !tau.is_empty_array(permissions.commands)) ||
 					(Array.isArray(permissions.queries) && !tau.is_empty_array(permissions.queries))),

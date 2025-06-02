@@ -1,172 +1,165 @@
 /*
- * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-FileCopyrightext: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
  * SPDX-License-Identifier: Unlicense
  */
 
-import { TOption } from "@ordo-pink/option"
-import type { TSwitch } from "@ordo-pink/sweech"
+import type { Sweech } from "@ordo-pink/sweech"
 
-export type TMatchResultFn = <$TOk, $TErr>(result: TResult<$TOk, $TErr>) => TSwitch<$TOk | $TErr, []>
+export type MatchResultFn = <$Ok, $Err>(result: Result.Instance<$Ok, $Err>) => Sweech.Instance<$Ok | $Err, []>
 
-type ArrayToUnion<$T> = $T extends Array<infer U> ? U : $T
-type RecordToUnion<$T extends Record<string, unknown>> = { [P in keyof $T]: $T[P] }[keyof $T]
+type ArrayToUnion<$> = $ extends Array<infer U> ? U : $
+type RecordToUnion<$ extends Record<string, unknown>> = { [P in keyof $]: $[P] }[keyof $]
 
-export type DoubtfulButOkay<$T> = $T extends object & {
+export type DoubtfulButOkay<$> = $ extends object & {
 	pipe(f: infer F): any
 }
-	? F extends (x: TResult<infer V, infer _>) => any
+	? F extends (x: Result.Instance<infer V, infer _>) => any
 		? V
 		: never
-	: $T
+	: $
 
-export type ErrWhat<$T> = $T extends object & {
+export type ErrWhat<$> = $ extends object & {
 	pipe(f: infer F): any
 }
-	? F extends (x: TResult<infer _, infer V>) => any
+	? F extends (x: Result.Instance<infer _, infer V>) => any
 		? ErrWhat<V>
 		: never
 	: never
 
-export type TOkResultConstructorFn = <$TOk, $TErr = never>(ok: $TOk) => TResult<$TOk, $TErr>
+export type OkResultConstructorFn = <$Ok, $Err = never>(ok: $Ok) => Result.Instance<$Ok, $Err>
 
-export type TErrResultConstructorFn = <$TErr, $TOk = never>(err: $TErr) => TResult<$TOk, $TErr>
+export type ErrResultConstructorFn = <$Err, $Ok = never>(err: $Err) => Result.Instance<$Ok, $Err>
 
-export type TFromOptionConstructorFn = <$TOk, $TErr = void>(
-	option: TOption<$TOk>,
-	on_none?: () => $TErr,
-) => TResult<$TOk, $TErr>
-
-export type TMergeResultConstructorFn = <TSomeThings extends readonly unknown[] | [] | Record<string, unknown>>(
-	results: TSomeThings,
-) => TResult<
-	TSomeThings extends []
-		? { -readonly [P in keyof TSomeThings]: DoubtfulButOkay<TSomeThings[P]> }
-		: { [P in keyof TSomeThings]: DoubtfulButOkay<TSomeThings[P]> },
-	TSomeThings extends Array<any>
-		? ArrayToUnion<{ -readonly [P in keyof TSomeThings]: ErrWhat<TSomeThings[P]> }>
-		: RecordToUnion<{ [P in keyof TSomeThings]: ErrWhat<TSomeThings[P]> }>
+export type MergeResultConstructorFn = <SomeThings extends readonly unknown[] | [] | Record<string, unknown>>(
+	results: SomeThings,
+) => Result.Instance<
+	SomeThings extends []
+		? { -readonly [P in keyof SomeThings]: DoubtfulButOkay<SomeThings[P]> }
+		: { [P in keyof SomeThings]: DoubtfulButOkay<SomeThings[P]> },
+	SomeThings extends Array<any>
+		? ArrayToUnion<{ -readonly [P in keyof SomeThings]: ErrWhat<SomeThings[P]> }>
+		: RecordToUnion<{ [P in keyof SomeThings]: ErrWhat<SomeThings[P]> }>
 >
 
-export type TTryResultConstructorFn = <$TOk, $TErr = unknown>(
-	trier: () => $TOk,
-	catcher?: (error: unknown) => $TErr,
-) => TResult<$TOk, $TErr>
+export type TryResultConstructorFn = <$Ok, $Err = unknown>(
+	trier: () => $Ok,
+	catcher?: (error: unknown) => $Err,
+) => Result.Instance<$Ok, $Err>
 
-export type TFromNullableResultConstructorFn = <$TOk, $TErr = null>(
-	x?: $TOk | null,
-	on_null?: () => $TErr,
-) => TResult<NonNullable<$TOk>, $TErr>
+export type FromNullableResultConstructorFn = <$Ok, $Err = null>(
+	x?: $Ok | null,
+	on_null?: () => $Err,
+) => Result.Instance<NonNullable<$Ok>, $Err>
 
-export type TIfResultConstructorFn = <$TOk = undefined, $TErr = undefined>(
+export type IfResultConstructorFn = <$Ok = undefined, $Err = undefined>(
 	predicate: boolean,
-	returns?: { T?: () => $TOk; F?: () => $TErr },
-) => TResult<$TOk, $TErr>
+	returns?: { T?: () => $Ok; F?: () => $Err },
+) => Result.Instance<$Ok, $Err>
 
-export type TMapResultOperatorFn = <$TOk, $TErr, $TNewOk>(
-	on_ok: (x: $TOk) => $TNewOk,
-) => (result: TResult<$TOk, $TErr>) => TResult<$TNewOk, $TErr>
+export type MapResultOperatorFn = <$Ok, $Err, $NewOk>(
+	on_ok: (x: $Ok) => $NewOk,
+) => (result: Result.Instance<$Ok, $Err>) => Result.Instance<$NewOk, $Err>
 
-export type TErrMapResultOperatorFn = <$TOk, $TErr, $TNewRrr>(
-	on_err: (x: $TErr) => $TNewRrr,
-) => (result: TResult<$TOk, $TErr>) => TResult<$TOk, $TNewRrr>
+export type ErrMapResultOperatorFn = <$Ok, $Err, $NewRrr>(
+	on_err: (x: $Err) => $NewRrr,
+) => (result: Result.Instance<$Ok, $Err>) => Result.Instance<$Ok, $NewRrr>
 
-export type TBiMapResultOperatorFn = <$TOk, $TErr, $TNewOk, $TNewRrr>(
-	on_err: (x: $TErr) => $TNewRrr,
-	on_ok: (x: $TOk) => $TNewOk,
-) => (result: TResult<$TOk, $TErr>) => TResult<$TNewOk, $TNewRrr>
+export type BiMapResultOperatorFn = <$Ok, $Err, $NewOk, $NewRrr>(
+	on_err: (x: $Err) => $NewRrr,
+	on_ok: (x: $Ok) => $NewOk,
+) => (result: Result.Instance<$Ok, $Err>) => Result.Instance<$NewOk, $NewRrr>
 
-export type TChainResultOperatorFn = <$TOk, $TErr, $TNewOk, $TNewRrr>(
-	on_ok: (x: $TOk) => TResult<$TNewOk, $TNewRrr>,
-) => (result: TResult<$TOk, $TErr>) => TResult<$TNewOk, $TErr | $TNewRrr>
+export type ChainResultOperatorFn = <$Ok, $Err, $NewOk, $NewRrr>(
+	on_ok: (x: $Ok) => Result.Instance<$NewOk, $NewRrr>,
+) => (result: Result.Instance<$Ok, $Err>) => Result.Instance<$NewOk, $Err | $NewRrr>
 
-export type TErrChainResultOperatorFn = <$TOk, $TErr, $TNewOk, $TNewRrr>(
-	on_err: (x: $TErr) => TResult<$TNewOk, $TNewRrr>,
-) => (result: TResult<$TOk, $TErr>) => TResult<$TOk, $TNewRrr>
+export type ErrChainResultOperatorFn = <$Ok, $Err, $NewOk, $NewRrr>(
+	on_err: (x: $Err) => Result.Instance<$NewOk, $NewRrr>,
+) => (result: Result.Instance<$Ok, $Err>) => Result.Instance<$Ok, $NewRrr>
 
-export type TBiChainResultOperatorFn = <$TOk, $TErr, $TNewOk, $TNewRrr>(
-	on_err: (x: $TErr) => TResult<$TNewOk, $TNewRrr>,
-	on_ok: (x: $TOk) => TResult<$TNewOk, $TNewRrr>,
-) => (result: TResult<$TOk, $TErr>) => TResult<$TNewOk, $TNewRrr>
+export type BiChainResultOperatorFn = <$Ok, $Err, $NewOk, $NewRrr>(
+	on_err: (x: $Err) => Result.Instance<$NewOk, $NewRrr>,
+	on_ok: (x: $Ok) => Result.Instance<$NewOk, $NewRrr>,
+) => (result: Result.Instance<$Ok, $Err>) => Result.Instance<$NewOk, $NewRrr>
 
-export type TTapResultOperatorFn = <$TOk, $TErr>(
-	on_ok: (x: $TOk) => any,
-) => (result: TResult<$TOk, $TErr>) => TResult<$TOk, $TErr>
+export type TapResultOperatorFn = <$Ok, $Err>(
+	on_ok: (x: $Ok) => any,
+) => (result: Result.Instance<$Ok, $Err>) => Result.Instance<$Ok, $Err>
 
-export type TErrTapResultOperatorFn = <$TOk, $TErr>(
-	on_err: (x: $TErr) => any,
-) => (result: TResult<$TOk, $TErr>) => TResult<$TOk, $TErr>
+export type ErrTapResultOperatorFn = <$Ok, $Err>(
+	on_err: (x: $Err) => any,
+) => (result: Result.Instance<$Ok, $Err>) => Result.Instance<$Ok, $Err>
 
-export type TBiTapResultOperatorFn = <$TOk, $TErr>(
-	on_err: (x: $TErr) => any,
-	on_ok: (x: $TOk) => any,
-) => (result: TResult<$TOk, $TErr>) => TResult<$TOk, $TErr>
+export type BiTapResultOperatorFn = <$Ok, $Err>(
+	on_err: (x: $Err) => any,
+	on_ok: (x: $Ok) => any,
+) => (result: Result.Instance<$Ok, $Err>) => Result.Instance<$Ok, $Err>
 
-export type TSwapResultOperatorFn = <$TOk, $TErr>() => (result: TResult<$TOk, $TErr>) => TResult<$TErr, $TOk>
+export type SwapResultOperatorFn = <$Ok, $Err>() => (result: Result.Instance<$Ok, $Err>) => Result.Instance<$Err, $Ok>
 
-export type TIsResultGuardFn<$TOk = unknown, $TErr = unknown> = (x: unknown) => x is TResult<$TOk, $TErr>
+export type IsResultGuardFn<$Ok = unknown, $Err = unknown> = (x: unknown) => x is Result.Instance<$Ok, $Err>
 
-export type TIsOkGuardFn = <_TOk, _TErr>(x: TResult<_TOk, _TErr>) => x is TResult<_TOk, never>
+export type IsOkGuardFn = <$Ok, $Err>(x: Result.Instance<$Ok, $Err>) => x is Result.Instance<$Ok, never>
 
-export type TIsErrGuardFn = <_TOk, _TErr>(x: TResult<_TOk, _TErr>) => x is TResult<never, _TErr>
+export type IsErrGuardFn = <$Ok, $Err>(x: Result.Instance<$Ok, $Err>) => x is Result.Instance<never, $Err>
 
-export type TOrElseCataFn = <_TOk, _TErr, _TNewErr>(
-	on_err: (err: _TErr) => _TNewErr,
-) => { Ok: (on_ok: _TOk) => _TOk; Err: (err: _TErr) => _TNewErr }
+export type OrElseCataFn = <$Ok, $Err, _NewErr>(
+	on_err: (err: $Err) => _NewErr,
+) => { ok: (on_ok: $Ok) => $Ok; err: (err: $Err) => _NewErr }
 
-export type TExpectFn = <_TOk, _TErr>(on_err: (err: _TErr) => void) => { Ok: (on_ok: _TOk) => _TOk; Err: (err: _TErr) => never }
+export type ExpectFn = <$Ok, $Err>(on_err: (err: $Err) => void) => { ok: (on_ok: $Ok) => $Ok; err: (err: $Err) => never }
 
-export type TThrowFn = <$TOk, $TErr>() => { Ok: (ok: $TOk) => $TOk; Err: (err: $TErr) => never }
+export type ThrowFn = <$Ok, $Err>() => { ok: (ok: $Ok) => $Ok; err: (err: $Err) => never }
 
-export type TIfOkCataFn = <_TOk, _TNewOk>(on_ok: (ok: _TOk) => _TNewOk) => { Ok: (on_ok: _TOk) => _TNewOk; Err: () => void }
+export type IfOkCataFn = <$Ok, $NewOk>(on_ok: (ok: $Ok) => $NewOk) => { ok: (on_ok: $Ok) => $NewOk; err: () => void }
 
-export type TOrNothingCata = <_TOk>() => { Ok: (ok: _TOk) => _TOk; Err: () => undefined }
+export type OrNothingCata = <$Ok>() => { ok: (ok: $Ok) => $Ok; err: () => undefined }
 
-export type TResultStatic = {
-	of: TOkResultConstructorFn
-	Ok: TOkResultConstructorFn
-	Err: TErrResultConstructorFn
-	Try: TTryResultConstructorFn
-	If: TIfResultConstructorFn
-	FromNullable: TFromNullableResultConstructorFn
-	FromOption: TFromOptionConstructorFn
-	Merge: TMergeResultConstructorFn
-	guards: {
-		is_result: TIsResultGuardFn
-		is_ok: TIsOkGuardFn
-		is_err: TIsErrGuardFn
+export type UnwrapOk<$Result> = $Result extends Result.Instance<infer $Ok, any> ? $Ok : never
+export type UnwrapErr<$Result> = $Result extends Result.Instance<any, infer $Err> ? $Err : never
+
+export namespace Result {
+	export type Instance<$Ok, $Err> = {
+		get is_ok(): boolean
+		get is_err(): boolean
+		get is_result(): true
+		/** @deprecated UNSAFE. Use `result.cata` instead. */
+		unwrap: () => $Ok | $Err
+		pipe: <$Ok, $Err>(operator: (result: Instance<$Ok, $Err>) => Instance<$Ok, $Err>) => Instance<$Ok, $Err>
+		cata: <$Ok, $Err>(explosion: { ok: (ok: $Ok) => $Ok; err: (err: $Err) => $Err }) => $Ok | $Err
 	}
-	catas: {
-		or_nothing: TOrNothingCata
-		or_else: TOrElseCataFn
-		if_ok: TIfOkCataFn
-		expect: TExpectFn
-		throw: TThrowFn
-	}
-	ops: {
-		map: TMapResultOperatorFn
-		err_map: TErrMapResultOperatorFn
-		bimap: TBiMapResultOperatorFn
-		chain: TChainResultOperatorFn
-		err_chain: TErrChainResultOperatorFn
-		bichain: TBiChainResultOperatorFn
-		tap: TTapResultOperatorFn
-		err_tap: TErrTapResultOperatorFn
-		bitap: TBiTapResultOperatorFn
-		swap: TSwapResultOperatorFn
-	}
-}
 
-export type TUnwrapOk<$TResult> = $TResult extends TResult<infer _TOk, any> ? _TOk : never
-export type TUnwrapErr<$TResult> = $TResult extends TResult<any, infer _TErr> ? _TErr : never
-
-export type TResult<$TOk, $TErr> = {
-	get is_ok(): boolean
-	get is_err(): boolean
-	get is_result(): true
-	/**
-	 * @deprecated UNSAFE. Use `result.cata` instead.
-	 */
-	unwrap: () => $TOk | $TErr
-	pipe: <_TOk, _TErr>(operator: (result: TResult<$TOk, $TErr>) => TResult<_TOk, _TErr>) => TResult<_TOk, _TErr>
-	cata: <_TOk, _TErr>(explosion: { Ok: (ok: $TOk) => _TOk; Err: (err: $TErr) => _TErr }) => _TOk | _TErr
+	export type Static = {
+		of: OkResultConstructorFn
+		ok: OkResultConstructorFn
+		err: ErrResultConstructorFn
+		try: TryResultConstructorFn
+		if: IfResultConstructorFn
+		from_nullable: FromNullableResultConstructorFn
+		merge: MergeResultConstructorFn
+		guards: {
+			is_result: IsResultGuardFn
+			is_ok: IsOkGuardFn
+			is_err: IsErrGuardFn
+		}
+		catas: {
+			or_nothing: OrNothingCata
+			or_else: OrElseCataFn
+			if_ok: IfOkCataFn
+			expect: ExpectFn
+			throw: ThrowFn
+		}
+		ops: {
+			map: MapResultOperatorFn
+			err_map: ErrMapResultOperatorFn
+			bimap: BiMapResultOperatorFn
+			chain: ChainResultOperatorFn
+			err_chain: ErrChainResultOperatorFn
+			bichain: BiChainResultOperatorFn
+			tap: TapResultOperatorFn
+			err_tap: ErrTapResultOperatorFn
+			bitap: BiTapResultOperatorFn
+			swap: SwapResultOperatorFn
+		}
+	}
 }

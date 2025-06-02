@@ -25,7 +25,7 @@
 
 import { METADATA_CONTENT_FSID, Metadata, rrr } from "@ordo-pink/core"
 import { Oath, oath } from "@ordo-pink/oath"
-import { Result } from "@ordo-pink/result"
+import { result } from "@ordo-pink/result"
 import { is_array } from "@ordo-pink/tau"
 
 import { ordo_app_state } from "../app.state"
@@ -85,8 +85,8 @@ export const MetadataManager = {
 
 					const dtos = metadata_repository
 						.get()
-						.pipe(Result.ops.map(metadata => metadata.map(item => item.to_dto())))
-						.cata(Result.catas.or_else(() => null))
+						.pipe(result.ops.map(metadata => metadata.map(item => item.to_dto())))
+						.cata(result.catas.or_else(() => null))
 
 					if (!dtos) return // TODO Log error, do stuff
 

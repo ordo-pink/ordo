@@ -5,9 +5,8 @@
 
 import { S3Client, S3File } from "bun"
 
+import { type Data, type User, rrr } from "@ordo-pink/sdk-core"
 import { oath } from "@ordo-pink/oath"
-import { prop } from "@ordo-pink/tau"
-import { rrr } from "@ordo-pink/core"
 
 import { PersistenceStrategyDataBunS3 } from "./backend-persistence-strategy-data-bun-s3.types"
 
@@ -37,45 +36,45 @@ export const create_persistence_strategy_data_bun_s3: PersistenceStrategyDataBun
 		exists: (uid, fsid) =>
 			get_key(uid, fsid)
 				.pipe(oath.ops.chain(check_file_exists(s3)))
-				.pipe(oath.ops.map(prop("exists"))),
+				.pipe(oath.ops.map(({ exists }) => exists)),
 
 		create: (uid, fsid, content) =>
 			get_key(uid, fsid)
 				.pipe(oath.ops.chain(validate_file_does_not_exist(s3)))
-				.pipe(oath.ops.map(prop("path")))
+				.pipe(oath.ops.map(({ path }) => path))
 				.pipe(oath.ops.chain(write_file(s3, content))),
 
 		read: (uid, fsid) =>
 			get_key(uid, fsid)
 				.pipe(oath.ops.chain(validate_file_exists(s3)))
-				.pipe(oath.ops.map(prop("file")))
+				.pipe(oath.ops.map(({ file }) => file))
 				.pipe(oath.ops.chain(get_file_content)),
 
 		update: (uid, fsid, content) =>
 			get_key(uid, fsid)
 				.pipe(oath.ops.chain(get_file(s3)))
-				.pipe(oath.ops.map(prop("path")))
+				.pipe(oath.ops.map(({ path }) => path))
 				.pipe(oath.ops.chain(write_file(s3, content))),
 
 		delete: (uid, fsid) =>
 			get_key(uid, fsid)
 				.pipe(oath.ops.chain(validate_file_exists(s3)))
-				.pipe(oath.ops.map(prop("file")))
+				.pipe(oath.ops.map(({ file }) => file))
 				.pipe(oath.ops.chain(delete_file)),
 
 		mtime: (uid, fsid) =>
 			get_key(uid, fsid)
 				.pipe(oath.ops.chain(validate_file_exists(s3)))
-				.pipe(oath.ops.map(prop("file")))
+				.pipe(oath.ops.map(({ file }) => file))
 				.pipe(oath.ops.chain(get_file_modification_timestamp)),
 	}
 }
 
 // --- Internal ---
 
-const already_exists_rrr = () => rrr.codes.eexist("File already exists")
-const not_found_rrr = () => rrr.codes.enoent("File not found")
-const io_rrr = (e: unknown) => rrr.codes.eio("Failed to connect to S3", e)
+const already_exists_rrr = () => rrr.eexist("File already exists")
+const not_found_rrr = () => rrr.enoent("File not found")
+const io_rrr = (e: unknown) => rrr.eio("Failed to connect to S3", e)
 
 const get_file = (s3: S3Client) => (path: string) =>
 	oath
@@ -87,7 +86,7 @@ const check_file_exists = (s3: S3Client) => (path: string) =>
 	oath
 		.resolve(get_file(s3))
 		.pipe(oath.ops.chain(f => f(path)))
-		.pipe(oath.ops.map(prop("file")))
+		.pipe(oath.ops.map(({ file }) => file))
 		.pipe(
 			oath.ops.chain(file =>
 				oath
@@ -132,4 +131,4 @@ const get_file_modification_timestamp = (file: S3File) =>
 
 const get_file_content = (file: S3File) => oath.try(() => file.readable).pipe(oath.ops.rmap(io_rrr))
 
-const get_key = (uid: Ordo.User.UID, fsid: Ordo.Metadata.FSID) => oath.resolve(`${uid}/${fsid}`)
+const get_key = (uid: User.ID, fsid: Data.ID) => oath.resolve(`${uid}/${fsid}`)

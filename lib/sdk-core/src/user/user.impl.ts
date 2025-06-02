@@ -1,35 +1,30 @@
-import { authenticated } from "./mixins/authenticated.mixin"
-import { creatable } from "./mixins/creatable.mixin"
-import { identifiable } from "../mixins/identifiable.mixin"
-import { mix } from "../sdk-core.impl"
-import { named } from "../mixins/named.mixin"
-import { receptive } from "./mixins/receptive.mixin"
-import { referable } from "./mixins/referable.mixin"
-import { space_limited } from "./mixins/space-limited.mixin"
-import { subscribed } from "./mixins/subscribed.mixin"
-import { timestampable } from "../mixins/timestampable.mixin"
-import { ui_extendable } from "./mixins/ui-extendable.mixin"
-import { user_transferable } from "./mixins/transferable.mixin"
+import type { Core } from "../core/core.types"
+import type { User } from "./user.types"
+import { core } from "../core/core.impl"
+import { core_mixins } from "../mixins/mixins.impl"
+import { user_mixins } from "./user.mixins"
 
-export const public_user = mix(
-	identifiable,
-	named.mixin,
-	referable.mixin,
-	subscribed.mixin,
-	timestampable.without_updates,
-	user_transferable.public_mixin,
-)
+export namespace user {
+	export const someone: Core.Impl<User.Someone.Interface> = core.mix(
+		core_mixins.identifiable,
+		core_mixins.named,
+		user_mixins.referable,
+		user_mixins.subscribed,
+		core_mixins.timestampable.without_updates,
+		user_mixins.serializable.someone,
+	)
 
-export const current_user = mix(
-	identifiable,
-	named.mixin,
-	referable.mixin,
-	subscribed.mixin,
-	timestampable.without_updates,
-	authenticated.mixin,
-	creatable.mixin,
-	receptive.mixin,
-	space_limited.mixin,
-	ui_extendable.mixin,
-	user_transferable.current_mixin,
-)
+	export const me = core.mix(
+		core_mixins.identifiable,
+		core_mixins.named,
+		user_mixins.referable,
+		user_mixins.subscribed,
+		core_mixins.timestampable.without_updates,
+		user_mixins.authenticated,
+		user_mixins.receptive,
+		user_mixins.space_limited,
+		user_mixins.ui_extendable,
+		user_mixins.creatable.me,
+		user_mixins.serializable.me,
+	)
+}

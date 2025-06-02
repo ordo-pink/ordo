@@ -1,25 +1,25 @@
 import { describe, expect, it } from "bun:test"
 
-import { current_user, public_user } from "./user.impl"
+import { user } from "./user.impl"
 
 describe("user", () => {
 	describe("other", () => {
 		describe("create_id", () => {
 			it("should create an identifier", () => {
-				expect(public_user.create_id()).toBeTypeOf("string")
-				expect(public_user.validations.is_id(public_user.create_id())).toBeTrue()
+				expect(user.someone.create_id()).toBeTypeOf("string")
+				expect(user.someone.validations.is_id(user.someone.create_id())).toBeTrue()
 			})
 		})
 
 		describe("create_timestamp", () => {
 			it("should create a timestamp", () => {
-				expect(public_user.create_timestamp()).toBeTypeOf("number")
-				expect(public_user.validations.is_timestamp(public_user.create_timestamp())).toBeTrue()
+				expect(user.someone.create_timestamp()).toBeTypeOf("number")
+				expect(user.someone.validations.is_timestamp(user.someone.create_timestamp())).toBeTrue()
 			})
 		})
 
 		describe("validations", () => {
-			const { is_dto, is_handle, is_id, is_name, is_subscription, is_timestamp } = public_user.validations
+			const { is_dto, is_handle, is_id, is_name, is_subscription, is_timestamp } = user.someone.validations
 
 			it("is_id should verify UUID", () => {
 				expect(is_id(crypto.randomUUID())).toBeTrue()
@@ -61,21 +61,21 @@ describe("user", () => {
 		})
 
 		describe("instance", () => {
-			const id = public_user.create_id()
-			const created_at = public_user.create_timestamp()
+			const id = user.someone.create_id()
+			const created_at = user.someone.create_timestamp()
 			const handle = "@test"
-			const subscription = public_user.get_default_subscription()
+			const subscription = user.someone.get_default_subscription()
 			const name = "Test Testfield"
 
-			const user = public_user.from_dto(id, created_at, handle, subscription, name)
+			const u = user.someone.from_dto(id, created_at, handle, subscription, name)
 
 			it("should return valid id", () => {
-				expect(user.get_id()).toBe(id)
+				expect(u.get_id()).toBe(id)
 			})
 
 			it("should have valid id", () => {
-				expect(user.has_id(id)).toBeTrue()
-				expect(user.has_id(crypto.randomUUID())).toBeFalse()
+				expect(u.has_id(id)).toBeTrue()
+				expect(u.has_id(crypto.randomUUID())).toBeFalse()
 			})
 		})
 	})

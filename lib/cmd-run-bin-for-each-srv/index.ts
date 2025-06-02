@@ -8,7 +8,7 @@ import node_path from "node:path"
 
 import { noop } from "@ordo-pink/tau"
 import { oath } from "@ordo-pink/oath"
-import { run_async_command } from "@ordo-pink/binutil"
+import { run_async_command } from "@ordo-pink/cmd-runner"
 
 export const run_bin_for_each_srv = async (bin_name: string): Promise<void> => {
 	const srvs = await node_fs.promises.readdir("srv")

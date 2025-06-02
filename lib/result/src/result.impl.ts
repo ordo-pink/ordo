@@ -7,7 +7,7 @@ import { is_bool, is_false, is_fn, is_object, is_true, noop } from "@ordo-pink/t
 
 import type * as Types from "./result.types"
 
-export const ResultOk: Types.TOkResultConstructorFn = x => ({
+const ok: Types.OkResultConstructorFn = x => ({
 	get is_ok() {
 		return true
 	},
@@ -18,11 +18,11 @@ export const ResultOk: Types.TOkResultConstructorFn = x => ({
 		return true as const
 	},
 	unwrap: () => x,
-	pipe: f => f(ResultOk(x)),
+	pipe: f => f(ok(x)),
 	cata: e => e.Ok(x),
 })
 
-export const ResultErr: Types.TErrResultConstructorFn = x => ({
+const err: Types.ErrResultConstructorFn = x => ({
 	get is_ok() {
 		return false
 	},
@@ -33,138 +33,131 @@ export const ResultErr: Types.TErrResultConstructorFn = x => ({
 		return true as const
 	},
 	unwrap: () => x,
-	pipe: f => f(ResultErr(x)),
+	pipe: f => f(err(x)),
 	cata: e => e.Err(x),
 })
 
-export const ResultTry: Types.TTryResultConstructorFn = (t, c = x => x as any) => {
+const try_catch: Types.TryResultConstructorFn = (t, c = x => x as any) => {
 	try {
-		return ResultOk(t())
+		return ok(t())
 	} catch (e) {
-		return ResultErr(c(e))
+		return err(c(e))
 	}
 }
 
-export const ResultFromOption: Types.TFromOptionConstructorFn = (o, onNone = () => void 0 as any) =>
-	o.cata({ Some: ResultOk, None: () => ResultErr(onNone()) })
+const from_nullable: Types.FromNullableResultConstructorFn = (x, onNull = () => null as any) =>
+	x != null ? ok(x) : err(onNull())
 
-export const ResultFromNullable: Types.TFromNullableResultConstructorFn = (x, onNull = () => null as any) =>
-	x != null ? ResultOk(x) : ResultErr(onNull())
-
-export const ResultMerge: Types.TMergeResultConstructorFn = rs => {
+const merge: Types.MergeResultConstructorFn = rs => {
 	if (Array.isArray(rs)) {
 		return rs.reduce(
-			(acc: Types.TResult<any[], any>, r) =>
+			(acc: Types.Result.Instance<any[], any>, r) =>
 				acc.pipe(
-					R.ops.chain(results =>
-						r && (r as Types.TResult<any, any>).is_result
-							? (r as Types.TResult<any, any>).cata({
-									Ok: v => R.Ok(results.concat(v)),
-									Err: R.Err,
+					result.ops.chain(results =>
+						r && (r as Types.Result.Instance<any, any>).is_result
+							? (r as Types.Result.Instance<any, any>).cata({
+									ok: v => result.ok(results.concat(v)),
+									err: result.err,
 								})
-							: R.Ok(r),
+							: result.ok(r),
 					),
 				),
-			R.Ok([] as any[]),
+			result.ok([] as any[]),
 		)
 	}
 
 	const keys = Object.keys(rs)
 
 	return keys.reduce(
-		(acc: Types.TResult<any[], any>, key) =>
+		(acc: Types.Result.Instance<any[], any>, key) =>
 			acc.pipe(
-				R.ops.chain(results =>
-					(rs as any)[key] && ((rs as any)[key] as Types.TResult<any, any>).is_result
-						? ((rs as any)[key] as Types.TResult<any, any>).cata({
-								Ok: v => R.Ok({ ...results, [key]: v }),
-								Err: R.Err,
+				result.ops.chain(results =>
+					(rs as any)[key] && ((rs as any)[key] as Types.Result.Instance<any, any>).is_result
+						? ((rs as any)[key] as Types.Result.Instance<any, any>).cata({
+								ok: v => result.ok({ ...results, [key]: v }),
+								err: result.err,
 							})
-						: R.Ok((rs as any)[key]),
+						: result.ok((rs as any)[key]),
 				),
 			),
-		R.Ok({} as any),
+		result.ok({} as any),
 	) as any
 }
 
-export const cata_result_or_nothing: Types.TOrNothingCata = () => ({ Ok: x => x, Err: () => void 0 })
+const cata_result_or_nothing: Types.OrNothingCata = () => ({ ok: x => x, err: () => void 0 })
 
-export const cata_result_expect: Types.TExpectFn = f => ({ Ok: x => x, Err: x => f(x) as never })
+const cata_result_expect: Types.ExpectFn = f => ({ ok: x => x, err: x => f(x) as never })
 
-export const cata_result_throw: Types.TThrowFn = () => ({
-	Ok: x => x,
-	Err: e => {
+const cata_result_throw: Types.ThrowFn = () => ({
+	ok: x => x,
+	err: e => {
 		throw e
 	},
 })
 
-export const cata_result_or_else: Types.TOrElseCataFn = f => ({ Ok: x => x, Err: x => f(x) })
+const cata_result_or_else: Types.OrElseCataFn = f => ({ ok: x => x, err: x => f(x) })
 
-export const cata_result_if_ok: Types.TIfOkCataFn = f => ({ Ok: x => f(x), Err: noop })
+const cata_result_if_ok: Types.IfOkCataFn = f => ({ ok: x => f(x), err: noop })
 
-export const map_result: Types.TMapResultOperatorFn = f => r => r.cata({ Ok: x => ResultOk(f(x)), Err: x => ResultErr(x) })
+const map_result: Types.MapResultOperatorFn = f => r => r.cata({ ok: x => ok(f(x)), err: x => err(x) })
 
-export const err_map_result: Types.TErrMapResultOperatorFn = f => r =>
-	r.cata({ Ok: x => ResultOk(x), Err: x => ResultErr(f(x)) })
+const err_map_result: Types.ErrMapResultOperatorFn = f => r => r.cata({ ok: x => ok(x), err: x => err(f(x)) })
 
-export const bimap_result: Types.TBiMapResultOperatorFn = (f, g) => r =>
-	r.cata({ Ok: x => ResultOk(g(x)), Err: x => ResultErr(f(x)) as any })
+const bimap_result: Types.BiMapResultOperatorFn = (f, g) => r => r.cata({ ok: x => ok(g(x)), err: x => err(f(x)) as any })
 
-export const chain_result: Types.TChainResultOperatorFn = f => r => r.cata({ Ok: x => f(x), Err: x => ResultErr(x) })
+const chain_result: Types.ChainResultOperatorFn = f => r => r.cata({ ok: x => f(x), err: x => err(x) })
 
-export const err_chain_result: Types.TErrChainResultOperatorFn = f => r =>
-	r.cata({ Ok: x => ResultOk(x), Err: x => f(x) as any })
+const err_chain_result: Types.ErrChainResultOperatorFn = f => r => r.cata({ ok: x => ok(x), err: x => f(x) as any })
 
-export const bichain_result: Types.TBiChainResultOperatorFn = (f, g) => r => r.cata({ Ok: x => g(x), Err: x => f(x) })
+const bichain_result: Types.BiChainResultOperatorFn = (f, g) => r => r.cata({ ok: x => g(x), err: x => f(x) })
 
-export const tap_result: Types.TTapResultOperatorFn = f => r => {
-	r.cata({ Ok: x => f(x), Err: () => void 0 })
+const tap_result: Types.TapResultOperatorFn = f => r => {
+	r.cata({ ok: x => f(x), err: () => void 0 })
 	return r
 }
 
-export const err_tap_result: Types.TErrTapResultOperatorFn = f => r => {
-	r.cata({ Ok: () => void 0, Err: x => f(x) })
+const err_tap_result: Types.ErrTapResultOperatorFn = f => r => {
+	r.cata({ ok: () => void 0, err: x => f(x) })
 	return r
 }
 
-export const bitap_result: Types.TBiTapResultOperatorFn = (f, g) => r => {
-	r.cata({ Ok: x => g(x), Err: x => f(x) })
+const bitap_result: Types.BiTapResultOperatorFn = (f, g) => r => {
+	r.cata({ ok: x => g(x), err: x => f(x) })
 	return r
 }
 
-export const swap_result: Types.TSwapResultOperatorFn = () => r => r.cata({ Ok: x => ResultErr(x), Err: x => ResultOk(x) })
+const swap_result: Types.SwapResultOperatorFn = () => r => r.cata({ ok: x => err(x), err: x => ok(x) })
 
-export const ResultIf: Types.TIfResultConstructorFn = (
+const if_else: Types.IfResultConstructorFn = (
 	orly: boolean,
 	{ T = () => undefined as any, F = () => undefined as any } = {
 		T: () => undefined as any,
 		F: () => undefined as any,
 	},
-) => (orly ? R.Ok(T()) : R.Err(F()))
+) => (orly ? result.ok(T()) : result.err(F()))
 
-export const is_result_guard = <$TOk = unknown, $TErr = unknown>(x: unknown): x is Types.TResult<$TOk, $TErr> => {
+const is_result_guard = <$TOk = unknown, $TErr = unknown>(x: unknown): x is Types.Result.Instance<$TOk, $TErr> => {
 	if (!is_object(x)) return false
 
-	const y = x as Types.TResult<any, any>
+	const y = x as Types.Result.Instance<any, any>
 
 	return is_true(y.is_result) && is_bool(y.is_err) && is_bool(y.is_ok) && is_fn(y.cata) && is_fn(y.pipe) && is_fn(y.unwrap)
 }
 
-export const is_ok_guard = <_TOk, _TErr>(x: Types.TResult<_TOk, _TErr>): x is Types.TResult<_TOk, never> =>
+const is_ok_guard = <_TOk, _TErr>(x: Types.Result.Instance<_TOk, _TErr>): x is Types.Result.Instance<_TOk, never> =>
 	is_result_guard(x) && is_true(x.is_ok) && is_false(x.is_err)
 
-export const is_err_guard = <_TOk, _TErr>(x: Types.TResult<_TOk, _TErr>): x is Types.TResult<never, _TErr> =>
+const is_err_guard = <_TOk, _TErr>(x: Types.Result.Instance<_TOk, _TErr>): x is Types.Result.Instance<never, _TErr> =>
 	is_result_guard(x) && is_false(x.is_ok) && is_true(x.is_err)
 
-export const R: Types.TResultStatic = {
-	of: ResultOk,
-	Ok: ResultOk,
-	Err: ResultErr,
-	Try: ResultTry,
-	If: ResultIf,
-	FromNullable: ResultFromNullable,
-	FromOption: ResultFromOption,
-	Merge: ResultMerge,
+export const result: Types.Result.Static = {
+	of: ok,
+	ok,
+	err,
+	try: try_catch,
+	if: if_else,
+	from_nullable,
+	merge,
 	catas: {
 		if_ok: cata_result_if_ok,
 		or_else: cata_result_or_else,
@@ -190,5 +183,3 @@ export const R: Types.TResultStatic = {
 		swap: swap_result,
 	},
 }
-
-export const Result = R

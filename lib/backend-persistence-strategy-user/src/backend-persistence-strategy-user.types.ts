@@ -19,6 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type { Server } from "@ordo-pink/sdk-server"
+
 export type PersistenceStrategyUser = (
-	persistence_strategy_data: OrdoBackend.Data.PersistenceStrategy,
-) => OrdoBackend.User.PersistenceStrategy
+	persistence_strategy_data: Server.Data.PersistenceStrategy,
+) => Server.User.PersistenceStrategy

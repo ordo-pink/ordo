@@ -72,7 +72,7 @@ export const all: Oath.Constructors.All = values => {
 		if (!values.length) return outer_resolve([])
 
 		values.forEach((value: any) => {
-			if (value.is_oath) {
+			if (value?.is_oath) {
 				value.cata({
 					reject: (e: any) => {
 						if (!rejected) {
@@ -89,7 +89,7 @@ export const all: Oath.Constructors.All = values => {
 						if (resolved_length === values.length) outer_resolve(resolved_values)
 					},
 				})
-			} else if (value.then) {
+			} else if (value?.then) {
 				value.then(
 					(s: any) => {
 						if (rejected) return

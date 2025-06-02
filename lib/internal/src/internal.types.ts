@@ -19,8 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Logger } from "@ordo-pink/logger"
-import { TOption } from "@ordo-pink/option"
+import { Logger } from "@ordo-pink/sdk-core"
 
 export type TRequireFID<$TReturn> = (fid: symbol | null) => $TReturn
 

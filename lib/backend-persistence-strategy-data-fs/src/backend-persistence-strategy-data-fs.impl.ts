@@ -6,9 +6,8 @@
 import { BunFile } from "bun"
 import { resolve } from "path"
 
+import { type Data, type User, rrr } from "@ordo-pink/sdk-core"
 import { oath } from "@ordo-pink/oath"
-import { prop } from "@ordo-pink/tau"
-import { rrr } from "@ordo-pink/core"
 
 import { PersistenceStrategyDataFS } from "./backend-persistence-strategy-data-fs.types"
 
@@ -30,18 +29,18 @@ export const create_persistence_strategy_data_fs: PersistenceStrategyDataFS.Crea
 		exists: (uid, fsid) =>
 			get_path(uid, fsid)
 				.pipe(oath.ops.chain(check_file_exists))
-				.pipe(oath.ops.map(prop("exists"))),
+				.pipe(oath.ops.map(({ exists }) => exists)),
 
 		create: (uid, fsid, content) =>
 			get_path(uid, fsid)
 				.pipe(oath.ops.chain(validate_file_does_not_exist))
-				.pipe(oath.ops.map(prop("path")))
+				.pipe(oath.ops.map(({ path }) => path))
 				.pipe(oath.ops.chain(write_file(content))),
 
 		read: (uid, fsid) =>
 			get_path(uid, fsid)
 				.pipe(oath.ops.chain(validate_file_exists))
-				.pipe(oath.ops.map(prop("file")))
+				.pipe(oath.ops.map(({ file }) => file))
 				.pipe(oath.ops.chain(get_file_content)),
 
 		update: (uid, fsid, content) =>
@@ -52,22 +51,22 @@ export const create_persistence_strategy_data_fs: PersistenceStrategyDataFS.Crea
 		delete: (uid, fsid) =>
 			get_path(uid, fsid)
 				.pipe(oath.ops.chain(validate_file_exists))
-				.pipe(oath.ops.map(prop("file")))
+				.pipe(oath.ops.map(({ file }) => file))
 				.pipe(oath.ops.chain(delete_file)),
 
 		mtime: (uid, fsid) =>
 			get_path(uid, fsid)
 				.pipe(oath.ops.chain(validate_file_exists))
-				.pipe(oath.ops.map(prop("file")))
+				.pipe(oath.ops.map(({ file }) => file))
 				.pipe(oath.ops.map(file => file.lastModified)),
 	}
 }
 
 // --- Internal ---
 
-const already_exists_rrr = () => rrr.codes.eexist("File already exists")
-const not_found_rrr = () => rrr.codes.enoent("File not found")
-const io_rrr = (e: unknown) => rrr.codes.eio("Failed to store local data", e)
+const already_exists_rrr = () => rrr.eexist("File already exists")
+const not_found_rrr = () => rrr.enoent("File not found")
+const io_rrr = (e: unknown) => rrr.eio("Failed to store local data", e)
 
 const get_file = (path: string) => oath.try(() => Bun.file(path)).pipe(oath.ops.rmap(io_rrr))
 
@@ -111,5 +110,5 @@ const validate_file_does_not_exist = (path: string) =>
 
 const get_file_content = (file: BunFile) => oath.try(() => file.stream()).pipe(oath.ops.rmap(io_rrr))
 
-const get_path_from_root = (root: string) => (uid: Ordo.User.UID, fsid: Ordo.Metadata.FSID) =>
+const get_path_from_root = (root: string) => (uid: User.ID, fsid: Data.ID) =>
 	oath.try(() => resolve(root, uid, ...fsid.split("-"))).pipe(oath.ops.rmap(io_rrr))

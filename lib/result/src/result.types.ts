@@ -1,4 +1,9 @@
 /*
+ * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ */
+
+/*
  * SPDX-FileCopyrightext: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
  * SPDX-License-Identifier: Unlicense
  */

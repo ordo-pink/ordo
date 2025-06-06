@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ */
+
 import type { Core } from "../core/core.types"
 import type { DATA } from "./data.constants"
 import type { CoreMixins } from "../mixins/mixins.types"

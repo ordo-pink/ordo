@@ -28,16 +28,20 @@ import { create_progress } from "@ordo-pink/cmd-progress"
 import { oath } from "@ordo-pink/oath"
 
 const unlicense = get_license("Unlicense")
+const agpl = get_license("AGPL-3.0-only")
 const progress = create_progress("Adding missing SPDX records")
 
 export const handle_spdx: CommandHandler.Fn = async opts => {
 	const noemit = !!opts.long_options["no-emit"] || !!opts.short_options["n"]
 	const bail = !!opts.long_options["--bail"] || !!opts.short_options["b"]
-	const unlicense = !!opts.long_options["--unlicense"] || !!opts.short_options["U"]
+	const use_unlicense_if_missing = !!opts.long_options["--unlicense"] || !!opts.short_options["U"]
 
 	await oath
-		.all([...(await create_licenses("lib", noemit, bail)), ...(await create_licenses("srv", noemit, bail))])
-		.pipe(oath.ops.chain(xs => oath.all(xs.flatMap(x => x))))
+		.all([
+			...(await create_licenses("lib", noemit, bail, use_unlicense_if_missing)),
+			...(await create_licenses("srv", noemit, bail, use_unlicense_if_missing)),
+		])
+		.pipe(oath.ops.chain(xs => oath.all(xs.flatMap(x => x as any))))
 		.pipe(
 			oath.ops.map(xs => (noemit && !bail ? (xs.some(x => !x) ? process.exit(1) : xs.filter(Boolean)) : xs.filter(Boolean))),
 		)
@@ -48,7 +52,7 @@ export const handle_spdx: CommandHandler.Fn = async opts => {
 
 // --- Internal ---
 
-const create_licenses = async (space: "lib" | "srv", noemit = false, bail = false) => {
+const create_licenses = async (space: "lib" | "srv", noemit = false, bail = false, use_unlicense_if_missing = false) => {
 	const entries = await node_fs.promises.readdir(space)
 
 	return entries.map(async entry => {
@@ -60,10 +64,10 @@ const create_licenses = async (space: "lib" | "srv", noemit = false, bail = fals
 			if (noemit) {
 				progress.break(`ERROR: Missing license file: ${entry_path}`)
 				if (bail) process.exit(1)
-				return false
+				return Promise.resolve(false)
 			}
 
-			const license = get_license(unlicense ? "Unlicense" : "AGPL-3.0-only")
+			const license = use_unlicense_if_missing ? unlicense : agpl
 
 			await node_fs.promises.writeFile(license_path, license, "utf-8")
 		}

@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ */
+
 import type { Core, CoreMixins, Data, Logger, Rrr, User } from "@ordo-pink/sdk-core"
 import type { Hunt } from "@ordo-pink/hunt"
 import type { I18n } from "@ordo-pink/i18n"

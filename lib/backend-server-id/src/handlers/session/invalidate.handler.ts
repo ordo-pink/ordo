@@ -19,36 +19,33 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { current_user, CURRENT_USER_KEYS } from "@ordo-pink/core"
 import { default_handler } from "@ordo-pink/routary-ordo"
 import { oath } from "@ordo-pink/oath"
+import { user } from "@ordo-pink/sdk-core"
 
-import { type TIDContext } from "../../backend-server-id.types"
+import type { ServerID } from "../../backend-server-id.types"
 import { get_user_from_cookie } from "../../common/get-user-from-cookie"
 
-export const handle_invalidate_session = default_handler<TIDContext>(intake => {
-	// TODO Move id generation and error handling to routary-ordo
-
-	return get_user_from_cookie(intake)
+export const handle_invalidate_session = default_handler<ServerID.Fuel>(intake =>
+	get_user_from_cookie(intake)
 		.pipe(
-			oath.ops.chain(({ sid, uid, user }) =>
+			oath.ops.chain(({ sid, uid, user: dto }) =>
 				oath
-					.of(user.to_dto())
+					.of(dto.to_dto())
 					.pipe(
 						oath.ops.chain(dto => {
-							const sessions = dto[CURRENT_USER_KEYS.SESSIONS].filter(session => session[0] !== sid)
-							dto[CURRENT_USER_KEYS.SESSIONS] = sessions
+							const sessions = dto[10].filter(session => session[0] !== sid)
+							dto[10] = sessions
 
-							return intake.persistence_strategy_user.update(uid, current_user.from_dto(dto))
+							return intake.persistence_strategy_user.update(uid, user.me.from_dto(...dto))
 						}),
 					)
 					.pipe(oath.ops.rmap(rrr => ({ rrr, intake })))
-					.pipe(oath.ops.map(() => ({ sid, uid, user }))),
+					.pipe(oath.ops.map(() => ({ sid, uid, user: dto }))),
 			),
 		)
 		.pipe(oath.ops.tap(p => intake.headers.set("Set-Cookie", `${p.uid}=${p.sid}; Expires=${new Date().toISOString()}`)))
 		.pipe(oath.ops.map(({ user }) => user.to_dto()))
-		.pipe(oath.ops.map(current_user.serialize))
 		.pipe(oath.ops.tap(dto => void (intake.payload = dto)))
-		.pipe(oath.ops.map(() => intake))
-})
+		.pipe(oath.ops.map(() => intake)),
+)

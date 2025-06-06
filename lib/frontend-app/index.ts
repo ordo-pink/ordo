@@ -20,7 +20,6 @@
  */
 
 import { maoka, maoka_dom } from "@ordo-pink/maoka"
-import type { Logger } from "@ordo-pink/logger"
 
 // import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 // import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
@@ -48,7 +47,9 @@ import type { Logger } from "@ordo-pink/logger"
 
 // TODO Move fonts to assets
 
+import type { Core, Logger } from "@ordo-pink/sdk-core"
 import { LOCALE, create_i18n } from "@ordo-pink/i18n"
+import type { Client } from "@ordo-pink/sdk-client"
 import { context } from "@ordo-pink/sdk-maoka"
 import { create_routary_browser } from "@ordo-pink/routary-browser"
 import { hunt } from "@ordo-pink/hunt"
@@ -60,13 +61,13 @@ import { create_modal_jab } from "./src/modal"
 import "./index.css"
 
 export type AppOptions = {
-	hosts: Ordo.Hosts
+	hosts: Core.Hosts
 	local_persistence_strategy: null
 	logger: Logger
 }
 
 export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
-	const hunter = hunt.begin<Ordo.Preys>()
+	const hunter = hunt.begin<Client.Preys>()
 	const fetch = window.fetch // TODO Replace with patched fetch
 	const rotor = create_routary_browser(window)
 	const i18n = create_i18n<Pick<t, keyof t>>(LOCALE.ENGLISH)

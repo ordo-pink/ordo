@@ -19,22 +19,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Routary } from "@ordo-pink/routary"
-import { rrr } from "@ordo-pink/core"
+import { rrr } from "@ordo-pink/sdk-core"
 
-import { type TIDContext } from "../backend-server-id.types"
+import type { ServerID } from "../backend-server-id.types"
 
-export const invalid_email_rrr = (email: unknown, intake: Routary.Intake<TIDContext>) => ({
-	rrr: rrr.codes.einval("invalid email", email),
+export const invalid_email_rrr = (email: unknown, intake: ServerID.Intake) => ({
+	rrr: rrr.einval("invalid email", email),
 	intake,
 })
 
-export const email_missing_rrr = (intake: Routary.Intake<TIDContext>) => ({
-	rrr: rrr.codes.einval("email not provided"),
+export const email_missing_rrr = (intake: ServerID.Intake) => ({
+	rrr: rrr.einval("email not provided"),
 	intake,
 })
 
-export const exists_by_email_rrr = (email: string, intake: Routary.Intake<TIDContext>) => ({
-	rrr: rrr.codes.eexist("user already exists", email),
+export const exists_by_email_rrr = (email: string, intake: ServerID.Intake) => ({
+	rrr: rrr.eexist("user already exists", email),
 	intake,
 })

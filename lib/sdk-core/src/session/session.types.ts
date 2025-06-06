@@ -8,6 +8,8 @@ import type { GetDeviceInfo } from "@ordo-pink/get-device-info"
 import type { CoreMixins } from "../mixins/mixins.types"
 
 export namespace Session {
+	export type ID = CoreMixins.Identifiable.ID
+
 	export type DTO = [
 		...CoreMixins.Identifiable.DTO,
 		...CoreMixins.Timestampable.DTO<"without_updates">,

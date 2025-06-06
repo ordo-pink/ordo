@@ -19,16 +19,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { current_user } from "@ordo-pink/core"
-import { type Routary } from "@ordo-pink/routary"
+import { type Session, type User, user } from "@ordo-pink/sdk-core"
 import { oath } from "@ordo-pink/oath"
 
-import { type TIDContext } from "../backend-server-id.types"
+import type { ServerID } from "../backend-server-id.types"
 
-export const persist_session_id =
-	(i: Routary.Intake<TIDContext>) => (params: { session: Ordo.User.Session; user: Ordo.User.Current.Instance }) =>
-		oath
-			.of(params.user.to_dto())
-			.pipe(oath.ops.chain(dto => i.persistence_strategy_user.update(params.user.get_uid(), current_user.from_dto(dto))))
-			.pipe(oath.ops.map(() => params))
-			.pipe(oath.ops.rmap(rrr => ({ rrr, intake: i })))
+export const persist_session_id = (intake: ServerID.Intake) => (params: { session: Session.DTO; user: User.Me.Instance }) =>
+	oath
+		.of(params.user.to_dto())
+		.pipe(oath.ops.chain(dto => intake.persistence_strategy_user.update(params.user.get_id(), user.me.from_dto(...dto))))
+		.pipe(oath.ops.map(() => params))
+		.pipe(oath.ops.rmap(rrr => ({ rrr, intake })))

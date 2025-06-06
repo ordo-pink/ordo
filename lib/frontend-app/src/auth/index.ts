@@ -19,8 +19,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { COMMAND_PALETTE_ITEM_TYPE, MODAL_SIZE, current_user } from "@ordo-pink/core"
+import { COMMAND_PALETTE, MODAL } from "@ordo-pink/sdk-client"
 import { Maoka, maoka_dom } from "@ordo-pink/maoka"
+import { type User, user } from "@ordo-pink/sdk-core"
 import { bs_box_arrow_in_right, bs_box_arrow_right } from "@ordo-pink/frontend-icons"
 import { get_device_info } from "@ordo-pink/get-device-info"
 import { maoka_sdk } from "@ordo-pink/sdk-maoka"
@@ -78,8 +79,8 @@ const refresh_session_jab: Maoka.Jab = ({ use }) => {
 			.pipe(oath.ops.map(headers => ({ headers, method: "POST", credentials: "include" }) as const))
 			.pipe(oath.ops.chain(init => oath.from_promise(() => fetch(`${hosts.id}/session`, init))))
 			.pipe(oath.ops.and(res => res.json()))
-			.pipe(oath.ops.chain(res => oath.if(res.success, { on_true: () => res.payload as Ordo.User.Current.DTO })))
-			.pipe(oath.ops.map(current_user.from_dto))
+			.pipe(oath.ops.chain(res => oath.if(res.success, { on_true: () => res.payload as User.Me.DTO })))
+			.pipe(oath.ops.map(dto => user.me.from_dto(...dto)))
 			.pipe(oath.ops.tap(user => auth$.update("user", () => user)))
 
 		// TODO Sign out on error
@@ -136,19 +137,19 @@ const track_prey_jab: Maoka.Jab = ({ node, use }) => {
 					render_icon: span => maoka_dom.render(span, bs_box_arrow_right({}), node.root.create_id),
 					value: () => hunter.shoot("auth.sign_out"),
 					description: "auth_commands_sign_out_description",
-					type: COMMAND_PALETTE_ITEM_TYPE.DESTRUCTIVE_ACTION,
+					type: COMMAND_PALETTE.ITEM_TYPE.DESTRUCTIVE_ACTION,
 				})
 			} else {
 				release_join = hunter.track("auth.show_request_code_modal", () => {
 					hunter.shoot("modal.show", {
-						size: MODAL_SIZE.SM,
+						size: MODAL.SIZE.SM,
 						render: div => maoka_dom.render(div, maoka_sdk.components.with_state(state, join_modal), node.root.create_id),
 					})
 				})
 
 				release_verify_code = hunter.track("auth.show_verify_code_modal", () => {
 					hunter.shoot("modal.show", {
-						size: MODAL_SIZE.SM,
+						size: MODAL.SIZE.SM,
 						render: div =>
 							maoka_dom.render(div, maoka_sdk.components.with_state(state, verify_code_modal), node.root.create_id),
 					})
@@ -165,7 +166,7 @@ const track_prey_jab: Maoka.Jab = ({ node, use }) => {
 						hunter.shoot("command_palette.hide")
 					},
 					description: "auth_commands_join_description",
-					type: COMMAND_PALETTE_ITEM_TYPE.MODAL_OPENER,
+					type: COMMAND_PALETTE.ITEM_TYPE.MODAL_OPENER,
 					hotkey: "mod+j",
 				})
 			}

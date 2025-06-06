@@ -5,7 +5,7 @@
 
 import type { Logger } from "./logger.types"
 
-export namespace logger {
+export namespace loggers {
 	/**
 	 * An average silence fan.
 	 */
@@ -23,7 +23,7 @@ export namespace logger {
 	/**
 	 * An average console enjoyer.
 	 */
-	export const console: Logger = {
+	export const stdout: Logger = {
 		alert: (...args) => console.error("🚨 [ALRT]:", ...args),
 		crit: (...args) => console.error("🚑️ [CRIT]:", ...args),
 		debug: (...args) => console.debug("🔨 [DEBG]:", ...args),

@@ -19,23 +19,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { RoutaryOrdo, default_handler } from "@ordo-pink/routary-ordo"
+import { type Logger, loggers } from "@ordo-pink/sdk-core"
+import { type RoutaryOrdo, default_handler } from "@ordo-pink/routary-ordo"
 import { LOCALE } from "@ordo-pink/i18n"
-import { Logger } from "@ordo-pink/logger"
-import { console_logger } from "@ordo-pink/logger"
 import { oath } from "@ordo-pink/oath"
 import { rickroll } from "@ordo-pink/rickroll"
 import { routary } from "@ordo-pink/routary"
 
 const logger: Logger = {
-	alert: (...message) => console_logger.alert("[FN]", ...message),
-	crit: (...message) => console_logger.crit("[FN]", ...message),
-	debug: (...message) => console_logger.debug("[FN]", ...message),
-	error: (...message) => console_logger.error("[FN]", ...message),
-	info: (...message) => console_logger.info("[FN]", ...message),
-	notice: (...message) => console_logger.notice("[FN]", ...message),
-	panic: (...message) => console_logger.panic("[FN]", ...message),
-	warn: (...message) => console_logger.warn("[FN]", ...message),
+	alert: (...message) => loggers.stdout.alert("[FN]", ...message),
+	crit: (...message) => loggers.stdout.crit("[FN]", ...message),
+	debug: (...message) => loggers.stdout.debug("[FN]", ...message),
+	error: (...message) => loggers.stdout.error("[FN]", ...message),
+	info: (...message) => loggers.stdout.info("[FN]", ...message),
+	notice: (...message) => loggers.stdout.notice("[FN]", ...message),
+	panic: (...message) => loggers.stdout.panic("[FN]", ...message),
+	warn: (...message) => loggers.stdout.warn("[FN]", ...message),
 }
 
 const rotor = routary

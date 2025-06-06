@@ -21,9 +21,10 @@
 
 import { components, jabs } from "@ordo-pink/sdk-maoka"
 import { maoka, maoka_dom, maoka_styled } from "@ordo-pink/maoka"
+import type { Client } from "@ordo-pink/sdk-client"
 import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 
-export const command_palette_item = maoka.create<{ item: Ordo.CommandPalette.Item; active: boolean }>(
+export const command_palette_item = maoka.create<{ item: Client.CommandPalette.Item.Instance; active: boolean }>(
 	"div",
 	({ active, item, use }) => {
 		const handle_click = () => item.value()
@@ -52,7 +53,7 @@ const item_title = maoka_styled.div("command-palette_item_title-wrapper")
 const item_info = maoka_styled.div("command-palette_item_info")
 const item_main = maoka_styled.div("command-palette_item_main")
 const item_footer = maoka_styled.div("command-palette_item_footer")
-const item_icon = maoka_styled.span<{ render: Ordo.CommandPalette.RenderIcon }>(
+const item_icon = maoka_styled.span<{ render: Client.CommandPalette.RenderIcon }>(
 	"command-palette_item_icon",
 	({ render, use }) => use(maoka_dom.jabs.if_dom(n => void render(n.value))),
 )

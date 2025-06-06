@@ -19,10 +19,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { SM_SCREEN_BREAKPOINT } from "@ordo-pink/core"
+import { CLIENT } from "@ordo-pink/sdk-client"
 import { create_zags } from "@ordo-pink/zags"
 
 export const sidebar$ = create_zags<{ enabled: boolean; visible: boolean }>({
 	enabled: false,
-	visible: window.innerWidth >= SM_SCREEN_BREAKPOINT,
+	visible: window.innerWidth >= CLIENT.SM_SCREEN_BREAKPOINT,
 })

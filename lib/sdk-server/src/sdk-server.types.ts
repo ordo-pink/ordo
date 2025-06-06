@@ -25,20 +25,20 @@ import type { Oath } from "@ordo-pink/oath"
 export namespace Server {
 	export namespace Data {
 		export type PersistenceStrategy = {
-			exists: (uid: CoreUser.ID, fsid: CoreData.ID) => Oath.Instance<boolean, Rrr.Instance<"EIO">>
+			exists: (user_id: CoreUser.ID, data_id: CoreData.ID) => Oath.Instance<boolean, Rrr.Instance<"EIO">>
 			create: (
-				uid: CoreUser.ID,
-				fsid: CoreData.ID,
+				user_id: CoreUser.ID,
+				data_id: CoreData.ID,
 				input: ReadableStream,
 			) => Oath.Instance<number, Rrr.Instance<"EIO" | "EEXIST">>
-			read: (uid: CoreUser.ID, fsid: CoreData.ID) => Oath.Instance<ReadableStream, Rrr.Instance<"EIO" | "ENOENT">>
+			read: (user_id: CoreUser.ID, data_id: CoreData.ID) => Oath.Instance<ReadableStream, Rrr.Instance<"EIO" | "ENOENT">>
 			update: (
-				uid: CoreUser.ID,
-				fsid: CoreData.ID,
+				user_id: CoreUser.ID,
+				data_id: CoreData.ID,
 				input: ReadableStream,
 			) => Oath.Instance<number, Rrr.Instance<"EIO" | "ENOENT">>
-			delete: (uid: CoreUser.ID, fsid: CoreData.ID) => Oath.Instance<void, Rrr.Instance<"EIO" | "ENOENT">>
-			mtime: (uid: CoreUser.ID, fsid: CoreData.ID) => Oath.Instance<number, Rrr.Instance<"EIO" | "ENOENT">>
+			delete: (user_id: CoreUser.ID, data_id: CoreData.ID) => Oath.Instance<void, Rrr.Instance<"EIO" | "ENOENT">>
+			mtime: (user_id: CoreUser.ID, data_id: CoreData.ID) => Oath.Instance<number, Rrr.Instance<"EIO" | "ENOENT">>
 		}
 	}
 

@@ -19,14 +19,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { current_user, rrr } from "@ordo-pink/core"
-import { type Routary } from "@ordo-pink/routary"
+import { type Session, type User, rrr, user } from "@ordo-pink/sdk-core"
 import { huyami } from "@ordo-pink/routary-ordo"
 import { oath } from "@ordo-pink/oath"
 
-import { type TIDContext } from "../backend-server-id.types"
+import type { ServerID } from "../backend-server-id.types"
 
-export const get_user_from_cookie = (intake: Routary.Intake<TIDContext>) => {
+export const get_user_from_cookie = (intake: ServerID.Intake) => {
 	const debug = huyami(intake)
 
 	return oath
@@ -36,8 +35,8 @@ export const get_user_from_cookie = (intake: Routary.Intake<TIDContext>) => {
 			oath.ops.chain(([uid, sid]) =>
 				oath
 					.merge({
-						uid: oath.if(current_user.validations.is_uid(uid), { on_true: () => uid as Ordo.User.UID }),
-						sid: oath.if(current_user.validations.is_uid(sid), { on_true: () => sid as Ordo.User.SessionID }),
+						uid: oath.if(user.me.validations.is_id(uid), { on_true: () => uid as User.ID }),
+						sid: oath.if(user.me.validations.is_id(sid), { on_true: () => sid as Session.ID }),
 					})
 					.pipe(oath.ops.tap(debug("Cookie extracted", ({ uid }) => uid)))
 					.pipe(
@@ -47,7 +46,7 @@ export const get_user_from_cookie = (intake: Routary.Intake<TIDContext>) => {
 								.pipe(
 									oath.ops.chain(user =>
 										oath.if(
-											user.get_sessions().some(session => session[0] === sid),
+											user.get_sessions().some(session => session.has_id(sid)),
 											{ on_true: () => ({ user, uid, sid }) },
 										),
 									),
@@ -57,5 +56,5 @@ export const get_user_from_cookie = (intake: Routary.Intake<TIDContext>) => {
 					),
 			),
 		)
-		.pipe(oath.ops.rmap(() => ({ rrr: rrr.codes.enoent("User not found"), intake })))
+		.pipe(oath.ops.rmap(() => ({ rrr: rrr.enoent("User not found"), intake })))
 }

@@ -3,15 +3,21 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import type { Logger } from "@ordo-pink/logger"
+import type { Logger } from "@ordo-pink/sdk-core"
+import type { Routary } from "@ordo-pink/routary"
 import type { RoutaryOrdo } from "@ordo-pink/routary-ordo"
+import type { Server } from "@ordo-pink/sdk-server"
 
-export type TDTFuel = {
-	allow_origin: string[]
-	data_persistence_strategy: OrdoBackend.Data.PersistenceStrategy
-	logger: Logger
-	id_host: string
-	dt_host: string
+export namespace ServerDT {
+	export type Params = {
+		allow_origin: string[]
+		data_persistence_strategy: Server.Data.PersistenceStrategy
+		logger: Logger
+		id_host: string
+		dt_host: string
+	}
+
+	export type Fuel = RoutaryOrdo.Fuel & ServerDT.Params
+
+	export type Intake = Routary.Intake<ServerDT.Fuel>
 }
-
-export type TDTContext = RoutaryOrdo.Fuel & TDTFuel

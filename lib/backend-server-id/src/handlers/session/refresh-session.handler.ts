@@ -19,33 +19,29 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { current_user, CURRENT_USER_KEYS } from "@ordo-pink/core"
 import { default_handler } from "@ordo-pink/routary-ordo"
 import { oath } from "@ordo-pink/oath"
+import { user } from "@ordo-pink/sdk-core"
 
-import { type TIDContext } from "../../backend-server-id.types"
+import type { ServerID } from "../../backend-server-id.types"
 import { get_user_from_cookie } from "../../common/get-user-from-cookie"
 import { persist_session_id } from "../../common/persist-session"
 
-export const handle_refresh_session = default_handler<TIDContext>(intake => {
+export const handle_refresh_session = default_handler<ServerID.Fuel>(intake => {
 	return get_user_from_cookie(intake)
 		.pipe(
-			oath.ops.chain(({ sid, user }) =>
+			oath.ops.chain(({ sid, user: u }) =>
 				oath
-					.of(user)
+					.of(u)
 					.pipe(oath.ops.map(user => user.to_dto()))
 					.pipe(
 						oath.ops.map(dto => {
-							const index = dto[CURRENT_USER_KEYS.SESSIONS].findIndex(session => session[0] === sid)
-							const session = dto[CURRENT_USER_KEYS.SESSIONS][index]
+							const index = dto[10].findIndex(session => session[0] === sid)
+							const session = dto[10][index]
 
-							dto[CURRENT_USER_KEYS.SESSIONS] = dto[CURRENT_USER_KEYS.SESSIONS].toSpliced(index, 1, [
-								session[0],
-								Date.now(),
-								session[2],
-							])
+							dto[10] = dto[10].toSpliced(index, 1, [session[0], Date.now(), session[2]])
 
-							return { user: current_user.from_dto(dto), session }
+							return { user: user.me.from_dto(...dto), session }
 						}),
 					),
 			),
@@ -55,12 +51,11 @@ export const handle_refresh_session = default_handler<TIDContext>(intake => {
 			oath.ops.tap(params =>
 				intake.headers.set(
 					"Set-Cookie",
-					`${params.user.get_uid()}=${params.session[0]}; Secure; HttpOnly; SameSite=Strict; Path=/; Max-Age=${intake.session_lifetime_s}`,
+					`${params.user.get_id()}=${params.session[0]}; Secure; HttpOnly; SameSite=Strict; Path=/; Max-Age=${intake.session_lifetime_s}`,
 				),
 			),
 		)
 		.pipe(oath.ops.map(({ user }) => user.to_dto()))
-		.pipe(oath.ops.map(current_user.serialize))
 		.pipe(oath.ops.map(dto => void (intake.payload = dto)))
 		.pipe(oath.ops.map(() => intake))
 })

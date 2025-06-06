@@ -20,7 +20,7 @@
  */
 
 import { maoka, maoka_dom } from "@ordo-pink/maoka"
-import { MODAL_SIZE } from "@ordo-pink/core"
+import { MODAL } from "@ordo-pink/sdk-client"
 import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { sweech } from "@ordo-pink/sweech"
 
@@ -53,12 +53,12 @@ export const modal = maoka.create("div", ({ use }) => {
 })
 
 namespace internal {
-	export const modal_size_to_class = (size: MODAL_SIZE) =>
+	export const modal_size_to_class = (size: MODAL.SIZE) =>
 		sweech
 			.match(size)
-			.case(MODAL_SIZE.SM, () => "sm")
-			.case(MODAL_SIZE.MD, () => "md")
-			.case(MODAL_SIZE.LG, () => "lg")
-			.case(MODAL_SIZE.XL, () => "xl")
+			.case(MODAL.SIZE.SM, () => "sm")
+			.case(MODAL.SIZE.MD, () => "md")
+			.case(MODAL.SIZE.LG, () => "lg")
+			.case(MODAL.SIZE.XL, () => "xl")
 			.default(() => "2xl")
 }

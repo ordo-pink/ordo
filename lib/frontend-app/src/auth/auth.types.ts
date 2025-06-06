@@ -19,9 +19,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type { User } from "@ordo-pink/sdk-core"
+
 export namespace Auth {
 	export type State = {
-		user?: Ordo.User.Current.Instance
+		user?: User.Me.Instance
 		email: string
 		code: string
 	}

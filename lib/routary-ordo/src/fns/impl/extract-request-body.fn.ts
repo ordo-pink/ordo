@@ -5,7 +5,7 @@
 
 import { type Routary } from "@ordo-pink/routary"
 import { oath } from "@ordo-pink/oath"
-import { rrr } from "@ordo-pink/core"
+import { rrr } from "@ordo-pink/sdk-core"
 
 import { type RoutaryOrdo } from "../../routary-ordo.types"
 
@@ -15,6 +15,6 @@ export const extract_json_body: RoutaryOrdo.ExtractJSONBody = intake =>
 // --- Internal ---
 
 const to_rrr = <$Intake extends Routary.Intake>(error: unknown, intake: $Intake) => ({
-	rrr: error instanceof Error ? rrr.codes.eio("Failed to parse body", error) : rrr.codes.eio("unknown error", error),
+	rrr: error instanceof Error ? rrr.eio("Failed to parse body", error) : rrr.eio("unknown error", error),
 	intake,
 })

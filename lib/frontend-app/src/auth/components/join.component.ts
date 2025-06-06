@@ -21,11 +21,11 @@
 
 import { maoka, maoka_dom, maoka_styled } from "@ordo-pink/maoka"
 import { bs_envelope_at } from "@ordo-pink/frontend-icons"
-import { current_user } from "@ordo-pink/core"
 import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { maoka_sdk } from "@ordo-pink/sdk-maoka"
 import { noop } from "@ordo-pink/tau"
 import { oath } from "@ordo-pink/oath"
+import { user } from "@ordo-pink/sdk-core"
 
 import { auth$ } from "../auth.state"
 
@@ -44,7 +44,7 @@ export const join_modal = maoka.create("div", ({ use }) => {
 	const on_ok_click = () => {
 		const email = auth$.select("email")
 
-		if (email.length < 5 || email.length > 255 || !current_user.validations.is_email(email)) {
+		if (email.length < 5 || email.length > 255 || !user.me.validations.is_email(email)) {
 			return // TODO Show error
 		}
 

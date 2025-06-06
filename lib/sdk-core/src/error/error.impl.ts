@@ -11,7 +11,7 @@ export namespace rrr {
 		type =>
 		(message, ...debug) => ({ type: RRR.TYPE[type], message, debug })
 
-	export const eaccess = create("EACCES")
+	export const eacces = create("EACCES")
 	export const eagain = create("EAGAIN")
 	export const eexist = create("EEXIST")
 	export const efbig = create("EFBIG")

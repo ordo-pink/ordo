@@ -19,11 +19,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { type Logger, console_logger } from "@ordo-pink/logger"
-import { type TIDFuel, create_backend_server_id } from "@ordo-pink/backend-server-id"
-import { create_persistence_strategy_user, create_reference_mapping_user } from "@ordo-pink/backend-persistence-strategy-user"
+import { type Logger, loggers } from "@ordo-pink/sdk-core"
+import { type ServerID, create_backend_server_id } from "@ordo-pink/backend-server-id"
 import { is_finite_non_negative_int, is_finite_positive_int, is_port, is_positive_number } from "@ordo-pink/tau"
 import { create_persistence_strategy_data_fs } from "@ordo-pink/backend-persistence-strategy-data-fs"
+import { create_persistence_strategy_user } from "@ordo-pink/backend-persistence-strategy-user"
+import { create_reference_mapping_user } from "@ordo-pink/backend-reference-mapping-user"
 import { oath } from "@ordo-pink/oath"
 
 const env_rrr = (env_var: string) => (value?: any) =>
@@ -90,7 +91,7 @@ const main = () =>
 							web_host,
 							reference_mapping_user,
 							persistence_strategy_user,
-						} satisfies TIDFuel)
+						} satisfies ServerID.Params)
 						.pipe(oath.ops.and(create_backend_server_id))
 						.pipe(oath.ops.and(fetch => Bun.serve({ fetch, port })))
 				},
@@ -107,14 +108,14 @@ const main = () =>
 // --- Internal ---
 
 const logger: Logger = {
-	alert: (...message) => console_logger.alert("[ID]", ...message),
-	crit: (...message) => console_logger.crit("[ID]", ...message),
-	debug: (...message) => console_logger.debug("[ID]", ...message),
-	error: (...message) => console_logger.error("[ID]", ...message),
-	info: (...message) => console_logger.info("[ID]", ...message),
-	notice: (...message) => console_logger.notice("[ID]", ...message),
-	panic: (...message) => console_logger.panic("[ID]", ...message),
-	warn: (...message) => console_logger.warn("[ID]", ...message),
+	alert: (...message) => loggers.stdout.alert("[ID]", ...message),
+	crit: (...message) => loggers.stdout.crit("[ID]", ...message),
+	debug: (...message) => loggers.stdout.debug("[ID]", ...message),
+	error: (...message) => loggers.stdout.error("[ID]", ...message),
+	info: (...message) => loggers.stdout.info("[ID]", ...message),
+	notice: (...message) => loggers.stdout.notice("[ID]", ...message),
+	panic: (...message) => loggers.stdout.panic("[ID]", ...message),
+	warn: (...message) => loggers.stdout.warn("[ID]", ...message),
 }
 
 void main()

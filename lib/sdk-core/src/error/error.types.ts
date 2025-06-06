@@ -8,7 +8,7 @@ import type { RRR } from "./error.constants"
 export namespace Rrr {
 	export type Type = keyof typeof RRR.TYPE
 
-	export type Instance<$Type extends Rrr.Type> = {
+	export type Instance<$Type extends Rrr.Type = Rrr.Type> = {
 		type: (typeof RRR.TYPE)[$Type]
 		message: string
 		debug?: any[]

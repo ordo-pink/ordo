@@ -19,8 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { COMMAND_PALETTE, type Client } from "@ordo-pink/sdk-client"
 import { type Maoka, maoka_dom } from "@ordo-pink/maoka"
-import { COMMAND_PALETTE_ITEM_TYPE } from "@ordo-pink/core"
 import { bs_terminal } from "@ordo-pink/frontend-icons"
 import { context } from "@ordo-pink/sdk-maoka"
 
@@ -64,7 +64,7 @@ const track_prey_jab: Maoka.Jab = ({ use }) => {
 			id: COMMAND_PALETTE_TOGGLE_COMMAND.ID,
 			readable_name: "command_palette_commands_toggle_name",
 			render_icon: span => maoka_dom.render(span, bs_terminal({}), () => crypto.randomUUID()),
-			type: COMMAND_PALETTE_ITEM_TYPE.MODAL_OPENER,
+			type: COMMAND_PALETTE.ITEM_TYPE.MODAL_OPENER,
 			value: () => hunter.shoot("command_palette.toggle"),
 		})
 
@@ -82,15 +82,15 @@ const track_prey_jab: Maoka.Jab = ({ use }) => {
 	use(maoka_dom.jabs.onmount(handle_onmount))
 }
 
-const global_palette = (): Ordo.CommandPalette.Instance<() => void> => ({
+const global_palette = (): Client.CommandPalette.Instance<() => void> => ({
 	items: command_palette$.select("items"),
 	on_select: item => item.value(),
 })
 
-const command_palette_add: Ordo.GunFor<"command_palette.add"> = item =>
+const command_palette_add: Client.GunFor<"command_palette.add"> = item =>
 	command_palette$.update("items", items => (items.some(i => i.id === item.id) ? items : [...items, item]))
 
-const command_palette_hide: Ordo.GunFor<"command_palette.hide"> = () => {
+const command_palette_hide: Client.GunFor<"command_palette.hide"> = () => {
 	command_palette$.each({
 		current: () => void 0,
 		index: () => 0,
@@ -99,14 +99,14 @@ const command_palette_hide: Ordo.GunFor<"command_palette.hide"> = () => {
 	})
 }
 
-const command_palette_remove: Ordo.GunFor<"command_palette.remove"> = id =>
+const command_palette_remove: Client.GunFor<"command_palette.remove"> = id =>
 	command_palette$.update("items", items => items.filter(i => i.id !== id))
 
-const command_palette_show: Ordo.GunFor<"command_palette.show"> = new_current => {
+const command_palette_show: Client.GunFor<"command_palette.show"> = new_current => {
 	command_palette$.update("current", () => new_current ?? global_palette())
 }
 
-const command_palette_toggle: Ordo.GunFor<"command_palette.toggle"> = () => {
+const command_palette_toggle: Client.GunFor<"command_palette.toggle"> = () => {
 	command_palette$.update("current", current => {
 		if (current) return
 		return global_palette()

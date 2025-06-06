@@ -19,18 +19,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { Logger } from "@ordo-pink/logger"
+import type { Logger } from "@ordo-pink/sdk-core"
+import type { Routary } from "@ordo-pink/routary"
 import type { RoutaryOrdo } from "@ordo-pink/routary-ordo"
+import type { Server } from "@ordo-pink/sdk-server"
 
-export type TIDFuel = {
-	allow_origin: string[]
-	defaults: { file_limit: number; max_upload_size: number; max_functions: number }
-	logger: Logger
-	notification_strategy: OrdoBackend.Notification.EmailStrategy
-	session_lifetime_s: number
-	persistence_strategy_user: OrdoBackend.User.PersistenceStrategy
-	reference_mapping_user: OrdoBackend.User.ReferenceMapping
-	web_host: string
+export namespace ServerID {
+	export type Params = {
+		allow_origin: string[]
+		defaults: { file_limit: number; max_upload_size: number; max_functions: number }
+		logger: Logger
+		notification_strategy: Server.Notification.EmailStrategy
+		session_lifetime_s: number
+		persistence_strategy_user: Server.User.PersistenceStrategy
+		reference_mapping_user: Server.User.ReferenceMapping
+		web_host: string
+	}
+
+	export type Fuel = RoutaryOrdo.Fuel & Params
+
+	export type Intake = Routary.Intake<ServerID.Fuel>
 }
-
-export type TIDContext = RoutaryOrdo.Fuel & TIDFuel

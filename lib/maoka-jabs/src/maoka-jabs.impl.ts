@@ -20,7 +20,7 @@
  */
 
 import { Maoka, maoka_dom } from "@ordo-pink/maoka"
-import { SM_SCREEN_BREAKPOINT } from "@ordo-pink/core"
+import { CLIENT } from "@ordo-pink/sdk-client"
 import { Zags } from "@ordo-pink/zags"
 import { lt } from "@ordo-pink/tau"
 
@@ -129,7 +129,7 @@ export const set_inner_html =
 		use(maoka_dom.jabs.if_dom(n => (n.value.innerHTML = html)))
 
 export const is_sm_screen$: Maoka.Jab<() => boolean> = ({ use }) => {
-	const is_sm = lt(SM_SCREEN_BREAKPOINT)
+	const is_sm = lt(CLIENT.SM_SCREEN_BREAKPOINT)
 
 	let value: boolean = is_sm(window.innerWidth)
 

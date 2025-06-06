@@ -3,7 +3,9 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-export const SM_SCREEN_BREAKPOINT = 640
+export namespace CLIENT {
+	export const SM_SCREEN_BREAKPOINT = 640
+}
 
 export namespace MODAL {
 	export enum SIZE {

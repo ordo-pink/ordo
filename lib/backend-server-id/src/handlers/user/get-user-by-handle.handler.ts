@@ -19,37 +19,32 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { public_user } from "@ordo-pink/core"
-import { type Routary } from "@ordo-pink/routary"
+import { type User, user } from "@ordo-pink/sdk-core"
 import { default_handler } from "@ordo-pink/routary-ordo"
 import { oath } from "@ordo-pink/oath"
 
-import { type TIDContext } from "../../backend-server-id.types"
+import type { ServerID } from "../../backend-server-id.types"
 import { invalid_handle_rrr } from "../../rrrs/invalid-user-handle.rrr"
 
-export const handle_get_user_by_handle = default_handler<TIDContext>(intake =>
+export const handle_get_user_by_handle = default_handler<ServerID.Fuel>(intake =>
 	oath
 		.of(intake.params.user_handle)
 		.pipe(oath.ops.chain(validate_user_handle(intake)))
 		.pipe(oath.ops.chain(get_user_by_handle(intake)))
 		.pipe(oath.ops.map(u => u.to_dto()))
-		.pipe(oath.ops.map(serialize_to_public_user))
+		.pipe(oath.ops.map(dto => user.someone.from_dto(...dto).to_dto()))
 		.pipe(oath.ops.map(user => void (intake.payload = user)))
 		.pipe(oath.ops.map(() => intake)),
 )
 
 // --- Internal ---
 
-type I = Routary.Intake<TIDContext>
+const is_handle = user.someone.validations.is_handle
 
-const is_handle = public_user.validations.is_handle
+const validate_user_handle = (intake: ServerID.Intake) => (handle?: string) =>
+	oath.if(is_handle(handle), { on_false: () => invalid_handle_rrr(handle!, intake), on_true: () => handle as User.Handle })
 
-const serialize_to_public_user = public_user.serialize
-
-const validate_user_handle = (intake: I) => (handle?: string) =>
-	oath.if(is_handle(handle), { on_false: () => invalid_handle_rrr(handle!, intake), on_true: () => handle as Ordo.User.Handle })
-
-const get_user_by_handle = (intake: I) => (handle: Ordo.User.Handle) =>
+const get_user_by_handle = (intake: ServerID.Intake) => (handle: User.Handle) =>
 	intake.reference_mapping_user
 		.get_by_handle(handle)
 		.pipe(oath.ops.chain(id => intake.persistence_strategy_user.read(id)))

@@ -21,6 +21,7 @@
 
 import * as maoka_sdk from "@ordo-pink/sdk-maoka"
 
+import type { Client } from "@ordo-pink/sdk-client"
 import { bs_x } from "@ordo-pink/frontend-icons"
 import { maoka } from "@ordo-pink/maoka"
 import { maoka_jabs } from "@ordo-pink/maoka-jabs"
@@ -45,5 +46,5 @@ export const close_modal = maoka.create("div", ({ use }) => {
 })
 
 namespace internal {
-	export const handle_click = (hunter: Ordo.Hunter) => () => void hunter.shoot("modal.hide")
+	export const handle_click = (hunter: Client.Hunter) => () => void hunter.shoot("modal.hide")
 }

@@ -19,8 +19,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type { Client } from "@ordo-pink/sdk-client"
+
 export namespace Modal {
 	export type State = {
-		instance?: Ordo.Modal.Params
+		instance?: Client.Modal.Params
 	}
 }

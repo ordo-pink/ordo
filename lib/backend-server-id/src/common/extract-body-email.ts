@@ -19,23 +19,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { current_user } from "@ordo-pink/core"
-import { type Routary } from "@ordo-pink/routary"
-
-import { email_missing_rrr, invalid_email_rrr } from "../rrrs/invalid-user-email.rrr"
-import { type TIDContext } from "../backend-server-id.types"
+import { type User, user } from "@ordo-pink/sdk-core"
 import { oath } from "@ordo-pink/oath"
 
-export const extract_body_email = (intake: Routary.Intake<TIDContext>) => (request_body: any) =>
+import { email_missing_rrr, invalid_email_rrr } from "../rrrs/invalid-user-email.rrr"
+import type { ServerID } from "../backend-server-id.types"
+
+export const extract_body_email = (intake: ServerID.Intake) => (request_body: any) =>
 	oath
 		.from_nullable(request_body.email)
 		.pipe(oath.ops.rmap(() => email_missing_rrr(intake)))
 		.pipe(
 			oath.ops.chain(email =>
-				oath.if(is_email(email), { on_true: () => email as Ordo.User.Email, on_false: () => invalid_email_rrr(email, intake) }),
+				oath.if(is_email(email), { on_true: () => email as User.Email, on_false: () => invalid_email_rrr(email, intake) }),
 			),
 		)
 
 // --- Internal ---
 
-const is_email = current_user.validations.is_email
+const is_email = user.me.validations.is_email

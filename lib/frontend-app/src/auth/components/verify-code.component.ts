@@ -21,12 +21,12 @@
 
 import { maoka, maoka_dom, maoka_styled } from "@ordo-pink/maoka"
 import { bs_question_circle } from "@ordo-pink/frontend-icons"
-import { current_user } from "@ordo-pink/core"
 import { get_device_info } from "@ordo-pink/get-device-info"
 import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { maoka_sdk } from "@ordo-pink/sdk-maoka"
 import { noop } from "@ordo-pink/tau"
 import { oath } from "@ordo-pink/oath"
+import { user } from "@ordo-pink/sdk-core"
 
 import { auth$ } from "../auth.state"
 
@@ -45,7 +45,7 @@ export const verify_code_modal = maoka.create("div", ({ use }) => {
 	const handle_ok_click = () => {
 		const { code, email } = auth$.unwrap()
 
-		if (code.length !== 6 || email.length < 5 || email.length > 255 || !current_user.validations.is_email(email)) {
+		if (code.length !== 6 || email.length < 5 || email.length > 255 || !user.me.validations.is_email(email)) {
 			return // TODO Show error
 		}
 

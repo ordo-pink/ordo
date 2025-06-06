@@ -21,11 +21,11 @@
 
 import * as tau from "@ordo-pink/tau"
 import { BackendAuth, create_backend_server_au } from "@ordo-pink/backend-server-au"
-import { type Logger, console_logger } from "@ordo-pink/logger"
-import { create_persistence_strategy_user, create_reference_mapping_user } from "@ordo-pink/backend-persistence-strategy-user"
+import { type Logger, loggers, rrr } from "@ordo-pink/sdk-core"
 import { create_persistence_strategy_data_fs } from "@ordo-pink/backend-persistence-strategy-data-fs"
+import { create_persistence_strategy_user } from "@ordo-pink/backend-persistence-strategy-user"
+import { create_reference_mapping_user } from "@ordo-pink/backend-reference-mapping-user"
 import { oath } from "@ordo-pink/oath"
-import { rrr } from "@ordo-pink/core"
 
 const env_rrr = (env_var: string) => (value?: any) =>
 	value != null ? `Invalid value for ${env_var}: "${value}"` : `Missing value for ${env_var}`
@@ -114,11 +114,11 @@ const main = () =>
 								hash: code =>
 									oath
 										.from_promise(() => Bun.password.hash(code, { algorithm: "bcrypt", cost: 4 }))
-										.pipe(oath.ops.rmap(error => rrr.codes.eio("Failed to hash code", error))),
+										.pipe(oath.ops.rmap(error => rrr.eio("Failed to hash code", error))),
 								verify: (hash, code) =>
 									oath
 										.from_promise(() => Bun.password.verify(code, hash))
-										.pipe(oath.ops.rmap(error => rrr.codes.eio("Failed to verify code", error))),
+										.pipe(oath.ops.rmap(error => rrr.eio("Failed to verify code", error))),
 							},
 							create_request_id: () => crypto.randomUUID(),
 							data_persistence_strategy: null as any,
@@ -144,14 +144,14 @@ const main = () =>
 // --- Internal ---
 
 const logger: Logger = {
-	alert: (...message) => console_logger.alert("[AU]", ...message),
-	crit: (...message) => console_logger.crit("[AU]", ...message),
-	debug: (...message) => console_logger.debug("[AU]", ...message),
-	error: (...message) => console_logger.error("[AU]", ...message),
-	info: (...message) => console_logger.info("[AU]", ...message),
-	notice: (...message) => console_logger.notice("[AU]", ...message),
-	panic: (...message) => console_logger.panic("[AU]", ...message),
-	warn: (...message) => console_logger.warn("[AU]", ...message),
+	alert: (...message) => loggers.stdout.alert("[AU]", ...message),
+	crit: (...message) => loggers.stdout.crit("[AU]", ...message),
+	debug: (...message) => loggers.stdout.debug("[AU]", ...message),
+	error: (...message) => loggers.stdout.error("[AU]", ...message),
+	info: (...message) => loggers.stdout.info("[AU]", ...message),
+	notice: (...message) => loggers.stdout.notice("[AU]", ...message),
+	panic: (...message) => loggers.stdout.panic("[AU]", ...message),
+	warn: (...message) => loggers.stdout.warn("[AU]", ...message),
 }
 
 void main()

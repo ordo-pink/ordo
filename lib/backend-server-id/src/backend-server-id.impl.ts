@@ -24,7 +24,7 @@ import { rickroll } from "@ordo-pink/rickroll"
 import { routary } from "@ordo-pink/routary"
 import { routary_cors } from "@ordo-pink/routary-cors"
 
-import { type TIDContext, type TIDFuel } from "./backend-server-id.types"
+import type { ServerID } from "./backend-server-id.types"
 import { handle_get_session } from "./handlers/session/get-session.handler"
 import { handle_get_user_by_handle } from "./handlers/user/get-user-by-handle.handler"
 import { handle_get_user_by_id } from "./handlers/user/get-user-by-id.handler"
@@ -34,9 +34,9 @@ import { handle_refresh_session } from "./handlers/session/refresh-session.handl
 
 // TODO Global stats when API is ready
 // TODO Custom handlers for updating email & handle + disallow editing them in PATCH
-export const create_backend_server_id = (chamber: TIDFuel) =>
+export const create_backend_server_id = (chamber: ServerID.Params) =>
 	routary
-		.http<TIDContext>({ ...chamber, status: 200, headers: new Headers(), request_language: LOCALE.ENGLISH })
+		.http<ServerID.Fuel>({ ...chamber, status: 200, headers: new Headers(), request_language: LOCALE.ENGLISH })
 		.get("/session", handle_get_session)
 		.post("/session", handle_refresh_session)
 		.delete("/session", handle_invalidate_session)

@@ -22,7 +22,7 @@
 import { components, context } from "@ordo-pink/sdk-maoka"
 import { maoka, maoka_styled } from "@ordo-pink/maoka"
 import { bs_question_circle } from "@ordo-pink/frontend-icons"
-import { create_hotkey_from_event } from "@ordo-pink/hotkey-from-event"
+import { client } from "@ordo-pink/sdk-client"
 import { fuzzy_check } from "@ordo-pink/tau"
 import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 
@@ -47,7 +47,7 @@ export const command_palette_modal = maoka.create("div", ({ use }) => {
 
 		if (current && event.code === "Escape") return void hunter.shoot("command_palette.hide")
 
-		const parsed_hotkey = create_hotkey_from_event(event, is_darwin)
+		const parsed_hotkey = client.create_hotkey_from_event(event, is_darwin)
 
 		if (current) {
 			const filtered_items = current.items.filter(i =>

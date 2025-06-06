@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { create_hotkey_from_event } from "@ordo-pink/hotkey-from-event"
+import { client } from "@ordo-pink/sdk-client"
 import { maoka } from "@ordo-pink/maoka"
 import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { sweech } from "@ordo-pink/sweech"
@@ -37,7 +37,7 @@ export const actionable_hotkey = maoka.create<MaokaSDK.Components.HotkeyArgs>(
 			if (prevent_in_inputs && target.tagName === "INPUT") return
 			if (prevent_in_contenteditable && target.tagName === "DIV" && target.contentEditable) return
 
-			const parsed_hotkey = create_hotkey_from_event(e, is_darwin)
+			const parsed_hotkey = client.create_hotkey_from_event(e, is_darwin)
 
 			// TODO Accept handler
 

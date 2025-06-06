@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Unlicense
  */
 
+import type { Logger, Rrr } from "@ordo-pink/sdk-core"
 import type { LOCALE } from "@ordo-pink/i18n"
-import type { Logger } from "@ordo-pink/logger"
 import type { Oath } from "@ordo-pink/oath"
 import type { Routary } from "@ordo-pink/routary"
 
@@ -41,7 +41,7 @@ export module RoutaryOrdo {
 
 	export type ExtractJSONBody = <$Intake extends Routary.Intake = Routary.Intake>(
 		intake: $Intake,
-	) => Oath.Instance<any, { rrr: Ordo.Rrr<"EIO">; intake: Routary.Intake<any> }>
+	) => Oath.Instance<any, { rrr: Rrr.Instance<"EIO">; intake: Routary.Intake<any> }>
 
-	export type Rejection = { rrr: Ordo.Rrr; intake: Routary.Intake<RoutaryOrdo.Fuel> }
+	export type Rejection = { rrr: Rrr.Instance; intake: Routary.Intake<RoutaryOrdo.Fuel> }
 }

@@ -19,22 +19,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Routary } from "@ordo-pink/routary"
-import { rrr } from "@ordo-pink/core"
+import { rrr } from "@ordo-pink/sdk-core"
 
-import { type TIDContext } from "../backend-server-id.types"
+import type { ServerID } from "../backend-server-id.types"
 
-export const invalid_installed_functions_rrr = (installed_functions: unknown, intake: Routary.Intake<TIDContext>) => ({
-	rrr: rrr.codes.einval("invalid installed functions", installed_functions),
+export const invalid_installed_functions_rrr = (installed_functions: unknown, intake: ServerID.Intake) => ({
+	rrr: rrr.einval("invalid installed functions", installed_functions),
 	intake,
 })
 
-export const invalid_first_name_rrr = (first_name: unknown, intake: Routary.Intake<TIDContext>) => ({
-	rrr: rrr.codes.einval("invalid first name", first_name),
+export const invalid_first_name_rrr = (first_name: unknown, intake: ServerID.Intake) => ({
+	rrr: rrr.einval("invalid first name", first_name),
 	intake,
 })
 
-export const invalid_last_name_rrr = (last_name: unknown, intake: Routary.Intake<TIDContext>) => ({
-	rrr: rrr.codes.einval("invalid last name", last_name),
+export const invalid_last_name_rrr = (last_name: unknown, intake: ServerID.Intake) => ({
+	rrr: rrr.einval("invalid last name", last_name),
 	intake,
 })

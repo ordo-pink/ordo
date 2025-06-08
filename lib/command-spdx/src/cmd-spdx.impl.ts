@@ -23,27 +23,30 @@ import node_fs from "node:fs"
 import node_path from "node:path"
 
 import { type License, get_license, get_spdx_record } from "@ordo-pink/cmd-license"
+import { type Progress, create_progress } from "@ordo-pink/cmd-progress"
 import type { CommandHandler } from "@ordo-pink/cmd-handler"
-import { create_progress } from "@ordo-pink/cmd-progress"
 import { oath } from "@ordo-pink/oath"
 
 const unlicense = get_license("Unlicense")
 const agpl = get_license("AGPL-3.0-only")
-const progress = create_progress("Adding missing SPDX records")
 
 export const handle_spdx: CommandHandler.Fn = async opts => {
 	const noemit = !!opts.long_options["no-emit"] || !!opts.short_options["n"]
 	const bail = !!opts.long_options["--bail"] || !!opts.short_options["b"]
 	const use_unlicense_if_missing = !!opts.long_options["--unlicense"] || !!opts.short_options["U"]
 
+	const progress = create_progress(noemit ? "Checking missing SDPX records" : "Adding missing SPDX records")
+
 	await oath
 		.all([
-			...(await create_licenses("lib", noemit, bail, use_unlicense_if_missing)),
-			...(await create_licenses("srv", noemit, bail, use_unlicense_if_missing)),
+			...(await create_licenses("lib", progress, noemit, bail, use_unlicense_if_missing)),
+			...(await create_licenses("srv", progress, noemit, bail, use_unlicense_if_missing)),
 		])
-		.pipe(oath.ops.chain(xs => oath.all(xs.flatMap(x => x as any))))
+		.pipe(oath.ops.chain(xs => oath.all(xs.flatMap(x => x as any[]))))
 		.pipe(
-			oath.ops.map(xs => (noemit && !bail ? (xs.some(x => !x) ? process.exit(1) : xs.filter(Boolean)) : xs.filter(Boolean))),
+			oath.ops.map(xs =>
+				noemit && !bail ? (xs.some(x => x === false) ? process.exit(1) : xs.filter(Boolean)) : xs.filter(Boolean),
+			),
 		)
 		.cata({ reject: () => process.exit(1), resolve: () => void 0 })
 
@@ -52,7 +55,13 @@ export const handle_spdx: CommandHandler.Fn = async opts => {
 
 // --- Internal ---
 
-const create_licenses = async (space: "lib" | "srv", noemit = false, bail = false, use_unlicense_if_missing = false) => {
+const create_licenses = async (
+	space: "lib" | "srv",
+	progress: Progress.Instance,
+	noemit = false,
+	bail = false,
+	use_unlicense_if_missing = false,
+) => {
 	const entries = await node_fs.promises.readdir(space)
 
 	return entries.map(async entry => {

@@ -19,8 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import node_fs from "node:fs"
-import node_path from "node:path"
+import { join } from "node:path"
+import { promises } from "node:fs"
 
 import { type License, get_license, get_spdx_record } from "@ordo-pink/cmd-license"
 import type { CommandHandler } from "@ordo-pink/cmd-handler"
@@ -52,36 +52,36 @@ export const mklib_handler: CommandHandler.Fn = async opts => {
 	progress.inc(` '${lib_name}'`)
 
 	try {
-		const lib_path = node_path.join("lib", lib_name)
-		const lib_src_path = node_path.join(lib_path, "src")
+		const lib_path = join("lib", lib_name)
+		const lib_src_path = join(lib_path, "src")
 
-		const license_path = node_path.join(lib_path, "license")
-		const readme_path = node_path.join(lib_path, "readme.md")
-		const index_path = node_path.join(lib_path, "index.ts")
-		const impl_path = node_path.join(lib_src_path, `${lib_name}.impl.ts`)
-		const types_path = node_path.join(lib_src_path, `${lib_name}.types.ts`)
-		const test_path = node_path.join(lib_src_path, `${lib_name}.test.ts`)
+		const license_path = join(lib_path, "license")
+		const readme_path = join(lib_path, "readme.md")
+		const index_path = join(lib_path, "index.ts")
+		const impl_path = join(lib_src_path, `${lib_name}.impl.ts`)
+		const types_path = join(lib_src_path, `${lib_name}.types.ts`)
+		const test_path = join(lib_src_path, `${lib_name}.test.ts`)
 
 		const update_progress = () => progress.inc()
 
-		await node_fs.promises.mkdir(lib_src_path, { recursive: true })
+		await promises.mkdir(lib_src_path, { recursive: true })
 
 		await Promise.all([
-			node_fs.promises.writeFile(license_path, get_license(license)).then(update_progress),
-			node_fs.promises.writeFile(readme_path, readme(lib_name)).then(update_progress),
-			node_fs.promises.writeFile(index_path, index(lib_name, license)).then(update_progress),
-			node_fs.promises.writeFile(impl_path, impl(lib_name, license)).then(update_progress),
-			node_fs.promises.writeFile(types_path, types(lib_name, license)).then(update_progress),
-			node_fs.promises.writeFile(test_path, test(lib_name, license)).then(update_progress),
+			promises.writeFile(license_path, get_license(license)).then(update_progress),
+			promises.writeFile(readme_path, readme(lib_name)).then(update_progress),
+			promises.writeFile(index_path, index(lib_name, license)).then(update_progress),
+			promises.writeFile(impl_path, impl(lib_name, license)).then(update_progress),
+			promises.writeFile(types_path, types(lib_name, license)).then(update_progress),
+			promises.writeFile(test_path, test(lib_name, license)).then(update_progress),
 		])
 
 		progress.finish()
 	} catch (e) {
 		try {
-			await node_fs.promises.rm(`lib/${lib_name}`, { recursive: true, force: true })
-			progress.break("ERROR: Failed to create necessary lib files: ", e)
+			await promises.rm(`lib/${lib_name}`, { recursive: true, force: true })
+			progress.break(`ERROR: Failed to create necessary lib files: ${String(e)}`)
 		} catch (e) {
-			progress.break("ERROR: Unexpected FS error:", e)
+			progress.break(`ERROR: Unexpected FS error: ${String(e)}`)
 		}
 
 		process.exit(1)
@@ -106,21 +106,26 @@ export * from "./src/${name}.types"
 `
 
 const impl = (name: string, license: License.Type) => `${get_spdx_record(license)}
-import type { T${pascal(name)} } from "./${name}.types"
+import type { ${pascal(name)} } from "./${name}.types"
 
-export const ${snake(name)}: T${pascal(name)} = "${name}"
+export const ${snake(name)}: ${pascal(name)}.Static = "${name}"
 `
 
 const types = (name: string, license: License.Type) => `${get_spdx_record(license)}
-export type T${pascal(name)} = "${name}"
+export namespace ${pascal(name)} {
+	export type Static = "${name}"
+}
 `
 
 const test = (name: string, license: License.Type) => `${get_spdx_record(license)}
-import { expect, test } from "bun:test"
+import { describe, expect, it } from "bun:test"
+
 import { ${snake(name)} } from "./${name}.impl"
 
-test("${name} should pass", () => {
-	expect(${snake(name)}).toEqual("${name}")
+describe("${name}", () => {
+	it("should exist", () => {
+		expect(${snake(name)}).toBe("${name}")
+	})
 })
 `
 

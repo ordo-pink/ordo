@@ -33,12 +33,12 @@ export const create_backend_server_au = (params: BackendAuth.Params) => {
 	const interval = setInterval(() => {
 		const now = Date.now()
 
-		params.auth_storage.entries().forEach(([email, { timestamp }]) => {
+		for (const [email, { timestamp }] of params.auth_storage.entries()) {
 			if (now - timestamp > params.code_lifetime_ms) {
 				params.auth_storage.delete(email)
 				params.logger.debug("Removed outdated code for", fns.obfuscate_email(email))
 			}
-		})
+		}
 	}, 15 * 1000)
 
 	interval.unref()

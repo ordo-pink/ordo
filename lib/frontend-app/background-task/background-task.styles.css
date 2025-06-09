@@ -1,0 +1,3 @@
+.background-task {
+	@apply fixed left-1 top-1 z-50 animate-pulse text-sm text-neutral-500;
+}

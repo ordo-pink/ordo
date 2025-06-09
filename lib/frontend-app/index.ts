@@ -19,47 +19,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { maoka, maoka_dom } from "@ordo-pink/maoka"
-
-// import { maoka_jabs } from "@ordo-pink/maoka-jabs"
-// import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
-
-// import { OrdoActivityBar } from "./src/components/activity-bar/activity-bar.component"
-// import { OrdoBackgroundTaskIndicator } from "./src/components/background-task-indicator.component"
-// import { OrdoContextMenu } from "./src/components/context-menu.component"
-// import { OrdoModal } from "./src/components/modal/modal.overlay"
-// import { OrdoNotifications } from "./src/components/notifications/notifications-list.component"
-// import { OrdoSidebar } from "./src/components/sidebar/sidebar.component"
-// import { OrdoTitleDisplay } from "./src/components/title.component"
-// import { OrdoWorkspace } from "./src/components/workspace.component"
-// import { ordo_app_state } from "./app.state"
-
-// import { create_command_palette } from "./src/jabs/create-command-palette.jab"
-// import { create_file_command } from "./src/jabs/commands/create-file.command"
-// import { create_function_state } from "./src/jabs/create-function-state.jab"
-// import { create_function_state_source } from "./src/jabs/create-function-state-source.jab"
-// import { edit_file_labels_command } from "./src/jabs/commands/edit-file-labels.command"
-// import { edit_file_links_command } from "./src/jabs/commands/edit-file-links.command"
-// import { move_file_command } from "./src/jabs/commands/move-file.command"
-// import { remove_file_command } from "./src/jabs/commands/remove-file.command"
-// import { rename_file_command } from "./src/jabs/commands/rename-file.command"
-// import { start_metadata_manager } from "./src/jabs/start-data-orchestrator.jab"
-
-// TODO Move fonts to assets
-
 import type { Core, Logger } from "@ordo-pink/sdk-core"
 import type { Client } from "@ordo-pink/sdk-client"
 import { context } from "@ordo-pink/sdk-maoka"
 import { hunt } from "@ordo-pink/hunt"
+import { maoka } from "@ordo-pink/maoka"
 
 import { auth_jab } from "./src/auth"
 import { create_command_palette_jab } from "./src/command-palette"
 import { create_i18n_jab } from "./src/i18n"
 import { create_modal_jab } from "./src/modal"
-
-import "./index.css"
 import { create_rotor_jab } from "./src/rotor"
 
+import "./index.css"
+import { create_background_task_status_jab } from "./background-task"
+
+// TODO Move fonts to assets
+// TODO Move types
 export type AppOptions = {
 	hosts: Core.Hosts
 	local_persistence_strategy: null
@@ -77,6 +53,7 @@ export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
 
 	const modal = use(create_modal_jab)
 	const command_palette = use(create_command_palette_jab)
+	const background_task_status = use(create_background_task_status_jab)
 
-	return () => [modal(), command_palette()]
+	return () => [background_task_status(), modal(), command_palette()]
 })

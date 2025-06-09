@@ -8,6 +8,8 @@ export const create_rotor_jab: (hunter: Client.Hunter) => Maoka.Jab<RoutaryBrows
 	({ use }) => {
 		const rotor = create_routary_browser(window)
 
+		// TODO External routes
+
 		const handle_onmount = () => {
 			const release_set_hash = hunter.track("router.set_hash", rotor.set_hash)
 			const release_set_pathname = hunter.track("router.set_pathname", rotor.set_pathname)

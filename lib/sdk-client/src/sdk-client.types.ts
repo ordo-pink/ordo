@@ -21,6 +21,11 @@ declare global {
 			show_verify_code_modal: { args: void }
 			sign_out: { args: void }
 		}
+		background_status: {
+			saving: { args: void }
+			loading: { args: void }
+			none: { args: void }
+		}
 		command_palette: {
 			add: { args: Client.CommandPalette.Item.Instance<() => void> }
 			hide: { args: void }
@@ -80,9 +85,9 @@ export namespace Client {
 			fetch: Client.Fetch
 			hosts: Core.Hosts
 			hunter: Hunter
-			i18n$: I18n.Instance<Pick<t, keyof t>>["$"]
+			i18n$: I18n.Zags<Pick<t, keyof t>>
 			logger: Logger
-			rotor$: RoutaryBrowser.Instance["$"]
+			rotor$: RoutaryBrowser.Zags
 		}
 
 		export type Create = (

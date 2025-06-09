@@ -14,8 +14,10 @@ export namespace RoutaryBrowser {
 		search: string
 	}
 
+	export type Zags = Zags.Instance<RoutaryBrowser.State>
+
 	export type Instance = {
-		$: Zags.Instance<RoutaryBrowser.State>
+		$: RoutaryBrowser.Zags
 		destroy: () => void
 		set_hash: (hash: string) => void
 		set_pathname: (pathname: string) => void

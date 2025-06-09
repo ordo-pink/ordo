@@ -31,7 +31,6 @@ import { command_palette$ } from "../command-palette.state"
 import { command_palette_items } from "./items.component"
 import { command_palette_search } from "./search.component"
 
-// TODO open via route fragment and query
 // TODO create subitems if item is found with fuzzy search but the match is not exact
 export const command_palette_modal = maoka.create("div", ({ use }) => {
 	const { hunter } = use(context.consume)

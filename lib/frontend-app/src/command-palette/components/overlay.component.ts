@@ -26,7 +26,7 @@ import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { command_palette$ } from "../command-palette.state"
 
 /**
- * Command palett overlay that blurs out the background content and handles clicks to close
+ * Command palette overlay that blurs out the background content and handles clicks to close
  * the command palette.
  */
 export const command_palette_overlay = maoka_styled.div("command-palette_wrapper", ({ use }) => {

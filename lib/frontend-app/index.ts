@@ -48,17 +48,17 @@ import { maoka, maoka_dom } from "@ordo-pink/maoka"
 // TODO Move fonts to assets
 
 import type { Core, Logger } from "@ordo-pink/sdk-core"
-import { LOCALE, create_i18n } from "@ordo-pink/i18n"
 import type { Client } from "@ordo-pink/sdk-client"
 import { context } from "@ordo-pink/sdk-maoka"
-import { create_routary_browser } from "@ordo-pink/routary-browser"
 import { hunt } from "@ordo-pink/hunt"
 
 import { auth_jab } from "./src/auth"
 import { create_command_palette_jab } from "./src/command-palette"
+import { create_i18n_jab } from "./src/i18n"
 import { create_modal_jab } from "./src/modal"
 
 import "./index.css"
+import { create_rotor_jab } from "./src/rotor"
 
 export type AppOptions = {
 	hosts: Core.Hosts
@@ -69,27 +69,14 @@ export type AppOptions = {
 export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
 	const hunter = hunt.begin<Client.Preys>()
 	const fetch = window.fetch // TODO Replace with patched fetch
-	const rotor = create_routary_browser(window)
-	const i18n = create_i18n<Pick<t, keyof t>>(LOCALE.ENGLISH)
+	const rotor$ = use(create_rotor_jab(hunter))
+	const i18n$ = use(create_i18n_jab(hunter))
 
-	use(context.provide({ fetch, hosts: Object.freeze(hosts), hunter, logger, rotor$: rotor.$, i18n$: i18n.$ }))
-
+	use(context.provide({ fetch, hosts: Object.freeze(hosts), hunter, logger, rotor$, i18n$ }))
 	use(auth_jab)
 
 	const modal = use(create_modal_jab)
 	const command_palette = use(create_command_palette_jab)
-
-	const handle_mount = () => {
-		const release_add_translations = hunter.track("i18n.add_translations", ({ locale, values }) => i18n.add(locale, values))
-		const release_set_locale = hunter.track("i18n.set_locale", locale => i18n.set_locale(locale))
-
-		return () => {
-			release_add_translations()
-			release_set_locale()
-		}
-	}
-
-	use(maoka_dom.jabs.onmount(handle_mount))
 
 	return () => [modal(), command_palette()]
 })

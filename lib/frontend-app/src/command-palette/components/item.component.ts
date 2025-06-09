@@ -33,19 +33,22 @@ export const command_palette_item = maoka.create<{ item: Client.CommandPalette.I
 
 		use(maoka_jabs.set_id(String(item.id)))
 		use(maoka_jabs.set_class("command-palette_item"))
-		use(maoka_jabs.set_attribute("title", item.description))
 		use(maoka_jabs.listen("onclick", handle_click))
 
 		if (active) use(maoka_jabs.add_class("active"))
 		else use(maoka_jabs.remove_class("active"))
 
-		return () => [
-			item_main(() => [
-				item_title(() => [item.render_icon && item_icon({ render: item.render_icon }), t_name()]),
-				item.hotkey && item_info(() => components.hotkey({ hotkey: item.hotkey!, decoration_only: true })),
-			]),
-			item_footer(() => t_description()),
-		]
+		return () => {
+			use(maoka_jabs.set_attribute("title", t_description()))
+
+			return [
+				item_main(() => [
+					item_title(() => [item.render_icon && item_icon({ render: item.render_icon }), t_name()]),
+					item.hotkey && item_info(() => components.hotkey({ hotkey: item.hotkey!, decoration_only: true })),
+				]),
+				item_footer(() => t_description()),
+			]
+		}
 	},
 )
 

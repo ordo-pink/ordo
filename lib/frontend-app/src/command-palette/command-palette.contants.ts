@@ -28,5 +28,5 @@ export const FUZZY_CHECK_RATIO = 0.7
 
 export const enum COMMAND_PALETTE_TOGGLE_COMMAND {
 	ID = "command_palette.toggle",
-	HOTKEY = "mod+alt+p",
+	HOTKEY = "mod+shift+p",
 }

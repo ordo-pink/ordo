@@ -30,6 +30,8 @@ export namespace I18n {
 
 	export type State<$Record extends Record<string, unknown>> = { locale: ISO_639_1_Locale; values: I18n.Values<$Record> }
 
+	export type Zags<$Record extends Record<string, unknown>> = Zags.Instance<I18n.State<$Record>>
+
 	export type Instance<$Record extends Record<string, unknown>> = {
 		$: Zags.Instance<I18n.State<$Record>>
 		add: (locale: ISO_639_1_Locale, values: Partial<Record<I18n.DefinitionToTranslationKeys<$Record>, string>>) => void

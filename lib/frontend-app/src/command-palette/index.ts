@@ -29,7 +29,7 @@ import { command_palette$ } from "./command-palette.state"
 import { command_palette_modal } from "./components/modal.component"
 import { command_palette_overlay } from "./components/overlay.component"
 
-import "./command-palette.style.css"
+import "./command-palette.styles.css"
 
 export const create_command_palette_jab: Maoka.Jab<() => Maoka.Component> = ({ use }) => {
 	use(track_prey_jab)

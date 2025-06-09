@@ -26,13 +26,13 @@ import { hunt } from "@ordo-pink/hunt"
 import { maoka } from "@ordo-pink/maoka"
 
 import { auth_jab } from "./src/auth"
+import { create_background_task_status_jab } from "./src/background-task"
 import { create_command_palette_jab } from "./src/command-palette"
 import { create_i18n_jab } from "./src/i18n"
 import { create_modal_jab } from "./src/modal"
 import { create_rotor_jab } from "./src/rotor"
 
 import "./index.css"
-import { create_background_task_status_jab } from "./background-task"
 
 // TODO Move fonts to assets
 // TODO Move types

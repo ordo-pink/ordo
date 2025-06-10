@@ -139,6 +139,10 @@ a {
 	@apply flex overflow-hidden;
 }
 
+*::-moz-focus-inner {
+	border: 0;
+}
+
 .sidebar {
 	@apply fixed bottom-0 left-0 right-0 top-0 overflow-auto sm:relative sm:left-auto sm:h-dvh sm:w-96 sm:pr-14 sm:shadow-md;
 	@apply bg-neutral-100 dark:bg-neutral-900;

@@ -70,21 +70,28 @@ const register_translations_jab: Maoka.Jab = ({ use }) => {
 }
 
 const refresh_session_jab: Maoka.Jab = ({ use }) => {
-	const { fetch, hosts } = use(maoka_sdk.context.consume)
+	const { fetch, hosts, hunter } = use(maoka_sdk.context.consume)
 
 	const handle_mount = () => {
 		const refresh_session0 = oath
 			.of(new Headers())
 			.pipe(oath.ops.tap(h => h.append("X-Device", get_device_info(navigator))))
 			.pipe(oath.ops.map(headers => ({ headers, method: "POST", credentials: "include" }) as const))
-			.pipe(oath.ops.chain(init => oath.from_promise(() => fetch(`${hosts.id}/session`, init))))
-			.pipe(oath.ops.chain(res => oath.if(res.status < 300, { on_true: () => res })))
-			.pipe(oath.ops.and(res => res.json()))
+			.pipe(
+				oath.ops.chain(init =>
+					oath.from_promise(() =>
+						fetch(`${hosts.id}/session`, init).then(res => (res.status < 300 ? res.json() : Promise.reject())),
+					),
+				),
+			)
 			.pipe(oath.ops.map(dto => user.current.from_dto(...dto)))
 			.pipe(oath.ops.tap(user => auth$.update("user", () => user)))
 
-		// TODO Sign out on error
-		refresh_session0.cata(oath.catas.to_promise()).catch(noop)
+		// TODO Sign out on error, show notification
+		refresh_session0
+			.cata(oath.catas.to_promise())
+			.catch(noop)
+			.finally(() => hunter.shoot("background_status.none"))
 
 		return () => {
 			refresh_session0.cancel("Root component refreshed")
@@ -126,6 +133,7 @@ const track_prey_jab: Maoka.Jab = ({ node, use }) => {
 						)
 						.cata(oath.catas.to_promise())
 						.catch(console.error)
+						.finally(() => hunter.shoot("background_status.none"))
 				})
 
 				release_join = noop

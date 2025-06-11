@@ -56,6 +56,7 @@ export const join_modal = maoka.create("div", ({ use }) => {
 			.pipe(oath.ops.tap(() => hunter.shoot("auth.show_verify_code_modal")))
 			.cata(oath.catas.to_promise())
 			.catch(noop)
+			.finally(() => hunter.shoot("background_status.none"))
 	}
 
 	return () => [

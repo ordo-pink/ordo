@@ -63,6 +63,7 @@ export const verify_code_modal = maoka.create("div", ({ use }) => {
 			.pipe(oath.ops.tap(() => hunter.shoot("modal.hide")))
 			.cata(oath.catas.to_promise())
 			.catch(noop) // TODO Show error
+			.finally(() => hunter.shoot("background_status.none"))
 	}
 
 	return () => [

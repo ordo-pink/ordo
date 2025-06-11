@@ -20,7 +20,7 @@
  */
 
 import type { CoreSDK, Logger } from "@ordo-pink/sdk-core"
-import type { ClientSDK } from "@ordo-pink/sdk-client"
+import { type ClientSDK } from "@ordo-pink/sdk-client"
 import { context } from "@ordo-pink/sdk-maoka"
 import { hunt } from "@ordo-pink/hunt"
 import { maoka } from "@ordo-pink/maoka"
@@ -43,11 +43,26 @@ export type AppOptions = {
 	logger: Logger
 }
 
+const native_fetch = window.fetch
+
+globalThis.window.fetch = undefined as any
+globalThis.XMLHttpRequest = undefined as any
+globalThis.XMLHttpRequestUpload = undefined as any
+
 export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
 	const hunter = hunt.begin<ClientSDK.Preys>()
-	const fetch = window.fetch // TODO Replace with patched fetch
 	const rotor$ = use(create_rotor_jab(hunter))
 	const i18n$ = use(create_i18n_jab(hunter))
+	const fetch: ClientSDK.Fetch = (input, init) => {
+		console.log("start")
+		hunter.shoot(
+			!init || !init.method || init.method === "GET" || init.method === "HEAD"
+				? "background_status.loading"
+				: "background_status.saving",
+		)
+
+		return native_fetch(input, init)
+	}
 
 	use(context.provide({ fetch, hosts: Object.freeze(hosts), hunter, logger, rotor$, i18n$ }))
 	use(auth_jab)

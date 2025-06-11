@@ -209,6 +209,10 @@ export namespace Data {
 	}
 }
 
+export namespace Content {
+	export type Parser = "text" | "json" | "array-buffer" | "stream" | "form-data" | "bytes" | "omit"
+}
+
 /*
 namespace Content {
 	type Instance = ArrayBuffer | ArrayBufferLike | ReadableStream | null

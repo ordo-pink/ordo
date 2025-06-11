@@ -58,7 +58,7 @@ declare global {
 export namespace ClientSDK {
 	export type CreateHotkeyFromEvent = (event: KeyboardEvent, is_darwin: boolean) => string
 
-	export type Fetch = (input: string | URL | globalThis.Request, init?: RequestInit) => Promise<Response>
+	export type Fetch = (input: string | URL | Request, init?: RequestInit) => Promise<Response>
 
 	export type Preys = Pick<cmd, keyof cmd>
 

@@ -21,7 +21,6 @@
 
 import { maoka, maoka_dom, maoka_styled } from "@ordo-pink/maoka"
 import { bs_envelope_at } from "@ordo-pink/frontend-icons"
-import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { maoka_sdk } from "@ordo-pink/sdk-maoka"
 import { noop } from "@ordo-pink/tau"
 import { oath } from "@ordo-pink/oath"
@@ -30,7 +29,7 @@ import { user } from "@ordo-pink/sdk-core"
 import { auth$ } from "../auth.state"
 
 export const join_modal = maoka.create("div", ({ use }) => {
-	use(maoka_jabs.set_class("auth_join-modal"))
+	use(maoka_sdk.jabs.classes.set("auth_join-modal"))
 
 	const { hosts, hunter } = use(maoka_sdk.context.consume)
 
@@ -79,7 +78,7 @@ const button_section = maoka_styled.div("auth_join-modal_actions")
 const hint = maoka_styled.p()
 
 const email_input = maoka.create("label", ({ use }) => {
-	use(maoka_jabs.set_class("auth_join-modal_email_wrapper"))
+	use(maoka_sdk.jabs.classes.set("auth_join-modal_email_wrapper"))
 
 	return () => [bs_envelope_at({}), search()]
 })
@@ -94,11 +93,11 @@ const search = maoka_styled.input("auth_join-modal_email", ({ use }) => {
 		auth$.update("email", () => target.value)
 	}
 
-	use(maoka_jabs.set_id("email-input"))
-	use(maoka_jabs.set_attribute("type", "email"))
-	use(maoka_jabs.set_attribute("placeholder", t_placeholer))
-	use(maoka_jabs.listen("oninput", handle_input))
+	use(maoka_sdk.jabs.set_id("email-input"))
+	use(maoka_sdk.jabs.set_attribute("type", "email"))
+	use(maoka_sdk.jabs.set_attribute("placeholder", t_placeholer))
+	use(maoka_sdk.jabs.listen("oninput", handle_input))
 	use(maoka_dom.jabs.onmount(handle_mount))
 
-	if (value) use(maoka_jabs.set_attribute("value", value))
+	if (value) use(maoka_sdk.jabs.set_attribute("value", value))
 })

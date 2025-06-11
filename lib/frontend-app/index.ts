@@ -19,8 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { Core, Logger } from "@ordo-pink/sdk-core"
-import type { Client } from "@ordo-pink/sdk-client"
+import type { CoreSDK, Logger } from "@ordo-pink/sdk-core"
+import type { ClientSDK } from "@ordo-pink/sdk-client"
 import { context } from "@ordo-pink/sdk-maoka"
 import { hunt } from "@ordo-pink/hunt"
 import { maoka } from "@ordo-pink/maoka"
@@ -33,17 +33,18 @@ import { create_modal_jab } from "./src/modal"
 import { create_rotor_jab } from "./src/rotor"
 
 import "./index.css"
+import { create_activity_bar_jab } from "./src/activity-bar"
 
 // TODO Move fonts to assets
 // TODO Move types
 export type AppOptions = {
-	hosts: Core.Hosts
+	hosts: CoreSDK.Hosts
 	local_persistence_strategy: null
 	logger: Logger
 }
 
 export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
-	const hunter = hunt.begin<Client.Preys>()
+	const hunter = hunt.begin<ClientSDK.Preys>()
 	const fetch = window.fetch // TODO Replace with patched fetch
 	const rotor$ = use(create_rotor_jab(hunter))
 	const i18n$ = use(create_i18n_jab(hunter))
@@ -54,6 +55,7 @@ export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
 	const modal = use(create_modal_jab)
 	const command_palette = use(create_command_palette_jab)
 	const background_task_status = use(create_background_task_status_jab)
+	const activity_bar = use(create_activity_bar_jab)
 
-	return () => [background_task_status(), modal(), command_palette()]
+	return () => [activity_bar(), background_task_status(), modal(), command_palette()]
 })

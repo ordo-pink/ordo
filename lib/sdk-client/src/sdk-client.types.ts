@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import type { Core, CoreMixins, Data, Logger, Rrr, User } from "@ordo-pink/sdk-core"
+import type { CoreMixins, CoreSDK, Data, Logger, Rrr, User } from "@ordo-pink/sdk-core"
 import type { Hunt } from "@ordo-pink/hunt"
 import type { I18n } from "@ordo-pink/i18n"
 import type { Oath } from "@ordo-pink/oath"
@@ -27,10 +27,10 @@ declare global {
 			none: { args: void }
 		}
 		command_palette: {
-			add: { args: Client.CommandPalette.Item.Instance<() => void> }
+			add: { args: ClientSDK.CommandPalette.Item.Instance<() => void> }
 			hide: { args: void }
 			remove: { args: string | number }
-			show: { args: Client.CommandPalette.Instance | undefined }
+			show: { args: ClientSDK.CommandPalette.Instance | undefined }
 			toggle: { args: void }
 		}
 		i18n: {
@@ -44,7 +44,7 @@ declare global {
 		}
 		modal: {
 			hide: { args: void }
-			show: { args: Client.Modal.Params }
+			show: { args: ClientSDK.Modal.Params }
 		}
 		router: {
 			set_hash: { args: string }
@@ -55,17 +55,17 @@ declare global {
 	}
 }
 
-export namespace Client {
+export namespace ClientSDK {
 	export type CreateHotkeyFromEvent = (event: KeyboardEvent, is_darwin: boolean) => string
 
 	export type Fetch = (input: string | URL | globalThis.Request, init?: RequestInit) => Promise<Response>
 
 	export type Preys = Pick<cmd, keyof cmd>
 
-	export type Hunter = Hunt.Instance<Client.Preys>
+	export type Hunter = Hunt.Instance<ClientSDK.Preys>
 
-	export type GunFor<$Prey extends keyof Hunt.Pouch.ToPreys<Client.Preys>> = Hunt.GunFor<
-		Hunt.Pouch.ToPreys<Client.Preys>,
+	export type GunFor<$Prey extends keyof Hunt.Pouch.ToPreys<ClientSDK.Preys>> = Hunt.GunFor<
+		Hunt.Pouch.ToPreys<ClientSDK.Preys>,
 		$Prey
 	>
 
@@ -82,8 +82,8 @@ export namespace Client {
 		}
 
 		export type State = {
-			fetch: Client.Fetch
-			hosts: Core.Hosts
+			fetch: ClientSDK.Fetch
+			hosts: CoreSDK.Hosts
 			hunter: Hunter
 			i18n$: I18n.Zags<Pick<t, keyof t>>
 			logger: Logger
@@ -98,44 +98,57 @@ export namespace Client {
 	}
 
 	export namespace Activity {
-		export type OnUnmountParams = { workspace: HTMLDivElement; sidebar: HTMLDivElement }
+		export type Route = `/${string}`
+
+		export type OnUnmountArgs = {
+			icon?: HTMLSpanElement
+			sidebar?: HTMLDivElement
+			workspace?: HTMLDivElement
+		}
+
+		export type OnUnmount = (args: ClientSDK.Activity.OnUnmountArgs) => void
+
+		export type RenderIcon = (span: HTMLSpanElement) => void | Promise<void>
+
+		export type RenderSidebar = (div: HTMLDivElement) => void | Promise<void>
+
+		export type RenderWorkspace = (div: HTMLDivElement) => void | Promise<void>
 
 		export type Instance = {
-			name: string
-			routes: `/${string}`[]
-			default_route?: `/${string}`
-			render_workspace?: (div: HTMLDivElement) => void | Promise<void>
-			render_sidebar?: (div: HTMLDivElement) => void | Promise<void>
-			render_icon?: (span: HTMLSpanElement) => void | Promise<void>
-			onunmount?: (params: Client.Activity.OnUnmountParams) => void
-			is_background?: boolean
-			is_fullscreen?: boolean
+			id: CoreMixins.Identifiable.ID
+			readable_name: ClientSDK.Translations.Key
+			routes: ClientSDK.Activity.Route[]
+			start_route?: ClientSDK.Activity.Route
+			onunmount?: ClientSDK.Activity.OnUnmount
+			render_icon?: ClientSDK.Activity.RenderIcon
+			render_sidebar?: ClientSDK.Activity.RenderSidebar
+			render_workspace?: ClientSDK.Activity.RenderWorkspace
 		}
 	}
 
 	export namespace FileAssociation {
-		export type RenderFn = (params: Client.FileAssociation.RenderParams) => void | Promise<void>
+		export type RenderFn = (params: ClientSDK.FileAssociation.RenderParams) => void | Promise<void>
 
-		export type RenderToStringFn = (params: Client.FileAssociation.RenderParams) => string | Promise<string>
+		export type RenderToStringFn = (params: ClientSDK.FileAssociation.RenderParams) => string | Promise<string>
 
 		export type RenderIconFn = (span: HTMLSpanElement) => void | Promise<void>
 
 		export type Type = {
-			description: Client.Translations.Key
+			description: ClientSDK.Translations.Key
 			name: string
-			readable_name: Client.Translations.Key
+			readable_name: ClientSDK.Translations.Key
 		}
 
 		// TODO Support for marking files as remote-only
 		export type Instance = {
 			name: string
-			render_icon?: Client.FileAssociation.RenderIconFn
+			render_icon?: ClientSDK.FileAssociation.RenderIconFn
 			content_to_string?: {
-				render?: Client.FileAssociation.RenderToStringFn
+				render?: ClientSDK.FileAssociation.RenderToStringFn
 				styles?: string[]
 			}
 			render: RenderFn
-			types: Client.FileAssociation.Type[]
+			types: ClientSDK.FileAssociation.Type[]
 		}
 
 		export type RenderParams = {
@@ -160,33 +173,33 @@ export namespace Client {
 
 			/** Command palette item. */
 			export type Instance<$Value = any> = {
-				id: Client.CommandPalette.Item.ID
+				id: ClientSDK.CommandPalette.Item.ID
 				/** Readable name of the command palette item. Put a translation key here, if you use i18n. */
-				readable_name: Client.Translations.Key
+				readable_name: ClientSDK.Translations.Key
 
 				value: $Value
 
 				/** Icon to be displayed for the menu item. */
-				render_icon?: Client.CommandPalette.RenderIcon
-				render_custom_footer?: Client.CommandPalette.RenderCustomItemFooter
-				render_custom_info?: Client.CommandPalette.RenderCustomItemFooter
+				render_icon?: ClientSDK.CommandPalette.RenderIcon
+				render_custom_footer?: ClientSDK.CommandPalette.RenderCustomItemFooter
+				render_custom_info?: ClientSDK.CommandPalette.RenderCustomItemFooter
 
 				/** Hotkey for the menu item to be triggered. It will work no matter if the command palette is opened or not. */
 				hotkey?: string
 
-				description?: Client.Translations.Key
+				description?: ClientSDK.Translations.Key
 
 				type?: COMMAND_PALETTE.ITEM_TYPE
 			}
 		}
 
 		export type Instance<$Value = any> = {
-			items: Client.CommandPalette.Item.Instance<$Value>[]
-			on_new_item?: (input: string) => Client.CommandPalette.Item.Instance<$Value>
+			items: ClientSDK.CommandPalette.Item.Instance<$Value>[]
+			on_new_item?: (input: string) => ClientSDK.CommandPalette.Item.Instance<$Value>
 			is_multiple?: boolean
-			on_select: (item: Client.CommandPalette.Item.Instance<$Value>) => void
-			on_deselect?: (item: Client.CommandPalette.Item.Instance<$Value>) => void
-			pinned_items?: Client.CommandPalette.Item.Instance<$Value>[]
+			on_select: (item: ClientSDK.CommandPalette.Item.Instance<$Value>) => void
+			on_deselect?: (item: ClientSDK.CommandPalette.Item.Instance<$Value>) => void
+			pinned_items?: ClientSDK.CommandPalette.Item.Instance<$Value>[]
 			max_items?: number
 		}
 
@@ -201,8 +214,8 @@ export namespace Client {
 		export type Instance = {
 			id: string
 			type: NOTIFICATION.TYPE
-			title?: Client.Translations.Key
-			message: Client.Translations.Key
+			title?: ClientSDK.Translations.Key
+			message: ClientSDK.Translations.Key
 			render_icon?: (div: HTMLDivElement) => void
 			duration?: number
 			on_click?: () => void
@@ -222,7 +235,7 @@ export namespace Client {
 				/**
 				 * Check whether the item needs to be shown.
 				 */
-				should_show: (params: Client.ContextMenu.Params) => boolean
+				should_show: (params: ClientSDK.ContextMenu.Params) => boolean
 
 				/**
 				 * @see ItemType
@@ -234,7 +247,7 @@ export namespace Client {
 				/**
 				 * Readable name of the context menu item. Put a translated value here.
 				 */
-				readable_name: Client.Translations.Key
+				readable_name: ClientSDK.Translations.Key
 
 				/**
 				 * Icon to be displayed for the context menu item.
@@ -255,7 +268,7 @@ export namespace Client {
 				 * @optional
 				 * @default () => false
 				 */
-				should_be_disabled?: (params: Client.ContextMenu.Params) => boolean
+				should_be_disabled?: (params: ClientSDK.ContextMenu.Params) => boolean
 
 				/**
 				 * This function allows you to override the incoming payload that will be passed to the command
@@ -264,7 +277,7 @@ export namespace Client {
 				 * @optional
 				 * @default () => payload
 				 */
-				payload_creator?: (params: Client.ContextMenu.Params<any>) => unknown
+				payload_creator?: (params: ClientSDK.ContextMenu.Params<any>) => unknown
 			}
 		}
 
@@ -310,7 +323,7 @@ export namespace Client {
 			/**
 			 * Items to be shown in the context menu.
 			 */
-			structure: Client.ContextMenu.Item.Instance[]
+			structure: ClientSDK.ContextMenu.Item.Instance[]
 		}
 	}
 
@@ -321,7 +334,7 @@ export namespace Client {
 				get_current: () => User.Current.Instance | null
 				get_by_id: (id: User.ID) => Oath.Instance<User.Someone.Instance, Rrr.Instance<"EPERM" | "EINVAL" | "EIO">>
 				get_by_handle: (handle: User.Handle) => Oath.Instance<User.Someone.Instance, Rrr.Instance<"EPERM" | "EINVAL" | "EIO">>
-				get $(): Zags.Instance<Core.VersionState>
+				get $(): Zags.Instance<CoreSDK.VersionState>
 			}
 			Plain: { current: User.Current.Instance | null }
 			Static: {}
@@ -331,14 +344,14 @@ export namespace Client {
 		export type CheckPermissions = (permission: F.QueryPermission) => Result.Instance<void, Rrr.Instance<"EPERM">>
 
 		export type Interface = CoreMixins.Creatable.Interface<
-			[check_permsissions: Client.UserQuery.CheckPermissions],
-			Client.UserQuery.DataInterface
+			[check_permsissions: ClientSDK.UserQuery.CheckPermissions],
+			ClientSDK.UserQuery.DataInterface
 		> &
-			Client.UserQuery.DataInterface
+			ClientSDK.UserQuery.DataInterface
 
-		export type Instance = Core.Prettify<Client.UserQuery.Interface["Instance"]>
+		export type Instance = CoreSDK.Prettify<ClientSDK.UserQuery.Interface["Instance"]>
 
-		export type Static = Core.Prettify<Client.UserQuery.Interface["Static"]>
+		export type Static = CoreSDK.Prettify<ClientSDK.UserQuery.Interface["Static"]>
 	}
 }
 

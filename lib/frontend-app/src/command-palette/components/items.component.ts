@@ -20,17 +20,17 @@
  */
 
 import { maoka, maoka_styled } from "@ordo-pink/maoka"
-import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 
 import { COMMAND_PALETTE_SECTION, FUZZY_CHECK_RATIO } from "../command-palette.contants"
 import { command_palette$ } from "../command-palette.state"
 import { command_palette_item } from "./item.component"
 import { fuzzy_check } from "@ordo-pink/tau"
+import { maoka_sdk } from "@ordo-pink/sdk-maoka"
 
 export const command_palette_items = maoka.create("div", ({ use }) => {
-	const get_state = use(maoka_jabs.marry$(command_palette$))
+	const get_state = use(maoka_sdk.jabs.zags.marry$(command_palette$))
 
-	use(maoka_jabs.set_class("command-palette_items_multiple-wrapper"))
+	use(maoka_sdk.jabs.classes.set("command-palette_items_multiple-wrapper"))
 
 	return () => {
 		const state = get_state()

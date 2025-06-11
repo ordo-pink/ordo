@@ -3,17 +3,17 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import type { Core } from "../core/core.types"
+import type { CoreSDK } from "../core/core.types"
 import type { CoreMixins } from "../mixins/mixins.types"
 import { DATA } from "./data.constants"
 import type { Data } from "./data.types"
-import { core } from "../core/core.impl"
+import { core_sdk } from "../core/core.impl"
 import { core_mixins } from "../mixins/mixins.impl"
 import { data } from "./data.impl"
 
 // TODO
 export namespace data_mixins {
-	export const childish: Core.Mixin<Data.CustomMixins.Childish.Interface> = {
+	export const childish: CoreSDK.Mixin<Data.CustomMixins.Childish.Interface> = {
 		instance: plain => ({
 			get_parent: () => plain.parent,
 			is_child_of: id => !!id && plain.parent === id,
@@ -26,7 +26,7 @@ export namespace data_mixins {
 		},
 	}
 
-	export const contentful: Core.Mixin<Data.CustomMixins.Contentful.Interface> = {
+	export const contentful: CoreSDK.Mixin<Data.CustomMixins.Contentful.Interface> = {
 		instance: plain => ({
 			get_content_type: () => plain.type,
 			get_readable_size: () => data_mixins.contentful.static.to_readable_size(plain.size),
@@ -51,12 +51,12 @@ export namespace data_mixins {
 			},
 		},
 		validations: {
-			is_content_type: (x): x is Data.CustomMixins.Contentful.ContentType => core.validations.is_string(x),
-			is_size: (x): x is Data.CustomMixins.Contentful.Size => core.validations.is_finite_non_negative_int(x),
+			is_content_type: (x): x is Data.CustomMixins.Contentful.ContentType => core_sdk.validations.is_string(x),
+			is_size: (x): x is Data.CustomMixins.Contentful.Size => core_sdk.validations.is_finite_non_negative_int(x),
 		},
 	}
 
-	export const creatable: Core.Mixin<CoreMixins.Creatable.Interface<Data.CreateParams, Data.Interface>> = {
+	export const creatable: CoreSDK.Mixin<CoreMixins.Creatable.Interface<Data.CreateParams, Data.Interface>> = {
 		instance: () => ({}),
 		static: {
 			new: (name, author, parent, content_type, size, persistence_location, links, tags, extensions, id) => {
@@ -84,7 +84,7 @@ export namespace data_mixins {
 		validations: {},
 	}
 
-	export const linkable: Core.Mixin<Data.CustomMixins.Linkable.Interface> = {
+	export const linkable: CoreSDK.Mixin<Data.CustomMixins.Linkable.Interface> = {
 		instance: plain => ({
 			get_links: () => plain.links,
 			has_every_link: (...links) => links.every(link => plain.links.includes(link)),
@@ -101,11 +101,11 @@ export namespace data_mixins {
 		validations: {
 			...core_mixins.identifiable.validations,
 			is_links: (x): x is Data.CustomMixins.Linkable.Link[] =>
-				core.validations.is_array(x) && x.every(linkable.validations.is_id),
+				core_sdk.validations.is_array(x) && x.every(linkable.validations.is_id),
 		},
 	}
 
-	export const taggable: Core.Mixin<Data.CustomMixins.Taggable.Interface> = {
+	export const taggable: CoreSDK.Mixin<Data.CustomMixins.Taggable.Interface> = {
 		instance: plain => ({
 			get_tags: () => plain.tags,
 			get_tags_by_colors: (...colors) => plain.tags.filter(tag => colors.includes(tag[0])),
@@ -125,13 +125,15 @@ export namespace data_mixins {
 		},
 		validations: {
 			is_tag: (x): x is Data.CustomMixins.Taggable.Tag =>
-				core.validations.is_array(x) && taggable.validations.is_tag_color(x[0]) && core.validations.is_non_empty_string(x[1]),
+				core_sdk.validations.is_array(x) &&
+				taggable.validations.is_tag_color(x[0]) &&
+				core_sdk.validations.is_non_empty_string(x[1]),
 			is_tag_color: (x): x is Data.CustomMixins.Taggable.TagColor =>
-				core.validations.is_finite_non_negative_int(x) && x < Number(DATA.TAG_COLOR.length),
+				core_sdk.validations.is_finite_non_negative_int(x) && x < Number(DATA.TAG_COLOR.length),
 		},
 	}
 
-	export const serializable: Core.Mixin<CoreMixins.Serializable.Interface<Data.DTO, Data.Interface>> = {
+	export const serializable: CoreSDK.Mixin<CoreMixins.Serializable.Interface<Data.DTO, Data.Interface>> = {
 		instance: plain => ({
 			to_dto: () => [
 				plain.id,
@@ -192,7 +194,7 @@ export namespace data_mixins {
 		// TODO
 		validations: {
 			is_dto: (x): x is Data.DTO => {
-				if (!core.validations.is_array(x)) return false
+				if (!core_sdk.validations.is_array(x)) return false
 
 				const dto = x as Data.DTO
 
@@ -205,7 +207,7 @@ export namespace data_mixins {
 		},
 	}
 
-	export const persistable: Core.Mixin<Data.CustomMixins.Persistable.Interface> = {
+	export const persistable: CoreSDK.Mixin<Data.CustomMixins.Persistable.Interface> = {
 		instance: plain => ({
 			get_persistence_location: () => plain.persistence_location,
 			should_persist_locally: () =>
@@ -221,11 +223,11 @@ export namespace data_mixins {
 		},
 		validations: {
 			is_persistence_location: (x): x is Data.CustomMixins.Persistable.Location =>
-				core.validations.is_finite_non_negative_int(x) && x < Number(DATA.PERSISTENCE_LOCATION.length),
+				core_sdk.validations.is_finite_non_negative_int(x) && x < Number(DATA.PERSISTENCE_LOCATION.length),
 		},
 	}
 
-	export const accessible: Core.Mixin<Data.CustomMixins.Accessible.Interface> = {
+	export const accessible: CoreSDK.Mixin<Data.CustomMixins.Accessible.Interface> = {
 		instance: plain => ({
 			can_exec: id => DATA.PERMISSION[plain.permissions[id]].includes("X"),
 			can_read: id => DATA.PERMISSION[plain.permissions[id]].includes("R"),
@@ -241,8 +243,8 @@ export namespace data_mixins {
 		validations: {
 			...core_mixins.identifiable.validations,
 			is_permission: (x): x is Data.CustomMixins.Accessible.Permission =>
-				core.validations.is_finite_non_negative_int(x) && x < Number(DATA.PERMISSION.length),
-			is_permissions: (x): x is Data.CustomMixins.Accessible.Permissions => core.validations.is_object(x),
+				core_sdk.validations.is_finite_non_negative_int(x) && x < Number(DATA.PERMISSION.length),
+			is_permissions: (x): x is Data.CustomMixins.Accessible.Permissions => core_sdk.validations.is_object(x),
 		},
 	}
 }

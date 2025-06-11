@@ -5,21 +5,21 @@
 
 import type { GetDeviceInfo } from "@ordo-pink/get-device-info"
 
-import type { Core } from "../core/core.types"
+import type { CoreSDK } from "../core/core.types"
 import type { CoreMixins } from "../mixins/mixins.types"
 import type { Session } from "./session.types"
-import { core } from "../core/core.impl"
+import { core_sdk } from "../core/core.impl"
 import { core_mixins } from "../mixins/mixins.impl"
 
 export namespace session_mixins {
-	export const device_aware: Core.Mixin<Session.CustomMixins.DeviceAware.Interface> = {
+	export const device_aware: CoreSDK.Mixin<Session.CustomMixins.DeviceAware.Interface> = {
 		instance: ({ device_info }) => ({ get_device_info: () => device_info }),
 		static: {},
 		// TODO Improve validation
-		validations: { is_device_info: (x): x is GetDeviceInfo.DeviceInfo => core.validations.is_string(x) },
+		validations: { is_device_info: (x): x is GetDeviceInfo.DeviceInfo => core_sdk.validations.is_string(x) },
 	}
 
-	export const serializable: Core.Mixin<CoreMixins.Serializable.Interface<Session.DTO, Session.DataInterface>> = {
+	export const serializable: CoreSDK.Mixin<CoreMixins.Serializable.Interface<Session.DTO, Session.DataInterface>> = {
 		instance: plain => ({ to_dto: () => [plain.id, plain.created_at, plain.device_info] }),
 		static: {
 			from_dto: (...dto) => {
@@ -35,7 +35,7 @@ export namespace session_mixins {
 		},
 		validations: {
 			is_dto: (x): x is Session.DTO => {
-				if (!core.validations.is_array(x)) return false
+				if (!core_sdk.validations.is_array(x)) return false
 
 				const dto = x as Session.DTO
 

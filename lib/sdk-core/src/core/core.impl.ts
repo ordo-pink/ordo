@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import type { Core } from "./core.types"
+import type { CoreSDK } from "./core.types"
 
-export namespace core {
-	export const mix: Core.Mix = (...mixins) => ({
+export namespace core_sdk {
+	export const mix: CoreSDK.Mix = (...mixins) => ({
 		...mixins.reduce((acc, mixin) => (mixin.static ? { ...acc, ...mixin.static } : acc), {} as any),
 		validations: {
 			...mixins.reduce((acc, mixin) => (mixin.validations ? { ...acc, ...mixin.validations } : mixin), {}),
@@ -36,8 +36,16 @@ export namespace core {
 		export const is_int = (x: unknown): x is number => Number.isInteger(x)
 		export const is_finite_non_negative_int = (x: unknown): x is number =>
 			is_non_negative_number(x) && is_finite(x) && is_int(x)
-		export const is_uuid = (x: unknown): x is Core.UUIDv4 => is_string(x) && rx.uuid_v4.test(x)
+		export const is_uuid = (x: unknown): x is CoreSDK.UUIDv4 => is_string(x) && rx.uuid_v4.test(x)
 		export const is_array = Array.isArray
 		export const is_object = (x: unknown): x is Record<string, unknown> => x != null && typeof x === "object" && !is_array(x)
+	}
+
+	export namespace fns {
+		export const eq = (target: number) => (val: number) => target === val
+		export const gt = (min: number) => (val: number) => val > min
+		export const gte = (min: number) => (val: number) => eq(min)(val) || gt(min)(val)
+		export const lt = (max: number) => (val: number) => val < max
+		export const lte = (max: number) => (val: number) => eq(max)(val) || lt(max)(val)
 	}
 }

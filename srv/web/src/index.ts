@@ -19,13 +19,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { type Core, loggers } from "@ordo-pink/sdk-core"
+import { type CoreSDK, loggers } from "@ordo-pink/sdk-core"
 import { app } from "@ordo-pink/frontend-app"
 import { maoka_dom } from "@ordo-pink/maoka"
 
 const body = document.querySelector("body")!
 
-const hosts: Core.Hosts = {
+const hosts: CoreSDK.Hosts = {
 	id: import.meta.env.VITE_ORDO_ID_HOST,
 	dt: import.meta.env.VITE_ORDO_DT_HOST,
 	pb: import.meta.env.VITE_ORDO_PB_HOST,

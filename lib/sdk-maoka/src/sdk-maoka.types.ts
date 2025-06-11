@@ -3,14 +3,14 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { Client } from "@ordo-pink/sdk-client"
+import { ClientSDK } from "@ordo-pink/sdk-client"
 import { Maoka } from "@ordo-pink/maoka"
 
 export namespace MaokaSDK {
-	export type Context = Maoka.Context.Instance<Client.F.State>
+	export type Context = Maoka.Context.Instance<ClientSDK.F.State>
 
 	export namespace Jabs {
-		export type Translate$ = (key?: Client.Translations.Key) => Maoka.Jab<(default_value?: string) => string>
+		export type Translate$ = (key?: ClientSDK.Translations.Key) => Maoka.Jab<(default_value?: string) => string>
 	}
 
 	export namespace Components {
@@ -29,5 +29,9 @@ export namespace MaokaSDK {
 			decoration_only?: boolean
 			show_in_mobile?: boolean
 		}
+	}
+
+	export namespace Pouch {
+		export type NoSpaceString<$Str extends string> = $Str extends `${string} ${string}` ? never : $Str
 	}
 }

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-export namespace Core {
+export namespace CoreSDK {
 	export type UUIDv4 = `${string}-${string}-${string}-${string}-${string}`
 
 	export type VersionState = { version: number }
@@ -11,32 +11,32 @@ export namespace Core {
 	export type TrackUpdates = "with_updates" | "without_updates"
 
 	export type Prettify<$Type> = {
-		[$Key in keyof $Type]: $Type[$Key] extends Record<string, unknown> ? Core.Prettify<$Type[$Key]> : $Type[$Key]
+		[$Key in keyof $Type]: $Type[$Key] extends Record<string, unknown> ? CoreSDK.Prettify<$Type[$Key]> : $Type[$Key]
 	} & {}
 
 	export type BaseInterface = { Plain: {}; Instance: {}; Validations: {}; Static: {} }
 
-	export type Mixin<$Interface extends Core.BaseInterface> = {
+	export type Mixin<$Interface extends CoreSDK.BaseInterface> = {
 		instance: (
-			plain: Core.Prettify<$Interface["Plain"]>,
-		) => Core.Prettify<{ [_Key in keyof $Interface["Instance"]]: $Interface["Instance"][_Key] }>
+			plain: CoreSDK.Prettify<$Interface["Plain"]>,
+		) => CoreSDK.Prettify<{ [_Key in keyof $Interface["Instance"]]: $Interface["Instance"][_Key] }>
 		static: $Interface["Static"]
 		validations: $Interface["Validations"]
 	}
 
-	export type Impl<$Interface extends BaseInterface> = Core.Prettify<
+	export type Impl<$Interface extends BaseInterface> = CoreSDK.Prettify<
 		$Interface["Static"] & { validations: $Interface["Validations"] }
 	>
 
-	export type MixInterfaces<$Interfaces extends Mixin<any>[]> = $Interfaces extends [Core.Mixin<infer _First>, ...infer _Rest]
+	export type MixInterfaces<$Interfaces extends Mixin<any>[]> = $Interfaces extends [CoreSDK.Mixin<infer _First>, ...infer _Rest]
 		? _Rest extends []
 			? _First
-			: _Rest extends Core.Mixin<any>[]
-				? _First & Core.MixInterfaces<_Rest>
+			: _Rest extends CoreSDK.Mixin<any>[]
+				? _First & CoreSDK.MixInterfaces<_Rest>
 				: never
 		: never
 
-	export type Mix = <$Mixins extends Core.Mixin<any>[]>(...mixins: $Mixins) => Core.Impl<Core.MixInterfaces<$Mixins>>
+	export type Mix = <$Mixins extends CoreSDK.Mixin<any>[]>(...mixins: $Mixins) => CoreSDK.Impl<CoreSDK.MixInterfaces<$Mixins>>
 
 	/**
 	 * Ordo backend hostnames.

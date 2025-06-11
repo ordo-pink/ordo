@@ -4,12 +4,12 @@
  */
 
 import { maoka, maoka_dom, maoka_styled } from "@ordo-pink/maoka"
-import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 
 import { MaokaSDK } from "../sdk-maoka.types"
 import { actionable_hotkey } from "./hotkey.component"
 
 import "./button.styles.css"
+import { maoka_sdk } from "@ordo-pink/sdk-maoka"
 
 export const button_success = (params: MaokaSDK.Components.ButtonArgs) =>
 	default_button({ ...params, custom_class: add_button_type_class("success", params.custom_class) })
@@ -27,9 +27,9 @@ const text_container = maoka_styled.div()
 const default_button = maoka.create<MaokaSDK.Components.ButtonArgs>(
 	"button",
 	({ kindergarten, on_click, aria_label = "", custom_class = "", hotkey: hotkey_args, use, node }) => {
-		use(maoka_jabs.set_class("button", custom_class))
-		use(maoka_jabs.set_attribute("aria-label", aria_label))
-		use(maoka_jabs.listen("onclick", event => handle_click(event)))
+		use(maoka_sdk.jabs.classes.set("button", custom_class))
+		use(maoka_sdk.jabs.set_attribute("aria-label", aria_label))
+		use(maoka_sdk.jabs.listen("onclick", event => handle_click(event)))
 
 		const handle_click = (event: MouseEvent) => {
 			event.preventDefault()

@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import type { Core } from "../core/core.types"
+import type { CoreSDK } from "../core/core.types"
 import type { Data } from "./data.types"
-import { core } from "../core/core.impl"
+import { core_sdk } from "../core/core.impl"
 import { core_mixins } from "../mixins/mixins.impl"
 import { data_mixins } from "./data.mixins"
 
-export const data: Core.Impl<Data.Interface> = core.mix(
+export const data: CoreSDK.Impl<Data.Interface> = core_sdk.mix(
 	core_mixins.identifiable,
 	core_mixins.timestampable.with_updates,
 	core_mixins.authored.with_updates,

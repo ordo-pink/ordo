@@ -6,10 +6,11 @@
 import { sweech } from "@ordo-pink/sweech"
 
 import type { SemVer } from "./semver.types"
-import { core } from "../core/core.impl"
+import { core_sdk } from "../core/core.impl"
 
 export namespace sem_ver {
-	export const is_sem_ver = (x: any): x is SemVer.Version => core.validations.is_string(x) && core.rx.semantic_version.test(x)
+	export const is_sem_ver = (x: any): x is SemVer.Version =>
+		core_sdk.validations.is_string(x) && core_sdk.rx.semantic_version.test(x)
 
 	export const create = (
 		major: SemVer.Major,

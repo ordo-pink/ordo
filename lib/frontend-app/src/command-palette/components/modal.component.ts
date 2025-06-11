@@ -19,12 +19,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { components, context } from "@ordo-pink/sdk-maoka"
+import { components, context, maoka_sdk } from "@ordo-pink/sdk-maoka"
 import { maoka, maoka_styled } from "@ordo-pink/maoka"
 import { bs_question_circle } from "@ordo-pink/frontend-icons"
-import { client } from "@ordo-pink/sdk-client"
+import { client_sdk } from "@ordo-pink/sdk-client"
 import { fuzzy_check } from "@ordo-pink/tau"
-import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 
 import { COMMAND_PALETTE_SECTION, FUZZY_CHECK_RATIO } from "../command-palette.contants"
 import { command_palette$ } from "../command-palette.state"
@@ -34,9 +33,8 @@ import { command_palette_search } from "./search.component"
 // TODO create subitems if item is found with fuzzy search but the match is not exact
 export const command_palette_modal = maoka.create("div", ({ use }) => {
 	const { hunter } = use(context.consume)
-
-	const is_darwin = use(maoka_jabs.is_darwin)
-	const get_current = use(maoka_jabs.cheat$(command_palette$, "current" as const))
+	const is_darwin = use(maoka_sdk.jabs.is_darwin)
+	const get_current = use(maoka_sdk.jabs.zags.cheat$(command_palette$, "current" as const))
 
 	const handle_click = (event: MouseEvent) => event.stopPropagation()
 	const handle_global_keydown = (event: KeyboardEvent) => {
@@ -46,7 +44,7 @@ export const command_palette_modal = maoka.create("div", ({ use }) => {
 
 		if (current && event.code === "Escape") return void hunter.shoot("command_palette.hide")
 
-		const parsed_hotkey = client.create_hotkey_from_event(event, is_darwin)
+		const parsed_hotkey = client_sdk.create_hotkey_from_event(event, is_darwin)
 
 		if (current) {
 			const filtered_items = current.items.filter(i =>
@@ -91,10 +89,10 @@ export const command_palette_modal = maoka.create("div", ({ use }) => {
 		}
 	}
 
-	use(maoka_jabs.set_id("cp"))
-	use(maoka_jabs.set_class("command-palette"))
-	use(maoka_jabs.listen("onclick", handle_click))
-	use(maoka_jabs.listen_global_event("keydown", handle_global_keydown))
+	use(maoka_sdk.jabs.set_id("cp"))
+	use(maoka_sdk.jabs.classes.set("command-palette"))
+	use(maoka_sdk.jabs.listen("onclick", handle_click))
+	use(maoka_sdk.jabs.listen_global_event("keydown", handle_global_keydown))
 
 	return () => {
 		const current = get_current() ?? null

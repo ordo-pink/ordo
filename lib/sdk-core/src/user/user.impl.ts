@@ -3,14 +3,14 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import type { Core } from "../core/core.types"
+import type { CoreSDK } from "../core/core.types"
 import type { User } from "./user.types"
-import { core } from "../core/core.impl"
+import { core_sdk } from "../core/core.impl"
 import { core_mixins } from "../mixins/mixins.impl"
 import { user_mixins } from "./user.mixins"
 
 export namespace user {
-	export const someone: Core.Impl<User.Someone.Interface> = core.mix(
+	export const someone: CoreSDK.Impl<User.Someone.Interface> = core_sdk.mix(
 		core_mixins.identifiable,
 		core_mixins.named,
 		user_mixins.referable,
@@ -19,7 +19,7 @@ export namespace user {
 		user_mixins.serializable.someone,
 	)
 
-	export const current = core.mix(
+	export const current = core_sdk.mix(
 		core_mixins.identifiable,
 		core_mixins.named,
 		user_mixins.referable,

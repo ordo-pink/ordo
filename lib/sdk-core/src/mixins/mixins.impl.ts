@@ -3,25 +3,25 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import type { Core } from "../core/core.types"
+import type { CoreSDK } from "../core/core.types"
 import type { CoreMixins } from "./mixins.types"
-import { core } from "../core/core.impl"
+import { core_sdk } from "../core/core.impl"
 
 export namespace core_mixins {
-	export const identifiable: Core.Mixin<CoreMixins.Identifiable.Interface> = {
+	export const identifiable: CoreSDK.Mixin<CoreMixins.Identifiable.Interface> = {
 		instance: ({ id }) => ({ get_id: () => id, has_id: x => id === x }),
 		static: { create_id: () => crypto.randomUUID() },
-		validations: { is_id: core.validations.is_uuid },
+		validations: { is_id: core_sdk.validations.is_uuid },
 	}
 
 	export namespace authored {
-		export const without_updates: Core.Mixin<CoreMixins.Authored.Interface<"without_updates">> = {
+		export const without_updates: CoreSDK.Mixin<CoreMixins.Authored.Interface<"without_updates">> = {
 			instance: ({ created_by }) => ({ get_created_by: () => created_by, is_created_by: id => created_by === id }),
 			static: {},
 			validations: identifiable.validations,
 		}
 
-		export const with_updates: Core.Mixin<CoreMixins.Authored.Interface<"with_updates">> = {
+		export const with_updates: CoreSDK.Mixin<CoreMixins.Authored.Interface<"with_updates">> = {
 			instance: ({ created_by, updated_by }) => ({
 				...authored.without_updates.instance({ created_by }),
 				get_updated_by: () => updated_by,
@@ -32,7 +32,7 @@ export namespace core_mixins {
 		}
 	}
 
-	export const extendable: Core.Mixin<CoreMixins.Extendable.Interface> = {
+	export const extendable: CoreSDK.Mixin<CoreMixins.Extendable.Interface> = {
 		instance: plain => ({
 			get_extension: key => (plain as any)[key] ?? null,
 			has_extension: key => !!(plain as any)[key],
@@ -41,18 +41,18 @@ export namespace core_mixins {
 			get_default_extensions: () => ({}),
 		},
 		validations: {
-			is_extensions: (x): x is CoreMixins.Extendable.Extensions => core.validations.is_object(x),
+			is_extensions: (x): x is CoreMixins.Extendable.Extensions => core_sdk.validations.is_object(x),
 		},
 	}
 
-	export const named: Core.Mixin<CoreMixins.Named.Interface> = {
+	export const named: CoreSDK.Mixin<CoreMixins.Named.Interface> = {
 		instance: ({ name }) => ({ get_name: () => name }),
 		static: { get_default_name: () => "" },
-		validations: { is_name: core.validations.is_string },
+		validations: { is_name: core_sdk.validations.is_string },
 	}
 
 	export namespace timestampable {
-		export const without_updates: Core.Mixin<CoreMixins.Timestampable.Interface<"without_updates">> = {
+		export const without_updates: CoreSDK.Mixin<CoreMixins.Timestampable.Interface<"without_updates">> = {
 			instance: plain => ({
 				get_created_at: () => new Date(plain.created_at),
 				get_raw_created_at: () => plain.created_at,
@@ -62,10 +62,10 @@ export namespace core_mixins {
 					exclude ? plain.created_at < date.getMilliseconds() : plain.created_at <= date.getMilliseconds(),
 			}),
 			static: { create_timestamp: () => Date.now() },
-			validations: { is_timestamp: core.validations.is_finite_non_negative_int },
+			validations: { is_timestamp: core_sdk.validations.is_finite_non_negative_int },
 		}
 
-		export const with_updates: Core.Mixin<CoreMixins.Timestampable.Interface<"with_updates">> = {
+		export const with_updates: CoreSDK.Mixin<CoreMixins.Timestampable.Interface<"with_updates">> = {
 			...timestampable.without_updates,
 			instance: plain => ({
 				...timestampable.without_updates.instance(plain),

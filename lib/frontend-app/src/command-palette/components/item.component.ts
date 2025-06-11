@@ -19,27 +19,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { components, jabs } from "@ordo-pink/sdk-maoka"
+import { components, jabs, maoka_sdk } from "@ordo-pink/sdk-maoka"
 import { maoka, maoka_dom, maoka_styled } from "@ordo-pink/maoka"
-import type { Client } from "@ordo-pink/sdk-client"
-import { maoka_jabs } from "@ordo-pink/maoka-jabs"
+import type { ClientSDK } from "@ordo-pink/sdk-client"
 
-export const command_palette_item = maoka.create<{ item: Client.CommandPalette.Item.Instance; active: boolean }>(
+export const command_palette_item = maoka.create<{ item: ClientSDK.CommandPalette.Item.Instance; active: boolean }>(
 	"div",
 	({ active, item, use }) => {
 		const handle_click = () => item.value()
 		const t_name = use(jabs.translate$(item.readable_name))
 		const t_description = use(jabs.translate$(item.description))
 
-		use(maoka_jabs.set_id(String(item.id)))
-		use(maoka_jabs.set_class("command-palette_item"))
-		use(maoka_jabs.listen("onclick", handle_click))
+		use(maoka_sdk.jabs.set_id(String(item.id)))
+		use(maoka_sdk.jabs.classes.set("command-palette_item"))
+		use(maoka_sdk.jabs.listen("onclick", handle_click))
 
-		if (active) use(maoka_jabs.add_class("active"))
-		else use(maoka_jabs.remove_class("active"))
+		if (active) use(maoka_sdk.jabs.classes.add("active"))
+		else use(maoka_sdk.jabs.classes.remove("active"))
 
 		return () => {
-			use(maoka_jabs.set_attribute("title", t_description()))
+			use(maoka_sdk.jabs.set_attribute("title", t_description()))
 
 			return [
 				item_main(() => [
@@ -56,7 +55,7 @@ const item_title = maoka_styled.div("command-palette_item_title-wrapper")
 const item_info = maoka_styled.div("command-palette_item_info")
 const item_main = maoka_styled.div("command-palette_item_main")
 const item_footer = maoka_styled.div("command-palette_item_footer")
-const item_icon = maoka_styled.span<{ render: Client.CommandPalette.RenderIcon }>(
+const item_icon = maoka_styled.span<{ render: ClientSDK.CommandPalette.RenderIcon }>(
 	"command-palette_item_icon",
 	({ render, use }) => use(maoka_dom.jabs.if_dom(n => void render(n.value))),
 )

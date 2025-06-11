@@ -5,10 +5,10 @@
 
 import { sweech } from "@ordo-pink/sweech"
 
-import type { Client } from "./sdk-client.types"
+import type { ClientSDK } from "./sdk-client.types"
 
-export namespace client {
-	export const create_hotkey_from_event: Client.CreateHotkeyFromEvent = (event, is_darwin) => {
+export namespace client_sdk {
+	export const create_hotkey_from_event: ClientSDK.CreateHotkeyFromEvent = (event, is_darwin) => {
 		let hotkey = ""
 
 		if (event.altKey) hotkey += "meta+"

@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { BsMenuButtonWideFill } from "@ordo-pink/frontend-icons"
+import { bs_menu_button_wide_fill } from "@ordo-pink/frontend-icons"
 import { maoka } from "@ordo-pink/maoka"
 import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { ordo_app_state } from "@ordo-pink/frontend-app/app.state"
@@ -59,7 +59,7 @@ export const OrdoActivityBar = maoka.styled.div("activity-bar", use => {
 				)
 
 				// TODO i18n
-				return () => activity_bar_icon({ name: "Command Palette", render_icon: BsMenuButtonWideFill })
+				return () => activity_bar_icon({ name: "Command Palette", render_icon: bs_menu_button_wide_fill })
 			}),
 
 			ActivityBarActivities(

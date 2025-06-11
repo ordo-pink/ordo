@@ -3,24 +3,24 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { client } from "@ordo-pink/sdk-client"
+import { client_sdk } from "@ordo-pink/sdk-client"
 import { maoka } from "@ordo-pink/maoka"
-import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { sweech } from "@ordo-pink/sweech"
 import { title_case } from "@ordo-pink/tau"
 
 import { MaokaSDK } from "../sdk-maoka.types"
 
 import "./hotkey.styles.css"
+import { maoka_sdk } from "@ordo-pink/sdk-maoka"
 
 export const actionable_hotkey = maoka.create<MaokaSDK.Components.HotkeyArgs>(
 	"div",
 	({ decoration_only, hotkey, node, prevent_in_contenteditable, prevent_in_inputs, show_in_mobile, use }) => {
-		const is_darwin = use(maoka_jabs.is_darwin)
+		const is_darwin = use(maoka_sdk.jabs.is_darwin)
 
-		use(maoka_jabs.set_class("hotkey"))
-		if (show_in_mobile) use(maoka_jabs.add_class("mobile"))
-		if (!decoration_only) use(maoka_jabs.listen_global_event("keydown", e => handle_keydown(e)))
+		use(maoka_sdk.jabs.classes.set("hotkey"))
+		if (show_in_mobile) use(maoka_sdk.jabs.classes.add("mobile"))
+		if (!decoration_only) use(maoka_sdk.jabs.listen_global_event("keydown", e => handle_keydown(e)))
 
 		const split = hotkey.split("+")
 		const meta = is_darwin ? hotkey_button({ key: "⌥" }) : hotkey_button({ key: "Alt" })
@@ -37,7 +37,7 @@ export const actionable_hotkey = maoka.create<MaokaSDK.Components.HotkeyArgs>(
 			if (prevent_in_inputs && target.tagName === "INPUT") return
 			if (prevent_in_contenteditable && target.tagName === "DIV" && target.contentEditable) return
 
-			const parsed_hotkey = client.create_hotkey_from_event(e, is_darwin)
+			const parsed_hotkey = client_sdk.create_hotkey_from_event(e, is_darwin)
 
 			// TODO Accept handler
 
@@ -65,7 +65,7 @@ export const actionable_hotkey = maoka.create<MaokaSDK.Components.HotkeyArgs>(
 const IGNORED_KEYS = ["Control", "Shift", "Alt", "Meta"]
 
 const hotkey_button = maoka.create<{ key: string }>("kbd", ({ use, key }) => {
-	use(maoka_jabs.set_class("key-container"))
+	use(maoka_sdk.jabs.classes.set("key-container"))
 
 	return () =>
 		sweech

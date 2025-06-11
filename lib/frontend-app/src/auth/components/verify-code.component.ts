@@ -23,7 +23,6 @@ import { type User, user } from "@ordo-pink/sdk-core"
 import { maoka, maoka_dom, maoka_styled } from "@ordo-pink/maoka"
 import { bs_question_circle } from "@ordo-pink/frontend-icons"
 import { get_device_info } from "@ordo-pink/get-device-info"
-import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { maoka_sdk } from "@ordo-pink/sdk-maoka"
 import { noop } from "@ordo-pink/tau"
 import { oath } from "@ordo-pink/oath"
@@ -33,7 +32,7 @@ import { auth$ } from "../auth.state"
 export const verify_code_modal = maoka.create("div", ({ use }) => {
 	const { fetch, hosts, hunter } = use(maoka_sdk.context.consume)
 
-	use(maoka_jabs.set_class("auth_join-modal"))
+	use(maoka_sdk.jabs.classes.set("auth_join-modal"))
 
 	const t_title = use(maoka_sdk.jabs.translate$("auth_modals_verify_title"))
 	const t_hint = use(maoka_sdk.jabs.translate$("auth_modals_verify_hint"))
@@ -86,7 +85,7 @@ const button_section = maoka_styled.div("auth_join-modal_actions")
 const hint = maoka_styled.p()
 
 const code_input = maoka.create("label", ({ use }) => {
-	use(maoka_jabs.set_class("auth_join-modal_email_wrapper"))
+	use(maoka_sdk.jabs.classes.set("auth_join-modal_email_wrapper"))
 
 	return () => [bs_question_circle({}), input()]
 })
@@ -101,11 +100,11 @@ const input = maoka_styled.input("auth_join-modal_email", ({ use }) => {
 		auth$.update("code", () => target.value)
 	}
 
-	use(maoka_jabs.set_id("code-input"))
-	use(maoka_jabs.set_attribute("type", "number"))
-	use(maoka_jabs.set_attribute("placeholder", t_placeholer))
-	use(maoka_jabs.listen("oninput", handle_input))
+	use(maoka_sdk.jabs.set_id("code-input"))
+	use(maoka_sdk.jabs.set_attribute("type", "number"))
+	use(maoka_sdk.jabs.set_attribute("placeholder", t_placeholer))
+	use(maoka_sdk.jabs.listen("oninput", handle_input))
 	use(maoka_dom.jabs.onmount(handle_mount))
 
-	if (value) use(maoka_jabs.set_attribute("value", value))
+	if (value) use(maoka_sdk.jabs.set_attribute("value", value))
 })

@@ -19,9 +19,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { COMMAND_PALETTE, type Client } from "@ordo-pink/sdk-client"
+import { COMMAND_PALETTE, type ClientSDK } from "@ordo-pink/sdk-client"
 import { type Maoka, maoka_dom } from "@ordo-pink/maoka"
-import { bs_terminal } from "@ordo-pink/frontend-icons"
+import { bs_menu_button_wide_fill } from "@ordo-pink/frontend-icons"
 import { context } from "@ordo-pink/sdk-maoka"
 
 import { COMMAND_PALETTE_SECTION, COMMAND_PALETTE_TOGGLE_COMMAND } from "./command-palette.contants"
@@ -52,6 +52,7 @@ const track_prey_jab: Maoka.Jab = ({ use }) => {
 		hunter.shoot("i18n.add_translations", {
 			locale: "en",
 			values: {
+				command_palette_name: "Command Palette",
 				command_palette_commands_toggle_description:
 					"Show or hide command palette. If you read this, doing this will hide the palette.",
 				command_palette_commands_toggle_name: "Toggle Command Palette",
@@ -63,7 +64,7 @@ const track_prey_jab: Maoka.Jab = ({ use }) => {
 			hotkey: COMMAND_PALETTE_TOGGLE_COMMAND.HOTKEY,
 			id: COMMAND_PALETTE_TOGGLE_COMMAND.ID,
 			readable_name: "command_palette_commands_toggle_name",
-			render_icon: span => maoka_dom.render(span, bs_terminal({}), () => crypto.randomUUID()),
+			render_icon: span => maoka_dom.render(span, bs_menu_button_wide_fill(), () => crypto.randomUUID()),
 			type: COMMAND_PALETTE.ITEM_TYPE.MODAL_OPENER,
 			value: () => hunter.shoot("command_palette.toggle"),
 		})
@@ -82,15 +83,15 @@ const track_prey_jab: Maoka.Jab = ({ use }) => {
 	use(maoka_dom.jabs.onmount(handle_onmount))
 }
 
-const global_palette = (): Client.CommandPalette.Instance<() => void> => ({
+const global_palette = (): ClientSDK.CommandPalette.Instance<() => void> => ({
 	items: command_palette$.select("items"),
 	on_select: item => item.value(),
 })
 
-const command_palette_add: Client.GunFor<"command_palette.add"> = item =>
+const command_palette_add: ClientSDK.GunFor<"command_palette.add"> = item =>
 	command_palette$.update("items", items => (items.some(i => i.id === item.id) ? items : [...items, item]))
 
-const command_palette_hide: Client.GunFor<"command_palette.hide"> = () => {
+const command_palette_hide: ClientSDK.GunFor<"command_palette.hide"> = () => {
 	command_palette$.each({
 		current: () => void 0,
 		index: () => 0,
@@ -99,14 +100,14 @@ const command_palette_hide: Client.GunFor<"command_palette.hide"> = () => {
 	})
 }
 
-const command_palette_remove: Client.GunFor<"command_palette.remove"> = id =>
+const command_palette_remove: ClientSDK.GunFor<"command_palette.remove"> = id =>
 	command_palette$.update("items", items => items.filter(i => i.id !== id))
 
-const command_palette_show: Client.GunFor<"command_palette.show"> = new_current => {
+const command_palette_show: ClientSDK.GunFor<"command_palette.show"> = new_current => {
 	command_palette$.update("current", () => new_current ?? global_palette())
 }
 
-const command_palette_toggle: Client.GunFor<"command_palette.toggle"> = () => {
+const command_palette_toggle: ClientSDK.GunFor<"command_palette.toggle"> = () => {
 	command_palette$.update("current", current => {
 		if (current) return
 		return global_palette()
@@ -116,6 +117,7 @@ const command_palette_toggle: Client.GunFor<"command_palette.toggle"> = () => {
 declare global {
 	interface t {
 		command_palette: {
+			name: string
 			commands: {
 				toggle: {
 					name: string

@@ -1,25 +1,23 @@
 import { bs_cloud_download, bs_cloud_upload } from "@ordo-pink/frontend-icons"
 import { BACKGROUND_TASK } from "@ordo-pink/sdk-client"
-import type { Zags } from "@ordo-pink/zags"
 import { maoka } from "@ordo-pink/maoka"
-import { maoka_jabs } from "@ordo-pink/maoka-jabs"
+import { maoka_sdk } from "@ordo-pink/sdk-maoka"
 import { sweech } from "@ordo-pink/sweech"
 
-export const background_task_status = maoka.create<{ $: Zags.Instance<{ status: BACKGROUND_TASK.STATUS }> }>(
-	"div",
-	({ $, use }) => {
-		use(maoka_jabs.set_class("background-task"))
+import { background_task$ } from "../background-task.state"
 
-		const get_status = use(maoka_jabs.cheat$($, "status"))
+export const background_task_status = maoka.create("div", ({ use }) => {
+	use(maoka_sdk.jabs.classes.set("background-task"))
 
-		return () => {
-			const status = get_status()
+	const get_status = use(maoka_sdk.jabs.zags.cheat$(background_task$, "status"))
 
-			return sweech
-				.match(status)
-				.case(BACKGROUND_TASK.STATUS.LOADING, () => bs_cloud_download({}))
-				.case(BACKGROUND_TASK.STATUS.SAVING, () => bs_cloud_upload({}))
-				.default(() => void 0)
-		}
-	},
-)
+	return () => {
+		const status = get_status()
+
+		return sweech
+			.match(status)
+			.case(BACKGROUND_TASK.STATUS.LOADING, () => bs_cloud_download({}))
+			.case(BACKGROUND_TASK.STATUS.SAVING, () => bs_cloud_upload({}))
+			.default(() => void 0)
+	}
+})

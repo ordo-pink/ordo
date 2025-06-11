@@ -5,7 +5,7 @@
 
 import type { GetDeviceInfo } from "@ordo-pink/get-device-info"
 
-import type { Core } from "../core/core.types"
+import type { CoreSDK } from "../core/core.types"
 import type { CoreMixins } from "../mixins/mixins.types"
 import type { SemVer } from "../semver/semver.types"
 import type { Session } from "../session/session.types"
@@ -31,9 +31,9 @@ export namespace User {
 			...CoreMixins.Named.DTO,
 		]
 
-		export type Instance = Core.Prettify<Interface["Instance"]>
+		export type Instance = CoreSDK.Prettify<Interface["Instance"]>
 
-		export type Static = Core.Prettify<Interface["Static"]>
+		export type Static = CoreSDK.Prettify<Interface["Static"]>
 
 		// Extracted to prevent circular reference
 		export type DataInterface = CoreMixins.Identifiable.Interface &
@@ -76,9 +76,9 @@ export namespace User {
 			...User.CustomMixins.Authenticated.DTO,
 		]
 
-		export type Instance = Core.Prettify<User.Current.Interface["Instance"]>
+		export type Instance = CoreSDK.Prettify<User.Current.Interface["Instance"]>
 
-		export type Static = Core.Prettify<User.Current.Interface["Static"]>
+		export type Static = CoreSDK.Prettify<User.Current.Interface["Static"]>
 
 		// Extracted to prevent circular reference
 		export type DataInterface = User.Someone.DataInterface &

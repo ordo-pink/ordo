@@ -3,19 +3,19 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import type { Core } from "../core/core.types"
+import type { CoreSDK } from "../core/core.types"
 import type { CoreMixins } from "../mixins/mixins.types"
 import type { Session } from "../session/session.types"
 import { USER } from "./user.constants"
 import type { User } from "./user.types"
-import { core } from "../core/core.impl"
+import { core_sdk } from "../core/core.impl"
 import { core_mixins } from "../mixins/mixins.impl"
 import { sem_ver } from "../semver/semver.impl"
 import { session } from "../session/session.impl"
 import { user } from "./user.impl"
 
 export namespace user_mixins {
-	export const authenticated: Core.Mixin<User.CustomMixins.Authenticated.Interface> = {
+	export const authenticated: CoreSDK.Mixin<User.CustomMixins.Authenticated.Interface> = {
 		instance: ({ sessions }) => ({
 			get_sessions: () => sessions,
 			get_sessions_raw: () => sessions.map(session => session.to_dto()),
@@ -31,15 +31,15 @@ export namespace user_mixins {
 			...core_mixins.timestampable.without_updates.validations,
 			is_session: (x): x is Session.DTO =>
 				// TODO More precise check for device info
-				core.validations.is_array(x) &&
+				core_sdk.validations.is_array(x) &&
 				core_mixins.identifiable.validations.is_id(x[0]) &&
 				core_mixins.timestampable.without_updates.validations.is_timestamp(x[1]) &&
-				core.validations.is_string(x[2]),
+				core_sdk.validations.is_string(x[2]),
 		},
 	}
 
 	export namespace creatable {
-		export const me: Core.Mixin<CoreMixins.Creatable.Interface<User.Current.CreateParams, User.Current.Interface>> = {
+		export const me: CoreSDK.Mixin<CoreMixins.Creatable.Interface<User.Current.CreateParams, User.Current.Interface>> = {
 			instance: () => ({}),
 			static: {
 				new: (email, handle, subscription, name, fns, fn_limit, file_limit, file_size_limit) => {
@@ -66,15 +66,15 @@ export namespace user_mixins {
 		}
 	}
 
-	export const receptive: Core.Mixin<User.CustomMixins.Receptive.Interface> = {
+	export const receptive: CoreSDK.Mixin<User.CustomMixins.Receptive.Interface> = {
 		instance: ({ email }) => ({ get_email: () => email }),
 		static: {},
 		validations: {
-			is_email: (x): x is User.CustomMixins.Receptive.Email => core.validations.is_string(x) && core.rx.email.test(x),
+			is_email: (x): x is User.CustomMixins.Receptive.Email => core_sdk.validations.is_string(x) && core_sdk.rx.email.test(x),
 		},
 	}
 
-	export const referable: Core.Mixin<User.CustomMixins.Referable.Interface> = {
+	export const referable: CoreSDK.Mixin<User.CustomMixins.Referable.Interface> = {
 		instance: ({ handle }) => ({ get_handle: () => handle }),
 		static: {
 			create_handle: (email, id) => {
@@ -86,11 +86,12 @@ export namespace user_mixins {
 			},
 		},
 		validations: {
-			is_handle: (x): x is User.CustomMixins.Referable.Handle => core.validations.is_string(x) && core.rx.handle.test(x),
+			is_handle: (x): x is User.CustomMixins.Referable.Handle =>
+				core_sdk.validations.is_string(x) && core_sdk.rx.handle.test(x),
 		},
 	}
 
-	export const space_limited: Core.Mixin<User.CustomMixins.SpaceLimited.Interface> = {
+	export const space_limited: CoreSDK.Mixin<User.CustomMixins.SpaceLimited.Interface> = {
 		instance: ({ file_limit, file_size_limit }) => ({
 			can_create_file: length => length < file_limit,
 			can_upload_file: size => size < file_size_limit,
@@ -103,12 +104,12 @@ export namespace user_mixins {
 			get_default_file_size_limit: () => 1.5,
 		},
 		validations: {
-			is_file_limit: core.validations.is_finite_non_negative_int,
-			is_file_size_limit: core.validations.is_positive_number,
+			is_file_limit: core_sdk.validations.is_finite_non_negative_int,
+			is_file_size_limit: core_sdk.validations.is_positive_number,
 		},
 	}
 
-	export const subscribed: Core.Mixin<User.CustomMixins.Subscribed.Interface> = {
+	export const subscribed: CoreSDK.Mixin<User.CustomMixins.Subscribed.Interface> = {
 		instance: ({ subscription }) => ({
 			get_subscription: () => subscription,
 			has_paid_subscription: () => Number(subscription) > 0 && Number(subscription) < Number(USER.SUBSCRIPTION.length),
@@ -116,12 +117,12 @@ export namespace user_mixins {
 		static: { get_default_subscription: () => USER.SUBSCRIPTION.FREE, SUBSCRIPTION: USER.SUBSCRIPTION },
 		validations: {
 			is_subscription: (x): x is USER.SUBSCRIPTION =>
-				core.validations.is_int(x) && x >= 0 && x < Number(USER.SUBSCRIPTION.length),
+				core_sdk.validations.is_int(x) && x >= 0 && x < Number(USER.SUBSCRIPTION.length),
 		},
 	}
 
 	export namespace serializable {
-		export const someone: Core.Mixin<CoreMixins.Serializable.Interface<User.Someone.DTO, User.Someone.DataInterface>> = {
+		export const someone: CoreSDK.Mixin<CoreMixins.Serializable.Interface<User.Someone.DTO, User.Someone.DataInterface>> = {
 			instance: plain => ({
 				to_dto: () => [plain.id, plain.created_at, plain.handle, plain.subscription, plain.name],
 			}),
@@ -147,7 +148,7 @@ export namespace user_mixins {
 			},
 			validations: {
 				is_dto: (x): x is User.Someone.DTO => {
-					if (!core.validations.is_array(x)) return false
+					if (!core_sdk.validations.is_array(x)) return false
 
 					const dto = x as User.Someone.DTO
 
@@ -162,7 +163,7 @@ export namespace user_mixins {
 			},
 		}
 
-		export const me: Core.Mixin<CoreMixins.Serializable.Interface<User.Current.DTO, User.Current.DataInterface>> = {
+		export const me: CoreSDK.Mixin<CoreMixins.Serializable.Interface<User.Current.DTO, User.Current.DataInterface>> = {
 			instance: plain => ({
 				to_dto: () => [
 					plain.id,
@@ -210,7 +211,7 @@ export namespace user_mixins {
 			},
 			validations: {
 				is_dto: (x): x is User.Current.DTO => {
-					if (!core.validations.is_array(x)) return false
+					if (!core_sdk.validations.is_array(x)) return false
 
 					const dto = x as User.Current.DTO
 
@@ -232,7 +233,7 @@ export namespace user_mixins {
 		}
 	}
 
-	export const ui_extendable: Core.Mixin<User.CustomMixins.UIExtendable.Interface> = {
+	export const ui_extendable: CoreSDK.Mixin<User.CustomMixins.UIExtendable.Interface> = {
 		instance: ({ installed_fns, fn_limit }) => ({
 			can_install_fns: () => installed_fns.length < fn_limit,
 			get_fn_limit: () => fn_limit,
@@ -243,13 +244,14 @@ export namespace user_mixins {
 		static: { get_default_fn_limit: () => 10, get_default_fns: () => [] },
 		validations: {
 			is_fn: (x): x is User.CustomMixins.UIExtendable.Fn => {
-				if (!core.validations.is_string(x)) return false
+				if (!core_sdk.validations.is_string(x)) return false
 				const parts = x.split(":")
 				if (parts.length !== 2) return false
-				return core.rx.fn_name.test(parts[0]) && sem_ver.is_sem_ver(parts[1])
+				return core_sdk.rx.fn_name.test(parts[0]) && sem_ver.is_sem_ver(parts[1])
 			},
-			is_fn_limit: core.validations.is_finite_non_negative_int,
-			is_fn_name: (x): x is User.CustomMixins.UIExtendable.FnName => core.validations.is_string(x) && core.rx.fn_name.test(x),
+			is_fn_limit: core_sdk.validations.is_finite_non_negative_int,
+			is_fn_name: (x): x is User.CustomMixins.UIExtendable.FnName =>
+				core_sdk.validations.is_string(x) && core_sdk.rx.fn_name.test(x),
 			is_version: sem_ver.is_sem_ver,
 		},
 	}

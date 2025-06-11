@@ -1,8 +1,8 @@
-import { BACKGROUND_TASK, type Client } from "@ordo-pink/sdk-client"
+import { BACKGROUND_TASK, type ClientSDK } from "@ordo-pink/sdk-client"
 import { type Maoka, maoka_dom } from "@ordo-pink/maoka"
 import { context } from "@ordo-pink/sdk-maoka"
-import { create_zags } from "@ordo-pink/zags"
 
+import { background_task$ } from "./background-task.state"
 import { background_task_status } from "./components/background-task-status.component"
 
 import "./background-task.styles.css"
@@ -24,18 +24,16 @@ export const create_background_task_status_jab: Maoka.Jab<() => Maoka.Component>
 
 	use(maoka_dom.jabs.onmount(handle_onmount))
 
-	return () => background_task_status({ $: background_task$ })
+	return () => background_task_status()
 }
 
 // --- Internal ---
 
-const background_task$ = create_zags({ status: BACKGROUND_TASK.STATUS.NONE })
-
-const handle_saving: Client.GunFor<"background_status.saving"> = () =>
+const handle_saving: ClientSDK.GunFor<"background_status.saving"> = () =>
 	background_task$.update("status", () => BACKGROUND_TASK.STATUS.SAVING)
 
-const handle_none: Client.GunFor<"background_status.none"> = () =>
+const handle_none: ClientSDK.GunFor<"background_status.none"> = () =>
 	background_task$.update("status", () => BACKGROUND_TASK.STATUS.NONE)
 
-const handle_loading: Client.GunFor<"background_status.loading"> = () =>
+const handle_loading: ClientSDK.GunFor<"background_status.loading"> = () =>
 	background_task$.update("status", () => BACKGROUND_TASK.STATUS.LOADING)

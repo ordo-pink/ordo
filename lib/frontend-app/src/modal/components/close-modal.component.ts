@@ -19,12 +19,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import * as maoka_sdk from "@ordo-pink/sdk-maoka"
+import { maoka_sdk } from "@ordo-pink/sdk-maoka"
 
-import type { Client } from "@ordo-pink/sdk-client"
+import type { ClientSDK } from "@ordo-pink/sdk-client"
 import { bs_x } from "@ordo-pink/frontend-icons"
 import { maoka } from "@ordo-pink/maoka"
-import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 
 import { modal$ } from "../modal.state"
 
@@ -37,14 +36,14 @@ export const close_modal = maoka.create("div", ({ use }) => {
 		hunter.shoot("modal.hide")
 	}
 
-	use(maoka_jabs.set_class("modal_close"))
-	use(maoka_jabs.set_attribute("title", "Click here, or anywhere else outside the modal window, or press Escape to close."))
-	use(maoka_jabs.listen("onclick", internal.handle_click(hunter)))
-	use(maoka_jabs.listen_global_event("keydown", handle_global_esc))
+	use(maoka_sdk.jabs.classes.set("modal_close"))
+	use(maoka_sdk.jabs.set_attribute("title", "Click here, or anywhere else outside the modal window, or press Escape to close."))
+	use(maoka_sdk.jabs.listen("onclick", internal.handle_click(hunter)))
+	use(maoka_sdk.jabs.listen_global_event("keydown", handle_global_esc))
 
 	return () => bs_x({})
 })
 
 namespace internal {
-	export const handle_click = (hunter: Client.Hunter) => () => void hunter.shoot("modal.hide")
+	export const handle_click = (hunter: ClientSDK.Hunter) => () => void hunter.shoot("modal.hide")
 }

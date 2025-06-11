@@ -1,8 +1,8 @@
 import { I18n, LOCALE, create_i18n } from "@ordo-pink/i18n"
 import { Maoka, maoka_dom } from "@ordo-pink/maoka"
-import { Client } from "@ordo-pink/sdk-client"
+import { ClientSDK } from "@ordo-pink/sdk-client"
 
-export const create_i18n_jab: (hunter: Client.Hunter) => Maoka.Jab<I18n.Zags<Pick<t, keyof t>>> =
+export const create_i18n_jab: (hunter: ClientSDK.Hunter) => Maoka.Jab<I18n.Zags<Pick<t, keyof t>>> =
 	hunter =>
 	({ use }) => {
 		const i18n = create_i18n<Pick<t, keyof t>>(LOCALE.ENGLISH)

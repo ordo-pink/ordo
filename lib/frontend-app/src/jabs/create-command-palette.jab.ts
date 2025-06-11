@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { BsMenuButtonWideFill } from "@ordo-pink/frontend-icons"
+import { bs_menu_button_wide_fill } from "@ordo-pink/frontend-icons"
 import { COMMAND_PALETTE_ITEM_TYPE } from "@ordo-pink/core"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
@@ -44,7 +44,7 @@ export const create_command_palette: TMaokaJab = ({ use }) => {
 		readable_name: "t.common.components.command_palette.reset",
 		type: COMMAND_PALETTE_ITEM_TYPE.COMMON_ACTION,
 		hotkey: "mod+shift+p",
-		render_icon: BsMenuButtonWideFill,
+		render_icon: bs_menu_button_wide_fill,
 	})
 
 	use(

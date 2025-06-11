@@ -19,7 +19,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/**
- * Supplementary type that checks whether provided string does not contain spaces.
- */
-export type NoSpace<$Str extends string> = $Str extends `${string} ${string}` ? never : $Str
+import { maoka, maoka_dom } from "@ordo-pink/maoka"
+import type { ClientSDK } from "@ordo-pink/sdk-client"
+import { maoka_sdk } from "@ordo-pink/sdk-maoka"
+
+type Args = { render_icon: ClientSDK.Activity.RenderIcon; is_current: boolean; readable_name: ClientSDK.Translations.Key }
+
+export const activity_bar_icon = maoka.create<Args>("span", ({ use, is_current, render_icon, readable_name }) => {
+	const t_readable_name = use(maoka_sdk.jabs.translate$(readable_name))
+
+	use(maoka_sdk.jabs.classes.set("activity-bar_icon"))
+	if (is_current) use(maoka_sdk.jabs.classes.add("active"))
+	else use(maoka_sdk.jabs.classes.remove("active"))
+
+	use(maoka_dom.jabs.if_dom(n => void render_icon(n.value)))
+
+	return () => {
+		use(maoka_sdk.jabs.set_attribute("title", t_readable_name()))
+	}
+})

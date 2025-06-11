@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import type { Core } from "../core/core.types"
+import type { CoreSDK } from "../core/core.types"
 import type { DATA } from "./data.constants"
 import type { CoreMixins } from "../mixins/mixins.types"
 import type { User } from "../user/user.types"
@@ -54,9 +54,9 @@ export namespace Data {
 		CoreMixins.Serializable.Interface<Data.DTO, Data.DataInterface> &
 		CoreMixins.Creatable.Interface<Data.CreateParams, Data.DataInterface>
 
-	export type Instance = Core.Prettify<Interface["Instance"]>
+	export type Instance = CoreSDK.Prettify<Interface["Instance"]>
 
-	export type Static = Core.Prettify<Interface["Static"]>
+	export type Static = CoreSDK.Prettify<Interface["Static"]>
 
 	export namespace CustomMixins {
 		export namespace Accessible {

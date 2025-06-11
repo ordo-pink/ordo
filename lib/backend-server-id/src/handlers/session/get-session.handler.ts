@@ -28,6 +28,6 @@ import { get_user_from_cookie } from "../../common/get-user-from-cookie"
 export const handle_get_session = default_handler<ServerID.Fuel>(intake => {
 	return get_user_from_cookie(intake)
 		.pipe(oath.ops.map(({ user }) => user.to_dto()))
-		.pipe(oath.ops.map(dto => void (intake.payload = dto)))
+		.pipe(oath.ops.map(dto => void (intake.res.body = JSON.stringify(dto))))
 		.pipe(oath.ops.map(() => intake))
 })

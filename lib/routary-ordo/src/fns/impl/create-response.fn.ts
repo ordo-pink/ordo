@@ -9,23 +9,13 @@ import { sweech } from "@ordo-pink/sweech"
 
 import { type RoutaryOrdo } from "../../routary-ordo.types"
 
-export const create_json_response = <
-	$TResult,
-	$TIntake extends Routary.Intake<{ payload?: $TResult; headers: Headers; status: number }>,
->({
-	headers,
-	payload,
-	status,
-}: $TIntake): Response => Response.json({ success: status <= 399, payload }, { headers, status })
+export const create_json_response = <$TIntake extends Routary.Intake<RoutaryOrdo.Fuel>>({ res }: $TIntake): Response => {
+	res.headers.set("Content-Type", "application/json")
+	return new Response(res.body, { headers: res.headers, status: res.status })
+}
 
-export const create_response = <
-	$TResult,
-	$TIntake extends Routary.Intake<{ payload?: $TResult; headers: Headers; status: number }>,
->({
-	headers,
-	payload,
-	status,
-}: $TIntake): Response => new Response(payload as any, { headers, status })
+export const create_response = <$TIntake extends Routary.Intake<RoutaryOrdo.Fuel>>({ res }: $TIntake): Response =>
+	new Response(res.body, { headers: res.headers, status: res.status })
 
 type TStatusFromRRRParams<$TContext extends RoutaryOrdo.Fuel> = { rrr: Rrr.Instance; intake: Routary.Intake<$TContext> }
 export const status_from_rrr = <$TContext extends RoutaryOrdo.Fuel>({
@@ -35,14 +25,13 @@ export const status_from_rrr = <$TContext extends RoutaryOrdo.Fuel>({
 	intake.logger.error(intake.request_id, "ERROR:", e.message)
 	intake.logger.debug(intake.request_id, "An error occured:", e.message, ...(e.debug ?? []))
 
-	if (intake.headers.get("Content-Type") !== "application/json") {
-		intake.headers.set("Content-Type", "application/json")
-		intake.payload = JSON.stringify({ success: false, payload: e.message })
-	} else {
-		intake.payload = e.message
+	if (intake.res.headers.get("Content-Type") !== "application/json") {
+		intake.res.headers.set("Content-Type", "application/json")
 	}
 
-	intake.status = sweech
+	intake.res.body = JSON.stringify([RRR.TYPE[e.type], e.message])
+
+	intake.res.status = sweech
 		.match(e.type)
 		.case([RRR.TYPE.EAGAIN, RRR.TYPE.ENXIO], () => 408)
 		.case([RRR.TYPE.EFBIG, RRR.TYPE.ENOSPC], () => 413)

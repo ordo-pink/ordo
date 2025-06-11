@@ -44,7 +44,7 @@ export const join_modal = maoka.create("div", ({ use }) => {
 	const on_ok_click = () => {
 		const email = auth$.select("email")
 
-		if (email.length < 5 || email.length > 255 || !user.me.validations.is_email(email)) {
+		if (email.length < 5 || email.length > 255 || !user.current.validations.is_email(email)) {
 			return // TODO Show error
 		}
 
@@ -53,8 +53,7 @@ export const join_modal = maoka.create("div", ({ use }) => {
 			.pipe(oath.ops.tap(h => h.append("Content-Type", "application/json")))
 			.pipe(oath.ops.map(headers => ({ headers, method: "POST", body: JSON.stringify({ email }) })))
 			.pipe(oath.ops.chain(init => oath.from_promise(() => fetch(`${hosts.au}/request-code`, init))))
-			.pipe(oath.ops.and(res => res.json()))
-			.pipe(oath.ops.chain(res => oath.if(res.success)))
+			.pipe(oath.ops.chain(res => oath.if(res.status < 300, { on_true: () => res })))
 			.pipe(oath.ops.tap(() => hunter.shoot("auth.show_verify_code_modal")))
 			.cata(oath.catas.to_promise())
 			.catch(noop)

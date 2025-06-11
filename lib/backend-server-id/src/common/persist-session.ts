@@ -24,9 +24,10 @@ import { oath } from "@ordo-pink/oath"
 
 import type { ServerID } from "../backend-server-id.types"
 
-export const persist_session_id = (intake: ServerID.Intake) => (params: { session: Session.DTO; user: User.Me.Instance }) =>
-	oath
-		.of(params.user.to_dto())
-		.pipe(oath.ops.chain(dto => intake.persistence_strategy_user.update(params.user.get_id(), user.me.from_dto(...dto))))
-		.pipe(oath.ops.map(() => params))
-		.pipe(oath.ops.rmap(rrr => ({ rrr, intake })))
+export const persist_session_id =
+	(intake: ServerID.Intake) => (params: { session: Session.DTO; user: User.Current.Instance }) =>
+		oath
+			.of(params.user.to_dto())
+			.pipe(oath.ops.chain(dto => intake.persistence_strategy_user.update(params.user.get_id(), user.current.from_dto(...dto))))
+			.pipe(oath.ops.map(() => params))
+			.pipe(oath.ops.rmap(rrr => ({ rrr, intake })))

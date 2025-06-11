@@ -44,7 +44,7 @@ export const handle_request_code = default_handler<BackendAuth.Fuel>(intake => {
 
 // --- Internal ---
 
-const is_email = user.me.validations.is_email
+const is_email = user.current.validations.is_email
 
 // TODO Move to lib
 

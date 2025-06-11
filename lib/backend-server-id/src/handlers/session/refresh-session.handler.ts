@@ -41,7 +41,7 @@ export const handle_refresh_session = default_handler<ServerID.Fuel>(intake => {
 
 							dto[10] = dto[10].toSpliced(index, 1, [session[0], Date.now(), session[2]])
 
-							return { user: user.me.from_dto(...dto), session }
+							return { user: user.current.from_dto(...dto), session }
 						}),
 					),
 			),
@@ -49,13 +49,13 @@ export const handle_refresh_session = default_handler<ServerID.Fuel>(intake => {
 		.pipe(oath.ops.chain(persist_session_id(intake)))
 		.pipe(
 			oath.ops.tap(params =>
-				intake.headers.set(
+				intake.res.headers.set(
 					"Set-Cookie",
 					`${params.user.get_id()}=${params.session[0]}; Secure; HttpOnly; SameSite=Strict; Path=/; Max-Age=${intake.session_lifetime_s}`,
 				),
 			),
 		)
 		.pipe(oath.ops.map(({ user }) => user.to_dto()))
-		.pipe(oath.ops.map(dto => void (intake.payload = dto)))
+		.pipe(oath.ops.map(dto => void (intake.res.body = JSON.stringify(dto))))
 		.pipe(oath.ops.map(() => intake))
 })

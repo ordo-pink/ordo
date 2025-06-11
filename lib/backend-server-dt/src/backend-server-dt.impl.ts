@@ -133,7 +133,7 @@ export const validate_request_params = (intake: ServerDT.Intake) =>
 	oath
 		.all([
 			oath.if(data.validations.is_id(intake.params.fsid)).pipe(oath.ops.rmap(() => rrr.einval("Invalid data id"))),
-			oath.if(user.me.validations.is_id(intake.params.uid)).pipe(oath.ops.rmap(() => rrr.einval("Invalid user id"))),
+			oath.if(user.current.validations.is_id(intake.params.uid)).pipe(oath.ops.rmap(() => rrr.einval("Invalid user id"))),
 		])
 		.pipe(oath.ops.map(() => intake))
 
@@ -144,11 +144,11 @@ export const authenticate = (intake: ServerDT.Intake) =>
 		.pipe(oath.ops.chain(init => oath.from_promise(() => fetch(`${intake.id_host}/session`, init))))
 		.pipe(oath.ops.chain(res => oath.from_promise(() => res.json())))
 		.pipe(oath.ops.chain(body => oath.if(body?.success, { on_true: () => body.payload })))
-		.pipe(oath.ops.chain(x => oath.if(user.me.validations.is_dto(x), { on_true: () => x as User.Me.DTO })))
+		.pipe(oath.ops.chain(x => oath.if(user.current.validations.is_dto(x), { on_true: () => x as User.Current.DTO })))
 		.pipe(oath.ops.rmap(e => rrr.eacces("Unauthorized", e)))
 
 // TODO checking permissions for editing files of other users
-export const check_authorization = (intake: ServerDT.Intake) => (user: User.Me.DTO) =>
+export const check_authorization = (intake: ServerDT.Intake) => (user: User.Current.DTO) =>
 	oath
 		.if(user[0] === intake.params.uid)
 		.pipe(oath.ops.map(() => user))
@@ -184,27 +184,27 @@ export const validate_body_is_not_empty = (intake: ServerDT.Intake) =>
 		.pipe(oath.ops.map(() => intake))
 		.pipe(oath.ops.rmap(() => rrr.einval("Empty file body")))
 
-export const validate_file_size_limit = (intake: ServerDT.Intake) => (dto: User.Me.DTO) =>
+export const validate_file_size_limit = (intake: ServerDT.Intake) => (dto: User.Current.DTO) =>
 	oath
 		.from_nullable(intake.req.headers.get("content-length"))
 		.pipe(oath.ops.map(file_size => Number.parseInt(file_size, 10)))
 		.pipe(oath.ops.chain(file_size => oath.if(is_finite_non_negative_int(file_size), { on_true: () => file_size })))
-		.pipe(oath.ops.chain(file_size => oath.if(user.me.from_dto(...dto).can_upload_file(file_size))))
+		.pipe(oath.ops.chain(file_size => oath.if(user.current.from_dto(...dto).can_upload_file(file_size))))
 		.pipe(oath.ops.rmap(() => rrr.efbig("File too big")))
 
 // TODO check if attemted to create a file in other user's space
-export const check_can_create_files = (intake: ServerDT.Intake) => (dto: User.Me.DTO) =>
+export const check_can_create_files = (intake: ServerDT.Intake) => (dto: User.Current.DTO) =>
 	intake.data_persistence_strategy
 		.read(dto[0], CORE.ROOT_METADATA_FILE_ID)
 		.pipe(oath.ops.chain(stream => oath.from_promise(() => new Response(stream).json())))
 		.pipe(oath.ops.map(metadata => metadata.length))
 		.pipe(oath.ops.fix(() => 0))
-		.pipe(oath.ops.map(total_files => user.me.from_dto(...dto).can_create_file(total_files)))
+		.pipe(oath.ops.map(total_files => user.current.from_dto(...dto).can_create_file(total_files)))
 		.pipe(oath.ops.chain(can_create => oath.if(can_create)))
 		.pipe(oath.ops.map(() => dto))
 		.pipe(oath.ops.rmap(() => rrr.enospc("Too many files")))
 
-const check_total_files_limit_if_file_does_not_exist = (intake: ServerDT.Intake) => (user: User.Me.DTO) =>
+const check_total_files_limit_if_file_does_not_exist = (intake: ServerDT.Intake) => (user: User.Current.DTO) =>
 	intake.data_persistence_strategy
 		.exists(intake.params.uid as User.ID, intake.params.fsid as Data.ID)
 		.pipe(oath.ops.chain(exists => (exists ? oath.of(user) : check_can_create_files(intake)(user))))

@@ -110,12 +110,12 @@ export namespace Server {
 
 		export type PersistenceStrategy = {
 			exists: (id: CoreUser.ID) => Oath.Instance<boolean, Rrr.Instance<"EIO">>
-			create: (user: CoreUser.Me.Instance) => Oath.Instance<CoreUser.Me.Instance, Rrr.Instance<"EIO" | "EEXIST">>
-			read: (id: CoreUser.ID) => Oath.Instance<CoreUser.Me.Instance, Rrr.Instance<"EIO" | "ENOENT">>
+			create: (user: CoreUser.Current.Instance) => Oath.Instance<CoreUser.Current.Instance, Rrr.Instance<"EIO" | "EEXIST">>
+			read: (id: CoreUser.ID) => Oath.Instance<CoreUser.Current.Instance, Rrr.Instance<"EIO" | "ENOENT">>
 			update: (
 				id: CoreUser.ID,
-				user: CoreUser.Me.Instance,
-			) => Oath.Instance<CoreUser.Me.Instance, Rrr.Instance<"EIO" | "ENOENT" | "EINVAL">>
+				user: CoreUser.Current.Instance,
+			) => Oath.Instance<CoreUser.Current.Instance, Rrr.Instance<"EIO" | "ENOENT" | "EINVAL">>
 			delete: (id: CoreUser.ID) => Oath.Instance<void, Rrr.Instance<"EIO" | "ENOENT">>
 		}
 	}

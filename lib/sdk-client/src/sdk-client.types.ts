@@ -318,12 +318,12 @@ export namespace Client {
 		export type DataInterface = {
 			Instance: {
 				is_authenticated: () => boolean
-				get_current: () => User.Me.Instance | null
+				get_current: () => User.Current.Instance | null
 				get_by_id: (id: User.ID) => Oath.Instance<User.Someone.Instance, Rrr.Instance<"EPERM" | "EINVAL" | "EIO">>
 				get_by_handle: (handle: User.Handle) => Oath.Instance<User.Someone.Instance, Rrr.Instance<"EPERM" | "EINVAL" | "EIO">>
 				get $(): Zags.Instance<Core.VersionState>
 			}
-			Plain: { current: User.Me.Instance | null }
+			Plain: { current: User.Current.Instance | null }
 			Static: {}
 			Validations: {}
 		}

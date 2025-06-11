@@ -55,13 +55,13 @@ export const create_persistence_strategy_user: PersistenceStrategyUser = persist
 			)
 			.pipe(
 				oath.ops.chain(dto =>
-					oath.if(user.me.validations.is_dto(dto), {
-						on_true: () => dto as User.Me.DTO,
+					oath.if(user.current.validations.is_dto(dto), {
+						on_true: () => dto as User.Current.DTO,
 						on_false: () => rrr.eio("Could not get user"),
 					}),
 				),
 			)
-			.pipe(oath.ops.map(dto => user.me.from_dto(...dto))),
+			.pipe(oath.ops.map(dto => user.current.from_dto(...dto))),
 
 	delete: () => oath.reject(rrr.eio("Not implemented")),
 

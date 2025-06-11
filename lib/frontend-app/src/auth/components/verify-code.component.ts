@@ -19,6 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { type User, user } from "@ordo-pink/sdk-core"
 import { maoka, maoka_dom, maoka_styled } from "@ordo-pink/maoka"
 import { bs_question_circle } from "@ordo-pink/frontend-icons"
 import { get_device_info } from "@ordo-pink/get-device-info"
@@ -26,7 +27,6 @@ import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { maoka_sdk } from "@ordo-pink/sdk-maoka"
 import { noop } from "@ordo-pink/tau"
 import { oath } from "@ordo-pink/oath"
-import { user } from "@ordo-pink/sdk-core"
 
 import { auth$ } from "../auth.state"
 
@@ -45,7 +45,7 @@ export const verify_code_modal = maoka.create("div", ({ use }) => {
 	const handle_ok_click = () => {
 		const { code, email } = auth$.unwrap()
 
-		if (code.length !== 6 || email.length < 5 || email.length > 255 || !user.me.validations.is_email(email)) {
+		if (code.length !== 6 || email.length < 5 || email.length > 255 || !user.current.validations.is_email(email)) {
 			return // TODO Show error
 		}
 
@@ -58,9 +58,9 @@ export const verify_code_modal = maoka.create("div", ({ use }) => {
 			.pipe(oath.ops.map(headers => ({ headers, method: "POST", credentials: "include" as const })))
 			.pipe(oath.ops.map(init => ({ ...init, body: JSON.stringify({ code: Number(code), email }) })))
 			.pipe(oath.ops.chain(init => oath.from_promise(() => fetch(`${hosts.au}/verify-code`, init))))
-			.pipe(oath.ops.and(res => res.json()))
-			.pipe(oath.ops.chain(res => oath.if(res.success, { on_true: () => res.payload })))
-			.pipe(oath.ops.tap(user => auth$.each({ email: () => "", code: () => "", user: () => user })))
+			.pipe(oath.ops.chain(res => oath.if(res.status < 300, { on_true: () => res })))
+			.pipe(oath.ops.and(res => res.json() as Promise<User.Current.DTO>))
+			.pipe(oath.ops.tap(dto => auth$.each({ email: () => "", code: () => "", user: () => user.current.from_dto(...dto) })))
 			.pipe(oath.ops.tap(() => hunter.shoot("modal.hide")))
 			.cata(oath.catas.to_promise())
 			.catch(noop) // TODO Show error

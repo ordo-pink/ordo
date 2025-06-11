@@ -44,7 +44,7 @@ export const create_backend_server_au = (params: BackendAuth.Params) => {
 	interval.unref()
 
 	return routary
-		.http({ ...params, status: 200, headers: new Headers(), request_language: LOCALE.ENGLISH })
+		.http({ ...params, status: 200, request_language: LOCALE.ENGLISH })
 		.post("/request-code", handle_request_code)
 		.post("/verify-code", handle_verify_code)
 		.get("/healthcheck", () => new Response("OK")) // TODO Extract to lib

@@ -21,12 +21,12 @@
 
 import { COMMAND_PALETTE, MODAL } from "@ordo-pink/sdk-client"
 import { Maoka, maoka_dom } from "@ordo-pink/maoka"
-import { type User, user } from "@ordo-pink/sdk-core"
 import { bs_box_arrow_in_right, bs_box_arrow_right } from "@ordo-pink/frontend-icons"
 import { get_device_info } from "@ordo-pink/get-device-info"
 import { maoka_sdk } from "@ordo-pink/sdk-maoka"
 import { noop } from "@ordo-pink/tau"
 import { oath } from "@ordo-pink/oath"
+import { user } from "@ordo-pink/sdk-core"
 
 import { auth$ } from "./auth.state"
 import { join_modal } from "./components/join.component"
@@ -78,9 +78,9 @@ const refresh_session_jab: Maoka.Jab = ({ use }) => {
 			.pipe(oath.ops.tap(h => h.append("X-Device", get_device_info(navigator))))
 			.pipe(oath.ops.map(headers => ({ headers, method: "POST", credentials: "include" }) as const))
 			.pipe(oath.ops.chain(init => oath.from_promise(() => fetch(`${hosts.id}/session`, init))))
+			.pipe(oath.ops.chain(res => oath.if(res.status < 300, { on_true: () => res })))
 			.pipe(oath.ops.and(res => res.json()))
-			.pipe(oath.ops.chain(res => oath.if(res.success, { on_true: () => res.payload as User.Me.DTO })))
-			.pipe(oath.ops.map(dto => user.me.from_dto(...dto)))
+			.pipe(oath.ops.map(dto => user.current.from_dto(...dto)))
 			.pipe(oath.ops.tap(user => auth$.update("user", () => user)))
 
 		// TODO Sign out on error

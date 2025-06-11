@@ -5,42 +5,38 @@
 
 import { type Routary, routary } from "@ordo-pink/routary"
 
-import { type RoutaryCORS } from "./routary-cors.types"
+import type { RoutaryCORS } from "./routary-cors.types"
 
-export const routary_cors: RoutaryCORS.Constructor =
+export const routary_cors: RoutaryCORS.Fn =
 	({ allow_origin, allow_headers = [], max_age = 0, success_status = 204, allow_credentials = false }) =>
-	(chamber, shaft) => {
+	(fuel, shaft) => {
 		const options = {} as Record<string, string[]>
 
 		Object.keys(shaft).forEach(bearing => {
 			if (bearing === "OPTIONS") return
 
-			Object.keys(shaft[bearing as Routary.Bearing] as Record<Routary.Gasket, Routary.Gear<{ headers: Headers }>>).forEach(
-				gasket => {
-					if (!options[gasket]) options[gasket] = ["OPTIONS"]
-					options[gasket].push(bearing)
+			Object.keys(shaft[bearing as Routary.Bearing] as Record<Routary.Gasket, Routary.Gear<{}>>).forEach(gasket => {
+				if (!options[gasket]) options[gasket] = ["OPTIONS"]
+				options[gasket].push(bearing)
 
-					const gear = shaft[bearing as Routary.Bearing]![gasket]
+				const gear = shaft[bearing as Routary.Bearing]![gasket]
 
-					shaft[bearing as Routary.Bearing]![gasket] = intake => {
-						if (typeof allow_origin === "string") allow_origin = [allow_origin]
-						const origin = intake.req.headers.get("origin")
+				shaft[bearing as Routary.Bearing]![gasket] = intake => {
+					if (typeof allow_origin === "string") allow_origin = [allow_origin]
+					const origin = intake.req.headers.get("origin")
 
-						if (!origin || !allow_origin.includes(origin)) return gear(intake)
+					if (!origin || !allow_origin.includes(origin)) return gear(intake)
 
-						if (!intake.headers) intake.headers = new Headers()
+					intake.res.headers.set("Access-Control-Allow-Origin", origin)
+					intake.res.headers.set("Access-Control-Allow-Methods", options[gasket].join(", "))
 
-						intake.headers.set("Access-Control-Allow-Origin", origin)
-						intake.headers.set("Access-Control-Allow-Methods", options[gasket].join(", "))
+					if (allow_credentials) intake.res.headers.set("Access-Control-Allow-Credentials", "true")
+					if (max_age) intake.res.headers.set("Access-Control-Max-Age", String(max_age))
+					if (allow_headers.length) intake.res.headers.set("Access-Control-Allow-Headers", allow_headers.join(", "))
 
-						if (allow_credentials) intake.headers.set("Access-Control-Allow-Credentials", "true")
-						if (max_age) intake.headers.set("Access-Control-Max-Age", String(max_age))
-						if (allow_headers.length) intake.headers.set("Access-Control-Allow-Headers", allow_headers.join(", "))
-
-						return gear(intake)
-					}
-				},
-			)
+					return gear(intake)
+				}
+			})
 		})
 
 		if (!shaft.OPTIONS) shaft.OPTIONS = {}
@@ -65,5 +61,5 @@ export const routary_cors: RoutaryCORS.Constructor =
 			}
 		})
 
-		return routary.http(chamber, shaft)
+		return routary.http(fuel, shaft)
 	}

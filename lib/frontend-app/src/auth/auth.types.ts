@@ -23,7 +23,7 @@ import type { User } from "@ordo-pink/sdk-core"
 
 export namespace Auth {
 	export type State = {
-		user?: User.Me.Instance
+		user?: User.Current.Instance
 		email: string
 		code: string
 	}

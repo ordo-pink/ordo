@@ -19,9 +19,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { BackendAuth } from "../../backend-server-au.types"
+import type { User } from "@ordo-pink/sdk-core"
 
-export type ObfuscateEmail = (email: BackendAuth.Email) => string
+export type ObfuscateEmail = (email: User.Email) => string
 
 export const obfuscate_email: ObfuscateEmail = email => {
 	const [localPart, domainPart] = email.split("@")

@@ -5,6 +5,6 @@
 
 import { RoutaryOrdo } from "../../routary-ordo.types"
 
-export const set_header: RoutaryOrdo.SetHeader = (key, value) => intake => void intake.headers.set(key, value)
+export const set_header: RoutaryOrdo.SetHeader = (key, value) => intake => void intake.res.headers.set(key, value)
 
 export const set_header_c: RoutaryOrdo.SetHeaderCurry = key => value => set_header(key, value)

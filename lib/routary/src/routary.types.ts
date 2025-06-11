@@ -6,17 +6,22 @@
 import { type Server } from "bun"
 
 export namespace Routary {
-	export type Exhaust = Response | Promise<Response>
-
-	export type Gear<$Fuel> = (intake: Routary.Intake<$Fuel>) => Routary.Exhaust
+	export type Gear<$Fuel> = (intake: Routary.Intake<$Fuel>) => Response | Promise<Response>
 
 	export type Shaft<$Fuel> = Partial<Record<Routary.Bearing, Record<Routary.Gasket, Routary.Gear<$Fuel>>>>
 
 	export type Gasket = string
 
+	export type Exhaust = {
+		headers: Headers
+		status: number
+		body: BodyInit | null
+	}
+
 	export type Intake<$Fuel = Record<string, unknown>> = $Fuel & {
 		req: Request
 		server: Server
+		res: Routary.Exhaust
 		params: Record<string, string>
 	}
 
@@ -38,6 +43,6 @@ export namespace Routary {
 		head: (gasket: Routary.Gasket, gear: Routary.Gear<$Fuel>) => Routary.Instance<$Fuel>
 		options: (gasket: Routary.Gasket, gear: Routary.Gear<$Fuel>) => Routary.Instance<$Fuel>
 		each: (gasket: Routary.Gasket, bearings: Routary.Bearing[], gear: Routary.Gear<$Fuel>) => Routary.Instance<$Fuel>
-		start: (crown_gear: Routary.Gear<$Fuel>) => (req: Request, server: Server) => Routary.Exhaust
+		start: (crown_gear: Routary.Gear<$Fuel>) => (req: Request, server: Server) => Response | Promise<Response>
 	}
 }

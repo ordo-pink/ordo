@@ -47,7 +47,7 @@ export namespace User {
 	}
 
 	/** Current user. Represents the current authenticated user with a full field set. */
-	export namespace Me {
+	export namespace Current {
 		/** Arguments to be provided to the `new` static method to create a me user. */
 		export type CreateParams = [
 			/** Email is the only required field. */
@@ -76,9 +76,9 @@ export namespace User {
 			...User.CustomMixins.Authenticated.DTO,
 		]
 
-		export type Instance = Core.Prettify<User.Me.Interface["Instance"]>
+		export type Instance = Core.Prettify<User.Current.Interface["Instance"]>
 
-		export type Static = Core.Prettify<User.Me.Interface["Static"]>
+		export type Static = Core.Prettify<User.Current.Interface["Static"]>
 
 		// Extracted to prevent circular reference
 		export type DataInterface = User.Someone.DataInterface &
@@ -87,7 +87,7 @@ export namespace User {
 			User.CustomMixins.SpaceLimited.Interface &
 			User.CustomMixins.Authenticated.Interface
 
-		export type SerializableInterface = User.Me.DataInterface & CoreMixins.Serializable.Interface<DTO, DataInterface>
+		export type SerializableInterface = User.Current.DataInterface & CoreMixins.Serializable.Interface<DTO, DataInterface>
 
 		export type Interface = SerializableInterface & CoreMixins.Creatable.Interface<CreateParams, DataInterface>
 	}

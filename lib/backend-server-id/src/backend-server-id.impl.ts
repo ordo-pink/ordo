@@ -36,7 +36,7 @@ import { handle_refresh_session } from "./handlers/session/refresh-session.handl
 // TODO Custom handlers for updating email & handle + disallow editing them in PATCH
 export const create_backend_server_id = (chamber: ServerID.Params) =>
 	routary
-		.http<ServerID.Fuel>({ ...chamber, status: 200, headers: new Headers(), request_language: LOCALE.ENGLISH })
+		.http<ServerID.Fuel>({ ...chamber, request_language: LOCALE.ENGLISH })
 		.get("/session", handle_get_session)
 		.post("/session", handle_refresh_session)
 		.delete("/session", handle_invalidate_session)

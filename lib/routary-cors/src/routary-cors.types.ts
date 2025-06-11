@@ -5,7 +5,7 @@
 
 import { Routary } from "@ordo-pink/routary"
 
-export module RoutaryCORS {
+export namespace RoutaryCORS {
 	export type Params = {
 		allow_origin: string | string[]
 		max_age?: number
@@ -14,7 +14,7 @@ export module RoutaryCORS {
 		allow_credentials?: boolean
 	}
 
-	export type Instance<$Fuel extends { headers: Headers }> = Parameters<Routary.Instance<$Fuel>["use"]>[0]
+	export type Instance<$Fuel extends {}> = Parameters<Routary.Instance<$Fuel>["use"]>[0]
 
-	export type Constructor = <$Fuel extends { headers: Headers }>(params: Params) => Instance<$Fuel>
+	export type Fn = <$Fuel extends {}>(params: Params) => Instance<$Fuel>
 }

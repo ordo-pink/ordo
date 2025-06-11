@@ -37,4 +37,4 @@ export const extract_body_email = (intake: ServerID.Intake) => (request_body: an
 
 // --- Internal ---
 
-const is_email = user.me.validations.is_email
+const is_email = user.current.validations.is_email

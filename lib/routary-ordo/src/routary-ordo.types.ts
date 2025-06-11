@@ -8,32 +8,34 @@ import type { LOCALE } from "@ordo-pink/i18n"
 import type { Oath } from "@ordo-pink/oath"
 import type { Routary } from "@ordo-pink/routary"
 
-export module RoutaryOrdo {
+export namespace RoutaryOrdo {
 	export type Fuel = {
-		headers: Headers
 		logger: Logger
-		payload?: unknown
 		request_id?: string
 		request_ip?: string
 		request_language: LOCALE
 		response_time?: number
 		stop_response_timer?: ResponseTimer
-		status: number
 	}
 
-	export type SetHeader = (key: string, value: string) => <$Intake extends { headers: Headers }>(intake: $Intake) => void
+	export type SetHeader = (
+		key: string,
+		value: string,
+	) => <$Intake extends Routary.Intake<RoutaryOrdo.Fuel>>(intake: $Intake) => void
 
-	export type SetHeaderCurry = (key: string) => (value: string) => <$Fuel extends { headers: Headers }>(intake: $Fuel) => void
+	export type SetHeaderCurry = (
+		key: string,
+	) => (value: string) => <$Intake extends Routary.Intake<RoutaryOrdo.Fuel>>(intake: $Intake) => void
 
 	export type ResponseTimer = () => void
 
-	export type StartResponseTimer = <$Fuel extends RoutaryOrdo.Fuel>(intake: $Fuel) => void
+	export type StartResponseTimer = <$Intake extends Routary.Intake<RoutaryOrdo.Fuel>>(intake: $Intake) => void
 
-	export type StopResponseTimer = <$Fuel extends RoutaryOrdo.Fuel>(intake: $Fuel) => void
+	export type StopResponseTimer = <$Intake extends Routary.Intake<RoutaryOrdo.Fuel>>(intake: $Intake) => void
 
 	export type LogRequest = <$Intake extends Routary.Intake<RoutaryOrdo.Fuel>>(params: $Intake) => void
 
-	export type AssignRequestId = <$Intake extends RoutaryOrdo.Fuel>(intake: $Intake) => void
+	export type AssignRequestId = <$Intake extends Routary.Intake<RoutaryOrdo.Fuel>>(intake: $Intake) => void
 
 	export type AssignRequestLanguage = <$Intake extends Routary.Intake<RoutaryOrdo.Fuel>>(intake: $Intake) => void
 

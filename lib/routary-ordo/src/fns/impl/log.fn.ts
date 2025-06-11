@@ -11,8 +11,8 @@ export const log_request: RoutaryOrdo.LogRequest = ({
 	request_id,
 	request_ip,
 	request_language,
+	res,
 	response_time,
-	status,
 }) => {
 	const method = req.method
 
@@ -22,5 +22,5 @@ export const log_request: RoutaryOrdo.LogRequest = ({
 
 	const url = `${pathname}${url_obj.search}`
 
-	logger.info(`${request_id} ${status} ${method} ${request_language} ${url} (${response_time}ms) - ${request_ip}`)
+	logger.info(`${request_id} ${res.status} ${method} ${request_language} ${url} (${response_time}ms) - ${request_ip}`)
 }

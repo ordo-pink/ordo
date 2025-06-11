@@ -28,11 +28,13 @@ export const routary: Routary.Static = {
 		},
 		start: crown_gear => async (req, server) => {
 			const current_bearing = req.method as Routary.Bearing
+			const res = { body: null, headers: new Headers(), status: 200 } as Routary.Exhaust
+
 			let current_gasket = new URL(req.url).pathname
 			if (current_gasket.endsWith("/") && current_gasket.length > 1) current_gasket = current_gasket.slice(0, -1)
 			let params = {} as Record<string, string>
 
-			if (!shaft[current_bearing]) return crown_gear({ ...fuel, req, params, server })
+			if (!shaft[current_bearing]) return crown_gear({ ...fuel, params, req, res, server })
 
 			const fitting_gasket = Object.keys(shaft[current_bearing]).find(bearing => {
 				if (is_colonoscopy_doctor(bearing)) {
@@ -47,9 +49,9 @@ export const routary: Routary.Static = {
 				return bearing === current_gasket
 			})
 
-			if (!fitting_gasket) return crown_gear({ ...fuel, req, params, server })
+			if (!fitting_gasket) return crown_gear({ ...fuel, params, req, res, server })
 
-			return shaft[current_bearing][fitting_gasket]({ ...fuel, req, params, server })
+			return shaft[current_bearing][fitting_gasket]({ ...fuel, params, req, res, server })
 		},
 	}),
 }

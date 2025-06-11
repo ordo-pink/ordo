@@ -39,25 +39,25 @@ export namespace user_mixins {
 	}
 
 	export namespace creatable {
-		export const me: Core.Mixin<CoreMixins.Creatable.Interface<User.Me.CreateParams, User.Me.Interface>> = {
+		export const me: Core.Mixin<CoreMixins.Creatable.Interface<User.Current.CreateParams, User.Current.Interface>> = {
 			instance: () => ({}),
 			static: {
 				new: (email, handle, subscription, name, fns, fn_limit, file_limit, file_size_limit) => {
-					const id = user.me.create_id()
-					const created_at = user.me.create_timestamp()
-					const sessions = user.me.get_default_sessions()
+					const id = user.current.create_id()
+					const created_at = user.current.create_timestamp()
+					const sessions = user.current.get_default_sessions()
 
-					return user.me.from_dto(
+					return user.current.from_dto(
 						id,
 						created_at,
-						handle ?? user.me.create_handle(email, id),
-						subscription ?? user.me.get_default_subscription(),
-						name ?? user.me.get_default_name(),
+						handle ?? user.current.create_handle(email, id),
+						subscription ?? user.current.get_default_subscription(),
+						name ?? user.current.get_default_name(),
 						email,
-						fns ?? user.me.get_default_fns(),
-						file_limit ?? user.me.get_default_file_limit(),
-						fn_limit ?? user.me.get_default_fn_limit(),
-						file_size_limit ?? user.me.get_default_file_size_limit(),
+						fns ?? user.current.get_default_fns(),
+						file_limit ?? user.current.get_default_file_limit(),
+						fn_limit ?? user.current.get_default_fn_limit(),
+						file_size_limit ?? user.current.get_default_file_size_limit(),
 						sessions,
 					)
 				},
@@ -162,7 +162,7 @@ export namespace user_mixins {
 			},
 		}
 
-		export const me: Core.Mixin<CoreMixins.Serializable.Interface<User.Me.DTO, User.Me.DataInterface>> = {
+		export const me: Core.Mixin<CoreMixins.Serializable.Interface<User.Current.DTO, User.Current.DataInterface>> = {
 			instance: plain => ({
 				to_dto: () => [
 					plain.id,
@@ -180,7 +180,7 @@ export namespace user_mixins {
 			}),
 			static: {
 				from_dto: (...dto) => {
-					const plain: User.Me.Interface["Plain"] = {
+					const plain: User.Current.Interface["Plain"] = {
 						created_at: dto[1],
 						email: dto[5],
 						file_limit: dto[8],
@@ -209,10 +209,10 @@ export namespace user_mixins {
 				},
 			},
 			validations: {
-				is_dto: (x): x is User.Me.DTO => {
+				is_dto: (x): x is User.Current.DTO => {
 					if (!core.validations.is_array(x)) return false
 
-					const dto = x as User.Me.DTO
+					const dto = x as User.Current.DTO
 
 					return (
 						core_mixins.identifiable.validations.is_id(dto[0]) &&

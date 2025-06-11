@@ -31,4 +31,4 @@ export const check_if_id_param_is_valid = (intake: ServerID.Intake) =>
 		.pipe(id => oath.if(is_id(id)))
 		.pipe(oath.ops.rmap(() => invalid_id_rrr(intake.params.user_id, intake)))
 
-const { is_id } = user.me.validations
+const { is_id } = user.current.validations

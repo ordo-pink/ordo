@@ -37,15 +37,15 @@ export const handle_invalidate_session = default_handler<ServerID.Fuel>(intake =
 							const sessions = dto[10].filter(session => session[0] !== sid)
 							dto[10] = sessions
 
-							return intake.persistence_strategy_user.update(uid, user.me.from_dto(...dto))
+							return intake.persistence_strategy_user.update(uid, user.current.from_dto(...dto))
 						}),
 					)
 					.pipe(oath.ops.rmap(rrr => ({ rrr, intake })))
 					.pipe(oath.ops.map(() => ({ sid, uid, user: dto }))),
 			),
 		)
-		.pipe(oath.ops.tap(p => intake.headers.set("Set-Cookie", `${p.uid}=${p.sid}; Expires=${new Date().toISOString()}`)))
+		.pipe(oath.ops.tap(p => intake.res.headers.set("Set-Cookie", `${p.uid}=${p.sid}; Expires=${new Date().toISOString()}`)))
 		.pipe(oath.ops.map(({ user }) => user.to_dto()))
-		.pipe(oath.ops.tap(dto => void (intake.payload = dto)))
+		.pipe(oath.ops.tap(dto => void (intake.res.body = JSON.stringify(dto))))
 		.pipe(oath.ops.map(() => intake)),
 )

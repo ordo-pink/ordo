@@ -19,7 +19,7 @@ export namespace user {
 		user_mixins.serializable.someone,
 	)
 
-	export const me = core.mix(
+	export const current = core.mix(
 		core_mixins.identifiable,
 		core_mixins.named,
 		user_mixins.referable,

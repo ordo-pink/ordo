@@ -35,8 +35,8 @@ export const get_user_from_cookie = (intake: ServerID.Intake) => {
 			oath.ops.chain(([uid, sid]) =>
 				oath
 					.merge({
-						uid: oath.if(user.me.validations.is_id(uid), { on_true: () => uid as User.ID }),
-						sid: oath.if(user.me.validations.is_id(sid), { on_true: () => sid as Session.ID }),
+						uid: oath.if(user.current.validations.is_id(uid), { on_true: () => uid as User.ID }),
+						sid: oath.if(user.current.validations.is_id(sid), { on_true: () => sid as Session.ID }),
 					})
 					.pipe(oath.ops.tap(debug("Cookie extracted", ({ uid }) => uid)))
 					.pipe(

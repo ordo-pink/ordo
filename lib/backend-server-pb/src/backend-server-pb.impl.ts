@@ -84,7 +84,7 @@ const validate_request_params = (intake: ServerPB.Intake) =>
 	oath
 		.all([
 			oath.if(data.validations.is_id(intake.params.fsid)).pipe(oath.ops.rmap(() => rrr.einval("invalid data id"))),
-			oath.if(user.me.validations.is_handle(intake.params.handle)).pipe(oath.ops.rmap(() => rrr.einval("invalid handle"))),
+			oath.if(user.current.validations.is_handle(intake.params.handle)).pipe(oath.ops.rmap(() => rrr.einval("invalid handle"))),
 		])
 		.pipe(oath.ops.map(() => intake))
 

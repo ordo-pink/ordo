@@ -11,7 +11,7 @@ export namespace Rrr {
 	export type Instance<$Type extends Rrr.Type = Rrr.Type> = {
 		type: (typeof RRR.TYPE)[$Type]
 		message: string
-		debug?: any[]
+		debug: any[]
 	}
 
 	export type Create<$Type extends Rrr.Type> = (message: string, ...debug: any) => Rrr.Instance<$Type>

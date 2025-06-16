@@ -46,6 +46,10 @@ declare global {
 			hide: { args: void }
 			show: { args: ClientSDK.Modal.Params }
 		}
+		notifications: {
+			hide: { args: CoreMixins.Identifiable.ID }
+			show: { args: ClientSDK.Notification.ShowArgs }
+		}
 		router: {
 			set_hash: { args: string }
 			set_href: { args: string }
@@ -211,9 +215,13 @@ export namespace ClientSDK {
 	}
 
 	export namespace Notification {
+		export type ShowArgs = CoreSDK.Prettify<
+			Partial<ClientSDK.Notification.Instance> & Required<Pick<ClientSDK.Notification.Instance, "message">>
+		>
+
 		export type Instance = {
-			id: string
-			type: NOTIFICATION.TYPE
+			id: CoreMixins.Identifiable.ID
+			type?: NOTIFICATION.TYPE
 			title?: ClientSDK.Translations.Key
 			message: ClientSDK.Translations.Key
 			render_icon?: (div: HTMLDivElement) => void

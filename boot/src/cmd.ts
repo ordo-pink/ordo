@@ -1,5 +1,5 @@
 import type { CommandHandler } from "@ordo-pink/cmd-handler"
-import { build_command } from "@ordo-pink/cmd-build"
+import { build_command } from "@ordo-pink/command-build"
 import { init_command } from "@ordo-pink/command-init"
 import { mklib_command } from "@ordo-pink/command-mklib"
 import { run_command } from "@ordo-pink/command-run"

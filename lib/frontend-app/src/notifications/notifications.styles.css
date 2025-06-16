@@ -1,0 +1,115 @@
+.notification-list {
+	@apply pointer-events-none fixed top-2 z-50 flex w-full flex-col-reverse gap-y-1 md:bottom-2 md:right-2 md:top-auto md:w-auto md:flex-col;
+}
+
+.notification-card_container {
+	@apply relative inset-x-0 z-50 size-full;
+}
+
+.notification-card_container.interactive {
+	@apply cursor-pointer select-none;
+}
+
+.notification-card {
+	@apply pointer-events-auto relative mx-auto flex min-h-10 w-80 max-w-lg items-center gap-x-4 rounded-lg px-4 py-2 shadow-sm md:mx-0;
+}
+
+.notification-card_title {
+	@apply font-bold;
+}
+
+.notification-card_body {
+	@apply w-full text-sm;
+}
+
+.notification-card_close {
+	@apply absolute right-2 top-2 rounded-full p-1 transition-colors duration-300;
+}
+
+.notification-card_close.info {
+	@apply hover:bg-sky-300 hover:dark:bg-sky-900;
+}
+
+.notification-card_close.question {
+	@apply hover:bg-violet-300 hover:dark:bg-violet-900;
+}
+
+.notification-card_close.rrr {
+	@apply hover:bg-rose-300 hover:dark:bg-rose-900;
+}
+
+.notification-card_close.success {
+	@apply hover:bg-emerald-300 hover:dark:bg-emerald-900;
+}
+
+.notification-card_close.warn {
+	@apply hover:bg-amber-300 hover:dark:bg-amber-900;
+}
+
+.notification-card_close.default {
+	@apply hover:bg-neutral-300 hover:dark:bg-neutral-900;
+}
+
+.notification-card_progress {
+	@apply absolute inset-x-1.5 bottom-0 rounded-full;
+}
+
+.notification-card_progress_foreground {
+	@apply h-1 rounded-full;
+}
+
+.notification-card_progress_foreground.info {
+	@apply bg-sky-300 dark:bg-sky-900;
+}
+
+.notification-card_progress_foreground.question {
+	@apply bg-violet-300 dark:bg-violet-900;
+}
+
+.notification-card_progress_foreground.rrr {
+	@apply bg-rose-300 dark:bg-rose-900;
+}
+
+.notification-card_progress_foreground.success {
+	@apply bg-emerald-300 dark:bg-emerald-900;
+}
+
+.notification-card_progress_foreground.warn {
+	@apply bg-amber-300 dark:bg-amber-900;
+}
+
+.notification-card_progress_foreground.default {
+	@apply bg-neutral-300 dark:bg-neutral-700;
+}
+
+.notification-card.info {
+	@apply bg-sky-100 dark:bg-sky-800;
+}
+
+.notification-card.question {
+	@apply bg-violet-100 dark:bg-violet-800;
+}
+
+.notification-card.rrr {
+	@apply bg-rose-100 dark:bg-rose-800;
+}
+
+.notification-card.success {
+	@apply bg-emerald-100 dark:bg-emerald-800;
+}
+
+.notification-card.warn {
+	@apply bg-amber-100 dark:bg-amber-800;
+}
+
+.notification-card.default {
+	@apply bg-neutral-200 dark:bg-neutral-600;
+}
+
+.more-notifications_card {
+	@apply notification-card mb-2 bg-neutral-200 text-center text-neutral-500 sm:mb-0 sm:mt-2 dark:bg-neutral-600;
+}
+
+.more-notifications_body {
+	@apply notification-card_body;
+}

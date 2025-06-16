@@ -19,6 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { type ClientSDK, NOTIFICATION } from "@ordo-pink/sdk-client"
 import {
 	bs_check_circle,
 	bs_circle,
@@ -27,22 +28,27 @@ import {
 	bs_info_circle,
 	bs_question_circle,
 } from "@ordo-pink/frontend-icons"
-import { Maoka } from "@ordo-pink/maoka"
-import { NOTIFICATION_TYPE } from "@ordo-pink/core"
+import { maoka, maoka_dom } from "@ordo-pink/maoka"
 import { sweech } from "@ordo-pink/sweech"
 
-type P = Pick<Ordo.Notification.Instance, "render_icon" | "type">
-export const OrdoNotificationIcon = ({ render_icon, type }: P) =>
-	Maoka.create("div", ({ element }) => {
-		if (render_icon) render_icon(element as unknown as HTMLDivElement)
+export const notification_icon = maoka.create<Pick<ClientSDK.Notification.Instance, "render_icon" | "type">>(
+	"div",
+	({ render_icon, type, use }) => {
+		if (render_icon)
+			use(
+				maoka_dom.jabs.if_dom(node => {
+					render_icon(node.value as HTMLDivElement)
+				}),
+			)
 		else
 			return () =>
 				sweech
 					.match(type)
-					.case(NOTIFICATION_TYPE.INFO, () => bs_info_circle("text-sky-500"))
-					.case(NOTIFICATION_TYPE.QUESTION, () => bs_question_circle("text-violet-500"))
-					.case(NOTIFICATION_TYPE.RRR, () => bs_error_circle("text-rose-500"))
-					.case(NOTIFICATION_TYPE.SUCCESS, () => bs_check_circle("text-emerald-500"))
-					.case(NOTIFICATION_TYPE.WARN, () => bs_exclamation_circle("text-amber-500"))
-					.default(() => bs_circle("text-neutral-500"))
-	})
+					.case(NOTIFICATION.TYPE.INFO, () => bs_info_circle({ classes: "text-sky-500" }))
+					.case(NOTIFICATION.TYPE.QUESTION, () => bs_question_circle({ classes: "text-violet-500" }))
+					.case(NOTIFICATION.TYPE.RRR, () => bs_error_circle({ classes: "text-rose-500" }))
+					.case(NOTIFICATION.TYPE.SUCCESS, () => bs_check_circle({ classes: "text-emerald-500" }))
+					.case(NOTIFICATION.TYPE.WARN, () => bs_exclamation_circle({ classes: "text-amber-500" }))
+					.default(() => bs_circle({ classes: "text-neutral-500" }))
+	},
+)

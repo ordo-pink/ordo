@@ -31,7 +31,7 @@ import { auth$ } from "../auth.state"
 export const join_modal = maoka.create("div", ({ use }) => {
 	use(maoka_sdk.jabs.classes.set("auth_join-modal"))
 
-	const { hosts, hunter } = use(maoka_sdk.context.consume)
+	const { fetch, hosts, hunter } = use(maoka_sdk.context.consume)
 
 	const t_title = use(maoka_sdk.jabs.translate$("auth_modals_join_title"))
 	const t_hint = use(maoka_sdk.jabs.translate$("auth_modals_join_title"))

@@ -1,0 +1,79 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ *
+ * Ordo.pink is an all-in-one team workspace.
+ * Copyright (C) 2024  谢尔盖 ||↓ and the Ordo.pink contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+import { maoka, maoka_dom } from "@ordo-pink/maoka"
+import { type ClientSDK } from "@ordo-pink/sdk-client"
+import { maoka_sdk } from "@ordo-pink/sdk-maoka"
+
+import { get_readable_type } from "./utils/common"
+import { notifications$ } from "../notifications.state"
+
+export const notification_progress = maoka.create<Pick<ClientSDK.Notification.Instance, "id" | "duration" | "type">>(
+	"div",
+	({ id, type, duration, use }) => {
+		if (!duration) return
+
+		const get_progress = use(maoka_sdk.jabs.zags.cheat$(notifications$, `progress_bars.${id}` as const))
+
+		const { hunter } = use(maoka_sdk.context.consume)
+
+		const handle_onmount = () => {
+			const update_progress_bar = () => {
+				notifications$.update("progress_bars", progress_bars => ({
+					...progress_bars,
+					[id]: progress_bars[id] === 0 ? 0 : !progress_bars[id] ? 100 : progress_bars[id] > 0 ? progress_bars[id] - 1 : 0,
+				}))
+			}
+
+			update_progress_bar()
+			const interval = setInterval(update_progress_bar, duration * 10)
+
+			return () => {
+				clearInterval(interval)
+			}
+		}
+
+		use(maoka_sdk.jabs.classes.set("notification-card_progress"))
+		use(maoka_dom.jabs.onmount(handle_onmount))
+
+		return () => {
+			const progress = get_progress()
+			const notifications = notifications$.select("items")
+
+			if (progress === 0 && notifications.some(notification => notification.id === id)) {
+				hunter.shoot("notifications.hide", id)
+				return
+			}
+
+			return progress_bar_foreground({ progress, type })
+		}
+	},
+)
+
+// --- Internal ---
+
+type P = Pick<ClientSDK.Notification.Instance, "type"> & { progress: number }
+const progress_bar_foreground = maoka.create<P>("div", ({ progress, type, use }) => {
+	if (!progress) return
+
+	use(maoka_sdk.jabs.classes.set("notification-card_progress_foreground", get_readable_type(type)))
+	use(maoka_sdk.jabs.set_style({ width: progress.toFixed(0).concat("%") }))
+})

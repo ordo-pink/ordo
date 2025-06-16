@@ -20,11 +20,11 @@
  */
 
 import {
-	BsCheckCircle,
-	BsCircle,
-	BsErrorCircle,
-	BsExclamationCircle,
-	BsInfoCircle,
+	bs_check_circle,
+	bs_circle,
+	bs_error_circle,
+	bs_exclamation_circle,
+	bs_info_circle,
 	bs_question_circle,
 	BsThreeDotsVertical,
 } from "@ordo-pink/frontend-icons"
@@ -189,12 +189,12 @@ const create_callout_card = (card_type: string) => MaokaStyled.Tags.div(`rte_blo
 const get_callout_icon = (type: CalloutType, custom_class?: string) =>
 	sweech
 		.match(type)
-		.case(CalloutType.INFO, () => BsInfoCircle("text-sky-500".concat(custom_class ? ` ${custom_class}` : "")))
+		.case(CalloutType.INFO, () => bs_info_circle("text-sky-500".concat(custom_class ? ` ${custom_class}` : "")))
 		.case(CalloutType.QUESTION, () => bs_question_circle("text-violet-500".concat(custom_class ? ` ${custom_class}` : "")))
-		.case(CalloutType.RRR, () => BsErrorCircle("text-rose-500".concat(custom_class ? ` ${custom_class}` : "")))
-		.case(CalloutType.SUCCESS, () => BsCheckCircle("text-emerald-500".concat(custom_class ? ` ${custom_class}` : "")))
-		.case(CalloutType.WARN, () => BsExclamationCircle("text-amber-500".concat(custom_class ? ` ${custom_class}` : "")))
-		.default(() => BsCircle("text-neutral-500".concat(custom_class ? ` ${custom_class}` : "")))
+		.case(CalloutType.RRR, () => bs_error_circle("text-rose-500".concat(custom_class ? ` ${custom_class}` : "")))
+		.case(CalloutType.SUCCESS, () => bs_check_circle("text-emerald-500".concat(custom_class ? ` ${custom_class}` : "")))
+		.case(CalloutType.WARN, () => bs_exclamation_circle("text-amber-500".concat(custom_class ? ` ${custom_class}` : "")))
+		.default(() => bs_circle("text-neutral-500".concat(custom_class ? ` ${custom_class}` : "")))
 
 const get_readable_type = (type: CalloutType) =>
 	sweech

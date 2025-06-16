@@ -22,7 +22,7 @@
 import {
 	BsBoxArrowInUpLeft,
 	BsFileEarmarkRichText,
-	BsInfoCircle,
+	bs_info_circle,
 	BsQuote,
 	BsType,
 	BsTypeH1,
@@ -257,7 +257,7 @@ export default create_function(
 			command: "cmd.rte.replace_block",
 			readable_name: "t.rte.commands.turn_to_callout",
 			should_show: RTE.Guards.is_rte_context_menu_payload,
-			render_icon: BsInfoCircle,
+			render_icon: bs_info_circle,
 			type: CONTEXT_MENU_ITEM_TYPE.UPDATE,
 			payload_creator: ({ payload }) => ({
 				fsid: payload.fsid,

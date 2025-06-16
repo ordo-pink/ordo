@@ -15,7 +15,7 @@
 }
 
 .command-palette_search {
-	@apply w-full bg-transparent shadow-none outline-none placeholder:text-neutral-500;
+	@apply w-full bg-transparent shadow-none outline-none placeholder:text-neutral-500 focus:outline-none;
 }
 
 .command-palette_items_multiple-wrapper {

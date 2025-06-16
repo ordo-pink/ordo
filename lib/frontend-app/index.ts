@@ -26,14 +26,15 @@ import { hunt } from "@ordo-pink/hunt"
 import { maoka } from "@ordo-pink/maoka"
 
 import { auth_jab } from "./src/auth"
+import { create_activity_bar_jab } from "./src/activity-bar"
 import { create_background_task_status_jab } from "./src/background-task"
 import { create_command_palette_jab } from "./src/command-palette"
 import { create_i18n_jab } from "./src/i18n"
 import { create_modal_jab } from "./src/modal"
+import { create_notifications_jab } from "./src/notifications"
 import { create_rotor_jab } from "./src/rotor"
 
 import "./index.css"
-import { create_activity_bar_jab } from "./src/activity-bar"
 
 // TODO Move fonts to assets
 // TODO Move types
@@ -54,7 +55,6 @@ export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
 	const rotor$ = use(create_rotor_jab(hunter))
 	const i18n$ = use(create_i18n_jab(hunter))
 	const fetch: ClientSDK.Fetch = (input, init) => {
-		console.log("start")
 		hunter.shoot(
 			!init || !init.method || init.method === "GET" || init.method === "HEAD"
 				? "background_status.loading"
@@ -71,6 +71,7 @@ export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
 	const command_palette = use(create_command_palette_jab)
 	const background_task_status = use(create_background_task_status_jab)
 	const activity_bar = use(create_activity_bar_jab)
+	const notifications = use(create_notifications_jab)
 
-	return () => [activity_bar(), background_task_status(), modal(), command_palette()]
+	return () => [activity_bar(), background_task_status(), modal(), command_palette(), notifications()]
 })

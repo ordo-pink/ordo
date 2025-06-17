@@ -18,6 +18,6 @@ export const background_task_status = maoka.create("div", ({ use }) => {
 			.match(status)
 			.case(BACKGROUND_TASK.STATUS.LOADING, () => bs_cloud_download({}))
 			.case(BACKGROUND_TASK.STATUS.SAVING, () => bs_cloud_upload({}))
-			.default(() => void 0)
+			.default(() => null)
 	}
 })

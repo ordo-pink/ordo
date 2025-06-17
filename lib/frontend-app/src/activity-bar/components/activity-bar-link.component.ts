@@ -47,7 +47,7 @@ export const activity_bar_link = maoka.create<Args>(
 		return () => {
 			use(maoka_sdk.jabs.set_attribute("title", t_title()))
 
-			return activity_bar_icon({ is_current, render_icon: item.render_icon! })
+			return activity_bar_icon({ is_current, render_icon: item.render_icon!, readable_name: item.readable_name })
 		}
 	},
 )

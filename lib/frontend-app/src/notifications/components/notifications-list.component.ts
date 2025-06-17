@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { maoka } from "@ordo-pink/maoka"
+import { maoka, maoka_styled } from "@ordo-pink/maoka"
 import { maoka_sdk } from "@ordo-pink/sdk-maoka"
 
 import { notification } from "./notification.component"
@@ -53,12 +53,5 @@ export const notification_list = maoka.create("div", ({ use }) => {
 
 // --- Internal ---
 
-const hidden_notifications_block = maoka.create("div", ({ kindergarten, use }) => {
-	use(maoka_sdk.jabs.classes.set("more-notifications_card"))
-	return kindergarten
-})
-
-const hidden_notifications_list = maoka.create("div", ({ kindergarten, use }) => {
-	use(maoka_sdk.jabs.classes.set("more-notifications_body"))
-	return kindergarten
-})
+const hidden_notifications_block = maoka_styled.div("more-notifications_card")
+const hidden_notifications_list = maoka_styled.div("more-notifications_body")

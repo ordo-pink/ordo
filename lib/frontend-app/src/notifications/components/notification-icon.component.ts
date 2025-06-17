@@ -34,21 +34,19 @@ import { sweech } from "@ordo-pink/sweech"
 export const notification_icon = maoka.create<Pick<ClientSDK.Notification.Instance, "render_icon" | "type">>(
 	"div",
 	({ render_icon, type, use }) => {
-		if (render_icon)
-			use(
-				maoka_dom.jabs.if_dom(node => {
-					render_icon(node.value as HTMLDivElement)
-				}),
-			)
-		else
-			return () =>
-				sweech
-					.match(type)
-					.case(NOTIFICATION.TYPE.INFO, () => bs_info_circle({ classes: "text-sky-500" }))
-					.case(NOTIFICATION.TYPE.QUESTION, () => bs_question_circle({ classes: "text-violet-500" }))
-					.case(NOTIFICATION.TYPE.RRR, () => bs_error_circle({ classes: "text-rose-500" }))
-					.case(NOTIFICATION.TYPE.SUCCESS, () => bs_check_circle({ classes: "text-emerald-500" }))
-					.case(NOTIFICATION.TYPE.WARN, () => bs_exclamation_circle({ classes: "text-amber-500" }))
-					.default(() => bs_circle({ classes: "text-neutral-500" }))
+		if (render_icon) use(maoka_dom.jabs.if_dom(n => void render_icon(n.value as HTMLDivElement)))
+		else return () => render_default_icon(type)
 	},
 )
+
+// --- Internal ---
+
+const render_default_icon = (type?: NOTIFICATION.TYPE) =>
+	sweech
+		.match(type)
+		.case(NOTIFICATION.TYPE.INFO, () => bs_info_circle({ classes: "text-sky-500" }))
+		.case(NOTIFICATION.TYPE.QUESTION, () => bs_question_circle({ classes: "text-violet-500" }))
+		.case(NOTIFICATION.TYPE.RRR, () => bs_error_circle({ classes: "text-rose-500" }))
+		.case(NOTIFICATION.TYPE.SUCCESS, () => bs_check_circle({ classes: "text-emerald-500" }))
+		.case(NOTIFICATION.TYPE.WARN, () => bs_exclamation_circle({ classes: "text-amber-500" }))
+		.default(() => bs_circle({ classes: "text-neutral-500" }))

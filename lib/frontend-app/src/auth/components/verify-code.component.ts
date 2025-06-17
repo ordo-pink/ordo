@@ -22,9 +22,9 @@
 import { type User, user } from "@ordo-pink/sdk-core"
 import { maoka, maoka_dom, maoka_styled } from "@ordo-pink/maoka"
 import { bs_question_circle } from "@ordo-pink/frontend-icons"
+import { client_rrr } from "@ordo-pink/sdk-client"
 import { get_device_info } from "@ordo-pink/get-device-info"
 import { maoka_sdk } from "@ordo-pink/sdk-maoka"
-import { noop } from "@ordo-pink/tau"
 import { oath } from "@ordo-pink/oath"
 
 import { auth$ } from "../auth.state"
@@ -44,13 +44,34 @@ export const verify_code_modal = maoka.create("div", ({ use }) => {
 	const handle_ok_click = () => {
 		const { code, email } = auth$.unwrap()
 
-		if (code.length !== 6 || email.length < 5 || email.length > 255 || !user.current.validations.is_email(email)) {
-			return // TODO Show error
+		if (code.length !== 6) {
+			auth$.update("code", () => "")
+
+			hunter.shoot("notifications.rrr", client_rrr.einval("auth_rrr_invalid_code_length"))
+
+			return
+		}
+		if (email.length < 5 || email.length > 255) {
+			auth$.update("email", () => "")
+			auth$.update("code", () => "")
+
+			hunter.shoot("modal.hide")
+			hunter.shoot("notifications.rrr", client_rrr.einval("auth_rrr_invalid_email_length"))
+
+			return
 		}
 
-		// TODO Use proper session ids
+		if (!user.current.validations.is_email(email)) {
+			auth$.update("email", () => "")
+			auth$.update("code", () => "")
 
-		oath
+			hunter.shoot("modal.hide")
+			hunter.shoot("notifications.rrr", client_rrr.einval("auth_rrr_invalid_email"))
+
+			return
+		}
+
+		void oath
 			.of(new Headers())
 			.pipe(oath.ops.tap(h => h.append("X-Device", get_device_info(navigator))))
 			.pipe(oath.ops.tap(h => h.append("Content-Type", "application/json")))
@@ -62,7 +83,6 @@ export const verify_code_modal = maoka.create("div", ({ use }) => {
 			.pipe(oath.ops.tap(dto => auth$.each({ email: () => "", code: () => "", user: () => user.current.from_dto(...dto) })))
 			.pipe(oath.ops.tap(() => hunter.shoot("modal.hide")))
 			.cata(oath.catas.to_promise())
-			.catch(noop) // TODO Show error
 			.finally(() => hunter.shoot("background_status.none"))
 	}
 

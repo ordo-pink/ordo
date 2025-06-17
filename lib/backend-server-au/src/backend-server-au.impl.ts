@@ -30,16 +30,19 @@ import { handle_request_code } from "./handlers/request-code.handler"
 import { handle_verify_code } from "./handlers/verify-code.handler"
 
 export const create_backend_server_au = (params: BackendAuth.Params) => {
-	const interval = setInterval(() => {
-		const now = Date.now()
+	const interval = setInterval(
+		() => {
+			const now = Date.now()
 
-		for (const [email, { timestamp }] of params.auth_storage.entries()) {
-			if (now - timestamp > params.code_lifetime_ms) {
-				params.auth_storage.delete(email)
-				params.logger.debug("Removed outdated code for", fns.obfuscate_email(email))
+			for (const [email, { timestamp }] of params.auth_storage.entries()) {
+				if (now - timestamp > params.code_lifetime_ms) {
+					params.auth_storage.delete(email)
+					params.logger.debug("Removed outdated code for", fns.obfuscate_email(email))
+				}
 			}
-		}
-	}, 15 * 1000)
+		},
+		5 * 60 * 1000,
+	)
 
 	interval.unref()
 

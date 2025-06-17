@@ -26,47 +26,42 @@ import { maoka_sdk } from "@ordo-pink/sdk-maoka"
 import { get_readable_type } from "./utils/common"
 import { notifications$ } from "../notifications.state"
 
-export const notification_progress = maoka.create<Pick<ClientSDK.Notification.Instance, "id" | "duration" | "type">>(
-	"div",
-	({ id, type, duration, use }) => {
-		if (!duration) return
+type Args = Pick<ClientSDK.Notification.Instance, "id" | "type"> & Required<Pick<ClientSDK.Notification.Instance, "duration">>
 
-		const get_progress = use(maoka_sdk.jabs.zags.cheat$(notifications$, `progress_bars.${id}` as const))
+export const notification_progress = maoka.create<Args>("div", ({ id, type, duration, use }) => {
+	const get_progress = use(maoka_sdk.jabs.zags.cheat$(notifications$, `progress_bars.${id}` as const))
 
-		const { hunter } = use(maoka_sdk.context.consume)
+	const { hunter } = use(maoka_sdk.context.consume)
 
-		const handle_onmount = () => {
-			const update_progress_bar = () => {
-				notifications$.update("progress_bars", progress_bars => ({
-					...progress_bars,
-					[id]: progress_bars[id] === 0 ? 0 : !progress_bars[id] ? 100 : progress_bars[id] > 0 ? progress_bars[id] - 1 : 0,
-				}))
-			}
-
-			update_progress_bar()
-			const interval = setInterval(update_progress_bar, duration * 10)
-
-			return () => {
-				clearInterval(interval)
-			}
+	const handle_onmount = () => {
+		const update_progress_bar = () => {
+			notifications$.update("progress_bars", progress_bars => ({
+				...progress_bars,
+				[id]: progress_bars[id] === 0 ? 0 : !progress_bars[id] ? 100 : progress_bars[id] > 0 ? progress_bars[id] - 1 : 0,
+			}))
 		}
 
-		use(maoka_sdk.jabs.classes.set("notification-card_progress"))
-		use(maoka_dom.jabs.onmount(handle_onmount))
+		update_progress_bar()
+		const interval = setInterval(update_progress_bar, duration * 10)
 
-		return () => {
-			const progress = get_progress()
-			const notifications = notifications$.select("items")
+		return () => clearInterval(interval)
+	}
 
-			if (progress === 0 && notifications.some(notification => notification.id === id)) {
-				hunter.shoot("notifications.hide", id)
-				return
-			}
+	use(maoka_sdk.jabs.classes.set("notification-card_progress"))
+	use(maoka_dom.jabs.onmount(handle_onmount))
 
-			return progress_bar_foreground({ progress, type })
+	return () => {
+		const progress = get_progress()
+		const notifications = notifications$.select("items")
+
+		if (progress === 0 && notifications.some(notification => notification.id === id)) {
+			hunter.shoot("notifications.hide", id)
+			return
 		}
-	},
-)
+
+		return progress_bar_foreground({ progress, type })
+	}
+})
 
 // --- Internal ---
 

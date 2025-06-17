@@ -64,6 +64,25 @@ export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
 		return native_fetch(input, init)
 	}
 
+	hunter.shoot("i18n.add_translations", {
+		locale: "en",
+		values: {
+			rrr_codes_EACCES: "Access Denied",
+			rrr_codes_EAGAIN: "Try Later",
+			rrr_codes_EEXIST: "Already Exists",
+			rrr_codes_EFBIG: "File Too Big",
+			rrr_codes_EINTR: "Operation Interrupted",
+			rrr_codes_EINVAL: "No!",
+			rrr_codes_EIO: "Connection Error",
+			rrr_codes_ENOENT: "Not Found",
+			rrr_codes_ENOSPC: "Total File Limit Reached",
+			rrr_codes_ENXIO: "Invalid Address Used",
+			rrr_codes_EPERM: "Permission Denied",
+			rrr_codes_EUNKNOWN: "Unknown Error",
+			rrr_codes_length: "42",
+		},
+	})
+
 	use(context.provide({ fetch, hosts: Object.freeze(hosts), hunter, logger, rotor$, i18n$ }))
 	use(auth_jab)
 

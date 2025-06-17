@@ -26,23 +26,21 @@ import { maoka_sdk } from "@ordo-pink/sdk-maoka"
 
 import { get_readable_type } from "./utils/common"
 
-export const hide_notification_button = maoka.create<Pick<ClientSDK.Notification.Instance, "id" | "type">>(
-	"button",
-	({ id, type, use }) => {
-		const { hunter } = use(maoka_sdk.context.consume)
-		const readable_type = get_readable_type(type)
+type Args = Pick<ClientSDK.Notification.Instance, "id" | "type">
+export const hide_notification_button = maoka.create<Args>("button", ({ id, type, use }) => {
+	const { hunter } = use(maoka_sdk.context.consume)
+	const readable_type = get_readable_type(type)
 
-		const handle_click = (event: MouseEvent) => {
-			event.preventDefault()
-			event.stopPropagation()
+	const handle_click = (event: MouseEvent) => {
+		event.preventDefault()
+		event.stopPropagation()
 
-			hunter.shoot("notifications.hide", id)
-		}
+		hunter.shoot("notifications.hide", id)
+	}
 
-		use(maoka_sdk.jabs.classes.set("notification-card_close", readable_type))
-		use(maoka_sdk.jabs.set_attribute("aria-label", "Close")) // TODO i18n
-		use(maoka_sdk.jabs.listen("onclick", handle_click))
+	use(maoka_sdk.jabs.classes.set("notification-card_close", readable_type))
+	use(maoka_sdk.jabs.set_attribute("aria-label", "Close")) // TODO i18n
+	use(maoka_sdk.jabs.listen("onclick", handle_click))
 
-		return () => bs_x()
-	},
-)
+	return () => bs_x()
+})

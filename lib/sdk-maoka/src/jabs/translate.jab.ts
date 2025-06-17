@@ -9,7 +9,7 @@ import { maoka_dom } from "@ordo-pink/maoka"
 import type { MaokaSDK } from "../sdk-maoka.types"
 import { context } from "../sdk-maoka.impl"
 
-export const t$: MaokaSDK.Jabs.T$ = ({ use }) => {
+export const t_jab$: MaokaSDK.Jabs.T$ = ({ use }) => {
 	const { i18n$ } = use(context.consume)
 
 	let current_locale: I18n.ISO_639_1_Locale = i18n$.select("locale")

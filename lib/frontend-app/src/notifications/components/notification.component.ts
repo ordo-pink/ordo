@@ -19,8 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { maoka, maoka_styled } from "@ordo-pink/maoka"
 import type { ClientSDK } from "@ordo-pink/sdk-client"
-import { maoka } from "@ordo-pink/maoka"
 import { maoka_sdk } from "@ordo-pink/sdk-maoka"
 
 import { get_readable_type } from "./utils/common"
@@ -28,51 +28,36 @@ import { hide_notification_button } from "./notification-hide-button.component"
 import { notification_icon } from "./notification-icon.component"
 import { notification_progress } from "./notification-progress.component"
 
-export const notification = maoka.create<ClientSDK.Notification.Instance>(
-	"div",
-	({ on_click, id, message, duration, render_icon, title, type, use }) => {
-		const t_title = use(maoka_sdk.jabs.translate$(title))
-		const t_message = use(maoka_sdk.jabs.translate$(message))
+type Args = ClientSDK.Notification.Instance
+export const notification = maoka.create<Args>("div", ({ on_click, id, message, duration, render_icon, title, type, use }) => {
+	const t_title = use(maoka_sdk.jabs.translate$(title))
+	const t_message = use(maoka_sdk.jabs.translate$(message))
 
-		use(maoka_sdk.jabs.classes.set("notification-card_container"))
+	use(maoka_sdk.jabs.classes.set("notification-card_container"))
 
-		if (on_click) {
-			use(maoka_sdk.jabs.classes.add("interactive"))
-			use(maoka_sdk.jabs.listen("onclick", on_click))
-		} else {
-			use(maoka_sdk.jabs.classes.remove("interactive"))
-			use(maoka_sdk.jabs.listen("onclick", () => void 0))
-		}
+	if (on_click) {
+		use(maoka_sdk.jabs.classes.add("interactive"))
+		use(maoka_sdk.jabs.listen("onclick", on_click))
+	} else {
+		use(maoka_sdk.jabs.classes.remove("interactive"))
+		use(maoka_sdk.jabs.listen("onclick", () => void 0))
+	}
 
-		const card_type = get_readable_type(type)
-		const notification_card = create_notification_card(card_type)
+	const card_type = get_readable_type(type)
+	const notification_card = create_notification_card(card_type)
 
-		return () =>
-			notification_card(() => [
-				notification_icon({ render_icon, type }),
-				notification_body(() => [title ? notification_title(t_title) : void 0, notification_message(t_message)]),
-				notification_progress({ id, duration, type }),
-				hide_notification_button({ id, type }),
-			])
-	},
-)
+	return () =>
+		notification_card(() => [
+			notification_icon({ render_icon, type }),
+			notification_body(() => [title ? notification_title(t_title) : void 0, notification_message(t_message)]),
+			duration ? notification_progress({ id, duration, type }) : void 0,
+			hide_notification_button({ id, type }),
+		])
+})
 
 // --- Internal ---
 
-const create_notification_card = (card_type: string) =>
-	maoka.create("div", ({ kindergarten, use }) => {
-		use(maoka_sdk.jabs.classes.set(`notification-card ${card_type}`))
-		return kindergarten
-	})
-
-const notification_body = maoka.create("div", ({ kindergarten, use }) => {
-	use(maoka_sdk.jabs.classes.set("notification-card_body"))
-	return kindergarten
-})
-
-const notification_message = maoka.create("p", ({ kindergarten }) => kindergarten)
-
-const notification_title = maoka.create("h2", ({ kindergarten, use }) => {
-	use(maoka_sdk.jabs.classes.set("notification-card_title"))
-	return kindergarten
-})
+const create_notification_card = (card_type: string) => maoka_styled.div(`notification-card ${card_type}`)
+const notification_body = maoka_styled.div("notification-card_body")
+const notification_message = maoka_styled.p()
+const notification_title = maoka_styled.h2("notification-card_title")

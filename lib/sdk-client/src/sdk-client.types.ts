@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import type { CoreMixins, CoreSDK, Data, Logger, Rrr, User } from "@ordo-pink/sdk-core"
+import type { CoreMixins, CoreSDK, Data, Logger, RRR, Rrr, User } from "@ordo-pink/sdk-core"
 import type { Hunt } from "@ordo-pink/hunt"
 import type { I18n } from "@ordo-pink/i18n"
 import type { Oath } from "@ordo-pink/oath"
@@ -37,9 +37,10 @@ declare global {
 			add_translations: {
 				args: {
 					locale: I18n.ISO_639_1_Locale
-					values: Partial<Record<I18n.DefinitionToTranslationKeys<Pick<t, keyof t>>, string>>
+					values: Partial<Record<I18n.DefinitionToTranslationKeys<ClientSDK.Translations.Keys>, string>>
 				}
 			}
+			remove_translations: { args: ClientSDK.Translations.Key[] }
 			set_locale: { args: I18n.ISO_639_1_Locale }
 		}
 		modal: {
@@ -58,6 +59,26 @@ declare global {
 			set_search: { args: string | Record<string, string> }
 		}
 	}
+}
+
+declare global {
+	interface t {
+		rrr: {
+			codes: Record<keyof typeof RRR.TYPE, string>
+		}
+	}
+}
+
+export namespace ClientRrr {
+	export type Instance<$Type extends Rrr.Type = Rrr.Type> = {
+		type: (typeof RRR.TYPE)[$Type]
+		message: ClientSDK.Translations.Key
+		debug: any[]
+	}
+
+	export type Create<$Type extends Rrr.Type> = (message: ClientSDK.Translations.Key, ...debug: any) => ClientRrr.Instance<$Type>
+
+	export type CreateType = <$Type extends Rrr.Type>(type: $Type) => ClientRrr.Create<$Type>
 }
 
 export namespace ClientSDK {
@@ -90,7 +111,7 @@ export namespace ClientSDK {
 			fetch: ClientSDK.Fetch
 			hosts: CoreSDK.Hosts
 			hunter: Hunter
-			i18n$: I18n.Zags<Pick<t, keyof t>>
+			i18n$: I18n.Zags<ClientSDK.Translations.Keys>
 			logger: Logger
 			rotor$: RoutaryBrowser.Zags
 		}
@@ -165,7 +186,8 @@ export namespace ClientSDK {
 	}
 
 	export namespace Translations {
-		export type Key = I18n.DefinitionToTranslationKeys<Pick<t, keyof t>>
+		export type Keys = Pick<t, keyof t>
+		export type Key = I18n.DefinitionToTranslationKeys<ClientSDK.Translations.Keys>
 	}
 
 	export namespace Modal {

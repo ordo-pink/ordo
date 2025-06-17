@@ -55,7 +55,7 @@ const handle_rrr_with_id_creator: (create_id: Maoka.CreateId) => ClientSDK.GunFo
 				{
 					id: create_id() as any,
 					message,
-					title: `http_rrr_codes_${rrr.to_readable_type(type)}`,
+					title: `rrr_codes_${rrr.to_readable_type(type)}`,
 					duration: 30,
 					type: NOTIFICATION.TYPE.RRR,
 				},

@@ -65,6 +65,11 @@ const register_translations_jab: Maoka.Jab = ({ use }) => {
 			auth_modals_verify_hint: "We sent you a code to the email you specified. Check your inbox!",
 			auth_modals_verify_submit: "Submit",
 			auth_modals_verify_title: "Enter code",
+			auth_modals_join_placeholder: "are@you.kidding",
+			auth_modals_verify_placeholder: "123456",
+			auth_rrr_invalid_code_length: "Verification code must be exactly 6 digits long",
+			auth_rrr_invalid_email: "Provided email is invalid or not supported.",
+			auth_rrr_invalid_email_length: "Email must be from 5 to 255 characters long.",
 		},
 	})
 }
@@ -103,7 +108,7 @@ const refresh_session_jab: Maoka.Jab = ({ use }) => {
 
 const track_prey_jab: Maoka.Jab = ({ node, use }) => {
 	const state = use(maoka_sdk.context.consume)
-	const { hosts, hunter } = state
+	const { fetch, hosts, hunter } = state
 
 	const handle_mount = () => {
 		let release_join = noop

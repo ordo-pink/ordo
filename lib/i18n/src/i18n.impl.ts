@@ -398,6 +398,13 @@ export const create_i18n: I18n.CreateFn = (locale, values = {}) => {
 				...Object.keys(values).reduce((acc, key) => ({ ...acc, [`${locale}_${key}`]: (values as any)[key] }), {}),
 			})),
 		set_locale: locale => $.update("locale", () => locale),
+		remove: values =>
+			$.update("values", prev_values =>
+				Object.keys(prev_values).reduce(
+					(acc, key) => (values.includes(key as any) ? acc : { ...acc, [key]: (prev_values as any)[key] }),
+					{},
+				),
+			),
 		translate: (key, default_value = "") => $.select(`values.${$.select("locale")}_${key as string}`) ?? default_value,
 	}
 }

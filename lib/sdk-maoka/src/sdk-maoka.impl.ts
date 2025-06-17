@@ -9,6 +9,7 @@ import type { ClientSDK } from "@ordo-pink/sdk-client"
 import { button_neutral, button_primary, button_success } from "./components/button.component"
 import { listen_global_event_jab, listen_jab } from "./jabs/listen.jab"
 import { set_attribute_jab, set_id_jab } from "./jabs/set-attribute.jab"
+import { t_jab$, translate_jab$ } from "./jabs/translate.jab"
 import type { MaokaSDK } from "./sdk-maoka.types"
 import { actionable_hotkey } from "./components/hotkey.component"
 import { class_jabs } from "./jabs/class.jab"
@@ -16,7 +17,6 @@ import { is_darwin_jab } from "./jabs/is-darwin.jab"
 import { is_mobile_jab } from "./jabs/is-mobile.jab"
 import { is_sm_screen_jab$ } from "./jabs/is-sm-screen.jab"
 import { set_style_jab } from "./jabs/set-style.jab"
-import { translate_jab$ } from "./jabs/translate.jab"
 import { zags_jabs } from "./jabs/zags.jab"
 
 export const context: MaokaSDK.Context = maoka_context.create()
@@ -41,6 +41,7 @@ export namespace jabs {
 	export const set_attribute = set_attribute_jab
 	export const set_id = set_id_jab
 	export const set_style = set_style_jab
+	export const t$ = t_jab$
 	export const translate$ = translate_jab$
 	export const zags = zags_jabs
 }

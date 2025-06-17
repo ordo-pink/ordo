@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: Unlicense
  */
 
+import { RRR } from "@ordo-pink/sdk-core"
 import { sweech } from "@ordo-pink/sweech"
 
-import type { ClientSDK } from "./sdk-client.types"
+import type { ClientRrr, ClientSDK } from "./sdk-client.types"
 
 export namespace client_sdk {
 	export const create_hotkey_from_event: ClientSDK.CreateHotkeyFromEvent = (event, is_darwin) => {
@@ -45,4 +46,23 @@ export namespace client_sdk {
 
 		return hotkey
 	}
+}
+
+export namespace client_rrr {
+	export const create: ClientRrr.CreateType =
+		type =>
+		(message, ...debug) => ({ type: RRR.TYPE[type], message, debug })
+
+	export const eacces = create("EACCES")
+	export const eagain = create("EAGAIN")
+	export const eexist = create("EEXIST")
+	export const efbig = create("EFBIG")
+	export const eintr = create("EINTR")
+	export const einval = create("EINVAL")
+	export const eio = create("EIO")
+	export const enoent = create("ENOENT")
+	export const enospc = create("ENOSPC")
+	export const enxio = create("ENXIO")
+	export const eperm = create("EPERM")
+	export const eunknown = create("EUNKNOWN")
 }

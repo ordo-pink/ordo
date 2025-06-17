@@ -21,8 +21,8 @@
 
 import { maoka, maoka_dom, maoka_styled } from "@ordo-pink/maoka"
 import { bs_envelope_at } from "@ordo-pink/frontend-icons"
+import { client_rrr } from "@ordo-pink/sdk-client"
 import { maoka_sdk } from "@ordo-pink/sdk-maoka"
-import { noop } from "@ordo-pink/tau"
 import { oath } from "@ordo-pink/oath"
 import { user } from "@ordo-pink/sdk-core"
 
@@ -43,9 +43,10 @@ export const join_modal = maoka.create("div", ({ use }) => {
 	const on_ok_click = () => {
 		const email = auth$.select("email")
 
-		if (email.length < 5 || email.length > 255 || !user.current.validations.is_email(email)) {
-			return // TODO Show error
-		}
+		if (email.length < 5 || email.length > 255)
+			return void hunter.shoot("notifications.rrr", client_rrr.einval("auth_rrr_invalid_email_length"))
+		if (!user.current.validations.is_email(email))
+			return void hunter.shoot("notifications.rrr", client_rrr.einval("auth_rrr_invalid_email"))
 
 		oath
 			.of(new Headers())
@@ -55,7 +56,7 @@ export const join_modal = maoka.create("div", ({ use }) => {
 			.pipe(oath.ops.chain(res => oath.if(res.status < 300, { on_true: () => res })))
 			.pipe(oath.ops.tap(() => hunter.shoot("auth.show_verify_code_modal")))
 			.cata(oath.catas.to_promise())
-			.catch(noop)
+			.catch(() => void 0)
 			.finally(() => hunter.shoot("background_status.none"))
 	}
 
@@ -85,7 +86,7 @@ const email_input = maoka.create("label", ({ use }) => {
 })
 
 const search = maoka_styled.input("auth_join-modal_email", ({ use }) => {
-	const t_placeholer = "are@you.kidding" // TODO i18n
+	const t_placeholder = use(maoka_sdk.jabs.translate$("auth_modals_join_placeholder"))
 	const value = auth$.select("email")
 
 	const handle_mount = () => use(maoka_dom.jabs.if_dom(n => n.value.focus()))
@@ -96,7 +97,7 @@ const search = maoka_styled.input("auth_join-modal_email", ({ use }) => {
 
 	use(maoka_sdk.jabs.set_id("email-input"))
 	use(maoka_sdk.jabs.set_attribute("type", "email"))
-	use(maoka_sdk.jabs.set_attribute("placeholder", t_placeholer))
+	use(maoka_sdk.jabs.set_attribute("placeholder", t_placeholder()))
 	use(maoka_sdk.jabs.listen("oninput", handle_input))
 	use(maoka_dom.jabs.onmount(handle_mount))
 

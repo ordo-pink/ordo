@@ -32,6 +32,11 @@ export namespace Auth {
 declare global {
 	interface t {
 		auth: {
+			rrr: {
+				invalid_code_length: string
+				invalid_email_length: string
+				invalid_email: string
+			}
 			commands: {
 				join: {
 					description: string
@@ -47,14 +52,16 @@ declare global {
 			}
 			modals: {
 				join: {
-					title: string
 					hint: string
 					join: string
+					placeholder: string
+					title: string
 				}
 				verify: {
-					title: string
 					hint: string
+					placeholder: string
 					submit: string
+					title: string
 				}
 			}
 		}

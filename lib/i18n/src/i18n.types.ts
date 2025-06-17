@@ -35,6 +35,7 @@ export namespace I18n {
 	export type Instance<$Record extends Record<string, unknown>> = {
 		$: Zags.Instance<I18n.State<$Record>>
 		add: (locale: ISO_639_1_Locale, values: Partial<Record<I18n.DefinitionToTranslationKeys<$Record>, string>>) => void
+		remove: (values: (keyof Partial<Record<I18n.DefinitionToTranslationKeys<$Record>, string>>)[]) => void
 		set_locale: (locale: ISO_639_1_Locale) => void
 		translate: (key: Key<$Record>, default_value?: string) => string
 	}

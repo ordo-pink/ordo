@@ -46,6 +46,6 @@ const handle_show_with_id_creator: (create_id: Maoka.CreateId) => ClientSDK.GunF
 		item.id
 			? items.some(i => i.id === item.id)
 				? items
-				: items.concat(item)
+				: items.concat(item as ClientSDK.Notification.Instance)
 			: items.concat({ ...item, id: create_id() as any, type: item.type }),
 	)

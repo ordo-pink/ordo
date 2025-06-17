@@ -17,4 +17,8 @@ export namespace Rrr {
 	export type Create<$Type extends Rrr.Type> = (message: string, ...debug: any) => Rrr.Instance<$Type>
 
 	export type CreateType = <$Type extends Rrr.Type>(type: $Type) => Rrr.Create<$Type>
+
+	export type ToStatusCode = (type: RRR.TYPE) => number
+
+	export type ToReadableType = (type: RRR.TYPE) => Rrr.Type
 }

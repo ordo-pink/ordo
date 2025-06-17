@@ -10,7 +10,11 @@ export namespace MaokaSDK {
 	export type Context = Maoka.Context.Instance<ClientSDK.F.State>
 
 	export namespace Jabs {
-		export type Translate$ = (key?: ClientSDK.Translations.Key) => Maoka.Jab<(default_value?: string) => string>
+		export type TranslateFn = (default_value?: string) => string
+		export type Translate$ = (key?: ClientSDK.Translations.Key) => Maoka.Jab<MaokaSDK.Jabs.TranslateFn>
+
+		export type TFn = (key: ClientSDK.Translations.Key, default_value?: string) => string
+		export type T$ = Maoka.Jab<MaokaSDK.Jabs.TFn>
 	}
 
 	export namespace Components {

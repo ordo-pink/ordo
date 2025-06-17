@@ -9,6 +9,27 @@ import { maoka_dom } from "@ordo-pink/maoka"
 import type { MaokaSDK } from "../sdk-maoka.types"
 import { context } from "../sdk-maoka.impl"
 
+export const t$: MaokaSDK.Jabs.T$ = ({ use }) => {
+	const { i18n$ } = use(context.consume)
+
+	let current_locale: I18n.ISO_639_1_Locale = i18n$.select("locale")
+
+	const handle_mount = () => {
+		const divorce_locale = i18n$.cheat("locale", new_locale => {
+			current_locale = new_locale
+			use(maoka_dom.jabs.refresh$)
+		})
+
+		return () => {
+			divorce_locale()
+		}
+	}
+
+	use(maoka_dom.jabs.onmount(handle_mount))
+
+	return (key, default_value = "") => i18n$.select(`values.${current_locale}_${key}`) ?? default_value
+}
+
 export const translate_jab$: MaokaSDK.Jabs.Translate$ =
 	key =>
 	({ use }) => {

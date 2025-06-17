@@ -49,6 +49,7 @@ declare global {
 		notifications: {
 			hide: { args: CoreMixins.Identifiable.ID }
 			show: { args: ClientSDK.Notification.ShowArgs }
+			rrr: { args: Rrr.Instance & { message: ClientSDK.Translations.Key } }
 		}
 		router: {
 			set_hash: { args: string }

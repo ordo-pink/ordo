@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: Unlicense
  */
 
+import { sweech } from "@ordo-pink/sweech"
+
 import { RRR } from "./error.constants"
 import type { Rrr } from "./error.types"
 
@@ -23,4 +25,20 @@ export namespace rrr {
 	export const enxio = create("ENXIO")
 	export const eperm = create("EPERM")
 	export const eunknown = create("EUNKNOWN")
+
+	export const to_readable_type: Rrr.ToReadableType = type => RRR.TYPE[type] as Rrr.Type
+
+	export const to_status_code: Rrr.ToStatusCode = type =>
+		sweech
+			.match(type)
+			.case(RRR.TYPE.EAGAIN, () => 425)
+			.case(RRR.TYPE.ENXIO, () => 408)
+			.case(RRR.TYPE.ENOSPC, () => 402)
+			.case(RRR.TYPE.EFBIG, () => 413)
+			.case(RRR.TYPE.EINVAL, () => 400)
+			.case(RRR.TYPE.EACCES, () => 401)
+			.case(RRR.TYPE.EPERM, () => 403)
+			.case(RRR.TYPE.ENOENT, () => 404)
+			.case(RRR.TYPE.EEXIST, () => 409)
+			.default(() => 500)
 }

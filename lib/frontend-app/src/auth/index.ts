@@ -192,35 +192,3 @@ const track_prey_jab: Maoka.Jab = ({ node, use }) => {
 
 	use(maoka_dom.jabs.onmount(handle_mount))
 }
-
-declare global {
-	interface t {
-		auth: {
-			commands: {
-				join: {
-					description: string
-					name: string
-				}
-				sign_out: {
-					description: string
-					name: string
-				}
-			}
-			common: {
-				cancel: string
-			}
-			modals: {
-				join: {
-					title: string
-					hint: string
-					join: string
-				}
-				verify: {
-					title: string
-					hint: string
-					submit: string
-				}
-			}
-		}
-	}
-}

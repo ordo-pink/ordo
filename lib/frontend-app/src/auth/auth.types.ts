@@ -28,3 +28,35 @@ export namespace Auth {
 		code: string
 	}
 }
+
+declare global {
+	interface t {
+		auth: {
+			commands: {
+				join: {
+					description: string
+					name: string
+				}
+				sign_out: {
+					description: string
+					name: string
+				}
+			}
+			common: {
+				cancel: string
+			}
+			modals: {
+				join: {
+					title: string
+					hint: string
+					join: string
+				}
+				verify: {
+					title: string
+					hint: string
+					submit: string
+				}
+			}
+		}
+	}
+}

@@ -19,24 +19,29 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { type Maoka, maoka, maoka_dom } from "@ordo-pink/maoka"
 import { context, maoka_sdk } from "@ordo-pink/sdk-maoka"
-import { maoka, maoka_dom } from "@ordo-pink/maoka"
-import type { ClientSDK } from "@ordo-pink/sdk-client"
+import { type ClientSDK } from "@ordo-pink/sdk-client"
 import { bs_menu_button_wide_fill } from "@ordo-pink/frontend-icons"
 
-import { activity_bar$ } from "../activity-bar.state"
 import { activity_bar_icon } from "./activity-bar-icon.component"
 import { activity_bar_link } from "./activity-bar-link.component"
+import { sidebar_toggle } from "../../sidebar/components/sidebar-activity-bar-toggle.component"
 
-export const activity_bar = maoka.create("div", ({ use }) => {
+export const activity_bar = maoka.create<{ sidebar_toggle: Maoka.Component }>("div", ({ use }) => {
+	const { activities$ } = use(maoka_sdk.context.consume)
+	const get_state = use(maoka_sdk.jabs.zags.marry$(activities$))
+
 	use(maoka_sdk.jabs.classes.set("activity-bar"))
-
-	const get_state = use(maoka_sdk.jabs.zags.marry$(activity_bar$))
 
 	return () => {
 		const { current, items } = get_state()
 
-		return [command_palette_activity_bar_toggle(), activity_bar_activities(() => items.map(render_activity(current)))]
+		return [
+			command_palette_activity_bar_toggle(),
+			activity_bar_activities(() => items.map(render_activity(current))),
+			sidebar_toggle(),
+		]
 	}
 })
 

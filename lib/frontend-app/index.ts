@@ -23,6 +23,7 @@ import type { CoreSDK, Logger } from "@ordo-pink/sdk-core"
 import { maoka, maoka_dom } from "@ordo-pink/maoka"
 import { type ClientSDK } from "@ordo-pink/sdk-client"
 import { context } from "@ordo-pink/sdk-maoka"
+import { create_zags } from "@ordo-pink/zags"
 import { hunt } from "@ordo-pink/hunt"
 
 import { auth_jab } from "./src/auth"
@@ -33,9 +34,10 @@ import { create_i18n_jab } from "./src/i18n"
 import { create_modal_jab } from "./src/modal"
 import { create_notifications_jab } from "./src/notifications"
 import { create_rotor_jab } from "./src/rotor"
+import { create_sidebar_jab } from "./src/sidebar"
+import { window_title_jab } from "./src/window-title"
 
 import "./index.css"
-import { window_title_jab } from "./src/window-title"
 
 // TODO Move fonts to assets
 // TODO Move types
@@ -107,9 +109,13 @@ export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
 
 	const rotor$ = use(create_rotor_jab(hunter))
 	const i18n$ = use(create_i18n_jab(hunter))
+	const activities$ = create_zags<ClientSDK.Activity.State>({
+		current: null,
+		items: [],
+	})
 
 	use(maoka_dom.jabs.onmount(handle_onmount))
-	use(context.provide({ fetch, hosts: Object.freeze(hosts), hunter, logger, rotor$, i18n$ }))
+	use(context.provide({ fetch, hosts: Object.freeze(hosts), hunter, logger, rotor$, i18n$, activities$ }))
 	use(auth_jab)
 	use(window_title_jab)
 
@@ -117,9 +123,10 @@ export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
 
 	const modal = use(create_modal_jab)
 	const command_palette = use(create_command_palette_jab)
+	const { sidebar, sidebar_toggle, workspace } = use(create_sidebar_jab)
 	const background_task_status = use(create_background_task_status_jab)
-	const activity_bar = use(create_activity_bar_jab)
+	const activity_bar = use(create_activity_bar_jab(sidebar_toggle()))
 	const notifications = use(create_notifications_jab)
 
-	return () => [activity_bar(), background_task_status(), modal(), command_palette(), notifications()]
+	return () => [workspace(), sidebar(), activity_bar(), background_task_status(), modal(), command_palette(), notifications()]
 })

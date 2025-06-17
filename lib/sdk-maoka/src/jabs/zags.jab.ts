@@ -17,7 +17,7 @@ export namespace zags_jabs {
 		}
 
 	export const cheat$ =
-		<$State extends Zags.BaseState, $DotPath extends Zags.Pouch.RecordToDotPaths<$State>>(
+		<$State extends Zags.BaseState, const $DotPath extends Zags.Pouch.RecordToDotPaths<$State>>(
 			zags: Zags.Instance<$State>,
 			dot_path: $DotPath,
 		): Maoka.Jab<() => Zags.Pouch.RecordValueByDotPath<$State, $DotPath>> =>

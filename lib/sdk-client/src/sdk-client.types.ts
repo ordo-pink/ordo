@@ -58,6 +58,13 @@ declare global {
 			set_pathname: { args: string }
 			set_search: { args: string | Record<string, string> }
 		}
+		sidebar: {
+			enable: { args: void }
+			disable: { args: void }
+			show: { args: void }
+			hide: { args: void }
+			toggle: { args: void }
+		}
 		title: {
 			set_title: { args: ClientSDK.Translations.Key }
 		}
@@ -119,6 +126,7 @@ export namespace ClientSDK {
 			i18n$: I18n.Zags<ClientSDK.Translations.Keys>
 			logger: Logger
 			rotor$: RoutaryBrowser.Zags
+			activities$: Zags.Instance<ClientSDK.Activity.State>
 		}
 
 		export type Create = (
@@ -129,6 +137,11 @@ export namespace ClientSDK {
 	}
 
 	export namespace Activity {
+		export type State = {
+			items: ClientSDK.Activity.Instance[]
+			current: ClientSDK.Activity.Instance | null
+		}
+
 		export type Route = `/${string}`
 
 		export type OnUnmountArgs = {

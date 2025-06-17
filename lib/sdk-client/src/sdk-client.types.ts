@@ -58,6 +58,9 @@ declare global {
 			set_pathname: { args: string }
 			set_search: { args: string | Record<string, string> }
 		}
+		title: {
+			set_title: { args: ClientSDK.Translations.Key }
+		}
 	}
 }
 
@@ -66,6 +69,8 @@ declare global {
 		rrr: {
 			codes: Record<keyof typeof RRR.TYPE, string>
 		}
+		loading_title: string
+		landing_title: string
 	}
 }
 

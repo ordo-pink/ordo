@@ -20,10 +20,10 @@
  */
 
 import type { CoreSDK, Logger } from "@ordo-pink/sdk-core"
+import { maoka, maoka_dom } from "@ordo-pink/maoka"
 import { type ClientSDK } from "@ordo-pink/sdk-client"
 import { context } from "@ordo-pink/sdk-maoka"
 import { hunt } from "@ordo-pink/hunt"
-import { maoka } from "@ordo-pink/maoka"
 
 import { auth_jab } from "./src/auth"
 import { create_activity_bar_jab } from "./src/activity-bar"
@@ -35,6 +35,7 @@ import { create_notifications_jab } from "./src/notifications"
 import { create_rotor_jab } from "./src/rotor"
 
 import "./index.css"
+import { window_title_jab } from "./src/window-title"
 
 // TODO Move fonts to assets
 // TODO Move types
@@ -52,8 +53,6 @@ globalThis.XMLHttpRequestUpload = undefined as any
 
 export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
 	const hunter = hunt.begin<ClientSDK.Preys>()
-	const rotor$ = use(create_rotor_jab(hunter))
-	const i18n$ = use(create_i18n_jab(hunter))
 	const fetch: ClientSDK.Fetch = (input, init) => {
 		hunter.shoot(
 			!init || !init.method || init.method === "GET" || init.method === "HEAD"
@@ -64,27 +63,57 @@ export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
 		return native_fetch(input, init)
 	}
 
-	hunter.shoot("i18n.add_translations", {
-		locale: "en",
-		values: {
-			rrr_codes_EACCES: "Access Denied",
-			rrr_codes_EAGAIN: "Try Later",
-			rrr_codes_EEXIST: "Already Exists",
-			rrr_codes_EFBIG: "File Too Big",
-			rrr_codes_EINTR: "Operation Interrupted",
-			rrr_codes_EINVAL: "No!",
-			rrr_codes_EIO: "Connection Error",
-			rrr_codes_ENOENT: "Not Found",
-			rrr_codes_ENOSPC: "Total File Limit Reached",
-			rrr_codes_ENXIO: "Invalid Address Used",
-			rrr_codes_EPERM: "Permission Denied",
-			rrr_codes_EUNKNOWN: "Unknown Error",
-			rrr_codes_length: "42",
-		},
-	})
+	const handle_onmount = () => {
+		hunter.shoot("i18n.add_translations", {
+			locale: "en",
+			values: {
+				landing_title: "Welcome to Ordo.pink!",
+				loading_title: "Loading... | Ordo.pink",
+				rrr_codes_EACCES: "Access Denied",
+				rrr_codes_EAGAIN: "Try Later",
+				rrr_codes_EEXIST: "Already Exists",
+				rrr_codes_EFBIG: "File Too Big",
+				rrr_codes_EINTR: "Operation Interrupted",
+				rrr_codes_EINVAL: "No!",
+				rrr_codes_EIO: "Connection Error",
+				rrr_codes_ENOENT: "Not Found",
+				rrr_codes_ENOSPC: "Total File Limit Reached",
+				rrr_codes_ENXIO: "Invalid Address Used",
+				rrr_codes_EPERM: "Permission Denied",
+				rrr_codes_EUNKNOWN: "Unknown Error",
+				rrr_codes_length: "42",
+			},
+		})
 
+		return () =>
+			hunter.shoot("i18n.remove_translations", [
+				"landing_title",
+				"loading_title",
+				"rrr_codes_EACCES",
+				"rrr_codes_EAGAIN",
+				"rrr_codes_EEXIST",
+				"rrr_codes_EFBIG",
+				"rrr_codes_EINTR",
+				"rrr_codes_EINVAL",
+				"rrr_codes_EIO",
+				"rrr_codes_ENOENT",
+				"rrr_codes_ENOSPC",
+				"rrr_codes_ENXIO",
+				"rrr_codes_EPERM",
+				"rrr_codes_EUNKNOWN",
+				"rrr_codes_length",
+			])
+	}
+
+	const rotor$ = use(create_rotor_jab(hunter))
+	const i18n$ = use(create_i18n_jab(hunter))
+
+	use(maoka_dom.jabs.onmount(handle_onmount))
 	use(context.provide({ fetch, hosts: Object.freeze(hosts), hunter, logger, rotor$, i18n$ }))
 	use(auth_jab)
+	use(window_title_jab)
+
+	hunter.shoot("title.set_title", "landing_title")
 
 	const modal = use(create_modal_jab)
 	const command_palette = use(create_command_palette_jab)

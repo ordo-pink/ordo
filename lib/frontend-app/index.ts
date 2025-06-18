@@ -117,10 +117,8 @@ export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
 	use(maoka_dom.jabs.onmount(handle_onmount))
 	use(context.provide({ fetch, hosts: Object.freeze(hosts), hunter, logger, rotor$, i18n$, activities$ }))
 	use(auth_jab)
-	use(window_title_jab)
 
-	hunter.shoot("title.set_title", "landing_title")
-
+	const title = use(window_title_jab)
 	const modal = use(create_modal_jab)
 	const command_palette = use(create_command_palette_jab)
 	const { sidebar, sidebar_toggle, workspace } = use(create_sidebar_jab)
@@ -128,5 +126,14 @@ export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
 	const activity_bar = use(create_activity_bar_jab(sidebar_toggle()))
 	const notifications = use(create_notifications_jab)
 
-	return () => [workspace(), sidebar(), activity_bar(), background_task_status(), modal(), command_palette(), notifications()]
+	return () => [
+		workspace(),
+		sidebar(),
+		activity_bar(),
+		background_task_status(),
+		modal(),
+		command_palette(),
+		notifications(),
+		title(),
+	]
 })

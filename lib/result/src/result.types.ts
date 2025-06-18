@@ -130,8 +130,8 @@ export namespace Result {
 		get is_result(): true
 		/** @deprecated UNSAFE. Use `result.cata` instead. */
 		unwrap: () => $Ok | $Err
-		pipe: <$Ok, $Err>(operator: (result: Instance<$Ok, $Err>) => Instance<$Ok, $Err>) => Instance<$Ok, $Err>
-		cata: <$Ok, $Err>(explosion: { ok: (ok: $Ok) => $Ok; err: (err: $Err) => $Err }) => $Ok | $Err
+		pipe: <_NewOk, _NewErr>(operator: (result: Instance<$Ok, $Err>) => Instance<_NewOk, _NewErr>) => Instance<_NewOk, _NewErr>
+		cata: <_NewOk, _NewErr>(explosion: { ok: (ok: $Ok) => _NewOk; err: (err: $Err) => _NewErr }) => _NewOk | _NewErr
 	}
 
 	export type Static = {

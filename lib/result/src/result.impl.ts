@@ -19,7 +19,7 @@ const ok: Types.OkResultConstructorFn = x => ({
 	},
 	unwrap: () => x,
 	pipe: f => f(ok(x)),
-	cata: e => e.Ok(x),
+	cata: e => e.ok(x),
 })
 
 const err: Types.ErrResultConstructorFn = x => ({
@@ -34,7 +34,7 @@ const err: Types.ErrResultConstructorFn = x => ({
 	},
 	unwrap: () => x,
 	pipe: f => f(err(x)),
-	cata: e => e.Err(x),
+	cata: e => e.err(x),
 })
 
 const try_catch: Types.TryResultConstructorFn = (t, c = x => x as any) => {

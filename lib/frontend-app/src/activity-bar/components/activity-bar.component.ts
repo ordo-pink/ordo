@@ -19,16 +19,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { type Maoka, maoka, maoka_dom } from "@ordo-pink/maoka"
-import { context, maoka_sdk } from "@ordo-pink/sdk-maoka"
+import { type Maoka, maoka, maoka_styled } from "@ordo-pink/maoka"
 import { type ClientSDK } from "@ordo-pink/sdk-client"
-import { bs_menu_button_wide_fill } from "@ordo-pink/frontend-icons"
+import { maoka_sdk } from "@ordo-pink/sdk-maoka"
 
-import { activity_bar_icon } from "./activity-bar-icon.component"
 import { activity_bar_link } from "./activity-bar-link.component"
-import { sidebar_toggle } from "../../sidebar/components/sidebar-activity-bar-toggle.component"
 
-export const activity_bar = maoka.create<{ sidebar_toggle: Maoka.Component }>("div", ({ use }) => {
+export const activity_bar = maoka.create<{
+	sidebar_toggle: () => Maoka.Component
+	command_palette_toggle: () => Maoka.Component
+}>("div", ({ command_palette_toggle, sidebar_toggle, use }) => {
 	const { activities$ } = use(maoka_sdk.context.consume)
 	const get_state = use(maoka_sdk.jabs.zags.marry$(activities$))
 
@@ -37,43 +37,11 @@ export const activity_bar = maoka.create<{ sidebar_toggle: Maoka.Component }>("d
 	return () => {
 		const { current, items } = get_state()
 
-		return [
-			command_palette_activity_bar_toggle(),
-			activity_bar_activities(() => items.map(render_activity(current))),
-			sidebar_toggle(),
-		]
+		return [command_palette_toggle(), activity_bar_activities(() => items.map(render_activity(current))), sidebar_toggle()]
 	}
 })
 
 const render_activity = (current: ClientSDK.Activity.Instance | null) => (item: ClientSDK.Activity.Instance) =>
 	item.render_icon && activity_bar_link({ is_current: !!current && current.id === item.id, item })
 
-const activity_bar_activities = maoka.create("div", ({ use }) => {
-	use(maoka_sdk.jabs.classes.set("activity-bar_activities"))
-})
-
-const command_palette_activity_bar_toggle = maoka.create("div", ({ use, node }) => {
-	const { hunter } = use(context.consume)
-
-	const render_icon = (span: HTMLSpanElement) => maoka_dom.render(span, bs_menu_button_wide_fill(), node.root.create_id)
-	const is_current = false
-	const readable_name = "command_palette_name"
-
-	const handle_click = (event: MouseEvent) => {
-		event.preventDefault()
-		hunter.shoot("command_palette.toggle")
-	}
-	const handle_keydown = (event: KeyboardEvent) => {
-		if (maoka_dom.guards.is_dom_node(node) && event.code === "Enter") {
-			event.stopPropagation()
-			hunter.shoot("command_palette.toggle")
-		}
-	}
-
-	use(maoka_sdk.jabs.classes.set("activity-bar_link"))
-	use(maoka_sdk.jabs.set_attribute("tabindex", "1"))
-	use(maoka_sdk.jabs.listen("onclick", handle_click))
-	use(maoka_sdk.jabs.listen("onkeydown", handle_keydown))
-
-	return () => activity_bar_icon({ is_current, render_icon, readable_name })
-})
+const activity_bar_activities = maoka_styled.div("activity-bar_activities")

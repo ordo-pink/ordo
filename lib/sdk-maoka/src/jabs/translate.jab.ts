@@ -8,9 +8,11 @@ import { maoka_dom } from "@ordo-pink/maoka"
 
 import type { MaokaSDK } from "../sdk-maoka.types"
 import { context } from "../sdk-maoka.impl"
+import { zags_jabs } from "./zags.jab"
 
 export const t_jab$: MaokaSDK.Jabs.T$ = ({ use }) => {
 	const { i18n$ } = use(context.consume)
+	use(zags_jabs.cheat$(i18n$, "values"))
 
 	let current_locale: I18n.ISO_639_1_Locale = i18n$.select("locale")
 
@@ -27,7 +29,13 @@ export const t_jab$: MaokaSDK.Jabs.T$ = ({ use }) => {
 
 	use(maoka_dom.jabs.onmount(handle_mount))
 
-	return (key, default_value = "") => i18n$.select(`values.${current_locale}_${key}`) ?? default_value
+	return (key, default_value = "") => {
+		try {
+			return i18n$.select(`values.${current_locale}_${key}`) ?? default_value
+		} catch (_) {
+			return default_value
+		}
+	}
 }
 
 export const translate_jab$: MaokaSDK.Jabs.Translate$ =
@@ -38,7 +46,13 @@ export const translate_jab$: MaokaSDK.Jabs.Translate$ =
 		const { i18n$ } = use(context.consume)
 
 		let current_locale: I18n.ISO_639_1_Locale = i18n$.select("locale")
-		let current_value: string = i18n$.select(`values.${current_locale}_${key}`)
+		let current_value: string
+
+		try {
+			current_value = i18n$.select(`values.${current_locale}_${key}`)
+		} catch (_) {
+			current_value = ""
+		}
 
 		const handle_mount = () => {
 			const divorce_locale = i18n$.cheat("locale", new_locale => {

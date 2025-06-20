@@ -24,17 +24,23 @@ import { type Maoka, maoka_dom } from "@ordo-pink/maoka"
 import { bs_menu_button_wide_fill } from "@ordo-pink/frontend-icons"
 import { context } from "@ordo-pink/sdk-maoka"
 
-import { COMMAND_PALETTE_SECTION, COMMAND_PALETTE_TOGGLE_COMMAND } from "./command-palette.contants"
 import { command_palette$ } from "./command-palette.state"
 import { command_palette_modal } from "./components/modal.component"
 import { command_palette_overlay } from "./components/overlay.component"
+import { command_palette_toggle } from "./components/toggle.component"
 
 import "./command-palette.styles.css"
 
-export const create_command_palette_jab: Maoka.Jab<() => Maoka.Component> = ({ use }) => {
+export const create_command_palette_jab: Maoka.Jab<{
+	command_palette: () => Maoka.Component
+	command_palette_toggle: () => Maoka.Component
+}> = ({ use }) => {
 	use(track_prey_jab)
 
-	return () => command_palette_overlay(() => command_palette_modal())
+	return {
+		command_palette: () => command_palette_overlay(() => command_palette_modal()),
+		command_palette_toggle: () => command_palette_toggle(),
+	}
 }
 
 // @internal
@@ -43,11 +49,11 @@ const track_prey_jab: Maoka.Jab = ({ use }) => {
 	const { hunter } = use(context.consume)
 
 	const handle_onmount = () => {
-		const release_add = hunter.track("command_palette.add", command_palette_add)
-		const release_hide = hunter.track("command_palette.hide", command_palette_hide)
-		const release_remove = hunter.track("command_palette.remove", command_palette_remove)
-		const release_show = hunter.track("command_palette.show", command_palette_show)
-		const release_toggle = hunter.track("command_palette.toggle", command_palette_toggle)
+		const release_add = hunter.track("command_palette.add", handle_add)
+		const release_hide = hunter.track("command_palette.hide", handle_hide)
+		const release_remove = hunter.track("command_palette.remove", handle_remove)
+		const release_show = hunter.track("command_palette.show", handle_show)
+		const release_toggle = hunter.track("command_palette.toggle", handle_toggle)
 
 		hunter.shoot("i18n.add_translations", {
 			locale: "en",
@@ -61,8 +67,8 @@ const track_prey_jab: Maoka.Jab = ({ use }) => {
 
 		hunter.shoot("command_palette.add", {
 			description: "command_palette_commands_toggle_description",
-			hotkey: COMMAND_PALETTE_TOGGLE_COMMAND.HOTKEY,
-			id: COMMAND_PALETTE_TOGGLE_COMMAND.ID,
+			hotkey: "mod+shift+p",
+			id: "command_palette.toggle",
 			readable_name: "command_palette_commands_toggle_name",
 			render_icon: span => maoka_dom.render(span, bs_menu_button_wide_fill(), () => crypto.randomUUID()),
 			type: COMMAND_PALETTE.ITEM_TYPE.MODAL_OPENER,
@@ -70,7 +76,7 @@ const track_prey_jab: Maoka.Jab = ({ use }) => {
 		})
 
 		return () => {
-			hunter.shoot("command_palette.remove", COMMAND_PALETTE_TOGGLE_COMMAND.ID)
+			hunter.shoot("command_palette.remove", "command_palette.toggle")
 
 			release_add()
 			release_hide()
@@ -88,26 +94,26 @@ const global_palette = (): ClientSDK.CommandPalette.Instance<() => void> => ({
 	on_select: item => item.value(),
 })
 
-const command_palette_add: ClientSDK.GunFor<"command_palette.add"> = item =>
+const handle_add: ClientSDK.GunFor<"command_palette.add"> = item =>
 	command_palette$.update("items", items => (items.some(i => i.id === item.id) ? items : [...items, item]))
 
-const command_palette_hide: ClientSDK.GunFor<"command_palette.hide"> = () => {
+const handle_hide: ClientSDK.GunFor<"command_palette.hide"> = () => {
 	command_palette$.each({
 		current: () => void 0,
 		index: () => 0,
-		location: () => COMMAND_PALETTE_SECTION.ITEMS,
+		location: () => COMMAND_PALETTE.SECTION.ITEMS,
 		search_value: () => "",
 	})
 }
 
-const command_palette_remove: ClientSDK.GunFor<"command_palette.remove"> = id =>
+const handle_remove: ClientSDK.GunFor<"command_palette.remove"> = id =>
 	command_palette$.update("items", items => items.filter(i => i.id !== id))
 
-const command_palette_show: ClientSDK.GunFor<"command_palette.show"> = new_current => {
+const handle_show: ClientSDK.GunFor<"command_palette.show"> = new_current => {
 	command_palette$.update("current", () => new_current ?? global_palette())
 }
 
-const command_palette_toggle: ClientSDK.GunFor<"command_palette.toggle"> = () => {
+const handle_toggle: ClientSDK.GunFor<"command_palette.toggle"> = () => {
 	command_palette$.update("current", current => {
 		if (current) return
 		return global_palette()

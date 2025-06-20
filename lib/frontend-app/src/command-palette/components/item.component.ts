@@ -26,7 +26,12 @@ import type { ClientSDK } from "@ordo-pink/sdk-client"
 export const command_palette_item = maoka.create<{ item: ClientSDK.CommandPalette.Item.Instance; active: boolean }>(
 	"div",
 	({ active, item, use }) => {
-		const handle_click = () => item.value()
+		const { hunter } = use(maoka_sdk.context.consume)
+
+		const handle_click = () => {
+			hunter.shoot("command_palette.hide")
+			item.value()
+		}
 		const t_name = use(jabs.translate$(item.readable_name))
 		const t_description = use(jabs.translate$(item.description))
 

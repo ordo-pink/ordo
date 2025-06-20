@@ -19,15 +19,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { COMMAND_PALETTE, MODAL } from "@ordo-pink/sdk-client"
-import { Maoka, maoka_dom } from "@ordo-pink/maoka"
+import { COMMAND_PALETTE, type ClientSDK, MODAL } from "@ordo-pink/sdk-client"
+import { type CoreSDK, user } from "@ordo-pink/sdk-core"
+import { type Maoka, maoka_dom } from "@ordo-pink/maoka"
 import { bs_box_arrow_in_right, bs_box_arrow_right } from "@ordo-pink/frontend-icons"
+import type { Zags } from "@ordo-pink/zags"
 import { get_device_info } from "@ordo-pink/get-device-info"
 import { maoka_sdk } from "@ordo-pink/sdk-maoka"
 import { noop } from "@ordo-pink/tau"
 import { oath } from "@ordo-pink/oath"
-import { user } from "@ordo-pink/sdk-core"
 
+import type { Auth } from "./auth.types"
 import { auth$ } from "./auth.state"
 import { join_modal } from "./components/join.component"
 import { verify_code_modal } from "./components/verify-code.component"
@@ -37,20 +39,26 @@ import "./auth.styles.css"
 /**
  * Auth jab is responsible for providing means of signing in and out.
  */
-export const auth_jab: Maoka.Jab = ({ use }) => {
-	use(refresh_session_jab)
-	use(track_prey_jab)
-	use(register_translations_jab)
-}
+export const auth_jab: (
+	fetch: ClientSDK.Fetch,
+	hosts: CoreSDK.Hosts,
+	hunter: ClientSDK.Hunter,
+) => Maoka.Jab<Zags.Instance<Auth.State>> =
+	(fetch, hosts, hunter) =>
+	({ use }) => {
+		use(refresh_session_jab(fetch, hosts, hunter))
+		use(track_prey_jab(fetch, hosts, hunter))
+		use(register_translations_jab(hunter))
+
+		return auth$
+	}
 
 // --- Internal ---
 
 const COMMAND_PALETTE_JOIN_ID = "auth.join"
 const COMMAND_PALETTE_SIGN_OUT_ID = "auth.sign_out"
 
-const register_translations_jab: Maoka.Jab = ({ use }) => {
-	const { hunter } = use(maoka_sdk.context.consume)
-
+const register_translations_jab: (hunter: ClientSDK.Hunter) => Maoka.Jab = hunter => () => {
 	hunter.shoot("i18n.add_translations", {
 		locale: "en",
 		values: {
@@ -74,126 +82,127 @@ const register_translations_jab: Maoka.Jab = ({ use }) => {
 	})
 }
 
-const refresh_session_jab: Maoka.Jab = ({ use }) => {
-	const { fetch, hosts, hunter } = use(maoka_sdk.context.consume)
-
-	const handle_mount = () => {
-		const refresh_session0 = oath
-			.of(new Headers())
-			.pipe(oath.ops.tap(h => h.append("X-Device", get_device_info(navigator))))
-			.pipe(oath.ops.map(headers => ({ headers, method: "POST", credentials: "include" }) as const))
-			.pipe(
-				oath.ops.chain(init =>
-					oath.from_promise(() =>
-						fetch(`${hosts.id}/session`, init).then(res => (res.status < 300 ? res.json() : Promise.reject())),
+const refresh_session_jab: (fetch: ClientSDK.Fetch, hosts: CoreSDK.Hosts, hunter: ClientSDK.Hunter) => Maoka.Jab =
+	(fetch, hosts, hunter) =>
+	({ use }) => {
+		const handle_mount = () => {
+			const refresh_session0 = oath
+				.of(new Headers())
+				.pipe(oath.ops.tap(h => h.append("X-Device", get_device_info(navigator))))
+				.pipe(oath.ops.map(headers => ({ headers, method: "POST", credentials: "include" }) as const))
+				.pipe(
+					oath.ops.chain(init =>
+						oath.from_promise(() =>
+							fetch(`${hosts.id}/session`, init).then(res => (res.status < 300 ? res.json() : Promise.reject())),
+						),
 					),
-				),
-			)
-			.pipe(oath.ops.map(dto => user.current.from_dto(...dto)))
-			.pipe(oath.ops.tap(user => auth$.update("user", () => user)))
+				)
+				.pipe(oath.ops.map(dto => user.current.from_dto(...dto)))
+				.pipe(oath.ops.tap(user => auth$.update("user", () => user)))
 
-		// TODO Sign out on error, show notification
-		refresh_session0
-			.cata(oath.catas.to_promise())
-			.catch(noop)
-			.finally(() => hunter.shoot("background_status.none"))
-
-		return () => {
-			refresh_session0.cancel("Root component refreshed")
-		}
-	}
-
-	use(maoka_dom.jabs.onmount(handle_mount))
-}
-
-const track_prey_jab: Maoka.Jab = ({ node, use }) => {
-	const state = use(maoka_sdk.context.consume)
-	const { fetch, hosts, hunter } = state
-
-	const handle_mount = () => {
-		let release_join = noop
-		let release_verify_code = noop
-		let release_sign_out = noop
-
-		const divorce_user = auth$.cheat("user", user => {
-			hunter.shoot("command_palette.remove", COMMAND_PALETTE_JOIN_ID)
-			hunter.shoot("command_palette.remove", COMMAND_PALETTE_SIGN_OUT_ID)
-
-			release_join()
-			release_verify_code()
-			release_sign_out()
-
-			if (user) {
-				release_sign_out = hunter.track("auth.sign_out", () => {
-					oath
-						.of({ method: "DELETE", credentials: "include" } as const)
-						.pipe(oath.ops.and(init => oath.from_promise(() => fetch(`${hosts.id}/session`, init))))
-						// TODO Clean up with local persistence strategy
-						.pipe(
-							oath.ops.tap(() => {
-								const history_length = history.length
-								history.go(-history_length)
-								window.location.replace("/")
-							}),
-						)
-						.cata(oath.catas.to_promise())
-						.catch(console.error)
-						.finally(() => hunter.shoot("background_status.none"))
-				})
-
-				release_join = noop
-				release_verify_code = noop
-
-				hunter.shoot("command_palette.add", {
-					id: COMMAND_PALETTE_SIGN_OUT_ID,
-					readable_name: "auth_commands_sign_out_name",
-					render_icon: span => maoka_dom.render(span, bs_box_arrow_right({}), node.root.create_id),
-					value: () => hunter.shoot("auth.sign_out"),
-					description: "auth_commands_sign_out_description",
-					type: COMMAND_PALETTE.ITEM_TYPE.DESTRUCTIVE_ACTION,
-				})
-			} else {
-				release_join = hunter.track("auth.show_request_code_modal", () => {
-					hunter.shoot("modal.show", {
-						size: MODAL.SIZE.SM,
-						render: div => maoka_dom.render(div, maoka_sdk.components.with_state(state, join_modal), node.root.create_id),
-					})
-				})
-
-				release_verify_code = hunter.track("auth.show_verify_code_modal", () => {
-					hunter.shoot("modal.show", {
-						size: MODAL.SIZE.SM,
-						render: div =>
-							maoka_dom.render(div, maoka_sdk.components.with_state(state, verify_code_modal), node.root.create_id),
-					})
-				})
-
-				release_sign_out = noop
-
-				hunter.shoot("command_palette.add", {
-					id: COMMAND_PALETTE_JOIN_ID,
-					readable_name: "auth_commands_join_name",
-					render_icon: span => maoka_dom.render(span, bs_box_arrow_in_right({}), node.root.create_id),
-					value: () => {
-						hunter.shoot("auth.show_request_code_modal")
-						hunter.shoot("command_palette.hide")
-					},
-					description: "auth_commands_join_description",
-					type: COMMAND_PALETTE.ITEM_TYPE.MODAL_OPENER,
-					hotkey: "mod+j",
-				})
-			}
+			// TODO Sign out on error, show notification
+			refresh_session0
+				.cata(oath.catas.to_promise())
+				.catch(noop)
+				.finally(() => hunter.shoot("background_status.none"))
 
 			return () => {
+				refresh_session0.cancel("Root component refreshed")
+			}
+		}
+
+		use(maoka_dom.jabs.onmount(handle_mount))
+	}
+
+const track_prey_jab: (fetch: ClientSDK.Fetch, hosts: CoreSDK.Hosts, hunter: ClientSDK.Hunter) => Maoka.Jab =
+	(fetch, hosts, hunter) =>
+	({ node, use }) => {
+		const state = use(maoka_sdk.context.consume)
+
+		const handle_mount = () => {
+			let release_join = noop
+			let release_verify_code = noop
+			let release_sign_out = noop
+
+			const divorce_user = auth$.cheat("user", user => {
 				hunter.shoot("command_palette.remove", COMMAND_PALETTE_JOIN_ID)
 				hunter.shoot("command_palette.remove", COMMAND_PALETTE_SIGN_OUT_ID)
+
 				release_join()
 				release_verify_code()
 				release_sign_out()
-				divorce_user()
-			}
-		})
-	}
 
-	use(maoka_dom.jabs.onmount(handle_mount))
-}
+				if (user) {
+					release_sign_out = hunter.track("auth.sign_out", () => {
+						oath
+							.of({ method: "DELETE", credentials: "include" } as const)
+							.pipe(oath.ops.and(init => oath.from_promise(() => fetch(`${hosts.id}/session`, init))))
+							// TODO Clean up with local persistence strategy
+							.pipe(
+								oath.ops.tap(() => {
+									const history_length = history.length
+									history.go(-history_length)
+									window.location.replace("/")
+								}),
+							)
+							.cata(oath.catas.to_promise())
+							.catch(console.error)
+							.finally(() => hunter.shoot("background_status.none"))
+					})
+
+					release_join = noop
+					release_verify_code = noop
+
+					hunter.shoot("command_palette.add", {
+						id: COMMAND_PALETTE_SIGN_OUT_ID,
+						readable_name: "auth_commands_sign_out_name",
+						render_icon: span => maoka_dom.render(span, bs_box_arrow_right({}), node.root.create_id),
+						value: () => hunter.shoot("auth.sign_out"),
+						description: "auth_commands_sign_out_description",
+						type: COMMAND_PALETTE.ITEM_TYPE.DESTRUCTIVE_ACTION,
+					})
+				} else {
+					release_join = hunter.track("auth.show_request_code_modal", () => {
+						hunter.shoot("modal.show", {
+							size: MODAL.SIZE.SM,
+							render: div => maoka_dom.render(div, maoka_sdk.components.with_state(state, join_modal), node.root.create_id),
+						})
+					})
+
+					release_verify_code = hunter.track("auth.show_verify_code_modal", () => {
+						hunter.shoot("modal.show", {
+							size: MODAL.SIZE.SM,
+							render: div =>
+								maoka_dom.render(div, maoka_sdk.components.with_state(state, verify_code_modal), node.root.create_id),
+						})
+					})
+
+					release_sign_out = noop
+
+					hunter.shoot("command_palette.add", {
+						id: COMMAND_PALETTE_JOIN_ID,
+						readable_name: "auth_commands_join_name",
+						render_icon: span => maoka_dom.render(span, bs_box_arrow_in_right({}), node.root.create_id),
+						value: () => {
+							hunter.shoot("auth.show_request_code_modal")
+							hunter.shoot("command_palette.hide")
+						},
+						description: "auth_commands_join_description",
+						type: COMMAND_PALETTE.ITEM_TYPE.MODAL_OPENER,
+						hotkey: "mod+j",
+					})
+				}
+
+				return () => {
+					hunter.shoot("command_palette.remove", COMMAND_PALETTE_JOIN_ID)
+					hunter.shoot("command_palette.remove", COMMAND_PALETTE_SIGN_OUT_ID)
+					release_join()
+					release_verify_code()
+					release_sign_out()
+					divorce_user()
+				}
+			})
+		}
+
+		use(maoka_dom.jabs.onmount(handle_mount))
+	}

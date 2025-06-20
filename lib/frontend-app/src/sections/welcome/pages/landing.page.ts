@@ -20,7 +20,7 @@
  */
 
 import { LABEL_COLOR, NOTIFICATION_TYPE } from "@ordo-pink/core"
-import { BsCookie } from "@ordo-pink/frontend-icons"
+import { bs_cookie } from "@ordo-pink/frontend-icons"
 import { Button } from "@ordo-pink/maoka-components"
 import { Maoka } from "@ordo-pink/maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
@@ -179,7 +179,7 @@ const show_cookie_modal = (emit: Ordo.Command.EmitFn) => {
 		message: "t.welcome.landing_page.cookie_banner.message",
 		type: NOTIFICATION_TYPE.WARN,
 		duration: 15,
-		render_icon: span => void MaokaDOM.render(span, BsCookie("size-5"), () => crypto.randomUUID()),
+		render_icon: span => void MaokaDOM.render(span, bs_cookie("size-5"), () => crypto.randomUUID()),
 	})
 
 	is_cookie_modal_shown = true

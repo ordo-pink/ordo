@@ -155,18 +155,6 @@ export const thunk =
 	() =>
 		value
 
-export const fuzzy_check = (source: string, target: string, ratio: number) => {
-	const clean_source = source.trim().toLowerCase()
-	const clean_target = target.trim().toLowerCase()
-	let hits = 0
-
-	if (!clean_target || clean_source.indexOf(clean_target) > -1) return true
-
-	for (let i = 0; i < clean_target.length; i++) clean_source.indexOf(clean_target[i]) > -1 ? hits++ : hits--
-
-	return hits / source.length >= ratio
-}
-
 export const title_case = (str: string) =>
 	str
 		.split(" ")

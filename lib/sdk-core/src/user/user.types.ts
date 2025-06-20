@@ -5,8 +5,8 @@
 
 import type { GetDeviceInfo } from "@ordo-pink/get-device-info"
 
-import type { CoreSDK } from "../core/core.types"
 import type { CoreMixins } from "../mixins/mixins.types"
+import type { CoreSDK } from "../core/core.types"
 import type { SemVer } from "../semver/semver.types"
 import type { Session } from "../session/session.types"
 import type { USER } from "./user.constants"

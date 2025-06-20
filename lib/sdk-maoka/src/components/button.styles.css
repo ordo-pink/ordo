@@ -1,4 +1,5 @@
 .button {
+	@apply focus:outline-none;
 	@apply flex flex-wrap items-center justify-center space-x-2 rounded-md px-4 py-1 text-sm outline-none transition-all duration-300;
 	@apply focus:!opacity-100 focus:ring-2 focus:ring-pink-400 focus:dark:ring-pink-700;
 	@apply active:!opacity-100 active:ring-2 active:ring-pink-400 active:dark:ring-pink-700;

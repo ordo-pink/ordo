@@ -19,16 +19,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { ClientSDK } from "@ordo-pink/sdk-client"
-
-import { COMMAND_PALETTE_SECTION } from "./command-palette.contants"
+import type { COMMAND_PALETTE, ClientSDK } from "@ordo-pink/sdk-client"
 
 export namespace CommandPalette {
 	export type State = {
 		current?: ClientSDK.CommandPalette.Instance
 		visible_items?: ClientSDK.CommandPalette.Item.Instance[]
 		items: ClientSDK.CommandPalette.Item.Instance[]
-		location: COMMAND_PALETTE_SECTION
+		location: COMMAND_PALETTE.SECTION
 		index: number
 		search_value: string
 	}

@@ -20,10 +20,9 @@
  */
 
 import type { CoreSDK, Logger } from "@ordo-pink/sdk-core"
-import { maoka, maoka_dom } from "@ordo-pink/maoka"
+import { maoka, maoka_dom, maoka_styled } from "@ordo-pink/maoka"
 import { type ClientSDK } from "@ordo-pink/sdk-client"
 import { context } from "@ordo-pink/sdk-maoka"
-import { create_zags } from "@ordo-pink/zags"
 import { hunt } from "@ordo-pink/hunt"
 
 import { auth_jab } from "./src/auth"
@@ -35,6 +34,7 @@ import { create_modal_jab } from "./src/modal"
 import { create_notifications_jab } from "./src/notifications"
 import { create_rotor_jab } from "./src/rotor"
 import { create_sidebar_jab } from "./src/sidebar"
+import { init_activities_jab } from "./src/activities"
 import { window_title_jab } from "./src/window-title"
 
 import "./index.css"
@@ -69,7 +69,6 @@ export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
 		hunter.shoot("i18n.add_translations", {
 			locale: "en",
 			values: {
-				landing_title: "Welcome to Ordo.pink!",
 				loading_title: "Loading... | Ordo.pink",
 				rrr_codes_EACCES: "Access Denied",
 				rrr_codes_EAGAIN: "Try Later",
@@ -89,7 +88,6 @@ export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
 
 		return () =>
 			hunter.shoot("i18n.remove_translations", [
-				"landing_title",
 				"loading_title",
 				"rrr_codes_EACCES",
 				"rrr_codes_EAGAIN",
@@ -109,26 +107,29 @@ export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
 
 	const rotor$ = use(create_rotor_jab(hunter))
 	const i18n$ = use(create_i18n_jab(hunter))
-	const activities$ = create_zags<ClientSDK.Activity.State>({
-		current: null,
-		items: [],
-	})
+	const activities$ = use(init_activities_jab(hunter, rotor$))
+
+	const state = { fetch, hosts: Object.freeze(hosts), hunter, logger, rotor$, i18n$, activities$ }
 
 	use(maoka_dom.jabs.onmount(handle_onmount))
-	use(context.provide({ fetch, hosts: Object.freeze(hosts), hunter, logger, rotor$, i18n$, activities$ }))
-	use(auth_jab)
+	use(context.provide(state))
+	use(auth_jab(fetch, hosts, hunter))
 
 	const title = use(window_title_jab)
 	const modal = use(create_modal_jab)
-	const command_palette = use(create_command_palette_jab)
+	const { command_palette, command_palette_toggle } = use(create_command_palette_jab)
 	const { sidebar, sidebar_toggle, workspace } = use(create_sidebar_jab)
 	const background_task_status = use(create_background_task_status_jab)
-	const activity_bar = use(create_activity_bar_jab(sidebar_toggle()))
+	const activity_bar = use(create_activity_bar_jab(command_palette_toggle, sidebar_toggle))
 	const notifications = use(create_notifications_jab)
 
+	import("@ordo-pink/f-landing")
+		.then(m => m.default)
+		.then(f => f(state))
+		.catch(logger.error)
+
 	return () => [
-		workspace(),
-		sidebar(),
+		screen_wrapper(() => [workspace(), sidebar()]),
 		activity_bar(),
 		background_task_status(),
 		modal(),
@@ -137,3 +138,5 @@ export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
 		title(),
 	]
 })
+
+const screen_wrapper = maoka_styled.div("app")

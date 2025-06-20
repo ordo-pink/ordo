@@ -18,6 +18,8 @@ export namespace MODAL {
 }
 
 export namespace COMMAND_PALETTE {
+	export const FUZZY_CHECK_RATIO = 0.7
+
 	export enum ITEM_TYPE {
 		PAGE_OPENER,
 		MODAL_OPENER,
@@ -27,6 +29,11 @@ export namespace COMMAND_PALETTE {
 		INFORMATION,
 		DESTRUCTIVE_ACTION,
 		length,
+	}
+
+	export enum SECTION {
+		ITEMS,
+		PINNED_ITEMS,
 	}
 }
 

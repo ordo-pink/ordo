@@ -19,14 +19,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { COMMAND_PALETTE } from "@ordo-pink/sdk-client"
 import { create_zags } from "@ordo-pink/zags"
 
-import { COMMAND_PALETTE_SECTION } from "./command-palette.contants"
-import { CommandPalette } from "./command-palette.types"
+import type { CommandPalette } from "./command-palette.types"
 
 export const command_palette$ = create_zags<CommandPalette.State>({
 	index: 0,
 	items: [],
-	location: COMMAND_PALETTE_SECTION.ITEMS,
+	location: COMMAND_PALETTE.SECTION.ITEMS,
 	search_value: "",
 })

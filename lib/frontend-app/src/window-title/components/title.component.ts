@@ -22,7 +22,7 @@ const listen_set_title_shots: ListenSetTitleShots = (hunter, translate, document
 	result
 		.from_nullable(document.querySelector("title"))
 		.pipe(result.ops.map(el => hunter.track("title.set_title", gun_for_set_title(el, translate))))
-		.cata(result.catas.if_ok(release => release()))
+		.cata(result.catas.if_ok(release => release))
 
 type GunForSetTitle = (element: HTMLTitleElement, translate: MaokaSDK.Jabs.TFn) => ClientSDK.GunFor<"title.set_title">
 const gun_for_set_title: GunForSetTitle = (el, translate) => t =>

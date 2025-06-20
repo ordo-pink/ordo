@@ -20,12 +20,12 @@
  */
 
 import { maoka, maoka_styled } from "@ordo-pink/maoka"
+import { COMMAND_PALETTE } from "@ordo-pink/sdk-client"
+import { core_sdk } from "@ordo-pink/sdk-core"
+import { maoka_sdk } from "@ordo-pink/sdk-maoka"
 
-import { COMMAND_PALETTE_SECTION, FUZZY_CHECK_RATIO } from "../command-palette.contants"
 import { command_palette$ } from "../command-palette.state"
 import { command_palette_item } from "./item.component"
-import { fuzzy_check } from "@ordo-pink/tau"
-import { maoka_sdk } from "@ordo-pink/sdk-maoka"
 
 export const command_palette_items = maoka.create("div", ({ use }) => {
 	const get_state = use(maoka_sdk.jabs.zags.marry$(command_palette$))
@@ -37,7 +37,9 @@ export const command_palette_items = maoka.create("div", ({ use }) => {
 
 		if (!state.current) return null
 
-		const visible_items = state.current.items.filter(i => fuzzy_check(i.readable_name, state.search_value, FUZZY_CHECK_RATIO))
+		const visible_items = state.current.items.filter(item =>
+			core_sdk.fns.fuzzy_check(item.readable_name, state.search_value, COMMAND_PALETTE.FUZZY_CHECK_RATIO),
+		)
 
 		if (!visible_items.length)
 			return internal.nothing_found_div(() => `Nothing matches the search term "${state.search_value}"`)
@@ -50,13 +52,13 @@ export const command_palette_items = maoka.create("div", ({ use }) => {
 		return [
 			internal.items(() =>
 				state.items.map((item, index) =>
-					command_palette_item({ active: state.location === COMMAND_PALETTE_SECTION.ITEMS && state.index === index, item }),
+					command_palette_item({ active: state.location === COMMAND_PALETTE.SECTION.ITEMS && state.index === index, item }),
 				),
 			),
 			internal.items(() =>
 				state.current!.pinned_items?.map((item, index) =>
 					command_palette_item({
-						active: state.location === COMMAND_PALETTE_SECTION.PINNED_ITEMS && state.index === index,
+						active: state.location === COMMAND_PALETTE.SECTION.PINNED_ITEMS && state.index === index,
 						item,
 					}),
 				),

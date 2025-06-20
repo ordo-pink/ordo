@@ -143,17 +143,22 @@ export namespace maoka_dom {
 				onmount?: MaokaDOM.OnMountHandler[]
 			},
 		) => {
-			if (element.onmount)
-				for (let i = 0; i < element.onmount.length; i++) {
-					const f = element.onmount[i]()
+			if (element.mounted) return
 
-					if (f && !element.mounted) {
+			element.mounted = true
+
+			if (element.onmount) {
+				for (let i = 0; i < element.onmount.length; i++) {
+					const maybe_handle_unmount = element.onmount[i]()
+
+					if (maybe_handle_unmount) {
 						if (!element.onunmount) element.onunmount = []
-						element.onunmount.push(f)
+						element.onunmount.push(maybe_handle_unmount)
 					}
 				}
+			}
+
 			if (element.children) for (let i = 0; i < element.children.length; i++) mount_element(element.children[i] as HTMLElement)
-			if (!element.mounted) element.mounted = true
 		}
 
 		export const unmount_element = (element: HTMLElement & { onunmount?: MaokaDOM.OnUnmountHandler[] }) => {

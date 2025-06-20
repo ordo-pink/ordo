@@ -15,6 +15,9 @@ export const create_zags: Zags.Module = (state, partners = []) => ({
 		const wrapped_f = (state: any, is_update: boolean) => {
 			const keys = (path as string).split(".")
 			const location: Record<string, any> = keys.slice(0, -1).reduce((acc, key) => acc[key], state)
+
+			if (!location) return
+
 			const current_value = location[keys[keys.length - 1]]
 
 			if (!is_update || !deep_equals(current_value, value)) {
@@ -50,6 +53,8 @@ export const create_zags: Zags.Module = (state, partners = []) => ({
 	select: path => {
 		const keys = (path as string).split(".")
 		const location: Record<string, any> = keys.slice(0, -1).reduce((acc, key) => (acc as any)[key], state)
+
+		if (!location) return
 
 		return location[keys[keys.length - 1]]
 	},

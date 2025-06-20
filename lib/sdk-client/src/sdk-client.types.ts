@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import type { CoreMixins, CoreSDK, Data, Logger, RRR, Rrr, User } from "@ordo-pink/sdk-core"
+import type { CoreMixins, CoreSDK, User as CoreUser, Data, Logger, RRR, Rrr } from "@ordo-pink/sdk-core"
 import type { Hunt } from "@ordo-pink/hunt"
 import type { I18n } from "@ordo-pink/i18n"
 import type { Oath } from "@ordo-pink/oath"
@@ -16,6 +16,10 @@ import type { COMMAND_PALETTE, CONTEXT_MENU, MODAL, NOTIFICATION } from "./sdk-c
 declare global {
 	interface t {}
 	interface cmd {
+		activity: {
+			register: { args: ClientSDK.Activity.Instance }
+			unregister: { args: ClientSDK.Activity.ID }
+		}
 		auth: {
 			show_request_code_modal: { args: void }
 			show_verify_code_modal: { args: void }
@@ -77,7 +81,15 @@ declare global {
 			codes: Record<keyof typeof RRR.TYPE, string>
 		}
 		loading_title: string
-		landing_title: string
+		f: {
+			rrr: {
+				not_permitted: {
+					direct_zags_update: string
+					fetch: string
+					shot: string
+				}
+			}
+		}
 	}
 }
 
@@ -110,13 +122,13 @@ export namespace ClientSDK {
 	// Press it, you
 	export namespace F {
 		// TODO permissions for data and user queries
-		export type QueryPermission = "application.fetch" | "application.router" | "application.file_associations"
+		export type Blessing = Exclude<keyof ClientSDK.F.State, "hunter"> | `user_query.${keyof ClientSDK.User.Query.Instance}`
 
-		export type CommandPermission = keyof Preys
+		export type HuntingTicket = keyof Hunt.Pouch.ToPreys<ClientSDK.Preys>
 
 		export type Permissions = {
-			queries: QueryPermission[]
-			commands: CommandPermission[]
+			queries: ClientSDK.F.Blessing[]
+			commands: ClientSDK.F.HuntingTicket[]
 		}
 
 		export type State = {
@@ -132,8 +144,8 @@ export namespace ClientSDK {
 		export type Create = (
 			name: string,
 			permissions: Permissions,
-			callback: (state: State) => void | Promise<void>,
-		) => (state: State) => void | Promise<void>
+			callback: (state: State) => void | Promise<void> | (() => void | Promise<void>) | Promise<() => void | Promise<void>>,
+		) => (state: State) => Promise<() => void | Promise<void>>
 	}
 
 	export namespace Activity {
@@ -158,8 +170,10 @@ export namespace ClientSDK {
 
 		export type RenderWorkspace = (div: HTMLDivElement) => void | Promise<void>
 
+		export type ID = string
+
 		export type Instance = {
-			id: CoreMixins.Identifiable.ID
+			id: ClientSDK.Activity.ID
 			readable_name: ClientSDK.Translations.Key
 			routes: ClientSDK.Activity.Route[]
 			start_route?: ClientSDK.Activity.Route
@@ -265,7 +279,7 @@ export namespace ClientSDK {
 			type?: NOTIFICATION.TYPE
 			title?: ClientSDK.Translations.Key
 			message: ClientSDK.Translations.Key
-			render_icon?: (div: HTMLDivElement) => void
+			render_icon?: (div: HTMLDivElement) => void | Promise<void>
 			duration?: number
 			on_click?: () => void
 			// persist?: boolean
@@ -376,31 +390,35 @@ export namespace ClientSDK {
 		}
 	}
 
-	export namespace UserQuery {
-		export type DataInterface = {
-			Instance: {
-				is_authenticated: () => boolean
-				get_current: () => User.Current.Instance | null
-				get_by_id: (id: User.ID) => Oath.Instance<User.Someone.Instance, Rrr.Instance<"EPERM" | "EINVAL" | "EIO">>
-				get_by_handle: (handle: User.Handle) => Oath.Instance<User.Someone.Instance, Rrr.Instance<"EPERM" | "EINVAL" | "EIO">>
-				get $(): Zags.Instance<CoreSDK.VersionState>
+	export namespace User {
+		export namespace Query {
+			export type DataInterface = {
+				Instance: {
+					is_authenticated: () => boolean
+					get_current: () => CoreUser.Current.Instance | null
+					get_by_id: (id: CoreUser.ID) => Oath.Instance<CoreUser.Someone.Instance, Rrr.Instance<"EPERM" | "EINVAL" | "EIO">>
+					get_by_handle: (
+						handle: CoreUser.Handle,
+					) => Oath.Instance<CoreUser.Someone.Instance, Rrr.Instance<"EPERM" | "EINVAL" | "EIO">>
+					get $(): Zags.Instance<CoreSDK.VersionState>
+				}
+				Plain: { current: CoreUser.Current.Instance | null }
+				Static: {}
+				Validations: {}
 			}
-			Plain: { current: User.Current.Instance | null }
-			Static: {}
-			Validations: {}
+
+			export type CheckPermissions = (permission: F.Blessing) => Result.Instance<void, Rrr.Instance<"EPERM">>
+
+			export type Interface = CoreMixins.Creatable.Interface<
+				[check_permsissions: ClientSDK.User.Query.CheckPermissions],
+				ClientSDK.User.Query.DataInterface
+			> &
+				ClientSDK.User.Query.DataInterface
+
+			export type Instance = CoreSDK.Prettify<ClientSDK.User.Query.Interface["Instance"]>
+
+			export type Static = CoreSDK.Prettify<ClientSDK.User.Query.Interface["Static"]>
 		}
-
-		export type CheckPermissions = (permission: F.QueryPermission) => Result.Instance<void, Rrr.Instance<"EPERM">>
-
-		export type Interface = CoreMixins.Creatable.Interface<
-			[check_permsissions: ClientSDK.UserQuery.CheckPermissions],
-			ClientSDK.UserQuery.DataInterface
-		> &
-			ClientSDK.UserQuery.DataInterface
-
-		export type Instance = CoreSDK.Prettify<ClientSDK.UserQuery.Interface["Instance"]>
-
-		export type Static = CoreSDK.Prettify<ClientSDK.UserQuery.Interface["Static"]>
 	}
 }
 

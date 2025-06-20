@@ -25,6 +25,7 @@ export namespace core_sdk {
 	}
 
 	export namespace validations {
+		export const is_fn = (x: unknown): x is (...args: any[]) => any => typeof x === "function"
 		export const is_string = (x: unknown): x is string => typeof x === "string"
 		export const is_non_empty_string = (x: unknown): x is string => is_string(x) && x.trim() !== ""
 
@@ -47,5 +48,16 @@ export namespace core_sdk {
 		export const gte = (min: number) => (val: number) => eq(min)(val) || gt(min)(val)
 		export const lt = (max: number) => (val: number) => val < max
 		export const lte = (max: number) => (val: number) => eq(max)(val) || lt(max)(val)
+		export const fuzzy_check = (source: string, target: string, ratio: number) => {
+			const clean_source = source.trim().toLowerCase()
+			const clean_target = target.trim().toLowerCase()
+			let hits = 0
+
+			if (!clean_target || clean_source.indexOf(clean_target) > -1) return true
+
+			for (let i = 0; i < clean_target.length; i++) clean_source.indexOf(clean_target[i]) > -1 ? hits++ : hits--
+
+			return hits / source.length >= ratio
+		}
 	}
 }

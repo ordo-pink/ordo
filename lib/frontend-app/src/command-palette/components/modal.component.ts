@@ -19,13 +19,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { COMMAND_PALETTE, client_sdk } from "@ordo-pink/sdk-client"
 import { components, context, maoka_sdk } from "@ordo-pink/sdk-maoka"
 import { maoka, maoka_styled } from "@ordo-pink/maoka"
 import { bs_question_circle } from "@ordo-pink/frontend-icons"
-import { client_sdk } from "@ordo-pink/sdk-client"
-import { fuzzy_check } from "@ordo-pink/tau"
+import { core_sdk } from "@ordo-pink/sdk-core"
 
-import { COMMAND_PALETTE_SECTION, FUZZY_CHECK_RATIO } from "../command-palette.contants"
 import { command_palette$ } from "../command-palette.state"
 import { command_palette_items } from "./items.component"
 import { command_palette_search } from "./search.component"
@@ -34,6 +33,7 @@ import { command_palette_search } from "./search.component"
 export const command_palette_modal = maoka.create("div", ({ use }) => {
 	const { hunter } = use(context.consume)
 	const is_darwin = use(maoka_sdk.jabs.is_darwin)
+	const is_mobile = use(maoka_sdk.jabs.is_mobile)
 	const get_current = use(maoka_sdk.jabs.zags.cheat$(command_palette$, "current" as const))
 
 	const handle_click = (event: MouseEvent) => event.stopPropagation()
@@ -48,12 +48,12 @@ export const command_palette_modal = maoka.create("div", ({ use }) => {
 
 		if (current) {
 			const filtered_items = current.items.filter(i =>
-				fuzzy_check(i.readable_name, command_palette$.select("search_value"), FUZZY_CHECK_RATIO),
+				core_sdk.fns.fuzzy_check(i.readable_name, command_palette$.select("search_value"), COMMAND_PALETTE.FUZZY_CHECK_RATIO),
 			)
 
 			if (current.is_multiple && event.code === "Tab")
 				return command_palette$.update("location", l =>
-					l === COMMAND_PALETTE_SECTION.ITEMS ? COMMAND_PALETTE_SECTION.PINNED_ITEMS : COMMAND_PALETTE_SECTION.ITEMS,
+					l === COMMAND_PALETTE.SECTION.ITEMS ? COMMAND_PALETTE.SECTION.PINNED_ITEMS : COMMAND_PALETTE.SECTION.ITEMS,
 				)
 			else if (event.code === "ArrowDown") {
 				event.preventDefault()
@@ -63,6 +63,7 @@ export const command_palette_modal = maoka.create("div", ({ use }) => {
 				return command_palette$.update("index", i => (i <= 0 ? filtered_items.length - 1 : i - 1))
 			} else if (event.code === "Enter") {
 				current.on_select(filtered_items[command_palette$.select("index")])
+				hunter.shoot("command_palette.hide")
 			}
 
 			for (let i = 0; i < current.items.length; i++) {
@@ -71,6 +72,7 @@ export const command_palette_modal = maoka.create("div", ({ use }) => {
 				if (parsed_hotkey === item.hotkey) {
 					event.preventDefault()
 					current.on_select(item)
+					hunter.shoot("command_palette.hide")
 					break
 				}
 			}
@@ -103,14 +105,16 @@ export const command_palette_modal = maoka.create("div", ({ use }) => {
 
 				command_palette_items(),
 
-				internal.footer(() => [
-					bs_question_circle({ classes: "mr-2" }),
-					internal.text_span(() => "Type to search. Arrows to navigate."),
-					components.hotkey({ hotkey: "enter", decoration_only: true }),
-					internal.text_span(() => "to select item."),
-					components.hotkey({ hotkey: "escape", decoration_only: true }),
-					internal.text_span(() => "to close."),
-				]),
+				is_mobile
+					? void 0
+					: internal.footer(() => [
+							bs_question_circle({ classes: "mr-2" }),
+							internal.text_span(() => "Type to search. Arrows to navigate."), // TODO i18n
+							components.hotkey({ hotkey: "enter", decoration_only: true }),
+							internal.text_span(() => "to select item."), // TODO i18n
+							components.hotkey({ hotkey: "escape", decoration_only: true }),
+							internal.text_span(() => "to close."), // TODO i18n
+						]),
 			]
 		)
 	}

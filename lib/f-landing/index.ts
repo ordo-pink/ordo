@@ -25,7 +25,6 @@ import { client_sdk } from "@ordo-pink/sdk-client"
 import { maoka_dom } from "@ordo-pink/maoka"
 import { maoka_sdk } from "@ordo-pink/sdk-maoka"
 
-import { sidebar } from "./src/components/sidebar.component"
 import { workspace } from "./src/components/workspace.component"
 
 export default client_sdk.create_f(
@@ -43,14 +42,11 @@ export default client_sdk.create_f(
 		queries: ["i18n$"], // TODO throw error if query is missing
 	},
 	state => {
-		const { logger, hunter } = state
-
 		const create_id = () => crypto.randomUUID()
 		const icon = bs_house()
-		const sidebar_with_state = maoka_sdk.components.with_state(state, sidebar)
 		const workspace_with_state = maoka_sdk.components.with_state(state, workspace)
 
-		hunter.shoot("i18n.add_translations", {
+		state.hunter.shoot("i18n.add_translations", {
 			locale: LOCALE.ENGLISH,
 			values: {
 				fns_landing_buttons_join: "Join",
@@ -63,23 +59,18 @@ export default client_sdk.create_f(
 			},
 		})
 
-		hunter.shoot("activity.register", {
+		state.hunter.shoot("activity.register", {
 			id: "@ordo.pink/landing",
 			readable_name: "loading_title",
 			render_icon: span => maoka_dom.render(span, icon, create_id),
-			render_sidebar: div => maoka_dom.render(div, sidebar_with_state, create_id),
 			render_workspace: div => maoka_dom.render(div, workspace_with_state, create_id),
 			routes: ["/"],
 			start_route: "/",
 		})
 
-		hunter.shoot("sidebar.hide")
-
-		logger.debug("initialized")
-
 		return () => {
-			hunter.shoot("activity.unregister", "@ordo.pink/landing") // TODO Drop current activity if it was unregistered
-			hunter.shoot("i18n.remove_translations", [
+			state.hunter.shoot("activity.unregister", "@ordo.pink/landing") // TODO Drop current activity if it was unregistered
+			state.hunter.shoot("i18n.remove_translations", [
 				"fns_landing_buttons_join",
 				"fns_landing_buttons_learn_more",
 				"fns_landing_buttons_try_now",

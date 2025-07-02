@@ -31,7 +31,9 @@ import { oath } from "@ordo-pink/oath"
 
 import type { Auth } from "./auth.types"
 import { auth$ } from "./auth.state"
+import { current_user_workspace } from "./components/current-user-workspace.component"
 import { join_modal } from "./components/join.component"
+import { other_user_workspace } from "./components/other-user-workspace.component"
 import { verify_code_modal } from "./components/verify-code.component"
 
 import "./auth.styles.css"
@@ -49,6 +51,7 @@ export const auth_jab: (
 		use(refresh_session_jab(fetch, hosts, hunter))
 		use(track_prey_jab(fetch, hosts, hunter))
 		use(register_translations_jab(hunter))
+		use(register_other_user_activity_jab)
 
 		return auth$
 	}
@@ -57,6 +60,26 @@ export const auth_jab: (
 
 const COMMAND_PALETTE_JOIN_ID = "auth.join"
 const COMMAND_PALETTE_SIGN_OUT_ID = "auth.sign_out"
+
+const register_other_user_activity_jab: Maoka.Jab = ({ use }) => {
+	const state = use(maoka_sdk.context.consume)
+
+	const handle_onmount = (n: Maoka.Node) => {
+		state.hunter.shoot("activity.register", {
+			id: USER_OTHER_ACTIVITY_ID,
+			readable_name: "auth_workspace_other_activity_name",
+			routes: ["/others/:id_or_handle"],
+			render_workspace: div =>
+				maoka_dom.render(div, maoka_sdk.components.with_state(state, other_user_workspace), n.root.create_id),
+		})
+
+		return () => {
+			state.hunter.shoot("activity.unregister", USER_OTHER_ACTIVITY_ID)
+		}
+	}
+
+	use(maoka_dom.jabs.onmount(handle_onmount))
+}
 
 const register_translations_jab: (hunter: ClientSDK.Hunter) => Maoka.Jab = hunter => () => {
 	hunter.shoot("i18n.add_translations", {
@@ -161,6 +184,14 @@ const track_prey_jab: (fetch: ClientSDK.Fetch, hosts: CoreSDK.Hosts, hunter: Cli
 						description: "auth_commands_sign_out_description",
 						type: COMMAND_PALETTE.ITEM_TYPE.DESTRUCTIVE_ACTION,
 					})
+
+					hunter.shoot("activity.register", {
+						id: USER_CURRENT_ACTIVITY_ID,
+						readable_name: "auth_workspace_current_activity_name",
+						routes: ["/me"],
+						render_workspace: div =>
+							maoka_dom.render(div, maoka_sdk.components.with_state(state, current_user_workspace), node.root.create_id),
+					})
 				} else {
 					release_join = hunter.track("auth.show_request_code_modal", () => {
 						hunter.shoot("modal.show", {
@@ -191,6 +222,8 @@ const track_prey_jab: (fetch: ClientSDK.Fetch, hosts: CoreSDK.Hosts, hunter: Cli
 						type: COMMAND_PALETTE.ITEM_TYPE.MODAL_OPENER,
 						hotkey: "mod+j",
 					})
+
+					hunter.shoot("activity.unregister", USER_CURRENT_ACTIVITY_ID)
 				}
 
 				return () => {
@@ -206,3 +239,6 @@ const track_prey_jab: (fetch: ClientSDK.Fetch, hosts: CoreSDK.Hosts, hunter: Cli
 
 		use(maoka_dom.jabs.onmount(handle_mount))
 	}
+
+const USER_CURRENT_ACTIVITY_ID = "@ordo-pink/user-current"
+const USER_OTHER_ACTIVITY_ID = "@ordo-pink/user-other"

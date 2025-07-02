@@ -37,6 +37,14 @@ declare global {
 				invalid_email_length: string
 				invalid_email: string
 			}
+			workspace: {
+				current: {
+					activity_name: string
+				}
+				other: {
+					activity_name: string
+				}
+			}
 			commands: {
 				join: {
 					description: string

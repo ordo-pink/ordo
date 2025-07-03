@@ -3,11 +3,29 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { maoka, maoka_dom } from "@ordo-pink/maoka"
+import { type Maoka, maoka, maoka_dom } from "@ordo-pink/maoka"
+
+import "./frontend-icons.styles.css"
 
 const icon = (children: string) =>
-	maoka.create<{ classes?: string } | void>("span", ({ classes, use }: any) =>
-		use(maoka_dom.jabs.if_dom(n => void (n.value.innerHTML = create_svg(children, classes)))),
+	maoka.create<{ classes?: string; on_click?: (event: MouseEvent) => void; title?: string } | void>(
+		"span",
+		({ classes, on_click, title, use }: any) => {
+			const handle_if_dom = (n: Maoka.Node<HTMLSpanElement>) => {
+				n.value.innerHTML = create_svg(children, classes)
+				n.value.classList.add("icon")
+
+				if (title) n.value.setAttribute("title", title)
+
+				if (on_click) {
+					n.value.classList.add("active")
+					n.value.onclick = on_click
+					n.value.tabIndex = 0
+				}
+			}
+
+			use(maoka_dom.jabs.if_dom(handle_if_dom))
+		},
 	)
 
 const create_svg = (children: string, cls = "") =>
@@ -117,6 +135,10 @@ export const bs_envelope_at =
 	icon(`<path d="M2 2a2 2 0 0 0-2 2v8.01A2 2 0 0 0 2 14h5.5a.5.5 0 0 0 0-1H2a1 1 0 0 1-.966-.741l5.64-3.471L8 9.583l7-4.2V8.5a.5.5 0 0 0 1 0V4a2 2 0 0 0-2-2zm3.708 6.208L1 11.105V5.383zM1 4.217V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v.217l-7 4.2z"></path>
 <path d="M14.247 14.269c1.01 0 1.587-.857 1.587-2.025v-.21C15.834 10.43 14.64 9 12.52 9h-.035C10.42 9 9 10.36 9 12.432v.214C9 14.82 10.438 16 12.358 16h.044c.594 0 1.018-.074 1.237-.175v-.73c-.245.11-.673.18-1.18.18h-.044c-1.334 0-2.571-.788-2.571-2.655v-.157c0-1.657 1.058-2.724 2.64-2.724h.04c1.535 0 2.484 1.05 2.484 2.326v.118c0 .975-.324 1.39-.639 1.39-.232 0-.41-.148-.41-.42v-2.19h-.906v.569h-.03c-.084-.298-.368-.63-.954-.63-.778 0-1.259.555-1.259 1.4v.528c0 .892.49 1.434 1.26 1.434.471 0 .896-.227 1.014-.643h.043c.118.42.617.648 1.12.648m-2.453-1.588v-.227c0-.546.227-.791.573-.791.297 0 .572.192.572.708v.367c0 .573-.253.744-.564.744-.354 0-.581-.215-.581-.8Z"></path>
 `)
+
+export const bs_person_bounding_box =
+	icon(`<path d="M1.5 1a.5.5 0 0 0-.5.5v3a.5.5 0 0 1-1 0v-3A1.5 1.5 0 0 1 1.5 0h3a.5.5 0 0 1 0 1zM11 .5a.5.5 0 0 1 .5-.5h3A1.5 1.5 0 0 1 16 1.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 1-.5-.5M.5 11a.5.5 0 0 1 .5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 1 0 1h-3A1.5 1.5 0 0 1 0 14.5v-3a.5.5 0 0 1 .5-.5m15 0a.5.5 0 0 1 .5.5v3a1.5 1.5 0 0 1-1.5 1.5h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 1 .5-.5"></path>
+<path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm8-9a3 3 0 1 1-6 0 3 3 0 0 1 6 0"></path>`)
 
 export const BsSendCheck =
 	icon(`<path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855a.75.75 0 0 0-.124 1.329l4.995 3.178 1.531 2.406a.5.5 0 0 0 .844-.536L6.637 10.07l7.494-7.494-1.895 4.738a.5.5 0 1 0 .928.372zm-2.54 1.183L5.93 9.363 1.591 6.602z"></path>

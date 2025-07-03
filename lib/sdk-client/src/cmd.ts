@@ -1,0 +1,66 @@
+import type { CoreMixins, Rrr } from "@ordo-pink/sdk-core"
+import type { I18n } from "@ordo-pink/i18n"
+
+import type { ClientSDK } from "./sdk-client.types"
+
+declare global {
+	interface cmd {
+		activity: {
+			register: { args: ClientSDK.Activity.Instance }
+			unregister: { args: ClientSDK.Activity.ID }
+		}
+		background_status: {
+			saving: { args: void }
+			loading: { args: void }
+			none: { args: void }
+		}
+		command_palette: {
+			add: { args: ClientSDK.CommandPalette.Item.Instance<() => void> }
+			hide: { args: void }
+			remove: { args: string | number }
+			show: { args: ClientSDK.CommandPalette.Instance | undefined }
+			toggle: { args: void }
+		}
+		i18n: {
+			add_translations: {
+				args: {
+					locale: I18n.ISO_639_1_Locale
+					values: Partial<Record<I18n.DefinitionToTranslationKeys<ClientSDK.Translations.Keys>, string>>
+				}
+			}
+			remove_translations: { args: ClientSDK.Translations.Key[] }
+			set_locale: { args: I18n.ISO_639_1_Locale }
+		}
+		modal: {
+			hide: { args: void }
+			show: { args: ClientSDK.Modal.Params }
+		}
+		notifications: {
+			hide: { args: CoreMixins.Identifiable.ID }
+			show: { args: ClientSDK.Notification.ShowArgs }
+			rrr: { args: Rrr.Instance & { message: ClientSDK.Translations.Key } }
+		}
+		router: {
+			set_hash: { args: string }
+			set_href: { args: string }
+			set_pathname: { args: string }
+			set_search: { args: string | Record<string, string> }
+		}
+		sidebar: {
+			enable: { args: void }
+			disable: { args: void }
+			show: { args: void }
+			hide: { args: void }
+			toggle: { args: void }
+		}
+		title: {
+			set_title: { args: ClientSDK.Translations.Key }
+		}
+		user: {
+			show_request_code_modal: { args: void }
+			show_verify_code_modal: { args: void }
+			sign_out: { args: void }
+			go_to_account: { args: void }
+		}
+	}
+}

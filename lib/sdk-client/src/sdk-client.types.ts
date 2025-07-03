@@ -13,86 +13,6 @@ import type { Zags } from "@ordo-pink/zags"
 
 import type { COMMAND_PALETTE, CONTEXT_MENU, MODAL, NOTIFICATION } from "./sdk-client.constants"
 
-declare global {
-	interface t {}
-	interface cmd {
-		activity: {
-			register: { args: ClientSDK.Activity.Instance }
-			unregister: { args: ClientSDK.Activity.ID }
-		}
-		auth: {
-			show_request_code_modal: { args: void }
-			show_verify_code_modal: { args: void }
-			sign_out: { args: void }
-		}
-		background_status: {
-			saving: { args: void }
-			loading: { args: void }
-			none: { args: void }
-		}
-		command_palette: {
-			add: { args: ClientSDK.CommandPalette.Item.Instance<() => void> }
-			hide: { args: void }
-			remove: { args: string | number }
-			show: { args: ClientSDK.CommandPalette.Instance | undefined }
-			toggle: { args: void }
-		}
-		i18n: {
-			add_translations: {
-				args: {
-					locale: I18n.ISO_639_1_Locale
-					values: Partial<Record<I18n.DefinitionToTranslationKeys<ClientSDK.Translations.Keys>, string>>
-				}
-			}
-			remove_translations: { args: ClientSDK.Translations.Key[] }
-			set_locale: { args: I18n.ISO_639_1_Locale }
-		}
-		modal: {
-			hide: { args: void }
-			show: { args: ClientSDK.Modal.Params }
-		}
-		notifications: {
-			hide: { args: CoreMixins.Identifiable.ID }
-			show: { args: ClientSDK.Notification.ShowArgs }
-			rrr: { args: Rrr.Instance & { message: ClientSDK.Translations.Key } }
-		}
-		router: {
-			set_hash: { args: string }
-			set_href: { args: string }
-			set_pathname: { args: string }
-			set_search: { args: string | Record<string, string> }
-		}
-		sidebar: {
-			enable: { args: void }
-			disable: { args: void }
-			show: { args: void }
-			hide: { args: void }
-			toggle: { args: void }
-		}
-		title: {
-			set_title: { args: ClientSDK.Translations.Key }
-		}
-	}
-}
-
-declare global {
-	interface t {
-		rrr: {
-			codes: Record<keyof typeof RRR.TYPE, string>
-		}
-		loading_title: string
-		f: {
-			rrr: {
-				not_permitted: {
-					direct_zags_update: string
-					fetch: string
-					shot: string
-				}
-			}
-		}
-	}
-}
-
 export namespace ClientRrr {
 	export type Instance<$Type extends Rrr.Type = Rrr.Type> = {
 		type: (typeof RRR.TYPE)[$Type]
@@ -132,13 +52,14 @@ export namespace ClientSDK {
 		}
 
 		export type State = {
+			activities$: Zags.Instance<ClientSDK.Activity.State>
+			auth$: Zags.Instance<ClientSDK.User.State>
 			fetch: ClientSDK.Fetch
 			hosts: CoreSDK.Hosts
 			hunter: Hunter
 			i18n$: I18n.Zags<ClientSDK.Translations.Keys>
 			logger: Logger
 			rotor$: RoutaryBrowser.Zags
-			activities$: Zags.Instance<ClientSDK.Activity.State>
 		}
 
 		export type Create = (
@@ -391,6 +312,8 @@ export namespace ClientSDK {
 	}
 
 	export namespace User {
+		export type State = { user?: CoreUser.Current.Instance }
+
 		export namespace Query {
 			export type DataInterface = {
 				Instance: {

@@ -20,15 +20,19 @@ export const button_neutral = (params: MaokaSDK.Components.ButtonArgs) =>
 export const button_primary = (params: MaokaSDK.Components.ButtonArgs) =>
 	default_button({ ...params, custom_class: add_button_type_class("primary", params.custom_class) })
 
+export const button_danger = (params: MaokaSDK.Components.ButtonArgs) =>
+	default_button({ ...params, custom_class: add_button_type_class("danger", params.custom_class) })
+
 // --- Internal ---
 
 const text_container = maoka_styled.div()
 
 const default_button = maoka.create<MaokaSDK.Components.ButtonArgs>(
 	"button",
-	({ kindergarten, on_click, aria_label = "", custom_class = "", hotkey: hotkey_args, use, node }) => {
+	({ kindergarten, on_click, aria_label = "", custom_class = "", hotkey: hotkey_args, use, node, disabled }) => {
 		use(maoka_sdk.jabs.classes.set("button", custom_class))
 		use(maoka_sdk.jabs.set_attribute("aria-label", aria_label))
+		if (disabled) use(maoka_sdk.jabs.set_attribute("disabled"))
 		use(maoka_sdk.jabs.listen("onclick", event => handle_click(event)))
 
 		const handle_click = (event: MouseEvent) => {

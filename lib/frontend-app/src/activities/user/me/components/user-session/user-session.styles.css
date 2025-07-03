@@ -1,0 +1,19 @@
+.current-user-workspace .user-card .session {
+	@apply flex w-full items-center text-sm;
+}
+
+.current-user-workspace .user-card .session .device-info {
+	@apply ml-2 line-clamp-1 w-full flex-grow text-ellipsis text-left;
+}
+
+.current-user-workspace .user-card .session .status {
+	@apply size-2 rounded-full bg-neutral-500;
+}
+
+.current-user-workspace .user-card .session.active .device-info {
+	@apply text-neutral-800 dark:text-neutral-200;
+}
+
+.current-user-workspace .user-card .session.active .status {
+	@apply bg-emerald-500;
+}

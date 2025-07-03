@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { ClientSDK } from "@ordo-pink/sdk-client"
-import { Maoka } from "@ordo-pink/maoka"
+import type { ClientSDK } from "@ordo-pink/sdk-client"
+import type { Maoka } from "@ordo-pink/maoka"
 
 export namespace MaokaSDK {
 	export type Context = Maoka.Context.Instance<ClientSDK.F.State>
@@ -19,18 +19,19 @@ export namespace MaokaSDK {
 
 	export namespace Components {
 		export type ButtonArgs = {
-			on_click: (event: MouseEvent) => void | Promise<void>
-			kindergarten: Maoka.Kindergarten
-			hotkey?: HotkeyArgs | string
-			custom_class?: string
 			aria_label?: string
+			custom_class?: string
+			disabled?: boolean
+			hotkey?: HotkeyArgs | string
+			kindergarten: Maoka.Kindergarten
+			on_click: (event: MouseEvent) => void | Promise<void>
 		}
 
 		export type HotkeyArgs = {
-			hotkey: string
-			prevent_in_inputs?: boolean
-			prevent_in_contenteditable?: boolean
 			decoration_only?: boolean
+			hotkey: string
+			prevent_in_contenteditable?: boolean
+			prevent_in_inputs?: boolean
 			show_in_mobile?: boolean
 		}
 	}

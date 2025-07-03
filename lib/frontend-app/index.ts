@@ -25,17 +25,18 @@ import { type ClientSDK } from "@ordo-pink/sdk-client"
 import { context } from "@ordo-pink/sdk-maoka"
 import { hunt } from "@ordo-pink/hunt"
 
-import { auth_jab } from "./src/auth"
-import { create_activity_bar_jab } from "./src/activity-bar"
-import { create_background_task_status_jab } from "./src/background-task"
-import { create_command_palette_jab } from "./src/command-palette"
-import { create_i18n_jab } from "./src/i18n"
-import { create_modal_jab } from "./src/modal"
-import { create_notifications_jab } from "./src/notifications"
-import { create_rotor_jab } from "./src/rotor"
-import { create_sidebar_jab } from "./src/sidebar"
-import { init_activities_jab } from "./src/activities"
-import { window_title_jab } from "./src/window-title"
+import { auth_jab } from "./src/state/auth"
+import { create_activity_bar_jab } from "./src/sections/activity-bar"
+import { create_background_task_status_jab } from "./src/sections/background-task"
+import { create_command_palette_jab } from "./src/sections/command-palette"
+import { create_i18n_jab } from "./src/state/i18n"
+import { create_modal_jab } from "./src/sections/modal"
+import { create_notifications_jab } from "./src/sections/notifications"
+import { create_rotor_jab } from "./src/state/rotor"
+import { create_sidebar_jab } from "./src/sections/workspace"
+import { create_user_jab } from "./src/activities/user"
+import { init_activities_jab } from "./src/state/activities"
+import { window_title_jab } from "./src/sections/window-title"
 
 import "./index.css"
 
@@ -108,12 +109,13 @@ export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
 	const rotor$ = use(create_rotor_jab(hunter))
 	const i18n$ = use(create_i18n_jab(hunter))
 	const activities$ = use(init_activities_jab(hunter, rotor$))
+	const auth$ = use(auth_jab(fetch, hosts, hunter))
 
-	const state = { fetch, hosts: Object.freeze(hosts), hunter, logger, rotor$, i18n$, activities$ }
+	const state = { auth$, fetch, hosts: Object.freeze(hosts), hunter, logger, rotor$, i18n$, activities$ }
 
-	use(maoka_dom.jabs.onmount(handle_onmount))
 	use(context.provide(state))
-	use(auth_jab(fetch, hosts, hunter))
+	use(maoka_dom.jabs.onmount(handle_onmount))
+	use(create_user_jab)
 
 	const title = use(window_title_jab)
 	const modal = use(create_modal_jab)

@@ -6,7 +6,7 @@
 import { type Maoka, maoka, maoka_context } from "@ordo-pink/maoka"
 import type { ClientSDK } from "@ordo-pink/sdk-client"
 
-import { button_neutral, button_primary, button_success } from "./components/button.component"
+import { button_danger, button_neutral, button_primary, button_success } from "./components/button.component"
 import { listen_global_event_jab, listen_jab } from "./jabs/listen.jab"
 import { set_attribute_jab, set_id_jab } from "./jabs/set-attribute.jab"
 import { t_jab$, translate_jab$ } from "./jabs/translate.jab"
@@ -22,7 +22,12 @@ import { zags_jabs } from "./jabs/zags.jab"
 export const context: MaokaSDK.Context = maoka_context.create()
 
 export namespace components {
-	export const button = { neutral: button_neutral, primary: button_primary, success: button_success }
+	export const button = {
+		danger: button_danger,
+		neutral: button_neutral,
+		primary: button_primary,
+		success: button_success,
+	}
 	export const hotkey = actionable_hotkey
 	export const with_state = (state: ClientSDK.F.State, component: () => Maoka.Component) =>
 		maoka.create("div", ({ use }) => {

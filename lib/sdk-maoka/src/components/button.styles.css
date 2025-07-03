@@ -21,3 +21,7 @@
 .button.primary {
 	@apply bg-neutral-800 font-bold text-neutral-200 shadow-md hover:bg-pink-600 hover:shadow-lg dark:bg-neutral-200 dark:text-neutral-900 hover:dark:bg-pink-600 hover:dark:text-neutral-100;
 }
+
+.button.danger {
+	@apply bg-red-500 font-bold  uppercase text-neutral-200 shadow-md hover:shadow-lg focus:!ring-red-500;
+}

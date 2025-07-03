@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: Unlicense
  */
 
+import "./src/cmd"
+import "./src/t"
+
 export * from "./src/sdk-client.constants"
 export * from "./src/sdk-client.impl"
 export * from "./src/sdk-client.types"

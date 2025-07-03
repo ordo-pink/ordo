@@ -29,7 +29,7 @@ const sidebar_padding_contractor = maoka.create<{ parent_node: Maoka.Node }>("di
 const workspace_renderer = maoka.create("div", ({ node, use }) => {
 	const { activities$ } = use(maoka_sdk.context.consume)
 
-	use(maoka_sdk.jabs.classes.set("h-full"))
+	use(maoka_sdk.jabs.classes.set("h-full")) // TODO Move to CSS
 	const get_current_activity = use(maoka_sdk.jabs.zags.cheat$(activities$, "current"))
 
 	return async () => {

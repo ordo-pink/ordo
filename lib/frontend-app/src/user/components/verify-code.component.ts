@@ -27,46 +27,46 @@ import { get_device_info } from "@ordo-pink/get-device-info"
 import { maoka_sdk } from "@ordo-pink/sdk-maoka"
 import { oath } from "@ordo-pink/oath"
 
-import { auth$ } from "../auth.state"
+import { authenticating_user$ } from "../user.state"
 
 export const verify_code_modal = maoka.create("div", ({ use }) => {
-	const { fetch, hosts, hunter } = use(maoka_sdk.context.consume)
+	const { auth$, fetch, hosts, hunter } = use(maoka_sdk.context.consume)
 
-	use(maoka_sdk.jabs.classes.set("auth_join-modal"))
+	use(maoka_sdk.jabs.classes.set("user_join-modal"))
 
-	const t_title = use(maoka_sdk.jabs.translate$("auth_modals_verify_title"))
-	const t_hint = use(maoka_sdk.jabs.translate$("auth_modals_verify_hint"))
-	const t_submit = use(maoka_sdk.jabs.translate$("auth_modals_verify_submit"))
-	const t_cancel = use(maoka_sdk.jabs.translate$("auth_common_cancel"))
+	const t_title = use(maoka_sdk.jabs.translate$("user_modals_verify_title"))
+	const t_hint = use(maoka_sdk.jabs.translate$("user_modals_verify_hint"))
+	const t_submit = use(maoka_sdk.jabs.translate$("user_modals_verify_submit"))
+	const t_cancel = use(maoka_sdk.jabs.translate$("user_common_cancel"))
 
 	const handle_cancel_click = () => void hunter.shoot("modal.hide")
 
 	const handle_ok_click = () => {
-		const { code, email } = auth$.unwrap()
+		const { code, email } = authenticating_user$.unwrap()
 
 		if (code.length !== 6) {
-			auth$.update("code", () => "")
+			authenticating_user$.update("code", () => "")
 
-			hunter.shoot("notifications.rrr", client_rrr.einval("auth_rrr_invalid_code_length"))
+			hunter.shoot("notifications.rrr", client_rrr.einval("user_rrr_invalid_code_length"))
 
 			return
 		}
 		if (email.length < 5 || email.length > 255) {
-			auth$.update("email", () => "")
-			auth$.update("code", () => "")
+			authenticating_user$.update("email", () => "")
+			authenticating_user$.update("code", () => "")
 
 			hunter.shoot("modal.hide")
-			hunter.shoot("notifications.rrr", client_rrr.einval("auth_rrr_invalid_email_length"))
+			hunter.shoot("notifications.rrr", client_rrr.einval("user_rrr_invalid_email_length"))
 
 			return
 		}
 
 		if (!user.current.validations.is_email(email)) {
-			auth$.update("email", () => "")
-			auth$.update("code", () => "")
+			authenticating_user$.update("email", () => "")
+			authenticating_user$.update("code", () => "")
 
 			hunter.shoot("modal.hide")
-			hunter.shoot("notifications.rrr", client_rrr.einval("auth_rrr_invalid_email"))
+			hunter.shoot("notifications.rrr", client_rrr.einval("user_rrr_invalid_email"))
 
 			return
 		}
@@ -80,7 +80,8 @@ export const verify_code_modal = maoka.create("div", ({ use }) => {
 			.pipe(oath.ops.chain(init => oath.from_promise(() => fetch(`${hosts.au}/verify-code`, init))))
 			.pipe(oath.ops.chain(res => oath.if(res.status < 300, { on_true: () => res })))
 			.pipe(oath.ops.and(res => res.json() as Promise<User.Current.DTO>))
-			.pipe(oath.ops.tap(dto => auth$.each({ email: () => "", code: () => "", user: () => user.current.from_dto(...dto) })))
+			.pipe(oath.ops.tap(() => authenticating_user$.each({ email: () => "", code: () => "" })))
+			.pipe(oath.ops.tap(dto => auth$.update("user", () => user.current.from_dto(...dto))))
 			.pipe(oath.ops.tap(() => hunter.shoot("modal.hide")))
 			.cata(oath.catas.to_promise())
 			.finally(() => hunter.shoot("background_status.none"))
@@ -99,26 +100,26 @@ export const verify_code_modal = maoka.create("div", ({ use }) => {
 
 // --- Internal ---
 
-const title = maoka_styled.h1("auth_join-modal_title")
+const title = maoka_styled.h1("user_join-modal_title")
 
-const button_section = maoka_styled.div("auth_join-modal_actions")
+const button_section = maoka_styled.div("user_join-modal_actions")
 
 const hint = maoka_styled.p()
 
 const code_input = maoka.create("label", ({ use }) => {
-	use(maoka_sdk.jabs.classes.set("auth_join-modal_email_wrapper"))
+	use(maoka_sdk.jabs.classes.set("user_join-modal_email_wrapper"))
 
 	return () => [bs_question_circle({}), input()]
 })
 
-const input = maoka_styled.input("auth_join-modal_email", ({ use }) => {
+const input = maoka_styled.input("user_join-modal_email", ({ use }) => {
 	const t_placeholer = "123456" // TODO i18n
-	const value = auth$.select("code")
+	const value = authenticating_user$.select("code")
 
 	const handle_mount = () => use(maoka_dom.jabs.if_dom(n => n.value.focus()))
 	const handle_input = (event: Event) => {
 		const target = event.target as HTMLInputElement
-		auth$.update("code", () => target.value)
+		authenticating_user$.update("code", () => target.value)
 	}
 
 	use(maoka_sdk.jabs.set_id("code-input"))

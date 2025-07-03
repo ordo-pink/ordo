@@ -4,6 +4,7 @@
  */
 
 import type { CoreSDK } from "./core.types"
+import type { User } from "../user/user.types"
 
 export namespace core_sdk {
 	export const mix: CoreSDK.Mix = (...mixins) => ({
@@ -43,6 +44,7 @@ export namespace core_sdk {
 	}
 
 	export namespace fns {
+		export const noop: () => void = () => void 0
 		export const eq = (target: number) => (val: number) => target === val
 		export const gt = (min: number) => (val: number) => val > min
 		export const gte = (min: number) => (val: number) => eq(min)(val) || gt(min)(val)
@@ -58,6 +60,28 @@ export namespace core_sdk {
 			for (let i = 0; i < clean_target.length; i++) clean_source.indexOf(clean_target[i]) > -1 ? hits++ : hits--
 
 			return hits / source.length >= ratio
+		}
+
+		export const obfuscate_email = (email: User.Email) => {
+			const [localPart, domainPart] = email.split("@")
+
+			const topLevelDomainStartIndex = domainPart.lastIndexOf(".")
+
+			const higherLevelDomain = domainPart.slice(0, topLevelDomainStartIndex)
+			const topLevelDomain = domainPart.slice(topLevelDomainStartIndex)
+
+			const localTrimSize = localPart.length > 5 ? 4 : localPart.length > 2 ? 2 : 0
+			const domainTrimSize = higherLevelDomain.length > 5 ? 4 : higherLevelDomain.length > 2 ? 2 : 0
+
+			return localPart
+				.slice(0, localTrimSize / 2)
+				.concat("*".repeat(localPart.length - localTrimSize))
+				.concat(localTrimSize ? localPart.slice(-localTrimSize / 2) : "")
+				.concat("@")
+				.concat(higherLevelDomain.slice(0, domainTrimSize / 2))
+				.concat("*".repeat(higherLevelDomain.length - domainTrimSize))
+				.concat(domainTrimSize ? higherLevelDomain.slice(-domainTrimSize / 2) : "")
+				.concat(topLevelDomain)
 		}
 	}
 }

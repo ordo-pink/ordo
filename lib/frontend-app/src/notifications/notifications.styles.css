@@ -19,7 +19,7 @@
 }
 
 .notification-card_body {
-	@apply w-full text-sm;
+	@apply w-full pr-2 text-sm;
 }
 
 .notification-card_close {

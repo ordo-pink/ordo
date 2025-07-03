@@ -41,17 +41,17 @@ export const t_jab$: MaokaSDK.Jabs.T$ = ({ use }) => {
 export const translate_jab$: MaokaSDK.Jabs.Translate$ =
 	key =>
 	({ use }) => {
-		if (!key) return (default_value = "") => default_value
+		if (!key) return default_value => default_value ?? key ?? ""
 
 		const { i18n$ } = use(context.consume)
 
 		let current_locale: I18n.ISO_639_1_Locale = i18n$.select("locale")
-		let current_value: string
+		let current_value: string | undefined
 
 		try {
 			current_value = i18n$.select(`values.${current_locale}_${key}`)
 		} catch (_) {
-			current_value = ""
+			current_value = undefined
 		}
 
 		const handle_mount = () => {
@@ -73,5 +73,5 @@ export const translate_jab$: MaokaSDK.Jabs.Translate$ =
 
 		use(maoka_dom.jabs.onmount(handle_mount))
 
-		return (default_value = "") => current_value ?? default_value
+		return default_value => current_value ?? default_value ?? key ?? ""
 	}

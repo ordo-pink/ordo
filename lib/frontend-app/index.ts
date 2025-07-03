@@ -34,6 +34,7 @@ import { create_modal_jab } from "./src/modal"
 import { create_notifications_jab } from "./src/notifications"
 import { create_rotor_jab } from "./src/rotor"
 import { create_sidebar_jab } from "./src/sidebar"
+import { create_user_jab } from "./src/user"
 import { init_activities_jab } from "./src/activities"
 import { window_title_jab } from "./src/window-title"
 
@@ -108,12 +109,13 @@ export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
 	const rotor$ = use(create_rotor_jab(hunter))
 	const i18n$ = use(create_i18n_jab(hunter))
 	const activities$ = use(init_activities_jab(hunter, rotor$))
+	const auth$ = use(auth_jab(fetch, hosts, hunter))
 
-	const state = { fetch, hosts: Object.freeze(hosts), hunter, logger, rotor$, i18n$, activities$ }
+	const state = { auth$, fetch, hosts: Object.freeze(hosts), hunter, logger, rotor$, i18n$, activities$ }
 
-	use(maoka_dom.jabs.onmount(handle_onmount))
 	use(context.provide(state))
-	use(auth_jab(fetch, hosts, hunter))
+	use(maoka_dom.jabs.onmount(handle_onmount))
+	use(create_user_jab)
 
 	const title = use(window_title_jab)
 	const modal = use(create_modal_jab)

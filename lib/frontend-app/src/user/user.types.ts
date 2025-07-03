@@ -19,11 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { User } from "@ordo-pink/sdk-core"
-
-export namespace Auth {
+export namespace AuthenticatingUser {
 	export type State = {
-		user?: User.Current.Instance
 		email: string
 		code: string
 	}
@@ -31,7 +28,7 @@ export namespace Auth {
 
 declare global {
 	interface t {
-		auth: {
+		user: {
 			rrr: {
 				invalid_code_length: string
 				invalid_email_length: string
@@ -40,6 +37,19 @@ declare global {
 			workspace: {
 				current: {
 					activity_name: string
+					handle: {
+						title: string
+					}
+					email: {
+						title: string
+					}
+					name: {
+						title: string
+					}
+					sessions: {
+						title: string
+						remove: string
+					}
 				}
 				other: {
 					activity_name: string
@@ -54,8 +64,13 @@ declare global {
 					description: string
 					name: string
 				}
+				go_to_account: {
+					description: string
+					name: string
+				}
 			}
 			common: {
+				edit: string
 				cancel: string
 			}
 			modals: {

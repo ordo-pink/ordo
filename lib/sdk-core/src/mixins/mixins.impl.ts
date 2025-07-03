@@ -56,10 +56,9 @@ export namespace core_mixins {
 			instance: plain => ({
 				get_created_at: () => new Date(plain.created_at),
 				get_raw_created_at: () => plain.created_at,
-				is_created_after: (date, exclude) =>
-					exclude ? plain.created_at > date.getMilliseconds() : plain.created_at >= date.getMilliseconds(),
+				is_created_after: (date, exclude) => (exclude ? plain.created_at > date.getTime() : plain.created_at >= date.getTime()),
 				is_created_before: (date, exclude) =>
-					exclude ? plain.created_at < date.getMilliseconds() : plain.created_at <= date.getMilliseconds(),
+					exclude ? plain.created_at < date.getTime() : plain.created_at <= date.getTime(),
 			}),
 			static: { create_timestamp: () => Date.now() },
 			validations: { is_timestamp: core_sdk.validations.is_finite_non_negative_int },
@@ -71,10 +70,9 @@ export namespace core_mixins {
 				...timestampable.without_updates.instance(plain),
 				get_raw_updated_at: () => plain.updated_at,
 				get_updated_at: () => new Date(plain.updated_at),
-				is_updated_after: (date, exclude) =>
-					exclude ? plain.updated_at > date.getMilliseconds() : plain.updated_at >= date.getMilliseconds(),
+				is_updated_after: (date, exclude) => (exclude ? plain.updated_at > date.getTime() : plain.updated_at >= date.getTime()),
 				is_updated_before: (date, exclude) =>
-					exclude ? plain.updated_at < date.getMilliseconds() : plain.updated_at <= date.getMilliseconds(),
+					exclude ? plain.updated_at < date.getTime() : plain.updated_at <= date.getTime(),
 			}),
 		}
 	}

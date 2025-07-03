@@ -1,0 +1,7 @@
+.icon {
+	@apply !outline-none focus:rounded-sm focus:ring-2 focus:ring-pink-400 focus:dark:ring-pink-700;
+}
+
+.icon.active {
+	@apply cursor-pointer;
+}

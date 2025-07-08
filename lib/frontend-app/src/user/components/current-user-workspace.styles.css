@@ -1,0 +1,35 @@
+.current-user-workspace {
+	@apply flex items-center justify-center p-8;
+}
+
+.current-user-workspace .cards {
+	@apply grid size-full grid-cols-1 gap-2 sm:h-auto sm:grid-cols-2 md:grid-cols-3;
+}
+
+.current-user-workspace .user-card {
+	@apply flex w-full flex-col gap-4 break-words rounded-md bg-gradient-to-br from-neutral-100 to-neutral-100 p-4 shadow-md;
+}
+
+.current-user-workspace .user-card .title {
+	@apply text-xl font-black;
+}
+
+.current-user-workspace .user-card .footer {
+	@apply self-end;
+}
+
+.current-user-workspace .user-card .session {
+	@apply flex w-full items-center gap-x-2 text-sm;
+}
+
+.current-user-workspace .user-card .session .device-info {
+	@apply flex-grow;
+}
+
+.current-user-workspace .user-card .session .status {
+	@apply size-2 rounded-full bg-neutral-500 shadow-inner;
+}
+
+.current-user-workspace .user-card .session .status.active {
+	@apply bg-emerald-500;
+}

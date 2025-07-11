@@ -26,6 +26,7 @@ const session_display = maoka.create<{ session: Session.Instance }>("div", ({ no
 		state.hunter.shoot("modal.show", {
 			size: MODAL.SIZE.SM,
 			render: div => maoka_dom.render(div, close_session_modal({ state }), node.root.create_id),
+			onunmount: () => console.log("UNMOUNT"),
 		})
 	}
 

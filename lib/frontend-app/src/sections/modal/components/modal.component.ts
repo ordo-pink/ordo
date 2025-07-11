@@ -31,10 +31,8 @@ export const modal = maoka.create("div", ({ use }) => {
 
 	const get_modal_instance = use(maoka_sdk.jabs.zags.cheat$(modal$, "instance"))
 
-	const handle_click = (event: MouseEvent) => event.stopPropagation()
-
 	use(maoka_sdk.jabs.classes.set("modal"))
-	use(maoka_sdk.jabs.listen("onclick", handle_click))
+	use(maoka_sdk.jabs.listen("onclick", event => event.stopPropagation()))
 
 	return () => {
 		const modal_instance = get_modal_instance()
@@ -44,12 +42,20 @@ export const modal = maoka.create("div", ({ use }) => {
 			onunmount = undefined
 		}
 
-		if (!modal_instance) return null
+		if (modal_instance) {
+			if (modal_instance.onunmount) onunmount = modal_instance.onunmount
+			if (modal_instance.size != null) use(maoka_sdk.jabs.classes.add(internal.modal_size_to_class(modal_instance.size)))
 
-		if (modal_instance.onunmount) onunmount = modal_instance.onunmount
-		if (modal_instance.size != null) use(maoka_sdk.jabs.classes.add(internal.modal_size_to_class(modal_instance.size)))
-		void use(maoka_dom.jabs.if_dom(n => modal_instance.render(n.value as HTMLDivElement)))
+			return content_wrapper()
+		} else {
+			use(maoka_dom.jabs.if_dom(n => (n.value.innerHTML = "")))
+		}
 	}
+})
+
+const content_wrapper = maoka.create("div", ({ use }) => {
+	const modal_instance = modal$.select("instance")
+	use(maoka_dom.jabs.if_dom(n => void modal_instance!.render(n.value as HTMLDivElement)))
 })
 
 namespace internal {

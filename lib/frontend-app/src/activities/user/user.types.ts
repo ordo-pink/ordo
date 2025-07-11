@@ -47,10 +47,17 @@ declare global {
 						rrr_title: string
 						title: string
 					}
-					email: { title: string }
-					handle: { title: string }
-					name: { title: string }
-					sessions: { title: string; remove: string }
+					user_info: { title: string; handle: string; name: string; email: string }
+					sessions: {
+						title: string
+						remove: string
+						modal: {
+							title: string
+							hint: string
+							notification_title: string
+							notification_message: string
+						}
+					}
 					settings: { title: string; message: string }
 					two_factor_auth: { title: string; message: string }
 				}
@@ -73,6 +80,7 @@ declare global {
 				}
 			}
 			common: {
+				ok: string
 				edit: string
 				cancel: string
 			}

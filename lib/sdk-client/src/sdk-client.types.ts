@@ -141,6 +141,13 @@ export namespace ClientSDK {
 	export namespace Translations {
 		export type Keys = Pick<t, keyof t>
 		export type Key = I18n.DefinitionToTranslationKeys<ClientSDK.Translations.Keys>
+		export type Values = Record<I18n.DefinitionToTranslationKeys<ClientSDK.Translations.Keys>, string>
+
+		type HasPrefix<T extends string, P extends string> = T extends `${P}${string}` ? T : never
+
+		export type PickValues<$Prefix extends string> = {
+			[_Key in keyof ClientSDK.Translations.Values as HasPrefix<_Key, $Prefix>]: ClientSDK.Translations.Values[_Key]
+		}
 	}
 
 	export namespace Modal {

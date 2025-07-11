@@ -20,9 +20,9 @@
  */
 
 import type { CoreSDK, Logger } from "@ordo-pink/sdk-core"
-import { maoka, maoka_dom, maoka_styled } from "@ordo-pink/maoka"
+import { context, maoka_sdk } from "@ordo-pink/sdk-maoka"
+import { maoka, maoka_styled } from "@ordo-pink/maoka"
 import { type ClientSDK } from "@ordo-pink/sdk-client"
-import { context } from "@ordo-pink/sdk-maoka"
 import { hunt } from "@ordo-pink/hunt"
 
 import { auth_jab } from "./src/state/auth"
@@ -66,46 +66,6 @@ export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
 		return native_fetch(input, init)
 	}
 
-	const handle_onmount = () => {
-		hunter.shoot("i18n.add_translations", {
-			locale: "en",
-			values: {
-				loading_title: "Loading... | Ordo.pink",
-				rrr_codes_EACCES: "Access Denied",
-				rrr_codes_EAGAIN: "Try Later",
-				rrr_codes_EEXIST: "Already Exists",
-				rrr_codes_EFBIG: "File Too Big",
-				rrr_codes_EINTR: "Operation Interrupted",
-				rrr_codes_EINVAL: "No!",
-				rrr_codes_EIO: "Connection Error",
-				rrr_codes_ENOENT: "Not Found",
-				rrr_codes_ENOSPC: "Total File Limit Reached",
-				rrr_codes_ENXIO: "Invalid Address Used",
-				rrr_codes_EPERM: "Permission Denied",
-				rrr_codes_EUNKNOWN: "Unknown Error",
-				rrr_codes_length: "42",
-			},
-		})
-
-		return () =>
-			hunter.shoot("i18n.remove_translations", [
-				"loading_title",
-				"rrr_codes_EACCES",
-				"rrr_codes_EAGAIN",
-				"rrr_codes_EEXIST",
-				"rrr_codes_EFBIG",
-				"rrr_codes_EINTR",
-				"rrr_codes_EINVAL",
-				"rrr_codes_EIO",
-				"rrr_codes_ENOENT",
-				"rrr_codes_ENOSPC",
-				"rrr_codes_ENXIO",
-				"rrr_codes_EPERM",
-				"rrr_codes_EUNKNOWN",
-				"rrr_codes_length",
-			])
-	}
-
 	const rotor$ = use(create_rotor_jab(hunter))
 	const i18n$ = use(create_i18n_jab(hunter))
 	const activities$ = use(init_activities_jab(hunter, rotor$))
@@ -114,7 +74,7 @@ export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
 	const state = { auth$, fetch, hosts: Object.freeze(hosts), hunter, logger, rotor$, i18n$, activities$ }
 
 	use(context.provide(state))
-	use(maoka_dom.jabs.onmount(handle_onmount))
+	use(maoka_sdk.jabs.register_translations("en", en_rrr_codes))
 	use(create_user_jab)
 
 	const title = use(window_title_jab)
@@ -142,3 +102,20 @@ export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
 })
 
 const screen_wrapper = maoka_styled.div("app")
+
+const en_rrr_codes = {
+	loading_title: "Loading... | Ordo.pink",
+	rrr_codes_EACCES: "Access Denied",
+	rrr_codes_EAGAIN: "Try Later",
+	rrr_codes_EEXIST: "Already Exists",
+	rrr_codes_EFBIG: "File Too Big",
+	rrr_codes_EINTR: "Operation Interrupted",
+	rrr_codes_EINVAL: "No!",
+	rrr_codes_EIO: "Connection Error",
+	rrr_codes_ENOENT: "Not Found",
+	rrr_codes_ENOSPC: "Total File Limit Reached",
+	rrr_codes_ENXIO: "Invalid Address Used",
+	rrr_codes_EPERM: "Permission Denied",
+	rrr_codes_EUNKNOWN: "Unknown Error",
+	rrr_codes_length: "42",
+}

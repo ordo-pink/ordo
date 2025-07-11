@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { COMMAND_PALETTE, MODAL } from "@ordo-pink/sdk-client"
+import { COMMAND_PALETTE, type ClientSDK, MODAL } from "@ordo-pink/sdk-client"
 import { type Maoka, maoka_dom } from "@ordo-pink/maoka"
 import { bs_box_arrow_in_right, bs_box_arrow_right, bs_person_bounding_box } from "@ordo-pink/frontend-icons"
 import { core_sdk, user } from "@ordo-pink/sdk-core"
@@ -40,7 +40,7 @@ import "./user.styles.css"
 export const create_user_jab: Maoka.Jab = ({ use }) => {
 	use(refresh_session_jab)
 	use(track_prey_jab)
-	use(register_translations_jab)
+	use(maoka_sdk.jabs.register_translations("en", en_translations))
 	use(register_other_user_activity_jab)
 }
 
@@ -68,54 +68,6 @@ const register_other_user_activity_jab: Maoka.Jab = ({ use }) => {
 	}
 
 	use(maoka_dom.jabs.onmount(handle_onmount))
-}
-
-const register_translations_jab: Maoka.Jab = ({ use }) => {
-	const { hunter } = use(maoka_sdk.context.consume)
-
-	hunter.shoot("i18n.add_translations", {
-		locale: "en",
-		values: {
-			user_workspace_current_activity_name: "Account",
-			user_workspace_other_activity_name: "User Info",
-			user_commands_join_description: "Sign up/sign in. Make sure you enter email correcly - we'll send a code there.",
-			user_commands_join_name: "Join...",
-			user_commands_sign_out_description: "Terminate current session and remove any locally stored files.",
-			user_commands_sign_out_name: "Sign out",
-			user_commands_go_to_account_description: "Open your account details page.",
-			user_commands_go_to_account_name: "Go to Account",
-			user_common_cancel: "Cancel",
-			user_common_edit: "Edit",
-			user_modals_join_hint: "Make sure you enter your email correctly. We'll send you a code that will let you in.",
-			user_modals_join_join: "Join",
-			user_modals_join_title: "Join ORDO",
-			user_modals_verify_hint: "We sent you a code to the email you specified. Check your inbox!",
-			user_modals_verify_submit: "Submit",
-			user_modals_verify_title: "Enter code",
-			user_modals_join_placeholder: "are@you.kidding",
-			user_modals_verify_placeholder: "123456",
-			user_rrr_invalid_code_length: "Verification code must be exactly 6 digits long",
-			user_rrr_invalid_email: "Provided email is invalid or not supported.",
-			user_rrr_invalid_email_length: "Email must be from 5 to 255 characters long.",
-			user_workspace_current_achievements_message: "🚧 SOON",
-			user_workspace_current_achievements_title: "Achievements",
-			user_workspace_current_danger_zone_hint: "WARNING: These actions are IRREVERSIBLE!",
-			user_workspace_current_danger_zone_remove_account: "Remove account",
-			user_workspace_current_danger_zone_remove_content: "Remove content",
-			user_workspace_current_danger_zone_title: "DANGER ZONE",
-			user_workspace_current_email_title: "Email",
-			user_workspace_current_handle_title: "Handle",
-			user_workspace_current_name_title: "Public Name",
-			user_workspace_current_sessions_remove: "Remove session",
-			user_workspace_current_sessions_title: "Sessions",
-			user_workspace_current_settings_message: "🚧 SOON",
-			user_workspace_current_settings_title: "Settings",
-			user_workspace_current_two_factor_auth_message: "🚧 SOON",
-			user_workspace_current_two_factor_auth_title: "MFA",
-			user_workspace_current_danger_zone_rrr_message: "This is not implemented yet 🥲",
-			user_workspace_current_danger_zone_rrr_title: "Sorry",
-		},
-	})
 }
 
 const refresh_session_jab: Maoka.Jab = ({ use }) => {
@@ -269,3 +221,51 @@ const track_prey_jab: Maoka.Jab = ({ node, use }) => {
 
 const USER_CURRENT_ACTIVITY_ID = "@ordo-pink/user-current"
 const USER_OTHER_ACTIVITY_ID = "@ordo-pink/user-other"
+
+const en_translations: ClientSDK.Translations.PickValues<"user"> = {
+	user_commands_go_to_account_description: "Open your account details page.",
+	user_commands_go_to_account_name: "Go to Account",
+	user_commands_join_description: "Sign up/sign in. Make sure you enter email correcly - we'll send a code there.",
+	user_commands_join_name: "Join...",
+	user_commands_sign_out_description: "Terminate current session and remove any locally stored files.",
+	user_commands_sign_out_name: "Sign out",
+	user_common_cancel: "Cancel",
+	user_common_edit: "Edit",
+	user_common_ok: "OK",
+	user_modals_join_hint: "Make sure you enter your email correctly. We'll send you a code that will let you in.",
+	user_modals_join_join: "Join",
+	user_modals_join_placeholder: "are@you.kidding",
+	user_modals_join_title: "Join ORDO",
+	user_modals_verify_hint: "We sent you a code to the email you specified. Check your inbox!",
+	user_modals_verify_placeholder: "123456",
+	user_modals_verify_submit: "Submit",
+	user_modals_verify_title: "Enter code",
+	user_rrr_invalid_code_length: "Verification code must be exactly 6 digits long",
+	user_rrr_invalid_email_length: "Email must be from 5 to 255 characters long.",
+	user_rrr_invalid_email: "Provided email is invalid or not supported.",
+	user_workspace_current_achievements_message: "🚧 SOON",
+	user_workspace_current_achievements_title: "Achievements",
+	user_workspace_current_activity_name: "Account",
+	user_workspace_current_danger_zone_hint: "WARNING: These actions are IRREVERSIBLE!",
+	user_workspace_current_danger_zone_remove_account: "Remove account",
+	user_workspace_current_danger_zone_remove_content: "Remove content",
+	user_workspace_current_danger_zone_rrr_message: "This is not implemented yet 🥲",
+	user_workspace_current_danger_zone_rrr_title: "Sorry",
+	user_workspace_current_danger_zone_title: "DANGER ZONE",
+	user_workspace_current_sessions_modal_hint:
+		"This action is irreversible. Someone will be kicked out of the account. Lucky if it was you!",
+	user_workspace_current_sessions_modal_notification_message: "This is not implemented yet 🥲",
+	user_workspace_current_sessions_modal_notification_title: "Sorry",
+	user_workspace_current_sessions_modal_title: "Revoke session",
+	user_workspace_current_sessions_remove: "Remove session",
+	user_workspace_current_sessions_title: "Sessions",
+	user_workspace_current_settings_message: "🚧 SOON",
+	user_workspace_current_settings_title: "Settings",
+	user_workspace_current_two_factor_auth_message: "🚧 SOON",
+	user_workspace_current_two_factor_auth_title: "MFA",
+	user_workspace_current_user_info_email: "Email",
+	user_workspace_current_user_info_handle: "Handle",
+	user_workspace_current_user_info_name: "Public Name",
+	user_workspace_current_user_info_title: "User Info",
+	user_workspace_other_activity_name: "User Info",
+}

@@ -11,7 +11,7 @@
 }
 
 .notification-card {
-	@apply pointer-events-auto relative mx-auto flex min-h-10 w-80 max-w-lg items-center gap-x-4 rounded-lg px-4 py-2 shadow-sm md:mx-0;
+	@apply pointer-events-auto relative mx-auto flex min-h-10 w-80 max-w-lg items-center gap-x-4 break-all rounded-lg px-4 py-2 shadow-sm md:mx-0;
 }
 
 .notification-card_title {

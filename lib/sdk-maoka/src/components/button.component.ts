@@ -33,13 +33,14 @@ const default_button = maoka.create<MaokaSDK.Components.ButtonArgs>(
 		use(maoka_sdk.jabs.classes.set("button", custom_class))
 		use(maoka_sdk.jabs.set_attribute("aria-label", aria_label))
 		if (disabled) use(maoka_sdk.jabs.set_attribute("disabled"))
-		use(maoka_sdk.jabs.listen("onclick", event => handle_click(event)))
 
 		const handle_click = (event: MouseEvent) => {
 			event.preventDefault()
 			if (maoka_dom.guards.is_dom_node(node)) node.value.focus()
 			return on_click(event)
 		}
+
+		use(maoka_sdk.jabs.listen("onclick", handle_click))
 
 		return () => [
 			text_container(() => kindergarten()),

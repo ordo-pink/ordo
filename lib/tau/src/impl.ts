@@ -78,7 +78,7 @@ export const is_port = (x: string) => {
 	return !x.startsWith("0") && !is_nan(n) && gt_0(n) && lt_65535(n)
 }
 
-export const keys_of: Types._KeysOfFn = o => {
+export const keys_of: <T extends object>(o: T) => (keyof T)[] = o => {
 	return Object.keys(o) as any
 }
 

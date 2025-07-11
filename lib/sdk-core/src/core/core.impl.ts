@@ -50,6 +50,9 @@ export namespace core_sdk {
 		export const gte = (min: number) => (val: number) => eq(min)(val) || gt(min)(val)
 		export const lt = (max: number) => (val: number) => val < max
 		export const lte = (max: number) => (val: number) => eq(max)(val) || lt(max)(val)
+		export const keys_of: <T extends object>(o: T) => (keyof T)[] = o => {
+			return Object.keys(o) as any
+		}
 		export const fuzzy_check = (source: string, target: string, ratio: number) => {
 			const clean_source = source.trim().toLowerCase()
 			const clean_target = target.trim().toLowerCase()

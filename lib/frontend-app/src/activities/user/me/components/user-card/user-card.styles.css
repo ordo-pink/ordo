@@ -2,18 +2,18 @@
 	@apply flex h-full w-full flex-col gap-4 break-words rounded-md bg-neutral-100 p-4 shadow-sm;
 }
 
-.user-card .title {
+.user-card.under-construction {
+	@apply bg-neutral-200 shadow-none;
+}
+
+.user-card > .title {
 	@apply text-xl font-black;
 }
 
-.user-card .body {
+.user-card > .body {
 	@apply flex-grow text-center text-sm text-neutral-500;
 }
 
-.user-card .footer {
+.user-card > .footer {
 	@apply self-end;
-}
-
-.user-card.under-construction {
-	@apply bg-neutral-200 shadow-none;
 }

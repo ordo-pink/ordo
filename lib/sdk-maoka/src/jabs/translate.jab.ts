@@ -3,12 +3,30 @@
  * SPDX-License-Identifier: Unlicense
  */
 
+import { type Maoka, maoka_dom } from "@ordo-pink/maoka"
+import type { ClientSDK } from "@ordo-pink/sdk-client"
 import type { I18n } from "@ordo-pink/i18n"
-import { maoka_dom } from "@ordo-pink/maoka"
+import { core_sdk } from "@ordo-pink/sdk-core"
 
 import type { MaokaSDK } from "../sdk-maoka.types"
 import { context } from "../sdk-maoka.impl"
 import { zags_jabs } from "./zags.jab"
+
+export const register_translations_jab: (
+	locale: I18n.ISO_639_1_Locale,
+	values: Partial<Record<I18n.DefinitionToTranslationKeys<ClientSDK.Translations.Keys>, string>>,
+) => Maoka.Jab =
+	(locale, values) =>
+	({ use }) => {
+		const state = use(context.consume)
+
+		if (!state || !state.hunter)
+			throw new Error("Maoka context is not yet initialized. Do 'context.provide' before registering translations.")
+
+		state.hunter.shoot("i18n.add_translations", { locale, values })
+
+		maoka_dom.jabs.onunmount(() => state.hunter.shoot("i18n.remove_translations", core_sdk.fns.keys_of(values)))
+	}
 
 export const t_jab$: MaokaSDK.Jabs.T$ = ({ use }) => {
 	const { i18n$ } = use(context.consume)

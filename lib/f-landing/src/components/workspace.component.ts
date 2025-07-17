@@ -75,7 +75,7 @@ export const workspace = maoka.create("div", ({ use, node }) => {
 	use(maoka_sdk.jabs.listen_global_event("mousemove", handle_mouse_move))
 	use(maoka_dom.jabs.onmount(handle_onmount))
 
-	const handle_join_click = () => void hunter.shoot("auth.show_request_code_modal")
+	const handle_join_click = () => void hunter.shoot("user.show_request_code_modal")
 	const handle_more_click = () => console.log("HERE")
 	const handle_try_click = () => console.log("THERE")
 

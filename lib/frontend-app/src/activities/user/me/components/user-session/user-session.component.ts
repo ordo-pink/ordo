@@ -19,8 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { maoka, maoka_dom, maoka_styled } from "@ordo-pink/maoka"
-import { MODAL } from "@ordo-pink/sdk-client"
+import { maoka, maoka_styled } from "@ordo-pink/maoka"
 import type { Session } from "@ordo-pink/sdk-core"
 import { bs_x } from "@ordo-pink/frontend-icons"
 import { maoka_sdk } from "@ordo-pink/sdk-maoka"
@@ -28,11 +27,10 @@ import { maoka_sdk } from "@ordo-pink/sdk-maoka"
 import { user_card, user_card_body, user_card_title } from "../user-card/user-card.component"
 
 import "./user-session.styles.css"
-import { close_session_modal } from "./close-session-modal.component"
 
 const session_device_info = maoka_styled.div("device-info")
 const session_status = maoka_styled.div("status")
-const session_display = maoka.create<{ session: Session.Instance }>("div", ({ node, session, use }) => {
+const session_display = maoka.create<{ session: Session.Instance }>("div", ({ session, use }) => {
 	const state = use(maoka_sdk.context.consume)
 
 	use(maoka_sdk.jabs.classes.set("session"))
@@ -42,19 +40,20 @@ const session_display = maoka.create<{ session: Session.Instance }>("div", ({ no
 	active ? use(maoka_sdk.jabs.classes.add("active")) : use(maoka_sdk.jabs.classes.remove("active"))
 
 	const t_remove_session = use(maoka_sdk.jabs.translate$("user_workspace_current_sessions_remove"))
+	const t_modal_title = use(maoka_sdk.jabs.translate$("user_workspace_current_sessions_modal_notification_title"))
+	const t_modal_message = use(maoka_sdk.jabs.translate$("user_workspace_current_sessions_modal_notification_message"))
 
-	const close_session = () => {
-		state.hunter.shoot("modal.show", {
-			size: MODAL.SIZE.SM,
-			render: div => maoka_dom.render(div, close_session_modal({ state }), node.root.create_id),
-			onunmount: () => console.log("UNMOUNT"),
-		})
-	}
+	const [show_whoopsie_modal] = use(
+		maoka_sdk.jabs.dialog.info(state, {
+			render_body: div => void (div.innerHTML = t_modal_message()),
+			title: t_modal_title,
+		}),
+	)
 
 	return () => [
 		session_status(),
 		session_device_info(() => session.get_device_info()),
-		bs_x({ on_click: close_session, title: t_remove_session() }),
+		bs_x({ on_click: show_whoopsie_modal, title: t_remove_session() }),
 	]
 })
 

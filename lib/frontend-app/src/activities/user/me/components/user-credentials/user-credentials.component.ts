@@ -30,10 +30,21 @@ import "./user-credentials.styles.css"
 export const credentials_card = maoka.create<{ handle: User.Handle; name: string; email: User.Email }>(
 	"div",
 	({ handle, email, name, use }) => {
+		const state = use(maoka_sdk.context.consume)
+
 		const t_edit = use(maoka_sdk.jabs.translate$("user_common_edit"))
 		const t_email_title = use(maoka_sdk.jabs.translate$("user_workspace_current_user_info_email"))
 		const t_handle_title = use(maoka_sdk.jabs.translate$("user_workspace_current_user_info_handle"))
 		const t_name_title = use(maoka_sdk.jabs.translate$("user_workspace_current_user_info_name"))
+		const t_modal_title = use(maoka_sdk.jabs.translate$("user_workspace_current_sessions_modal_notification_title"))
+		const t_modal_message = use(maoka_sdk.jabs.translate$("user_workspace_current_sessions_modal_notification_message"))
+
+		const [show_whoopsie_modal] = use(
+			maoka_sdk.jabs.dialog.info(state, {
+				render_body: div => void (div.innerHTML = t_modal_message()),
+				title: t_modal_title,
+			}),
+		)
 
 		use(maoka_sdk.jabs.classes.set("credentials-card"))
 
@@ -45,17 +56,17 @@ export const credentials_card = maoka.create<{ handle: User.Handle; name: string
 						item(() => [
 							item_title(t_handle_title),
 							item_content(() => handle),
-							maoka_sdk.components.button.neutral({ hotkey: "meta+h", kindergarten: t_edit, on_click: () => void 0 }),
+							maoka_sdk.components.button.neutral({ hotkey: "meta+h", kindergarten: t_edit, on_click: show_whoopsie_modal }),
 						]),
 						item(() => [
 							item_title(t_email_title),
 							item_content(() => email),
-							maoka_sdk.components.button.neutral({ hotkey: "meta+e", kindergarten: t_edit, on_click: () => void 0 }),
+							maoka_sdk.components.button.neutral({ hotkey: "meta+e", kindergarten: t_edit, on_click: show_whoopsie_modal }),
 						]),
 						item(() => [
 							item_title(t_name_title),
 							item_content(() => name),
-							maoka_sdk.components.button.neutral({ hotkey: "meta+n", kindergarten: t_edit, on_click: () => void 0 }),
+							maoka_sdk.components.button.neutral({ hotkey: "meta+n", kindergarten: t_edit, on_click: show_whoopsie_modal }),
 						]),
 					]),
 				),

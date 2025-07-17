@@ -19,16 +19,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { COMMAND_PALETTE, type ClientSDK, MODAL } from "@ordo-pink/sdk-client"
-import { type Maoka, maoka_dom } from "@ordo-pink/maoka"
-import { bs_box_arrow_in_right, bs_box_arrow_right, bs_person_bounding_box } from "@ordo-pink/frontend-icons"
+import { COMMAND_PALETTE, type ClientSDK, MODAL, client_rrr } from "@ordo-pink/sdk-client"
+import { type Maoka, maoka, maoka_dom, maoka_styled } from "@ordo-pink/maoka"
+import { bs_box_arrow_in_right, bs_box_arrow_right, bs_envelope_at, bs_person_bounding_box } from "@ordo-pink/frontend-icons"
 import { core_sdk, user } from "@ordo-pink/sdk-core"
 import { get_device_info } from "@ordo-pink/get-device-info"
 import { maoka_sdk } from "@ordo-pink/sdk-maoka"
 import { oath } from "@ordo-pink/oath"
 
+import { authenticating_user$ } from "./user.state"
 import { current_user_workspace } from "./me/user-me-workspace.component"
-import { join_modal } from "./modals/join.component"
 import { other_user_workspace } from "./someone/someone-workspace.component"
 import { verify_code_modal } from "./modals/verify-code.component"
 
@@ -106,6 +106,36 @@ const track_prey_jab: Maoka.Jab = ({ node, use }) => {
 	const state = use(maoka_sdk.context.consume)
 	const { auth$, fetch, hosts, hunter } = state
 
+	const t_join = use(maoka_sdk.jabs.translate$("user_modals_join_title"))
+
+	const on_ok_click = () => {
+		const email = authenticating_user$.select("email")
+
+		if (email.length < 5 || email.length > 255)
+			return void hunter.shoot("notifications.rrr", client_rrr.einval("user_rrr_invalid_email_length"))
+		if (!user.current.validations.is_email(email))
+			return void hunter.shoot("notifications.rrr", client_rrr.einval("user_rrr_invalid_email"))
+
+		oath
+			.of(new Headers())
+			.pipe(oath.ops.tap(h => h.append("Content-Type", "application/json")))
+			.pipe(oath.ops.map(headers => ({ headers, method: "POST", body: JSON.stringify({ email }) })))
+			.pipe(oath.ops.chain(init => oath.from_promise(() => fetch(`${hosts.au}/request-code`, init))))
+			.pipe(oath.ops.chain(res => oath.if(res.status < 300, { on_true: () => res })))
+			.pipe(oath.ops.tap(() => hunter.shoot("user.show_verify_code_modal")))
+			.cata(oath.catas.to_promise())
+			.catch(() => void 0)
+			.finally(() => hunter.shoot("background_status.none"))
+	}
+
+	const [show_join_modal, hide_modal] = use(
+		maoka_sdk.jabs.dialog.actions(state, {
+			actions: () => [{ hotkey: "enter", kindergarten: t_join, on_click: on_ok_click }],
+			title: t_join,
+			render_body: div => maoka_dom.render(div, maoka_sdk.components.with_state(state, email_input), node.root.create_id),
+		}),
+	)
+
 	const handle_mount = () => {
 		let release_join = core_sdk.fns.noop
 		let release_verify_code = core_sdk.fns.noop
@@ -123,6 +153,7 @@ const track_prey_jab: Maoka.Jab = ({ node, use }) => {
 			release_go_to_account()
 
 			if (user) {
+				hide_modal()
 				release_go_to_account = hunter.track("user.go_to_account", () => void hunter.shoot("router.set_pathname", "/me"))
 				release_sign_out = hunter.track("user.sign_out", () => {
 					oath
@@ -170,12 +201,7 @@ const track_prey_jab: Maoka.Jab = ({ node, use }) => {
 					render_workspace: div => maoka_dom.render(div, current_user_workspace({ state }), node.root.create_id),
 				})
 			} else {
-				release_join = hunter.track("user.show_request_code_modal", () => {
-					hunter.shoot("modal.show", {
-						size: MODAL.SIZE.SM,
-						render: div => maoka_dom.render(div, maoka_sdk.components.with_state(state, join_modal), node.root.create_id),
-					})
-				})
+				release_join = hunter.track("user.show_request_code_modal", show_join_modal)
 
 				release_verify_code = hunter.track("user.show_verify_code_modal", () => {
 					hunter.shoot("modal.show", {
@@ -191,7 +217,7 @@ const track_prey_jab: Maoka.Jab = ({ node, use }) => {
 				hunter.shoot("command_palette.add", {
 					id: COMMAND_PALETTE_JOIN_ID,
 					readable_name: "user_commands_join_name",
-					render_icon: span => maoka_dom.render(span, bs_box_arrow_in_right({}), node.root.create_id),
+					render_icon: span => maoka_dom.render(span, bs_box_arrow_in_right(), node.root.create_id),
 					value: () => {
 						hunter.shoot("user.show_request_code_modal")
 						hunter.shoot("command_palette.hide")
@@ -269,3 +295,28 @@ const en_translations: ClientSDK.Translations.PickValues<"user"> = {
 	user_workspace_current_user_info_title: "User Info",
 	user_workspace_other_activity_name: "User Info",
 }
+
+const email_input = maoka.create("label", ({ use }) => {
+	use(maoka_sdk.jabs.classes.set("user_join-modal_email_wrapper"))
+
+	return () => [bs_envelope_at({}), search()]
+})
+
+const search = maoka_styled.input("user_join-modal_email", ({ use }) => {
+	const t_placeholder = use(maoka_sdk.jabs.translate$("user_modals_join_placeholder"))
+	const value = authenticating_user$.select("email")
+
+	const handle_mount = () => use(maoka_dom.jabs.if_dom(n => n.value.focus()))
+	const handle_input = (event: Event) => {
+		const target = event.target as HTMLInputElement
+		authenticating_user$.update("email", () => target.value)
+	}
+
+	use(maoka_sdk.jabs.set_id("email-input"))
+	use(maoka_sdk.jabs.set_attribute("type", "email"))
+	use(maoka_sdk.jabs.set_attribute("placeholder", t_placeholder()))
+	use(maoka_sdk.jabs.listen("oninput", handle_input))
+	use(maoka_dom.jabs.onmount(handle_mount))
+
+	if (value) use(maoka_sdk.jabs.set_attribute("value", value))
+})

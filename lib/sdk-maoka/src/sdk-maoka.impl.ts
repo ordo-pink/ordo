@@ -7,6 +7,7 @@ import { type Maoka, maoka, maoka_context } from "@ordo-pink/maoka"
 import type { ClientSDK } from "@ordo-pink/sdk-client"
 
 import { button_danger, button_neutral, button_primary, button_success } from "./components/button.component"
+import { create_dialog_actions, create_dialog_info, dialog_actions, dialog_info } from "./components/dialog.component"
 import { listen_global_event_jab, listen_jab } from "./jabs/listen.jab"
 import { register_translations_jab, t_jab$, translate_jab$ } from "./jabs/translate.jab"
 import { set_attribute_jab, set_id_jab } from "./jabs/set-attribute.jab"
@@ -23,11 +24,16 @@ import { zags_jabs } from "./jabs/zags.jab"
 export const context: MaokaSDK.Context = maoka_context.create()
 
 export namespace components {
-	export const button = {
-		danger: button_danger,
-		neutral: button_neutral,
-		primary: button_primary,
-		success: button_success,
+	export namespace button {
+		export const danger = button_danger
+		export const neutral = button_neutral
+		export const primary = button_primary
+		export const success = button_success
+	}
+
+	export namespace dialog {
+		export const info = dialog_info
+		export const actions = dialog_actions
 	}
 	export const hotkey = actionable_hotkey
 	export const with_state = (state: ClientSDK.F.State, component: () => Maoka.Component) =>
@@ -52,4 +58,8 @@ export namespace jabs {
 	export const t$ = t_jab$
 	export const translate$ = translate_jab$
 	export const zags = zags_jabs
+	export namespace dialog {
+		export const info = create_dialog_info
+		export const actions = create_dialog_actions
+	}
 }

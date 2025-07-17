@@ -17,19 +17,3 @@
 .current-user-workspace .user-card .session.active .status {
 	@apply bg-emerald-500;
 }
-
-.close-session-modal {
-	@apply flex flex-col gap-4 p-4;
-}
-
-.close-session-modal .title {
-	@apply text-2xl font-bold;
-}
-
-.close-session-modal .body {
-	@apply text-sm text-neutral-500;
-}
-
-.close-session-modal .actions {
-	@apply flex flex-wrap gap-2 self-end;
-}

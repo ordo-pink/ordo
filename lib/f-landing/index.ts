@@ -32,7 +32,7 @@ export default client_sdk.create_f(
 	{
 		commands: [
 			"activity.register",
-			"auth.show_request_code_modal",
+			"user.show_request_code_modal",
 			"i18n.add_translations",
 			"i18n.remove_translations",
 			"notifications.show",

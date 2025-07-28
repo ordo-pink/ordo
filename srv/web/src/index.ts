@@ -19,26 +19,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { type CoreSDK, loggers } from "@ordo-pink/sdk-core"
+import { type Core, core } from "@ordo-pink/sdk-core"
 import { app } from "@ordo-pink/frontend-app"
 import { maoka_dom } from "@ordo-pink/maoka"
 
 const body = document.querySelector("body")!
 
-const hosts: CoreSDK.Hosts = {
-	id: import.meta.env.VITE_ORDO_ID_HOST,
-	dt: import.meta.env.VITE_ORDO_DT_HOST,
-	pb: import.meta.env.VITE_ORDO_PB_HOST,
-	au: import.meta.env.VITE_ORDO_AU_HOST,
-	fn: import.meta.env.VITE_ORDO_FN_HOST,
-	web: import.meta.env.VITE_ORDO_WEB_HOST,
+const hosts: Core.Hosts = {
+	id: import.meta.env.VITE_ORDO_ID_HOST!,
+	dt: import.meta.env.VITE_ORDO_DT_HOST!,
+	pb: import.meta.env.VITE_ORDO_PB_HOST!,
+	au: import.meta.env.VITE_ORDO_AU_HOST!,
+	fn: import.meta.env.VITE_ORDO_FN_HOST!,
+	web: import.meta.env.VITE_ORDO_WEB_HOST!,
 }
 
 void maoka_dom.render(
 	body,
 	app({
 		hosts,
-		logger: loggers.stdout,
+		logger: core.logger.stout,
 		local_persistence_strategy: null as any,
 	}),
 	() => crypto.randomUUID(),

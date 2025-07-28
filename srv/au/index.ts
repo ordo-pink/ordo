@@ -21,7 +21,7 @@
 
 import * as tau from "@ordo-pink/tau"
 import { BackendAuth, create_backend_server_au } from "@ordo-pink/backend-server-au"
-import { type Logger, loggers, rrr } from "@ordo-pink/sdk-core"
+import { Core, core } from "@ordo-pink/sdk-core"
 import { create_persistence_strategy_data_fs } from "@ordo-pink/backend-persistence-strategy-data-fs"
 import { create_persistence_strategy_user } from "@ordo-pink/backend-persistence-strategy-user"
 import { create_reference_mapping_user } from "@ordo-pink/backend-reference-mapping-user"
@@ -114,11 +114,11 @@ const main = () =>
 								hash: code =>
 									oath
 										.from_promise(() => Bun.password.hash(code, { algorithm: "bcrypt", cost: 4 }))
-										.pipe(oath.ops.rmap(error => rrr.eio("Failed to hash code", error))),
+										.pipe(oath.ops.rmap(error => core.rrr.eio("Failed to hash code", error))),
 								verify: (hash, code) =>
 									oath
 										.from_promise(() => Bun.password.verify(code, hash))
-										.pipe(oath.ops.rmap(error => rrr.eio("Failed to verify code", error))),
+										.pipe(oath.ops.rmap(error => core.rrr.eio("Failed to verify code", error))),
 							},
 							create_request_id: () => crypto.randomUUID(),
 							data_persistence_strategy: null as any,
@@ -143,15 +143,15 @@ const main = () =>
 
 // --- Internal ---
 
-const logger: Logger = {
-	alert: (...message) => loggers.stdout.alert("[AU]", ...message),
-	crit: (...message) => loggers.stdout.crit("[AU]", ...message),
-	debug: (...message) => loggers.stdout.debug("[AU]", ...message),
-	error: (...message) => loggers.stdout.error("[AU]", ...message),
-	info: (...message) => loggers.stdout.info("[AU]", ...message),
-	notice: (...message) => loggers.stdout.notice("[AU]", ...message),
-	panic: (...message) => loggers.stdout.panic("[AU]", ...message),
-	warn: (...message) => loggers.stdout.warn("[AU]", ...message),
+const logger: Core.Logger = {
+	alert: (...message) => core.logger.stout.alert("[AU]", ...message),
+	crit: (...message) => core.logger.stout.crit("[AU]", ...message),
+	debug: (...message) => core.logger.stout.debug("[AU]", ...message),
+	error: (...message) => core.logger.stout.error("[AU]", ...message),
+	info: (...message) => core.logger.stout.info("[AU]", ...message),
+	notice: (...message) => core.logger.stout.notice("[AU]", ...message),
+	panic: (...message) => core.logger.stout.panic("[AU]", ...message),
+	warn: (...message) => core.logger.stout.warn("[AU]", ...message),
 }
 
 void main()

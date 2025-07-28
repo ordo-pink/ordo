@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { type Logger, loggers } from "@ordo-pink/sdk-core"
+import { Core, core } from "@ordo-pink/sdk-core"
 import { type ServerID, create_backend_server_id } from "@ordo-pink/backend-server-id"
 import { is_finite_non_negative_int, is_finite_positive_int, is_port, is_positive_number } from "@ordo-pink/tau"
 import { create_persistence_strategy_data_fs } from "@ordo-pink/backend-persistence-strategy-data-fs"
@@ -107,15 +107,15 @@ const main = () =>
 
 // --- Internal ---
 
-const logger: Logger = {
-	alert: (...message) => loggers.stdout.alert("[ID]", ...message),
-	crit: (...message) => loggers.stdout.crit("[ID]", ...message),
-	debug: (...message) => loggers.stdout.debug("[ID]", ...message),
-	error: (...message) => loggers.stdout.error("[ID]", ...message),
-	info: (...message) => loggers.stdout.info("[ID]", ...message),
-	notice: (...message) => loggers.stdout.notice("[ID]", ...message),
-	panic: (...message) => loggers.stdout.panic("[ID]", ...message),
-	warn: (...message) => loggers.stdout.warn("[ID]", ...message),
+const logger: Core.Logger = {
+	alert: (...message) => core.logger.stout.alert("[ID]", ...message),
+	crit: (...message) => core.logger.stout.crit("[ID]", ...message),
+	debug: (...message) => core.logger.stout.debug("[ID]", ...message),
+	error: (...message) => core.logger.stout.error("[ID]", ...message),
+	info: (...message) => core.logger.stout.info("[ID]", ...message),
+	notice: (...message) => core.logger.stout.notice("[ID]", ...message),
+	panic: (...message) => core.logger.stout.panic("[ID]", ...message),
+	warn: (...message) => core.logger.stout.warn("[ID]", ...message),
 }
 
 void main()

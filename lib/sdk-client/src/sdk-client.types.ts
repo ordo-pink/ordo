@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import type { CoreMixins, CoreSDK, User as CoreUser, Data, Logger, RRR, Rrr } from "@ordo-pink/sdk-core"
+import type { CORE, Core } from "@ordo-pink/sdk-core"
 import type { Hunt } from "@ordo-pink/hunt"
 import type { I18n } from "@ordo-pink/i18n"
 import type { Oath } from "@ordo-pink/oath"
@@ -14,15 +14,18 @@ import type { Zags } from "@ordo-pink/zags"
 import type { COMMAND_PALETTE, CONTEXT_MENU, MODAL, NOTIFICATION } from "./sdk-client.constants"
 
 export namespace ClientRrr {
-	export type Instance<$Type extends Rrr.Type = Rrr.Type> = {
-		type: (typeof RRR.TYPE)[$Type]
+	export type Instance<$Type extends Core.Rrr.Type = Core.Rrr.Type> = {
+		type: (typeof CORE.RRR.TYPE)[$Type]
 		message: ClientSDK.Translations.Key
 		debug: any[]
 	}
 
-	export type Create<$Type extends Rrr.Type> = (message: ClientSDK.Translations.Key, ...debug: any) => ClientRrr.Instance<$Type>
+	export type Create<$Type extends Core.Rrr.Type> = (
+		message: ClientSDK.Translations.Key,
+		...debug: any
+	) => ClientRrr.Instance<$Type>
 
-	export type CreateType = <$Type extends Rrr.Type>(type: $Type) => ClientRrr.Create<$Type>
+	export type CreateType = <$Type extends Core.Rrr.Type>(type: $Type) => ClientRrr.Create<$Type>
 }
 
 export namespace ClientSDK {
@@ -55,10 +58,10 @@ export namespace ClientSDK {
 			activities$: Zags.Instance<ClientSDK.Activity.State>
 			auth$: Zags.Instance<ClientSDK.User.State>
 			fetch: ClientSDK.Fetch
-			hosts: CoreSDK.Hosts
+			hosts: Core.Hosts
 			hunter: Hunter
 			i18n$: I18n.Zags<ClientSDK.Translations.Keys>
-			logger: Logger
+			logger: Core.Logger
 			rotor$: RoutaryBrowser.Zags
 		}
 
@@ -134,7 +137,7 @@ export namespace ClientSDK {
 			div: HTMLDivElement
 			is_editable: boolean
 			is_embedded: boolean
-			data: Data.Instance
+			// data: Data.Instance
 		}
 	}
 
@@ -198,12 +201,12 @@ export namespace ClientSDK {
 	}
 
 	export namespace Notification {
-		export type ShowArgs = CoreSDK.Prettify<
+		export type ShowArgs = Core.Prettify<
 			Partial<ClientSDK.Notification.Instance> & Required<Pick<ClientSDK.Notification.Instance, "message">>
 		>
 
 		export type Instance = {
-			id: CoreMixins.Identifiable.ID
+			id: Core.Uuid.Instance
 			type?: NOTIFICATION.TYPE
 			title?: ClientSDK.Translations.Key
 			message: ClientSDK.Translations.Key
@@ -319,35 +322,31 @@ export namespace ClientSDK {
 	}
 
 	export namespace User {
-		export type State = { user?: CoreUser.Current.Instance }
+		export type State = { user?: Core.User.Instance }
 
 		export namespace Query {
 			export type DataInterface = {
-				Instance: {
-					is_authenticated: () => boolean
-					get_current: () => CoreUser.Current.Instance | null
-					get_by_id: (id: CoreUser.ID) => Oath.Instance<CoreUser.Someone.Instance, Rrr.Instance<"EPERM" | "EINVAL" | "EIO">>
-					get_by_handle: (
-						handle: CoreUser.Handle,
-					) => Oath.Instance<CoreUser.Someone.Instance, Rrr.Instance<"EPERM" | "EINVAL" | "EIO">>
-					get $(): Zags.Instance<CoreSDK.VersionState>
-				}
-				Plain: { current: CoreUser.Current.Instance | null }
+				Instance: {}
+				Plain: { current: Core.User.Instance | null }
 				Static: {}
 				Validations: {}
 			}
 
-			export type CheckPermissions = (permission: F.Blessing) => Result.Instance<void, Rrr.Instance<"EPERM">>
+			export type CheckPermissions = (permission: F.Blessing) => Result.Instance<void, Core.Rrr.Instance<"EPERM">>
 
-			export type Interface = CoreMixins.Creatable.Interface<
-				[check_permsissions: ClientSDK.User.Query.CheckPermissions],
-				ClientSDK.User.Query.DataInterface
-			> &
-				ClientSDK.User.Query.DataInterface
+			export type Instance = {
+				is_authenticated: () => boolean
+				get_current: () => Core.User.Instance | null
+				get_by_id: (id: Core.Uuid.Instance) => Oath.Instance<Core.User.Instance, Core.Rrr.Instance<"EPERM" | "EINVAL" | "EIO">>
+				get_by_handle: (
+					handle: Core.User.Ref,
+				) => Oath.Instance<Core.User.Instance, Core.Rrr.Instance<"EPERM" | "EINVAL" | "EIO">>
+				get $(): Zags.Instance<{ version: number }>
+			}
 
-			export type Instance = CoreSDK.Prettify<ClientSDK.User.Query.Interface["Instance"]>
-
-			export type Static = CoreSDK.Prettify<ClientSDK.User.Query.Interface["Static"]>
+			export type Static = {
+				create: (check_permissions: ClientSDK.User.Query.CheckPermissions) => Instance
+			}
 		}
 	}
 }

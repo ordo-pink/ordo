@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-export * from "./src/catas"
-export * from "./src/constructors"
+export * from "./src/catas/index.ts"
+export * from "./src/constructors/index.ts"
 export * from "./src/oath.impl.ts"
 export * from "./src/oath.types.ts"
-export * from "./src/ops"
+export * from "./src/ops/index.ts"

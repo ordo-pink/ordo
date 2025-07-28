@@ -52,4 +52,4 @@ const setup_netlify_redirects = () => oath.from_promise(() => Bun.write(redirect
 
 // --- Invoke ---
 
-main()
+void main()

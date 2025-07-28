@@ -19,26 +19,37 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { Data as CoreData, User as CoreUser, Rrr } from "@ordo-pink/sdk-core"
+import type { Core } from "@ordo-pink/sdk-core"
 import type { Oath } from "@ordo-pink/oath"
+
+export type ObfuscateEmail = (email: Email) => string
+
+export type PersistenceStrategy = {
+	delete: (id: Id) => Oath.Instance<DTO, Rrr.Instance<"EIO" | "ENOENT">>
+	get_by_email: (email: Email) => Oath.Instance<DTO, Rrr.Instance<"EIO" | "ENOENT">>
+	get_by_id: (id: Id) => Oath.Instance<DTO, Rrr.Instance<"EIO" | "ENOENT">>
+	get_by_ref: (ref: Ref) => Oath.Instance<DTO, Rrr.Instance<"EIO" | "ENOENT">>
+	list: () => Oath.Instance<DTO[], Rrr.Instance<"EIO">>
+	set: (id: Id, dto: DTO) => Oath.Instance<DTO, Rrr.Instance<"EIO">>
+}
 
 export namespace Server {
 	export namespace Data {
 		export type PersistenceStrategy = {
-			exists: (user_id: CoreUser.ID, data_id: CoreData.ID) => Oath.Instance<boolean, Rrr.Instance<"EIO">>
+			exists: (user_id: Core.User.Id, data_id: CoreData.ID) => Oath.Instance<boolean, Rrr.Instance<"EIO">>
 			create: (
-				user_id: CoreUser.ID,
+				user_id: Core.User.Id,
 				data_id: CoreData.ID,
 				input: ReadableStream,
 			) => Oath.Instance<number, Rrr.Instance<"EIO" | "EEXIST">>
-			read: (user_id: CoreUser.ID, data_id: CoreData.ID) => Oath.Instance<ReadableStream, Rrr.Instance<"EIO" | "ENOENT">>
+			read: (user_id: Core.User.Id, data_id: CoreData.ID) => Oath.Instance<ReadableStream, Rrr.Instance<"EIO" | "ENOENT">>
 			update: (
-				user_id: CoreUser.ID,
+				user_id: Core.User.Id,
 				data_id: CoreData.ID,
 				input: ReadableStream,
 			) => Oath.Instance<number, Rrr.Instance<"EIO" | "ENOENT">>
-			delete: (user_id: CoreUser.ID, data_id: CoreData.ID) => Oath.Instance<void, Rrr.Instance<"EIO" | "ENOENT">>
-			mtime: (user_id: CoreUser.ID, data_id: CoreData.ID) => Oath.Instance<number, Rrr.Instance<"EIO" | "ENOENT">>
+			delete: (user_id: Core.User.Id, data_id: CoreData.ID) => Oath.Instance<void, Rrr.Instance<"EIO" | "ENOENT">>
+			mtime: (user_id: Core.User.Id, data_id: CoreData.ID) => Oath.Instance<number, Rrr.Instance<"EIO" | "ENOENT">>
 		}
 	}
 
@@ -69,54 +80,54 @@ export namespace Server {
 			 *
 			 * Rejects with EIO if the underlying persistence strategy cannot access mapping data.
 			 */
-			exists_by_handle: (handle: CoreUser.Handle) => Oath.Instance<boolean, Rrr.Instance<"EIO">>
+			exists_by_handle: (handle: Core.User.Handle) => Oath.Instance<boolean, Rrr.Instance<"EIO">>
 
 			/**
-			 * Resolves the {@link CoreUser.ID identifier} of the user by given {@link CoreUser.Handle handle}.
+			 * Resolves the {@link Core.User.Id identifier} of the user by given {@link Core.User.Handle handle}.
 			 *
 			 * Rejects with EIO if the underlying persistence strategy cannot access mapping data.
-			 * Rejects with ENOENT if the user with given {@link CoreUser.Handle handle} does not exist.
+			 * Rejects with ENOENT if the user with given {@link Core.User.Handle handle} does not exist.
 			 */
-			get_by_handle: (handle: CoreUser.Handle) => Oath.Instance<CoreUser.ID, Rrr.Instance<"EIO" | "ENOENT">>
+			get_by_handle: (handle: Core.User.Handle) => Oath.Instance<Core.User.Id, Rrr.Instance<"EIO" | "ENOENT">>
 
 			/**
-			 * Lazily resolves with a boolean indicating whether a user exists with given {@link CoreUser.Email email}.
+			 * Lazily resolves with a boolean indicating whether a user exists with given {@link Core.User.Email email}.
 			 *
 			 * Rejects with EIO if the underlying persistence strategy cannot access mapping data.
 			 */
-			exists_by_email: (email: CoreUser.Email) => Oath.Instance<boolean, Rrr.Instance<"EIO">>
+			exists_by_email: (email: Core.User.Email) => Oath.Instance<boolean, Rrr.Instance<"EIO">>
 
 			/**
-			 * Resolves the {@link CoreUser.ID identifier} of the user by given {@link CoreUser.Email email}.
+			 * Resolves the {@link Core.User.Id identifier} of the user by given {@link Core.User.Email email}.
 			 *
 			 * Rejects with EIO if the underlying persistence strategy cannot access mapping data.
 			 * Rejects with ENOENT if the user with given email does not exist.
 			 */
-			get_by_email: (email: CoreUser.Email) => Oath.Instance<CoreUser.ID, Rrr.Instance<"EIO" | "ENOENT">>
+			get_by_email: (email: Core.User.Email) => Oath.Instance<Core.User.Id, Rrr.Instance<"EIO" | "ENOENT">>
 
 			/**
-			 * Triggers refresh of user mappings for given {@link CoreUser.ID identifier}.
+			 * Triggers refresh of user mappings for given {@link Core.User.Id identifier}.
 			 *
 			 * - Creates a mapping if it did not exist.
-			 * - Updates {@link CoreUser.Handle handle} and {@link CoreUser.Email email} if they changed.
+			 * - Updates {@link Core.User.Handle handle} and {@link Core.User.Email email} if they changed.
 			 * - Removes the user if it no longer exists.
 			 *
 			 * Resolves with void on success.
 			 *
 			 * Rejects with EIO if the underlying persistence strategy cannot access or persist mapping data.
 			 */
-			refresh: (id: CoreUser.ID) => Oath.Instance<void, Rrr.Instance<"EIO">>
+			refresh: (id: Core.User.Id) => Oath.Instance<void, Rrr.Instance<"EIO">>
 		}
 
 		export type PersistenceStrategy = {
-			exists: (id: CoreUser.ID) => Oath.Instance<boolean, Rrr.Instance<"EIO">>
-			create: (user: CoreUser.Current.Instance) => Oath.Instance<CoreUser.Current.Instance, Rrr.Instance<"EIO" | "EEXIST">>
-			read: (id: CoreUser.ID) => Oath.Instance<CoreUser.Current.Instance, Rrr.Instance<"EIO" | "ENOENT">>
+			exists: (id: Core.User.Id) => Oath.Instance<boolean, Rrr.Instance<"EIO">>
+			create: (user: Core.User.Current.Instance) => Oath.Instance<Core.User.Current.Instance, Rrr.Instance<"EIO" | "EEXIST">>
+			read: (id: Core.User.Id) => Oath.Instance<Core.User.Current.Instance, Rrr.Instance<"EIO" | "ENOENT">>
 			update: (
-				id: CoreUser.ID,
-				user: CoreUser.Current.Instance,
-			) => Oath.Instance<CoreUser.Current.Instance, Rrr.Instance<"EIO" | "ENOENT" | "EINVAL">>
-			delete: (id: CoreUser.ID) => Oath.Instance<void, Rrr.Instance<"EIO" | "ENOENT">>
+				id: Core.User.Id,
+				user: Core.User.Current.Instance,
+			) => Oath.Instance<Core.User.Current.Instance, Rrr.Instance<"EIO" | "ENOENT" | "EINVAL">>
+			delete: (id: Core.User.Id) => Oath.Instance<void, Rrr.Instance<"EIO" | "ENOENT">>
 		}
 	}
 }

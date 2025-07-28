@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { type CoreSDK, type Logger, RRR, core_sdk } from "@ordo-pink/sdk-core"
+import { CORE, Core, core } from "@ordo-pink/sdk-core"
 import { sweech } from "@ordo-pink/sweech"
 
 import type { ClientRrr, ClientSDK } from "./sdk-client.types"
@@ -12,7 +12,7 @@ import { create_zags } from "@ordo-pink/zags"
 export namespace client_sdk {
 	// TODO Compose queries into a single zags with what is permitted instead of providing them separately
 	export const create_f: ClientSDK.F.Create = (name, permissions, callback) => async global_state => {
-		const logger: Logger = {
+		const logger: Core.Logger = {
 			alert: (...message) => global_state.logger.alert(`f(${name}) =>`, ...message),
 			crit: (...message) => global_state.logger.crit(`f(${name}) =>`, ...message),
 			debug: (...message) => global_state.logger.debug(`f(${name}) =>`, ...message),
@@ -29,7 +29,7 @@ export namespace client_sdk {
 				return global_state.fetch(...args)
 			},
 			hosts: (() => {
-				if (!permissions.queries.includes("hosts")) return {} as CoreSDK.Hosts
+				if (!permissions.queries.includes("hosts")) return {} as Core.Hosts
 				return global_state.hosts
 			})(),
 			logger,
@@ -72,7 +72,7 @@ export namespace client_sdk {
 		const destroy = await callback(state)
 
 		return async () => {
-			if (core_sdk.validations.is_fn(destroy)) {
+			if (core.fns.is_fn(destroy)) {
 				await destroy()
 			}
 		}
@@ -120,7 +120,7 @@ export namespace client_sdk {
 export namespace client_rrr {
 	export const create: ClientRrr.CreateType =
 		type =>
-		(message, ...debug) => ({ type: RRR.TYPE[type], message, debug })
+		(message, ...debug) => ({ type: CORE.RRR.TYPE[type], message, debug })
 
 	export const eacces = create("EACCES")
 	export const eagain = create("EAGAIN")

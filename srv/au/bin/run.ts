@@ -23,7 +23,7 @@ import { die, run_async_command } from "@ordo-pink/cmd-runner"
 import { oath } from "@ordo-pink/oath"
 
 void run_async_command("opt/bun run --watch srv/au/index.ts", {
-	stdout: "pipe",
-	stderr: "pipe",
+	stdout: "inherit",
+	stderr: "inherit",
 	env: { ...process.env, FORCE_COLOR: "1" },
 }).cata(oath.catas.or_else(die()))

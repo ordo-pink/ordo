@@ -1,45 +1,20 @@
-/*
- * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
- * SPDX-License-Identifier: Unlicense
- */
+import * as Timestamp from "../timestamp/timestamp.types"
+import { GenericGuard } from "../sdk-core.types"
 
-import type { GetDeviceInfo } from "@ordo-pink/get-device-info"
+/** Time at which the session was issued. */
+export type IssuedAt = Timestamp.Instance
 
-import type { CoreMixins } from "../mixins/mixins.types"
+/** Readable name of the session to be displayed to the user. */
+export type Name = string
 
-export namespace Session {
-	export type ID = CoreMixins.Identifiable.ID
+export type Instance = [issued_at: IssuedAt, name: Name]
 
-	export type DTO = [
-		...CoreMixins.Identifiable.DTO,
-		...CoreMixins.Timestampable.DTO<"without_updates">,
-		...Session.CustomMixins.DeviceAware.DTO,
-	]
+export type Create = (name: Name) => Instance
 
-	export type DataInterface = CoreMixins.Identifiable.Interface &
-		CoreMixins.Timestampable.Interface<"without_updates"> &
-		Session.CustomMixins.DeviceAware.Interface
+export type GetIssuedAt = (session: Instance) => IssuedAt
+export type GetName = (session: Instance) => Name
 
-	export type Interface = Session.DataInterface & CoreMixins.Serializable.Interface<Session.DTO, Session.DataInterface>
+export type Guard = GenericGuard<Instance>
 
-	export type Static = Session.Interface["Static"]
-
-	export type Instance = Session.Interface["Instance"]
-
-	export namespace CustomMixins {
-		export namespace DeviceAware {
-			export type DTO = [device_info: GetDeviceInfo.DeviceInfo]
-
-			export type Interface = {
-				Instance: {
-					get_device_info: () => GetDeviceInfo.DeviceInfo
-				}
-				Plain: { device_info: GetDeviceInfo.DeviceInfo }
-				Static: {}
-				Validations: {
-					is_device_info: (x: any) => x is GetDeviceInfo.DeviceInfo
-				}
-			}
-		}
-	}
-}
+/** Checks whether the session was issued in this many seconds back from now. */
+export type WasActiveIn = (seconds: number, session: Instance) => boolean

@@ -5,9 +5,11 @@
 
 import { sweech } from "@ordo-pink/sweech"
 
-import { GetDeviceInfo } from "./get-device-info.types"
+import type { DeviceInfo, GetDeviceInfo, IsDeviceInfo } from "./get-device-info.types"
 
-export const get_device_info: GetDeviceInfo.Fn = navigator => {
+export const is_device_info: IsDeviceInfo = (x): x is DeviceInfo => typeof x === "string" && /^.*\s\(.*\)$/.test(x)
+
+export const get_device_info: GetDeviceInfo = navigator => {
 	const device = sweech
 		.of_true()
 		.case(/Windows/i.test(navigator.platform), () =>

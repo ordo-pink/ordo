@@ -1,87 +1,48 @@
-/*
- * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
- * SPDX-License-Identifier: Unlicense
- */
+import { describe, expect, test } from "bun:test"
+import * as uuid from "../uuid/uuid.impl"
+import * as user from "./user.impl"
+import * as USER from "./user.constants"
 
-import { describe, expect, it } from "bun:test"
-
-import { user } from "./user.impl"
+const a: any = ""
 
 describe("user", () => {
-	describe("other", () => {
-		describe("create_id", () => {
-			it("should create an identifier", () => {
-				expect(user.someone.create_id()).toBeTypeOf("string")
-				expect(user.someone.validations.is_id(user.someone.create_id())).toBeTrue()
-			})
-		})
-
-		describe("create_timestamp", () => {
-			it("should create a timestamp", () => {
-				expect(user.someone.create_timestamp()).toBeTypeOf("number")
-				expect(user.someone.validations.is_timestamp(user.someone.create_timestamp())).toBeTrue()
-			})
-		})
-
-		describe("validations", () => {
-			const { is_dto, is_handle, is_id, is_name, is_subscription, is_timestamp } = user.someone.validations
-
-			it("is_id should verify UUID", () => {
-				expect(is_id(crypto.randomUUID())).toBeTrue()
-				expect(is_id("")).toBeFalse()
-				expect(is_id(null)).toBeFalse()
-				expect(is_id(undefined)).toBeFalse()
-				expect(is_id("asdf-asdf-asdf-asdf-asdf")).toBeFalse()
-			})
-
-			it("is_handle should verify handle", () => {
-				expect(is_handle("@a")).toBeTrue()
-				expect(is_handle("aaa")).toBeFalse()
-				expect(is_handle("@!")).toBeFalse()
-				expect(is_handle("@way_too_long_to_be_a_valid_handle")).toBeFalse()
-			})
-
-			it("is_name should verify name", () => {
-				expect(is_name("hello")).toBeTrue()
-				expect(is_name("")).toBeTrue()
-				expect(is_name(null)).toBeFalse()
-			})
-
-			it("is_subscription should verify subscription", () => {
-				expect(is_subscription(0)).toBeTrue()
-				expect(is_subscription(1)).toBeTrue()
-				expect(is_subscription(2)).toBeTrue()
-				expect(is_subscription(3)).toBeTrue()
-				expect(is_subscription(4)).toBeTrue()
-				expect(is_subscription(5)).toBeFalse()
-			})
-
-			it("is_timestamp should verify timestamp", () => {
-				expect(is_timestamp(1000000)).toBeTrue()
-				expect(is_timestamp(-1)).toBeFalse()
-				expect(is_timestamp(1.1)).toBeFalse()
-			})
-
-			// TODO is_dto
-		})
-
-		describe("instance", () => {
-			const id = user.someone.create_id()
-			const created_at = user.someone.create_timestamp()
-			const handle = "@test"
-			const subscription = user.someone.get_default_subscription()
-			const name = "Test Testfield"
-
-			const u = user.someone.from_dto(id, created_at, handle, subscription, name)
-
-			it("should return valid id", () => {
-				expect(u.get_id()).toBe(id)
-			})
-
-			it("should have valid id", () => {
-				expect(u.has_id(id)).toBeTrue()
-				expect(u.has_id(crypto.randomUUID())).toBeFalse()
-			})
-		})
+	test("default_name", () => expect(user.default_name()).toBe(""))
+	test("default_subscription", () => expect(user.default_subscription()).toBe(0))
+	test("get_handle", () => expect(user.get_handle([a, "hey", a, a])).toBe("hey"))
+	test("get_name", () => expect(user.get_name([a, a, "hey", a])).toBe("hey"))
+	test("get_subscription", () =>
+		expect(user.get_subscription([a, a, a, USER.SUBSCRIPTION.FAMILY])).toBe(USER.SUBSCRIPTION.FAMILY))
+	test("handle_guard", () => {
+		expect(user.handle_guard("hello")).toBeTrue()
+		expect(user.handle_guard("")).toBeFalse()
+		expect(user.handle_guard("hellohellohellohellohello")).toBeFalse()
+	})
+	test("has_name", () => {
+		expect(user.has_name([a, a, "hey", a])).toBeTrue()
+		expect(user.has_name([a, a, a, a])).toBeFalse()
+	})
+	test("has_the_id", () => {
+		const id = uuid.create()
+		expect(user.has_the_id(id, [id, a, a, a])).toBeTrue()
+	})
+	test("has_the_handle", () => expect(user.has_the_handle("a", [a, "a", a, a])).toBeTrue())
+	test("has_the_name", () => expect(user.has_the_name("a", [a, a, "a", a])).toBeTrue())
+	test("has_the_subscription", () => expect(user.has_the_subscription(0, [a, a, a, 0])).toBeTrue())
+	test("is_free", () => expect(user.is_free([a, a, a, 0])).toBeTrue())
+	test("is_paid", () => expect(user.is_paid([a, a, a, 0])).toBeFalse())
+	test("name_guard", () => {
+		expect(user.name_guard("")).toBeTrue()
+		expect(user.name_guard("hello")).toBeTrue()
+		expect(
+			user.name_guard(
+				"hellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohello",
+			),
+		).toBeFalse()
+	})
+	test("subscription_guard", () => {
+		expect(user.subscription_guard(0)).toBeTrue()
+		expect(user.subscription_guard(-1)).toBeFalse()
+		expect(user.subscription_guard(1.1)).toBeFalse()
+		expect(user.subscription_guard(SUBSCRIPTION.length)).toBeFalse()
 	})
 })

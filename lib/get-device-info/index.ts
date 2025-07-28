@@ -3,5 +3,5 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-export * from "./src/get-device-info.impl"
-export * from "./src/get-device-info.types"
+export * as GetDeviceInfo from "./src/get-device-info.types"
+export * as get_device_info from "./src/get-device-info.impl"

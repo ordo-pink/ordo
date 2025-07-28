@@ -19,10 +19,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { type CoreSDK, user } from "@ordo-pink/sdk-core"
 import { type Maoka, maoka_dom } from "@ordo-pink/maoka"
 import { type Zags, create_zags } from "@ordo-pink/zags"
-import { type ClientSDK } from "@ordo-pink/sdk-client"
+import type { ClientSDK } from "@ordo-pink/sdk-client"
+import type { Core } from "@ordo-pink/sdk-core"
 import { get_device_info } from "@ordo-pink/get-device-info"
 import { noop } from "@ordo-pink/tau"
 import { oath } from "@ordo-pink/oath"
@@ -32,7 +32,7 @@ import { oath } from "@ordo-pink/oath"
  */
 export const auth_jab: (
 	fetch: ClientSDK.Fetch,
-	hosts: CoreSDK.Hosts,
+	hosts: Core.Hosts,
 	hunter: ClientSDK.Hunter,
 ) => Maoka.Jab<Zags.Instance<ClientSDK.User.State>> =
 	(fetch, hosts, hunter) =>
@@ -40,7 +40,7 @@ export const auth_jab: (
 		const handle_mount = () => {
 			const refresh_session0 = oath
 				.of(new Headers())
-				.pipe(oath.ops.tap(h => h.append("X-Device", get_device_info(navigator))))
+				.pipe(oath.ops.tap(h => h.append("X-Device", get_device_info.get_device_info(navigator))))
 				.pipe(oath.ops.map(headers => ({ headers, method: "POST", credentials: "include" }) as const))
 				.pipe(
 					oath.ops.chain(init =>
@@ -49,7 +49,6 @@ export const auth_jab: (
 						),
 					),
 				)
-				.pipe(oath.ops.map(dto => user.current.from_dto(...dto)))
 				.pipe(oath.ops.tap(user => auth$.update("user", () => user)))
 
 			// TODO Sign out on error, show notification

@@ -3,6 +3,5 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-export namespace CORE {
-	export const ROOT_METADATA_FILE_ID = "00000000-0000-1000-8000-000000000000"
-}
+export * from "./src/curry.impl"
+export * from "./src/curry.types"

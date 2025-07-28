@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { type Logger, loggers } from "@ordo-pink/sdk-core"
+import { Core, core } from "@ordo-pink/sdk-core"
 import { create_backend_server_pb } from "@ordo-pink/backend-server-pb"
 import { create_persistence_strategy_data_fs } from "@ordo-pink/backend-persistence-strategy-data-fs"
 import { is_port } from "@ordo-pink/tau"
@@ -70,15 +70,15 @@ const main = () =>
 
 // --- Internal ---
 
-const logger: Logger = {
-	alert: (...message) => loggers.stdout.alert("[PB]", ...message),
-	crit: (...message) => loggers.stdout.crit("[PB]", ...message),
-	debug: (...message) => loggers.stdout.debug("[PB]", ...message),
-	error: (...message) => loggers.stdout.error("[PB]", ...message),
-	info: (...message) => loggers.stdout.info("[PB]", ...message),
-	notice: (...message) => loggers.stdout.notice("[PB]", ...message),
-	panic: (...message) => loggers.stdout.panic("[PB]", ...message),
-	warn: (...message) => loggers.stdout.warn("[PB]", ...message),
+const logger: Core.Logger = {
+	alert: (...message) => core.logger.stout.alert("[PB]", ...message),
+	crit: (...message) => core.logger.stout.crit("[PB]", ...message),
+	debug: (...message) => core.logger.stout.debug("[PB]", ...message),
+	error: (...message) => core.logger.stout.error("[PB]", ...message),
+	info: (...message) => core.logger.stout.info("[PB]", ...message),
+	notice: (...message) => core.logger.stout.notice("[PB]", ...message),
+	panic: (...message) => core.logger.stout.panic("[PB]", ...message),
+	warn: (...message) => core.logger.stout.warn("[PB]", ...message),
 }
 
 void main()

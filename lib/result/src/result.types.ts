@@ -58,7 +58,7 @@ export type FromNullableResultConstructorFn = <$Ok, $Err = null>(
 
 export type IfResultConstructorFn = <$Ok = undefined, $Err = undefined>(
 	predicate: boolean,
-	returns?: { T?: () => $Ok; F?: () => $Err },
+	returns?: { on_true?: () => $Ok; on_false?: () => $Err },
 ) => Result.Instance<$Ok, $Err>
 
 export type MapResultOperatorFn = <$Ok, $Err, $NewOk>(

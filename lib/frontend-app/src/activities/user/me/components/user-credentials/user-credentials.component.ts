@@ -20,14 +20,14 @@
  */
 
 import { maoka, maoka_styled } from "@ordo-pink/maoka"
-import type { User } from "@ordo-pink/sdk-core"
+import type { Core } from "@ordo-pink/sdk-core"
 import { maoka_sdk } from "@ordo-pink/sdk-maoka"
 
 import { user_card, user_card_body, user_card_title } from "../user-card/user-card.component"
 
 import "./user-credentials.styles.css"
 
-export const credentials_card = maoka.create<{ handle: User.Handle; name: string; email: User.Email }>(
+export const credentials_card = maoka.create<{ handle: Core.User.Ref; name: string; email: Core.User.Email }>(
 	"div",
 	({ handle, email, name, use }) => {
 		const state = use(maoka_sdk.context.consume)

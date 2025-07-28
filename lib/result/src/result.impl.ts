@@ -130,11 +130,11 @@ const swap_result: Types.SwapResultOperatorFn = () => r => r.cata({ ok: x => err
 
 const if_else: Types.IfResultConstructorFn = (
 	orly: boolean,
-	{ T = () => undefined as any, F = () => undefined as any } = {
-		T: () => undefined as any,
-		F: () => undefined as any,
+	{ on_true = () => undefined as any, on_false = () => undefined as any } = {
+		on_true: () => undefined as any,
+		on_false: () => undefined as any,
 	},
-) => (orly ? result.ok(T()) : result.err(F()))
+) => (orly ? result.ok(on_true()) : result.err(on_false()))
 
 const is_result_guard = <$TOk = unknown, $TErr = unknown>(x: unknown): x is Types.Result.Instance<$TOk, $TErr> => {
 	if (!is_object(x)) return false

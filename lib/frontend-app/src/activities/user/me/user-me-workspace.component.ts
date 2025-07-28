@@ -29,6 +29,8 @@ import { danger_zone_card } from "./components/user-danger-zone/user-danger-zone
 import { sessions_card } from "./components/user-session/user-session.component"
 
 import "./user-me-workspace.styles.css"
+import { core_sdk } from "@ordo-pink/sdk-core"
+import { result } from "@ordo-pink/result"
 
 export const current_user_workspace = maoka.create<{ state: ClientSDK.F.State }>("div", ({ state, use }) => {
 	use(maoka_sdk.context.provide(state))
@@ -39,21 +41,36 @@ export const current_user_workspace = maoka.create<{ state: ClientSDK.F.State }>
 
 	hunter.shoot("title.set_title", "user_workspace_current_activity_name")
 
-	return () => {
-		const user = get_user()
-
-		return (
-			user &&
-			cards(() => [
-				credentials_card({ email: user.get_email(), handle: user.get_handle(), name: user.get_name() }),
-				sessions_card({ sessions: user.get_sessions() }),
-				achievements_card(),
-				settings_card(),
-				danger_zone_card(),
-				two_factor_auth_card(),
-			])
-		)
-	}
+	return () =>
+		result
+			.from_nullable(get_user())
+			.pipe(
+				result.ops.chain(u =>
+					result.merge({
+						email: core_sdk.user.get_email(u),
+						handle: core_sdk.user.get_handle(u),
+						name: core_sdk.user.get_name(u),
+						sessions: core_sdk.user.get_sessions(u),
+					}),
+				),
+			)
+			.pipe(
+				result.ops.map(({ email, handle, name, sessions }) =>
+					cards(() => [
+						credentials_card({
+							email,
+							handle,
+							name,
+						}),
+						sessions_card({ sessions }),
+						achievements_card(),
+						settings_card(),
+						danger_zone_card(),
+						two_factor_auth_card(),
+					]),
+				),
+			)
+			.cata(result.catas.or_nothing())
 })
 
 const cards = maoka_styled.div("cards")

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import type { CoreMixins, Rrr } from "@ordo-pink/sdk-core"
+import type { Core } from "@ordo-pink/sdk-core"
 import type { I18n } from "@ordo-pink/i18n"
 
 import type { ClientSDK } from "./sdk-client.types"
@@ -41,9 +41,9 @@ declare global {
 			show: { args: ClientSDK.Modal.Params }
 		}
 		notifications: {
-			hide: { args: CoreMixins.Identifiable.ID }
+			hide: { args: Core.Uuid.Instance }
 			show: { args: ClientSDK.Notification.ShowArgs }
-			rrr: { args: Rrr.Instance & { message: ClientSDK.Translations.Key } }
+			rrr: { args: Core.Rrr.Instance & { message: ClientSDK.Translations.Key } }
 		}
 		router: {
 			set_hash: { args: string }

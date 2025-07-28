@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-export namespace GetDeviceInfo {
-	export type Fn = (navigator: Navigator) => DeviceInfo
+export type GetDeviceInfo = (navigator: Navigator) => DeviceInfo
 
-	export type DeviceInfo = `${string} ${string} (${string})`
-}
+export type IsDeviceInfo = (x: any) => x is DeviceInfo
+
+export type DeviceInfo = `${string} ${string} (${string})`

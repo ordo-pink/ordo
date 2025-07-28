@@ -1,15 +1,13 @@
-/*
- * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
- * SPDX-License-Identifier: Unlicense
- */
+import type * as Session from "./session.types"
+import * as fns from "../fns/fns.impl"
+import * as timestamp from "../timestamp/timestamp.impl"
 
-import { core_sdk } from "../core/core.impl"
-import { core_mixins } from "../mixins/mixins.impl"
-import { session_mixins } from "./session.mixins"
+export const create: Session.Create = n => [timestamp.create(), n]
 
-export const session = core_sdk.mix(
-	core_mixins.identifiable,
-	core_mixins.timestampable.without_updates,
-	session_mixins.device_aware,
-	session_mixins.serializable,
-)
+export const guard: Session.Guard = (x): x is Session.Instance =>
+	fns.is_array(x) && timestamp.guard(x[0]) && fns.is_non_empty_string(x[1])
+
+export const get_issued_at: Session.GetIssuedAt = fns.prop(0)
+export const get_name: Session.GetName = fns.prop(1)
+
+export const was_active_in: Session.WasActiveIn = (t, s) => timestamp.create() - s[0] <= t * 1000

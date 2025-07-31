@@ -19,4 +19,5 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export * from "./src/sdk-server.types"
+export * as Server from "./src/sdk-server.types"
+export * as server from "./src/sdk-server.impl"

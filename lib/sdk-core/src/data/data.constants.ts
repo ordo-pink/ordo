@@ -1,5 +1,5 @@
 export enum LABEL_COLOR {
-	NONE,
+	DEFAULT,
 	AMBER,
 	BLUE,
 	CYAN,
@@ -19,4 +19,10 @@ export enum LABEL_COLOR {
 	VIOLET,
 	YELLOW,
 	length,
+}
+
+export enum LOCATION {
+	LOCAL_AND_REMOTE,
+	LOCAL_ONLY,
+	REMOTE_ONLY,
 }

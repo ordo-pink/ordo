@@ -20,14 +20,15 @@
  */
 
 import * as tau from "@ordo-pink/tau"
+import { type Core, core } from "@ordo-pink/sdk-core"
 import { Oath, oath } from "@ordo-pink/oath"
-import { type Rrr, type Session, type User, rrr, user } from "@ordo-pink/sdk-core"
 import { default_handler, huyami } from "@ordo-pink/routary-ordo"
 
-import { create_user_authenticated_email_body, create_user_authenticated_email_subject, obfuscate_email } from "../fns"
-import { type BackendAuth } from "../backend-server-au.types"
+import * as Types from "../backend-server-au.types"
+import { create_user_authenticated_email_body, create_user_authenticated_email_subject } from "../fns"
+import { server } from "@ordo-pink/sdk-server"
 
-export const handle_verify_code = default_handler<BackendAuth.Fuel>(intake => {
+export const handle_verify_code = default_handler<Types.Fuel>(intake => {
 	const debug = huyami(intake)
 
 	return get_request_body(intake.req)
@@ -35,10 +36,10 @@ export const handle_verify_code = default_handler<BackendAuth.Fuel>(intake => {
 		.pipe(oath.ops.tap(debug("Provided email", ({ email }) => obfuscate_email(email))))
 		.pipe(oath.ops.chain(get_code_hash(intake)))
 		.pipe(oath.ops.tap(debug("Code verified successfully")))
-		.pipe(oath.ops.tap(remove_auth_record(intake.auth_storage)))
+		.pipe(oath.ops.tap(remove_auth_record(intake.code_storage)))
 		.pipe(oath.ops.tap(debug("Auth record removed")))
 		.pipe(oath.ops.chain(get_or_create_user(intake)))
-		.pipe(oath.ops.tap(debug("User upserted", user => user.get_id())))
+		.pipe(oath.ops.tap(debug("User upserted", user => user[0])))
 		.pipe(oath.ops.tap(send_email(intake)))
 		.pipe(oath.ops.tap(debug("Email sent")))
 		.pipe(oath.ops.chain(create_session_id(intake)))
@@ -53,93 +54,75 @@ export const handle_verify_code = default_handler<BackendAuth.Fuel>(intake => {
 
 // --- Internal ---
 
-const is_email = user.current.validations.is_email
 const is_code = (x: unknown): x is number => tau.is_finite_non_negative_int(x)
 
 // TODO Move to lib
 
-const get_request_body = (req: Request): Oath.Instance<any, Rrr.Instance<"EIO">> =>
-	oath.from_promise(() => req.json()).pipe(oath.ops.rmap(error => rrr.eio("Failed to parse request body", error)))
+const get_request_body = (req: Request): Oath.Instance<any, Core.Rrr.Instance<"EIO">> =>
+	oath.from_promise(() => req.json()).pipe(oath.ops.rmap(error => core.rrr.eio("Failed to parse request body", error)))
 
 const validate_request_body = (body: any) =>
 	oath.merge({
-		email: oath.if(body && body.email && is_email(body.email), {
-			on_true: () => body.email as User.Email,
-			on_false: () => rrr.einval("Provided email is invalid", body.email),
+		email: oath.if(body && body.email && core.user.email_guard(body.email), {
+			on_true: () => body.email as Core.User.Email,
+			on_false: () => core.rrr.einval("Provided email is invalid", body.email),
 		}),
 		code: oath.if(body && body.code && is_code(body.code), {
-			on_true: () => body.code as BackendAuth.Code,
-			on_false: () => rrr.einval("Provided code is invalid", body.code),
+			on_true: () => body.code as Types.Code,
+			on_false: () => core.rrr.einval("Provided code is invalid", body.code),
 		}),
 	})
 
-type P1 = { email: User.Email; code: BackendAuth.Code }
+type P1 = { email: Core.User.Email; code: Types.Code }
 
-const not_found_rrr = (email: User.Email) => () => rrr.enoent("User not found", obfuscate_email(email))
+const not_found_rrr = (email: Core.User.Email) => () => core.rrr.enoent("User not found", server.user.obfuscate_email(email))
 
 const get_code_hash =
-	(intake: BackendAuth.Intake) =>
+	(intake: Types.Intake) =>
 	({ email, code }: P1) =>
 		oath
-			.from_nullable(intake.auth_storage.get(email), not_found_rrr(email))
+			.from_nullable(intake.code_storage.get(email), not_found_rrr(email))
 			.pipe(oath.ops.chain(({ hash }) => intake.code_strategy.verify(hash, code)))
 			.pipe(oath.ops.chain(is_valid => oath.if(is_valid, { on_true: () => email, on_false: not_found_rrr(email) })))
 
 const remove_auth_record =
-	(auth_storage: BackendAuth.Storage) =>
-	(email: User.Email): void =>
-		void auth_storage.delete(email)
+	(code_storage: Types.CodeStorage) =>
+	(email: Core.User.Email): void =>
+		void code_storage.delete(email)
 
-const send_email =
-	(intake: BackendAuth.Intake) =>
-	(user: User.Current.Instance): void =>
-		intake.email_strategy.send({
-			to: user.get_email(),
-			content: create_user_authenticated_email_body(intake.request_language, intake.request_ip as string),
-			subject: create_user_authenticated_email_subject(intake.request_language),
-		})
+const send_email = (intake: Types.Intake) => (user: Core.User.Instance) =>
+	intake.email_strategy.send(
+		user[6] + intake.request_ip, // TODO
+		create_user_authenticated_email_subject(intake.request_language),
+		create_user_authenticated_email_body(intake.request_language, intake.request_ip as string),
+		{ email: user[6] },
+	)
 
-const create_user = (email: User.Email) => (intake: BackendAuth.Intake) =>
-	oath
-		.of(intake.defaults)
-		.pipe(
-			oath.ops.map(d =>
-				user.current.new(email, void 0, void 0, void 0, void 0, d.max_functions, d.file_limit, d.max_upload_size),
-			),
-		)
-		.pipe(oath.ops.chain(user => intake.persistence_strategy_user.create(user)))
+const create_user = (email: Core.User.Email) => (intake: Types.Intake) =>
+	oath.of(server.user.create(email)).pipe(oath.ops.chain(user => intake.user_repository.create(user)))
 
-const get_or_create_user = (intake: BackendAuth.Intake) => (email: User.Email) =>
-	intake.reference_mapping_user
-		.exists_by_email(email)
-		.pipe(
-			oath.ops.chain(exists =>
-				oath
-					.if(exists)
-					.pipe(oath.ops.chain(() => intake.reference_mapping_user.get_by_email(email)))
-					.pipe(oath.ops.chain(id => intake.persistence_strategy_user.read(id))),
-			),
-		)
+const get_or_create_user = (intake: Types.Intake) => (email: Core.User.Email) =>
+	intake.user_repository
+		.get_by_email(email)
 		.pipe(oath.ops.rmap(() => intake))
 		.pipe(oath.ops.fix(create_user(email)))
 
-const create_session_id = (intake: BackendAuth.Intake) => (user: User.Current.Instance) =>
+const create_session_id = (intake: Types.Intake) => (user: Core.User.Instance) =>
 	oath
-		.try(() => [crypto.randomUUID(), Date.now(), `${intake.req.headers.get("X-Device")}`] as Session.DTO)
+		.try(() => server.user.create_session(intake.req.headers.get("X-Device")))
 		.pipe(oath.ops.map(session => ({ session, user })))
-		.pipe(oath.ops.rmap(error => rrr.eio("Failed to create session", error)))
+		.pipe(oath.ops.rmap(error => core.rrr.eio("Failed to create session", error)))
 
-type P2 = { session: Session.DTO; user: User.Current.Instance }
-const persist_session_id = (intake: BackendAuth.Intake) => (params: P2) =>
+type P2 = { session: Core.Session.Instance; user: Core.User.Instance }
+const persist_session_id = (intake: Types.Intake) => (params: P2) =>
 	oath
-		.of(params.user.to_dto())
-		.pipe(oath.ops.tap(dto => void (dto[10] = [...dto[10], params.session])))
-		.pipe(oath.ops.chain(dto => intake.persistence_strategy_user.update(params.user.get_id(), user.current.from_dto(...dto))))
-		.pipe(oath.ops.chain(user => intake.reference_mapping_user.refresh(user.get_id())))
+		.of(params.user)
+		.pipe(oath.ops.map(user => user.with(8, [...user[8], params.session])))
+		.pipe(oath.ops.chain(user => intake.user_repository.update(params.user[0], user)))
 		.pipe(oath.ops.map(() => params))
 
-const set_cookie = (intake: BackendAuth.Intake) => (params: P2) =>
+const set_cookie = (intake: Types.Intake) => (params: P2) =>
 	intake.res.headers.set(
 		"Set-Cookie",
-		`${params.user.get_id()}=${params.session[0]}; Secure; HttpOnly; SameSite=Strict; Path=/; Max-Age=${intake.session_lifetime_s}`,
+		`${params.user[0]}=${params.session[0]}; Secure; HttpOnly; SameSite=Strict; Path=/; Max-Age=${intake.session_lifetime_seconds}`,
 	)

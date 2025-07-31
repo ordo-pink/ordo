@@ -19,15 +19,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { LOCALE } from "@ordo-pink/i18n"
-import { sweech } from "@ordo-pink/sweech"
+import type { Core } from "@ordo-pink/sdk-core"
+import type { Server } from "@ordo-pink/sdk-server"
 
-import type * as Types from "../../backend-server-au.types"
+export type Args = [
+	repository_data: Server.Data.Repository,
+	cache_user_id: Core.User.Id,
+	cache_file_id: Core.Data.Id,
+	user_file_id: Core.Data.Id,
+]
+export type Instance = Server.User.Repository
 
-// TODO Email body creation
+export type Create = (...args: Args) => Instance
 
-export const create_request_code_email_body = (lang: LOCALE, code: Types.Code) =>
-	sweech
-		.match(lang)
-		.case(LOCALE.RUSSIAN, () => code)
-		.default(() => code)
+export type Mapping<$Key extends string> = Record<$Key, Core.User.Id | undefined>
+
+export type Cache = { email: Mapping<Core.User.Email>; ref: Mapping<Core.User.Ref> }

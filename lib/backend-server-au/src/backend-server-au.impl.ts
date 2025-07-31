@@ -24,35 +24,50 @@ import { rickroll } from "@ordo-pink/rickroll"
 import { routary } from "@ordo-pink/routary"
 import { routary_cors } from "@ordo-pink/routary-cors"
 
-import * as fns from "./fns"
-import { BackendAuth } from "./backend-server-au.types"
+import * as Types from "./backend-server-au.types"
 import { handle_request_code } from "./handlers/request-code.handler"
 import { handle_verify_code } from "./handlers/verify-code.handler"
+import { server } from "@ordo-pink/sdk-server"
 
-export const create_backend_server_au = (params: BackendAuth.Params) => {
-	const interval = setInterval(
-		() => {
-			const now = Date.now()
+export const create: Types.Create = (
+	allow_origin,
+	code_lifetime_ms,
+	code_strategy,
+	data_repository,
+	email_strategy,
+	logger,
+	session_lifetime_seconds,
+	user_repository,
+) => {
+	const code_storage: Types.CodeStorage = new Map()
 
-			for (const [email, { timestamp }] of params.auth_storage.entries()) {
-				if (now - timestamp > params.code_lifetime_ms) {
-					params.auth_storage.delete(email)
-					params.logger.debug("Removed outdated code for", fns.obfuscate_email(email))
-				}
+	const interval = setInterval(() => {
+		const now = Date.now()
+
+		for (const [email, { timestamp }] of code_storage.entries()) {
+			if (now - timestamp > code_lifetime_ms) {
+				code_storage.delete(email)
+				logger.debug("Removed outdated code for", server.user.obfuscate_email(email))
 			}
-		},
-		5 * 60 * 1000,
-	)
+		}
+	}, code_lifetime_ms)
 
 	interval.unref()
 
 	return routary
-		.http({ ...params, status: 200, request_language: LOCALE.ENGLISH })
+		.http<Types.Fuel>({
+			code_storage,
+			code_strategy,
+			data_repository,
+			email_strategy,
+			logger,
+			request_language: LOCALE.ENGLISH,
+			session_lifetime_seconds,
+			user_repository,
+		})
 		.post("/request-code", handle_request_code)
 		.post("/verify-code", handle_verify_code)
 		.get("/healthcheck", () => new Response("OK")) // TODO Extract to lib
-		.use(
-			routary_cors({ allow_origin: params.allow_origin, allow_headers: ["content-type", "x-device"], allow_credentials: true }),
-		)
+		.use(routary_cors({ allow_origin: allow_origin, allow_headers: ["content-type", "x-device"], allow_credentials: true }))
 		.start(() => rickroll)
 }

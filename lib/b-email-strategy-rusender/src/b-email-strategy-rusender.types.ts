@@ -19,15 +19,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { LOCALE } from "@ordo-pink/i18n"
-import { sweech } from "@ordo-pink/sweech"
+import type * as EMAIL_STRATEGY_RUSENDER from "./b-email-strategy-rusender.constants"
+import type { Server } from "@ordo-pink/sdk-server"
 
-import type * as Types from "../../backend-server-au.types"
+export type ApiKey = string
+export type From = Server.Email.EmailGuy
+export type Args = [api_key: ApiKey, sender: From]
+export type Instance = Server.Email.Strategy
 
-// TODO Email body creation
+export type Create = (...args: Args) => Instance
 
-export const create_request_code_email_body = (lang: LOCALE, code: Types.Code) =>
-	sweech
-		.match(lang)
-		.case(LOCALE.RUSSIAN, () => code)
-		.default(() => code)
+export type CreateApiKeyHeader = (key: ApiKey) => [typeof EMAIL_STRATEGY_RUSENDER.X_API_KEY_HEADER_KEY, ApiKey]

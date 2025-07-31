@@ -19,15 +19,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { LOCALE } from "@ordo-pink/i18n"
-import { sweech } from "@ordo-pink/sweech"
+import { core } from "@ordo-pink/sdk-core"
+import { oath } from "@ordo-pink/oath"
 
-import type * as Types from "../../backend-server-au.types"
+import type * as Types from "./b-strategy-codegen-bun.types"
+import { curry } from "@ordo-pink/curry"
 
-// TODO Email body creation
+export const create: Types.Create = algorithm => ({
+	generate: () =>
+		oath
+			.of(new Uint8Array(6))
+			.pipe(oath.ops.map(ua => crypto.getRandomValues(ua)))
+			.pipe(oath.ops.and(ns => ns.join("")))
+			.pipe(oath.ops.and(s => s.slice(0, 6))),
 
-export const create_request_code_email_body = (lang: LOCALE, code: Types.Code) =>
-	sweech
-		.match(lang)
-		.case(LOCALE.RUSSIAN, () => code)
-		.default(() => code)
+	hash: code => oath.from_promise(() => Bun.password.hash(code, algorithm)).pipe(oath.ops.rmap(eio("Failed to hash code"))),
+
+	verify: (hash, code) =>
+		oath.from_promise(() => Bun.password.verify(code, hash)).pipe(oath.ops.rmap(eio("Failed to verify code"))),
+})
+
+const eio = curry(core.rrr.eio)

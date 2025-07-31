@@ -2,6 +2,8 @@ export type Prettify<$Type> = { [$Key in keyof $Type]: $Type[$Key] } & {}
 
 export type GenericGuard<$T> = (x: any) => x is $T
 
+export type Todo = (message?: string) => any
+
 /**
  * Logger definition in accordance with {@link https://www.rfc-editor.org/rfc/rfc5424 RFC5424}.
  */

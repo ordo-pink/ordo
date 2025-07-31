@@ -7,19 +7,19 @@ import type * as USER from "./user.constants"
 import type * as Uuid from "../uuid/uuid.types"
 import type { GenericGuard } from "../sdk-core.types"
 
-export type Id = Uuid.Instance
-export type Ref = string
-export type Name = string
+export type Id = Uuid.Instance & {}
+export type Ref = string & {}
+export type Name = string & {}
 export type Subscription = USER.SUBSCRIPTION
-export type CreatedAt = Timestamp.Instance
-export type UpdatedAt = Timestamp.Instance
-export type Email = `${string}@${string}.${string}`
-export type InstalledFunctionName = `@${string}/${string}`
-export type InstalledFunction = `${InstalledFunctionName}:${SemVer.Instance}`
+export type CreatedAt = Timestamp.Instance & {}
+export type UpdatedAt = Timestamp.Instance & {}
+export type Email = `${string}@${string}.${string}` & {}
+export type InstalledFunctionName = `@${string}/${string}` & {}
+export type InstalledFunction = `${InstalledFunctionName}:${SemVer.Instance}` & {}
 export type InstalledFunctions = InstalledFunction[]
-export type Parent = Id | null
+export type Parent = (Id | null) & {}
 export type Sessions = Session.Instance[]
-export type CarbonCopy = Id
+export type CarbonCopy = Id & {}
 export type CarbonCopies = CarbonCopy[]
 
 export type OtherUserInstance = [id: Id, ref: Ref, name: Name, subscription: Subscription]
@@ -34,8 +34,8 @@ export type Instance = [
 	cc: CarbonCopies,
 ]
 
-export type NewRef = (id: Id, email: Email) => Ref
-export type NewUser = (
+export type CreateRef = (id: Id, email: Email) => Ref
+export type Create = (
 	email: Email,
 	ref?: Ref,
 	name?: Name,

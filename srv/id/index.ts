@@ -22,8 +22,8 @@
 import { Core, core } from "@ordo-pink/sdk-core"
 import { type ServerID, create_backend_server_id } from "@ordo-pink/backend-server-id"
 import { is_finite_non_negative_int, is_finite_positive_int, is_port, is_positive_number } from "@ordo-pink/tau"
-import { create_persistence_strategy_data_fs } from "@ordo-pink/backend-persistence-strategy-data-fs"
-import { create_persistence_strategy_user } from "@ordo-pink/backend-persistence-strategy-user"
+import { create_persistence_strategy_data_fs } from "@ordo-pink/b-repository-data-fs"
+import { create_persistence_strategy_user } from "@ordo-pink/b-repository-user-repository-data"
 import { create_reference_mapping_user } from "@ordo-pink/backend-reference-mapping-user"
 import { oath } from "@ordo-pink/oath"
 

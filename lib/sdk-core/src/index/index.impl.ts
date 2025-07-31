@@ -1,5 +1,5 @@
 import * as fns from "../fns/fns.impl"
-import type { Logger } from "../sdk-core.types"
+import type { Logger, Todo } from "../sdk-core.types"
 
 export namespace logger {
 	/** An average silence fan. */
@@ -25,4 +25,10 @@ export namespace logger {
 		panic: (...args: any[]) => console.error("🔥 [PANC]:", ...args),
 		warn: (...args: any[]) => console.warn("⚠️ [WARN]:", ...args),
 	}
+}
+
+export const todo: Todo = message => {
+	logger.stout.alert(message ?? "Not Implemented")
+	if (globalThis.process) process.exitCode = 1
+	else throw new Error("Todo reached!")
 }

@@ -19,47 +19,41 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { Logger, Rrr, User } from "@ordo-pink/sdk-core"
-import type { Oath } from "@ordo-pink/oath"
+import type { Core } from "@ordo-pink/sdk-core"
 import type { Routary } from "@ordo-pink/routary"
 import type { RoutaryOrdo } from "@ordo-pink/routary-ordo"
 import type { Server } from "@ordo-pink/sdk-server"
 
-/**
- * BackendAuth implements a backend for user authentication.
- */
-export namespace BackendAuth {
-	/** User authentication code. */
-	export type Code = string
+export type Code = string & {}
 
-	/** Hashed user authentication code type alias. */
-	export type CodeHash = string
+export type CodeHash = string & {}
 
-	export type CodeStrategy = {
-		hash: (code: BackendAuth.Code) => Oath.Instance<string, Rrr.Instance<"EIO">>
-		generate: () => Oath.Instance<string, Rrr.Instance<"EIO">>
-		verify: (hash: BackendAuth.CodeHash, code: BackendAuth.Code) => Oath.Instance<boolean, Rrr.Instance<"EIO">>
+export type CodeStorage = Map<Core.User.Email, { hash: CodeHash; timestamp: number }>
+
+export type Args = [
+	allow_origin: string[],
+	code_lifetime_ms: number,
+	code_strategy: Server.Codegen.Instance,
+	data_repository: Server.Data.Repository,
+	email_strategy: Server.Email.Strategy,
+	logger: Core.Logger,
+	session_lifetime_seconds: number,
+	user_repository: Server.User.Repository,
+]
+
+export type Instance = ReturnType<Routary.Instance<Fuel>["start"]>
+
+export type Create = (...args: Args) => Instance
+
+export type Fuel = Core.Prettify<
+	RoutaryOrdo.Fuel & {
+		data_repository: Server.Data.Repository
+		email_strategy: Server.Email.Strategy
+		session_lifetime_seconds: number
+		user_repository: Server.User.Repository
+		code_strategy: Server.Codegen.Instance
+		code_storage: CodeStorage
 	}
+>
 
-	export type Storage = Map<User.Email, { hash: BackendAuth.CodeHash; timestamp: number }>
-
-	export type Params = {
-		allow_origin: string[]
-		auth_storage: BackendAuth.Storage
-		code_lifetime_ms: number
-		code_strategy: BackendAuth.CodeStrategy
-		create_request_id: () => string
-		data_persistence_strategy: Server.Data.PersistenceStrategy
-		defaults: { file_limit: number; max_upload_size: number; max_functions: number }
-		email_strategy: Server.Notification.EmailStrategy
-		logger: Logger
-		port: number
-		session_lifetime_s: number
-		reference_mapping_user: Server.User.ReferenceMapping
-		persistence_strategy_user: Server.User.PersistenceStrategy
-	}
-
-	export type Fuel = RoutaryOrdo.Fuel & Params
-
-	export type Intake = Routary.Intake<BackendAuth.Fuel>
-}
+export type Intake = Core.Prettify<Routary.Intake<Fuel>>

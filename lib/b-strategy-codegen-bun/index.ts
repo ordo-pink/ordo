@@ -19,15 +19,5 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { LOCALE } from "@ordo-pink/i18n"
-import { sweech } from "@ordo-pink/sweech"
-
-import type * as Types from "../../backend-server-au.types"
-
-// TODO Email body creation
-
-export const create_request_code_email_body = (lang: LOCALE, code: Types.Code) =>
-	sweech
-		.match(lang)
-		.case(LOCALE.RUSSIAN, () => code)
-		.default(() => code)
+export * as codegen_strategy_bun from "./src/b-strategy-codegen-bun.impl"
+export * as CodegenStrategyBun from "./src/b-strategy-codegen-bun.types"

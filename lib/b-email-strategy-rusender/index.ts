@@ -19,15 +19,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { LOCALE } from "@ordo-pink/i18n"
-import { sweech } from "@ordo-pink/sweech"
-
-import type * as Types from "../../backend-server-au.types"
-
-// TODO Email body creation
-
-export const create_request_code_email_body = (lang: LOCALE, code: Types.Code) =>
-	sweech
-		.match(lang)
-		.case(LOCALE.RUSSIAN, () => code)
-		.default(() => code)
+export * as EMAIL_STRATEGY_RUSENDER from "./src/b-email-strategy-rusender.constants"
+export type * as EmailStrategyRusender from "./src/b-email-strategy-rusender.types"
+export * as email_strategy_rusender from "./src/b-email-strategy-rusender.impl"

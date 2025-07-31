@@ -8,9 +8,7 @@ import { sweech } from "@ordo-pink/sweech"
 import * as RRR from "./rrr.constants"
 import * as Rrr from "./rrr.types"
 
-const create: Rrr.CreateType =
-	type =>
-	(message, ...debug) => ({ type: RRR.TYPE[type], message, debug })
+const create: Rrr.CreateType = type => (message, debug) => ({ type: RRR.TYPE[type], message, debug })
 
 export const eacces = create("EACCES")
 export const eagain = create("EAGAIN")

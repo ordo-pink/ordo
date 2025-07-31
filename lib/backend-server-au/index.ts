@@ -19,5 +19,5 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export * from "./src/backend-server-au.impl"
-export * from "./src/backend-server-au.types"
+export * as server_au from "./src/backend-server-au.impl"
+export * as ServerAU from "./src/backend-server-au.types"

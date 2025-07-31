@@ -7,11 +7,11 @@ import * as sem_ver from "../sem-ver/semver.impl"
 import * as timestamp from "../timestamp/timestamp.impl"
 import * as uuid from "../uuid/uuid.impl"
 
-export const new_ref: User.NewRef = (id, email) => email.split("@")[0].concat(id.split("-")[0])
-export const new_user: User.NewUser = (email, ref, name = default_name(), sub = default_subscription(), ifs = [], p = null) =>
+export const create_ref: User.CreateRef = (id, email) => email.split("@")[0].concat(id.split("-")[0])
+export const create: User.Create = (email, ref, name = default_name(), sub = default_subscription(), ifs = [], p = null) =>
 	result
 		.of(uuid.create())
-		.pipe(result.ops.chain(id => result.merge({ id, t: timestamp.create(), ref: ref ?? new_ref(id, email) })))
+		.pipe(result.ops.chain(id => result.merge({ id, t: timestamp.create(), ref: ref ?? create_ref(id, email) })))
 		.pipe(result.ops.map(({ ref, id, t }) => [id, ref, name, sub, t, t, email, ifs, [], p, []] satisfies User.Instance))
 		.cata(result.catas.expect(fns.v)) // Never gonna happen
 

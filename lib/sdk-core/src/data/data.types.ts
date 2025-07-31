@@ -21,12 +21,15 @@ export type Labels = Label[]
 export type Link = Id
 export type Links = Link[]
 export type Fields = Record<string, unknown>
-export type Permissions = [user: Permission.Instance, group: Permission.Instance]
+export type Permissions = [user: Permission.Instance, group: Permission.Instance, other: Permission.Instance]
+export type Location = DATA.LOCATION
+export type Size = number
 
 export type Instance = [
 	id: Id,
 	name: Name,
 	parent: Parent,
+	size: Size,
 	owner: OwnerUser,
 	group: OwnerGroup,
 	created_at: CreatedAt,
@@ -37,48 +40,57 @@ export type Instance = [
 	links: Links,
 	fields: Fields,
 	permissions: Permissions,
+	location: Location,
 ]
 
-export type NameGuard = GenericGuard<Name>
-export type ParentGuard = GenericGuard<Parent>
+export type FieldsGuard = GenericGuard<Fields>
+export type Guard = GenericGuard<Instance>
 export type LabelGuard = GenericGuard<Label>
 export type LabelsGuard = GenericGuard<Labels>
 export type LinksGuard = GenericGuard<Links>
-export type FieldsGuard = GenericGuard<Fields>
+export type LocationGuard = GenericGuard<Location>
+export type NameGuard = GenericGuard<Name>
+export type ParentGuard = GenericGuard<Parent>
 export type PermissionsGuard = GenericGuard<Permissions>
-export type Guard = GenericGuard<Instance>
+export type SizeGuard = GenericGuard<Size>
 
 export type CreateLabel = (text: LabelText, color?: LabelColor) => Label
 export type Create = (
 	name: Name,
 	parent: Parent,
+	size: Size,
 	owner: OwnerUser,
 	author: CreatedBy,
+	location?: Location,
 	labels?: Labels,
 	links?: Links,
 	fields?: Fields,
 	permissions?: Permissions,
 ) => Instance
 
-export type GetId = (data: Instance) => Id
-export type GetName = (data: Instance) => Name
-export type GetParent = (data: Instance) => Parent
-export type GetOwnerUser = (data: Instance) => OwnerUser
-export type GetOwnerGroup = (data: Instance) => OwnerGroup
 export type GetCreatedAt = (data: Instance) => CreatedAt
-export type GetUpdatedAt = (data: Instance) => UpdatedAt
 export type GetCreatedBy = (data: Instance) => CreatedBy
-export type GetUpdatedBy = (data: Instance) => UpdatedBy
+export type GetFields = (data: Instance) => Fields
+export type GetId = (data: Instance) => Id
 export type GetLabels = (data: Instance) => Labels
 export type GetLinks = (data: Instance) => Links
-export type GetFields = (data: Instance) => Fields
+export type GetLocation = (data: Instance) => Location
+export type GetName = (data: Instance) => Name
+export type GetOwnerGroup = (data: Instance) => OwnerGroup
+export type GetOwnerUser = (data: Instance) => OwnerUser
+export type GetParent = (data: Instance) => Parent
 export type GetPermissions = (data: Instance) => Permissions
+export type GetSize = (data: Instance) => Size
+export type GetUpdatedAt = (data: Instance) => UpdatedAt
+export type GetUpdatedBy = (data: Instance) => UpdatedBy
 
-export type SetName = (value: Name, data: Instance) => Instance
-export type SetParent = (value: Parent, data: Instance) => Instance
-export type SetOwnerUser = (value: OwnerUser, data: Instance) => Instance
-export type SetOwnerGroup = (value: OwnerGroup, data: Instance) => Instance
+export type SetFields = (value: Fields, data: Instance) => Instance
 export type SetLabels = (value: Labels, data: Instance) => Instance
 export type SetLinks = (value: Links, data: Instance) => Instance
-export type SetFields = (value: Fields, data: Instance) => Instance
+export type SetLocation = (value: Location, data: Instance) => Instance
+export type SetName = (value: Name, data: Instance) => Instance
+export type SetOwnerGroup = (value: OwnerGroup, data: Instance) => Instance
+export type SetOwnerUser = (value: OwnerUser, data: Instance) => Instance
+export type SetParent = (value: Parent, data: Instance) => Instance
 export type SetPermissions = (value: Permissions, data: Instance) => Instance
+export type SetSize = (value: Size, data: Instance) => Instance

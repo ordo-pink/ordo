@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { RRR, type Rrr } from "@ordo-pink/sdk-core"
+import { CORE, type Core } from "@ordo-pink/sdk-core"
 import { type Routary } from "@ordo-pink/routary"
 import { sweech } from "@ordo-pink/sweech"
 
@@ -17,7 +17,7 @@ export const create_json_response = <$TIntake extends Routary.Intake<RoutaryOrdo
 export const create_response = <$TIntake extends Routary.Intake<RoutaryOrdo.Fuel>>({ res }: $TIntake): Response =>
 	new Response(res.body, { headers: res.headers, status: res.status })
 
-type TStatusFromRRRParams<$TContext extends RoutaryOrdo.Fuel> = { rrr: Rrr.Instance; intake: Routary.Intake<$TContext> }
+type TStatusFromRRRParams<$TContext extends RoutaryOrdo.Fuel> = { rrr: Core.Rrr.Instance; intake: Routary.Intake<$TContext> }
 export const status_from_rrr = <$TContext extends RoutaryOrdo.Fuel>({
 	rrr: e,
 	intake,
@@ -29,17 +29,17 @@ export const status_from_rrr = <$TContext extends RoutaryOrdo.Fuel>({
 		intake.res.headers.set("Content-Type", "application/json")
 	}
 
-	intake.res.body = JSON.stringify([RRR.TYPE[e.type], e.message])
+	intake.res.body = JSON.stringify([CORE.RRR.TYPE[e.type], e.message])
 
 	intake.res.status = sweech
 		.match(e.type)
-		.case([RRR.TYPE.EAGAIN, RRR.TYPE.ENXIO], () => 408)
-		.case([RRR.TYPE.EFBIG, RRR.TYPE.ENOSPC], () => 413)
-		.case(RRR.TYPE.EINVAL, () => 400)
-		.case(RRR.TYPE.EACCES, () => 401)
-		.case(RRR.TYPE.EPERM, () => 403)
-		.case(RRR.TYPE.ENOENT, () => 404)
-		.case(RRR.TYPE.EEXIST, () => 409)
+		.case([CORE.RRR.TYPE.EAGAIN, CORE.RRR.TYPE.ENXIO], () => 408)
+		.case([CORE.RRR.TYPE.EFBIG, CORE.RRR.TYPE.ENOSPC], () => 413)
+		.case(CORE.RRR.TYPE.EINVAL, () => 400)
+		.case(CORE.RRR.TYPE.EACCES, () => 401)
+		.case(CORE.RRR.TYPE.EPERM, () => 403)
+		.case(CORE.RRR.TYPE.ENOENT, () => 404)
+		.case(CORE.RRR.TYPE.EEXIST, () => 409)
 		.default(() => 500)
 
 	return intake

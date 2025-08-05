@@ -92,8 +92,6 @@ function download_deno {
     curl -fLo "$zip" "https://github.com/denoland/deno/releases/download/v$DENO_VERSION/$NESTED_DIR.zip"
 
     unzip -o $zip -d opt &>/dev/null
-    mv opt/$NESTED_DIR/deno opt/deno
-    rm -rf opt/$NESTED_DIR
     chmod +x opt/deno
     rm $zip
   fi

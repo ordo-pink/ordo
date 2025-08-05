@@ -4,6 +4,7 @@
 
 [![Lint](https://github.com/ordo-pink/ordo/actions/workflows/lint.yml/badge.svg)](https://github.com/ordo-pink/ordo/actions/workflows/lint.yml)
 [![Lint](https://github.com/ordo-pink/ordo/actions/workflows/test.yml/badge.svg)](https://github.com/ordo-pink/ordo/actions/workflows/test.yml)
+[![SPDX](https://github.com/ordo-pink/ordo/actions/workflows/spdx.yml/badge.svg)](https://github.com/ordo-pink/ordo/actions/workflows/spdx.yml)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fordo-pink%2Fordo.svg?type=shield&issueType=license)](https://app.fossa.com/projects/git%2Bgithub.com%2Fordo-pink%2Fordo?ref=badge_shield&issueType=license)
 [![Netlify Status](https://api.netlify.com/api/v1/badges/9f9131e0-14d5-42b2-8df4-36d3cad185f7/deploy-status)](https://app.netlify.com/sites/ordo-pink/deploys)
 

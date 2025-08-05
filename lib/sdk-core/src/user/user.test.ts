@@ -48,6 +48,6 @@ describe("user", () => {
 		expect(user.subscription_guard(0)).toBeTrue()
 		expect(user.subscription_guard(-1)).toBeFalse()
 		expect(user.subscription_guard(1.1)).toBeFalse()
-		expect(user.subscription_guard(SUBSCRIPTION.length)).toBeFalse()
+		expect(user.subscription_guard(USER.SUBSCRIPTION.length)).toBeFalse()
 	})
 })

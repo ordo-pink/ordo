@@ -10,7 +10,7 @@ PLATFORM=$(uname -ms)
 
 BUN_VERSION="1.2.19"
 DENO_VERSION="2.4.3"
-TAILWIND_VERSION="v3.1.17"
+TAILWIND_VERSION="v3.4.17"
 
 # --- Internal ---
 

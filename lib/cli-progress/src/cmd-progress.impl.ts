@@ -17,12 +17,12 @@ export const create_progress: Progress.Fn = (message = "") => ({
 		process.stdout.write(msg)
 	},
 	finish: () => {
-		process.stdout.moveCursor(-message.length, -Math.floor(message.length / process.stdout.columns))
+		process.stdout.moveCursor?.(-message.length, -Math.floor(message.length / process.stdout.columns))
 		process.stdout.write(`${chalk.green("✔")} ${message}\n`)
 		message = ""
 	},
 	break: (message: string) => {
-		process.stdout.moveCursor(-message.length, -Math.floor(message.length / process.stdout.columns))
+		process.stdout.moveCursor?.(-message.length, -Math.floor(message.length / process.stdout.columns))
 		process.stdout.write(`${chalk.red("✘")} ${message}\n`)
 		message = ""
 	},

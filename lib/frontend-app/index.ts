@@ -20,10 +20,10 @@
  */
 
 import { context, maoka_sdk } from "@ordo-pink/sdk-maoka"
-import { maoka, maoka_styled } from "@ordo-pink/maoka"
+import { maoka, maoka_styled } from "@ordo-pink/oss-maoka"
 import { type ClientSDK } from "@ordo-pink/sdk-client"
 import type { Core } from "@ordo-pink/sdk-core"
-import { hunt } from "@ordo-pink/hunt"
+import { hunt } from "@ordo-pink/oss-hunt"
 
 import { auth_jab } from "./src/state/auth"
 import { create_activity_bar_jab } from "./src/sections/activity-bar"
@@ -45,7 +45,7 @@ import "./index.css"
 export type AppOptions = {
 	hosts: Core.Hosts
 	local_persistence_strategy: null
-	logger: Core.Logger.Instance
+	logger: Core.Logger
 }
 
 const native_fetch = window.fetch
@@ -85,7 +85,7 @@ export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
 	const activity_bar = use(create_activity_bar_jab(command_palette_toggle, sidebar_toggle))
 	const notifications = use(create_notifications_jab)
 
-	void import("@ordo-pink/f-landing")
+	void import("@ordo-pink/function-landing")
 		.then(m => m.default)
 		.then(f => f(state))
 		.catch(logger.error)

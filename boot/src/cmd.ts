@@ -1,4 +1,4 @@
-import type { CommandHandler } from "@ordo-pink/cmd-handler"
+import type { CommandHandler } from "@ordo-pink/cli-handler"
 import { build_command } from "@ordo-pink/command-build"
 import { init_command } from "@ordo-pink/command-init"
 import { mklib_command } from "@ordo-pink/command-mklib"

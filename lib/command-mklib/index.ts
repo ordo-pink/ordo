@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { CommandHandler } from "@ordo-pink/cmd-handler"
+import type { CommandHandler } from "@ordo-pink/cli-handler"
 
 import { mklib_handler } from "./src/cmd-mklib.impl"
 

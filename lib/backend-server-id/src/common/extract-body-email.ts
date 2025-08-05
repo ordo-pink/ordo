@@ -20,7 +20,7 @@
  */
 
 import { type User, user } from "@ordo-pink/sdk-core"
-import { oath } from "@ordo-pink/oath"
+import { oath } from "@ordo-pink/oss-oath"
 
 import { email_missing_rrr, invalid_email_rrr } from "../rrrs/invalid-user-email.rrr"
 import type { ServerID } from "../backend-server-id.types"

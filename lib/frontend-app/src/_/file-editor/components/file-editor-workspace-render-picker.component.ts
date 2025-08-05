@@ -19,10 +19,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Maoka } from "@ordo-pink/maoka"
+import { Maoka } from "@ordo-pink/oss-maoka"
 import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
-import { oath } from "@ordo-pink/oath"
+import { oath } from "@ordo-pink/oss-oath"
 import { ordo_app_state } from "@ordo-pink/frontend-app/app.state"
 
 export const RenderPicker = (metadata: Ordo.Metadata.Instance, force_editable?: boolean, force_embedded?: boolean) =>

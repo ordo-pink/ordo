@@ -19,10 +19,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import * as tau from "@ordo-pink/tau"
+import * as tau from "@ordo-pink/_tau"
 import { type Core, core } from "@ordo-pink/sdk-core"
-import { Oath, oath } from "@ordo-pink/oath"
-import { default_handler, huyami } from "@ordo-pink/routary-ordo"
+import { Oath, oath } from "@ordo-pink/oss-oath"
+import { default_handler, huyami } from "@ordo-pink/b-server-core"
 
 import * as Types from "../backend-server-au.types"
 import { create_user_authenticated_email_body, create_user_authenticated_email_subject } from "../fns"

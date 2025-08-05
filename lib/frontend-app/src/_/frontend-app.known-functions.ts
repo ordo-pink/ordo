@@ -19,8 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import * as tau from "@ordo-pink/tau"
-import { type Result, result } from "@ordo-pink/result"
+import * as tau from "@ordo-pink/_tau"
+import { type Result, result } from "@ordo-pink/oss-result"
 import { ordo_app_state } from "../app.state"
 
 // TODO: Extend query list :: data, etc.

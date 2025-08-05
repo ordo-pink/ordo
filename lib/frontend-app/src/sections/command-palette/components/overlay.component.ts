@@ -20,7 +20,7 @@
  */
 
 import { context, maoka_sdk } from "@ordo-pink/sdk-maoka"
-import { maoka_dom, maoka_styled } from "@ordo-pink/maoka"
+import { maoka_dom, maoka_styled } from "@ordo-pink/oss-maoka"
 
 import { command_palette$ } from "../command-palette.state"
 

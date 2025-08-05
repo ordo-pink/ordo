@@ -19,8 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { die, run_command } from "@ordo-pink/cmd-runner"
-import { oath } from "@ordo-pink/oath"
+import { die, run_command } from "@ordo-pink/cli-runner"
+import { oath } from "@ordo-pink/oss-oath"
 
 const main = () =>
 	run_command(clean_up_cmd, { stdout: "inherit", stderr: "inherit" })

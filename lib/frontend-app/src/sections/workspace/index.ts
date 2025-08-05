@@ -19,9 +19,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { type Maoka, maoka_dom } from "@ordo-pink/maoka"
+import { type Maoka, maoka_dom } from "@ordo-pink/oss-maoka"
 import { COMMAND_PALETTE } from "@ordo-pink/sdk-client"
-import { LOCALE } from "@ordo-pink/i18n"
+import { LOCALE } from "@ordo-pink/oss-i18n"
 import { bs_layout_sidebar_inset_reverse } from "@ordo-pink/frontend-icons"
 import { maoka_sdk } from "@ordo-pink/sdk-maoka"
 

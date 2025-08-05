@@ -20,9 +20,9 @@
  */
 
 import { type Core, core } from "@ordo-pink/sdk-core"
-import { type Oath, oath } from "@ordo-pink/oath"
+import { type Oath, oath } from "@ordo-pink/oss-oath"
 import { type Server, server } from "@ordo-pink/sdk-server"
-import { default_handler, huyami } from "@ordo-pink/routary-ordo"
+import { default_handler, huyami } from "@ordo-pink/b-server-core"
 
 import type * as Types from "../backend-server-au.types"
 import { create_request_code_email_body, create_request_code_email_subject } from "../fns"

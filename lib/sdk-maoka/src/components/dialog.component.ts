@@ -1,7 +1,12 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ */
+
 import { type ClientSDK, MODAL } from "@ordo-pink/sdk-client"
-import { type Maoka, maoka, maoka_dom, maoka_styled } from "@ordo-pink/maoka"
+import { type Maoka, maoka, maoka_dom, maoka_styled } from "@ordo-pink/oss-maoka"
 import { type MaokaSDK, maoka_sdk } from "@ordo-pink/sdk-maoka"
-import { sweech } from "@ordo-pink/sweech"
+import { sweech } from "@ordo-pink/oss-sweech"
 
 import "./dialog.styles.css"
 import type { Dialog } from "@ordo-pink/maoka-components"

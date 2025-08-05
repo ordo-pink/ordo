@@ -28,8 +28,8 @@ import {
 	bs_info_circle,
 	bs_question_circle,
 } from "@ordo-pink/frontend-icons"
-import { maoka, maoka_dom } from "@ordo-pink/maoka"
-import { sweech } from "@ordo-pink/sweech"
+import { maoka, maoka_dom } from "@ordo-pink/oss-maoka"
+import { sweech } from "@ordo-pink/oss-sweech"
 
 export const notification_icon = maoka.create<Pick<ClientSDK.Notification.Instance, "render_icon" | "type">>(
 	"div",

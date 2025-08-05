@@ -20,7 +20,7 @@
  */
 
 import { type Core, core_sdk } from "@ordo-pink/sdk-core"
-import { maoka, maoka_styled } from "@ordo-pink/maoka"
+import { maoka, maoka_styled } from "@ordo-pink/oss-maoka"
 import { bs_x } from "@ordo-pink/frontend-icons"
 import { maoka_sdk } from "@ordo-pink/sdk-maoka"
 

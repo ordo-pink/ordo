@@ -4,7 +4,7 @@
  */
 
 import type { Core } from "@ordo-pink/sdk-core"
-import type { I18n } from "@ordo-pink/i18n"
+import type { I18n } from "@ordo-pink/oss-i18n"
 
 import type { ClientSDK } from "./sdk-client.types"
 

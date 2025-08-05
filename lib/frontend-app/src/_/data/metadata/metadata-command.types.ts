@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { TResult } from "@ordo-pink/result"
+import type { TResult } from "@ordo-pink/oss-result"
 
 export type TMetadatCommandConstructor = (
 	metadata_repository: Ordo.Metadata.Repository,

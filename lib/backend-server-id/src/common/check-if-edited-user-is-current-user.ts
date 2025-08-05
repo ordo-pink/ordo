@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { oath } from "@ordo-pink/oath"
+import { oath } from "@ordo-pink/oss-oath"
 import { rrr } from "@ordo-pink/sdk-core"
 
 import type { ServerID } from "../backend-server-id.types"

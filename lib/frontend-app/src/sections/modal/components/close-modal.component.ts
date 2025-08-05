@@ -23,7 +23,7 @@ import { maoka_sdk } from "@ordo-pink/sdk-maoka"
 
 import type { ClientSDK } from "@ordo-pink/sdk-client"
 import { bs_x } from "@ordo-pink/frontend-icons"
-import { maoka } from "@ordo-pink/maoka"
+import { maoka } from "@ordo-pink/oss-maoka"
 
 import { modal$ } from "../modal.state"
 

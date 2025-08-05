@@ -19,12 +19,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { NOTIFICATION_TYPE, rrr } from "@ordo-pink/core"
-import { result } from "@ordo-pink/result"
-import { call_once } from "@ordo-pink/tau"
+import { NOTIFICATION_TYPE, rrr } from "@ordo-pink/_core"
+import { result } from "@ordo-pink/oss-result"
+import { call_once } from "@ordo-pink/_tau"
 import { console_logger } from "@ordo-pink/logger"
-import { create_zags } from "@ordo-pink/zags"
-import { oath } from "@ordo-pink/oath"
+import { create_zags } from "@ordo-pink/oss-zags"
+import { oath } from "@ordo-pink/oss-oath"
 
 import { MetadataCommand } from "./data/metadata/metadata-command.impl"
 import { MetadataQuery } from "./data/metadata/metadata-query.impl"

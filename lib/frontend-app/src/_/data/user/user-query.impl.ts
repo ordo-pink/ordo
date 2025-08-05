@@ -19,10 +19,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { result } from "@ordo-pink/result"
-import { create_zags } from "@ordo-pink/zags"
-import { oath } from "@ordo-pink/oath"
-import { rrr } from "@ordo-pink/core"
+import { result } from "@ordo-pink/oss-result"
+import { create_zags } from "@ordo-pink/oss-zags"
+import { oath } from "@ordo-pink/oss-oath"
+import { rrr } from "@ordo-pink/_core"
 
 import { current_user, public_user } from "../../../../core/src/user.impl"
 import { ordo_app_state } from "../../../app.state"

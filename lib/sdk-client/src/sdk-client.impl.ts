@@ -4,10 +4,10 @@
  */
 
 import { CORE, Core, core } from "@ordo-pink/sdk-core"
-import { sweech } from "@ordo-pink/sweech"
+import { sweech } from "@ordo-pink/oss-sweech"
 
 import type { ClientRrr, ClientSDK } from "./sdk-client.types"
-import { create_zags } from "@ordo-pink/zags"
+import { create_zags } from "@ordo-pink/oss-zags"
 
 export namespace client_sdk {
 	// TODO Compose queries into a single zags with what is permitted instead of providing them separately

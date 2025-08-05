@@ -20,8 +20,8 @@
  */
 
 import { Logger, console_logger } from "@ordo-pink/logger"
-import { type TMaokaJab } from "@ordo-pink/maoka"
-import { Zags } from "@ordo-pink/zags"
+import { type TMaokaJab } from "@ordo-pink/oss-maoka"
+import { Zags } from "@ordo-pink/oss-zags"
 
 import { init_commands } from "../frontend-app.commands"
 import { init_content } from "../frontend-app.content"

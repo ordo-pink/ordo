@@ -21,7 +21,7 @@
 
 import { type Logger } from "@ordo-pink/logger"
 import { O } from "@ordo-pink/option"
-import { call_once } from "@ordo-pink/tau"
+import { call_once } from "@ordo-pink/_tau"
 
 import { ordo_app_state } from "../app.state"
 

@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { CommandHandler } from "@ordo-pink/cmd-handler"
+import type { CommandHandler } from "@ordo-pink/cli-handler"
 import { handle_spdx } from "./src/cmd-spdx.impl"
 
 export const spdx_command: CommandHandler.Commands = {

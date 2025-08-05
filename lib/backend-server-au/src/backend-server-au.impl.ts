@@ -19,10 +19,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { LOCALE } from "@ordo-pink/i18n"
-import { rickroll } from "@ordo-pink/rickroll"
-import { routary } from "@ordo-pink/routary"
-import { routary_cors } from "@ordo-pink/routary-cors"
+import { LOCALE } from "@ordo-pink/oss-i18n"
+import { rickroll } from "@ordo-pink/oss-rickroll"
+import { routary } from "@ordo-pink/oss-routary"
+import { routary_cors } from "@ordo-pink/oss-routary-cors"
 
 import * as Types from "./backend-server-au.types"
 import { handle_request_code } from "./handlers/request-code.handler"

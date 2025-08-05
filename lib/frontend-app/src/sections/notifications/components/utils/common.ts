@@ -20,7 +20,7 @@
  */
 
 import { NOTIFICATION } from "@ordo-pink/sdk-client"
-import { sweech } from "@ordo-pink/sweech"
+import { sweech } from "@ordo-pink/oss-sweech"
 
 export const get_readable_type = (type = NOTIFICATION.TYPE.DEFAULT) =>
 	sweech

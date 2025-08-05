@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ */
+
 import type * as Session from "./session.types"
 import * as fns from "../fns/fns.impl"
 import * as timestamp from "../timestamp/timestamp.impl"

@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { Maoka } from "@ordo-pink/maoka"
+import type { Maoka } from "@ordo-pink/oss-maoka"
 
 import { activity_bar } from "./components/activity-bar.component"
 

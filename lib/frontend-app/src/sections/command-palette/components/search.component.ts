@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { maoka, maoka_dom, maoka_styled } from "@ordo-pink/maoka"
+import { maoka, maoka_dom, maoka_styled } from "@ordo-pink/oss-maoka"
 import { bs_search } from "@ordo-pink/frontend-icons"
 
 import { command_palette$ } from "../command-palette.state"

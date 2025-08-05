@@ -20,12 +20,12 @@
  */
 
 import { BsFilesAlt, BsSlash } from "@ordo-pink/frontend-icons"
-import { CONTEXT_MENU_ITEM_TYPE, Metadata } from "@ordo-pink/core"
-import { R, type TResult } from "@ordo-pink/result"
+import { CONTEXT_MENU_ITEM_TYPE, Metadata } from "@ordo-pink/_core"
+import { R, type TResult } from "@ordo-pink/oss-result"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MetadataIcon } from "@ordo-pink/maoka-components"
-import { type TMaokaJab } from "@ordo-pink/maoka"
+import { type TMaokaJab } from "@ordo-pink/oss-maoka"
 
 /**
  * Register `Move...` command in {@link Ordo.ContextMenu.Item Context Menu} of a

@@ -13,7 +13,7 @@ export type Instance<$Type extends Type = Type> = {
 	debug: any[]
 }
 
-export type Create<$Type extends Type> = (message: string, debug: any) => Instance<$Type>
+export type Create<$Type extends Type> = (message: string, debug?: any) => Instance<$Type>
 
 export type CreateType = <$Type extends Type>(type: $Type) => Create<$Type>
 

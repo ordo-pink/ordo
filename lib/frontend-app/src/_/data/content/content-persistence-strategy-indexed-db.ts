@@ -20,9 +20,9 @@
  */
 
 import { IndexedDBStorePromise } from "@ordo-pink/indexeddb-promise"
-import { noop } from "@ordo-pink/tau"
-import { oath } from "@ordo-pink/oath"
-import { rrr } from "@ordo-pink/core"
+import { noop } from "@ordo-pink/_tau"
+import { oath } from "@ordo-pink/oss-oath"
+import { rrr } from "@ordo-pink/_core"
 
 export const PersistenceStrategyContentIndexedDB = {
 	Of: (

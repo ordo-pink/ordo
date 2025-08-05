@@ -19,9 +19,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Metadata as M, get_wrong_label, rrr } from "@ordo-pink/core"
-import { gt, negate, prop } from "@ordo-pink/tau"
-import { R } from "@ordo-pink/result"
+import { Metadata as M, get_wrong_label, rrr } from "@ordo-pink/_core"
+import { gt, negate, prop } from "@ordo-pink/_tau"
+import { R } from "@ordo-pink/oss-result"
 
 // TODO Move to frontend-app
 // TODO Avoid reusing methods in all queries

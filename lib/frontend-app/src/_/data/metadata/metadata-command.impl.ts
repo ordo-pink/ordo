@@ -19,10 +19,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { R, type TResult } from "@ordo-pink/result"
-import { alpha_sort, concat, override, thunk } from "@ordo-pink/tau"
+import { R, type TResult } from "@ordo-pink/oss-result"
+import { alpha_sort, concat, override, thunk } from "@ordo-pink/_tau"
 
-import { Metadata as M, Metadata, get_wrong_label, get_wrong_link, rrr } from "@ordo-pink/core"
+import { Metadata as M, Metadata, get_wrong_label, get_wrong_link, rrr } from "@ordo-pink/_core"
 
 // TODO Move to frontend-app
 export const MetadataCommand: Ordo.Metadata.CommandStatic = {

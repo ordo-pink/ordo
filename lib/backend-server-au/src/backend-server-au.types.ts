@@ -20,8 +20,8 @@
  */
 
 import type { Core } from "@ordo-pink/sdk-core"
-import type { Routary } from "@ordo-pink/routary"
-import type { RoutaryOrdo } from "@ordo-pink/routary-ordo"
+import type { Routary } from "@ordo-pink/oss-routary"
+import type { RoutaryOrdo } from "@ordo-pink/b-server-core"
 import type { Server } from "@ordo-pink/sdk-server"
 
 export type Code = string & {}

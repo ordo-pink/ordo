@@ -20,8 +20,8 @@
  */
 
 import { ActionListItem } from "@ordo-pink/maoka-components"
-import { CONTEXT_MENU_ITEM_TYPE } from "@ordo-pink/core"
-import { Maoka } from "@ordo-pink/maoka"
+import { CONTEXT_MENU_ITEM_TYPE } from "@ordo-pink/_core"
+import { Maoka } from "@ordo-pink/oss-maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"

@@ -20,14 +20,14 @@
  */
 
 import { Input, Label, MetadataIcon, MetadataLink } from "@ordo-pink/maoka-components"
-import { Maoka } from "@ordo-pink/maoka"
+import { Maoka } from "@ordo-pink/oss-maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
-import { R } from "@ordo-pink/result"
-import { noop } from "@ordo-pink/tau"
-import { oath } from "@ordo-pink/oath"
+import { R } from "@ordo-pink/oss-result"
+import { noop } from "@ordo-pink/_tau"
+import { oath } from "@ordo-pink/oss-oath"
 
 // TODO Refresh if metadata was changed from the outside
 export const FileMetadata = (metadata: Ordo.Metadata.Instance) =>

@@ -4,7 +4,7 @@
  */
 
 import type { ClientSDK } from "@ordo-pink/sdk-client"
-import type { Maoka } from "@ordo-pink/maoka"
+import type { Maoka } from "@ordo-pink/oss-maoka"
 
 export namespace MaokaSDK {
 	export type Context = Maoka.Context.Instance<ClientSDK.F.State>

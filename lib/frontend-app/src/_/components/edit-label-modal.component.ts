@@ -20,9 +20,9 @@
  */
 
 import { Dialog, Input, Select, color_class } from "@ordo-pink/maoka-components"
-import { is_non_empty_string, title_case } from "@ordo-pink/tau"
-import { LABEL_COLOR } from "@ordo-pink/core"
-import { Maoka } from "@ordo-pink/maoka"
+import { is_non_empty_string, title_case } from "@ordo-pink/_tau"
+import { LABEL_COLOR } from "@ordo-pink/_core"
+import { Maoka } from "@ordo-pink/oss-maoka"
 import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"

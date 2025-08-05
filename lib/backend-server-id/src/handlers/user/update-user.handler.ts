@@ -19,10 +19,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { current_user, CURRENT_USER_KEYS } from "@ordo-pink/core"
-import { default_handler, extract_json_body } from "@ordo-pink/routary-ordo"
-import { type Routary } from "@ordo-pink/routary"
-import { oath } from "@ordo-pink/oath"
+import { current_user, CURRENT_USER_KEYS } from "@ordo-pink/_core"
+import { default_handler, extract_json_body } from "@ordo-pink/b-server-core"
+import { type Routary } from "@ordo-pink/oss-routary"
+import { oath } from "@ordo-pink/oss-oath"
 
 import { exists_by_email_rrr, invalid_email_rrr } from "../../rrrs/invalid-user-email.rrr"
 import { exists_by_handle, invalid_handle_rrr } from "../../rrrs/invalid-user-handle.rrr"

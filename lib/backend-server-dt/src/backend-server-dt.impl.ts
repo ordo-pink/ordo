@@ -9,16 +9,16 @@ import {
 	default_handler,
 	extract_request_ip,
 	log_request,
-	start_response_timer,
+	count_response_time,
 	status_from_rrr,
 	stop_response_timer,
-} from "@ordo-pink/routary-ordo"
-import { LOCALE } from "@ordo-pink/i18n"
-import { is_finite_non_negative_int } from "@ordo-pink/tau"
-import { oath } from "@ordo-pink/oath"
-import { rickroll } from "@ordo-pink/rickroll"
-import { routary } from "@ordo-pink/routary"
-import { routary_cors } from "@ordo-pink/routary-cors"
+} from "@ordo-pink/b-server-core"
+import { LOCALE } from "@ordo-pink/oss-i18n"
+import { is_finite_non_negative_int } from "@ordo-pink/_tau"
+import { oath } from "@ordo-pink/oss-oath"
+import { rickroll } from "@ordo-pink/oss-rickroll"
+import { routary } from "@ordo-pink/oss-routary"
+import { routary_cors } from "@ordo-pink/oss-routary-cors"
 
 import type { ServerDT } from "./backend-server-dt.types"
 
@@ -29,7 +29,7 @@ export const create_backend_server_dt = (fuel: ServerDT.Params) =>
 		.head("/:uid/:fsid", intake => {
 			return oath
 				.of(intake)
-				.pipe(oath.ops.tap(start_response_timer))
+				.pipe(oath.ops.tap(count_response_time))
 				.pipe(oath.ops.tap(extract_request_ip))
 				.pipe(oath.ops.chain(validate_request_params))
 				.pipe(oath.ops.chain(authenticate))
@@ -49,7 +49,7 @@ export const create_backend_server_dt = (fuel: ServerDT.Params) =>
 		.get("/:uid/:fsid", intake => {
 			return oath
 				.of(intake)
-				.pipe(oath.ops.tap(start_response_timer))
+				.pipe(oath.ops.tap(count_response_time))
 				.pipe(oath.ops.tap(extract_request_ip))
 				.pipe(oath.ops.chain(validate_request_params))
 				.pipe(oath.ops.chain(authenticate))

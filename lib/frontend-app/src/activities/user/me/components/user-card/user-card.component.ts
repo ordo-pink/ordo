@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { maoka_styled } from "@ordo-pink/maoka"
+import { maoka_styled } from "@ordo-pink/oss-maoka"
 
 import "./user-card.styles.css"
 

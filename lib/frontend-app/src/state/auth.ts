@@ -19,13 +19,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { type Maoka, maoka_dom } from "@ordo-pink/maoka"
-import { type Zags, create_zags } from "@ordo-pink/zags"
+import { type Maoka, maoka_dom } from "@ordo-pink/oss-maoka"
+import { type Zags, create_zags } from "@ordo-pink/oss-zags"
 import type { ClientSDK } from "@ordo-pink/sdk-client"
 import type { Core } from "@ordo-pink/sdk-core"
-import { get_device_info } from "@ordo-pink/get-device-info"
-import { noop } from "@ordo-pink/tau"
-import { oath } from "@ordo-pink/oath"
+import { get_device_info } from "@ordo-pink/_get-device-info"
+import { noop } from "@ordo-pink/_tau"
+import { oath } from "@ordo-pink/oss-oath"
 
 /**
  * Auth jab is responsible for providing means of signing in and out.

@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { maoka, maoka_dom } from "@ordo-pink/maoka"
+import { maoka, maoka_dom } from "@ordo-pink/oss-maoka"
 import { maoka_sdk } from "@ordo-pink/sdk-maoka"
 
 import { sidebar$ } from "../workspace.state"

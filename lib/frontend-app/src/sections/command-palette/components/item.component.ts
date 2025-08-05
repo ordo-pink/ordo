@@ -20,7 +20,7 @@
  */
 
 import { components, jabs, maoka_sdk } from "@ordo-pink/sdk-maoka"
-import { maoka, maoka_dom, maoka_styled } from "@ordo-pink/maoka"
+import { maoka, maoka_dom, maoka_styled } from "@ordo-pink/oss-maoka"
 import type { ClientSDK } from "@ordo-pink/sdk-client"
 
 export const command_palette_item = maoka.create<{ item: ClientSDK.CommandPalette.Item.Instance; active: boolean }>(

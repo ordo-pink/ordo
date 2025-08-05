@@ -20,7 +20,7 @@
  */
 
 import { type Session, type User, user } from "@ordo-pink/sdk-core"
-import { oath } from "@ordo-pink/oath"
+import { oath } from "@ordo-pink/oss-oath"
 
 import type { ServerID } from "../backend-server-id.types"
 

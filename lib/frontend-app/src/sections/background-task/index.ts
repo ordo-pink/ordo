@@ -20,7 +20,7 @@
  */
 
 import { BACKGROUND_TASK, type ClientSDK } from "@ordo-pink/sdk-client"
-import { type Maoka, maoka_dom } from "@ordo-pink/maoka"
+import { type Maoka, maoka_dom } from "@ordo-pink/oss-maoka"
 import { context } from "@ordo-pink/sdk-maoka"
 
 import { background_task$ } from "./background-task.state"

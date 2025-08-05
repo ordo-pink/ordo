@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { type Oath, oath } from "@ordo-pink/oath"
+import { type Oath, oath } from "@ordo-pink/oss-oath"
 import { core } from "@ordo-pink/sdk-core"
 
 import * as CONST from "./b-email-strategy-rusender.constants"

@@ -21,7 +21,7 @@
 
 import { type Core, core } from "@ordo-pink/sdk-core"
 import { app } from "@ordo-pink/frontend-app"
-import { maoka_dom } from "@ordo-pink/maoka"
+import { maoka_dom } from "@ordo-pink/oss-maoka"
 
 const body = document.querySelector("body")!
 

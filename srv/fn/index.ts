@@ -20,11 +20,11 @@
  */
 
 import { Core, core } from "@ordo-pink/sdk-core"
-import { type RoutaryOrdo, default_handler } from "@ordo-pink/routary-ordo"
-import { LOCALE } from "@ordo-pink/i18n"
-import { oath } from "@ordo-pink/oath"
-import { rickroll } from "@ordo-pink/rickroll"
-import { routary } from "@ordo-pink/routary"
+import { type RoutaryOrdo, default_handler } from "@ordo-pink/b-server-core"
+import { LOCALE } from "@ordo-pink/oss-i18n"
+import { oath } from "@ordo-pink/oss-oath"
+import { rickroll } from "@ordo-pink/oss-rickroll"
+import { routary } from "@ordo-pink/oss-routary"
 
 const logger: Core.Logger = {
 	alert: (...message) => core.logger.stout.alert("[FN]", ...message),

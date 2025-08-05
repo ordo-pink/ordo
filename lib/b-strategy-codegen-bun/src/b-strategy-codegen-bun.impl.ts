@@ -20,10 +20,10 @@
  */
 
 import { core } from "@ordo-pink/sdk-core"
-import { oath } from "@ordo-pink/oath"
+import { oath } from "@ordo-pink/oss-oath"
 
 import type * as Types from "./b-strategy-codegen-bun.types"
-import { curry } from "@ordo-pink/curry"
+import { curry } from "@ordo-pink/oss-curry"
 
 export const create: Types.Create = algorithm => ({
 	generate: () =>

@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ */
+
 import * as PERMISSION from "./permission.constants"
 import type * as Permission from "./permission.types"
 import * as fns from "../fns/fns.impl"

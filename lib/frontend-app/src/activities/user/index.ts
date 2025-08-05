@@ -20,12 +20,12 @@
  */
 
 import { COMMAND_PALETTE, type ClientSDK, MODAL, client_rrr } from "@ordo-pink/sdk-client"
-import { type Maoka, maoka, maoka_dom, maoka_styled } from "@ordo-pink/maoka"
+import { type Maoka, maoka, maoka_dom, maoka_styled } from "@ordo-pink/oss-maoka"
 import { bs_box_arrow_in_right, bs_box_arrow_right, bs_envelope_at, bs_person_bounding_box } from "@ordo-pink/frontend-icons"
 import { core_sdk, user } from "@ordo-pink/sdk-core"
-import { get_device_info } from "@ordo-pink/get-device-info"
+import { get_device_info } from "@ordo-pink/_get-device-info"
 import { maoka_sdk } from "@ordo-pink/sdk-maoka"
-import { oath } from "@ordo-pink/oath"
+import { oath } from "@ordo-pink/oss-oath"
 
 import { authenticating_user$ } from "./user.state"
 import { current_user_workspace } from "./me/user-me-workspace.component"

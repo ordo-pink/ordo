@@ -21,7 +21,7 @@
 
 import { Dialog, Input } from "@ordo-pink/maoka-components"
 import { BsFileEarmarkRichText } from "@ordo-pink/frontend-icons"
-import { Maoka } from "@ordo-pink/maoka"
+import { Maoka } from "@ordo-pink/oss-maoka"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
 export const RenameFileModal = (fsid: Ordo.Metadata.FSID) =>

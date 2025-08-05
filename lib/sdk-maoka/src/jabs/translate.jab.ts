@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { type Maoka, maoka_dom } from "@ordo-pink/maoka"
+import { type Maoka, maoka_dom } from "@ordo-pink/oss-maoka"
 import type { ClientSDK } from "@ordo-pink/sdk-client"
-import type { I18n } from "@ordo-pink/i18n"
+import type { I18n } from "@ordo-pink/oss-i18n"
 import { core_sdk } from "@ordo-pink/sdk-core"
 
 import type { MaokaSDK } from "../sdk-maoka.types"

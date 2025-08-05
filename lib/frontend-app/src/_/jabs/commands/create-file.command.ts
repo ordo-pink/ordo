@@ -19,11 +19,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { COMMAND_PALETTE_ITEM_TYPE, CONTEXT_MENU_ITEM_TYPE, Metadata } from "@ordo-pink/core"
+import { COMMAND_PALETTE_ITEM_TYPE, CONTEXT_MENU_ITEM_TYPE, Metadata } from "@ordo-pink/_core"
 import { BsFileEarmarkPlus } from "@ordo-pink/frontend-icons"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
-import { type TMaokaJab } from "@ordo-pink/maoka"
+import { type TMaokaJab } from "@ordo-pink/oss-maoka"
 
 import { CreateFileModal } from "../../_/components/create-file-modal.component"
 

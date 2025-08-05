@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { type Maoka, maoka, maoka_context } from "@ordo-pink/maoka"
+import { type Maoka, maoka, maoka_context } from "@ordo-pink/oss-maoka"
 import type { ClientSDK } from "@ordo-pink/sdk-client"
 
 import { button_danger, button_neutral, button_primary, button_success } from "./components/button.component"

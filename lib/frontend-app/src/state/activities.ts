@@ -19,11 +19,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { type Maoka, maoka_dom } from "@ordo-pink/maoka"
-import { type Zags, create_zags } from "@ordo-pink/zags"
-import { colonoscope, is_colonoscopy_doctor } from "@ordo-pink/colonoscope"
+import { type Maoka, maoka_dom } from "@ordo-pink/oss-maoka"
+import { type Zags, create_zags } from "@ordo-pink/oss-zags"
+import { colonoscope, is_colonoscopy_doctor } from "@ordo-pink/oss-colonoscope"
 import type { ClientSDK } from "@ordo-pink/sdk-client"
-import type { RoutaryBrowser } from "@ordo-pink/routary-browser"
+import type { RoutaryBrowser } from "@ordo-pink/oss-aist"
 
 export const init_activities_jab: (
 	hunter: ClientSDK.Hunter,

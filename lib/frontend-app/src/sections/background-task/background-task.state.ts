@@ -20,7 +20,7 @@
  */
 
 import { BACKGROUND_TASK } from "@ordo-pink/sdk-client"
-import { create_zags } from "@ordo-pink/zags"
+import { create_zags } from "@ordo-pink/oss-zags"
 
 import type { BackgroundTask } from "./background-task.types"
 

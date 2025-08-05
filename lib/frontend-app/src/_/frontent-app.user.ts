@@ -20,16 +20,16 @@
  */
 
 import { bs_box_arrow_in_right, bs_box_arrow_right } from "@ordo-pink/frontend-icons"
-import { COMMAND_PALETTE_ITEM_TYPE, current_user, rrr } from "@ordo-pink/core"
+import { COMMAND_PALETTE_ITEM_TYPE, current_user, rrr } from "@ordo-pink/_core"
 import { /* CheckboxInput, */ Dialog, Input } from "@ordo-pink/maoka-components"
-import { call_once, noop } from "@ordo-pink/tau"
-import { Maoka } from "@ordo-pink/maoka"
+import { call_once, noop } from "@ordo-pink/_tau"
+import { Maoka } from "@ordo-pink/oss-maoka"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
-import { result } from "@ordo-pink/result"
+import { result } from "@ordo-pink/oss-result"
 import { console_logger } from "@ordo-pink/logger"
-import { get_device_info } from "@ordo-pink/get-device-info"
-import { oath } from "@ordo-pink/oath"
+import { get_device_info } from "@ordo-pink/_get-device-info"
+import { oath } from "@ordo-pink/oss-oath"
 
 import { UserQuery } from "./data/user/user-query.impl"
 import { ordo_app_state } from "../app.state"

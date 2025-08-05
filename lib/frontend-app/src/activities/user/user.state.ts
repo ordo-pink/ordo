@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { create_zags } from "@ordo-pink/zags"
+import { create_zags } from "@ordo-pink/oss-zags"
 
 import type { AuthenticatingUser } from "./user.types"
 

@@ -23,10 +23,10 @@
 // TODO Access file by user_handle and prop link (e.g. https://pub.ordo.pink/@ordo-blog/en/release-0.8.0)
 //                                                     ^-----pub host------^ ^----user---^ ^--file_id---^
 
-import { METADATA_CONTENT_FSID, Metadata, rrr } from "@ordo-pink/core"
-import { Oath, oath } from "@ordo-pink/oath"
-import { result } from "@ordo-pink/result"
-import { is_array } from "@ordo-pink/tau"
+import { METADATA_CONTENT_FSID, Metadata, rrr } from "@ordo-pink/_core"
+import { Oath, oath } from "@ordo-pink/oss-oath"
+import { result } from "@ordo-pink/oss-result"
+import { is_array } from "@ordo-pink/_tau"
 
 import { ordo_app_state } from "../app.state"
 

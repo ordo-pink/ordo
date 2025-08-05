@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { sweech } from "@ordo-pink/sweech"
+import { sweech } from "@ordo-pink/oss-sweech"
 
 import * as SEM_VER from "./sem-ver.constants"
 import type * as SemVer from "./semver.types"

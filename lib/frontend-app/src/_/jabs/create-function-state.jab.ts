@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { type TMaokaJab } from "@ordo-pink/maoka"
+import { type TMaokaJab } from "@ordo-pink/oss-maoka"
 
 import { type TFunctionStateSource } from "./create-function-state-source.jab"
 

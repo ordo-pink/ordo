@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { maoka, maoka_dom, maoka_styled } from "@ordo-pink/maoka"
+import { maoka, maoka_dom, maoka_styled } from "@ordo-pink/oss-maoka"
 
 import { MaokaSDK } from "../sdk-maoka.types"
 import { actionable_hotkey } from "./hotkey.component"

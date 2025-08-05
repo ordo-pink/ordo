@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { maoka, maoka_styled } from "@ordo-pink/maoka"
+import { maoka, maoka_styled } from "@ordo-pink/oss-maoka"
 import type { ClientSDK } from "@ordo-pink/sdk-client"
 import { maoka_sdk } from "@ordo-pink/sdk-maoka"
 
@@ -30,7 +30,7 @@ import { sessions_card } from "./components/user-session/user-session.component"
 
 import "./user-me-workspace.styles.css"
 import { core_sdk } from "@ordo-pink/sdk-core"
-import { result } from "@ordo-pink/result"
+import { result } from "@ordo-pink/oss-result"
 
 export const current_user_workspace = maoka.create<{ state: ClientSDK.F.State }>("div", ({ state, use }) => {
 	use(maoka_sdk.context.provide(state))

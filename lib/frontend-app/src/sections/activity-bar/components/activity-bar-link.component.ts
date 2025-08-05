@@ -21,7 +21,7 @@
 
 import { context, maoka_sdk } from "@ordo-pink/sdk-maoka"
 import type { ClientSDK } from "@ordo-pink/sdk-client"
-import { maoka } from "@ordo-pink/maoka"
+import { maoka } from "@ordo-pink/oss-maoka"
 
 import { activity_bar_icon } from "./activity-bar-icon.component"
 

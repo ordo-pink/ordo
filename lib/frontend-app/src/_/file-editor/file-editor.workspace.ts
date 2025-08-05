@@ -21,8 +21,8 @@
 
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
-import { Metadata } from "@ordo-pink/core"
-import { R } from "@ordo-pink/result"
+import { Metadata } from "@ordo-pink/_core"
+import { R } from "@ordo-pink/oss-result"
 
 import { EmptyEditor } from "./components/empty-editor.component"
 import { FileMetadata } from "./components/file-editor-workspace-file-metadata.component"

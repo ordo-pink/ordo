@@ -19,15 +19,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { type Maoka, maoka_dom } from "@ordo-pink/maoka"
-import { type RoutaryBrowser, create_routary_browser } from "@ordo-pink/routary-browser"
+import { type Maoka, maoka_dom } from "@ordo-pink/oss-maoka"
+import { type RoutaryBrowser, create } from "@ordo-pink/oss-aist"
 import { type ClientSDK } from "@ordo-pink/sdk-client"
 import { core_sdk } from "@ordo-pink/sdk-core"
 
 export const create_rotor_jab: (hunter: ClientSDK.Hunter) => Maoka.Jab<RoutaryBrowser.Zags> =
 	hunter =>
 	({ use }) => {
-		const rotor = create_routary_browser(window)
+		const rotor = create(window)
 
 		const open = window.open
 		window.open = undefined as any

@@ -22,8 +22,8 @@
 import { type Logger, loggers } from "@ordo-pink/sdk-core"
 import { type ServerDT, create_backend_server_dt } from "@ordo-pink/backend-server-dt"
 import { create_persistence_strategy_data_fs } from "@ordo-pink/b-repository-data-fs"
-import { is_port } from "@ordo-pink/tau"
-import { oath } from "@ordo-pink/oath"
+import { is_port } from "@ordo-pink/_tau"
+import { oath } from "@ordo-pink/oss-oath"
 
 const env_rrr = (env_var: string) => (value?: any) =>
 	value != null ? `Invalid value for ${env_var}: "${value}"` : `Missing value for ${env_var}`

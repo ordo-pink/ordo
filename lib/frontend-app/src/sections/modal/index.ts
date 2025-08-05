@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Maoka, maoka_dom } from "@ordo-pink/maoka"
+import { Maoka, maoka_dom } from "@ordo-pink/oss-maoka"
 import { context } from "@ordo-pink/sdk-maoka"
 
 import { close_modal } from "./components/close-modal.component"

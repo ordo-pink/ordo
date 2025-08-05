@@ -19,10 +19,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Maoka } from "@ordo-pink/maoka"
+import { Maoka } from "@ordo-pink/oss-maoka"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
-import { R } from "@ordo-pink/result"
-import { sweech } from "@ordo-pink/sweech"
+import { R } from "@ordo-pink/oss-result"
+import { sweech } from "@ordo-pink/oss-sweech"
 
 export const TitleSetter = (metadata: Ordo.Metadata.Instance | null) =>
 	Maoka.create("div", ({ use }) => {

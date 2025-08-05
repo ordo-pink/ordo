@@ -19,8 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { I18n, LOCALE, create_i18n } from "@ordo-pink/i18n"
-import { Maoka, maoka_dom } from "@ordo-pink/maoka"
+import { I18n, LOCALE, create_i18n } from "@ordo-pink/oss-i18n"
+import { Maoka, maoka_dom } from "@ordo-pink/oss-maoka"
 import { ClientSDK } from "@ordo-pink/sdk-client"
 
 export const create_i18n_jab: (hunter: ClientSDK.Hunter) => Maoka.Jab<I18n.Zags<ClientSDK.Translations.Keys>> =

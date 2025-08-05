@@ -21,7 +21,7 @@
 
 import { maoka_sdk } from "@ordo-pink/sdk-maoka"
 
-import { maoka, maoka_dom } from "@ordo-pink/maoka"
+import { maoka, maoka_dom } from "@ordo-pink/oss-maoka"
 
 import { modal$ } from "../modal.state"
 

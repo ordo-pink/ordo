@@ -21,7 +21,7 @@
 
 import { BsFileEarmarkMinus } from "@ordo-pink/frontend-icons"
 import { Dialog } from "@ordo-pink/maoka-components"
-import { Maoka } from "@ordo-pink/maoka"
+import { Maoka } from "@ordo-pink/oss-maoka"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
 export const RemoveFileModal = (fsid: Ordo.Metadata.FSID) =>

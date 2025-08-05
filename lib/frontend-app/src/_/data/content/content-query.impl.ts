@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { oath } from "@ordo-pink/oath"
+import { oath } from "@ordo-pink/oss-oath"
 
 // TODO Move to frontend-app
 export const ContentQuery: Ordo.Content.QueryStatic = {

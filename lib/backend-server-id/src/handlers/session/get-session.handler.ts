@@ -19,8 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { default_handler } from "@ordo-pink/routary-ordo"
-import { oath } from "@ordo-pink/oath"
+import { default_handler } from "@ordo-pink/b-server-core"
+import { oath } from "@ordo-pink/oss-oath"
 
 import type { ServerID } from "../../backend-server-id.types"
 import { get_user_from_cookie } from "../../common/get-user-from-cookie"

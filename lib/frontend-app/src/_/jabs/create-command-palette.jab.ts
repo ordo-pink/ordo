@@ -20,10 +20,10 @@
  */
 
 import { bs_menu_button_wide_fill } from "@ordo-pink/frontend-icons"
-import { COMMAND_PALETTE_ITEM_TYPE } from "@ordo-pink/core"
+import { COMMAND_PALETTE_ITEM_TYPE } from "@ordo-pink/_core"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
-import { type TMaokaJab } from "@ordo-pink/maoka"
+import { type TMaokaJab } from "@ordo-pink/oss-maoka"
 import { create_hotkey_from_event } from "@ordo-pink/hotkey-from-event"
 import { ordo_app_state } from "@ordo-pink/frontend-app/app.state"
 

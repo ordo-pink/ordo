@@ -19,8 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { oath } from "@ordo-pink/oath"
-import { rrr } from "@ordo-pink/core"
+import { oath } from "@ordo-pink/oss-oath"
+import { rrr } from "@ordo-pink/_core"
 
 export const PersistenceStrategyContentOrdoBackend = {
 	Of: (dt_host: string, fetch: Ordo.Fetch): Ordo.Content.PersistenceStrategy => {

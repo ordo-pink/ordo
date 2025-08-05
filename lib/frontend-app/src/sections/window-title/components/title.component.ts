@@ -20,9 +20,9 @@
  */
 
 import { type MaokaSDK, maoka_sdk } from "@ordo-pink/sdk-maoka"
-import { maoka, maoka_dom } from "@ordo-pink/maoka"
+import { maoka, maoka_dom } from "@ordo-pink/oss-maoka"
 import type { ClientSDK } from "@ordo-pink/sdk-client"
-import { result } from "@ordo-pink/result"
+import { result } from "@ordo-pink/oss-result"
 
 /**
  * Title div watches for "title.set_title" shots and makes changes to the DOM. This behavior is extracted into

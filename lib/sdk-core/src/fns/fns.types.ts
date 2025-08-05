@@ -1,4 +1,9 @@
-import type { Curry } from "@ordo-pink/curry"
+/*
+ * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ */
+
+import type { Curry } from "@ordo-pink/oss-curry"
 
 export type KeysOf = <T extends object>(o: T) => (keyof T)[]
 export type Eq<$T extends number | string | boolean | null | undefined = number | string | boolean | null | undefined> = Curry<

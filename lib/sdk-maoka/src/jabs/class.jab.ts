@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { type Maoka, maoka_dom } from "@ordo-pink/maoka"
+import { type Maoka, maoka_dom } from "@ordo-pink/oss-maoka"
 
 import type { MaokaSDK } from "../sdk-maoka.types"
 import { set_attribute_jab } from "./set-attribute.jab"

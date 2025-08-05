@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { maoka } from "@ordo-pink/maoka"
+import { maoka } from "@ordo-pink/oss-maoka"
 
 export const other_user_workspace = maoka.create("div", () => {
 	return () => "HELLO OTHER USER"

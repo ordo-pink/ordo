@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { type Maoka, maoka_dom } from "@ordo-pink/maoka"
+import { type Maoka, maoka_dom } from "@ordo-pink/oss-maoka"
 
 export const set_style_jab =
 	(str: Partial<Omit<CSSStyleDeclaration, "length" | "parentRule">>): Maoka.Jab =>

@@ -1,7 +1,7 @@
-import { oath } from "@ordo-pink/oath"
+import { oath } from "@ordo-pink/oss-oath"
 
 import commands from "./cmd"
-import { get_opts } from "@ordo-pink/cmd-get-opts"
+import { get_opts } from "@ordo-pink/cli-get-opts"
 
 const all_args = process.argv.slice(2)
 

@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import type { CommandHandler } from "@ordo-pink/cmd-handler"
-import { run_bin_for_each_srv } from "@ordo-pink/cmd-run-bin-for-each-srv"
+import type { CommandHandler } from "@ordo-pink/cli-handler"
+import { run_bin_for_each_srv } from "@ordo-pink/cli-run-bin-for-each-srv"
 
 export const init_command: CommandHandler.Commands = {
 	init: {

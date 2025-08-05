@@ -19,13 +19,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { CONTEXT_MENU_ITEM_TYPE, LABEL_COLOR, Metadata } from "@ordo-pink/core"
+import { CONTEXT_MENU_ITEM_TYPE, LABEL_COLOR, Metadata } from "@ordo-pink/_core"
 import { BsTags } from "@ordo-pink/frontend-icons"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
-import { R } from "@ordo-pink/result"
-import { type TMaokaJab } from "@ordo-pink/maoka"
+import { R } from "@ordo-pink/oss-result"
+import { type TMaokaJab } from "@ordo-pink/oss-maoka"
 import { color_class } from "@ordo-pink/maoka-components"
 
 import { EditLabelModal } from "../../_/components/edit-label-modal.component"

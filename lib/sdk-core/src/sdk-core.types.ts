@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ */
+
 export * from "./index/index.types"
 export * as Data from "./data/data.types"
 export * as Fns from "./fns/fns.types"

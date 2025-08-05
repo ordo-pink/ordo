@@ -20,7 +20,7 @@
  */
 
 import { context, maoka_sdk } from "@ordo-pink/sdk-maoka"
-import { maoka, maoka_dom } from "@ordo-pink/maoka"
+import { maoka, maoka_dom } from "@ordo-pink/oss-maoka"
 import { bs_menu_button_wide_fill } from "@ordo-pink/frontend-icons"
 
 import { activity_bar_icon } from "../../activity-bar/components/activity-bar-icon.component"

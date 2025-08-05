@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { type Maoka, maoka_dom } from "@ordo-pink/maoka"
-import type { Zags } from "@ordo-pink/zags"
+import { type Maoka, maoka_dom } from "@ordo-pink/oss-maoka"
+import type { Zags } from "@ordo-pink/oss-zags"
 
 export namespace zags_jabs {
 	export const marry$ =

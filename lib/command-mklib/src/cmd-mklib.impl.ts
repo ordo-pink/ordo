@@ -22,10 +22,10 @@
 import { join } from "node:path"
 import { promises } from "node:fs"
 
-import { type License, get_license, get_spdx_record } from "@ordo-pink/cmd-license"
-import type { CommandHandler } from "@ordo-pink/cmd-handler"
-import { create_progress } from "@ordo-pink/cmd-progress"
-import { is_reserved_javascript_keyword } from "@ordo-pink/rkwjs"
+import { type License, get_license, get_spdx_record } from "@ordo-pink/cli-license"
+import type { CommandHandler } from "@ordo-pink/cli-handler"
+import { create_progress } from "@ordo-pink/cli-progress"
+import { reserved_javascript_keywords } from "@ordo-pink/cli-rkwjs"
 
 export const mklib_handler: CommandHandler.Fn = async opts => {
 	const lib_name = opts.args[1]
@@ -43,7 +43,7 @@ export const mklib_handler: CommandHandler.Fn = async opts => {
 		process.exit(1)
 	}
 
-	if (is_reserved_javascript_keyword(lib_name)) {
+	if (reserved_javascript_keywords.guard(lib_name)) {
 		progress.break(`ERROR: Invalid usage: lib name '${lib_name}' is a reserved JavaScript keyword.`)
 		process.exit(1)
 	}

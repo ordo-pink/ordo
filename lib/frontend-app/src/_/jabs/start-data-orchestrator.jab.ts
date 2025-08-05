@@ -21,9 +21,9 @@
 
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
-import { sweech } from "@ordo-pink/sweech"
-import { type TMaokaJab } from "@ordo-pink/maoka"
-import { noop } from "@ordo-pink/tau"
+import { sweech } from "@ordo-pink/oss-sweech"
+import { type TMaokaJab } from "@ordo-pink/oss-maoka"
+import { noop } from "@ordo-pink/_tau"
 
 import { MetadataManager } from "../frontend-app.metadata-manager"
 

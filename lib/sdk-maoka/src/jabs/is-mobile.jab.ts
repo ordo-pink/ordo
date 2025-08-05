@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import type { Maoka } from "@ordo-pink/maoka"
+import type { Maoka } from "@ordo-pink/oss-maoka"
 
 export const is_mobile_jab: Maoka.Jab<boolean> = () =>
 	["Android", "webOS", "iPhone", "iPad", "iPod", "BlackBerry", "IEMobile", "Opera Mini"].some(platform =>

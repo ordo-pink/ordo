@@ -19,8 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { LOCALE } from "@ordo-pink/i18n"
-import { sweech } from "@ordo-pink/sweech"
+import { LOCALE } from "@ordo-pink/oss-i18n"
+import { sweech } from "@ordo-pink/oss-sweech"
 
 // TODO Email body creation
 

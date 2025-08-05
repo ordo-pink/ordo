@@ -19,11 +19,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Maoka, type TMaokaComponent } from "@ordo-pink/maoka"
+import { Maoka, type TMaokaComponent } from "@ordo-pink/oss-maoka"
 import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
-import { sweech } from "@ordo-pink/sweech"
-import { noop } from "@ordo-pink/tau"
+import { sweech } from "@ordo-pink/oss-sweech"
+import { noop } from "@ordo-pink/_tau"
 
 import { FileEditorSidebarDirectory } from "./file-editor-sidebar-directory.component"
 import { FileEditorSidebarFile } from "./file-editor-sidebar-file.component"

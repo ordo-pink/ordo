@@ -19,10 +19,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { call_once, deep_equals } from "@ordo-pink/tau"
-import { create_zags } from "@ordo-pink/zags"
-import { oath } from "@ordo-pink/oath"
-import { rrr } from "@ordo-pink/core"
+import { call_once, deep_equals } from "@ordo-pink/_tau"
+import { create_zags } from "@ordo-pink/oss-zags"
+import { oath } from "@ordo-pink/oss-oath"
+import { rrr } from "@ordo-pink/_core"
 
 import { ordo_app_state } from "../app.state"
 

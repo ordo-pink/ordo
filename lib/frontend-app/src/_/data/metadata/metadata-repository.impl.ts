@@ -19,8 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { result } from "@ordo-pink/result"
-import { create_zags } from "@ordo-pink/zags"
+import { result } from "@ordo-pink/oss-result"
+import { create_zags } from "@ordo-pink/oss-zags"
 
 import { rrr } from "../../../../core/src/rrr"
 

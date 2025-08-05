@@ -20,7 +20,7 @@
  */
 
 import { COMMAND_PALETTE } from "@ordo-pink/sdk-client"
-import { create_zags } from "@ordo-pink/zags"
+import { create_zags } from "@ordo-pink/oss-zags"
 
 import type { CommandPalette } from "./command-palette.types"
 

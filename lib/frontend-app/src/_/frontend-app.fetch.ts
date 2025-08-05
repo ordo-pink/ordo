@@ -19,8 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { R } from "@ordo-pink/result"
-import { call_once } from "@ordo-pink/tau"
+import { R } from "@ordo-pink/oss-result"
+import { call_once } from "@ordo-pink/_tau"
 import { console_logger } from "@ordo-pink/logger"
 
 import { ordo_app_state } from "../app.state"

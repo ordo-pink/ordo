@@ -21,7 +21,7 @@
 
 import { type Core, core } from "@ordo-pink/sdk-core"
 import { type Server, server } from "@ordo-pink/sdk-server"
-import { oath } from "@ordo-pink/oath"
+import { oath } from "@ordo-pink/oss-oath"
 
 import * as Types from "./b-repository-user-repository-data.types"
 

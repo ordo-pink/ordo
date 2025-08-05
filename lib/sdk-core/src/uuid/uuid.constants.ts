@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ */
+
 export const FIRSTBORN = "00000000-0000-4000-8000-000000000000"
 export const THE_LAST_ONE = "ffffffff-ffff-4fff-8fff-ffffffffffff"
 

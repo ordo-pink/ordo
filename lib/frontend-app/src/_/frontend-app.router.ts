@@ -19,10 +19,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { call_once, deep_equals } from "@ordo-pink/tau"
-import { colonoscope, is_colonoscopy_doctor } from "@ordo-pink/colonoscope"
-import { R } from "@ordo-pink/result"
-import { create_zags } from "@ordo-pink/zags"
+import { call_once, deep_equals } from "@ordo-pink/_tau"
+import { colonoscope, is_colonoscopy_doctor } from "@ordo-pink/oss-colonoscope"
+import { R } from "@ordo-pink/oss-result"
+import { create_zags } from "@ordo-pink/oss-zags"
 
 import { ordo_app_state } from "../app.state"
 

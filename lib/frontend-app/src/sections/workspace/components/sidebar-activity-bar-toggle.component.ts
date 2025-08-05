@@ -20,9 +20,9 @@
  */
 
 import { bs_arrow_left, bs_layout_sidebar_inset_reverse } from "@ordo-pink/frontend-icons"
-import { maoka } from "@ordo-pink/maoka"
+import { maoka } from "@ordo-pink/oss-maoka"
 import { maoka_sdk } from "@ordo-pink/sdk-maoka"
-import { sweech } from "@ordo-pink/sweech"
+import { sweech } from "@ordo-pink/oss-sweech"
 
 import { sidebar$ } from "../workspace.state"
 

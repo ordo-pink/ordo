@@ -20,7 +20,7 @@
  */
 
 import { type ClientSDK, NOTIFICATION } from "@ordo-pink/sdk-client"
-import { type Maoka, maoka_dom } from "@ordo-pink/maoka"
+import { type Maoka, maoka_dom } from "@ordo-pink/oss-maoka"
 import { maoka_sdk } from "@ordo-pink/sdk-maoka"
 import { rrr } from "@ordo-pink/sdk-core"
 

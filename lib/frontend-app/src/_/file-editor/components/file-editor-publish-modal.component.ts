@@ -20,12 +20,12 @@
  */
 
 import { /* CheckboxInput, */ Dialog } from "@ordo-pink/maoka-components"
-import { Maoka } from "@ordo-pink/maoka"
+import { Maoka } from "@ordo-pink/oss-maoka"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
-import { NOTIFICATION_TYPE } from "@ordo-pink/core"
+import { NOTIFICATION_TYPE } from "@ordo-pink/_core"
 // import { Result } from "@ordo-pink/result"
-import { oath } from "@ordo-pink/oath"
+import { oath } from "@ordo-pink/oss-oath"
 
 export const PublishMetadataModal = (fsid: Ordo.Metadata.FSID) =>
 	Maoka.create("div", ({ use }) => {

@@ -20,12 +20,12 @@
  */
 
 import { BsCaretDown, BsCaretRight } from "@ordo-pink/frontend-icons"
-import { Maoka, type TMaokaJab } from "@ordo-pink/maoka"
+import { Maoka, type TMaokaJab } from "@ordo-pink/oss-maoka"
 import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
-import { Metadata } from "@ordo-pink/core"
+import { Metadata } from "@ordo-pink/_core"
 import { MetadataIcon } from "@ordo-pink/maoka-components"
-import { R } from "@ordo-pink/result"
+import { R } from "@ordo-pink/oss-result"
 
 import { FileEditorSidebarItem } from "./file-editor-sidebar-item.component"
 

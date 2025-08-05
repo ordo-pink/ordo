@@ -21,12 +21,12 @@
 
 import { Dialog, Input } from "@ordo-pink/maoka-components"
 import { BsFileEarmarkPlus } from "@ordo-pink/frontend-icons"
-import { Maoka } from "@ordo-pink/maoka"
+import { Maoka } from "@ordo-pink/oss-maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
-import { sweech } from "@ordo-pink/sweech"
-import { oath } from "@ordo-pink/oath"
+import { sweech } from "@ordo-pink/oss-sweech"
+import { oath } from "@ordo-pink/oss-oath"
 
 export const CreateFileModal = (parent: Ordo.Metadata.FSID | null = null) =>
 	Maoka.create("div", ({ use }) => {

@@ -20,7 +20,7 @@
  */
 
 import { COMMAND_PALETTE, type ClientSDK } from "@ordo-pink/sdk-client"
-import { type Maoka, maoka_dom } from "@ordo-pink/maoka"
+import { type Maoka, maoka_dom } from "@ordo-pink/oss-maoka"
 import { bs_menu_button_wide_fill } from "@ordo-pink/frontend-icons"
 import { context } from "@ordo-pink/sdk-maoka"
 

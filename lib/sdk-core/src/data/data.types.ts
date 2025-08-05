@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ */
+
 import type * as DATA from "./data.constants"
 import type * as Permission from "../permission/permission.types"
 import type * as Timestamp from "../timestamp/timestamp.types"
@@ -8,8 +13,8 @@ import type { GenericGuard } from "../sdk-core.types"
 export type Id = Uuid.Instance
 export type Name = string
 export type Parent = Id | null
-export type OwnerUser = User.Id
-export type OwnerGroup = Uuid.Instance
+export type OwnerUserId = User.Id
+export type OwnerGroupId = Uuid.Instance
 export type CreatedAt = Timestamp.Instance
 export type UpdatedAt = Timestamp.Instance
 export type CreatedBy = User.Id
@@ -30,8 +35,8 @@ export type Instance = [
 	name: Name,
 	parent: Parent,
 	size: Size,
-	owner: OwnerUser,
-	group: OwnerGroup,
+	owner: OwnerUserId,
+	group: OwnerGroupId,
 	created_at: CreatedAt,
 	created_by: CreatedBy,
 	updated_at: UpdatedAt,
@@ -59,7 +64,7 @@ export type Create = (
 	name: Name,
 	parent: Parent,
 	size: Size,
-	owner: OwnerUser,
+	owner: OwnerUserId,
 	author: CreatedBy,
 	location?: Location,
 	labels?: Labels,
@@ -76,8 +81,8 @@ export type GetLabels = (data: Instance) => Labels
 export type GetLinks = (data: Instance) => Links
 export type GetLocation = (data: Instance) => Location
 export type GetName = (data: Instance) => Name
-export type GetOwnerGroup = (data: Instance) => OwnerGroup
-export type GetOwnerUser = (data: Instance) => OwnerUser
+export type GetOwnerGroup = (data: Instance) => OwnerGroupId
+export type GetOwnerUser = (data: Instance) => OwnerUserId
 export type GetParent = (data: Instance) => Parent
 export type GetPermissions = (data: Instance) => Permissions
 export type GetSize = (data: Instance) => Size
@@ -89,8 +94,8 @@ export type SetLabels = (value: Labels, data: Instance) => Instance
 export type SetLinks = (value: Links, data: Instance) => Instance
 export type SetLocation = (value: Location, data: Instance) => Instance
 export type SetName = (value: Name, data: Instance) => Instance
-export type SetOwnerGroup = (value: OwnerGroup, data: Instance) => Instance
-export type SetOwnerUser = (value: OwnerUser, data: Instance) => Instance
+export type SetOwnerGroup = (value: OwnerGroupId, data: Instance) => Instance
+export type SetOwnerUser = (value: OwnerUserId, data: Instance) => Instance
 export type SetParent = (value: Parent, data: Instance) => Instance
 export type SetPermissions = (value: Permissions, data: Instance) => Instance
 export type SetSize = (value: Size, data: Instance) => Instance

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { type Maoka, maoka, maoka_dom } from "@ordo-pink/maoka"
+import { type Maoka, maoka, maoka_dom } from "@ordo-pink/oss-maoka"
 
 import "./frontend-icons.styles.css"
 

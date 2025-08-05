@@ -1,4 +1,9 @@
-import { result } from "@ordo-pink/result"
+/*
+ * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ */
+
+import { result } from "@ordo-pink/oss-result"
 
 import * as USER from "./user.constants"
 import * as User from "./user.types"

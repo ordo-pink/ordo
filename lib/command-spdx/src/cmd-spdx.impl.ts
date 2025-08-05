@@ -22,10 +22,10 @@
 import node_fs from "node:fs"
 import node_path from "node:path"
 
-import { type License, get_license, get_spdx_record } from "@ordo-pink/cmd-license"
-import { type Progress, create_progress } from "@ordo-pink/cmd-progress"
-import type { CommandHandler } from "@ordo-pink/cmd-handler"
-import { oath } from "@ordo-pink/oath"
+import { type License, get_license, get_spdx_record } from "@ordo-pink/cli-license"
+import { type Progress, create_progress } from "@ordo-pink/cli-progress"
+import type { CommandHandler } from "@ordo-pink/cli-handler"
+import { oath } from "@ordo-pink/oss-oath"
 
 const unlicense = get_license("Unlicense")
 const agpl = get_license("AGPL-3.0-only")

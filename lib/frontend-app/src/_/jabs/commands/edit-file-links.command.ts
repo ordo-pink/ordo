@@ -19,13 +19,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { CONTEXT_MENU_ITEM_TYPE, Metadata } from "@ordo-pink/core"
+import { CONTEXT_MENU_ITEM_TYPE, Metadata } from "@ordo-pink/_core"
 import { BsLink } from "@ordo-pink/frontend-icons"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MetadataIcon } from "@ordo-pink/maoka-components"
-import { R } from "@ordo-pink/result"
-import { type TMaokaJab } from "@ordo-pink/maoka"
+import { R } from "@ordo-pink/oss-result"
+import { type TMaokaJab } from "@ordo-pink/oss-maoka"
 
 export const edit_file_links_command: TMaokaJab = ({ use }) => {
 	const state = use(MaokaOrdo.Context.consume)

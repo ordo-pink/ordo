@@ -1,4 +1,9 @@
-import { curry } from "@ordo-pink/curry"
+/*
+ * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ */
+
+import { curry } from "@ordo-pink/oss-curry"
 
 import * as Fns from "./fns.types"
 

@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ */
+
 export type Prettify<$Type> = { [$Key in keyof $Type]: $Type[$Key] } & {}
 
 export type GenericGuard<$T> = (x: any) => x is $T

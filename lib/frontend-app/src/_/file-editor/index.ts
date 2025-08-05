@@ -20,11 +20,11 @@
  */
 
 import { BsBoxArrowUp, BsCloudMinus, BsCloudPlus, BsLayoutTextWindow } from "@ordo-pink/frontend-icons"
-import { COMMAND_PALETTE_ITEM_TYPE, CONTEXT_MENU_ITEM_TYPE, Metadata, create_function, rrr } from "@ordo-pink/core"
+import { COMMAND_PALETTE_ITEM_TYPE, CONTEXT_MENU_ITEM_TYPE, Metadata, create_function, rrr } from "@ordo-pink/_core"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { MetadataIcon } from "@ordo-pink/maoka-components"
-import { R } from "@ordo-pink/result"
-import { sweech } from "@ordo-pink/sweech"
+import { R } from "@ordo-pink/oss-result"
+import { sweech } from "@ordo-pink/oss-sweech"
 import { TWO_LETTER_LOCALE } from "@ordo-pink/locale"
 
 import { FileEditorSidebar } from "./file-editor.sidebar"
@@ -34,8 +34,8 @@ import { ordo_app_state } from "../../../app.state"
 
 import core_styles from "@ordo-pink/frontend-app/index.css?inline"
 import maoka_components from "@ordo-pink/maoka-components/maoka-components.css?inline"
-import { noop } from "@ordo-pink/tau"
-import { oath } from "@ordo-pink/oath"
+import { noop } from "@ordo-pink/_tau"
+import { oath } from "@ordo-pink/oss-oath"
 
 export default create_function(
 	"pink.ordo.editor",

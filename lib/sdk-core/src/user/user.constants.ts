@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ */
+
 /** Only used for highlighting paying users so that they feel it was worth paying (it was not). */
 export enum SUBSCRIPTION {
 	FREE,

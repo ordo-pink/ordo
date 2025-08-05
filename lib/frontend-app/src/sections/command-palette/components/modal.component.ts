@@ -21,7 +21,7 @@
 
 import { COMMAND_PALETTE, client_sdk } from "@ordo-pink/sdk-client"
 import { components, context, maoka_sdk } from "@ordo-pink/sdk-maoka"
-import { maoka, maoka_styled } from "@ordo-pink/maoka"
+import { maoka, maoka_styled } from "@ordo-pink/oss-maoka"
 import { bs_question_circle } from "@ordo-pink/frontend-icons"
 import { core_sdk } from "@ordo-pink/sdk-core"
 

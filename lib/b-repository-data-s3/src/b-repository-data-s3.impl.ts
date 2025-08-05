@@ -1,12 +1,28 @@
 /*
  * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
- * SPDX-License-Identifier: Unlicense
+ * SPDX-License-Identifier: AGPL-3.0-only
+ *
+ * Ordo.pink is an all-in-one team workspace.
+ * Copyright (C) 2025  谢尔盖 ||↓ and the Ordo.pink contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 import { S3Client, S3File } from "bun"
 
 import { type Core, core } from "@ordo-pink/sdk-core"
-import { oath } from "@ordo-pink/oath"
+import { oath } from "@ordo-pink/oss-oath"
 
 import type * as Types from "./b-repository-data-s3.types"
 
@@ -72,19 +88,15 @@ const validate_file_exists = (s3: S3Client) => (path: string) =>
 	oath
 		.resolve(check_file_exists(s3))
 		.pipe(oath.ops.chain(f => f(path)))
-		.pipe(oath.ops.chain(({ exists, file }) => oath.if(exists).pipe(oath.ops.bimap(() => ({ path, file }), not_found_rrr))))
+		.pipe(oath.ops.chain(({ exists, file }) => oath.if(exists, { on_true: () => ({ path, file }) })))
+		.pipe(oath.ops.rmap(not_found_rrr))
 
 const validate_file_does_not_exist = (s3: S3Client) => (path: string) =>
 	oath
 		.resolve(check_file_exists(s3))
 		.pipe(oath.ops.chain(f => f(path)))
-		.pipe(
-			oath.ops.chain(({ exists, file }) =>
-				oath
-					.if(!exists, { on_false: already_exists_rrr, on_true: () => ({ path, file }) })
-					.pipe(oath.ops.rmap(already_exists_rrr)),
-			),
-		)
+		.pipe(oath.ops.chain(({ exists, file }) => oath.if(!exists, { on_true: () => ({ path, file }) })))
+		.pipe(oath.ops.rmap(already_exists_rrr))
 
 const write_file = (s3: S3Client, content: ReadableStream) => (path: string) =>
 	oath

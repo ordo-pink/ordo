@@ -23,8 +23,8 @@ import { Button, MetadataIcon } from "@ordo-pink/maoka-components"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
-import { R } from "@ordo-pink/result"
-import { sweech } from "@ordo-pink/sweech"
+import { R } from "@ordo-pink/oss-result"
+import { sweech } from "@ordo-pink/oss-sweech"
 
 import LogoImage from "../../../../static/logo.png"
 

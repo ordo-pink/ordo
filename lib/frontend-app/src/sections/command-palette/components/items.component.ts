@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { maoka, maoka_styled } from "@ordo-pink/maoka"
+import { maoka, maoka_styled } from "@ordo-pink/oss-maoka"
 import { COMMAND_PALETTE } from "@ordo-pink/sdk-client"
 import { core_sdk } from "@ordo-pink/sdk-core"
 import { maoka_sdk } from "@ordo-pink/sdk-maoka"

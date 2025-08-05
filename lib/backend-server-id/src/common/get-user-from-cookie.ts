@@ -20,8 +20,8 @@
  */
 
 import { type Session, type User, rrr, user } from "@ordo-pink/sdk-core"
-import { huyami } from "@ordo-pink/routary-ordo"
-import { oath } from "@ordo-pink/oath"
+import { huyami } from "@ordo-pink/b-server-core"
+import { oath } from "@ordo-pink/oss-oath"
 
 import type { ServerID } from "../backend-server-id.types"
 

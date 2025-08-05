@@ -19,10 +19,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { maoka, maoka_dom } from "@ordo-pink/maoka"
+import { maoka, maoka_dom } from "@ordo-pink/oss-maoka"
 import { MODAL } from "@ordo-pink/sdk-client"
 import { maoka_sdk } from "@ordo-pink/sdk-maoka"
-import { sweech } from "@ordo-pink/sweech"
+import { sweech } from "@ordo-pink/oss-sweech"
 
 import { modal$ } from "../modal.state"
 

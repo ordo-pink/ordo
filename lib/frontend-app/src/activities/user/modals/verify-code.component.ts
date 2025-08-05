@@ -20,12 +20,12 @@
  */
 
 import { type User, user } from "@ordo-pink/sdk-core"
-import { maoka, maoka_dom, maoka_styled } from "@ordo-pink/maoka"
+import { maoka, maoka_dom, maoka_styled } from "@ordo-pink/oss-maoka"
 import { bs_question_circle } from "@ordo-pink/frontend-icons"
 import { client_rrr } from "@ordo-pink/sdk-client"
-import { get_device_info } from "@ordo-pink/get-device-info"
+import { get_device_info } from "@ordo-pink/_get-device-info"
 import { maoka_sdk } from "@ordo-pink/sdk-maoka"
-import { oath } from "@ordo-pink/oath"
+import { oath } from "@ordo-pink/oss-oath"
 
 import { authenticating_user$ } from "../user.state"
 

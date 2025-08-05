@@ -4,12 +4,12 @@
  */
 
 import type { CORE, Core } from "@ordo-pink/sdk-core"
-import type { Hunt } from "@ordo-pink/hunt"
-import type { I18n } from "@ordo-pink/i18n"
-import type { Oath } from "@ordo-pink/oath"
-import type { Result } from "@ordo-pink/result"
-import type { RoutaryBrowser } from "@ordo-pink/routary-browser"
-import type { Zags } from "@ordo-pink/zags"
+import type { Hunt } from "@ordo-pink/oss-hunt"
+import type { I18n } from "@ordo-pink/oss-i18n"
+import type { Oath } from "@ordo-pink/oss-oath"
+import type { Result } from "@ordo-pink/oss-result"
+import type { RoutaryBrowser } from "@ordo-pink/oss-aist"
+import type { Zags } from "@ordo-pink/oss-zags"
 
 import type { COMMAND_PALETTE, CONTEXT_MENU, MODAL, NOTIFICATION } from "./sdk-client.constants"
 

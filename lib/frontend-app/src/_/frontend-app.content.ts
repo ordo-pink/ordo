@@ -19,13 +19,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Metadata, NOTIFICATION_TYPE, rrr } from "@ordo-pink/core"
-import { is_instance_of, is_string } from "@ordo-pink/tau"
-import { R } from "@ordo-pink/result"
+import { Metadata, NOTIFICATION_TYPE, rrr } from "@ordo-pink/_core"
+import { is_instance_of, is_string } from "@ordo-pink/_tau"
+import { R } from "@ordo-pink/oss-result"
 import { console_logger } from "@ordo-pink/logger"
-import { create_zags } from "@ordo-pink/zags"
-import { oath } from "@ordo-pink/oath"
-import { sweech } from "@ordo-pink/sweech"
+import { create_zags } from "@ordo-pink/oss-zags"
+import { oath } from "@ordo-pink/oss-oath"
+import { sweech } from "@ordo-pink/oss-sweech"
 
 import { ContentQuery } from "./data/content/content-query.impl"
 import { ContentRepository } from "./data/content/content-repository.impl"

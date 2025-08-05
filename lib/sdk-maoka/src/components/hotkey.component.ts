@@ -4,9 +4,9 @@
  */
 
 import { client_sdk } from "@ordo-pink/sdk-client"
-import { maoka } from "@ordo-pink/maoka"
-import { sweech } from "@ordo-pink/sweech"
-import { title_case } from "@ordo-pink/tau"
+import { maoka } from "@ordo-pink/oss-maoka"
+import { sweech } from "@ordo-pink/oss-sweech"
+import { title_case } from "@ordo-pink/_tau"
 
 import { MaokaSDK } from "../sdk-maoka.types"
 

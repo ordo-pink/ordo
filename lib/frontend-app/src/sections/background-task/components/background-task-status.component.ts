@@ -21,9 +21,9 @@
 
 import { bs_cloud_download, bs_cloud_upload } from "@ordo-pink/frontend-icons"
 import { BACKGROUND_TASK } from "@ordo-pink/sdk-client"
-import { maoka } from "@ordo-pink/maoka"
+import { maoka } from "@ordo-pink/oss-maoka"
 import { maoka_sdk } from "@ordo-pink/sdk-maoka"
-import { sweech } from "@ordo-pink/sweech"
+import { sweech } from "@ordo-pink/oss-sweech"
 
 import { background_task$ } from "../background-task.state"
 

@@ -19,11 +19,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { create_dir_if_not_exists0, mv0 } from "@ordo-pink/fs"
-import { die, run_command } from "@ordo-pink/cmd-runner"
-import { getc } from "@ordo-pink/getc"
-import { keys_of } from "@ordo-pink/tau"
-import { oath } from "@ordo-pink/oath"
+import { create_dir_if_not_exists0, mv0 } from "@ordo-pink/_fs"
+import { die, run_command } from "@ordo-pink/cli-runner"
+import { getc } from "@ordo-pink/_getc"
+import { keys_of } from "@ordo-pink/_tau"
+import { oath } from "@ordo-pink/oss-oath"
 
 const env = getc()
 

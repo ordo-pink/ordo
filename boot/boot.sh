@@ -8,9 +8,9 @@ set -eux
 
 PLATFORM=$(uname -ms)
 
-BUN_VERSION="1.2.8"
-DENO_VERSION="2.2.10"
-TAILWIND_VERSION="v3.1.6"
+BUN_VERSION="1.2.19"
+DENO_VERSION="2.4.3"
+TAILWIND_VERSION="v3.1.17"
 
 # --- Internal ---
 

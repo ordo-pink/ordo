@@ -30,6 +30,7 @@ const test_bimap = async () => {
 				),
 			)
 			.cata(oath.catas.if_ok(x => x))
+			.catch(console.error)
 
 		oaths.push(performance.now() - time)
 	}
@@ -61,6 +62,7 @@ const test_map = async () => {
 			.of(1)
 			.pipe(oath.ops.map(x => x + 1))
 			.cata(oath.catas.if_ok(x => x))
+			.catch(console.error)
 
 		oaths.push(performance.now() - time)
 	}
@@ -89,6 +91,7 @@ const test_chain = async () => {
 			.of(1)
 			.pipe(oath.ops.chain(x => oath.of(x + 1)))
 			.cata(oath.catas.if_ok(x => x))
+			.catch(console.error)
 
 		oathss.push(performance.now() - time)
 	}
@@ -117,6 +120,7 @@ const test_and = async () => {
 			.of(1)
 			.pipe(oath.ops.and(x => x + 1))
 			.cata(oath.catas.if_ok(x => x))
+			.catch(console.error)
 
 		oaths.push(performance.now() - time)
 	}
@@ -145,6 +149,7 @@ const test_fix = async () => {
 			.reject(1)
 			.pipe(oath.ops.fix(x => x + 1))
 			.cata(oath.catas.if_ok(x => x))
+			.catch(console.error)
 
 		oaths.push(performance.now() - time)
 	}

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import type { Zags } from "@ordo-pink/oss-zags"
+import type { Zags as LibZags } from "@ordo-pink/oss-zags"
 
 import type { LOCALE } from "./i18n.impl"
 
@@ -30,7 +30,7 @@ export namespace I18n {
 
 	export type State<$Record extends Record<string, unknown>> = { locale: ISO_639_1_Locale; values: I18n.Values<$Record> }
 
-	export type Zags<$Record extends Record<string, unknown>> = Zags.Instance<I18n.State<$Record>>
+	export type Zags<$Record extends Record<string, unknown>> = LibZags.Instance<I18n.State<$Record>>
 
 	export type Instance<$Record extends Record<string, unknown>> = {
 		$: Zags.Instance<I18n.State<$Record>>

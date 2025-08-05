@@ -89,7 +89,7 @@ const refresh_session_jab: Maoka.Jab = ({ use }) => {
 			.pipe(oath.ops.tap(user => auth$.update("user", () => user)))
 
 		// TODO Sign out on error, show notification
-		refresh_session0
+		void refresh_session0
 			.cata(oath.catas.to_promise())
 			.catch(core_sdk.fns.noop)
 			.finally(() => hunter.shoot("background_status.none"))

@@ -20,12 +20,12 @@
  */
 
 import { core } from "@ordo-pink/sdk-core"
+import { curry } from "@ordo-pink/oss-curry"
 import { oath } from "@ordo-pink/oss-oath"
 
-import type * as Types from "./b-strategy-codegen-bun.types"
-import { curry } from "@ordo-pink/oss-curry"
+import type * as Lib from "./b-strategy-codegen-bun.types"
 
-export const create: Types.Create = algorithm => ({
+export const create: Lib.Create = algorithm => ({
 	generate: () =>
 		oath
 			.of(new Uint8Array(6))
@@ -38,5 +38,7 @@ export const create: Types.Create = algorithm => ({
 	verify: (hash, code) =>
 		oath.from_promise(() => Bun.password.verify(code, hash)).pipe(oath.ops.rmap(eio("Failed to verify code"))),
 })
+
+// --- Internal ---
 
 const eio = curry(core.rrr.eio)

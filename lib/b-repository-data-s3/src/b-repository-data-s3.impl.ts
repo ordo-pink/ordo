@@ -24,9 +24,9 @@ import { S3Client, S3File } from "bun"
 import { type Core, core } from "@ordo-pink/sdk-core"
 import { oath } from "@ordo-pink/oss-oath"
 
-import type * as Types from "./b-repository-data-s3.types"
+import type * as Lib from "./b-repository-data-s3.types"
 
-export const create: Types.Create = (accessKeyId, secretAccessKey, region, bucket, endpoint) => {
+export const create: Lib.Create = (accessKeyId, secretAccessKey, region, bucket, endpoint) => {
 	const s3 = new Bun.S3Client({ accessKeyId, bucket, endpoint, region, secretAccessKey })
 
 	return {
@@ -60,8 +60,8 @@ export const create: Types.Create = (accessKeyId, secretAccessKey, region, bucke
 
 // --- Internal ---
 
-const already_exists_rrr = () => core.rrr.eexist("File already exists")
-const not_found_rrr = () => core.rrr.enoent("File not found")
+const already_exists_rrr = () => core.rrr.eexist("File already exists", null)
+const not_found_rrr = () => core.rrr.enoent("File not found", null)
 const io_rrr = (e: unknown) => core.rrr.eio("Failed to connect to S3", e)
 
 const get_file = (s3: S3Client) => (path: string) =>

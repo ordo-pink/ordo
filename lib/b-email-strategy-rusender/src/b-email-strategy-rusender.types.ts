@@ -19,8 +19,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type * as EMAIL_STRATEGY_RUSENDER from "./b-email-strategy-rusender.constants"
 import type { Server } from "@ordo-pink/sdk-server"
+
+import type * as LIB from "./b-email-strategy-rusender.constants"
 
 export type ApiKey = string
 export type From = Server.Email.EmailGuy
@@ -29,4 +30,4 @@ export type Instance = Server.Email.Strategy
 
 export type Create = (...args: Args) => Instance
 
-export type CreateApiKeyHeader = (key: ApiKey) => [typeof EMAIL_STRATEGY_RUSENDER.X_API_KEY_HEADER_KEY, ApiKey]
+export type CreateApiKeyHeader = (key: ApiKey) => [typeof LIB.X_API_KEY_HEADER_KEY, ApiKey]

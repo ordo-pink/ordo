@@ -19,108 +19,34 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { type Core, core } from "@ordo-pink/sdk-core"
+import { CORE, type Core, core } from "@ordo-pink/sdk-core"
+import { type Server, server } from "@ordo-pink/sdk-server"
+import { codegen_strategy_bun } from "@ordo-pink/b-strategy-codegen-bun"
+import { data_repository_fs } from "@ordo-pink/b-repository-data-fs"
+import { result } from "@ordo-pink/oss-result"
 import { rickroll } from "@ordo-pink/oss-rickroll"
-import { routary } from "@ordo-pink/oss-routary"
-import { routary_cors } from "@ordo-pink/oss-routary-cors"
-import { server_core } from "@ordo-pink/b-server-core"
-
-// import { Core, core } from "@ordo-pink/sdk-core"
-// import { type ServerID, create_backend_server_id } from "@ordo-pink/backend-server-id"
-// import { is_finite_non_negative_int, is_finite_positive_int, is_port, is_positive_number } from "@ordo-pink/_tau"
-// import { create_persistence_strategy_data_fs } from "@ordo-pink/b-repository-data-fs"
-// import { create_persistence_strategy_user } from "@ordo-pink/b-repository-user-repository-data"
-// import { create_reference_mapping_user } from "@ordo-pink/backend-reference-mapping-user"
-// import { oath } from "@ordo-pink/oss-oath"
-
-// const env_rrr = (env_var: string) => (value?: any) =>
-// 	value != null ? `Invalid value for ${env_var}: "${value}"` : `Missing value for ${env_var}`
-
-// const get_env = () =>
-// 	oath.merge({
-// 		port: oath
-// 			.from_nullable(Bun.env.ORDO_ID_PORT)
-// 			.pipe(oath.ops.and(n => oath.if(is_port(n), { on_true: () => n })))
-// 			.pipe(oath.ops.rmap(env_rrr("ORDO_ID_PORT"))),
-
-// 		data_root: oath.from_nullable(Bun.env.ORDO_DT_DATA_PATH, env_rrr("ORDO_DT_DATA_PATH")),
-
-// 		allow_origin: oath
-// 			.from_nullable(Bun.env.ORDO_ID_ALLOW_ORIGIN)
-// 			.pipe(oath.ops.and(s => s.split(", ")))
-// 			.pipe(oath.ops.rmap(env_rrr("ORDO_ID_ALLOW_ORIGIN"))),
-
-// 		file_limit: oath
-// 			.from_nullable(Bun.env.ORDO_ID_DEFAULT_FILE_LIMIT)
-// 			.pipe(oath.ops.and(s => Number.parseInt(s, 10)))
-// 			.pipe(oath.ops.and(n => oath.if(is_finite_positive_int(n), { on_true: () => n })))
-// 			.pipe(oath.ops.rmap(env_rrr("ORDO_ID_DEFAULT_FILE_LIMIT"))),
-
-// 		max_upload_size: oath
-// 			.from_nullable(Bun.env.ORDO_ID_DEFAULT_MAX_UPLOAD_SIZE)
-// 			.pipe(oath.ops.and(s => Number.parseFloat(s)))
-// 			.pipe(oath.ops.and(n => oath.if(is_positive_number(n), { on_true: () => n })))
-// 			.pipe(oath.ops.rmap(env_rrr("ORDO_ID_DEFAULT_MAX_UPLOAD_SIZE"))),
-
-// 		max_functions: oath
-// 			.from_nullable(Bun.env.ORDO_ID_DEFAULT_MAX_FUNCTIONS)
-// 			.pipe(oath.ops.and(s => Number.parseInt(s, 10)))
-// 			.pipe(oath.ops.and(n => oath.if(is_finite_non_negative_int(n), { on_true: () => n })))
-// 			.pipe(oath.ops.rmap(env_rrr("ORDO_ID_DEFAULT_MAX_FUNCTIONS"))),
-
-// 		session_lifetime: oath
-// 			.from_nullable(Bun.env.ORDO_ID_SESSION_LIFETIME)
-// 			.pipe(oath.ops.and(s => Number.parseInt(s, 10)))
-// 			.pipe(oath.ops.and(n => oath.if(is_finite_positive_int(n), { on_true: () => n })))
-// 			.pipe(oath.ops.rmap(env_rrr("ORDO_ID_SESSION_LIFETIME"))),
-
-// 		web_host: oath.from_nullable(Bun.env.ORDO_WEB_HOST, env_rrr("ORDO_WEB_HOST")),
-// 		dt_host: oath.from_nullable(Bun.env.ORDO_DT_HOST, env_rrr("ORDO_DT_HOST")),
-// 	})
-
-// const main = () =>
-// 	get_env()
-// 		.pipe(
-// 			oath.ops.and(
-// 				({ allow_origin, data_root, file_limit, max_functions, max_upload_size, session_lifetime, port, web_host }) => {
-// 					const persistence_strategy_data = create_persistence_strategy_data_fs({ root: data_root })
-// 					const persistence_strategy_user = create_persistence_strategy_user(persistence_strategy_data)
-// 					const reference_mapping_user = create_reference_mapping_user(persistence_strategy_data, persistence_strategy_user)
-
-// 					return oath
-// 						.merge({
-// 							allow_origin,
-// 							defaults: { file_limit, max_functions, max_upload_size },
-// 							logger,
-// 							notification_strategy: { send: ({ content }) => logger.notice("NOTIFICATION:", "::", content) }, // TODO
-// 							session_lifetime_s: session_lifetime,
-// 							web_host,
-// 							reference_mapping_user,
-// 							persistence_strategy_user,
-// 						} satisfies ServerID.Params)
-// 						.pipe(oath.ops.and(create_backend_server_id))
-// 						.pipe(oath.ops.and(fetch => Bun.serve({ fetch, port })))
-// 				},
-// 			),
-// 		)
-// 		.pipe(oath.ops.tap(server => logger.info(`server running on http://${server.hostname}:${server.port}`)))
-// 		.cata(
-// 			oath.catas.or_else(e => {
-// 				logger.panic(e)
-// 				process.exit(1)
-// 			}),
-// 		)
+import { server_id } from "@ordo-pink/b-server-id"
+import { user_repository_data } from "@ordo-pink/b-repository-user-repository-data"
 
 const main = () => {
-	const fetch = server_core
-		.create({ logger })
-		.pipe(routary.ops.once(routary_cors.create("*")))
-		.pipe(routary.ops.get("/", () => new Response("Hello")))
+	const path = "var/dt"
+	const codegen_algorithm = { algorithm: "bcrypt", cost: 4 } as const
+	const data_repository = data_repository_fs.create(path)
+	const code_lifetime_seconds = 60 * 5
+	const session_lifetime_minutes = 60 * 24 * 30
+	const user_repository = user_repository_data.create(data_repository, cache_user_id, cache_file_id, user_file_id)
+	// TODO Real email strategy
+	const email_strategy: Server.Email.Strategy = { send: (_, __, content) => Promise.resolve(logger.debug(content)) }
+	const codegen = codegen_strategy_bun.create(codegen_algorithm)
+	const allowed_origins = ["http://localhost:3000" as const]
+
+	const fetch = server_id
+		.create(logger, user_repository, code_lifetime_seconds, session_lifetime_minutes, email_strategy, allowed_origins, codegen)
 		.or_else(() => rickroll)
 
-	Bun.serve({ fetch, port: 3001 })
+	const bun_server = Bun.serve({ fetch, port })
 
-	logger.info("Server started on port 3001")
+	logger.info(`Server started on ${bun_server.url.toString()}`)
 }
 
 // --- Internal ---
@@ -135,5 +61,25 @@ const logger: Core.Logger = {
 	panic: (...message) => core.logger.stout.panic("[ID]", ...message),
 	warn: (...message) => core.logger.stout.warn("[ID]", ...message),
 }
+
+const port = result
+	.from_nullable(Bun.env.ORDO_ID_PORT)
+	.pipe(result.ops.chain(port => result.if(server.is_port(port), { on_true: () => port })))
+	.cata(result.catas.or_else(() => "3001"))
+
+const user_file_id = result
+	.from_nullable(Bun.env.ORDO_USER_FILE_ID)
+	.pipe(result.ops.chain(id => result.if(core.uuid.guard(id), { on_true: () => id as Core.Uuid.Instance })))
+	.cata(result.catas.or_else(() => CORE.UUID.FIRSTBORN as Core.Uuid.Instance))
+
+const cache_user_id = result
+	.from_nullable(Bun.env.ORDO_ID_CACHE_USER_ID)
+	.pipe(result.ops.chain(id => result.if(core.uuid.guard(id), { on_true: () => id as Core.Uuid.Instance })))
+	.cata(result.catas.or_else(() => CORE.UUID.FIRSTBORN as Core.Uuid.Instance))
+
+const cache_file_id = result
+	.from_nullable(Bun.env.ORDO_ID_CACHE_FILE_ID)
+	.pipe(result.ops.chain(id => result.if(core.uuid.guard(id), { on_true: () => id as Core.Uuid.Instance })))
+	.cata(result.catas.or_else(() => CORE.UUID.THE_LAST_ONE as Core.Uuid.Instance))
 
 main()

@@ -70,14 +70,6 @@ export const lte = (max: number) => (val: number) => eq(max)(val) || lt(max)(val
 export const noop = (): void => {}
 export const undef = (): undefined => {}
 
-export const is_port = (x: string) => {
-	const n = Number.parseInt(x, 10)
-	const gt_0 = gt(0)
-	const lt_65535 = lt(65535)
-
-	return !x.startsWith("0") && !is_nan(n) && gt_0(n) && lt_65535(n)
-}
-
 export const keys_of: <T extends object>(o: T) => (keyof T)[] = o => {
 	return Object.keys(o) as any
 }

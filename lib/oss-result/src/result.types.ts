@@ -108,7 +108,7 @@ export type IsOkGuardFn = <$Ok, $Err>(x: Result.Instance<$Ok, $Err>) => x is Res
 
 export type IsErrGuardFn = <$Ok, $Err>(x: Result.Instance<$Ok, $Err>) => x is Result.Instance<never, $Err>
 
-export type OrElseCataFn = <$Ok, $Err, _NewErr>(
+export type OrElseCataFn = <const $Ok, const $Err, const _NewErr>(
 	on_err: (err: $Err) => _NewErr,
 ) => { ok: (on_ok: $Ok) => $Ok; err: (err: $Err) => _NewErr }
 
@@ -131,7 +131,7 @@ export namespace Result {
 		/** @deprecated UNSAFE. Use `result.cata` instead. */
 		unwrap: () => $Ok | $Err
 		pipe: <_NewOk, _NewErr>(operator: (result: Instance<$Ok, $Err>) => Instance<_NewOk, _NewErr>) => Instance<_NewOk, _NewErr>
-		cata: <_NewOk, _NewErr>(explosion: { ok: (ok: $Ok) => _NewOk; err: (err: $Err) => _NewErr }) => _NewOk | _NewErr
+		cata: <const _NewOk, const _NewErr>(explosion: { ok: (ok: $Ok) => _NewOk; err: (err: $Err) => _NewErr }) => _NewOk | _NewErr
 	}
 
 	export type Static = {

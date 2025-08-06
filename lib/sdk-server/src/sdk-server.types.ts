@@ -19,6 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+export * from "./index/index.types"
 export * as Codegen from "./codegen/codegen.types"
 export * as Data from "./data/data.types"
 export * as Email from "./email/email.types"

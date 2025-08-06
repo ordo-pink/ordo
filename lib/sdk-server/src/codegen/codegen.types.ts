@@ -22,8 +22,11 @@
 import type { Core } from "@ordo-pink/sdk-core"
 import type { Oath } from "@ordo-pink/oss-oath"
 
+export type Code = string & {}
+export type Hash = string & {}
+
 export type Instance = {
-	generate: () => Oath.Instance<string>
-	hash: (code: string) => Oath.Instance<string, Core.Rrr.Instance<"EIO">>
-	verify: (code: string, hash: string) => Oath.Instance<boolean, Core.Rrr.Instance<"EIO">>
+	generate: () => Oath.Instance<Code>
+	hash: (code: Code) => Oath.Instance<Hash, Core.Rrr.Instance<"EIO">>
+	verify: (code: Code, hash: Hash) => Oath.Instance<boolean, Core.Rrr.Instance<"EIO">>
 }

@@ -19,4 +19,5 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+export * from "./index/index.impl"
 export * as user from "./user/user.impl"

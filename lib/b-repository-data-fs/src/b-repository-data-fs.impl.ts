@@ -30,9 +30,9 @@ import { resolve } from "path"
 import { type Core, core } from "@ordo-pink/sdk-core"
 import { oath } from "@ordo-pink/oss-oath"
 
-import * as Types from "./b-repository-data-fs.types"
+import type * as Lib from "./b-repository-data-fs.types"
 
-export const create: Types.Create = root => {
+export const create: Lib.Create = root => {
 	const get_path = get_path_from_root(root)
 
 	return {
@@ -65,8 +65,8 @@ export const create: Types.Create = root => {
 
 // --- Internal ---
 
-const to_already_exists_rrr = () => core.rrr.eexist("File already exists")
-const to_not_found_rrr = () => core.rrr.enoent("File not found")
+const to_already_exists_rrr = () => core.rrr.eexist("File already exists", null)
+const to_not_found_rrr = () => core.rrr.enoent("File not found", null)
 const to_io_rrr = (e: unknown) => core.rrr.eio("Failed to store local data", e)
 
 const get_file = (path: string) => oath.try(() => Bun.file(path)).pipe(oath.ops.rmap(to_io_rrr))

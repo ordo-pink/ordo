@@ -32,8 +32,8 @@ export namespace logger {
 	}
 }
 
-export const todo: Todo = message => {
-	logger.stout.alert(message ?? "Not Implemented")
+export const todo: Todo = () => {
+	logger.stout.alert("Not Implemented")
 	if (globalThis.process) process.exitCode = 1
 	else throw new Error("Todo reached!")
 }

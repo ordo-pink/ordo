@@ -6,8 +6,8 @@
 import { Routary } from "@ordo-pink/oss-routary"
 
 export type Args = [
-	allow_origins: string | string[],
-	allow_headers?: string[],
+	allowed_origins: string | string[],
+	allowed_headers?: string[],
 	allow_credentials?: boolean,
 	max_age?: number,
 	success_status?: number,

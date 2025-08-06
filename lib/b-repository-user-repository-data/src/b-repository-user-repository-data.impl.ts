@@ -23,16 +23,16 @@ import { type Core, core } from "@ordo-pink/sdk-core"
 import { type Server, server } from "@ordo-pink/sdk-server"
 import { oath } from "@ordo-pink/oss-oath"
 
-import * as Types from "./b-repository-user-repository-data.types"
+import type * as Lib from "./b-repository-user-repository-data.types"
 
-export const create: Types.Create = (repository, uid, fid, ufid) => {
+export const create: Lib.Create = (repository, uid, fid, ufid) => {
 	let cache = get_cache_promise(repository, uid, fid)
-	const cache0 = oath.from_promise<Types.Cache, never>(() => cache)
+	const cache0 = oath.from_promise<Lib.Cache, never>(() => cache)
 
-	const read: Types.Instance["read"] = id =>
-		repository.read(id, ufid).pipe(oath.ops.chain(from_stream0(() => core.rrr.eio("Cound not read user"))))
+	const read: Lib.Instance["read"] = id =>
+		repository.read(id, ufid).pipe(oath.ops.chain(from_stream0(() => core.rrr.eio("Cound not read user", id))))
 
-	const update_cache0 = (current_cache: Types.Cache) =>
+	const update_cache0 = (current_cache: Lib.Cache) =>
 		oath
 			.try(() => JSON.stringify(current_cache))
 			.pipe(oath.ops.chain(to_stream0()))
@@ -70,7 +70,7 @@ export const create: Types.Create = (repository, uid, fid, ufid) => {
 
 		read,
 
-		delete: id => repository.delete(id),
+		delete: repository.delete,
 
 		update: (id, new_user) =>
 			read(id).pipe(
@@ -135,8 +135,8 @@ const to_rrr = (message: string) => (error: unknown) => core.rrr.eio(message, er
 const get_cache_promise = (repository: Server.Data.Repository, uid: Core.User.Id, fid: Core.Data.Id) =>
 	repository
 		.read(uid, fid)
-		.pipe(oath.ops.chain(stream => oath.from_promise(() => Bun.readableStreamToJSON(stream) as Promise<Types.Cache>)))
-		.cata(oath.catas.or_else(() => ({ email: {}, ref: {} }) as Types.Cache))
+		.pipe(oath.ops.chain(stream => oath.from_promise(() => Bun.readableStreamToJSON(stream) as Promise<Lib.Cache>)))
+		.cata(oath.catas.or_else(() => ({ email: {}, ref: {} }) as Lib.Cache))
 
 const to_stream0 =
 	<$F>(on_error: (e: unknown) => $F = e => e as any) =>

@@ -30,6 +30,8 @@ export const fuzzy_check: Fns.Fuzz = curry((source, target, ratio) => {
 	return hits / source.length >= ratio
 })
 
+export const is_nan = Number.isNaN
+
 export const is_non_empty_string = (x: unknown): x is string => is_string(x) && x.trim() !== ""
 
 export const is_0 = eq(0)

@@ -19,19 +19,5 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { Core } from "@ordo-pink/sdk-core"
-import type { Server } from "@ordo-pink/sdk-server"
-
-export type Args = [
-	data_repository: Server.Data.Repository,
-	cache_user_id: Core.User.Id,
-	cache_file_id: Core.Data.Id,
-	user_file_id: Core.Data.Id,
-]
-export type Instance = Server.User.Repository
-
-export type Create = (...args: Args) => Instance
-
-export type Mapping<$Key extends string> = Record<$Key, Core.User.Id | undefined>
-
-export type Cache = { email: Mapping<Core.User.Email>; ref: Mapping<Core.User.Ref> }
+export * as server_id from "./src/b-server-id.impl"
+export * as ServerId from "./src/b-server-id.types"

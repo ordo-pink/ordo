@@ -22,10 +22,10 @@
 import { type Oath, oath } from "@ordo-pink/oss-oath"
 import { core } from "@ordo-pink/sdk-core"
 
-import * as CONST from "./b-email-strategy-rusender.constants"
-import type * as Types from "./b-email-strategy-rusender.types"
+import * as LIB from "./b-email-strategy-rusender.constants"
+import type * as Lib from "./b-email-strategy-rusender.types"
 
-export const create: Types.Create = (k, s) => ({
+export const create: Lib.Create = (k, s) => ({
 	send: (idempotencyKey, subject, html, to, from = s, previewTitle, headers, cc, bcc) =>
 		oath
 			.all([to_json({ idempotencyKey, mail: { bcc, cc, from, headers, html, previewTitle, subject, to } }), create_headers(k)])
@@ -42,12 +42,12 @@ const ignore_response = core.fns.v
 
 type SendRequest = (args: [string, Headers]) => Oath.Instance<Response, Error>
 const send_request: SendRequest = ([body, headers]) =>
-	oath.from_promise(() => fetch(CONST.URL, { method: CONST.METHOD, body, headers }))
+	oath.from_promise(() => fetch(LIB.URL, { method: LIB.METHOD, body, headers }))
 
-const create_headers = (k: Types.ApiKey) =>
+const create_headers = (k: Lib.ApiKey) =>
 	oath
 		.of(new Headers())
-		.pipe(oath.ops.tap(h => h.set(...CONST.CONTENT_TYPE_HEADER)))
+		.pipe(oath.ops.tap(h => h.set(...LIB.CONTENT_TYPE_HEADER)))
 		.pipe(oath.ops.tap(h => h.set(...create_api_key_header(k))))
 
-const create_api_key_header = (k: Types.ApiKey) => [CONST.X_API_KEY_HEADER_KEY, k] as const
+const create_api_key_header = (k: Lib.ApiKey) => [LIB.X_API_KEY_HEADER_KEY, k] as const

@@ -2,9 +2,9 @@ import { CORE, type Core, core } from "@ordo-pink/sdk-core"
 import { curry } from "@ordo-pink/oss-curry"
 import { oath } from "@ordo-pink/oss-oath"
 import { server } from "@ordo-pink/sdk-server"
+import { server_core } from "@ordo-pink/b-server-core"
 
 import type * as Lib from "../b-server-id.types"
-import { server_core } from "@ordo-pink/b-server-core"
 
 export const get_user_by_email: Lib.Handler = ({ env, params }) =>
 	oath
@@ -14,12 +14,10 @@ export const get_user_by_email: Lib.Handler = ({ env, params }) =>
 		.pipe(oath.ops.map(server.user.serialize_other))
 		.pipe(oath.ops.chain(server_core.oaths.to_json))
 		.pipe(oath.ops.map(core.fns.construct(Response)))
-		.pipe(oath.ops.tap(set_content_type_header("application/json")))
+		.pipe(oath.ops.tap(server_core.set_response_header("Content-Type", "application/json")))
 		.cata(oath.catas.or_else(env.fail))
 
 // --- Internal ---
-
-const set_content_type_header = server_core.set_response_header("Content-Type")
 
 const einval = curry(core.rrr.einval)
 

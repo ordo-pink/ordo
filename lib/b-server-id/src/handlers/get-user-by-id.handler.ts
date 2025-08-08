@@ -14,17 +14,12 @@ export const get_user_by_id: Lib.Handler = ({ env, params, request }) =>
 		.pipe(oath.ops.chain(env.user_repository.read))
 		.pipe(oath.ops.map(server.user.serialize))
 		.pipe(oath.ops.chain(server_core.oaths.to_json))
-		.pipe(oath.ops.map(create_response))
-		.pipe(oath.ops.tap(set_content_type_json))
+		.pipe(oath.ops.map(core.fns.construct(Response)))
+		.pipe(oath.ops.tap(server_core.set_response_header("Content-Type", "application/json")))
 		.cata(oath.catas.or_else(env.fail))
 
 // --- Internal ---
 
-const create_response = core.fns.construct(Response)
-
-const set_content_type_json = server_core.set_response_header("Content-Type", "application/json")
-
 const to_invalid_id_rrr = (e: string) => () => core.rrr.einval(CORE.RRR.REASON.USER_ID_INVALID, e)
-
 const validate_id = (e: string) =>
 	oath.if(core.uuid.guard(e), { on_false: to_invalid_id_rrr(e), on_true: () => e as Core.User.Id })

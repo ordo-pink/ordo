@@ -22,7 +22,8 @@
 import type { Core } from "@ordo-pink/sdk-core"
 import type { Oath } from "@ordo-pink/oss-oath"
 
-export type Session = [id: Core.Uuid.Instance, ...Core.Session.Instance]
+export type SessionId = Core.Uuid.Instance
+export type Session = [id: SessionId, ...Core.Session.Instance]
 export type Sessions = Session[]
 
 type Replace<$Arr extends any[], $Type, $NewType> = $Arr extends [infer _This, ...infer _Rest]
@@ -43,9 +44,11 @@ export type Repository = {
 	get_by_ref: (ref: Core.User.Ref) => Oath.Instance<Instance, Core.Rrr.Instance<"EIO" | "ENOENT">>
 }
 
-export type GetSession = (user: Instance) => Sessions
-export type HasSession = (session: Session, user: Instance) => boolean
+export type GetSessions = (user: Instance) => Sessions
+export type HasSession = (session_id: SessionId, user: Instance) => boolean
+export type GetSession = (session_id: SessionId, user: Instance) => Session | null
 export type Serialize = (user: Instance) => Core.User.Instance
+export type SerializeOther = (user: Instance) => Core.User.OtherUserInstance
 export type SerializeSession = (session: Session) => Core.Session.Instance
 
 export type ObfuscateEmail = (email: Core.User.Email) => Core.User.Email

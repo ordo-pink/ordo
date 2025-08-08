@@ -33,6 +33,4 @@ export const request: T.Request = ({ env, mut, request, response }) => {
 	const url = `${pathname}${url_obj.search}`
 
 	env.logger.info(`${request_id} ${status} ${method} ${request_language} ${url} (${response_time}ms) - ${request_ip}`)
-
-	return {}
 }

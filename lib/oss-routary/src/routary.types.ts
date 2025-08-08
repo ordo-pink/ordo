@@ -19,7 +19,7 @@ export type RouteParams = Colonoscope.Results
 export type Structure<$Env extends Env, $Mut extends Mut> = Partial<Record<Method, Record<Route, Handler<$Env, $Mut>>>>
 
 export type HandlerParams<$Env extends Env, $Mut extends Mut> = {
-	request: Request
+	request: Bun.BunRequest
 	server: Server
 	env: $Env
 	mut: $Mut
@@ -48,9 +48,17 @@ export type Pipe<$Env extends Env, $Mut extends Mut> = <_NewMut extends Mut>(
 	) => Instance<$Env, _NewMut>,
 ) => Instance<$Env, _NewMut>
 
+export type CatcherParams<$Env extends Env, $Mut extends Mut> = HandlerParams<$Env, $Mut> & {
+	error: unknown
+	response: Response | null
+	matched_route: Route | null
+}
+export type Catcher<$Env extends Env, $Mut extends Mut> = (params: CatcherParams<$Env, $Mut>) => Response | Promise<Response>
+
 export type OrElse<$Env extends Env, $Mut extends Mut> = (
-	handler: Handler<$Env, $Mut>,
-) => (request: Request, server: Server) => Response | Promise<Response>
+	on_none_matched: Handler<$Env, $Mut>,
+	catcher: (params: CatcherParams<$Env, $Mut>) => Response | Promise<Response>,
+) => (request: Bun.BunRequest, server: Server) => Response | Promise<Response>
 
 export type Instance<$Env extends Env, $Mut extends Mut> = {
 	pipe: Pipe<$Env, $Mut>
@@ -95,22 +103,26 @@ export type CustomMethodHandler = <const $Env extends Env, $Mut extends Mut>(
 ) => Op<$Env, $Mut>
 
 export type BeforeEachCallbackParams<$Env extends Env, $Mut extends Mut> = HandlerParams<$Env, $Mut>
+export type BeforeEachCallbackResult<$NewMut extends Mut> = $NewMut | Promise<$NewMut | void> | void
 export type BeforeEachCallback<$Env extends Env, $Mut extends Mut> = <$NewMut extends Mut>(
 	params: BeforeEachCallbackParams<$Env, $Mut>,
-) => $NewMut | Promise<$NewMut>
+) => BeforeEachCallbackResult<$NewMut>
 export type BeforeEach = <const $Env extends Env, $Mut extends Mut, $NewMut extends Mut>(
-	callback: (params: BeforeEachCallbackParams<$Env, $Mut>) => $NewMut | Promise<$NewMut>,
+	callback: (params: BeforeEachCallbackParams<$Env, $Mut>) => BeforeEachCallbackResult<$NewMut>,
 ) => MutOp<$Env, $Mut, $NewMut>
 
 export type AfterEachCallbackParams<$Env extends Env, $Mut extends Mut> = HandlerParams<$Env, $Mut> & {
 	response: Response
 	matched_route: Route | null
 }
+export type AfterEachCallbackResult<$NewMut extends Mut> = { mut?: $NewMut; response?: Response } | void
 export type AfterEachCallback<$Env extends Env, $Mut extends Mut> = <$NewMut extends Mut>(
 	params: AfterEachCallbackParams<$Env, $Mut>,
-) => $NewMut | Promise<$NewMut>
+) => AfterEachCallbackResult<$NewMut> | Promise<AfterEachCallbackResult<$NewMut>>
 export type AfterEach = <const $Env extends Env, $Mut extends Mut, $NewMut extends Mut>(
-	callback: (params: AfterEachCallbackParams<$Env, $Mut>) => $NewMut | Promise<$NewMut>,
+	callback: (
+		params: AfterEachCallbackParams<$Env, $Mut>,
+	) => AfterEachCallbackResult<$NewMut> | Promise<AfterEachCallbackResult<$NewMut>>,
 ) => MutOp<$Env, $Mut, $NewMut>
 
 export type OnceCallbackParams<$Env extends Env, $Mut extends Mut> = { env: $Env; structure: Structure<$Env, $Mut> }

@@ -19,7 +19,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { core } from "@ordo-pink/sdk-core"
 import { hunt } from "@ordo-pink/oss-hunt"
 import { routary } from "@ordo-pink/oss-routary"
 import { routary_cors } from "@ordo-pink/oss-routary-cors"
@@ -27,6 +26,7 @@ import { server } from "@ordo-pink/sdk-server"
 import { server_core } from "@ordo-pink/b-server-core"
 
 import type * as Lib from "./b-server-id.types"
+import * as handlers from "./handlers"
 
 export const create: Lib.Create = (
 	logger,
@@ -44,7 +44,7 @@ export const create: Lib.Create = (
 	const allow_credentials = true
 
 	// TODO Send email
-	partymaker.track("auth.requested", ([user, code]) => logger.debug(user[0], code))
+	const release_auth_requested = partymaker.track("auth.requested", ([user, code]) => logger.debug(user[0], code))
 
 	const interval = setInterval(() => {
 		const now = Date.now()
@@ -55,22 +55,27 @@ export const create: Lib.Create = (
 				logger.debug("Removed outdated code for", server.user.obfuscate_email(email))
 			}
 		}
-	}, code_lifetime_seconds)
+	}, 5000).unref()
 
-	interval.unref()
+	const handle_exit = () => {
+		clearInterval(interval)
+		release_auth_requested()
+		code_storage.clear()
+	}
+
+	process.on("exit", handle_exit)
 
 	return server_core
 		.create({ codegen, logger, partymaker, session_lifetime_minutes, user_repository })
 		.pipe(routary.ops.once(routary_cors.create(allowed_origins, allowed_headers, allow_credentials)))
-		.pipe(routary.ops.get("/healthcheck", () => new Response("OK")))
-		.pipe(routary.ops.post("/auth/request-code", core.todo))
-		.pipe(routary.ops.post("/auth/verify-code", core.todo))
-		.pipe(routary.ops.post("/auth/refresh", core.todo))
-		.pipe(routary.ops.get("/users/email/:email", core.todo))
-		.pipe(routary.ops.get("/users/ref/:ref", core.todo))
-		.pipe(routary.ops.get("/users/:id", core.todo))
-		.pipe(routary.ops.patch("/users/:id/email", core.todo))
-		.pipe(routary.ops.patch("/users/:id/handle", core.todo))
-		.pipe(routary.ops.patch("/users/:id", core.todo))
-		.pipe(routary.ops.delete("/users/:id", core.todo))
+		.pipe(routary.ops.post("/auth/request-code", handlers.request_code))
+		.pipe(routary.ops.post("/auth/verify-code", handlers.verify_code))
+		.pipe(routary.ops.post("/auth/refresh", handlers.refresh_session))
+		.pipe(routary.ops.get("/users/email/:email", handlers.get_user_by_email))
+		.pipe(routary.ops.patch("/users/email/:id", handlers.update_email))
+		.pipe(routary.ops.get("/users/ref/:ref", handlers.get_user_by_ref))
+		.pipe(routary.ops.patch("/users/ref/:id", handlers.update_ref))
+		.pipe(routary.ops.get("/users/:id", handlers.get_user_by_id))
+		.pipe(routary.ops.patch("/users/:id", handlers.update_user))
+		.pipe(routary.ops.delete("/users/:id", handlers.delete_user))
 }

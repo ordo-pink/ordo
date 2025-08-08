@@ -21,6 +21,8 @@
 
 import { CORE, type Core, core } from "@ordo-pink/sdk-core"
 import { type Server, server } from "@ordo-pink/sdk-server"
+import type { Routary } from "@ordo-pink/oss-routary"
+import type { ServerCore } from "@ordo-pink/b-server-core"
 import { codegen_strategy_bun } from "@ordo-pink/b-strategy-codegen-bun"
 import { data_repository_fs } from "@ordo-pink/b-repository-data-fs"
 import { result } from "@ordo-pink/oss-result"
@@ -42,7 +44,7 @@ const main = () => {
 
 	const fetch = server_id
 		.create(logger, user_repository, code_lifetime_seconds, session_lifetime_minutes, email_strategy, allowed_origins, codegen)
-		.or_else(() => rickroll)
+		.or_else(() => rickroll, catcher)
 
 	const bun_server = Bun.serve({ fetch, port })
 
@@ -81,5 +83,11 @@ const cache_file_id = result
 	.from_nullable(Bun.env.ORDO_ID_CACHE_FILE_ID)
 	.pipe(result.ops.chain(id => result.if(core.uuid.guard(id), { on_true: () => id as Core.Uuid.Instance })))
 	.cata(result.catas.or_else(() => CORE.UUID.THE_LAST_ONE as Core.Uuid.Instance))
+
+const catcher: Routary.Catcher<ServerCore.Env, ServerCore.Mut> = ({ env, request, error }) => {
+	const pathname = new URL(request.url).pathname
+	env.logger.error(`UNEXPECTED ERROR (${pathname}):`, error)
+	return new Response("", { status: 500 })
+}
 
 main()

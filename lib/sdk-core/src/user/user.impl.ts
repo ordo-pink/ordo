@@ -23,7 +23,7 @@ export const create: User.Create = (email, ref, name = default_name(), sub = def
 export const default_name: User.DefaultName = () => ""
 export const default_subscription: User.DefaultSubscription = () => USER.SUBSCRIPTION.FREE
 
-export const handle_guard: User.RefGuard = (x): x is User.Ref => fns.is_string(x) && USER.RX.HANDLE.test(x)
+export const ref_guard: User.RefGuard = (x): x is User.Ref => fns.is_string(x) && USER.RX.REF.test(x)
 export const name_guard: User.NameGuard = (x): x is User.Name => fns.is_string(x) && fns.lt(256, x.length)
 export const subscription_guard: User.SubscriptionGuard = (x): x is User.Subscription =>
 	fns.is_non_negative_integer(x) && fns.lt(USER.SUBSCRIPTION.length, x)
@@ -37,7 +37,7 @@ export const installed_function_guard: User.InstalledFunctionGuard = (x): x is U
 		.cata(result.catas.or_else(() => false))
 
 export const get_id: User.GetId = fns.prop(0)
-export const get_handle: User.GetRef = fns.prop(1)
+export const get_ref: User.GetRef = fns.prop(1)
 export const get_name: User.GetName = fns.prop(2)
 export const get_subscription: User.GetSubscription = fns.prop(3)
 export const get_created_at: User.GetCreatedAt = fns.prop(4)
@@ -48,7 +48,7 @@ export const get_sessions: User.GetSessions = fns.prop(8)
 
 export const has_the_name: User.HasTheName = (x, dto) => fns.eq(get_name(dto), x)
 export const has_the_id: User.HasTheId = (x, dto) => fns.eq(get_id(dto), x)
-export const has_the_handle: User.HasTheRef = (x, dto) => fns.eq(get_handle(dto), x)
+export const has_the_ref: User.HasTheRef = (x, dto) => fns.eq(get_ref(dto), x)
 export const has_the_subscription: User.HasTheSubscription = (x, dto) => fns.pipe(get_subscription).pipe(fns.eq(x))(dto)
 export const has_the_email: User.HasTheEmail = (email, dto) => fns.eq(get_email(dto), email)
 

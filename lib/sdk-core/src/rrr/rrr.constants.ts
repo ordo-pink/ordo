@@ -34,3 +34,34 @@ export enum TYPE {
 	/** ENUM length. */
 	length,
 }
+
+export enum REASON {
+	/** Error type is self-explanatory. */
+	OBVIOUS,
+	/** The service is initialized incorrectly. FIX ASAP! */
+	INVALID_SERVICE_INITIALIZATION,
+	/** Provided input could not be parsed. */
+	JSON_PARSE_FAILED,
+	/** Provided input could not be initialized. */
+	JSON_STRINGIFY_FAILED,
+	/** Could not write a file. */
+	FILE_WRITE_FAILED,
+	/** Could not read a file. */
+	FILE_READ_FAILED,
+	/** Could not delete a file. */
+	FILE_UNLINK_FAILED,
+	/** Email was not provided. */
+	EMAIL_MISSING,
+	/** Provided email was not valid. */
+	EMAIL_INVALID,
+	/** Ref was not provided. */
+	REF_MISSING,
+	/** Provided ref was not valid. */
+	REF_INVALID,
+	/** Id was not provided. */
+	USER_ID_MISSING,
+	/** Provided id was not valid. */
+	USER_ID_INVALID,
+	/** Captain Cookie. */
+	MISSING_REQUIRED_COOKIE,
+}

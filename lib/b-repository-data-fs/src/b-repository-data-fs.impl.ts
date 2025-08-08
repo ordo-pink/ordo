@@ -27,7 +27,7 @@
 import { BunFile } from "bun"
 import { resolve } from "path"
 
-import { type Core, core } from "@ordo-pink/sdk-core"
+import { CORE, type Core, core } from "@ordo-pink/sdk-core"
 import { oath } from "@ordo-pink/oss-oath"
 
 import type * as Lib from "./b-repository-data-fs.types"
@@ -65,11 +65,14 @@ export const create: Lib.Create = root => {
 
 // --- Internal ---
 
-const to_already_exists_rrr = () => core.rrr.eexist("File already exists", null)
-const to_not_found_rrr = () => core.rrr.enoent("File not found", null)
-const to_io_rrr = (e: unknown) => core.rrr.eio("Failed to store local data", e)
+const to_already_exists_rrr = () => core.rrr.eexist(CORE.RRR.REASON.OBVIOUS, null)
+const to_not_found_rrr = () => core.rrr.enoent(CORE.RRR.REASON.OBVIOUS, null)
+const to_file_write_rrr = (e: unknown) => core.rrr.eio(CORE.RRR.REASON.FILE_WRITE_FAILED, e)
+const to_file_read_rrr = (e: unknown) => core.rrr.eio(CORE.RRR.REASON.FILE_READ_FAILED, e)
+const to_file_delete_rrr = (e: unknown) => core.rrr.eio(CORE.RRR.REASON.FILE_UNLINK_FAILED, e)
+const to_initialization_rrr = (e: unknown) => core.rrr.eio(CORE.RRR.REASON.INVALID_SERVICE_INITIALIZATION, e)
 
-const get_file = (path: string) => oath.try(() => Bun.file(path)).pipe(oath.ops.rmap(to_io_rrr))
+const get_file = (path: string) => oath.try(() => Bun.file(path)).pipe(oath.ops.rmap(to_file_read_rrr))
 
 const check_file_exists = (path: string) =>
 	get_file(path).pipe(
@@ -85,9 +88,9 @@ const write_file = (content: ReadableStream) => (path: BunFile | string) =>
 	oath
 		.from_promise(() => Bun.readableStreamToArrayBuffer(content) as Promise<ArrayBuffer>)
 		.pipe(oath.ops.chain(input => oath.from_promise(() => Bun.write(path, input))))
-		.pipe(oath.ops.rmap(to_io_rrr))
+		.pipe(oath.ops.rmap(to_file_write_rrr))
 
-const delete_file = (file: BunFile) => oath.from_promise(() => file.delete()).pipe(oath.ops.rmap(to_io_rrr))
+const delete_file = (file: BunFile) => oath.from_promise(() => file.delete()).pipe(oath.ops.rmap(to_file_delete_rrr))
 
 const validate_file_exists = (path: string) =>
 	check_file_exists(path)
@@ -99,7 +102,7 @@ const validate_file_does_not_exist = (path: string) =>
 		.pipe(oath.ops.chain(({ exists, file }) => oath.if(!exists, { on_true: () => ({ path, file }) })))
 		.pipe(oath.ops.rmap(to_already_exists_rrr))
 
-const get_file_content = (file: BunFile) => oath.try(() => file.stream()).pipe(oath.ops.rmap(to_io_rrr))
+const get_file_content = (file: BunFile) => oath.try(() => file.stream()).pipe(oath.ops.rmap(to_file_read_rrr))
 
 const get_path_from_root = (root: string) => (uid: Core.User.Id, fsid: Core.Data.Id) =>
-	oath.try(() => resolve(root, uid, ...fsid.split("-"))).pipe(oath.ops.rmap(to_io_rrr))
+	oath.try(() => resolve(root, uid, ...fsid)).pipe(oath.ops.rmap(to_initialization_rrr))

@@ -19,6 +19,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type * as RequestId from "./request-id.types"
+import type * as T from "./request-id.types"
 
-export const set: RequestId.Set = () => ({ request_id: crypto.randomUUID() })
+export const set: T.Set = () => ({ request_id: crypto.randomUUID() })

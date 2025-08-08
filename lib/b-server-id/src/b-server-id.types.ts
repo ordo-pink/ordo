@@ -63,12 +63,15 @@ export type Prey = {
 	}
 }
 
-export type Env = ServerCore.Env & {
+export type Mut = ServerCore.Mut
+export type Env = ServerCore.PrefilledEnv & {
 	partymaker: PartyMaker
 	user_repository: Server.User.Repository
 	codegen: Server.Codegen.Instance
 	session_lifetime_minutes: SessionLifetimeMinutes
 }
+
+export type Handler = Routary.Handler<Env, Mut>
 
 export type Instance = Routary.Instance<Env, ServerCore.Mut>
 

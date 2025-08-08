@@ -45,6 +45,8 @@ export type NonNegativeInt<T extends number> = number extends T
 
 export type Curry<T extends (...args: any) => any> = (x: CurryFirst<T>) => CurryRest<T>
 
+export type Curried<T extends (...args: any) => any> = CurryRest<T>
+
 export type Identity<T> = (x: T) => T
 
 /**

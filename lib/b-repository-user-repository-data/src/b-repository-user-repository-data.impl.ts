@@ -19,11 +19,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { type Core, core } from "@ordo-pink/sdk-core"
+import { CORE, type Core, core } from "@ordo-pink/sdk-core"
 import { type Server, server } from "@ordo-pink/sdk-server"
 import { oath } from "@ordo-pink/oss-oath"
 
 import type * as Lib from "./b-repository-user-repository-data.types"
+
+// TODO Error handling
 
 export const create: Lib.Create = (repository, uid, fid, ufid) => {
 	let cache = get_cache_promise(repository, uid, fid)
@@ -115,13 +117,13 @@ export const create: Lib.Create = (repository, uid, fid, ufid) => {
 		get_by_email: email =>
 			cache0
 				.pipe(oath.ops.chain(m => oath.from_nullable(m.email[email])))
-				.pipe(oath.ops.rmap(() => core.rrr.enoent("Mapping not found", server.user.obfuscate_email(email))))
+				.pipe(oath.ops.rmap(() => core.rrr.enoent(CORE.RRR.REASON.OBVIOUS, server.user.obfuscate_email(email))))
 				.pipe(oath.ops.chain(read)),
 
 		get_by_ref: ref =>
 			cache0
 				.pipe(oath.ops.chain(m => oath.from_nullable(m.ref[ref])))
-				.pipe(oath.ops.rmap(() => core.rrr.enoent("Mapping not found", ref)))
+				.pipe(oath.ops.rmap(() => core.rrr.enoent(CORE.RRR.REASON.OBVIOUS, ref)))
 				.pipe(oath.ops.chain(read)),
 	}
 }

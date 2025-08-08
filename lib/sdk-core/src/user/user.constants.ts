@@ -14,7 +14,7 @@ export enum SUBSCRIPTION {
 }
 
 export namespace RX {
-	export const HANDLE = /^[a-z0-9_]{1,23}$/
+	export const REF = /^[a-z0-9_]{1,23}$/
 
 	export const EMAIL =
 		// eslint-disable-next-line no-useless-escape

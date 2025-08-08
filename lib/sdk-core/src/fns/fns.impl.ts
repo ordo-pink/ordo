@@ -77,3 +77,11 @@ export const contra =
 export const prop: Fns.Prop = key => obj => obj[key]
 
 export const replace: Fns.Replace = index => (value, arr) => arr.with(index, value) as any
+
+export type Construct = <$Constructor extends { new (...args: any[]): any }>(
+	konstructor: $Constructor,
+) => $Constructor extends { new (...args: infer _Args): infer _Result }
+	? (...args: _Args) => _Result
+	: (...args: any[]) => never
+
+export const construct: Construct = ctor => ((...args: any[]) => new ctor(...args)) as any

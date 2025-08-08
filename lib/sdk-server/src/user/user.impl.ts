@@ -25,6 +25,8 @@ import type * as User from "./user.types"
 
 const serialize_session: User.SerializeSession = session => [session[1], session[2]]
 
+export const serialize_other: User.SerializeOther = user => [user[0], user[1], user[2], user[3]]
+
 export const serialize: User.Serialize = user => [
 	user[0],
 	user[1],
@@ -38,6 +40,9 @@ export const serialize: User.Serialize = user => [
 	user[9],
 	user[10],
 ]
+
+export const has_session: User.HasSession = (sid, user) => user[8].some(s => s[0] === sid)
+export const get_session: User.GetSession = (sid, user) => user[8].find(s => s[0] === sid) ?? null
 
 export const obfuscate_email: User.ObfuscateEmail = email => {
 	const [local, domain] = email.split("@")

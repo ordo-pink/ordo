@@ -37,7 +37,7 @@ const once: Lib.Once = callback => (env, mut, structure, before_handlers, after_
 
 export const create: Lib.Create = (env, initial_mut = {} as any, structure = {}, before = [], after = [], on_creates = []) => ({
 	pipe: op => op(env, initial_mut, structure, before, after, on_creates),
-	or_else: on_none_matched => {
+	or_else: (on_none_matched, catcher) => {
 		const before_handlers = [...before]
 		const after_handlers = [...after]
 
@@ -52,6 +52,7 @@ export const create: Lib.Create = (env, initial_mut = {} as any, structure = {},
 			let mut = { ...initial_mut }
 			let current_path = new URL(request.url).pathname as Lib.Route
 			let params = null as Colonoscope.Results
+			let response: Response = null as any
 
 			if (current_path.endsWith("/") && current_path.length > 1) current_path = current_path.slice(0, -1) as Lib.Route
 
@@ -70,21 +71,29 @@ export const create: Lib.Create = (env, initial_mut = {} as any, structure = {},
 				return route === current_path
 			}) as Lib.Route | undefined
 
-			if (before_handlers.length)
-				for (const handler of before_handlers) mut = { ...mut, ...(await handler({ env, mut, request, server, params })) }
-
-			const response = matched_route
-				? await structure[method][matched_route]({ env, mut, request, server, params })
-				: await on_none_matched({ env, mut, request, server, params })
-
-			if (after.length)
-				for (const handler of after_handlers)
-					mut = {
-						...mut,
-						...(await handler({ env, mut, request, server, params, response, matched_route: matched_route ?? null })),
+			try {
+				if (before_handlers.length)
+					for (const handler of before_handlers) {
+						mut = { ...mut, ...(await handler({ env, mut, request, server, params })) }
 					}
 
-			return response
+				response = matched_route
+					? await structure[method][matched_route]({ env, mut, request, server, params })
+					: await on_none_matched({ env, mut, request, server, params })
+
+				if (after.length)
+					for (const handler of after_handlers) {
+						const result = await handler({ env, mut, request, server, params, response, matched_route: matched_route ?? null })
+
+						if (!result) continue
+						if (result.mut) mut = { ...mut, ...result.mut }
+						if (result.response) response = result.response
+					}
+
+				return response
+			} catch (error) {
+				return catcher({ request, mut, server, params, env, response, error, matched_route: matched_route ?? null })
+			}
 		}
 	},
 })

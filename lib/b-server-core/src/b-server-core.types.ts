@@ -29,5 +29,10 @@ import type * as ResponseTimer from "./response-timer/response-timer.types"
 
 export type Env = Routary.Env & { logger: Core.Logger }
 export type Mut = Routary.Mut & RequestId.Mut & ResponseTimer.Mut & RequestLang.Mut & RequestIP.Mut
+export type PrefilledEnv = Env & { fail: Fail }
 
-export type Create = <$Env extends Env, $Mut extends Routary.Mut>(env: $Env, mut?: $Mut) => Routary.Instance<$Env, $Mut & Mut>
+export type Create = <$Env extends Env, $Mut extends Routary.Mut>(
+	env: $Env,
+	mut?: $Mut,
+) => Routary.Instance<$Env & PrefilledEnv, $Mut & Mut>
+export type Fail = (rrr: Core.Rrr.Instance) => Response

@@ -27,5 +27,5 @@ export const end: T.End = ({ mut, response }) => {
 	const response_time = Date.now() - mut.response_time
 	response.headers.set("X-Response-Time", String(response_time))
 
-	return { response_time }
+	return { mut: { response_time } }
 }

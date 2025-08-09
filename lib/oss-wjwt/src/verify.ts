@@ -3,36 +3,40 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { TWJWTVerifyFn } from "./wjwt.types"
+import { Verify } from "./wjwt.types"
 import { decode } from "./decode"
 
-export const verify: TWJWTVerifyFn =
-	({ alg, key, aud }) =>
-	async token => {
-		if (!token) throw new TypeError("Token not provided")
-		if (typeof token !== "string") throw new TypeError("Invalid token")
+export const verify: Verify = (key, alg, aud) => async token => {
+	if (!token) throw new TypeError("Token not provided")
+	if (typeof token !== "string") throw new TypeError("Token must be a string")
 
-		const parts = token.split(".")
+	const parts = token.split(".")
 
-		if (parts.length !== 3 || parts.some(part => !part)) throw new TypeError("Invalid token")
+	if (parts.length !== 3 || parts.some(part => !part)) throw new TypeError("Invalid JWT structure")
 
-		const encoder = new TextEncoder()
-		const data = parts.slice(0, 2).join(".")
-		const signature = Buffer.from(parts[2], "base64url")
+	const encoder = new TextEncoder()
+	const data = parts.slice(0, 2).join(".")
+	const signature = Buffer.from(parts[2], "base64url")
 
-		const is_valid = await crypto.subtle.verify(alg, key, signature, encoder.encode(data))
+	const is_valid = await crypto.subtle.verify(alg, key, signature, encoder.encode(data))
 
-		if (!is_valid) return false
+	if (!is_valid) return false
 
-		const { payload } = decode(token)
+	const { payload } = decode(token)
 
-		if (payload.exp <= Date.now() / 1000) return false
+	if (payload.exp && payload.exp <= Date.now() / 1000) return false
+
+	if (aud) {
+		if (!payload.aud) return false
 
 		if (typeof aud === "string") {
 			if (typeof payload.aud === "string") return aud === payload.aud
-			return payload.aud.includes(aud)
+			return payload.aud.includes(aud) ?? false
+		} else if (Array.isArray(aud)) {
+			if (typeof payload.aud === "string") return aud.includes(payload.aud)
+			return aud.some(x => payload.aud!.includes(x)) ?? false
 		}
-
-		if (typeof payload.aud === "string") return aud.includes(payload.aud)
-		return aud.some(aud => payload.aud.includes(aud))
 	}
+
+	return true
+}

@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { type TWJWTDecodeFn } from "./wjwt.types"
+import { type Decode } from "./wjwt.types"
 
-export const decode: TWJWTDecodeFn = token => {
+export const decode: Decode = token => {
 	if (!token) throw new TypeError("Token not provided")
 	if (typeof token !== "string") throw new TypeError("Invalid token")
 

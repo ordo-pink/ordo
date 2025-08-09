@@ -3,11 +3,10 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { UUIDv4 } from "@ordo-pink/_tau"
+export type StandardPayload = { sub: Sub; aud?: Aud; iat?: Iat; jti?: Jti; iss?: Iss; exp?: Exp }
+export type Payload<$Custom extends Record<string, unknown> = Record<string, unknown>> = StandardPayload & $Custom
 
-export type TCustomPayload = TStandardJWTPayload & Record<string, unknown>
-
-export type TAlgorithm =
+export type Algorithm =
 	| {
 			name: "RSA-PSS"
 			hash: {
@@ -25,87 +24,71 @@ export type TAlgorithm =
 			}
 	  }
 
-export type TWJWTFn<$TPayload extends TCustomPayload = TCustomPayload> = (params: {
-	alg: TAlgorithm
-	public_key: CryptoKey
-	private_key: CryptoKey
-	aud: AUD
-	iss: ISS
-	token_lifetime: number
-}) => TWJWT<$TPayload>
+export type CreateArgs = [
+	alg: Algorithm,
+	private_key: CryptoKey,
+	public_key: CryptoKey,
+	aud: Aud,
+	iss: Iss,
+	token_lifetime_seconds: number,
+]
 
-export type TWJWT<$TPayload extends TCustomPayload = TCustomPayload> = {
-	sign: ReturnType<TWJWTSignFn<$TPayload>>
-	decode: TWJWTDecodeFn<$TPayload>
-	verify: ReturnType<TWJWTVerifyFn>
+export type Create<$Payload extends Payload = Payload> = (...args: CreateArgs) => Instance<$Payload>
+
+export type Instance<$Payload extends Payload = Payload> = {
+	sign: ReturnType<Sign<$Payload>>
+	decode: Decode<$Payload>
+	verify: ReturnType<Verify>
 }
 
 /**
  * JWT subject. User id is stored here.
  */
-export type SUB = UUIDv4
+export type Sub = `${string}-${string}-${string}-${string}-${string}` & {}
 
 /**
  * JWT audience.
  */
-export type AUD = string | string[]
+export type Aud = (string | string[]) & {}
 
 /**
  * JWT issue time stamp.
  */
-export type IAT = number
+export type Iat = number & {}
 
 /**
  * JWT id. This value is the same for refresh token and access token. This way access token can
  * be revoked even if its expiration time hasn't come yet.
  */
-export type JTI = UUIDv4
+export type Jti = `${string}-${string}-${string}-${string}-${string}` & {}
 
 /**
  * JWT issuer.
  */
-export type ISS = string
+export type Iss = string & {}
 
 /**
  * JWT expiration time stamp.
  */
-export type EXP = number
+export type Exp = number & {}
 
-export type TStandardJWTPayload = {
-	sub: SUB
-	aud: AUD
-	iat: IAT
-	jti: JTI
-	iss: ISS
-	exp: EXP
-}
-
-export type TJWTHeader = {
+export type Header = {
 	typ: "JWT"
 	alg: "ES256" | "ES384" | "ES512" | "ECDSA" | "RS256" | "RS384" | "RS512" | "RSA-PSS"
 }
 
-export type TJWTSignature = Uint8Array
+export type Signature = Uint8Array
+export type TokenString = `${string}.${string}.${string}`
 
-export type TJWT<$TPayload extends TCustomPayload = TCustomPayload> = {
-	header: TJWTHeader
-	payload: $TPayload & TStandardJWTPayload
-	signature: TJWTSignature
-}
+export type Token<$Payload extends Payload = Payload> = { header: Header; payload: $Payload; signature: Signature }
 
-export type TWJWTVerifyFn = (params: { key: CryptoKey; alg: TAlgorithm; aud: AUD }) => (token: string) => Promise<boolean>
+export type VerifyArgs = [key: CryptoKey, alg: Algorithm, aud: Aud]
+export type Verify = (...args: VerifyArgs) => (token: TokenString) => Promise<boolean>
 
-export type TWJWTSignResult<$TPayload extends TCustomPayload = TCustomPayload> = {
-	token: string
-	payload: $TPayload & TStandardJWTPayload
-}
+export type SignArgs = [key: CryptoKey, alg: Algorithm, iss: Iss, aud: Aud, token_lifetime: Exp]
+export type SignResult<$Payload extends Payload = Payload> = [token: TokenString, payload: $Payload]
+export type Sign<$Payload extends Payload = Payload> = (
+	...args: SignArgs
+) => (payload: $Payload) => Promise<SignResult<$Payload>>
 
-export type TWJWTSignFn<$TPayload extends TCustomPayload = TCustomPayload> = (params: {
-	key: CryptoKey
-	alg: TAlgorithm
-	iss: ISS
-	aud: AUD
-	token_lifetime: EXP
-}) => (payload: Partial<TJWT<$TPayload>["payload"]> & { sub: SUB }) => Promise<TWJWTSignResult>
-
-export type TWJWTDecodeFn<T extends TCustomPayload = TCustomPayload> = (token: string) => TJWT<T>
+export type Decode<$Payload extends Payload = Payload> = (token: TokenString) => Token<$Payload>

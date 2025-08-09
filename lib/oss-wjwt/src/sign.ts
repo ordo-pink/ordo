@@ -32,6 +32,8 @@ export const sign: Sign = (key, alg, iss, aud, token_lifetime) => async data => 
 }
 
 const get_alg_str = (alg: Algorithm): Header["alg"] => {
+	if (alg === "Ed25519") return "Ed25519"
+
 	if (alg.name === "ECDSA") {
 		if (alg.namedCurve === "P-256") return "ES256"
 		if (alg.namedCurve === "P-384") return "ES384"

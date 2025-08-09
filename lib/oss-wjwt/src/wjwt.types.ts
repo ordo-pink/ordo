@@ -7,6 +7,7 @@ export type StandardPayload = { sub: Sub; aud?: Aud; iat?: Iat; jti?: Jti; iss?:
 export type Payload<$Custom extends Record<string, unknown> = Record<string, unknown>> = StandardPayload & $Custom
 
 export type Algorithm =
+	| "Ed25519"
 	| {
 			name: "RSA-PSS"
 			hash: {
@@ -74,7 +75,7 @@ export type Exp = number & {}
 
 export type Header = {
 	typ: "JWT"
-	alg: "ES256" | "ES384" | "ES512" | "ECDSA" | "RS256" | "RS384" | "RS512" | "RSA-PSS"
+	alg: "ES256" | "ES384" | "ES512" | "ECDSA" | "RS256" | "RS384" | "RS512" | "RSA-PSS" | "Ed25519"
 }
 
 export type Signature = Uint8Array

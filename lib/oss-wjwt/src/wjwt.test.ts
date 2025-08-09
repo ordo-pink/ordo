@@ -33,6 +33,15 @@ const get_rsa_wjwt = async () => {
 	return create(alg, private_key, public_key, "asdf", iss, 1000)
 }
 
+const get_eddsa_wjwt = async () => {
+	const { privateKey: private_key, publicKey: public_key } = await crypto.subtle.generateKey({ name: "Ed25519" }, false, [
+		"sign",
+		"verify",
+	])
+
+	return create("Ed25519", private_key, public_key, "asdf", iss, 1000)
+}
+
 test("wjwt should sign given payload with ECDSA", async () => {
 	const wjwt = await get_ecdsa_wjwt()
 	const signed = await wjwt.sign(payload)
@@ -42,6 +51,21 @@ test("wjwt should sign given payload with ECDSA", async () => {
 
 test("wjwt should verify given token with ECDSA", async () => {
 	const wjwt = await get_ecdsa_wjwt()
+	const signed = await wjwt.sign(payload)
+	const verified = await wjwt.verify(signed[0])
+
+	expect(verified).toBeTrue()
+})
+
+test("wjwt should sign given payload with EdDSA", async () => {
+	const wjwt = await get_eddsa_wjwt()
+	const signed = await wjwt.sign(payload)
+
+	expect(signed[0]).toBeTypeOf("string")
+})
+
+test("wjwt should verify given token with EdDSA", async () => {
+	const wjwt = await get_eddsa_wjwt()
 	const signed = await wjwt.sign(payload)
 	const verified = await wjwt.verify(signed[0])
 

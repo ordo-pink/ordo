@@ -42,7 +42,8 @@ const main = () => {
 	const codegen = codegen_strategy_bun.create(codegen_algorithm)
 	const allowed_origins = ["http://localhost:3000" as const]
 
-	const fetch = server_id
+	// Set to any until bun types are fixed
+	const fetch: any = server_id
 		.create(logger, user_repository, code_lifetime_seconds, session_lifetime_minutes, email_strategy, allowed_origins, codegen)
 		.or_else(() => rickroll, catcher)
 

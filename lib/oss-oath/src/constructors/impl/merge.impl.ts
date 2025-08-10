@@ -112,3 +112,50 @@ export const all: Oath.Constructors.All = values => {
 		})
 	})
 }
+
+export const any: Oath.Constructors.Any = values => {
+	let resolved = false
+
+	const rejected_values = [] as any[]
+	let rejected_length = 0
+
+	return create((outer_resolve: any, outer_reject: any) => {
+		if (!values.length) return outer_resolve([])
+
+		for (const value of values as any[]) {
+			if (value?.is_oath) {
+				value.cata({
+					reject: (e: any) => {
+						rejected_values.push(e)
+						rejected_length++
+
+						if (!resolved && rejected_length === values.length) outer_reject(rejected_values)
+					},
+					resolve: (s: any) => {
+						if (!resolved) {
+							resolved = true
+							outer_resolve(s)
+						}
+					},
+				})
+			} else if (value?.then) {
+				value.then(
+					(s: any) => {
+						if (!resolved) {
+							resolved = true
+							outer_resolve(s)
+						}
+					},
+					(e: any) => {
+						rejected_values.push(e)
+						rejected_length++
+
+						if (!resolved && rejected_length === values.length) outer_resolve(rejected_values)
+					},
+				)
+			} else {
+				outer_resolve(value)
+			}
+		}
+	})
+}

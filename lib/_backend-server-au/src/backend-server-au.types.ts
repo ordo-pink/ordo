@@ -21,7 +21,7 @@
 
 import type { Core } from "@ordo-pink/sdk-core"
 import type { Routary } from "@ordo-pink/oss-routary"
-import type { RoutaryOrdo } from "@ordo-pink/b-server-core"
+import type { RoutaryOrdo } from "@ordo-pink/sdk-server-routary"
 import type { Server } from "@ordo-pink/sdk-server"
 
 export type Code = string & {}
@@ -33,7 +33,7 @@ export type CodeStorage = Map<Core.User.Email, { hash: CodeHash; timestamp: numb
 export type Args = [
 	allow_origin: string[],
 	code_lifetime_ms: number,
-	code_strategy: Server.Codegen.Instance,
+	code_strategy: Server.Code.Codegen,
 	data_repository: Server.Data.Repository,
 	email_strategy: Server.Email.Strategy,
 	logger: Core.Logger,
@@ -51,7 +51,7 @@ export type Fuel = Core.Prettify<
 		email_strategy: Server.Email.Strategy
 		session_lifetime_seconds: number
 		user_repository: Server.User.Repository
-		code_strategy: Server.Codegen.Instance
+		code_strategy: Server.Code.Codegen
 		code_storage: CodeStorage
 	}
 >

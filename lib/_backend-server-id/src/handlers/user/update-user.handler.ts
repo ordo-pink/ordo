@@ -20,7 +20,7 @@
  */
 
 import { current_user, CURRENT_USER_KEYS } from "@ordo-pink/_core"
-import { default_handler, extract_json_body } from "@ordo-pink/b-server-core"
+import { default_handler, extract_json_body } from "@ordo-pink/sdk-server-routary"
 import { type Routary } from "@ordo-pink/oss-routary"
 import { oath } from "@ordo-pink/oss-oath"
 

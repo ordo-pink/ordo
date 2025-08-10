@@ -19,12 +19,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type { I18n } from "@ordo-pink/oss-i18n"
 import type { Routary } from "@ordo-pink/oss-routary"
 
-import type * as Lib from "../b-server-core.types"
+import type * as Lib from "../sdk-server-routary.types"
 
-export type Params<$Env extends Lib.PrefilledEnv, $Mut extends Routary.Mut> = Routary.BeforeEachCallbackParams<$Env, $Mut>
-
-export type Mut = { request_ip: string }
-
-export type Set = <$Env extends Lib.PrefilledEnv, $Mut extends Routary.Mut>(params: Params<$Env, $Mut>) => Mut
+export type Mut = { request_language: I18n.ISO_639_1_Locale }
+export type Set = <const $Env extends Lib.PrefilledEnv, $Mut extends Routary.Mut>(
+	params: Routary.HandlerParams<$Env, $Mut>,
+) => Mut

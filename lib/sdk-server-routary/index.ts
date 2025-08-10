@@ -19,10 +19,5 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { Routary } from "@ordo-pink/oss-routary"
-
-import type * as Lib from "../b-server-core.types"
-
-export type Request = <$Env extends Lib.PrefilledEnv, $Mut extends Lib.Mut>(
-	params: Routary.AfterEachCallbackParams<$Env, $Mut>,
-) => void
+export * as server_routary from "./src/sdk-server-routary.impl"
+export * as ServerRoutary from "./src/sdk-server-routary.types"

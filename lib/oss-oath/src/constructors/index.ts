@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { all, merge } from "./impl/merge.impl"
+import { all, any, merge } from "./impl/merge.impl"
 import { empty, reject, resolve } from "./impl/of.impl"
 import { type Oath } from "../oath.types"
 import { create } from "./impl/create.impl"
@@ -22,6 +22,7 @@ export * from "./impl/try.impl"
 
 export const constructors: Oath.Constructors.Static = {
 	all,
+	any,
 	empty,
 	from_nullable,
 	from_promise,

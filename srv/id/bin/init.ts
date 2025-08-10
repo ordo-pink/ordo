@@ -21,7 +21,7 @@
 
 import { core } from "@ordo-pink/sdk-core"
 import { oath } from "@ordo-pink/oss-oath"
-import { server_core } from "@ordo-pink/b-server-core"
+import { server_routary } from "@ordo-pink/sdk-server-routary"
 
 const init = async () => {
 	const public_key = Bun.env.ORDO_ID_SESSION_TOKEN_PUBLIC_KEY
@@ -64,10 +64,10 @@ const create_keys = (alg_name?: string, alg_params?: string) =>
 const create_alg = (alg_name?: string, alg_params?: string) =>
 	oath.merge({
 		name: oath.from_nullable(alg_name),
-		params: oath.from_nullable(alg_params).pipe(oath.ops.chain(server_core.oaths.to_json)),
+		params: oath.from_nullable(alg_params).pipe(oath.ops.chain(server_routary.oaths.to_json)),
 	})
 
 const to_jwk = (key: CryptoKey) =>
-	oath.from_promise(() => crypto.subtle.exportKey("jwk", key)).pipe(oath.ops.chain(server_core.oaths.to_json))
+	oath.from_promise(() => crypto.subtle.exportKey("jwk", key)).pipe(oath.ops.chain(server_routary.oaths.to_json))
 
 void init()

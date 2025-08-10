@@ -25,7 +25,7 @@ import { oath } from "@ordo-pink/oss-oath"
 import { routary } from "@ordo-pink/oss-routary"
 import { sweech } from "@ordo-pink/oss-sweech"
 
-import type * as Lib from "./b-server-core.types"
+import type * as Lib from "./sdk-server-routary.types"
 import * as log from "./log/log.impl"
 import * as request_id from "./request-id/request-id.impl"
 import * as request_ip from "./request-ip/request-ip.impl"
@@ -73,6 +73,11 @@ export namespace oaths {
 			.from_nullable(request.cookies, () => core.rrr.einval(CORE.RRR.REASON.MISSING_REQUIRED_COOKIE, name))
 			.pipe(oath.ops.chain(c => oath.from_nullable(c.get(name))))
 			.pipe(oath.ops.rmap(() => core.rrr.einval(CORE.RRR.REASON.MISSING_REQUIRED_COOKIE, name)))
+
+	export const get_json_body = (request: Bun.BunRequest) =>
+		oath
+			.from_promise(() => request.json())
+			.pipe(oath.ops.rmap(() => core.rrr.einval(CORE.RRR.REASON.JSON_PARSE_FAILED, void 0)))
 }
 
 export const set_response_header = curry((key: string, value: string, r: Response) => r.headers.set(key, value))

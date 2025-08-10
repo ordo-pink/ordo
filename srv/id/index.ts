@@ -22,7 +22,7 @@
 import { CORE, type Core, core } from "@ordo-pink/sdk-core"
 import { type Server, server } from "@ordo-pink/sdk-server"
 import type { Routary } from "@ordo-pink/oss-routary"
-import type { ServerCore } from "@ordo-pink/b-server-core"
+import type { ServerRoutary } from "@ordo-pink/sdk-server-routary"
 import { codegen_strategy_bun } from "@ordo-pink/b-strategy-codegen-bun"
 import { data_repository_fs } from "@ordo-pink/b-repository-data-fs"
 import { result } from "@ordo-pink/oss-result"
@@ -85,7 +85,7 @@ const cache_file_id = result
 	.pipe(result.ops.chain(id => result.if(core.uuid.guard(id), { on_true: () => id as Core.Uuid.Instance })))
 	.cata(result.catas.or_else(() => CORE.UUID.THE_LAST_ONE as Core.Uuid.Instance))
 
-const catcher: Routary.Catcher<ServerCore.Env, ServerCore.Mut> = ({ env, request, error }) => {
+const catcher: Routary.Catcher<ServerRoutary.Env, ServerRoutary.Mut> = ({ env, request, error }) => {
 	const pathname = new URL(request.url).pathname
 	env.logger.error(`UNEXPECTED ERROR (${pathname}):`, error)
 	return new Response("", { status: 500 })

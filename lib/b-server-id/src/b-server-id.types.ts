@@ -23,9 +23,7 @@ import type { Core } from "@ordo-pink/sdk-core"
 import type { Hunt } from "@ordo-pink/oss-hunt"
 import type { Routary } from "@ordo-pink/oss-routary"
 import type { Server } from "@ordo-pink/sdk-server"
-import type { ServerCore } from "@ordo-pink/b-server-core"
-
-export type CodeStorage = Map<Core.User.Email, { hash: Server.Codegen.Hash; timestamp: Core.Timestamp.Instance }>
+import type { ServerRoutary } from "@ordo-pink/sdk-server-routary"
 
 export type CodeLifetimeSeconds = number & {}
 
@@ -33,7 +31,7 @@ export type SessionLifetimeMinutes = number & {}
 
 export type AllowedOrigin = `http${string}`
 
-export type PartyMaker = Hunt.Instance<Prey>
+export type Hunt = Hunt.Instance<Prey>
 
 export type Args = [
 	logger: Core.Logger,
@@ -42,12 +40,12 @@ export type Args = [
 	session_lifetime_minutes: SessionLifetimeMinutes,
 	email_strategy: Server.Email.Strategy,
 	allowed_origins: AllowedOrigin[],
-	codegen: Server.Codegen.Instance,
+	codegen: Server.Code.Codegen,
 ]
 
 export type Prey = {
 	auth: {
-		requested: { args: [user: Core.User.Instance, code: Server.Codegen.Code] }
+		requested: { args: [email: Core.User.Email, code: Server.Code.Instance] }
 		signed_up: { args: void }
 		logged_in: { args: void }
 	}
@@ -63,16 +61,16 @@ export type Prey = {
 	}
 }
 
-export type Mut = ServerCore.Mut
-export type Env = ServerCore.PrefilledEnv & {
-	partymaker: PartyMaker
+export type Mut = ServerRoutary.Mut
+export type Env = ServerRoutary.PrefilledEnv & {
+	hunt: Hunt
 	user_repository: Server.User.Repository
-	codegen: Server.Codegen.Instance
+	code_service: Server.Code.Service
 	session_lifetime_minutes: SessionLifetimeMinutes
 }
 
 export type Handler = Routary.Handler<Env, Mut>
 
-export type Instance = Routary.Instance<Env, ServerCore.Mut>
+export type Instance = Routary.Instance<Env, ServerRoutary.Mut>
 
 export type Create = (...args: Args) => Instance

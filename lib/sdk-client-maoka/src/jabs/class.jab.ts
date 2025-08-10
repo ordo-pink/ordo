@@ -5,7 +5,7 @@
 
 import { type Maoka, maoka_dom } from "@ordo-pink/oss-maoka"
 
-import type { MaokaSDK } from "../sdk-maoka.types"
+import type { MaokaSDK } from "../sdk-client-maoka.types"
 import { set_attribute_jab } from "./set-attribute.jab"
 
 export namespace class_jabs {

@@ -22,6 +22,6 @@
 import type { Server } from "@ordo-pink/sdk-server"
 
 export type Args = [algorithm: Parameters<typeof Bun.password.hash>[1]]
-export type Instance = Server.Codegen.Instance
+export type Instance = Server.Code.Codegen
 
 export type Create = (...args: Args) => Instance

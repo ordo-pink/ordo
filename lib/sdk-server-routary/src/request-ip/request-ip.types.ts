@@ -19,14 +19,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { Core } from "@ordo-pink/sdk-core"
-import type { Oath } from "@ordo-pink/oss-oath"
+import type { Routary } from "@ordo-pink/oss-routary"
 
-export type Code = string & {}
-export type Hash = string & {}
+import type * as Lib from "../sdk-server-routary.types"
 
-export type Instance = {
-	generate: () => Oath.Instance<Code>
-	hash: (code: Code) => Oath.Instance<Hash, Core.Rrr.Instance<"EIO">>
-	verify: (code: Code, hash: Hash) => Oath.Instance<boolean, Core.Rrr.Instance<"EIO">>
-}
+export type Params<$Env extends Lib.PrefilledEnv, $Mut extends Routary.Mut> = Routary.BeforeEachCallbackParams<$Env, $Mut>
+
+export type Mut = { request_ip: string }
+
+export type Set = <$Env extends Lib.PrefilledEnv, $Mut extends Routary.Mut>(params: Params<$Env, $Mut>) => Mut

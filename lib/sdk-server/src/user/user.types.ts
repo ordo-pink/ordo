@@ -34,6 +34,17 @@ type Replace<$Arr extends any[], $Type, $NewType> = $Arr extends [infer _This, .
 
 export type Instance = Replace<Core.User.Instance, Core.User.Sessions, Sessions>
 
+export type CreateArgs = [
+	email: Core.User.Email,
+	ref?: Core.User.Ref,
+	name?: Core.User.Name,
+	subscription?: Core.User.Subscription,
+	installed_functions?: Core.User.InstalledFunctions,
+	parent?: Core.User.Parent,
+]
+
+export type Create = (...args: CreateArgs) => Instance
+
 export type Repository = {
 	create: (user: Instance) => Oath.Instance<Instance, Core.Rrr.Instance<"EIO" | "EEXIST">>
 	read: (id: Core.User.Id) => Oath.Instance<Instance, Core.Rrr.Instance<"EIO" | "ENOENT">>

@@ -20,7 +20,7 @@
  */
 
 export * from "./index/index.types"
-export * as Codegen from "./codegen/codegen.types"
+export * as Code from "./code/code.types"
 export * as Data from "./data/data.types"
 export * as Email from "./email/email.types"
 export * as User from "./user/user.types"

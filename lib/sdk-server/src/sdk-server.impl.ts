@@ -20,4 +20,5 @@
  */
 
 export * from "./index/index.impl"
+export * as code from "./code/code.impl"
 export * as user from "./user/user.impl"

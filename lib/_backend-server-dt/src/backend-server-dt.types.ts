@@ -5,7 +5,7 @@
 
 import type { Logger } from "@ordo-pink/sdk-core"
 import type { Routary } from "@ordo-pink/oss-routary"
-import type { RoutaryOrdo } from "@ordo-pink/b-server-core"
+import type { RoutaryOrdo } from "@ordo-pink/sdk-server-routary"
 import type { Server } from "@ordo-pink/sdk-server"
 
 export namespace ServerDT {

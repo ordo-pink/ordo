@@ -64,4 +64,9 @@ export enum REASON {
 	USER_ID_INVALID,
 	/** Captain Cookie. */
 	MISSING_REQUIRED_COOKIE,
+	/** User attempted to request authentication having an authentication cookie. */
+	ALREADY_AUTHENTICATED,
+	/** Something went wrong with hashing or verifying hashes. */
+	HASHING_ISSUE,
+	USER_NOT_FOUND,
 }

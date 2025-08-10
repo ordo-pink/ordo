@@ -11,7 +11,7 @@ import { create_dialog_actions, create_dialog_info, dialog_actions, dialog_info 
 import { listen_global_event_jab, listen_jab } from "./jabs/listen.jab"
 import { register_translations_jab, t_jab$, translate_jab$ } from "./jabs/translate.jab"
 import { set_attribute_jab, set_id_jab } from "./jabs/set-attribute.jab"
-import type { MaokaSDK } from "./sdk-maoka.types"
+import type { MaokaSDK } from "./sdk-client-maoka.types"
 import { actionable_hotkey } from "./components/hotkey.component"
 import { class_jabs } from "./jabs/class.jab"
 import { hunter_jabs } from "./jabs/hunter.jab"

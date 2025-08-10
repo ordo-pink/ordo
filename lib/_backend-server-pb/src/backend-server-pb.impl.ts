@@ -11,7 +11,7 @@ import {
 	count_response_time,
 	status_from_rrr,
 	stop_response_timer,
-} from "@ordo-pink/b-server-core"
+} from "@ordo-pink/sdk-server-routary"
 import { LOCALE } from "@ordo-pink/oss-i18n"
 import { oath } from "@ordo-pink/oss-oath"
 import { rickroll } from "@ordo-pink/oss-rickroll"

@@ -5,7 +5,7 @@
 
 import { maoka, maoka_dom, maoka_styled } from "@ordo-pink/oss-maoka"
 
-import { MaokaSDK } from "../sdk-maoka.types"
+import { MaokaSDK } from "../sdk-client-maoka.types"
 import { actionable_hotkey } from "./hotkey.component"
 
 import "./button.styles.css"

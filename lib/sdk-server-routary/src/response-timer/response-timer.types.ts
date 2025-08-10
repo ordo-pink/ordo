@@ -21,7 +21,7 @@
 
 import type { Routary } from "@ordo-pink/oss-routary"
 
-import type * as Lib from "../b-server-core.types"
+import type * as Lib from "../sdk-server-routary.types"
 
 export type Params<$Env extends Lib.PrefilledEnv, $Mut extends Routary.Mut> = Routary.BeforeEachCallbackParams<$Env, $Mut>
 

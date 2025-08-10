@@ -20,7 +20,7 @@
  */
 
 import { Core, core } from "@ordo-pink/sdk-core"
-import { type RoutaryOrdo, default_handler } from "@ordo-pink/b-server-core"
+import { type RoutaryOrdo, default_handler } from "@ordo-pink/sdk-server-routary"
 import { LOCALE } from "@ordo-pink/oss-i18n"
 import { oath } from "@ordo-pink/oss-oath"
 import { rickroll } from "@ordo-pink/oss-rickroll"

@@ -19,8 +19,37 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { core } from "@ordo-pink/sdk-core"
+import { CORE, type Core, core } from "@ordo-pink/sdk-core"
+import { oath } from "@ordo-pink/oss-oath"
+import { server_routary } from "@ordo-pink/sdk-server-routary"
 
 import type * as Lib from "../b-server-id.types"
 
-export const request_code: Lib.Handler = core.todo
+export const request_code: Lib.Handler = ({ env, request }) =>
+	check_user_is_not_already_authenticated(request)
+		.pipe(oath.ops.chain(() => server_routary.oaths.get_json_body(request)))
+		.pipe(oath.ops.chain(validate_body_email))
+		.pipe(oath.ops.chain(validate_is_email))
+		.pipe(oath.ops.chain(email => env.code_service.assign_code(email).pipe(oath.ops.map(code => [email, code] as const))))
+		.pipe(oath.ops.tap(([email, code]) => env.hunt.shoot("auth.requested", [email, code])))
+		.pipe(oath.ops.map(() => new Response("", { status: 204 })))
+		.cata(oath.catas.or_else(env.fail))
+
+// --- Internal ---
+
+const check_user_is_not_already_authenticated = (request: Bun.BunRequest) =>
+	oath
+		.if(!request.cookies.has("llianso"))
+		.pipe(oath.ops.rmap(() => core.rrr.eexist(CORE.RRR.REASON.ALREADY_AUTHENTICATED, void 0)))
+
+const validate_is_email = (maybe_email: unknown) =>
+	oath.if(core.user.email_guard(maybe_email), {
+		on_true: () => maybe_email as Core.User.Email,
+		on_false: () => core.rrr.einval(CORE.RRR.REASON.EMAIL_INVALID, maybe_email),
+	})
+
+const validate_body_email = (maybe_body: any) =>
+	oath.if(maybe_body && maybe_body.email, {
+		on_true: () => maybe_body,
+		on_false: () => core.rrr.einval(CORE.RRR.REASON.EMAIL_MISSING, maybe_body.email),
+	})

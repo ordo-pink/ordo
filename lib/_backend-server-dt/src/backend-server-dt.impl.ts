@@ -12,7 +12,7 @@ import {
 	count_response_time,
 	status_from_rrr,
 	stop_response_timer,
-} from "@ordo-pink/b-server-core"
+} from "@ordo-pink/sdk-server-routary"
 import { LOCALE } from "@ordo-pink/oss-i18n"
 import { is_finite_non_negative_int } from "@ordo-pink/_tau"
 import { oath } from "@ordo-pink/oss-oath"

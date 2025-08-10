@@ -19,26 +19,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { core } from "@ordo-pink/sdk-core"
+import { CORE, core } from "@ordo-pink/sdk-core"
 import { curry } from "@ordo-pink/oss-curry"
 import { oath } from "@ordo-pink/oss-oath"
 
 import type * as Lib from "./b-strategy-codegen-bun.types"
 
 export const create: Lib.Create = algorithm => ({
-	generate: () =>
-		oath
-			.of(new Uint8Array(6))
-			.pipe(oath.ops.map(ua => crypto.getRandomValues(ua)))
-			.pipe(oath.ops.and(ns => ns.join("")))
-			.pipe(oath.ops.and(s => s.slice(0, 6))),
-
-	hash: code => oath.from_promise(() => Bun.password.hash(code, algorithm)).pipe(oath.ops.rmap(eio("Failed to hash code"))),
-
-	verify: (hash, code) =>
-		oath.from_promise(() => Bun.password.verify(code, hash)).pipe(oath.ops.rmap(eio("Failed to verify code"))),
+	hash: code => oath.from_promise(() => Bun.password.hash(code, algorithm)).pipe(oath.ops.rmap(eio(E))),
+	verify: (hash, code) => oath.from_promise(() => Bun.password.verify(code, hash)).pipe(oath.ops.rmap(eio(E))),
 })
 
 // --- Internal ---
+
+const E = CORE.RRR.REASON.HASHING_ISSUE
 
 const eio = curry(core.rrr.eio)

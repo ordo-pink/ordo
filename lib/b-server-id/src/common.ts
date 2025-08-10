@@ -24,7 +24,7 @@ import type { Routary } from "@ordo-pink/oss-routary"
 import { curry } from "@ordo-pink/oss-curry"
 import { oath } from "@ordo-pink/oss-oath"
 import { server } from "@ordo-pink/sdk-server"
-import { server_core } from "@ordo-pink/b-server-core"
+import { server_routary } from "@ordo-pink/sdk-server-routary"
 
 import type * as Lib from "./b-server-id.types"
 
@@ -35,13 +35,13 @@ export const extract_id_param = (params: Routary.RouteParams) => () =>
 
 const to_non_permitted_rrr = () => core.rrr.eperm(CORE.RRR.REASON.OBVIOUS, void 0)
 export const check_is_executing_on_self = (request: Bun.BunRequest) => (id: Core.User.Id) =>
-	server_core.oaths
+	server_routary.oaths
 		.get_cookie(request, "uid")
 		.pipe(oath.ops.chain(cid => oath.if(cid === id, { on_true: () => id, on_false: to_non_permitted_rrr })))
 
 const to_unauthorized_rrr = () => core.rrr.eacces(CORE.RRR.REASON.OBVIOUS, void 0)
 const get_uuid_cookie = (request: Bun.BunRequest, name: string) =>
-	server_core.oaths
+	server_routary.oaths
 		.get_cookie(request, name)
 		.pipe(oath.ops.chain(x => oath.if(core.uuid.guard(x), { on_true: () => x as Core.Uuid.Instance })))
 export const check_user_is_authenticated = (request: Bun.BunRequest, env: Lib.Env) =>

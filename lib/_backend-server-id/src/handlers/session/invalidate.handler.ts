@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { default_handler } from "@ordo-pink/b-server-core"
+import { default_handler } from "@ordo-pink/sdk-server-routary"
 import { oath } from "@ordo-pink/oss-oath"
 import { user } from "@ordo-pink/sdk-core"
 

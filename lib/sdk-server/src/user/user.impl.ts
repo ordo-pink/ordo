@@ -19,7 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { Core } from "@ordo-pink/sdk-core"
+import { type Core, core } from "@ordo-pink/sdk-core"
+import { result } from "@ordo-pink/oss-result"
 
 import type * as User from "./user.types"
 
@@ -40,6 +41,20 @@ export const serialize: User.Serialize = user => [
 	user[9],
 	user[10],
 ]
+
+export const create: User.Create = (
+	email,
+	ref,
+	name = core.user.default_name(),
+	sub = core.user.default_subscription(),
+	ifs = [],
+	p = null,
+) =>
+	result
+		.of(core.uuid.create())
+		.pipe(result.ops.chain(id => result.merge({ id, t: core.timestamp.create(), ref: ref ?? core.user.create_ref(id, email) })))
+		.pipe(result.ops.map(({ ref, id, t }) => [id, ref, name, sub, t, t, email, ifs, [], p, []] satisfies User.Instance))
+		.cata(result.catas.expect(core.fns.v)) // Never gonna happen
 
 export const has_session: User.HasSession = (sid, user) => user[8].some(s => s[0] === sid)
 export const get_session: User.GetSession = (sid, user) => user[8].find(s => s[0] === sid) ?? null

@@ -58,7 +58,7 @@ export const is_string = (x: unknown): x is string => typeof x === "string"
 export const is_array = Array.isArray
 export const is_fn = (x: unknown): x is (...args: any[]) => any => typeof x === "function"
 export const is_object = (x: unknown): x is Record<string, unknown> => x != null && typeof x === "object" && !is_array(x)
-
+export const head = <$Xs extends any[]>(xs: $Xs) => xs.at(0)
 export const pipe = <$Arg, $Result>(f: (arg: $Arg) => $Result, ...fs: ((arg: any) => any)[]): Fns.Pipe<$Arg, $Result> => {
 	const pub_f: any = (arg: any) => [f, ...fs].reduce((r, f) => f(r), arg)
 	const _pipe = (new_f: any) => pipe(f, ...fs, new_f)

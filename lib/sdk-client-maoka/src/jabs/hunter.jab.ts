@@ -7,7 +7,7 @@ import { type Maoka, maoka_dom } from "@ordo-pink/oss-maoka"
 import type { ClientSDK } from "@ordo-pink/sdk-client"
 import type { Hunt } from "@ordo-pink/oss-hunt"
 
-import { context } from "../sdk-maoka.impl"
+import { context } from "../sdk-client-maoka.impl"
 
 export namespace hunter_jabs {
 	export const track_on_create: <$Prey extends keyof Hunt.Pouch.ToPreys<ClientSDK.Preys>>(

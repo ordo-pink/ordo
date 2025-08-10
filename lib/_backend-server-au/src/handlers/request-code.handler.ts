@@ -22,7 +22,7 @@
 import { type Core, core } from "@ordo-pink/sdk-core"
 import { type Oath, oath } from "@ordo-pink/oss-oath"
 import { type Server, server } from "@ordo-pink/sdk-server"
-import { default_handler, huyami } from "@ordo-pink/b-server-core"
+import { default_handler, huyami } from "@ordo-pink/sdk-server-routary"
 
 import type * as Types from "../backend-server-au.types"
 import { create_request_code_email_body, create_request_code_email_subject } from "../fns"
@@ -58,7 +58,7 @@ const validate_request_body = (body: any) =>
 
 type Triplet = [Core.User.Email, Types.Code, Types.CodeHash]
 
-const create_code = (code_strategy: Server.Codegen.Instance) => (email: Core.User.Email) =>
+const create_code = (code_strategy: Server.Code.Codegen) => (email: Core.User.Email) =>
 	code_strategy
 		.generate()
 		.pipe(oath.ops.chain(code => code_strategy.hash(code).pipe(oath.ops.map(hash => [code, hash]))))

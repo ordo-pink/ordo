@@ -20,7 +20,7 @@
  */
 
 import { type User, user } from "@ordo-pink/sdk-core"
-import { default_handler } from "@ordo-pink/b-server-core"
+import { default_handler } from "@ordo-pink/sdk-server-routary"
 import { oath } from "@ordo-pink/oss-oath"
 
 import type { ServerID } from "../../backend-server-id.types"

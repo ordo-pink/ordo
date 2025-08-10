@@ -84,6 +84,7 @@ export namespace Oath {
 	export namespace Constructors {
 		export type Static = {
 			all: Oath.Constructors.All
+			any: Oath.Constructors.Any
 			empty: Oath.Constructors.Empty
 			from_nullable: Oath.Constructors.FromNullable
 			from_promise: Oath.Constructors.FromPromise
@@ -128,6 +129,13 @@ export namespace Oath {
 			Oath.ArrayToUnion<{ -readonly [P in keyof $Values]: UnderOathRejected<$Values[P]> }>
 		>
 
+		export type Any = <$Values extends readonly unknown[] | []>(
+			values: $Values,
+		) => Oath.Instance<
+			Oath.ArrayToUnion<{ -readonly [P in keyof $Values]: UnderOath<$Values[P]> }>,
+			{ -readonly [P in keyof $Values]: UnderOathRejected<$Values[P]> }
+		>
+
 		export type Try = <$Resolve, $Reject = unknown, _NewReject = $Reject>(
 			trier: () => $Resolve,
 			catcher?: (e: $Reject) => _NewReject,
@@ -142,7 +150,7 @@ export namespace Oath {
 	export namespace Methods {
 		export type Cata<$Resolve, $Reject> = <_NewResolve, _NewReject>(boom: {
 			resolve: (resolved: $Resolve) => _NewResolve
-			reject?: (rejected: $Reject) => _NewReject
+			reject: (rejected: $Reject) => _NewReject
 		}) => typeof boom extends undefined ? Promise<_NewResolve> : Promise<_NewResolve | _NewReject>
 
 		export type Pipe<$Resolve, $Reject> = <_NewResolve, _NewReject>(
@@ -220,8 +228,10 @@ export namespace Oath {
 	}
 		? __Boom extends { reject: (x: infer __Rejected) => any }
 			? __Rejected
-			: never
-		: never
+			: 1
+		: $X extends object & { then: (...args: any[]) => any }
+			? unknown
+			: 2
 
 	/**
 	 * Transforms an array type into an intersection (` | `).

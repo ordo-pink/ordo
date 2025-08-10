@@ -8,7 +8,7 @@ import { maoka } from "@ordo-pink/oss-maoka"
 import { sweech } from "@ordo-pink/oss-sweech"
 import { title_case } from "@ordo-pink/_tau"
 
-import { MaokaSDK } from "../sdk-maoka.types"
+import { MaokaSDK } from "../sdk-client-maoka.types"
 
 import "./hotkey.styles.css"
 import { maoka_sdk } from "@ordo-pink/sdk-maoka"

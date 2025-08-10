@@ -40,14 +40,6 @@ export type Instance = [
 ]
 
 export type CreateRef = (id: Id, email: Email) => Ref
-export type Create = (
-	email: Email,
-	ref?: Ref,
-	name?: Name,
-	subscription?: Subscription,
-	installed_functions?: InstalledFunctions,
-	parent?: Parent,
-) => Instance
 
 export type Serialize = (user: Instance) => Instance
 export type SerializeOtherUser = (user: OtherUserInstance) => OtherUserInstance

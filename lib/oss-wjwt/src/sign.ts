@@ -5,7 +5,7 @@
 
 import { Algorithm, type Header, type Sign } from "./wjwt.types"
 
-export const sign: Sign = (key, alg, iss, aud, token_lifetime) => async data => {
+export const sign: Sign = (key, alg, token_lifetime, iss, aud) => async data => {
 	const encoder = new TextEncoder()
 
 	if (data.iss && data.iss !== iss) throw new TypeError(`Unexpected issuer "${data.iss}"`)

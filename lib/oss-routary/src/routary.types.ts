@@ -4,7 +4,6 @@
  */
 
 import type { Colonoscope } from "@ordo-pink/oss-colonoscope"
-import type { Server } from "bun"
 
 export type Env = Record<string, unknown>
 
@@ -19,8 +18,8 @@ export type RouteParams = Colonoscope.Results
 export type Structure<$Env extends Env, $Mut extends Mut> = Partial<Record<Method, Record<Route, Handler<$Env, $Mut>>>>
 
 export type HandlerParams<$Env extends Env, $Mut extends Mut> = {
-	request: Bun.BunRequest
-	server: Server
+	request: Request
+	server: Bun.Server
 	env: $Env
 	mut: $Mut
 	params: RouteParams
@@ -58,7 +57,7 @@ export type Catcher<$Env extends Env, $Mut extends Mut> = (params: CatcherParams
 export type OrElse<$Env extends Env, $Mut extends Mut> = (
 	on_none_matched: Handler<$Env, $Mut>,
 	catcher: (params: CatcherParams<$Env, $Mut>) => Response | Promise<Response>,
-) => (request: Bun.BunRequest, server: Server) => Response | Promise<Response>
+) => (request: Request, server: Bun.Server) => Response | Promise<Response>
 
 export type Instance<$Env extends Env, $Mut extends Mut> = {
 	pipe: Pipe<$Env, $Mut>

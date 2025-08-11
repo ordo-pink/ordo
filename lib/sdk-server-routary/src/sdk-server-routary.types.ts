@@ -27,12 +27,29 @@ import type * as RequestId from "./request-id/request-id.types"
 import type * as RequestLang from "./request-lang/request-lang.types"
 import type * as ResponseTimer from "./response-timer/response-timer.types"
 
-export type Env = Routary.Env & { logger: Core.Logger }
+export type ArgsEnv = Routary.Env & { logger: Core.Logger }
 export type Mut = Routary.Mut & RequestId.Mut & ResponseTimer.Mut & RequestLang.Mut & RequestIP.Mut
-export type PrefilledEnv = Env & { fail: Fail }
+export type Env = ArgsEnv & { fail: Fail }
 
-export type Create = <$Env extends Env, $Mut extends Routary.Mut>(
+export type Create = <$Env extends ArgsEnv, $Mut extends Routary.Mut>(
 	env: $Env,
 	mut?: $Mut,
-) => Routary.Instance<$Env & PrefilledEnv, $Mut & Mut>
+) => Routary.Instance<$Env & Env, $Mut & Mut>
+
 export type Fail = (rrr: Core.Rrr.Instance) => Response
+
+export type CreateCookieParams = {
+	http_only?: boolean
+	secure?: boolean
+	domain?: string
+	expires?: Date
+	max_age?: number
+	partitioned?: boolean
+	path?: `/${string}`
+	same_site?: "Strict" | "Lax" | "None"
+}
+
+export type Cookies = {
+	set: (key: string, value: string, options: CreateCookieParams) => (response: Response) => Response
+	get: (key: string) => (request: Request) => string | undefined
+}

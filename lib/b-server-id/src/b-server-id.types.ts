@@ -24,6 +24,7 @@ import type { Hunt } from "@ordo-pink/oss-hunt"
 import type { Routary } from "@ordo-pink/oss-routary"
 import type { Server } from "@ordo-pink/sdk-server"
 import type { ServerRoutary } from "@ordo-pink/sdk-server-routary"
+import type { Wjwt } from "@ordo-pink/oss-wjwt"
 
 export type CodeLifetimeSeconds = number & {}
 
@@ -41,6 +42,7 @@ export type Args = [
 	email_strategy: Server.Email.Strategy,
 	allowed_origins: AllowedOrigin[],
 	codegen: Server.Code.Codegen,
+	wjwt: Wjwt.Instance,
 ]
 
 export type Prey = {
@@ -62,11 +64,12 @@ export type Prey = {
 }
 
 export type Mut = ServerRoutary.Mut
-export type Env = ServerRoutary.PrefilledEnv & {
+export type Env = ServerRoutary.Env & {
 	hunt: Hunt
 	user_repository: Server.User.Repository
 	code_service: Server.Code.Service
 	session_lifetime_minutes: SessionLifetimeMinutes
+	wjwt: Wjwt.Instance
 }
 
 export type Handler = Routary.Handler<Env, Mut>

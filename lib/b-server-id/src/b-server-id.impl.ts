@@ -36,8 +36,8 @@ export const create: Lib.Create = (
 	_email_strategy,
 	allowed_origins,
 	codegen,
+	wjwt,
 ) => {
-	// Email codes are stored in memory because nobody cares - just request another one
 	const hunt = lib_hunt.begin<Lib.Prey>()
 	const allowed_headers = ["Content-Type", "Accept-Language", "X-Device-Info"]
 	const allow_credentials = true
@@ -46,15 +46,13 @@ export const create: Lib.Create = (
 	// TODO Send email
 	const release_auth_requested = hunt.track("auth.requested", ([user, code]) => logger.debug(user[0], code))
 
-	const handle_exit = () => {
+	process.on("exit", () => {
 		release_auth_requested()
 		code_service.die()
-	}
-
-	process.on("exit", handle_exit)
+	})
 
 	return server_routary
-		.create({ code_service, logger, hunt, session_lifetime_minutes, user_repository })
+		.create({ code_service, logger, hunt, session_lifetime_minutes, user_repository, wjwt })
 		.pipe(routary.ops.once(routary_cors.create(allowed_origins, allowed_headers, allow_credentials)))
 		.pipe(routary.ops.post("/auth/request-code", handlers.request_code))
 		.pipe(routary.ops.post("/auth/verify-code", handlers.verify_code))

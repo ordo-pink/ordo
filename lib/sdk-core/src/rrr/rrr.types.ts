@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: Unlicense
  */
 
+import type { Curry } from "@ordo-pink/oss-curry"
+
 import type * as RRR from "./rrr.constants"
 
 export type Type = keyof typeof RRR.TYPE
@@ -13,7 +15,7 @@ export type Instance<$Type extends Type = Type> = {
 	debug: any[]
 }
 
-export type Create<$Type extends Type> = (message: string | number, info: any) => Instance<$Type>
+export type Create<$Type extends Type> = Curry<[message: string | number, info: any], Instance<$Type>>
 
 export type CreateType = <$Type extends Type>(type: $Type) => Create<$Type>
 

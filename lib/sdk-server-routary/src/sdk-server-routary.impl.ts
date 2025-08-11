@@ -20,6 +20,8 @@
  */
 
 import { CORE, type Core, core } from "@ordo-pink/sdk-core"
+import { SERVER } from "@ordo-pink/sdk-server"
+import type { Wjwt } from "@ordo-pink/oss-wjwt"
 import { curry } from "@ordo-pink/oss-curry"
 import { oath } from "@ordo-pink/oss-oath"
 import { routary } from "@ordo-pink/oss-routary"
@@ -66,18 +68,26 @@ export const fail = (logger: Core.Logger) => (rrr: Core.Rrr.Instance) => {
 
 export namespace oaths {
 	export const to_json = (x: any) =>
-		oath.try(() => JSON.stringify(x)).pipe(oath.ops.rmap(e => core.rrr.eio(CORE.RRR.REASON.JSON_STRINGIFY_FAILED, e)))
+		oath.try(() => JSON.stringify(x)).pipe(oath.ops.rmap(core.rrr.eio(CORE.RRR.REASON.JSON_STRINGIFY_FAILED)))
 
-	export const get_cookie = (request: Bun.BunRequest, name: string) =>
+	export const get_auth_cookie = (request: Request) =>
 		oath
-			.from_nullable(request.cookies, () => core.rrr.einval(CORE.RRR.REASON.MISSING_REQUIRED_COOKIE, name))
-			.pipe(oath.ops.chain(c => oath.from_nullable(c.get(name))))
-			.pipe(oath.ops.rmap(() => core.rrr.einval(CORE.RRR.REASON.MISSING_REQUIRED_COOKIE, name)))
+			.from_nullable(request.headers.get("Cookie"), core.rrr.einval(CORE.RRR.REASON.MISSING_REQUIRED_COOKIE))
+			.pipe(oath.ops.map(Bun.Cookie.parse))
+			.pipe(oath.ops.chain(c => oath.if(c.name === SERVER.COOKIE_NAME, { on_true: () => c.value })))
+			.pipe(oath.ops.rmap(core.rrr.einval(CORE.RRR.REASON.MISSING_REQUIRED_COOKIE)))
 
-	export const get_json_body = (request: Bun.BunRequest) =>
-		oath
-			.from_promise(() => request.json())
-			.pipe(oath.ops.rmap(() => core.rrr.einval(CORE.RRR.REASON.JSON_PARSE_FAILED, void 0)))
+	export const get_json_body = (request: Request) =>
+		oath.from_promise(() => request.json()).pipe(oath.ops.rmap(core.rrr.einval(CORE.RRR.REASON.JSON_PARSE_FAILED)))
 }
 
-export const set_response_header = curry((key: string, value: string, r: Response) => r.headers.set(key, value))
+export const set_response_header = curry((key: string, value: string, response: Response) => response.headers.set(key, value))
+
+export const set_auth_cookie = (response: Response, expires: Wjwt.Exp, token_string: Wjwt.TokenString) =>
+	response.headers.set(
+		"Set-Cookie",
+		new Bun.Cookie(SERVER.COOKIE_NAME, token_string, { expires, httpOnly: true, secure: true }).serialize(),
+	)
+
+export const create_alg = (alg_name?: string, alg_params?: string) =>
+	oath.merge({ name: oath.from_nullable(alg_name), params: oath.from_nullable(alg_params).pipe(oath.ops.chain(oaths.to_json)) })

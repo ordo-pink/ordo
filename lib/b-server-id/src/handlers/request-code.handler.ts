@@ -30,17 +30,18 @@ export const request_code: Lib.Handler = ({ env, request }) =>
 		.pipe(oath.ops.chain(() => server_routary.oaths.get_json_body(request)))
 		.pipe(oath.ops.chain(validate_body_email))
 		.pipe(oath.ops.chain(validate_is_email))
-		.pipe(oath.ops.chain(email => env.code_service.assign_code(email).pipe(oath.ops.map(code => [email, code] as const))))
+		.pipe(oath.ops.chain(email => env.code_service.assign_code(email).pipe(oath.ops.map(code => [email, code]))))
 		.pipe(oath.ops.tap(([email, code]) => env.hunt.shoot("auth.requested", [email, code])))
 		.pipe(oath.ops.map(() => new Response("", { status: 204 })))
 		.cata(oath.catas.or_else(env.fail))
 
 // --- Internal ---
 
-const check_user_is_not_already_authenticated = (request: Bun.BunRequest) =>
-	oath
-		.if(!request.cookies.has("llianso"))
-		.pipe(oath.ops.rmap(() => core.rrr.eexist(CORE.RRR.REASON.ALREADY_AUTHENTICATED, void 0)))
+const check_user_is_not_already_authenticated = (request: Request) =>
+	server_routary.oaths
+		.get_auth_cookie(request)
+		.pipe(oath.ops.swap)
+		.pipe(oath.ops.rmap(core.rrr.eexist(CORE.RRR.REASON.ALREADY_AUTHENTICATED)))
 
 const validate_is_email = (maybe_email: unknown) =>
 	oath.if(core.user.email_guard(maybe_email), {

@@ -12,6 +12,7 @@ export const f: Fns.F = () => false
 export const n: Fns.N = () => null
 export const u: Fns.U = () => {}
 export const v: Fns.V = u
+export const lazy: Fns.Lazy = x => () => x
 export const eq: Fns.Eq = curry((target, val) => target === val)
 export const gt: Fns.Gt = curry((min, val) => val > min)
 export const lt: Fns.Lt = curry((max, val) => val < max)

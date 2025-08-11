@@ -10,6 +10,7 @@ import { and_op } from "./impl/and.impl"
 import { ap_op } from "./impl/ap.impl"
 import { chain_op } from "./impl/chain.impl"
 import { fix_op } from "./impl/fix.impl"
+import { swap_op } from "./impl/swap.impl"
 
 export * from "./impl/ap.impl"
 export * from "./impl/chain.impl"
@@ -26,4 +27,5 @@ export const ops: Oath.Ops.Static = {
 	tap: tap_op,
 	rmap: rejected_map_op,
 	rtap: rejected_tap_op,
+	swap: swap_op,
 }

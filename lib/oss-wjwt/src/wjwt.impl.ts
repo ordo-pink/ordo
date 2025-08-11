@@ -9,7 +9,7 @@ import { sign } from "./sign"
 import { verify } from "./verify"
 
 export const create: Lib.Create = (alg, private_key, public_key, aud, iss, token_lifetime) => ({
-	sign: sign(private_key, alg, iss, aud, token_lifetime),
+	sign: sign(private_key, alg, token_lifetime, iss, aud) as any,
 	verify: verify(public_key, alg, aud),
-	decode,
+	decode: decode as any,
 })

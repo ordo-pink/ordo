@@ -20,6 +20,7 @@ export type F = () => false
 export type N = () => null
 export type U = () => undefined
 export type V = () => void
+export type Lazy = <$X>(x: $X) => () => $X
 
 export type Pipe<$InitialArg, $Result> = {
 	pipe: <$NewResult>(f: (arg: $Result) => $NewResult) => Pipe<$InitialArg, $NewResult>

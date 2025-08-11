@@ -29,6 +29,7 @@ import { result } from "@ordo-pink/oss-result"
 import { rickroll } from "@ordo-pink/oss-rickroll"
 import { server_id } from "@ordo-pink/b-server-id"
 import { user_repository_data } from "@ordo-pink/b-repository-user-repository-data"
+import { wjwt as wjwt_lib } from "@ordo-pink/oss-wjwt"
 
 const main = () => {
 	const path = "var/dt"
@@ -41,10 +42,20 @@ const main = () => {
 	const email_strategy: Server.Email.Strategy = { send: (_, __, content) => Promise.resolve(logger.debug(content)) }
 	const codegen = codegen_strategy_bun.create(codegen_algorithm)
 	const allowed_origins = ["http://localhost:3000" as const]
+	const wjwt = wjwt_lib.create("Ed25519", null as any, null as any, "", "", 60 * 24 * 30)
 
 	// Set to any until bun types are fixed
 	const fetch: any = server_id
-		.create(logger, user_repository, code_lifetime_seconds, session_lifetime_minutes, email_strategy, allowed_origins, codegen)
+		.create(
+			logger,
+			user_repository,
+			code_lifetime_seconds,
+			session_lifetime_minutes,
+			email_strategy,
+			allowed_origins,
+			codegen,
+			wjwt,
+		)
 		.or_else(() => rickroll, catcher)
 
 	const bun_server = Bun.serve({ fetch, port })
@@ -85,7 +96,7 @@ const cache_file_id = result
 	.pipe(result.ops.chain(id => result.if(core.uuid.guard(id), { on_true: () => id as Core.Uuid.Instance })))
 	.cata(result.catas.or_else(() => CORE.UUID.THE_LAST_ONE as Core.Uuid.Instance))
 
-const catcher: Routary.Catcher<ServerRoutary.Env, ServerRoutary.Mut> = ({ env, request, error }) => {
+const catcher: Routary.Catcher<ServerRoutary.ArgsEnv, ServerRoutary.Mut> = ({ env, request, error }) => {
 	const pathname = new URL(request.url).pathname
 	env.logger.error(`UNEXPECTED ERROR (${pathname}):`, error)
 	return new Response("", { status: 500 })

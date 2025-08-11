@@ -17,6 +17,7 @@ export namespace Oath {
 			rmap: Oath.Ops.RMap
 			rtap: Oath.Ops.RTap
 			tap: Oath.Ops.Tap
+			swap: Oath.Ops.Swap
 		}
 
 		// TODO Infer _NewReject
@@ -61,13 +62,15 @@ export namespace Oath {
 			on_resolved?: (x: _Resolve) => any,
 		) => (o: Oath.Instance<_Resolve, _Reject>) => Oath.Instance<_Resolve, _Reject>
 
-		export type Map = <_Resolve, _Reject, _NewResolve>(
+		export type Map = <const _Resolve, const _Reject, const _NewResolve>(
 			f: (x: _Resolve) => _NewResolve,
 		) => (o: Oath.Instance<_Resolve, _Reject>) => Oath.Instance<_NewResolve, _Reject>
 
 		export type RMap = <_Resolve, _Reject, _NewReject>(
 			f: (x: _Reject) => _NewReject,
 		) => (o: Oath.Instance<_Resolve, _Reject>) => Oath.Instance<_Resolve, _NewReject>
+
+		export type Swap = <_Resolve, _Reject>(o: Oath.Instance<_Resolve, _Reject>) => Oath.Instance<_Reject, _Resolve>
 
 		export type BiMap = <_Resolve, _Reject, _NewResolve, _NewReject>(
 			on_resolved: (x: _Resolve) => _NewResolve,
@@ -153,7 +156,7 @@ export namespace Oath {
 			reject: (rejected: $Reject) => _NewReject
 		}) => typeof boom extends undefined ? Promise<_NewResolve> : Promise<_NewResolve | _NewReject>
 
-		export type Pipe<$Resolve, $Reject> = <_NewResolve, _NewReject>(
+		export type Pipe<$Resolve, $Reject> = <const _NewResolve, const _NewReject>(
 			op: (o: Oath.Instance<$Resolve, $Reject>) => Oath.Instance<_NewResolve, _NewReject>,
 		) => Oath.Instance<_NewResolve, _NewReject>
 

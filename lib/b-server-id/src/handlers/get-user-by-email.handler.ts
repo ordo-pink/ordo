@@ -19,29 +19,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { CORE, type Core, core } from "@ordo-pink/sdk-core"
-import { curry } from "@ordo-pink/oss-curry"
+import { CORE, core } from "@ordo-pink/sdk-core"
 import { oath } from "@ordo-pink/oss-oath"
 import { server } from "@ordo-pink/sdk-server"
 import { server_routary } from "@ordo-pink/sdk-server-routary"
 
 import type * as Lib from "../b-server-id.types"
+import * as id_common from "../common"
 
 export const get_user_by_email: Lib.Handler = ({ env, params }) =>
 	oath
-		.from_nullable(params && params.email, to_missing_email_rrr)
-		.pipe(oath.ops.chain(validate_email))
+		.from_nullable(params && params.email, core.rrr.einval(CORE.RRR.REASON.EMAIL_MISSING))
+		.pipe(oath.ops.chain(id_common.validate_params_email))
 		.pipe(oath.ops.chain(env.user_repository.get_by_email))
 		.pipe(oath.ops.map(server.user.serialize_other))
 		.pipe(oath.ops.chain(server_routary.oaths.to_json))
 		.pipe(oath.ops.map(core.fns.construct(Response)))
 		.pipe(oath.ops.tap(server_routary.set_response_header("Content-Type", "application/json")))
 		.cata(oath.catas.or_else(env.fail))
-
-// --- Internal ---
-
-const einval = curry(core.rrr.einval)
-const to_missing_email_rrr = einval(CORE.RRR.REASON.EMAIL_MISSING)
-const to_invalid_email_rrr = (e: string) => () => core.rrr.einval(CORE.RRR.REASON.EMAIL_INVALID, e)
-const validate_email = (e: string) =>
-	oath.if(core.user.email_guard(e), { on_false: to_invalid_email_rrr(e), on_true: () => e as Core.User.Email })

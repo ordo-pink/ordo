@@ -37,7 +37,7 @@ export enum TYPE {
 
 export enum REASON {
 	/** Error type is self-explanatory. */
-	OBVIOUS,
+	NO,
 	/** The service is initialized incorrectly. FIX ASAP! */
 	INVALID_SERVICE_INITIALIZATION,
 	/** Provided input could not be parsed. */

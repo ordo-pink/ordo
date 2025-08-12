@@ -42,7 +42,7 @@ export const handle_get_user_by_handle = default_handler<ServerID.Fuel>(intake =
 const is_handle = user.someone.validations.is_handle
 
 const validate_user_handle = (intake: ServerID.Intake) => (handle?: string) =>
-	oath.if(is_handle(handle), { on_false: () => invalid_handle_rrr(handle!, intake), on_true: () => handle as User.Handle })
+	oath.if(is_handle(handle), { f: () => invalid_handle_rrr(handle!, intake), t: () => handle as User.Handle })
 
 const get_user_by_handle = (intake: ServerID.Intake) => (handle: User.Handle) =>
 	intake.reference_mapping_user

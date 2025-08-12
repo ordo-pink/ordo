@@ -31,7 +31,7 @@ export const extract_body_email = (intake: ServerID.Intake) => (request_body: an
 		.pipe(oath.ops.rmap(() => email_missing_rrr(intake)))
 		.pipe(
 			oath.ops.chain(email =>
-				oath.if(is_email(email), { on_true: () => email as User.Email, on_false: () => invalid_email_rrr(email, intake) }),
+				oath.if(is_email(email), { t: () => email as User.Email, f: () => invalid_email_rrr(email, intake) }),
 			),
 		)
 

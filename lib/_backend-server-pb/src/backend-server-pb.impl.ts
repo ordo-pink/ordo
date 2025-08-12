@@ -36,7 +36,7 @@ export const create_backend_server_pb = (fuel: ServerPB.Params) =>
 							oath
 								.from_promise(() => fetch(`${intake.id_host}/users/handle/${handle}`))
 								.pipe(oath.ops.chain(res => oath.from_promise(() => res.json())))
-								.pipe(oath.ops.chain(res => oath.if(res.success, { on_true: () => res.payload as User.Someone.DTO })))
+								.pipe(oath.ops.chain(res => oath.if(res.success, { t: () => res.payload as User.Someone.DTO })))
 								.pipe(oath.ops.map(user => ({ uid: user[0], fsid })))
 								.pipe(oath.ops.rmap(() => rrr.enoent("User not found"))),
 						),
@@ -52,7 +52,7 @@ export const create_backend_server_pb = (fuel: ServerPB.Params) =>
 								.pipe(
 									oath.ops.chain(m =>
 										oath
-											.if(!!m[12] && !!m[12].public_id, { on_true: () => m })
+											.if(!!m[12] && !!m[12].public_id, { t: () => m })
 											.pipe(oath.ops.tap(m => intake.headers.set("Last-Modified", new Date(m[2]).toUTCString())))
 											.pipe(oath.ops.tap(() => intake.headers.set("Content-Type", "text/html")))
 											.pipe(oath.ops.map(m => ({ uid, fsid: m[12]!.public_id as Data.ID })))

@@ -51,40 +51,36 @@ type I = Routary.Intake<TIDContext>
 const check_email_is_not_taken_if_present = (body: Record<string, any>, i: I) =>
 	body.email
 		? oath
-				.if(is_email(body.email), { on_false: () => invalid_email_rrr(body.email, i) })
+				.if(is_email(body.email), { f: () => invalid_email_rrr(body.email, i) })
 				.pipe(oath.ops.map(() => body.email as Ordo.User.Email))
 				.pipe(oath.ops.chain(email => i.reference_mapping_user.get_by_email(email).pipe(oath.ops.fix(() => null))))
-				.pipe(
-					oath.ops.chain(id => oath.if(!id || id === i.params.user_id, { on_false: () => exists_by_email_rrr(body.email, i) })),
-				)
+				.pipe(oath.ops.chain(id => oath.if(!id || id === i.params.user_id, { f: () => exists_by_email_rrr(body.email, i) })))
 		: oath.of(void 0)
 
 const check_handle_is_not_taken_if_present = (body: Record<string, any>, i: I) =>
 	body.handle
 		? oath
-				.if(is_handle(body.handle), { on_false: () => invalid_handle_rrr(body.handle, i) })
+				.if(is_handle(body.handle), { f: () => invalid_handle_rrr(body.handle, i) })
 				.pipe(oath.ops.map(() => body.handle as Ordo.User.Handle))
 				.pipe(oath.ops.chain(handle => i.reference_mapping_user.get_by_handle(handle).pipe(oath.ops.fix(() => null))))
-				.pipe(
-					oath.ops.chain(id => oath.if(!id || id === i.params.user_id, { on_false: () => exists_by_handle(body.handle, i) })),
-				)
+				.pipe(oath.ops.chain(id => oath.if(!id || id === i.params.user_id, { f: () => exists_by_handle(body.handle, i) })))
 		: oath.of(void 0)
 
 const check_installed_functions_is_valid_if_present = (body: Record<string, any>, i: I) =>
 	body.installed_functions
 		? oath.if(is_installed_functions(body.installed_functions), {
-				on_false: () => invalid_installed_functions_rrr(body.installed_functions, i),
+				f: () => invalid_installed_functions_rrr(body.installed_functions, i),
 			})
 		: oath.of(void 0)
 
 const check_first_name_is_valid_if_present = (body: Record<string, any>, i: I) =>
 	body.first_name
-		? oath.if(is_first_name(body.first_name), { on_false: () => invalid_first_name_rrr(body.first_name, i) })
+		? oath.if(is_first_name(body.first_name), { f: () => invalid_first_name_rrr(body.first_name, i) })
 		: oath.of(void 0)
 
 const check_last_name_is_valid_if_present = (body: Record<string, any>, i: I) =>
 	body.last_name
-		? oath.if(is_last_name(body.last_name), { on_false: () => invalid_last_name_rrr(body.last_name, i) })
+		? oath.if(is_last_name(body.last_name), { f: () => invalid_last_name_rrr(body.last_name, i) })
 		: oath.of(void 0)
 
 const valdiate_body = (i: I) => (body: any) =>

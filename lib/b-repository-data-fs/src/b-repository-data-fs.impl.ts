@@ -84,12 +84,12 @@ const delete_file = (file: BunFile) =>
 
 const validate_file_exists = (path: string) =>
 	check_file_exists(path)
-		.pipe(oath.ops.chain(({ exists, file }) => oath.if(exists, { on_true: () => ({ path, file }) })))
+		.pipe(oath.ops.chain(({ exists, file }) => oath.if(exists, { t: () => ({ path, file }) })))
 		.pipe(oath.ops.rmap(core.rrr.enoent(CORE.RRR.REASON.NO)))
 
 const validate_file_does_not_exist = (path: string) =>
 	check_file_exists(path)
-		.pipe(oath.ops.chain(({ exists, file }) => oath.if(!exists, { on_true: () => ({ path, file }) })))
+		.pipe(oath.ops.chain(({ exists, file }) => oath.if(!exists, { t: () => ({ path, file }) })))
 		.pipe(oath.ops.rmap(core.rrr.eexist(CORE.RRR.REASON.NO)))
 
 const get_file_content = (file: BunFile) =>

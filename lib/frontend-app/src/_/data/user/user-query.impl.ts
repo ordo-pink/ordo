@@ -67,9 +67,7 @@ export const UserQuery: Ordo.User.QueryStatic = {
 									.from_promise(() => fetch(`${id_host}/users/${id}`, { credentials: "include" }))
 									.pipe(oath.ops.and(res => res.json()))
 									.pipe(
-										oath.ops.and(res =>
-											oath.if(res.success, { on_true: () => res.payload, on_false: () => rrr.codes.eio(res.payload) }),
-										),
+										oath.ops.and(res => oath.if(res.success, { t: () => res.payload, f: () => rrr.codes.eio(res.payload) })),
 									)
 									.pipe(oath.ops.tap(dto => void (user_cache[dto.id] = dto))),
 						),
@@ -95,9 +93,7 @@ export const UserQuery: Ordo.User.QueryStatic = {
 									.from_promise(() => fetch(`${id_host}/users/handle/${handle}`, { credentials: "include" }))
 									.pipe(oath.ops.and(res => res.json()))
 									.pipe(
-										oath.ops.and(res =>
-											oath.if(res.success, { on_true: () => res.payload, on_false: () => rrr.codes.eio(res.payload) }),
-										),
+										oath.ops.and(res => oath.if(res.success, { t: () => res.payload, f: () => rrr.codes.eio(res.payload) })),
 									)
 									.pipe(oath.ops.tap(dto => void (user_cache[dto.handle] = dto))),
 						),

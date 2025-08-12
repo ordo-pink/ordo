@@ -48,8 +48,7 @@ export type Args = [
 export type Prey = {
 	auth: {
 		requested: { args: [email: Core.User.Email, code: Server.Code.Instance] }
-		signed_up: { args: void }
-		logged_in: { args: void }
+		succeeded: { args: [email: Core.User.Email, ip: string] }
 	}
 	user: {
 		update_requested: {

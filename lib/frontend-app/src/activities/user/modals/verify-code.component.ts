@@ -80,7 +80,7 @@ export const verify_code_modal = maoka.create("div", ({ use }) => {
 			.pipe(oath.ops.map(headers => ({ headers, method: "POST", credentials: "include" as const })))
 			.pipe(oath.ops.map(init => ({ ...init, body: JSON.stringify({ code: Number(code), email }) })))
 			.pipe(oath.ops.chain(init => oath.from_promise(() => fetch(`${hosts.au}/verify-code`, init))))
-			.pipe(oath.ops.chain(res => oath.if(res.status < 300, { on_true: () => res })))
+			.pipe(oath.ops.chain(res => oath.if(res.status < 300, { t: () => res })))
 			.pipe(oath.ops.and(res => res.json() as Promise<User.Current.DTO>))
 			.pipe(oath.ops.tap(() => authenticating_user$.each({ email: () => "", code: () => "" })))
 			.pipe(oath.ops.tap(dto => auth$.update("user", () => user.current.from_dto(...dto))))

@@ -27,6 +27,7 @@ import { server } from "@ordo-pink/sdk-server"
 import { server_routary } from "@ordo-pink/sdk-server-routary"
 
 import type * as Lib from "./b-server-id.types"
+import type { Colonoscope } from "@ordo-pink/oss-colonoscope"
 
 export const extract_id_param = (params: Routary.RouteParams) => () =>
 	oath.from_nullable(params && params.id, core.rrr.einval(CORE.RRR.REASON.USER_ID_MISSING))
@@ -34,7 +35,7 @@ export const extract_id_param = (params: Routary.RouteParams) => () =>
 export const check_is_executing_on_self = (request: Request) => (id: Core.User.Id) =>
 	server_routary.oaths
 		.get_auth_cookie(request)
-		.pipe(oath.ops.chain(x => oath.if(x === id, { on_false: core.rrr.eperm(CORE.RRR.REASON.NO), on_true: core.fns.lazy(id) })))
+		.pipe(oath.ops.chain(x => oath.if(x === id, { f: core.rrr.eperm(CORE.RRR.REASON.NO), t: core.fns.lazy(id) })))
 
 export const check_user_is_authenticated = (request: Request, env: Lib.Env) =>
 	server_routary.oaths
@@ -47,20 +48,19 @@ export const check_user_is_authenticated = (request: Request, env: Lib.Env) =>
 		.pipe(oath.ops.chain(t => oath.if(core.timestamp.is_after(Date.now() - env.session_lifetime_minutes * 60, t))))
 		.pipe(oath.ops.rmap(core.rrr.eacces(CORE.RRR.REASON.NO)))
 
-export const validate_params_email = (e: string) =>
-	oath.if(core.user.email_guard(e), {
-		on_false: () => core.rrr.einval(CORE.RRR.REASON.EMAIL_INVALID, e),
-		on_true: () => e as Core.User.Email,
-	})
+export const get_request_param = (params: Colonoscope.Results, name: string) => oath.from_nullable(params && params[name])
 
-export const validate_params_id = (e: string) =>
-	oath.if(core.uuid.guard(e), {
-		on_false: () => core.rrr.einval(CORE.RRR.REASON.USER_ID_INVALID, e),
-		on_true: () => e as Core.User.Id,
-	})
+export const get_param_id = (params: Colonoscope.Results) =>
+	get_request_param(params, "id")
+		.pipe(oath.ops.chain(i => oath.if(core.uuid.guard(i), { t: () => i as Core.Uuid.Instance, f: () => i })))
+		.pipe(oath.ops.rmap(core.rrr.einval(CORE.RRR.REASON.USER_ID_INVALID)))
 
-export const validate_params_ref = (e: string) =>
-	oath.if(core.user.ref_guard(e), {
-		on_false: () => core.rrr.einval(CORE.RRR.REASON.REF_INVALID, e),
-		on_true: () => e as Core.User.Ref,
-	})
+export const get_param_email = (params: Colonoscope.Results) =>
+	get_request_param(params, "email")
+		.pipe(oath.ops.chain(e => oath.if(core.user.email_guard(e), { t: () => e as Core.User.Email, f: () => e })))
+		.pipe(oath.ops.rmap(core.rrr.einval(CORE.RRR.REASON.EMAIL_INVALID)))
+
+export const get_param_ref = (params: Colonoscope.Results) =>
+	get_request_param(params, "ref")
+		.pipe(oath.ops.chain(e => oath.if(core.user.ref_guard(e), { t: () => e as Core.User.Ref, f: () => e })))
+		.pipe(oath.ops.rmap(core.rrr.einval(CORE.RRR.REASON.REF_INVALID)))

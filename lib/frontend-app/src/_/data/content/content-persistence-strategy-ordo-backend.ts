@@ -37,7 +37,7 @@ export const PersistenceStrategyContentOrdoBackend = {
 			get: (uid, fsid) =>
 				oath
 					.from_promise(() => fetch(`${dt_host}/${uid}/${fsid}`, { credentials: "include" }))
-					.pipe(oath.ops.and(res => oath.if(res.status === 200, { on_true: () => res })))
+					.pipe(oath.ops.and(res => oath.if(res.status === 200, { t: () => res })))
 					.pipe(oath.ops.and(res => res.body))
 					.pipe(oath.ops.rmap(e => rrr.codes.eio("Failed to get content", e))),
 			put: (uid, fsid, body) =>

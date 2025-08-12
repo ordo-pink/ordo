@@ -88,14 +88,14 @@ const validate_file_exists = (s3: S3Client) => (path: string) =>
 	oath
 		.resolve(check_file_exists(s3))
 		.pipe(oath.ops.chain(f => f(path)))
-		.pipe(oath.ops.chain(({ exists, file }) => oath.if(exists, { on_true: () => ({ path, file }) })))
+		.pipe(oath.ops.chain(({ exists, file }) => oath.if(exists, { t: () => ({ path, file }) })))
 		.pipe(oath.ops.rmap(not_found_rrr))
 
 const validate_file_does_not_exist = (s3: S3Client) => (path: string) =>
 	oath
 		.resolve(check_file_exists(s3))
 		.pipe(oath.ops.chain(f => f(path)))
-		.pipe(oath.ops.chain(({ exists, file }) => oath.if(!exists, { on_true: () => ({ path, file }) })))
+		.pipe(oath.ops.chain(({ exists, file }) => oath.if(!exists, { t: () => ({ path, file }) })))
 		.pipe(oath.ops.rmap(already_exists_rrr))
 
 const write_file = (s3: S3Client, content: ReadableStream) => (path: string) =>

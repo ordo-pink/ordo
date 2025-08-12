@@ -27,6 +27,9 @@ import { server } from "@ordo-pink/sdk-server"
 
 import type * as T from "./code.types"
 
+export const guard: T.Guard = (x): x is T.Instance =>
+	core.fns.is_non_empty_string(x) && Number.parseInt(x).toString() === x && x.length === 6
+
 export const create_service: T.CreateService = (codegen, lifetime_seconds, logger) => {
 	const storage: T.Storage = new Map()
 
@@ -49,7 +52,7 @@ export const create_service: T.CreateService = (codegen, lifetime_seconds, logge
 
 			return oath
 				.from_nullable(storage.get(email), enoent(CORE.RRR.REASON.USER_NOT_FOUND))
-				.pipe(oath.ops.chain(values => codegen.hash(code).pipe(oath.ops.map(hash => [values, hash] as const))))
+				.pipe(oath.ops.chain(values => codegen.hash(code).pipe(oath.ops.map(hash => [values, hash]))))
 				.pipe(oath.ops.map(([values, hash]) => [...values, [core.timestamp.create(), hash] as T.Value]))
 				.pipe(oath.ops.map(values => storage.set(email, values)))
 				.pipe(oath.ops.map(() => code))

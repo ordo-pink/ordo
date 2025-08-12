@@ -40,8 +40,8 @@ export const handle_get_user_by_id = default_handler<ServerID.Fuel>(intake =>
 
 const validate_user_id = (intake: ServerID.Intake) => (id: unknown) =>
 	oath.if(user.someone.validations.is_id(id), {
-		on_true: () => id as User.ID,
-		on_false: () => invalid_id_rrr(id, intake),
+		t: () => id as User.ID,
+		f: () => invalid_id_rrr(id, intake),
 	})
 
 const get_by_id = (intake: ServerID.Intake) => (id: User.ID) =>

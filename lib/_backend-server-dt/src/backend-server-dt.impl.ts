@@ -143,8 +143,8 @@ export const authenticate = (intake: ServerDT.Intake) =>
 		.pipe(oath.ops.map(headers => ({ headers, method: "GET", credentials: "include" as const })))
 		.pipe(oath.ops.chain(init => oath.from_promise(() => fetch(`${intake.id_host}/session`, init))))
 		.pipe(oath.ops.chain(res => oath.from_promise(() => res.json())))
-		.pipe(oath.ops.chain(body => oath.if(body?.success, { on_true: () => body.payload })))
-		.pipe(oath.ops.chain(x => oath.if(user.current.validations.is_dto(x), { on_true: () => x as User.Current.DTO })))
+		.pipe(oath.ops.chain(body => oath.if(body?.success, { t: () => body.payload })))
+		.pipe(oath.ops.chain(x => oath.if(user.current.validations.is_dto(x), { t: () => x as User.Current.DTO })))
 		.pipe(oath.ops.rmap(e => rrr.eacces("Unauthorized", e)))
 
 // TODO checking permissions for editing files of other users
@@ -188,7 +188,7 @@ export const validate_file_size_limit = (intake: ServerDT.Intake) => (dto: User.
 	oath
 		.from_nullable(intake.req.headers.get("content-length"))
 		.pipe(oath.ops.map(file_size => Number.parseInt(file_size, 10)))
-		.pipe(oath.ops.chain(file_size => oath.if(is_finite_non_negative_int(file_size), { on_true: () => file_size })))
+		.pipe(oath.ops.chain(file_size => oath.if(is_finite_non_negative_int(file_size), { t: () => file_size })))
 		.pipe(oath.ops.chain(file_size => oath.if(user.current.from_dto(...dto).can_upload_file(file_size))))
 		.pipe(oath.ops.rmap(() => rrr.efbig("File too big")))
 

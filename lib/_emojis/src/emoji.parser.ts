@@ -25,7 +25,7 @@ import { oath } from "@ordo-pink/oss-oath"
 
 const main = () =>
 	read_file0("lib/emojis/src/v16/spec.txt", "utf8")
-		.pipe(oath.ops.chain(content => oath.if(is_string(content), { on_true: () => content as string })))
+		.pipe(oath.ops.chain(content => oath.if(is_string(content), { t: () => content as string })))
 		.pipe(oath.ops.map(content => content.split("\n")))
 		.pipe(oath.ops.map(lines => lines.filter(line => !line.startsWith("#"))))
 		.pipe(oath.ops.map(lines => lines.filter(line => !!line.trim())))

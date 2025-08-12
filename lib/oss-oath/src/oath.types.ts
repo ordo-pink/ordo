@@ -115,7 +115,7 @@ export namespace Oath {
 
 		export type If = <$OnTrue = void, $OnFalse = void>(
 			condition: boolean,
-			branches?: { on_true?: () => $OnTrue; on_false?: () => $OnFalse },
+			branches?: { t?: () => $OnTrue; f?: () => $OnFalse },
 		) => Oath.Instance<$OnTrue, $OnFalse>
 
 		export type Merge = <$Values extends Record<string, unknown>>(

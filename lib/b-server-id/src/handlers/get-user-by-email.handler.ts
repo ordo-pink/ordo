@@ -19,21 +19,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { CORE, core } from "@ordo-pink/sdk-core"
 import { oath } from "@ordo-pink/oss-oath"
 import { server } from "@ordo-pink/sdk-server"
-import { server_routary } from "@ordo-pink/sdk-server-routary"
 
 import type * as Lib from "../b-server-id.types"
 import * as id_common from "../common"
 
 export const get_user_by_email: Lib.Handler = ({ env, params }) =>
-	oath
-		.from_nullable(params && params.email, core.rrr.einval(CORE.RRR.REASON.EMAIL_MISSING))
-		.pipe(oath.ops.chain(id_common.validate_params_email))
+	id_common
+		.get_param_email(params)
 		.pipe(oath.ops.chain(env.user_repository.get_by_email))
 		.pipe(oath.ops.map(server.user.serialize_other))
-		.pipe(oath.ops.chain(server_routary.oaths.to_json))
-		.pipe(oath.ops.map(core.fns.construct(Response)))
-		.pipe(oath.ops.tap(server_routary.set_response_header("Content-Type", "application/json")))
+		.pipe(oath.ops.map(Response.json))
 		.cata(oath.catas.or_else(env.fail))

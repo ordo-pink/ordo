@@ -121,7 +121,7 @@ const track_prey_jab: Maoka.Jab = ({ node, use }) => {
 			.pipe(oath.ops.tap(h => h.append("Content-Type", "application/json")))
 			.pipe(oath.ops.map(headers => ({ headers, method: "POST", body: JSON.stringify({ email }) })))
 			.pipe(oath.ops.chain(init => oath.from_promise(() => fetch(`${hosts.au}/request-code`, init))))
-			.pipe(oath.ops.chain(res => oath.if(res.status < 300, { on_true: () => res })))
+			.pipe(oath.ops.chain(res => oath.if(res.status < 300, { t: () => res })))
 			.pipe(oath.ops.tap(() => hunter.shoot("user.show_verify_code_modal")))
 			.cata(oath.catas.to_promise())
 			.catch(() => void 0)

@@ -25,9 +25,11 @@ import type { Oath } from "@ordo-pink/oss-oath"
 export type Instance = string & {}
 export type HashedInstance = string & {}
 
+export type Guard = (x: any) => x is Instance
+
 export type Value = [timestamp: Core.Timestamp.Instance, hash: HashedInstance]
 
-export type Storage = Map<Core.User.Email, [timestamp: Core.Timestamp.Instance, hash: HashedInstance][]>
+export type Storage = Map<Core.User.Email, readonly [timestamp: Core.Timestamp.Instance, hash: HashedInstance][]>
 
 export type Service = {
 	assign_code: (email: Core.User.Email) => Oath.Instance<Instance, Core.Rrr.Instance<"EIO" | "ENOENT">>

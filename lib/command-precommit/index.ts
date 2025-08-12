@@ -19,8 +19,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { core } from "@ordo-pink/sdk-core"
+import type { CommandHandler } from "@ordo-pink/cli-handler"
+import { handle_precommit } from "./src/command-precommit.impl"
 
-import type * as Lib from "../b-server-id.types"
-
-export const verify_code: Lib.Handler = core.todo
+export const precommit_command: CommandHandler.Commands = {
+	precommit: {
+		help: "Check for any errors with spdx, eslint and tests.",
+		handler: handle_precommit,
+	},
+}

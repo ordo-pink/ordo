@@ -68,5 +68,10 @@ export enum REASON {
 	ALREADY_AUTHENTICATED,
 	/** Something went wrong with hashing or verifying hashes. */
 	HASHING_ISSUE,
+
 	USER_NOT_FOUND,
+
+	MALFORMED_REQUEST_BODY,
+
+	CODE_INVALID,
 }

@@ -28,8 +28,7 @@ import type * as Lib from "../b-server-id.types"
 export const request_code: Lib.Handler = ({ env, request }) =>
 	check_user_is_not_already_authenticated(request)
 		.pipe(oath.ops.chain(() => server_routary.oaths.get_json_body(request)))
-		.pipe(oath.ops.chain(validate_body_email))
-		.pipe(oath.ops.chain(validate_is_email))
+		.pipe(oath.ops.chain(get_body_email))
 		.pipe(oath.ops.chain(email => env.code_service.assign_code(email).pipe(oath.ops.map(code => [email, code]))))
 		.pipe(oath.ops.tap(([email, code]) => env.hunt.shoot("auth.requested", [email, code])))
 		.pipe(oath.ops.map(() => new Response("", { status: 204 })))
@@ -43,14 +42,15 @@ const check_user_is_not_already_authenticated = (request: Request) =>
 		.pipe(oath.ops.swap)
 		.pipe(oath.ops.rmap(core.rrr.eexist(CORE.RRR.REASON.ALREADY_AUTHENTICATED)))
 
-const validate_is_email = (maybe_email: unknown) =>
-	oath.if(core.user.email_guard(maybe_email), {
-		on_true: () => maybe_email as Core.User.Email,
-		on_false: () => core.rrr.einval(CORE.RRR.REASON.EMAIL_INVALID, maybe_email),
-	})
-
-const validate_body_email = (maybe_body: any) =>
-	oath.if(maybe_body && maybe_body.email, {
-		on_true: () => maybe_body,
-		on_false: () => core.rrr.einval(CORE.RRR.REASON.EMAIL_MISSING, maybe_body.email),
-	})
+const get_body_email = (body: any) =>
+	oath
+		.if(body && core.fns.is_array(body) && body[0])
+		.pipe(oath.ops.bimap(() => body, core.rrr.einval(CORE.RRR.REASON.EMAIL_MISSING)))
+		.pipe(
+			oath.ops.chain(email =>
+				oath
+					.if(core.user.email_guard(email))
+					.pipe(oath.ops.rmap(() => core.rrr.einval(CORE.RRR.REASON.EMAIL_INVALID, email)))
+					.pipe(oath.ops.map(() => email as Core.User.Email)),
+			),
+		)

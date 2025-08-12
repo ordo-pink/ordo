@@ -52,8 +52,8 @@ const get_request_body = (req: Request): Oath.Instance<any, Core.Rrr.Instance<"E
 
 const validate_request_body = (body: any) =>
 	oath.if(body && body.email && core.user.email_guard(body.email), {
-		on_true: () => body.email as Core.User.Email,
-		on_false: () => core.rrr.einval("Provided email is invalid", body.email),
+		t: () => body.email as Core.User.Email,
+		f: () => core.rrr.einval("Provided email is invalid", body.email),
 	})
 
 type Triplet = [Core.User.Email, Types.Code, Types.CodeHash]

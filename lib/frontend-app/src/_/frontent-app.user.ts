@@ -70,7 +70,7 @@ export const init_user = call_once(() => {
 	oath
 		.from_promise(() => fetch(`${hosts.id}/session`, init))
 		.pipe(oath.ops.and(res => res.json()))
-		.pipe(oath.ops.and(res => oath.if(res.success, { on_true: () => res.payload as Ordo.User.Current.DTO })))
+		.pipe(oath.ops.and(res => oath.if(res.success, { t: () => res.payload as Ordo.User.Current.DTO })))
 		.pipe(oath.ops.and(dto => current_user.from_dto(dto)))
 		.pipe(oath.ops.and(user => ordo_app_state.zags.update("user", () => user)))
 		.cata(oath.catas.to_promise())
@@ -239,7 +239,7 @@ const ValidateCodeModal = (email: Ordo.User.Email) =>
 						// TODO Get input from env
 						.pipe(oath.ops.and(init => oath.from_promise(() => fetch(`${au_host}/verify-code`, init))))
 						.pipe(oath.ops.and(res => res.json()))
-						.pipe(oath.ops.and(res => oath.if(res.success, { on_true: () => res.payload })))
+						.pipe(oath.ops.and(res => oath.if(res.success, { t: () => res.payload })))
 						.pipe(oath.ops.and(user => ordo_app_state.zags.update("user", () => current_user.from_dto(user))))
 						.pipe(oath.ops.and(() => commands.emit("cmd.application.modal.hide")))
 						.cata(oath.catas.to_promise()),

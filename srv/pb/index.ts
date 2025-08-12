@@ -32,7 +32,7 @@ const get_env = () =>
 	oath.merge({
 		port: oath
 			.from_nullable(Bun.env.ORDO_PB_PORT)
-			.pipe(oath.ops.and(n => oath.if(is_port(n), { on_true: () => n })))
+			.pipe(oath.ops.and(n => oath.if(is_port(n), { t: () => n })))
 			.pipe(oath.ops.rmap(env_rrr("ORDO_PB_PORT"))),
 
 		data_path: oath.from_nullable(Bun.env.ORDO_DT_DATA_PATH, env_rrr("ORDO_DT_DATA_PATH")),

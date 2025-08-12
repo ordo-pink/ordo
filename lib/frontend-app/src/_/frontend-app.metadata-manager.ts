@@ -57,7 +57,7 @@ export const MetadataManager = {
 				.get(user?.get_uid() ?? null, METADATA_CONTENT_FSID)
 				.pipe(oath.ops.and(stream => new Response(stream as ArrayBuffer)))
 				.pipe(oath.ops.and(res => res.json()))
-				.pipe(oath.ops.and(items => oath.if(is_array(items), { on_true: () => items })))
+				.pipe(oath.ops.and(items => oath.if(is_array(items), { t: () => items })))
 				.pipe(oath.ops.and(items => items.map(Metadata.FromDTO)))
 				.pipe(oath.ops.and(json => metadata_repository.put(json)))
 				.cata(oath.catas.unwrap())

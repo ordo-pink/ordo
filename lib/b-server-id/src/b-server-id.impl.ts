@@ -39,6 +39,7 @@ export const create: Lib.Create = (
 	wjwt,
 ) => {
 	const hunt = lib_hunt.begin<Lib.Prey>()
+
 	const allowed_headers = ["Content-Type", "Accept-Language", "X-Device-Info"]
 	const allow_credentials = true
 	const code_service = server.code.create_service(codegen, code_lifetime_seconds, logger)

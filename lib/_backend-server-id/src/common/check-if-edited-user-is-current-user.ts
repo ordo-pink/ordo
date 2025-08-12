@@ -29,7 +29,7 @@ export const check_if_edited_user_is_current_user = (intake: ServerID.Intake) =>
 	get_user_from_cookie(intake).pipe(
 		oath.ops.chain(({ user }) =>
 			oath.if(user.get_id() === intake.params.user_id, {
-				on_false: () => ({ rrr: rrr.eperm("Cannot edit other user"), intake }),
+				f: () => ({ rrr: rrr.eperm("Cannot edit other user"), intake }),
 			}),
 		),
 	)

@@ -19,11 +19,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-// import { die, run_async_command } from "@ordo-pink/cli-runner"
-// import { oath } from "@ordo-pink/oss-oath"
+import type { CommandHandler } from "@ordo-pink/cli-handler"
+import { oath } from "@ordo-pink/oss-oath"
+import { run_command } from "@ordo-pink/cli-runner"
 
-// void run_async_command("opt/bun run --watch srv/dt/index.ts", {
-// 	stdout: "pipe",
-// 	stderr: "pipe",
-// 	env: { ...process.env, FORCE_COLOR: "1" },
-// }).cata(oath.catas.or_else(die()))
+export const handle_precommit: CommandHandler.Fn = () =>
+	run_command("bin/dog spdx -bn", { stderr: "inherit", stdout: "inherit" })
+		.pipe(oath.ops.chain(() => run_command("opt/bun x eslint lib", { stderr: "inherit", stdout: "inherit" })))
+		.pipe(oath.ops.chain(() => run_command("opt/bun test lib", { stderr: "inherit", stdout: "inherit" })))
+		.cata(oath.catas.or_else(e => console.error(e.message)))

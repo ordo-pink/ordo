@@ -19,15 +19,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { type Aist, aist } from "@ordo-pink/oss-aist"
 import { type Maoka, maoka_dom } from "@ordo-pink/oss-maoka"
-import { type RoutaryBrowser, create } from "@ordo-pink/oss-aist"
 import { type ClientSDK } from "@ordo-pink/sdk-client"
-import { core_sdk } from "@ordo-pink/sdk-core"
+import { core } from "@ordo-pink/sdk-core"
 
-export const create_rotor_jab: (hunter: ClientSDK.Hunter) => Maoka.Jab<RoutaryBrowser.Zags> =
+export const create_rotor_jab: (hunter: ClientSDK.Hunter) => Maoka.Jab<Aist.Stream> =
 	hunter =>
 	({ use }) => {
-		const rotor = create(window)
+		const rotor = aist.create(window)
 
 		const open = window.open
 		window.open = undefined as any
@@ -37,7 +37,7 @@ export const create_rotor_jab: (hunter: ClientSDK.Hunter) => Maoka.Jab<RoutaryBr
 			const release_set_href = hunter.track("router.set_href", href => void open(href, "_blank")?.focus())
 			const release_set_pathname = hunter.track("router.set_pathname", rotor.set_pathname)
 			const release_set_search = hunter.track("router.set_search", params =>
-				core_sdk.validations.is_string(params) ? rotor.set_search(params) : rotor.set_search_params(params),
+				core.fns.is_string(params) ? rotor.set_search(params) : rotor.set_search_params(params),
 			)
 
 			return () => {

@@ -64,7 +64,7 @@ export type Prey = {
 
 export type Mut = ServerRoutary.Mut
 export type Env = ServerRoutary.Env & {
-	hunt: Hunt
+	hunter: Hunt
 	user_repository: Server.User.Repository
 	code_service: Server.Code.Service
 	session_lifetime_minutes: SessionLifetimeMinutes

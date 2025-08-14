@@ -21,7 +21,7 @@
 
 import { maoka, maoka_styled } from "@ordo-pink/oss-maoka"
 import type { ClientSDK } from "@ordo-pink/sdk-client"
-import { maoka_sdk } from "@ordo-pink/sdk-maoka"
+import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 
 import { get_readable_type } from "./utils/common"
 import { hide_notification_button } from "./notification-hide-button.component"
@@ -30,17 +30,17 @@ import { notification_progress } from "./notification-progress.component"
 
 type Args = ClientSDK.Notification.Instance
 export const notification = maoka.create<Args>("div", ({ on_click, id, message, duration, render_icon, title, type, use }) => {
-	const t_title = use(maoka_sdk.jabs.translate$(title))
-	const t_message = use(maoka_sdk.jabs.translate$(message))
+	const t_title = use(client_maoka.jabs.translate$(title))
+	const t_message = use(client_maoka.jabs.translate$(message))
 
-	use(maoka_sdk.jabs.classes.set("notification-card_container"))
+	use(client_maoka.jabs.classes.set("notification-card_container"))
 
 	if (on_click) {
-		use(maoka_sdk.jabs.classes.add("interactive"))
-		use(maoka_sdk.jabs.listen("onclick", on_click))
+		use(client_maoka.jabs.classes.add("interactive"))
+		use(client_maoka.jabs.listen("onclick", on_click))
 	} else {
-		use(maoka_sdk.jabs.classes.remove("interactive"))
-		use(maoka_sdk.jabs.listen("onclick", () => void 0))
+		use(client_maoka.jabs.classes.remove("interactive"))
+		use(client_maoka.jabs.listen("onclick", () => void 0))
 	}
 
 	const card_type = get_readable_type(type)

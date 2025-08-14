@@ -21,7 +21,7 @@
 
 import { type Maoka, maoka, maoka_styled } from "@ordo-pink/oss-maoka"
 import { type ClientSDK } from "@ordo-pink/sdk-client"
-import { maoka_sdk } from "@ordo-pink/sdk-maoka"
+import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 
 import { activity_bar_link } from "./activity-bar-link.component"
 
@@ -29,10 +29,10 @@ export const activity_bar = maoka.create<{
 	sidebar_toggle: () => Maoka.Component
 	command_palette_toggle: () => Maoka.Component
 }>("div", ({ command_palette_toggle, sidebar_toggle, use }) => {
-	const { activities$ } = use(maoka_sdk.context.consume)
-	const get_state = use(maoka_sdk.jabs.zags.marry$(activities$))
+	const { activities$ } = use(client_maoka.context.consume)
+	const get_state = use(client_maoka.jabs.zags.marry$(activities$))
 
-	use(maoka_sdk.jabs.classes.set("activity-bar"))
+	use(client_maoka.jabs.classes.set("activity-bar"))
 
 	return () => {
 		const { current, items } = get_state()

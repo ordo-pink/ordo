@@ -21,7 +21,7 @@
 
 import { BACKGROUND_TASK, type ClientSDK } from "@ordo-pink/sdk-client"
 import { type Maoka, maoka_dom } from "@ordo-pink/oss-maoka"
-import { context } from "@ordo-pink/sdk-maoka"
+import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 
 import { background_task$ } from "./background-task.state"
 import { background_task_status } from "./components/background-task-status.component"
@@ -29,7 +29,7 @@ import { background_task_status } from "./components/background-task-status.comp
 import "./background-task.styles.css"
 
 export const create_background_task_status_jab: Maoka.Jab<() => Maoka.Component> = ({ use }) => {
-	const { hunter } = use(context.consume)
+	const { hunter } = use(client_maoka.context.consume)
 
 	const handle_onmount = () => {
 		const release_loading = hunter.track("background_status.loading", handle_loading)

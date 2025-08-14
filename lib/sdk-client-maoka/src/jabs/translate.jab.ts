@@ -6,9 +6,9 @@
 import { type Maoka, maoka_dom } from "@ordo-pink/oss-maoka"
 import type { ClientSDK } from "@ordo-pink/sdk-client"
 import type { I18n } from "@ordo-pink/oss-i18n"
-import { core_sdk } from "@ordo-pink/sdk-core"
+import { core } from "@ordo-pink/sdk-core"
 
-import type { MaokaSDK } from "../sdk-client-maoka.types"
+import type * as Lib from "../sdk-client-maoka.types"
 import { context } from "../sdk-client-maoka.impl"
 import { zags_jabs } from "./zags.jab"
 
@@ -25,10 +25,10 @@ export const register_translations_jab: (
 
 		state.hunter.shoot("i18n.add_translations", { locale, values })
 
-		maoka_dom.jabs.onunmount(() => state.hunter.shoot("i18n.remove_translations", core_sdk.fns.keys_of(values)))
+		maoka_dom.jabs.onunmount(() => state.hunter.shoot("i18n.remove_translations", core.fns.keys_of(values)))
 	}
 
-export const t_jab$: MaokaSDK.Jabs.T$ = ({ use }) => {
+export const t_jab$: Lib.Jabs.T$ = ({ use }) => {
 	const { i18n$ } = use(context.consume)
 	use(zags_jabs.cheat$(i18n$, "values"))
 
@@ -56,7 +56,7 @@ export const t_jab$: MaokaSDK.Jabs.T$ = ({ use }) => {
 	}
 }
 
-export const translate_jab$: MaokaSDK.Jabs.Translate$ =
+export const translate_jab$: Lib.Jabs.Translate$ =
 	key =>
 	({ use }) => {
 		if (!key) return default_value => default_value ?? key ?? ""

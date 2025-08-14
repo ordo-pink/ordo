@@ -25,13 +25,13 @@ import { oath } from "@ordo-pink/oss-oath"
 
 import type * as Lib from "./b-strategy-codegen-bun.types"
 
-export const create: Lib.Create = algorithm => ({
-	hash: code => oath.from_promise(() => Bun.password.hash(code, algorithm)).pipe(oath.ops.rmap(eio(E))),
-	verify: (hash, code) => oath.from_promise(() => Bun.password.verify(code, hash)).pipe(oath.ops.rmap(eio(E))),
+export const create: Lib.Create = a => ({
+	hash: code => oath.from_promise(() => Bun.password.hash(code, a)).pipe(oath.ops.rmap(eio(RRR))),
+	verify: (code, hash) => oath.from_promise(() => Bun.password.verify(code, hash, a.algorithm)).pipe(oath.ops.rmap(eio(RRR))),
 })
 
 // --- Internal ---
 
-const E = CORE.RRR.REASON.HASHING_ISSUE
+const RRR = CORE.RRR.REASON.HASHING_ISSUE
 
 const eio = curry(core.rrr.eio)

@@ -19,18 +19,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Maoka, type TMaokaChildren } from "@ordo-pink/oss-maoka"
-import { Button } from "@ordo-pink/maoka-components"
-import { maoka_jabs } from "@ordo-pink/maoka-jabs"
-import { MaokaStyled } from "@ordo-pink/maoka-styled"
+import { maoka, maoka_styled, type Maoka } from "@ordo-pink/oss-maoka"
+import { Button } from "@ordo-pink/_maoka-components"
+import { maoka_jabs } from "@ordo-pink/_maoka-jabs"
 
 import "../../maoka-components.css"
 
 type TDialogParams = {
 	title: string
 	custom_class?: string
-	render_icon?: (() => TMaokaChildren) | (() => Promise<TMaokaChildren>)
-	body: () => TMaokaChildren
+	render_icon?: (() => Maoka.Children) | (() => Promise<Maoka.Children>)
+	body: () => Maoka.Children
 	action: () => void | Promise<void>
 	action_text: string
 	action_hotkey?: string
@@ -47,14 +46,14 @@ export const Dialog = ({
 	action_hotkey,
 	action_disabled = () => false,
 }: TDialogParams) =>
-	Maoka.create("div", ({ use }) => {
+	maoka.create("div", ({ use }) => {
 		use(maoka_jabs.set_class("dialog", custom_class))
 
-		const Icon = render_icon ? Maoka.create("div", () => render_icon) : void 0
+		const Icon = render_icon ? maoka.create("div", () => render_icon) : void 0
 
 		return () => [
-			Header(() => () => [Icon, Title(() => () => title)]),
-			Body(() => body),
+			Header(() => [Icon, Title(() => title)]),
+			Body(body),
 			Footer(
 				() => () =>
 					Button.Success({
@@ -67,7 +66,7 @@ export const Dialog = ({
 		]
 	})
 
-const Header = MaokaStyled.Tags.div("dialog_header")
-const Title = MaokaStyled.Tags.h2("dialog_title")
-const Body = MaokaStyled.Tags.div()
-const Footer = MaokaStyled.Tags.div("dialog_footer")
+const Header = maoka_styled.div("dialog_header")
+const Title = maoka_styled.h2("dialog_title")
+const Body = maoka_styled.div()
+const Footer = maoka_styled.div("dialog_footer")

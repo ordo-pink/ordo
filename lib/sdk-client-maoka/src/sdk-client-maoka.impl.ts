@@ -6,12 +6,12 @@
 import { type Maoka, maoka, maoka_context } from "@ordo-pink/oss-maoka"
 import type { ClientSDK } from "@ordo-pink/sdk-client"
 
+import type * as Lib from "./sdk-client-maoka.types"
 import { button_danger, button_neutral, button_primary, button_success } from "./components/button.component"
 import { create_dialog_actions, create_dialog_info, dialog_actions, dialog_info } from "./components/dialog.component"
 import { listen_global_event_jab, listen_jab } from "./jabs/listen.jab"
 import { register_translations_jab, t_jab$, translate_jab$ } from "./jabs/translate.jab"
 import { set_attribute_jab, set_id_jab } from "./jabs/set-attribute.jab"
-import type { MaokaSDK } from "./sdk-client-maoka.types"
 import { actionable_hotkey } from "./components/hotkey.component"
 import { class_jabs } from "./jabs/class.jab"
 import { hunter_jabs } from "./jabs/hunter.jab"
@@ -21,7 +21,7 @@ import { is_sm_screen_jab$ } from "./jabs/is-sm-screen.jab"
 import { set_style_jab } from "./jabs/set-style.jab"
 import { zags_jabs } from "./jabs/zags.jab"
 
-export const context: MaokaSDK.Context = maoka_context.create()
+export const context: Lib.Context = maoka_context.create()
 
 export namespace components {
 	export namespace button {

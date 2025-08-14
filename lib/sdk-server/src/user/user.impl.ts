@@ -52,7 +52,7 @@ export const create: User.Create = (
 ) =>
 	result
 		.of(core.uuid.create())
-		.pipe(result.ops.chain(id => result.merge({ id, t: core.timestamp.create(), ref: ref ?? core.user.create_ref(id, email) })))
+		.pipe(result.ops.map(id => ({ id, t: core.timestamp.create(), ref: ref ?? core.user.create_ref(id, email) })))
 		.pipe(result.ops.map(({ ref, id, t }) => [id, ref, name, sub, t, t, email, ifs, [], p, []] satisfies User.Instance))
 		.cata(result.catas.expect(core.fns.v)) // Never gonna happen
 

@@ -19,10 +19,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { type Core, core_sdk } from "@ordo-pink/sdk-core"
+import { type Core, core } from "@ordo-pink/sdk-core"
 import { maoka, maoka_styled } from "@ordo-pink/oss-maoka"
 import { bs_x } from "@ordo-pink/frontend-icons"
-import { maoka_sdk } from "@ordo-pink/sdk-maoka"
+import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 
 import { user_card, user_card_body, user_card_title } from "../user-card/user-card.component"
 
@@ -30,21 +30,21 @@ import "./user-session.styles.css"
 
 const session_device_info = maoka_styled.div("device-info")
 const session_status = maoka_styled.div("status")
-const session_display = maoka.create<{ session: Core.User.Session }>("div", ({ session, use }) => {
-	const state = use(maoka_sdk.context.consume)
+const session_display = maoka.create<{ session: Core.Session.Instance }>("div", ({ session, use }) => {
+	const state = use(client_maoka.context.consume)
 
-	use(maoka_sdk.jabs.classes.set("session"))
-	use(maoka_sdk.jabs.set_attribute("title", core_sdk.user.get_readable_session(session)))
+	use(client_maoka.jabs.classes.set("session"))
+	use(client_maoka.jabs.set_attribute("title", session[1]))
 
-	const active = core_sdk.user.was_active_in(600 * 1000, session)
-	active ? use(maoka_sdk.jabs.classes.add("active")) : use(maoka_sdk.jabs.classes.remove("active"))
+	const active = core.session.was_active_in(600 * 1000, session)
+	active ? use(client_maoka.jabs.classes.add("active")) : use(client_maoka.jabs.classes.remove("active"))
 
-	const t_remove_session = use(maoka_sdk.jabs.translate$("user_workspace_current_sessions_remove"))
-	const t_modal_title = use(maoka_sdk.jabs.translate$("user_workspace_current_sessions_modal_notification_title"))
-	const t_modal_message = use(maoka_sdk.jabs.translate$("user_workspace_current_sessions_modal_notification_message"))
+	const t_remove_session = use(client_maoka.jabs.translate$("user_workspace_current_sessions_remove"))
+	const t_modal_title = use(client_maoka.jabs.translate$("user_workspace_current_sessions_modal_notification_title"))
+	const t_modal_message = use(client_maoka.jabs.translate$("user_workspace_current_sessions_modal_notification_message"))
 
 	const [show_whoopsie_modal] = use(
-		maoka_sdk.jabs.dialog.info(state, {
+		client_maoka.jabs.dialog.info(state, {
 			render_body: div => void (div.innerHTML = t_modal_message()),
 			title: t_modal_title,
 		}),
@@ -52,14 +52,14 @@ const session_display = maoka.create<{ session: Core.User.Session }>("div", ({ s
 
 	return () => [
 		session_status(),
-		session_device_info(() => session[2]),
+		session_device_info(() => session[1]),
 		bs_x({ on_click: show_whoopsie_modal, title: t_remove_session() }),
 	]
 })
 
-export const sessions_card = maoka.create<{ sessions: Core.User.Session[] }>("div", ({ sessions, use }) => {
-	const t_title = use(maoka_sdk.jabs.translate$("user_workspace_current_sessions_title"))
+export const sessions_card = maoka.create<{ sessions: Core.Session.Instance[] }>("div", ({ sessions, use }) => {
+	const t_title = use(client_maoka.jabs.translate$("user_workspace_current_sessions_title"))
 
 	return () =>
-		user_card(() => [user_card_title(t_title), user_card_body(() => sessions.map(session => session_display({ session })))])
+		user_card(() => [user_card_title(t_title), user_card_body(() => sessions?.map(session => session_display({ session })))])
 })

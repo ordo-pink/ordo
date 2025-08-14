@@ -19,12 +19,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { type User, user } from "@ordo-pink/sdk-core"
+import { type Core, core } from "@ordo-pink/sdk-core"
 import { maoka, maoka_dom, maoka_styled } from "@ordo-pink/oss-maoka"
 import { bs_question_circle } from "@ordo-pink/frontend-icons"
+import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 import { client_rrr } from "@ordo-pink/sdk-client"
 import { get_device_info } from "@ordo-pink/_get-device-info"
-import { maoka_sdk } from "@ordo-pink/sdk-maoka"
 import { oath } from "@ordo-pink/oss-oath"
 
 import { authenticating_user$ } from "../user.state"
@@ -32,14 +32,14 @@ import { authenticating_user$ } from "../user.state"
 import "./modal.styles.css"
 
 export const verify_code_modal = maoka.create("div", ({ use }) => {
-	const { auth$, fetch, hosts, hunter } = use(maoka_sdk.context.consume)
+	const { auth$, fetch, hosts, hunter } = use(client_maoka.context.consume)
 
-	use(maoka_sdk.jabs.classes.set("user_join-modal"))
+	use(client_maoka.jabs.classes.set("user_join-modal"))
 
-	const t_title = use(maoka_sdk.jabs.translate$("user_modals_verify_title"))
-	const t_hint = use(maoka_sdk.jabs.translate$("user_modals_verify_hint"))
-	const t_submit = use(maoka_sdk.jabs.translate$("user_modals_verify_submit"))
-	const t_cancel = use(maoka_sdk.jabs.translate$("user_common_cancel"))
+	const t_title = use(client_maoka.jabs.translate$("user_modals_verify_title"))
+	const t_hint = use(client_maoka.jabs.translate$("user_modals_verify_hint"))
+	const t_submit = use(client_maoka.jabs.translate$("user_modals_verify_submit"))
+	const t_cancel = use(client_maoka.jabs.translate$("user_common_cancel"))
 
 	const handle_cancel_click = () => void hunter.shoot("modal.hide")
 
@@ -63,7 +63,7 @@ export const verify_code_modal = maoka.create("div", ({ use }) => {
 			return
 		}
 
-		if (!user.current.validations.is_email(email)) {
+		if (!core.user.email_guard(email)) {
 			authenticating_user$.update("email", () => "")
 			authenticating_user$.update("code", () => "")
 
@@ -75,15 +75,15 @@ export const verify_code_modal = maoka.create("div", ({ use }) => {
 
 		void oath
 			.of(new Headers())
-			.pipe(oath.ops.tap(h => h.append("X-Device", get_device_info(navigator))))
+			.pipe(oath.ops.tap(h => h.append("X-Device", get_device_info.get_device_info(navigator))))
 			.pipe(oath.ops.tap(h => h.append("Content-Type", "application/json")))
 			.pipe(oath.ops.map(headers => ({ headers, method: "POST", credentials: "include" as const })))
-			.pipe(oath.ops.map(init => ({ ...init, body: JSON.stringify({ code: Number(code), email }) })))
-			.pipe(oath.ops.chain(init => oath.from_promise(() => fetch(`${hosts.au}/verify-code`, init))))
+			.pipe(oath.ops.map(init => ({ ...init, body: JSON.stringify([email, code]) })))
+			.pipe(oath.ops.chain(init => oath.from_promise(() => fetch(`${hosts.id}/auth/verify-code`, init))))
 			.pipe(oath.ops.chain(res => oath.if(res.status < 300, { t: () => res })))
-			.pipe(oath.ops.and(res => res.json() as Promise<User.Current.DTO>))
+			.pipe(oath.ops.and(res => res.json() as Promise<Core.User.Instance>))
 			.pipe(oath.ops.tap(() => authenticating_user$.each({ email: () => "", code: () => "" })))
-			.pipe(oath.ops.tap(dto => auth$.update("user", () => user.current.from_dto(...dto))))
+			.pipe(oath.ops.tap(user => auth$.update("user", () => user)))
 			.pipe(oath.ops.tap(() => hunter.shoot("modal.hide")))
 			.cata(oath.catas.to_promise())
 			.finally(() => hunter.shoot("background_status.none"))
@@ -94,8 +94,8 @@ export const verify_code_modal = maoka.create("div", ({ use }) => {
 		hint(t_hint),
 		code_input(),
 		button_section(() => [
-			maoka_sdk.components.button.neutral({ hotkey: "escape", kindergarten: t_cancel, on_click: handle_cancel_click }),
-			maoka_sdk.components.button.primary({ hotkey: "enter", kindergarten: t_submit, on_click: handle_ok_click }),
+			client_maoka.components.button.neutral({ hotkey: "escape", kindergarten: t_cancel, on_click: handle_cancel_click }),
+			client_maoka.components.button.primary({ hotkey: "enter", kindergarten: t_submit, on_click: handle_ok_click }),
 		]),
 	]
 })
@@ -109,7 +109,7 @@ const button_section = maoka_styled.div("user_join-modal_actions")
 const hint = maoka_styled.p()
 
 const code_input = maoka.create("label", ({ use }) => {
-	use(maoka_sdk.jabs.classes.set("user_join-modal_email_wrapper"))
+	use(client_maoka.jabs.classes.set("user_join-modal_email_wrapper"))
 
 	return () => [bs_question_circle({}), input()]
 })
@@ -124,11 +124,11 @@ const input = maoka_styled.input("user_join-modal_email", ({ use }) => {
 		authenticating_user$.update("code", () => target.value)
 	}
 
-	use(maoka_sdk.jabs.set_id("code-input"))
-	use(maoka_sdk.jabs.set_attribute("type", "number"))
-	use(maoka_sdk.jabs.set_attribute("placeholder", t_placeholer))
-	use(maoka_sdk.jabs.listen("oninput", handle_input))
+	use(client_maoka.jabs.set_id("code-input"))
+	use(client_maoka.jabs.set_attribute("type", "number"))
+	use(client_maoka.jabs.set_attribute("placeholder", t_placeholer))
+	use(client_maoka.jabs.listen("oninput", handle_input))
 	use(maoka_dom.jabs.onmount(handle_mount))
 
-	if (value) use(maoka_sdk.jabs.set_attribute("value", value))
+	if (value) use(client_maoka.jabs.set_attribute("value", value))
 })

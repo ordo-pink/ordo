@@ -58,10 +58,10 @@ export namespace client_sdk {
 					update: direct_zags_update_not_permitted,
 				}
 			})(),
-			rotor$: (() => {
+			aist$: (() => {
 				if (!permissions.queries.includes("rotor$")) return create_zags({}) as any
 				return {
-					...global_state.rotor$,
+					...global_state.aist$,
 					each: direct_zags_update_not_permitted,
 					replace: direct_zags_update_not_permitted,
 					update: direct_zags_update_not_permitted,

@@ -47,8 +47,9 @@ export const create: Lib.Create = (env, mut) =>
 
 export const fail = (logger: Core.Logger) => (rrr: Core.Rrr.Instance) => {
 	const headers = new Headers()
+
 	const status = sweech
-		.match(rrr.type)
+		.match(rrr?.type)
 		.case([CORE.RRR.TYPE.EAGAIN, CORE.RRR.TYPE.ENXIO], () => 408)
 		.case([CORE.RRR.TYPE.EFBIG, CORE.RRR.TYPE.ENOSPC], () => 413)
 		.case(CORE.RRR.TYPE.EINVAL, () => 400)
@@ -58,8 +59,8 @@ export const fail = (logger: Core.Logger) => (rrr: Core.Rrr.Instance) => {
 		.case(CORE.RRR.TYPE.EEXIST, () => 409)
 		.default(() => 500)
 
-	if (rrr.debug) logger.debug(CORE.RRR.TYPE[rrr.type], rrr.debug)
-	if (rrr.message) headers.set("X-Reason", String(rrr.message))
+	if (rrr?.debug) logger.debug(CORE.RRR.TYPE[rrr.type], rrr.debug)
+	if (rrr?.message) headers.set("X-Reason", String(rrr.message))
 
 	return new Response("", { status, headers })
 }

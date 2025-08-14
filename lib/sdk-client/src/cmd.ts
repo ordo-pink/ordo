@@ -7,6 +7,7 @@ import type { Core } from "@ordo-pink/sdk-core"
 import type { I18n } from "@ordo-pink/oss-i18n"
 
 import type { ClientSDK } from "./sdk-client.types"
+import type { Aist } from "@ordo-pink/oss-aist"
 
 declare global {
 	interface cmd {
@@ -46,10 +47,10 @@ declare global {
 			rrr: { args: Core.Rrr.Instance & { message: ClientSDK.Translations.Key } }
 		}
 		router: {
-			set_hash: { args: string }
+			set_hash: { args: Aist.Hash }
 			set_href: { args: string }
-			set_pathname: { args: string }
-			set_search: { args: string | Record<string, string> }
+			set_pathname: { args: Aist.Pathname }
+			set_search: { args: Aist.Search | Record<string, string> }
 		}
 		sidebar: {
 			enable: { args: void }

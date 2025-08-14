@@ -23,11 +23,11 @@ import { die, run_command } from "@ordo-pink/cli-runner"
 import { getc } from "@ordo-pink/_getc"
 import { oath } from "@ordo-pink/oss-oath"
 
-const { ORDO_ID_HOST, ORDO_DT_HOST, ORDO_PB_HOST, ORDO_AU_HOST } = getc([
-	"ORDO_AU_HOST",
-	"ORDO_ID_HOST",
-	"ORDO_DT_HOST",
-	"ORDO_PB_HOST",
+const { ORDO_ID_PUBLIC_HOST, ORDO_DT_PUBLIC_HOST, ORDO_PB_PUBLIC_HOST, ORDO_AU_PUBLIC_HOST } = getc([
+	"ORDO_AU_PUBLIC_HOST",
+	"ORDO_ID_PUBLIC_HOST",
+	"ORDO_DT_PUBLIC_HOST",
+	"ORDO_PB_PUBLIC_HOST",
 ])
 
 void run_command("npm run dev", {
@@ -36,10 +36,10 @@ void run_command("npm run dev", {
 	stdout: "inherit",
 	env: {
 		...process.env,
-		VITE_ORDO_ID_HOST: ORDO_ID_HOST,
-		VITE_ORDO_PB_HOST: ORDO_PB_HOST,
-		VITE_ORDO_DT_HOST: ORDO_DT_HOST,
-		VITE_ORDO_AU_HOST: ORDO_AU_HOST,
+		VITE_ORDO_ID_HOST: ORDO_ID_PUBLIC_HOST,
+		VITE_ORDO_PB_HOST: ORDO_PB_PUBLIC_HOST,
+		VITE_ORDO_DT_HOST: ORDO_DT_PUBLIC_HOST,
+		VITE_ORDO_AU_HOST: ORDO_AU_PUBLIC_HOST,
 		FORCE_COLOR: "1",
 	},
 }).cata(oath.catas.or_else(die()))

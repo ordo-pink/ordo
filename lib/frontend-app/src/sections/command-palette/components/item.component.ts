@@ -19,36 +19,36 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { components, jabs, maoka_sdk } from "@ordo-pink/sdk-maoka"
 import { maoka, maoka_dom, maoka_styled } from "@ordo-pink/oss-maoka"
 import type { ClientSDK } from "@ordo-pink/sdk-client"
+import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 
 export const command_palette_item = maoka.create<{ item: ClientSDK.CommandPalette.Item.Instance; active: boolean }>(
 	"div",
 	({ active, item, use }) => {
-		const { hunter } = use(maoka_sdk.context.consume)
+		const { hunter } = use(client_maoka.context.consume)
 
 		const handle_click = () => {
 			hunter.shoot("command_palette.hide")
 			item.value()
 		}
-		const t_name = use(jabs.translate$(item.readable_name))
-		const t_description = use(jabs.translate$(item.description))
+		const t_name = use(client_maoka.jabs.translate$(item.readable_name))
+		const t_description = use(client_maoka.jabs.translate$(item.description))
 
-		use(maoka_sdk.jabs.set_id(String(item.id)))
-		use(maoka_sdk.jabs.classes.set("command-palette_item"))
-		use(maoka_sdk.jabs.listen("onclick", handle_click))
+		use(client_maoka.jabs.set_id(String(item.id)))
+		use(client_maoka.jabs.classes.set("command-palette_item"))
+		use(client_maoka.jabs.listen("onclick", handle_click))
 
-		if (active) use(maoka_sdk.jabs.classes.add("active"))
-		else use(maoka_sdk.jabs.classes.remove("active"))
+		if (active) use(client_maoka.jabs.classes.add("active"))
+		else use(client_maoka.jabs.classes.remove("active"))
 
 		return () => {
-			use(maoka_sdk.jabs.set_attribute("title", t_description()))
+			use(client_maoka.jabs.set_attribute("title", t_description()))
 
 			return [
 				item_main(() => [
 					item_title(() => [item.render_icon && item_icon({ render: item.render_icon }), t_name()]),
-					item.hotkey && item_info(() => components.hotkey({ hotkey: item.hotkey!, decoration_only: true })),
+					item.hotkey && item_info(() => client_maoka.components.hotkey({ hotkey: item.hotkey!, decoration_only: true })),
 				]),
 				item_footer(() => t_description()),
 			]

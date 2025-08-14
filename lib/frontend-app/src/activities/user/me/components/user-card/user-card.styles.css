@@ -1,9 +1,9 @@
 .user-card {
-	@apply flex h-full w-full flex-col gap-4 break-words rounded-md bg-neutral-100 p-4 shadow-sm;
+	@apply flex h-full w-full flex-col gap-4 break-words rounded-md bg-neutral-100 p-4 shadow-sm dark:bg-neutral-950;
 }
 
 .user-card.under-construction {
-	@apply bg-neutral-200 shadow-none;
+	@apply bg-neutral-200 shadow-none dark:bg-neutral-900;
 }
 
 .user-card > .title {

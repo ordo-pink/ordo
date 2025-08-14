@@ -19,22 +19,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { maoka_sdk } from "@ordo-pink/sdk-maoka"
+import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 
 import { maoka, maoka_dom } from "@ordo-pink/oss-maoka"
 
 import { modal$ } from "../modal.state"
 
 export const overlay = maoka.create("div", ({ kindergarten, use }) => {
-	const { hunter } = use(maoka_sdk.context.consume)
+	const { hunter } = use(client_maoka.context.consume)
 
-	const handle_show = () => use(maoka_sdk.jabs.classes.add("active"))
-	const handle_hide = () => use(maoka_sdk.jabs.classes.remove("active"))
+	const handle_show = () => use(client_maoka.jabs.classes.add("active"))
+	const handle_hide = () => use(client_maoka.jabs.classes.remove("active"))
 	const handle_click = () => hunter.shoot("modal.hide")
 	const handle_mount = () => modal$.cheat("instance", instance => (instance ? handle_show() : handle_hide()))
 
-	use(maoka_sdk.jabs.classes.set("modal_wrapper"))
-	use(maoka_sdk.jabs.listen("onclick", handle_click))
+	use(client_maoka.jabs.classes.set("modal_wrapper"))
+	use(client_maoka.jabs.listen("onclick", handle_click))
 	use(maoka_dom.jabs.onmount(handle_mount))
 
 	return kindergarten

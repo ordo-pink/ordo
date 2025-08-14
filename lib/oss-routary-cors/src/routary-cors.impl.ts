@@ -46,7 +46,7 @@ export const create: Lib.Create =
 				if (typeof allowed_origins === "string") allowed_origins = [allowed_origins]
 				const origin = params.request.headers.get("origin")
 
-				if (!origin || (!allowed_origins.includes(origin) && !allowed_origins.includes("*"))) return {} as any
+				if (!origin || (!allowed_origins.includes(origin) && !allowed_origins.includes("*"))) return
 
 				params.response.headers.set("Access-Control-Allow-Origin", origin)
 
@@ -55,8 +55,6 @@ export const create: Lib.Create =
 				if (allow_credentials) params.response.headers.set("Access-Control-Allow-Credentials", "true")
 				if (max_age) params.response.headers.set("Access-Control-Max-Age", String(max_age))
 				if (allowed_headers.length) params.response.headers.set("Access-Control-Allow-Headers", allowed_headers.join(", "))
-
-				return {} as any
 			},
 		}
 	}

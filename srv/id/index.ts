@@ -25,13 +25,14 @@ import type { Routary } from "@ordo-pink/oss-routary"
 import type { ServerRoutary } from "@ordo-pink/sdk-server-routary"
 import { codegen_strategy_bun } from "@ordo-pink/b-strategy-codegen-bun"
 import { data_repository_fs } from "@ordo-pink/b-repository-data-fs"
+import { oath } from "@ordo-pink/oss-oath"
 import { result } from "@ordo-pink/oss-result"
 import { rickroll } from "@ordo-pink/oss-rickroll"
 import { server_id } from "@ordo-pink/b-server-id"
 import { user_repository_data } from "@ordo-pink/b-repository-user-repository-data"
 import { wjwt as wjwt_lib } from "@ordo-pink/oss-wjwt"
 
-const main = () => {
+const main = async () => {
 	const path = "var/dt"
 	const codegen_algorithm = { algorithm: "bcrypt", cost: 4 } as const
 	const data_repository = data_repository_fs.create(path)
@@ -42,7 +43,18 @@ const main = () => {
 	const email_strategy: Server.Email.Strategy = { send: (_, __, content) => Promise.resolve(logger.debug(content)) }
 	const codegen = codegen_strategy_bun.create(codegen_algorithm)
 	const allowed_origins = ["http://localhost:3000" as const]
-	const wjwt = wjwt_lib.create("Ed25519", null as any, null as any, "", "", 60 * 24 * 30)
+	const priv = await private_key.cata(
+		oath.catas.or_else(() => {
+			throw new Error("Missing private key for JWT")
+		}),
+	)
+	const pub = await public_key.cata(
+		oath.catas.or_else(() => {
+			throw new Error("Missing public key for JWT")
+		}),
+	)
+
+	const wjwt = wjwt_lib.create("Ed25519", priv, pub, "http://localhost:3000", "http://localhost:3001", 60 * 24 * 30)
 
 	// Set to any until bun types are fixed
 	const fetch: any = server_id
@@ -76,6 +88,28 @@ const logger: Core.Logger = {
 	warn: (...message) => core.logger.stout.warn("[ID]", ...message),
 }
 
+const get_alg = () => oath.from_nullable(Bun.env.ORDO_ID_SESSION_TOKEN_ALGORITHM)
+
+// TODO Clean up, add checks
+const private_key = oath
+	.from_nullable(Bun.env.ORDO_ID_SESSION_TOKEN_PRIVATE_KEY)
+	.pipe(oath.ops.chain(key => get_alg().pipe(oath.ops.map(alg => [alg, key]))))
+	.pipe(
+		oath.ops.chain(([alg, str]) =>
+			oath.from_promise(() => crypto.subtle.importKey("jwk", JSON.parse(str), alg as any, true, ["sign"])),
+		),
+	)
+
+// TODO Clean up, add checks
+const public_key = oath
+	.from_nullable(Bun.env.ORDO_ID_SESSION_TOKEN_PUBLIC_KEY)
+	.pipe(oath.ops.chain(key => get_alg().pipe(oath.ops.map(alg => [alg, key]))))
+	.pipe(
+		oath.ops.chain(([alg, str]) =>
+			oath.from_promise(() => crypto.subtle.importKey("jwk", JSON.parse(str), alg as any, true, ["verify"])),
+		),
+	)
+
 const port = result
 	.from_nullable(Bun.env.ORDO_ID_PORT)
 	.pipe(result.ops.chain(port => result.if(server.is_port(port), { on_true: () => port })))
@@ -102,4 +136,4 @@ const catcher: Routary.Catcher<ServerRoutary.ArgsEnv, ServerRoutary.Mut> = ({ en
 	return new Response("", { status: 500 })
 }
 
-main()
+main().catch(console.error)

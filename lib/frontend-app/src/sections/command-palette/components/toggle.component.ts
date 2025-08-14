@@ -19,14 +19,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { context, maoka_sdk } from "@ordo-pink/sdk-maoka"
 import { maoka, maoka_dom } from "@ordo-pink/oss-maoka"
 import { bs_menu_button_wide_fill } from "@ordo-pink/frontend-icons"
+import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 
 import { activity_bar_icon } from "../../activity-bar/components/activity-bar-icon.component"
 
 export const command_palette_toggle = maoka.create("div", ({ use, node }) => {
-	const { hunter } = use(context.consume)
+	const { hunter } = use(client_maoka.context.consume)
 
 	const render_icon = (span: HTMLSpanElement) => maoka_dom.render(span, bs_menu_button_wide_fill(), node.root.create_id)
 	const is_current = false
@@ -43,10 +43,10 @@ export const command_palette_toggle = maoka.create("div", ({ use, node }) => {
 		}
 	}
 
-	use(maoka_sdk.jabs.classes.set("activity-bar_link"))
-	use(maoka_sdk.jabs.set_attribute("tabindex", "1"))
-	use(maoka_sdk.jabs.listen("onclick", handle_click))
-	use(maoka_sdk.jabs.listen("onkeydown", handle_keydown))
+	use(client_maoka.jabs.classes.set("activity-bar_link"))
+	use(client_maoka.jabs.set_attribute("tabindex", "1"))
+	use(client_maoka.jabs.listen("onclick", handle_click))
+	use(client_maoka.jabs.listen("onkeydown", handle_keydown))
 
 	return () => activity_bar_icon({ is_current, render_icon, readable_name })
 })

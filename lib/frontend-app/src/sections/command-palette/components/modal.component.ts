@@ -20,10 +20,10 @@
  */
 
 import { COMMAND_PALETTE, client_sdk } from "@ordo-pink/sdk-client"
-import { components, context, maoka_sdk } from "@ordo-pink/sdk-maoka"
 import { maoka, maoka_styled } from "@ordo-pink/oss-maoka"
 import { bs_question_circle } from "@ordo-pink/frontend-icons"
-import { core_sdk } from "@ordo-pink/sdk-core"
+import { client_maoka } from "@ordo-pink/sdk-client-maoka"
+import { core } from "@ordo-pink/sdk-core"
 
 import { command_palette$ } from "../command-palette.state"
 import { command_palette_items } from "./items.component"
@@ -31,10 +31,10 @@ import { command_palette_search } from "./search.component"
 
 // TODO create subitems if item is found with fuzzy search but the match is not exact
 export const command_palette_modal = maoka.create("div", ({ use }) => {
-	const { hunter } = use(context.consume)
-	const is_darwin = use(maoka_sdk.jabs.is_darwin)
-	const is_mobile = use(maoka_sdk.jabs.is_mobile)
-	const get_current = use(maoka_sdk.jabs.zags.cheat$(command_palette$, "current" as const))
+	const { hunter } = use(client_maoka.context.consume)
+	const is_darwin = use(client_maoka.jabs.is_darwin)
+	const is_mobile = use(client_maoka.jabs.is_mobile)
+	const get_current = use(client_maoka.jabs.zags.cheat$(command_palette$, "current" as const))
 
 	const handle_click = (event: MouseEvent) => event.stopPropagation()
 	const handle_global_keydown = (event: KeyboardEvent) => {
@@ -48,7 +48,7 @@ export const command_palette_modal = maoka.create("div", ({ use }) => {
 
 		if (current) {
 			const filtered_items = current.items.filter(i =>
-				core_sdk.fns.fuzzy_check(i.readable_name, command_palette$.select("search_value"), COMMAND_PALETTE.FUZZY_CHECK_RATIO),
+				core.fns.fuzzy_check(i.readable_name, command_palette$.select("search_value"), COMMAND_PALETTE.FUZZY_CHECK_RATIO),
 			)
 
 			if (current.is_multiple && event.code === "Tab")
@@ -91,10 +91,10 @@ export const command_palette_modal = maoka.create("div", ({ use }) => {
 		}
 	}
 
-	use(maoka_sdk.jabs.set_id("cp"))
-	use(maoka_sdk.jabs.classes.set("command-palette"))
-	use(maoka_sdk.jabs.listen("onclick", handle_click))
-	use(maoka_sdk.jabs.listen_global_event("keydown", handle_global_keydown))
+	use(client_maoka.jabs.set_id("cp"))
+	use(client_maoka.jabs.classes.set("command-palette"))
+	use(client_maoka.jabs.listen("onclick", handle_click))
+	use(client_maoka.jabs.listen_global_event("keydown", handle_global_keydown))
 
 	return () => {
 		const current = get_current() ?? null
@@ -110,9 +110,9 @@ export const command_palette_modal = maoka.create("div", ({ use }) => {
 					: internal.footer(() => [
 							bs_question_circle({ classes: "mr-2" }),
 							internal.text_span(() => "Type to search. Arrows to navigate."), // TODO i18n
-							components.hotkey({ hotkey: "enter", decoration_only: true }),
+							client_maoka.components.hotkey({ hotkey: "enter", decoration_only: true }),
 							internal.text_span(() => "to select item."), // TODO i18n
-							components.hotkey({ hotkey: "escape", decoration_only: true }),
+							client_maoka.components.hotkey({ hotkey: "escape", decoration_only: true }),
 							internal.text_span(() => "to close."), // TODO i18n
 						]),
 			]

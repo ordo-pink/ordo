@@ -38,7 +38,7 @@ export const create_service: T.CreateService = (codegen, lifetime_seconds, logge
 
 		for (const [email, values] of storage.entries()) {
 			for (const value of values) {
-				if (now - value[0] > lifetime_seconds) {
+				if (now - value[0] < lifetime_seconds) {
 					storage.set(email, values.toSpliced(values.indexOf(value), 1))
 					logger.debug("Removed outdated code for", server.user.obfuscate_email(email))
 				}
@@ -51,7 +51,8 @@ export const create_service: T.CreateService = (codegen, lifetime_seconds, logge
 			const code = generate()
 
 			return oath
-				.from_nullable(storage.get(email), enoent(CORE.RRR.REASON.USER_NOT_FOUND))
+				.from_nullable(storage.get(email))
+				.pipe(oath.ops.fix(() => []))
 				.pipe(oath.ops.chain(values => codegen.hash(code).pipe(oath.ops.map(hash => [values, hash]))))
 				.pipe(oath.ops.map(([values, hash]) => [...values, [core.timestamp.create(), hash] as T.Value]))
 				.pipe(oath.ops.map(values => storage.set(email, values)))

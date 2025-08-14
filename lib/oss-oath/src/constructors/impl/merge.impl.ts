@@ -56,6 +56,7 @@ export const merge: Oath.Constructors.Merge = values => {
 			} else {
 				resolved_values[key] = value
 				resolved_length++
+
 				if (resolved_length === keys.length) outer_resolve(resolved_values)
 			}
 		})
@@ -108,6 +109,8 @@ export const all: Oath.Constructors.All = values => {
 			} else {
 				resolved_values.push(value)
 				resolved_length++
+
+				if (resolved_length === values.length) outer_resolve(resolved_values)
 			}
 		})
 	})
@@ -120,16 +123,18 @@ export const any: Oath.Constructors.Any = values => {
 	let rejected_length = 0
 
 	return create((outer_resolve: any, outer_reject: any) => {
-		if (!values.length) return outer_resolve([])
+		if (!values.length) return outer_resolve()
 
 		for (const value of values as any[]) {
+			if (resolved) break
+
 			if (value?.is_oath) {
 				value.cata({
 					reject: (e: any) => {
 						rejected_values.push(e)
 						rejected_length++
 
-						if (!resolved && rejected_length === values.length) outer_reject(rejected_values)
+						if (rejected_length === values.length) outer_reject(rejected_values)
 					},
 					resolve: (s: any) => {
 						if (!resolved) {
@@ -150,10 +155,11 @@ export const any: Oath.Constructors.Any = values => {
 						rejected_values.push(e)
 						rejected_length++
 
-						if (!resolved && rejected_length === values.length) outer_resolve(rejected_values)
+						if (rejected_length === values.length) outer_reject(rejected_values)
 					},
 				)
 			} else {
+				resolved = true
 				outer_resolve(value)
 			}
 		}

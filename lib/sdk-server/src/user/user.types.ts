@@ -48,7 +48,7 @@ export type Create = (...args: CreateArgs) => Instance
 export type Repository = {
 	create: (user: Instance) => Oath.Instance<Instance, Core.Rrr.Instance<"EIO" | "EEXIST">>
 	read: (id: Core.User.Id) => Oath.Instance<Instance, Core.Rrr.Instance<"EIO" | "ENOENT">>
-	update: (id: Core.User.Id, dto: Instance) => Oath.Instance<Instance, Core.Rrr.Instance<"EIO" | "ENOENT">>
+	update: (user: Instance) => Oath.Instance<Instance, Core.Rrr.Instance<"EIO" | "ENOENT">>
 	delete: (id: Core.User.Id) => Oath.Instance<void, Core.Rrr.Instance<"EIO" | "ENOENT">>
 
 	get_by_email: (email: Core.User.Email) => Oath.Instance<Instance, Core.Rrr.Instance<"EIO" | "ENOENT">>

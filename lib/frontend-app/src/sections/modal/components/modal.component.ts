@@ -21,7 +21,7 @@
 
 import { maoka, maoka_dom } from "@ordo-pink/oss-maoka"
 import { MODAL } from "@ordo-pink/sdk-client"
-import { maoka_sdk } from "@ordo-pink/sdk-maoka"
+import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 import { sweech } from "@ordo-pink/oss-sweech"
 
 import { modal$ } from "../modal.state"
@@ -29,10 +29,10 @@ import { modal$ } from "../modal.state"
 export const modal = maoka.create("div", ({ use }) => {
 	let onunmount: (() => void) | undefined
 
-	const get_modal_instance = use(maoka_sdk.jabs.zags.cheat$(modal$, "instance"))
+	const get_modal_instance = use(client_maoka.jabs.zags.cheat$(modal$, "instance"))
 
-	use(maoka_sdk.jabs.classes.set("modal"))
-	use(maoka_sdk.jabs.listen("onclick", event => event.stopPropagation()))
+	use(client_maoka.jabs.classes.set("modal"))
+	use(client_maoka.jabs.listen("onclick", event => event.stopPropagation()))
 
 	return () => {
 		const modal_instance = get_modal_instance()
@@ -44,7 +44,7 @@ export const modal = maoka.create("div", ({ use }) => {
 
 		if (modal_instance) {
 			if (modal_instance.onunmount) onunmount = modal_instance.onunmount
-			if (modal_instance.size != null) use(maoka_sdk.jabs.classes.add(internal.modal_size_to_class(modal_instance.size)))
+			if (modal_instance.size != null) use(client_maoka.jabs.classes.add(internal.modal_size_to_class(modal_instance.size)))
 
 			return content_wrapper()
 		} else {

@@ -20,12 +20,12 @@
  */
 
 import { type Maoka } from "@ordo-pink/oss-maoka"
-import { maoka_sdk } from "@ordo-pink/sdk-maoka"
+import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 
 import { title } from "./components/title.component"
 
 export const window_title_jab: Maoka.Jab<() => Maoka.Component> = ({ use }) => {
-	const { hunter } = use(maoka_sdk.context.consume)
+	const { hunter } = use(client_maoka.context.consume)
 
 	hunter.shoot("title.set_title", "loading_title")
 

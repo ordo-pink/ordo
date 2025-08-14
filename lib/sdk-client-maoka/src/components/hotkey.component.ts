@@ -3,24 +3,24 @@
  * SPDX-License-Identifier: Unlicense
  */
 
+import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 import { client_sdk } from "@ordo-pink/sdk-client"
 import { maoka } from "@ordo-pink/oss-maoka"
 import { sweech } from "@ordo-pink/oss-sweech"
 import { title_case } from "@ordo-pink/_tau"
 
-import { MaokaSDK } from "../sdk-client-maoka.types"
+import type * as ClientMaoka from "../sdk-client-maoka.types"
 
 import "./hotkey.styles.css"
-import { maoka_sdk } from "@ordo-pink/sdk-maoka"
 
-export const actionable_hotkey = maoka.create<MaokaSDK.Components.HotkeyArgs>(
+export const actionable_hotkey = maoka.create<ClientMaoka.Components.HotkeyArgs>(
 	"div",
 	({ decoration_only, hotkey, node, prevent_in_contenteditable, prevent_in_inputs, show_in_mobile, use }) => {
-		const is_darwin = use(maoka_sdk.jabs.is_darwin)
+		const is_darwin = use(client_maoka.jabs.is_darwin)
 
-		use(maoka_sdk.jabs.classes.set("hotkey"))
-		if (show_in_mobile) use(maoka_sdk.jabs.classes.add("mobile"))
-		if (!decoration_only) use(maoka_sdk.jabs.listen_global_event("keydown", e => handle_keydown(e)))
+		use(client_maoka.jabs.classes.set("hotkey"))
+		if (show_in_mobile) use(client_maoka.jabs.classes.add("mobile"))
+		if (!decoration_only) use(client_maoka.jabs.listen_global_event("keydown", e => handle_keydown(e)))
 
 		const split = hotkey.split("+")
 		const meta = is_darwin ? hotkey_button({ key: "⌥" }) : hotkey_button({ key: "Alt" })
@@ -65,7 +65,7 @@ export const actionable_hotkey = maoka.create<MaokaSDK.Components.HotkeyArgs>(
 const IGNORED_KEYS = ["Control", "Shift", "Alt", "Meta"]
 
 const hotkey_button = maoka.create<{ key: string }>("kbd", ({ use, key }) => {
-	use(maoka_sdk.jabs.classes.set("key-container"))
+	use(client_maoka.jabs.classes.set("key-container"))
 
 	return () =>
 		sweech

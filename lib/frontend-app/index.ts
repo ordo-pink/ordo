@@ -19,10 +19,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { context, maoka_sdk } from "@ordo-pink/sdk-maoka"
 import { maoka, maoka_styled } from "@ordo-pink/oss-maoka"
 import { type ClientSDK } from "@ordo-pink/sdk-client"
 import type { Core } from "@ordo-pink/sdk-core"
+import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 import { hunt } from "@ordo-pink/oss-hunt"
 
 import { auth_jab } from "./src/state/auth"
@@ -32,7 +32,7 @@ import { create_command_palette_jab } from "./src/sections/command-palette"
 import { create_i18n_jab } from "./src/state/i18n"
 import { create_modal_jab } from "./src/sections/modal"
 import { create_notifications_jab } from "./src/sections/notifications"
-import { create_rotor_jab } from "./src/state/rotor"
+import { create_rotor_jab } from "./src/state/aist"
 import { create_sidebar_jab } from "./src/sections/workspace"
 import { create_user_jab } from "./src/activities/user"
 import { init_activities_jab } from "./src/state/activities"
@@ -66,15 +66,15 @@ export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
 		return native_fetch(input, init)
 	}
 
-	const rotor$ = use(create_rotor_jab(hunter))
+	const aist$ = use(create_rotor_jab(hunter))
 	const i18n$ = use(create_i18n_jab(hunter))
-	const activities$ = use(init_activities_jab(hunter, rotor$))
+	const activities$ = use(init_activities_jab(hunter, aist$))
 	const auth$ = use(auth_jab(fetch, hosts, hunter))
 
-	const state = { auth$, fetch, hosts: Object.freeze(hosts), hunter, logger, rotor$, i18n$, activities$ }
+	const state = { auth$, fetch, hosts: Object.freeze(hosts), hunter, logger, aist$, i18n$, activities$ }
 
-	use(context.provide(state))
-	use(maoka_sdk.jabs.register_translations("en", en_rrr_codes))
+	use(client_maoka.context.provide(state))
+	use(client_maoka.jabs.register_translations("en", en_rrr_codes))
 	use(create_user_jab)
 
 	const title = use(window_title_jab)

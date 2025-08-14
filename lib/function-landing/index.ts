@@ -21,9 +21,9 @@
 
 import { LOCALE } from "@ordo-pink/oss-i18n"
 import { bs_house } from "@ordo-pink/frontend-icons"
+import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 import { client_sdk } from "@ordo-pink/sdk-client"
 import { maoka_dom } from "@ordo-pink/oss-maoka"
-import { maoka_sdk } from "@ordo-pink/sdk-maoka"
 
 import { workspace } from "./src/components/workspace.component"
 
@@ -44,7 +44,7 @@ export default client_sdk.create_f(
 	state => {
 		const create_id = () => crypto.randomUUID()
 		const icon = bs_house()
-		const workspace_with_state = maoka_sdk.components.with_state(state, workspace)
+		const workspace_with_state = client_maoka.components.with_state(state, workspace)
 
 		state.hunter.shoot("i18n.add_translations", {
 			locale: LOCALE.ENGLISH,

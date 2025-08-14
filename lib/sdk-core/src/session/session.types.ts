@@ -14,8 +14,6 @@ export type Name = string
 
 export type Instance = [issued_at: IssuedAt, name: Name]
 
-export type Create = (name: Name) => Instance
-
 export type GetIssuedAt = (session: Instance) => IssuedAt
 export type GetName = (session: Instance) => Name
 

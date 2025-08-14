@@ -20,13 +20,13 @@
  */
 
 import { type Maoka, maoka, maoka_dom } from "@ordo-pink/oss-maoka"
-import { maoka_sdk } from "@ordo-pink/sdk-maoka"
+import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 import { sweech } from "@ordo-pink/oss-sweech"
 
 import { sidebar$ } from "../workspace.state"
 
 export const workspace = maoka.create("main", ({ use, node }) => {
-	use(maoka_sdk.jabs.classes.set("workspace"))
+	use(client_maoka.jabs.classes.set("workspace"))
 
 	return () => [workspace_renderer(), sidebar_padding_contractor({ parent_node: node })]
 })
@@ -34,7 +34,7 @@ export const workspace = maoka.create("main", ({ use, node }) => {
 // --- Internal ---
 
 const sidebar_padding_contractor = maoka.create<{ parent_node: Maoka.Node }>("div", ({ parent_node, use }) => {
-	const get_sidebar = use(maoka_sdk.jabs.zags.marry$(sidebar$))
+	const get_sidebar = use(client_maoka.jabs.zags.marry$(sidebar$))
 
 	return () => {
 		const sidebar = get_sidebar()
@@ -48,10 +48,10 @@ const sidebar_padding_contractor = maoka.create<{ parent_node: Maoka.Node }>("di
 })
 
 const workspace_renderer = maoka.create("div", ({ node, use }) => {
-	const { activities$ } = use(maoka_sdk.context.consume)
+	const { activities$ } = use(client_maoka.context.consume)
 
-	use(maoka_sdk.jabs.classes.set("h-full")) // TODO Move to CSS
-	const get_current_activity = use(maoka_sdk.jabs.zags.cheat$(activities$, "current"))
+	use(client_maoka.jabs.classes.set("h-full")) // TODO Move to CSS
+	const get_current_activity = use(client_maoka.jabs.zags.cheat$(activities$, "current"))
 
 	return async () => {
 		const current_activity = get_current_activity()

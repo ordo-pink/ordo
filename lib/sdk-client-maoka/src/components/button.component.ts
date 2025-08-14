@@ -5,34 +5,34 @@
 
 import { maoka, maoka_dom, maoka_styled } from "@ordo-pink/oss-maoka"
 
-import { MaokaSDK } from "../sdk-client-maoka.types"
+import type * as ClientMaoka from "../sdk-client-maoka.types"
 import { actionable_hotkey } from "./hotkey.component"
 
 import "./button.styles.css"
-import { maoka_sdk } from "@ordo-pink/sdk-maoka"
+import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 
-export const button_success = (params: MaokaSDK.Components.ButtonArgs) =>
+export const button_success = (params: ClientMaoka.Components.ButtonArgs) =>
 	default_button({ ...params, custom_class: add_button_type_class("success", params.custom_class) })
 
-export const button_neutral = (params: MaokaSDK.Components.ButtonArgs) =>
+export const button_neutral = (params: ClientMaoka.Components.ButtonArgs) =>
 	default_button({ ...params, custom_class: add_button_type_class("neutral", params.custom_class) })
 
-export const button_primary = (params: MaokaSDK.Components.ButtonArgs) =>
+export const button_primary = (params: ClientMaoka.Components.ButtonArgs) =>
 	default_button({ ...params, custom_class: add_button_type_class("primary", params.custom_class) })
 
-export const button_danger = (params: MaokaSDK.Components.ButtonArgs) =>
+export const button_danger = (params: ClientMaoka.Components.ButtonArgs) =>
 	default_button({ ...params, custom_class: add_button_type_class("danger", params.custom_class) })
 
 // --- Internal ---
 
 const text_container = maoka_styled.div()
 
-const default_button = maoka.create<MaokaSDK.Components.ButtonArgs>(
+const default_button = maoka.create<ClientMaoka.Components.ButtonArgs>(
 	"button",
 	({ kindergarten, on_click, aria_label = "", custom_class = "", hotkey: hotkey_args, use, node, disabled }) => {
-		use(maoka_sdk.jabs.classes.set("button", custom_class))
-		use(maoka_sdk.jabs.set_attribute("aria-label", aria_label))
-		if (disabled) use(maoka_sdk.jabs.set_attribute("disabled"))
+		use(client_maoka.jabs.classes.set("button", custom_class))
+		use(client_maoka.jabs.set_attribute("aria-label", aria_label))
+		if (disabled) use(client_maoka.jabs.set_attribute("disabled"))
 
 		const handle_click = (event: MouseEvent) => {
 			event.preventDefault()
@@ -40,7 +40,7 @@ const default_button = maoka.create<MaokaSDK.Components.ButtonArgs>(
 			return on_click(event)
 		}
 
-		use(maoka_sdk.jabs.listen("onclick", handle_click))
+		use(client_maoka.jabs.listen("onclick", handle_click))
 
 		return () => [
 			text_container(() => kindergarten()),

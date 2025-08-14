@@ -43,7 +43,7 @@ export const check_user_is_authenticated = (request: Request, env: Lib.Env) =>
 		.pipe(oath.ops.chain(x => oath.from_promise(() => env.wjwt.verify(x)).pipe(oath.ops.map(() => x as Wjwt.TokenString))))
 		.pipe(oath.ops.map(x => env.wjwt.decode(x).payload))
 		.pipe(oath.ops.chain(({ sub, jti }) => env.user_repository.read(sub).pipe(oath.ops.map(user => ({ user, jti })))))
-		.pipe(oath.ops.chain(({ user, jti }) => oath.from_nullable(server.user.get_session(jti, user))))
+		.pipe(oath.ops.chain(({ user, jti }) => oath.from_nullable(server.user.get_session(jti!, user)))) // TODO wjwt types
 		.pipe(oath.ops.map(core.fns.prop(1)))
 		.pipe(oath.ops.chain(t => oath.if(core.timestamp.is_after(Date.now() - env.session_lifetime_minutes * 60, t))))
 		.pipe(oath.ops.rmap(core.rrr.eacces(CORE.RRR.REASON.NO)))
@@ -64,3 +64,10 @@ export const get_param_ref = (params: Colonoscope.Results) =>
 	get_request_param(params, "ref")
 		.pipe(oath.ops.chain(e => oath.if(core.user.ref_guard(e), { t: () => e as Core.User.Ref, f: () => e })))
 		.pipe(oath.ops.rmap(core.rrr.einval(CORE.RRR.REASON.REF_INVALID)))
+
+export const check_user_is_not_already_authenticated = (request: Request) =>
+	server_routary.oaths
+		.get_auth_cookie(request)
+		.pipe(oath.ops.swap)
+		.pipe(oath.ops.map(core.fns.v))
+		.pipe(oath.ops.rmap(core.rrr.eexist(CORE.RRR.REASON.ALREADY_AUTHENTICATED)))

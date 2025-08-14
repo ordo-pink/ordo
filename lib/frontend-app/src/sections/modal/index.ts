@@ -20,7 +20,7 @@
  */
 
 import { Maoka, maoka_dom } from "@ordo-pink/oss-maoka"
-import { context } from "@ordo-pink/sdk-maoka"
+import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 
 import { close_modal } from "./components/close-modal.component"
 import { modal } from "./components/modal.component"
@@ -37,7 +37,7 @@ export const create_modal_jab: Maoka.Jab<() => Maoka.Component> = ({ use }) => {
 
 namespace internal {
 	export const track_prey_jab: Maoka.Jab = ({ use }) => {
-		const { hunter } = use(context.consume)
+		const { hunter } = use(client_maoka.context.consume)
 
 		const handle_mount = () => {
 			const release_show = hunter.track("modal.show", params => modal$.update("instance", () => params))

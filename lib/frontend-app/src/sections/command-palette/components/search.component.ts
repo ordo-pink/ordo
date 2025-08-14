@@ -21,12 +21,12 @@
 
 import { maoka, maoka_dom, maoka_styled } from "@ordo-pink/oss-maoka"
 import { bs_search } from "@ordo-pink/frontend-icons"
+import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 
 import { command_palette$ } from "../command-palette.state"
-import { maoka_sdk } from "@ordo-pink/sdk-maoka"
 
 export const command_palette_search = maoka.create("label", ({ use }) => {
-	use(maoka_sdk.jabs.classes.set("command-palette_search_wrapper"))
+	use(client_maoka.jabs.classes.set("command-palette_search_wrapper"))
 
 	return () => [bs_search({ classes: "" }), search()]
 })
@@ -40,10 +40,10 @@ const search = maoka_styled.input("command-palette_search", ({ use }) => {
 		command_palette$.update("search_value", () => target.value)
 	}
 
-	use(maoka_sdk.jabs.set_id("cp-input"))
-	use(maoka_sdk.jabs.set_attribute("placeholder", t_search))
-	use(maoka_sdk.jabs.set_attribute("autocomplete", "off"))
-	use(maoka_sdk.jabs.set_attribute("value", command_palette$.select("search_value")))
-	use(maoka_sdk.jabs.listen("oninput", handle_input))
+	use(client_maoka.jabs.set_id("cp-input"))
+	use(client_maoka.jabs.set_attribute("placeholder", t_search))
+	use(client_maoka.jabs.set_attribute("autocomplete", "off"))
+	use(client_maoka.jabs.set_attribute("value", command_palette$.select("search_value")))
+	use(client_maoka.jabs.listen("oninput", handle_input))
 	use(maoka_dom.jabs.onmount(handle_mount))
 })

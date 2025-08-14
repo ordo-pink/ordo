@@ -23,7 +23,6 @@ import { type Maoka, maoka_dom } from "@ordo-pink/oss-maoka"
 import { type Zags, create_zags } from "@ordo-pink/oss-zags"
 import type { ClientSDK } from "@ordo-pink/sdk-client"
 import type { Core } from "@ordo-pink/sdk-core"
-import { get_device_info } from "@ordo-pink/_get-device-info"
 import { noop } from "@ordo-pink/_tau"
 import { oath } from "@ordo-pink/oss-oath"
 
@@ -40,12 +39,11 @@ export const auth_jab: (
 		const handle_mount = () => {
 			const refresh_session0 = oath
 				.of(new Headers())
-				.pipe(oath.ops.tap(h => h.append("X-Device", get_device_info.get_device_info(navigator))))
 				.pipe(oath.ops.map(headers => ({ headers, method: "POST", credentials: "include" }) as const))
 				.pipe(
 					oath.ops.chain(init =>
 						oath.from_promise(() =>
-							fetch(`${hosts.id}/session`, init).then(res => (res.status < 300 ? res.json() : Promise.reject())),
+							fetch(`${hosts.id}/auth/refresh`, init).then(res => (res.status < 300 ? res.json() : Promise.reject())),
 						),
 					),
 				)

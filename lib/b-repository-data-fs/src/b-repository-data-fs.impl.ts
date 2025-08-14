@@ -20,7 +20,7 @@
  */
 
 import { BunFile } from "bun"
-import { resolve } from "path"
+import { join } from "path"
 
 import { CORE, type Core, core } from "@ordo-pink/sdk-core"
 import { oath } from "@ordo-pink/oss-oath"
@@ -96,4 +96,4 @@ const get_file_content = (file: BunFile) =>
 	oath.try(() => file.stream()).pipe(oath.ops.rmap(core.rrr.eio(CORE.RRR.REASON.FILE_READ_FAILED)))
 
 const get_path_from_root = (root: string) => (uid: Core.User.Id, fsid: Core.Data.Id) =>
-	oath.try(() => resolve(root, uid, ...fsid)).pipe(oath.ops.rmap(core.rrr.eio(CORE.RRR.REASON.INVALID_SERVICE_INITIALIZATION)))
+	oath.try(() => join(root, uid, fsid)).pipe(oath.ops.rmap(core.rrr.eio(CORE.RRR.REASON.INVALID_SERVICE_INITIALIZATION)))

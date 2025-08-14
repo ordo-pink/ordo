@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { maoka_sdk } from "@ordo-pink/sdk-maoka"
+import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 
 import type { ClientSDK } from "@ordo-pink/sdk-client"
 import { bs_x } from "@ordo-pink/frontend-icons"
@@ -28,7 +28,7 @@ import { maoka } from "@ordo-pink/oss-maoka"
 import { modal$ } from "../modal.state"
 
 export const close_modal = maoka.create("div", ({ use }) => {
-	const { hunter } = use(maoka_sdk.context.consume)
+	const { hunter } = use(client_maoka.context.consume)
 
 	const handle_global_esc = (event: KeyboardEvent) => {
 		if (event.code !== "Escape" || !modal$.select("instance")) return
@@ -36,10 +36,15 @@ export const close_modal = maoka.create("div", ({ use }) => {
 		hunter.shoot("modal.hide")
 	}
 
-	use(maoka_sdk.jabs.classes.set("modal_close"))
-	use(maoka_sdk.jabs.set_attribute("title", "Click here, or anywhere else outside the modal window, or press Escape to close."))
-	use(maoka_sdk.jabs.listen("onclick", internal.handle_click(hunter)))
-	use(maoka_sdk.jabs.listen_global_event("keydown", handle_global_esc))
+	use(client_maoka.jabs.classes.set("modal_close"))
+	use(
+		client_maoka.jabs.set_attribute(
+			"title",
+			"Click here, or anywhere else outside the modal window, or press Escape to close.",
+		),
+	)
+	use(client_maoka.jabs.listen("onclick", internal.handle_click(hunter)))
+	use(client_maoka.jabs.listen_global_event("keydown", handle_global_esc))
 
 	return () => bs_x({})
 })

@@ -172,8 +172,9 @@ export namespace Oath {
 			to_promise: Oath.Catas.ToPromise
 		}
 
-		export type ToPromise = <_Resolve>() => {
+		export type ToPromise = <_Resolve, _Reject>() => {
 			resolve: (x: _Resolve) => _Resolve
+			reject: (x: _Reject) => never
 		}
 
 		export type Noop = () => { resolve: () => void; reject: () => void }

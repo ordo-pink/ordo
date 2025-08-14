@@ -21,31 +21,31 @@
 
 import { type Maoka, maoka_dom } from "@ordo-pink/oss-maoka"
 import { type Zags, create_zags } from "@ordo-pink/oss-zags"
-import { colonoscope, is_colonoscopy_doctor } from "@ordo-pink/oss-colonoscope"
+import type { Aist } from "@ordo-pink/oss-aist"
 import type { ClientSDK } from "@ordo-pink/sdk-client"
-import type { RoutaryBrowser } from "@ordo-pink/oss-aist"
+import { colonoscope } from "@ordo-pink/oss-colonoscope"
 
 export const init_activities_jab: (
 	hunter: ClientSDK.Hunter,
-	rotor$: RoutaryBrowser.Zags,
+	aist$: Aist.Stream,
 ) => Maoka.Jab<Zags.Instance<ClientSDK.Activity.State>> =
-	(hunter, rotor$) =>
+	(hunter, aist$) =>
 	({ use }) => {
 		const handle_onmount = () => {
 			const release_register = hunter.track("activity.register", item => {
 				activities$.update("items", items => (items.some(i => i.id === item.id) ? items : items.concat(item)))
 
-				const pathname = rotor$.select("pathname")
+				const pathname = aist$.select("pathname")
 
 				for (const route of item.routes) {
-					if ((is_colonoscopy_doctor(route) && colonoscope(route, pathname)) || route === pathname) {
+					if ((colonoscope.is_doctor(route) && colonoscope.check(route, pathname)) || route === pathname) {
 						activities$.update("current", () => item)
 						break
 					}
 				}
 			})
 
-			const divorce_rotor = rotor$.cheat("pathname", pathname => {
+			const divorce_rotor = aist$.cheat("pathname", pathname => {
 				const items = activities$.select("items")
 
 				activities$.update(
@@ -53,8 +53,8 @@ export const init_activities_jab: (
 					() =>
 						items.find(item => {
 							for (const route of item.routes) {
-								if (is_colonoscopy_doctor(route)) {
-									if (colonoscope(route, pathname)) return true
+								if (colonoscope.is_doctor(route)) {
+									if (colonoscope.check(route, pathname)) return true
 								}
 								if (route === pathname) return true
 							}

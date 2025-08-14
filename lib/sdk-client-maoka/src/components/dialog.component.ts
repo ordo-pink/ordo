@@ -5,11 +5,12 @@
 
 import { type ClientSDK, MODAL } from "@ordo-pink/sdk-client"
 import { type Maoka, maoka, maoka_dom, maoka_styled } from "@ordo-pink/oss-maoka"
-import { type MaokaSDK, maoka_sdk } from "@ordo-pink/sdk-maoka"
+import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 import { sweech } from "@ordo-pink/oss-sweech"
 
+import type * as ClientMaoka from "../sdk-client-maoka.types"
+
 import "./dialog.styles.css"
-import type { Dialog } from "@ordo-pink/maoka-components"
 
 export namespace DIALOG {
 	export enum TYPE {
@@ -24,7 +25,7 @@ export namespace Dialog {
 	export type BodyRenderer = (div: HTMLDivElement) => void | Promise<void>
 
 	export type Args = {
-		actions: () => MaokaSDK.Components.ButtonArgs[]
+		actions: () => ClientMaoka.Components.ButtonArgs[]
 		render_body?: Dialog.BodyRenderer
 		render_icon: Dialog.IconRenderer
 		title: () => string
@@ -45,7 +46,7 @@ export namespace Dialog {
 
 	export namespace Actions {
 		export type Args = {
-			actions: () => MaokaSDK.Components.ButtonArgs[]
+			actions: () => ClientMaoka.Components.ButtonArgs[]
 			render_body?: Dialog.BodyRenderer
 			render_icon?: Dialog.IconRenderer
 			title: () => string
@@ -58,7 +59,7 @@ export namespace Dialog {
 const dialog_base = maoka.create<Dialog.Args>(
 	"div",
 	({ actions = () => [], node, render_body, render_icon, title, type, use }) => {
-		use(maoka_sdk.jabs.classes.set("dialog", get_dialog_css_class(type)))
+		use(client_maoka.jabs.classes.set("dialog", get_dialog_css_class(type)))
 
 		const handle_cancel_click = () =>
 			void (maoka_dom.guards.is_dom_node(node) && node.value.parentElement?.parentElement?.parentElement?.click())
@@ -67,8 +68,8 @@ const dialog_base = maoka.create<Dialog.Args>(
 			dialog_header_div(() => [dialog_icon_span({ render_icon }), dialog_title_h2(title)]),
 			render_body ? dialog_body_div({ render_body }) : void 0,
 			dialog_footer_div(() => [
-				maoka_sdk.components.button.neutral({ hotkey: "escape", kindergarten: () => "OK", on_click: handle_cancel_click }),
-				...actions().map(action => maoka_sdk.components.button.primary(action)),
+				client_maoka.components.button.neutral({ hotkey: "escape", kindergarten: () => "OK", on_click: handle_cancel_click }),
+				...actions().map(action => client_maoka.components.button.primary(action)),
 			]),
 		]
 	},
@@ -116,11 +117,11 @@ const dialog_header_div = maoka_styled.div("header")
 const dialog_title_h2 = maoka_styled.h2("title")
 const dialog_footer_div = maoka_styled.div("footer")
 const dialog_body_div = maoka.create<{ render_body: Dialog.BodyRenderer }>("div", ({ render_body, use }) => {
-	use(maoka_sdk.jabs.classes.set("body"))
+	use(client_maoka.jabs.classes.set("body"))
 	use(maoka_dom.jabs.onmount(n => void render_body(n.value as HTMLDivElement)))
 })
 const dialog_icon_span = maoka.create<{ render_icon: Dialog.IconRenderer }>("span", ({ render_icon, use }) => {
-	use(maoka_sdk.jabs.classes.set("icon"))
+	use(client_maoka.jabs.classes.set("icon"))
 	use(maoka_dom.jabs.onmount(n => void render_icon(n.value as HTMLSpanElement)))
 })
 

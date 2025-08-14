@@ -21,8 +21,8 @@
 
 import { type ClientSDK, NOTIFICATION } from "@ordo-pink/sdk-client"
 import { type Maoka, maoka_dom } from "@ordo-pink/oss-maoka"
-import { maoka_sdk } from "@ordo-pink/sdk-maoka"
-import { rrr } from "@ordo-pink/sdk-core"
+import { client_maoka } from "@ordo-pink/sdk-client-maoka"
+import { core } from "@ordo-pink/sdk-core"
 
 import { notification_list } from "./components/notifications-list.component"
 import { notifications$ } from "./notifications.state"
@@ -30,7 +30,7 @@ import { notifications$ } from "./notifications.state"
 import "./notifications.styles.css"
 
 export const create_notifications_jab: Maoka.Jab<() => Maoka.Component> = ({ use }) => {
-	const { hunter } = use(maoka_sdk.context.consume)
+	const { hunter } = use(client_maoka.context.consume)
 
 	hunter.shoot("i18n.add_translations", {
 		locale: "en",
@@ -43,7 +43,7 @@ export const create_notifications_jab: Maoka.Jab<() => Maoka.Component> = ({ use
 }
 
 const track_prey_jab: Maoka.Jab = ({ use, node }) => {
-	const { hunter } = use(maoka_sdk.context.consume)
+	const { hunter } = use(client_maoka.context.consume)
 
 	const handle_onmount = () => {
 		const handle_show = handle_show_with_id_creator(node.root.create_id)
@@ -76,7 +76,7 @@ const handle_rrr_with_id_creator: (create_id: Maoka.CreateId) => ClientSDK.GunFo
 				{
 					id: create_id() as any,
 					message,
-					title: `rrr_codes_${rrr.to_readable_type(type)}`,
+					title: `rrr_codes_${core.rrr.to_readable_type(type)}`,
 					duration: 30,
 					type: NOTIFICATION.TYPE.RRR,
 				},

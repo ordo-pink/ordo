@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-export type StandardPayload = { sub: Sub; aud?: Aud; iat: Iat; jti: Jti; iss?: Iss; exp?: Exp }
+export type StandardPayload = { sub: Sub; aud?: Aud; iat?: Iat; jti?: Jti; iss?: Iss; exp?: Exp }
 export type Payload<$Custom extends Record<string, unknown> = Record<string, unknown>> = StandardPayload & $Custom
 
 export type Algorithm =

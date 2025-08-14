@@ -7,8 +7,6 @@ import type * as Session from "./session.types"
 import * as fns from "../fns/fns.impl"
 import * as timestamp from "../timestamp/timestamp.impl"
 
-export const create: Session.Create = n => [timestamp.create(), n]
-
 export const guard: Session.Guard = (x): x is Session.Instance =>
 	fns.is_array(x) && timestamp.guard(x[0]) && fns.is_non_empty_string(x[1])
 

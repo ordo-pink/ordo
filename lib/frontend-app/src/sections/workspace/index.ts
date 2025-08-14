@@ -23,7 +23,7 @@ import { type Maoka, maoka_dom } from "@ordo-pink/oss-maoka"
 import { COMMAND_PALETTE } from "@ordo-pink/sdk-client"
 import { LOCALE } from "@ordo-pink/oss-i18n"
 import { bs_layout_sidebar_inset_reverse } from "@ordo-pink/frontend-icons"
-import { maoka_sdk } from "@ordo-pink/sdk-maoka"
+import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 
 import { SIDEBAR } from "./workspace.constants"
 import { sidebar } from "./components/sidebar.component"
@@ -38,7 +38,7 @@ export const create_sidebar_jab: Maoka.Jab<{
 	sidebar_toggle: () => Maoka.Component
 	workspace: () => Maoka.Component
 }> = ({ use }) => {
-	const { hunter } = use(maoka_sdk.context.consume)
+	const { hunter } = use(client_maoka.context.consume)
 
 	const handle_mount = () => {
 		const release_disable = hunter.track("sidebar.disable", handle_disable_sidebar)

@@ -22,9 +22,9 @@
 import { COMMAND_PALETTE, type ClientSDK, MODAL, client_rrr } from "@ordo-pink/sdk-client"
 import { type Maoka, maoka, maoka_dom, maoka_styled } from "@ordo-pink/oss-maoka"
 import { bs_box_arrow_in_right, bs_box_arrow_right, bs_envelope_at, bs_person_bounding_box } from "@ordo-pink/frontend-icons"
-import { core_sdk, user } from "@ordo-pink/sdk-core"
-import { get_device_info } from "@ordo-pink/_get-device-info"
-import { maoka_sdk } from "@ordo-pink/sdk-maoka"
+import { client_maoka } from "@ordo-pink/sdk-client-maoka"
+import { core } from "@ordo-pink/sdk-core"
+// import { get_device_info } from "@ordo-pink/_get-device-info"
 import { oath } from "@ordo-pink/oss-oath"
 
 import { authenticating_user$ } from "./user.state"
@@ -38,9 +38,9 @@ import "./user.styles.css"
  * Auth jab is responsible for providing means of signing in and out.
  */
 export const create_user_jab: Maoka.Jab = ({ use }) => {
-	use(refresh_session_jab)
+	// use(refresh_session_jab)
+	use(client_maoka.jabs.register_translations("en", en_translations))
 	use(track_prey_jab)
-	use(maoka_sdk.jabs.register_translations("en", en_translations))
 	use(register_other_user_activity_jab)
 }
 
@@ -51,7 +51,7 @@ const COMMAND_PALETTE_SIGN_OUT_ID = "auth.sign_out"
 const COMMAND_PALETTE_GO_TO_ACCOUNT_ID = "auth.go_to_account"
 
 const register_other_user_activity_jab: Maoka.Jab = ({ use }) => {
-	const state = use(maoka_sdk.context.consume)
+	const state = use(client_maoka.context.consume)
 
 	const handle_onmount = (n: Maoka.Node) => {
 		state.hunter.shoot("activity.register", {
@@ -59,7 +59,7 @@ const register_other_user_activity_jab: Maoka.Jab = ({ use }) => {
 			readable_name: "user_workspace_other_activity_name",
 			routes: ["/others/:id_or_handle"],
 			render_workspace: div =>
-				maoka_dom.render(div, maoka_sdk.components.with_state(state, other_user_workspace), n.root.create_id),
+				maoka_dom.render(div, client_maoka.components.with_state(state, other_user_workspace), n.root.create_id),
 		})
 
 		return () => {
@@ -70,57 +70,57 @@ const register_other_user_activity_jab: Maoka.Jab = ({ use }) => {
 	use(maoka_dom.jabs.onmount(handle_onmount))
 }
 
-const refresh_session_jab: Maoka.Jab = ({ use }) => {
-	const { auth$, fetch, hosts, hunter } = use(maoka_sdk.context.consume)
+// const refresh_session_jab: Maoka.Jab = ({ use }) => {
+// const { auth$, fetch, hosts, hunter } = use(client_maoka.context.consume)
 
-	const handle_mount = () => {
-		const refresh_session0 = oath
-			.of(new Headers())
-			.pipe(oath.ops.tap(h => h.append("X-Device", get_device_info(navigator))))
-			.pipe(oath.ops.map(headers => ({ headers, method: "POST", credentials: "include" }) as const))
-			.pipe(
-				oath.ops.chain(init =>
-					oath.from_promise(() =>
-						fetch(`${hosts.id}/session`, init).then(res => (res.status < 300 ? res.json() : Promise.reject())),
-					),
-				),
-			)
-			.pipe(oath.ops.map(dto => user.current.from_dto(...dto)))
-			.pipe(oath.ops.tap(user => auth$.update("user", () => user)))
+// const handle_mount = () => {
+// 	const refresh_session0 = oath
+// 		.of(new Headers())
+// 		.pipe(oath.ops.tap(h => h.append("X-Device", get_device_info.get_device_info(navigator))))
+// 		.pipe(oath.ops.map(headers => ({ headers, method: "POST", credentials: "include" }) as const))
+// 		.pipe(
+// 			oath.ops.chain(init =>
+// 				oath.from_promise(() =>
+// 					fetch(`${hosts.id}/auth/refresh`, init).then(res => (res.status < 300 ? res.json() : Promise.reject())),
+// 				),
+// 			),
+// 		)
+// 		.pipe(oath.ops.tap(user => auth$.update("user", () => user)))
 
-		// TODO Sign out on error, show notification
-		void refresh_session0
-			.cata(oath.catas.to_promise())
-			.catch(core_sdk.fns.noop)
-			.finally(() => hunter.shoot("background_status.none"))
+// 	// TODO Sign out on error, show notification
+// 	void refresh_session0
+// 		.cata(oath.catas.to_promise())
+// 		.catch(core.fns.v)
+// 		.finally(() => hunter.shoot("background_status.none"))
 
-		return () => {
-			refresh_session0.cancel("Root component refreshed")
-		}
-	}
+// 	return () => {
+// 		refresh_session0.cancel("Root component refreshed")
+// 	}
+// }
 
-	use(maoka_dom.jabs.onmount(handle_mount))
-}
+// use(maoka_dom.jabs.onmount(handle_mount))
+// }
 
 const track_prey_jab: Maoka.Jab = ({ node, use }) => {
-	const state = use(maoka_sdk.context.consume)
+	const state = use(client_maoka.context.consume)
 	const { auth$, fetch, hosts, hunter } = state
-
-	const t_join = use(maoka_sdk.jabs.translate$("user_modals_join_title"))
+	const t_join = use(client_maoka.jabs.translate$("user_modals_join_title"))
 
 	const on_ok_click = () => {
 		const email = authenticating_user$.select("email")
 
 		if (email.length < 5 || email.length > 255)
 			return void hunter.shoot("notifications.rrr", client_rrr.einval("user_rrr_invalid_email_length"))
-		if (!user.current.validations.is_email(email))
+		if (!core.user.email_guard(email))
 			return void hunter.shoot("notifications.rrr", client_rrr.einval("user_rrr_invalid_email"))
 
 		oath
 			.of(new Headers())
 			.pipe(oath.ops.tap(h => h.append("Content-Type", "application/json")))
-			.pipe(oath.ops.map(headers => ({ headers, method: "POST", body: JSON.stringify({ email }) })))
-			.pipe(oath.ops.chain(init => oath.from_promise(() => fetch(`${hosts.au}/request-code`, init))))
+			.pipe(
+				oath.ops.map(headers => ({ headers, method: "POST", body: JSON.stringify([email]), credentials: "include" as const })),
+			)
+			.pipe(oath.ops.chain(init => oath.from_promise(() => fetch(`${hosts.id}/auth/request-code`, init))))
 			.pipe(oath.ops.chain(res => oath.if(res.status < 300, { t: () => res })))
 			.pipe(oath.ops.tap(() => hunter.shoot("user.show_verify_code_modal")))
 			.cata(oath.catas.to_promise())
@@ -129,18 +129,18 @@ const track_prey_jab: Maoka.Jab = ({ node, use }) => {
 	}
 
 	const [show_join_modal, hide_modal] = use(
-		maoka_sdk.jabs.dialog.actions(state, {
+		client_maoka.jabs.dialog.actions(state, {
 			actions: () => [{ hotkey: "enter", kindergarten: t_join, on_click: on_ok_click }],
+			render_body: div => maoka_dom.render(div, client_maoka.components.with_state(state, email_input), node.root.create_id),
 			title: t_join,
-			render_body: div => maoka_dom.render(div, maoka_sdk.components.with_state(state, email_input), node.root.create_id),
 		}),
 	)
 
 	const handle_mount = () => {
-		let release_join = core_sdk.fns.noop
-		let release_verify_code = core_sdk.fns.noop
-		let release_sign_out = core_sdk.fns.noop
-		let release_go_to_account = core_sdk.fns.noop
+		let release_join = core.fns.v
+		let release_verify_code = core.fns.v
+		let release_sign_out = core.fns.v
+		let release_go_to_account = core.fns.v
 
 		const divorce_user = auth$.cheat("user", user => {
 			hunter.shoot("command_palette.remove", COMMAND_PALETTE_JOIN_ID)
@@ -158,7 +158,7 @@ const track_prey_jab: Maoka.Jab = ({ node, use }) => {
 				release_sign_out = hunter.track("user.sign_out", () => {
 					oath
 						.of({ method: "DELETE", credentials: "include" } as const)
-						.pipe(oath.ops.and(init => oath.from_promise(() => fetch(`${hosts.id}/session`, init))))
+						.pipe(oath.ops.and(init => oath.from_promise(() => fetch(`${hosts.id}/auth/kill`, init))))
 						// TODO Clean up with local persistence strategy
 						.pipe(
 							oath.ops.tap(() => {
@@ -172,8 +172,8 @@ const track_prey_jab: Maoka.Jab = ({ node, use }) => {
 						.finally(() => hunter.shoot("background_status.none"))
 				})
 
-				release_join = core_sdk.fns.noop
-				release_verify_code = core_sdk.fns.noop
+				release_join = core.fns.v
+				release_verify_code = core.fns.v
 
 				hunter.shoot("command_palette.add", {
 					id: COMMAND_PALETTE_SIGN_OUT_ID,
@@ -207,12 +207,12 @@ const track_prey_jab: Maoka.Jab = ({ node, use }) => {
 					hunter.shoot("modal.show", {
 						size: MODAL.SIZE.SM,
 						render: div =>
-							maoka_dom.render(div, maoka_sdk.components.with_state(state, verify_code_modal), node.root.create_id),
+							maoka_dom.render(div, client_maoka.components.with_state(state, verify_code_modal), node.root.create_id),
 					})
 				})
 
-				release_go_to_account = core_sdk.fns.noop
-				release_sign_out = core_sdk.fns.noop
+				release_go_to_account = core.fns.v
+				release_sign_out = core.fns.v
 
 				hunter.shoot("command_palette.add", {
 					id: COMMAND_PALETTE_JOIN_ID,
@@ -297,13 +297,12 @@ const en_translations: ClientSDK.Translations.PickValues<"user"> = {
 }
 
 const email_input = maoka.create("label", ({ use }) => {
-	use(maoka_sdk.jabs.classes.set("user_join-modal_email_wrapper"))
-
+	use(client_maoka.jabs.classes.set("user_join-modal_email_wrapper"))
 	return () => [bs_envelope_at({}), search()]
 })
 
 const search = maoka_styled.input("user_join-modal_email", ({ use }) => {
-	const t_placeholder = use(maoka_sdk.jabs.translate$("user_modals_join_placeholder"))
+	const t_placeholder = use(client_maoka.jabs.translate$("user_modals_join_placeholder"))
 	const value = authenticating_user$.select("email")
 
 	const handle_mount = () => use(maoka_dom.jabs.if_dom(n => n.value.focus()))
@@ -311,12 +310,11 @@ const search = maoka_styled.input("user_join-modal_email", ({ use }) => {
 		const target = event.target as HTMLInputElement
 		authenticating_user$.update("email", () => target.value)
 	}
+	use(client_maoka.jabs.set_id("email-input"))
 
-	use(maoka_sdk.jabs.set_id("email-input"))
-	use(maoka_sdk.jabs.set_attribute("type", "email"))
-	use(maoka_sdk.jabs.set_attribute("placeholder", t_placeholder()))
-	use(maoka_sdk.jabs.listen("oninput", handle_input))
+	use(client_maoka.jabs.set_attribute("type", "email"))
+	use(client_maoka.jabs.set_attribute("placeholder", t_placeholder()))
+	use(client_maoka.jabs.listen("oninput", handle_input))
 	use(maoka_dom.jabs.onmount(handle_mount))
-
-	if (value) use(maoka_sdk.jabs.set_attribute("value", value))
+	if (value) use(client_maoka.jabs.set_attribute("value", value))
 })

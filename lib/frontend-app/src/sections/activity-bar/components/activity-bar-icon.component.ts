@@ -21,20 +21,20 @@
 
 import { maoka, maoka_dom } from "@ordo-pink/oss-maoka"
 import type { ClientSDK } from "@ordo-pink/sdk-client"
-import { maoka_sdk } from "@ordo-pink/sdk-maoka"
+import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 
 type Args = Required<Pick<ClientSDK.Activity.Instance, "render_icon" | "readable_name">> & { is_current: boolean }
 
 export const activity_bar_icon = maoka.create<Args>("span", ({ use, is_current, render_icon, readable_name }) => {
-	const t_readable_name = use(maoka_sdk.jabs.translate$(readable_name))
+	const t_readable_name = use(client_maoka.jabs.translate$(readable_name))
 
-	use(maoka_sdk.jabs.classes.set("activity-bar_icon"))
+	use(client_maoka.jabs.classes.set("activity-bar_icon"))
 	use(maoka_dom.jabs.if_dom(n => void render_icon(n.value)))
 
 	return () => {
-		use(maoka_sdk.jabs.set_attribute("title", t_readable_name()))
+		use(client_maoka.jabs.set_attribute("title", t_readable_name()))
 
-		if (is_current) use(maoka_sdk.jabs.classes.add("active"))
-		else use(maoka_sdk.jabs.classes.remove("active"))
+		if (is_current) use(client_maoka.jabs.classes.add("active"))
+		else use(client_maoka.jabs.classes.remove("active"))
 	}
 })

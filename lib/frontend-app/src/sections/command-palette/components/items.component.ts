@@ -21,16 +21,16 @@
 
 import { maoka, maoka_styled } from "@ordo-pink/oss-maoka"
 import { COMMAND_PALETTE } from "@ordo-pink/sdk-client"
-import { core_sdk } from "@ordo-pink/sdk-core"
-import { maoka_sdk } from "@ordo-pink/sdk-maoka"
+import { client_maoka } from "@ordo-pink/sdk-client-maoka"
+import { core } from "@ordo-pink/sdk-core"
 
 import { command_palette$ } from "../command-palette.state"
 import { command_palette_item } from "./item.component"
 
 export const command_palette_items = maoka.create("div", ({ use }) => {
-	const get_state = use(maoka_sdk.jabs.zags.marry$(command_palette$))
+	const get_state = use(client_maoka.jabs.zags.marry$(command_palette$))
 
-	use(maoka_sdk.jabs.classes.set("command-palette_items_multiple-wrapper"))
+	use(client_maoka.jabs.classes.set("command-palette_items_multiple-wrapper"))
 
 	return () => {
 		const state = get_state()
@@ -38,7 +38,7 @@ export const command_palette_items = maoka.create("div", ({ use }) => {
 		if (!state.current) return null
 
 		const visible_items = state.current.items.filter(item =>
-			core_sdk.fns.fuzzy_check(item.readable_name, state.search_value, COMMAND_PALETTE.FUZZY_CHECK_RATIO),
+			core.fns.fuzzy_check(item.readable_name, state.search_value, COMMAND_PALETTE.FUZZY_CHECK_RATIO),
 		)
 
 		if (!visible_items.length)

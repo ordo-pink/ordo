@@ -74,13 +74,13 @@ export const create: Lib.Create = (repository, uid, fid, ufid) => {
 
 		delete: repository.delete,
 
-		update: (id, new_user) =>
-			read(id).pipe(
+		update: new_user =>
+			read(new_user[0]).pipe(
 				oath.ops.chain(old_user =>
 					oath
 						.try(() => JSON.stringify(new_user), to_rrr("Could not save user"))
 						.pipe(oath.ops.chain(to_stream0(to_rrr("Could not save user"))))
-						.pipe(oath.ops.chain(s => repository.update(id, ufid, s)))
+						.pipe(oath.ops.chain(s => repository.update(new_user[0], ufid, s)))
 						.pipe(
 							oath.ops.tap(() => {
 								if (new_user[1] === old_user[1] && new_user[6] === old_user[6]) return
@@ -90,12 +90,12 @@ export const create: Lib.Create = (repository, uid, fid, ufid) => {
 										oath.ops.map(cache => {
 											if (new_user[1] !== old_user[1]) {
 												cache.ref[old_user[1]] = undefined
-												cache.ref[new_user[1]] = id
+												cache.ref[new_user[1]] = new_user[0]
 											}
 
 											if (new_user[6] !== old_user[6]) {
 												cache.email[old_user[6]] = undefined
-												cache.email[new_user[6]] = id
+												cache.email[new_user[6]] = new_user[0]
 											}
 
 											return cache

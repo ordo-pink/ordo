@@ -4,11 +4,11 @@
  */
 
 import type { CORE, Core } from "@ordo-pink/sdk-core"
+import type { Aist } from "@ordo-pink/oss-aist"
 import type { Hunt } from "@ordo-pink/oss-hunt"
 import type { I18n } from "@ordo-pink/oss-i18n"
 import type { Oath } from "@ordo-pink/oss-oath"
 import type { Result } from "@ordo-pink/oss-result"
-import type { RoutaryBrowser } from "@ordo-pink/oss-aist"
 import type { Zags } from "@ordo-pink/oss-zags"
 
 import type { COMMAND_PALETTE, CONTEXT_MENU, MODAL, NOTIFICATION } from "./sdk-client.constants"
@@ -62,7 +62,7 @@ export namespace ClientSDK {
 			hunter: Hunter
 			i18n$: I18n.Zags<ClientSDK.Translations.Keys>
 			logger: Core.Logger
-			rotor$: RoutaryBrowser.Zags
+			aist$: Aist.Stream
 		}
 
 		export type Create = (

@@ -22,7 +22,7 @@
 import { COMMAND_PALETTE, type ClientSDK } from "@ordo-pink/sdk-client"
 import { type Maoka, maoka_dom } from "@ordo-pink/oss-maoka"
 import { bs_menu_button_wide_fill } from "@ordo-pink/frontend-icons"
-import { context } from "@ordo-pink/sdk-maoka"
+import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 
 import { command_palette$ } from "./command-palette.state"
 import { command_palette_modal } from "./components/modal.component"
@@ -46,7 +46,7 @@ export const create_command_palette_jab: Maoka.Jab<{
 // @internal
 
 const track_prey_jab: Maoka.Jab = ({ use }) => {
-	const { hunter } = use(context.consume)
+	const { hunter } = use(client_maoka.context.consume)
 
 	const handle_onmount = () => {
 		const release_add = hunter.track("command_palette.add", handle_add)

@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { type MaokaSDK, maoka_sdk } from "@ordo-pink/sdk-maoka"
+import { type ClientMaoka, client_maoka } from "@ordo-pink/sdk-client-maoka"
 import { maoka, maoka_dom } from "@ordo-pink/oss-maoka"
 import type { ClientSDK } from "@ordo-pink/sdk-client"
 import { result } from "@ordo-pink/oss-result"
@@ -30,22 +30,22 @@ import { result } from "@ordo-pink/oss-result"
  * a refresh due to changes in translations.
  */
 export const title = maoka.create("div", ({ use }) => {
-	const { hunter } = use(maoka_sdk.context.consume)
-	const translate = use(maoka_sdk.jabs.t$) // TODO Move to context
+	const { hunter } = use(client_maoka.context.consume)
+	const translate = use(client_maoka.jabs.t$) // TODO Move to context
 
 	use(maoka_dom.jabs.onmount(listen_set_title_shots(hunter, translate, document)))
 })
 
 // --- Internal ---
 
-type ListenSetTitleShots = (hunter: ClientSDK.Hunter, translate: MaokaSDK.Jabs.TFn, document: Document) => () => void
+type ListenSetTitleShots = (hunter: ClientSDK.Hunter, translate: ClientMaoka.Jabs.TFn, document: Document) => () => void
 const listen_set_title_shots: ListenSetTitleShots = (hunter, translate, document) => () =>
 	result
 		.from_nullable(document.querySelector("title"))
 		.pipe(result.ops.map(el => hunter.track("title.set_title", gun_for_set_title(el, translate))))
 		.cata(result.catas.if_ok(release => release))
 
-type GunForSetTitle = (element: HTMLTitleElement, translate: MaokaSDK.Jabs.TFn) => ClientSDK.GunFor<"title.set_title">
+type GunForSetTitle = (element: HTMLTitleElement, translate: ClientMaoka.Jabs.TFn) => ClientSDK.GunFor<"title.set_title">
 const gun_for_set_title: GunForSetTitle = (el, translate) => t =>
 	result
 		.of(translate(t, "404"))

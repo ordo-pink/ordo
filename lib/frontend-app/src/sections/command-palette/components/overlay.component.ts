@@ -19,8 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { context, maoka_sdk } from "@ordo-pink/sdk-maoka"
 import { maoka_dom, maoka_styled } from "@ordo-pink/oss-maoka"
+import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 
 import { command_palette$ } from "../command-palette.state"
 
@@ -29,13 +29,13 @@ import { command_palette$ } from "../command-palette.state"
  * the command palette.
  */
 export const command_palette_overlay = maoka_styled.div("command-palette_wrapper", ({ use }) => {
-	const { hunter } = use(context.consume)
+	const { hunter } = use(client_maoka.context.consume)
 
-	const handle_show = () => use(maoka_sdk.jabs.classes.add("active"))
-	const handle_hide = () => use(maoka_sdk.jabs.classes.remove("active"))
+	const handle_show = () => use(client_maoka.jabs.classes.add("active"))
+	const handle_hide = () => use(client_maoka.jabs.classes.remove("active"))
 	const handle_click = () => hunter.shoot("command_palette.hide")
 	const handle_mount = () => command_palette$.cheat("current", current => (current ? handle_show() : handle_hide()))
 
-	use(maoka_sdk.jabs.listen("onclick", handle_click))
+	use(client_maoka.jabs.listen("onclick", handle_click))
 	use(maoka_dom.jabs.onmount(handle_mount))
 })

@@ -20,28 +20,28 @@
  */
 
 import { bs_arrow_left, bs_layout_sidebar_inset_reverse } from "@ordo-pink/frontend-icons"
+import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 import { maoka } from "@ordo-pink/oss-maoka"
-import { maoka_sdk } from "@ordo-pink/sdk-maoka"
 import { sweech } from "@ordo-pink/oss-sweech"
 
 import { sidebar$ } from "../workspace.state"
 
 export const sidebar_toggle = maoka.create("button", ({ use }) => {
-	const { hunter } = use(maoka_sdk.context.consume)
-	const get_sidebar = use(maoka_sdk.jabs.zags.marry$(sidebar$))
-	const translate = use(maoka_sdk.jabs.t$)
+	const { hunter } = use(client_maoka.context.consume)
+	const get_sidebar = use(client_maoka.jabs.zags.marry$(sidebar$))
+	const translate = use(client_maoka.jabs.t$)
 
-	use(maoka_sdk.jabs.classes.set("sidebar-toggle hidden"))
-	use(maoka_sdk.jabs.listen("onclick", () => hunter.shoot("sidebar.toggle")))
+	use(client_maoka.jabs.classes.set("sidebar-toggle hidden"))
+	use(client_maoka.jabs.listen("onclick", () => hunter.shoot("sidebar.toggle")))
 
 	return () => {
 		const { visible, enabled } = get_sidebar()
 
 		const t_title = translate(visible ? "sidebar_commands_hide_title" : "sidebar_commands_show_title")
 
-		use(maoka_sdk.jabs.set_attribute("title", t_title))
-		if (enabled) use(maoka_sdk.jabs.classes.replace("hidden", "visible"))
-		else use(maoka_sdk.jabs.classes.replace("visible", "hidden"))
+		use(client_maoka.jabs.set_attribute("title", t_title))
+		if (enabled) use(client_maoka.jabs.classes.replace("hidden", "visible"))
+		else use(client_maoka.jabs.classes.replace("visible", "hidden"))
 
 		return sweech
 			.of_true()

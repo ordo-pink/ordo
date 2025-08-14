@@ -31,7 +31,7 @@ export const create: Lib.Create =
 				const headers = new Headers()
 
 				headers.set("Access-Control-Allow-Origin", origin)
-				headers.set("Access-Control-Allow-Methods", options[route].join(", "))
+				headers.set("Access-Control-Allow-Methods", options[route].join(", ").toUpperCase())
 
 				if (allow_credentials) headers.set("Access-Control-Allow-Credentials", "true")
 				if (max_age) headers.set("Access-Control-Max-Age", String(max_age))
@@ -51,7 +51,7 @@ export const create: Lib.Create =
 				params.response.headers.set("Access-Control-Allow-Origin", origin)
 
 				if (params.matched_route)
-					params.response.headers.set("Access-Control-Allow-Methods", options[params.matched_route].join(", "))
+					params.response.headers.set("Access-Control-Allow-Methods", options[params.matched_route].join(", ").toUpperCase())
 				if (allow_credentials) params.response.headers.set("Access-Control-Allow-Credentials", "true")
 				if (max_age) params.response.headers.set("Access-Control-Max-Age", String(max_age))
 				if (allowed_headers.length) params.response.headers.set("Access-Control-Allow-Headers", allowed_headers.join(", "))

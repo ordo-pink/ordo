@@ -43,7 +43,7 @@ export const auth_jab: (
 				.pipe(
 					oath.ops.chain(init =>
 						oath.from_promise(() =>
-							fetch(`${hosts.id}/auth/refresh`, init).then(res => (res.status < 300 ? res.json() : Promise.reject())),
+							fetch(`${hosts.id}/auth`, init).then(res => (res.status < 300 ? res.json() : Promise.reject())),
 						),
 					),
 				)

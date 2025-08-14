@@ -158,7 +158,7 @@ const track_prey_jab: Maoka.Jab = ({ node, use }) => {
 				release_sign_out = hunter.track("user.sign_out", () => {
 					oath
 						.of({ method: "DELETE", credentials: "include" } as const)
-						.pipe(oath.ops.and(init => oath.from_promise(() => fetch(`${hosts.id}/auth/kill`, init))))
+						.pipe(oath.ops.and(init => oath.from_promise(() => fetch(`${hosts.id}/auth`, init))))
 						// TODO Clean up with local persistence strategy
 						.pipe(
 							oath.ops.tap(() => {

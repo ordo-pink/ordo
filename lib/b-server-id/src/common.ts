@@ -35,7 +35,7 @@ export const extract_id_param = (params: Routary.RouteParams) => () =>
 export const check_is_executing_on_self = (request: Request) => (id: Core.User.Id) =>
 	server_routary.oaths
 		.get_auth_cookie(request)
-		.pipe(oath.ops.chain(x => oath.if(x === id, { f: core.rrr.eperm(CORE.RRR.REASON.NO), t: core.fns.lazy(id) })))
+		.pipe(oath.ops.chain(x => oath.if(x === id, { f: core.rrr.eperm(CORE.RRR.REASON.NO), t: () => id })))
 
 export const check_user_is_authenticated = (request: Request, env: Lib.Env) =>
 	server_routary.oaths
@@ -46,7 +46,7 @@ export const check_user_is_authenticated = (request: Request, env: Lib.Env) =>
 		.pipe(oath.ops.chain(({ user, jti }) => oath.from_nullable(server.user.get_session(jti!, user)))) // TODO wjwt types
 		.pipe(oath.ops.map(core.fns.prop(1)))
 		.pipe(oath.ops.chain(t => oath.if(core.timestamp.is_after(Date.now() - env.session_lifetime_minutes * 60, t))))
-		.pipe(oath.ops.rmap(core.rrr.eacces(CORE.RRR.REASON.NO)))
+		.pipe(oath.ops.rmap(() => core.rrr.eacces(CORE.RRR.REASON.NO, void 0)))
 
 export const get_request_param = (params: Colonoscope.Results, name: string) => oath.from_nullable(params && params[name])
 

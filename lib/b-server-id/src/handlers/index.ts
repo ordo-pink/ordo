@@ -19,11 +19,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+export * from "./auth-kill.handler"
+export * from "./auth-refresh.handler"
 export * from "./delete-user.handler"
 export * from "./get-user-by-email.handler"
 export * from "./get-user-by-id.handler"
 export * from "./get-user-by-ref.handler"
-export * from "./refresh-session.handler"
 export * from "./code-request.handler"
 export * from "./update-email.handler"
 export * from "./update-ref.handler"

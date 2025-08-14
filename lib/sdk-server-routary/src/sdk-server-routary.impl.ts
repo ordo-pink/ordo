@@ -73,10 +73,10 @@ export namespace oaths {
 
 	export const get_auth_cookie = (request: Request) =>
 		oath
-			.from_nullable(request.headers.get("Cookie"), core.rrr.einval(CORE.RRR.REASON.MISSING_REQUIRED_COOKIE))
+			.from_nullable(request.headers.get("Cookie"))
 			.pipe(oath.ops.map(Bun.Cookie.parse))
 			.pipe(oath.ops.chain(c => oath.if(c.name === SERVER.COOKIE_NAME, { t: () => c.value })))
-			.pipe(oath.ops.rmap(core.rrr.einval(CORE.RRR.REASON.MISSING_REQUIRED_COOKIE)))
+			.pipe(oath.ops.rmap(() => core.rrr.einval(CORE.RRR.REASON.MISSING_REQUIRED_COOKIE, void 0)))
 
 	export const get_json_body = (request: Request) =>
 		oath.from_promise(() => request.json()).pipe(oath.ops.rmap(core.rrr.einval(CORE.RRR.REASON.JSON_PARSE_FAILED)))

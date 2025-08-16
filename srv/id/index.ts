@@ -33,31 +33,19 @@ import { user_repository_data } from "@ordo-pink/b-repository-user-repository-da
 import { wjwt as wjwt_lib } from "@ordo-pink/oss-wjwt"
 
 const main = async () => {
-	const path = "var/dt"
-	const codegen_algorithm = { algorithm: "bcrypt", cost: 4 } as const
-	const data_repository = data_repository_fs.create(path)
-	const code_lifetime_seconds = 60 * 5
-	const session_lifetime_minutes = 60 * 24 * 30
-	const user_repository = user_repository_data.create(data_repository, cache_user_id, cache_file_id, user_file_id)
+	const codegen_algorithm = await codegen_algorithm0.cata(oath.catas.to_promise())
+	const wjwt_alg = await wjwt_algorithm0.cata(oath.catas.to_promise())
+	const priv = await private_key0.cata(oath.catas.to_promise())
+	const pub = await public_key0.cata(oath.catas.to_promise())
+
 	// TODO Real email strategy
 	const email_strategy: Server.Email.Strategy = { send: (_, __, content) => Promise.resolve(logger.debug(content)) }
-	const codegen = codegen_strategy_bun.create(codegen_algorithm)
-	const allowed_origins = ["http://localhost:3000" as const]
-	const priv = await private_key.cata(
-		oath.catas.or_else(() => {
-			throw new Error("Missing private key for JWT")
-		}),
-	)
-	const pub = await public_key.cata(
-		oath.catas.or_else(() => {
-			throw new Error("Missing public key for JWT")
-		}),
-	)
+	const data_repository = data_repository_fs.create(data_root)
+	const user_repository = user_repository_data.create(data_repository, cache_user_id, cache_file_id, user_file_id)
+	const codegen_strategy = codegen_strategy_bun.create(codegen_algorithm)
+	const wjwt = wjwt_lib.create(wjwt_alg, priv, pub, allowed_origins, "http://localhost:3001", session_lifetime_minutes)
 
-	const wjwt = wjwt_lib.create("Ed25519", priv, pub, "http://localhost:3000", "http://localhost:3001", 60 * 24 * 30)
-
-	// Set to any until bun types are fixed
-	const fetch: any = server_id
+	const fetch = server_id
 		.create(
 			logger,
 			user_repository,
@@ -65,7 +53,7 @@ const main = async () => {
 			session_lifetime_minutes,
 			email_strategy,
 			allowed_origins,
-			codegen,
+			codegen_strategy,
 			wjwt,
 		)
 		.or_else(() => rickroll, catcher)
@@ -91,7 +79,7 @@ const logger: Core.Logger = {
 const get_alg = () => oath.from_nullable(Bun.env.ORDO_ID_SESSION_TOKEN_ALGORITHM)
 
 // TODO Clean up, add checks
-const private_key = oath
+const private_key0 = oath
 	.from_nullable(Bun.env.ORDO_ID_SESSION_TOKEN_PRIVATE_KEY)
 	.pipe(oath.ops.chain(key => get_alg().pipe(oath.ops.map(alg => [alg, key]))))
 	.pipe(
@@ -101,7 +89,7 @@ const private_key = oath
 	)
 
 // TODO Clean up, add checks
-const public_key = oath
+const public_key0 = oath
 	.from_nullable(Bun.env.ORDO_ID_SESSION_TOKEN_PUBLIC_KEY)
 	.pipe(oath.ops.chain(key => get_alg().pipe(oath.ops.map(alg => [alg, key]))))
 	.pipe(
@@ -110,10 +98,17 @@ const public_key = oath
 		),
 	)
 
+const allowed_origins = result
+	.from_nullable(Bun.env.ORDO_ID_ALLOW_ORIGIN)
+	.pipe(result.ops.map(str => str.split(", ")))
+	.cata(result.catas.or_else(() => "http://localhost:3000"))
+
 const port = result
 	.from_nullable(Bun.env.ORDO_ID_PORT)
 	.pipe(result.ops.chain(port => result.if(server.is_port(port), { on_true: () => port })))
 	.cata(result.catas.or_else(() => "3001"))
+
+const data_root = result.from_nullable(Bun.env.ORDO_ID_DATA_ROOT).cata(result.catas.or_else(() => "var/dt1"))
 
 const user_file_id = result
 	.from_nullable(Bun.env.ORDO_USER_FILE_ID)
@@ -129,6 +124,38 @@ const cache_file_id = result
 	.from_nullable(Bun.env.ORDO_ID_CACHE_FILE_ID)
 	.pipe(result.ops.chain(id => result.if(core.uuid.guard(id), { on_true: () => id as Core.Uuid.Instance })))
 	.cata(result.catas.or_else(() => CORE.UUID.THE_LAST_ONE as Core.Uuid.Instance))
+
+const codegen_algorithm0 = oath.from_nullable(Bun.env.ORDO_ID_CODE_ALGORITHM).pipe(
+	oath.ops.chain(algorithm =>
+		oath
+			.from_nullable(Bun.env.ORDO_ID_CODE_ALGORITHM_PARAMS)
+			.pipe(oath.ops.chain(str => oath.try(() => JSON.parse(str))))
+			.pipe(oath.ops.fix(() => ({})))
+			.pipe(oath.ops.map(params => ({ algorithm, ...params }))),
+	),
+)
+
+const code_lifetime_seconds = result
+	.from_nullable(Bun.env.ORDO_ID_CODE_LIFETIME_SECONDS)
+	.pipe(result.ops.map(str => Number.parseInt(str, 10)))
+	.pipe(result.ops.chain(n => result.if(core.fns.is_non_negative_integer(n), { on_true: () => n })))
+	.cata(result.catas.or_else(() => 60 * 5))
+
+const session_lifetime_minutes = result
+	.from_nullable(Bun.env.ORDO_ID_SESSION_LIFETIME_MINUTES)
+	.pipe(result.ops.map(str => Number.parseInt(str, 10)))
+	.pipe(result.ops.chain(n => result.if(core.fns.is_non_negative_integer(n), { on_true: () => n })))
+	.cata(result.catas.or_else(() => 60 * 24 * 30))
+
+const wjwt_algorithm0 = oath.from_nullable(Bun.env.ORDO_ID_SESSION_TOKEN_ALGORITHM).pipe(
+	oath.ops.chain(name =>
+		oath
+			.from_nullable(Bun.env.ORDO_ID_SESSION_TOKEN_ALGORITHM_PARAMS)
+			.pipe(oath.ops.chain(str => oath.try(() => JSON.parse(str))))
+			.pipe(oath.ops.fix(() => ({})))
+			.pipe(oath.ops.map(params => ({ name, ...params }))),
+	),
+)
 
 const catcher: Routary.Catcher<ServerRoutary.ArgsEnv, ServerRoutary.Mut> = ({ env, request, error }) => {
 	const pathname = new URL(request.url).pathname

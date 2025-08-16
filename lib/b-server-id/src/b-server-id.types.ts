@@ -30,7 +30,7 @@ export type CodeLifetimeSeconds = number & {}
 
 export type SessionLifetimeMinutes = number & {}
 
-export type AllowedOrigin = `http${string}`
+export type AllowedOrigin = string
 
 export type Hunt = Hunt.Instance<Prey>
 
@@ -40,8 +40,8 @@ export type Args = [
 	code_lifetime_seconds: CodeLifetimeSeconds,
 	session_lifetime_minutes: SessionLifetimeMinutes,
 	email_strategy: Server.Email.Strategy,
-	allowed_origins: AllowedOrigin[],
-	codegen: Server.Code.Codegen,
+	allowed_origins: AllowedOrigin | AllowedOrigin[],
+	codegen_strategy: Server.Code.Codegen,
 	wjwt: Wjwt.Instance,
 ]
 

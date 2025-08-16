@@ -8,6 +8,7 @@ export type Payload<$Custom extends Record<string, unknown> = Record<string, unk
 
 export type Algorithm =
 	| "Ed25519"
+	| { name: "Ed25519" }
 	| {
 			name: "RSA-PSS"
 			hash: {
@@ -26,12 +27,12 @@ export type Algorithm =
 	  }
 
 export type CreateArgs = [
-	alg: Algorithm,
+	algorithm: Algorithm,
 	private_key: CryptoKey,
 	public_key: CryptoKey,
 	aud: Aud,
 	iss: Iss,
-	token_lifetime_seconds: number,
+	token_lifetime_minutes: number,
 ]
 
 export type Create = <$Payload extends {} = {}>(...args: CreateArgs) => Instance<$Payload>

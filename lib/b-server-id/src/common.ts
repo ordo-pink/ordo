@@ -45,7 +45,7 @@ export const check_user_is_authenticated = (request: Request, env: Lib.Env) =>
 		.pipe(oath.ops.chain(({ sub, jti }) => env.user_repository.read(sub).pipe(oath.ops.map(user => ({ user, jti })))))
 		.pipe(oath.ops.chain(({ user, jti }) => oath.from_nullable(server.user.get_session(jti!, user)))) // TODO wjwt types
 		.pipe(oath.ops.map(core.fns.prop(1)))
-		.pipe(oath.ops.chain(t => oath.if(core.timestamp.is_after(Date.now() - env.session_lifetime_minutes * 60, t))))
+		.pipe(oath.ops.chain(t => oath.if(core.timestamp.is_after(Date.now() - env.session_lifetime_minutes * 60 * 1000, t))))
 		.pipe(oath.ops.rmap(() => core.rrr.eacces(CORE.RRR.REASON.NO, void 0)))
 
 export const get_request_param = (params: Colonoscope.Results, name: string) => oath.from_nullable(params && params[name])

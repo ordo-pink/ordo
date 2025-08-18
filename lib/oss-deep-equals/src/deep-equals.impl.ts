@@ -9,6 +9,11 @@ export const deep_equals: DeepEquals = (x, y) => {
 	if (typeof x !== typeof y) return false
 
 	if (is_arr(x)) return is_arr(y) && x.length === y.length && x.reduce(arr_value_deep_equals(y), true)
+	if (is_fn(x)) {
+		if (!is_fn(y)) return false
+
+		return x.toString() === y.toString()
+	}
 
 	if (is_obj(x)) {
 		if (!is_obj(y)) return false
@@ -24,6 +29,7 @@ export const deep_equals: DeepEquals = (x, y) => {
 
 const is_arr = Array.isArray
 const is_obj = (x: unknown): x is Record<string, unknown> => !!x && typeof x === "object"
+const is_fn = (x: unknown): x is (...args: any[]) => any => !!x && typeof x === "function"
 const keys = Object.keys
 const arr_value_deep_equals =
 	(y: any[]) =>

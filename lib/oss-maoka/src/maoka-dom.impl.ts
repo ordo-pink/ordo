@@ -80,24 +80,22 @@ export namespace maoka_dom {
 			event.stopPropagation()
 
 			const node = (event as CustomEvent).detail as MaokaDOM.Node
+			let skip = false
 
 			if (root.refresh_queue.some(n => n.id === node.id)) return
 
 			for (let i = 0; i < root.refresh_queue.length; i++) {
 				const refresh_element = root.refresh_queue[i]?.value
 
-				if (
-					refresh_element &&
-					refresh_element instanceof Element &&
-					node.value instanceof Element &&
-					node.value.contains?.(refresh_element)
-				) {
-					root.refresh_queue.splice(i, 1)
-					break
+				if (refresh_element && refresh_element instanceof Element && node.value instanceof Element) {
+					if (skip) break
+
+					if (node.value.contains?.(refresh_element)) root.refresh_queue.splice(i, 1)
+					if (refresh_element.isEqualNode(node.value) || refresh_element.contains(node.value)) skip = true
 				}
 			}
 
-			root.refresh_queue.push(node)
+			if (!skip) root.refresh_queue.push(node)
 		})
 
 		const observer = new MutationObserver(records => {

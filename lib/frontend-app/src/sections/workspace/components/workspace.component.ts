@@ -19,16 +19,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { type Maoka, maoka, maoka_dom } from "@ordo-pink/oss-maoka"
+import { type Maoka, type MaokaDOM, maoka, maoka_dom } from "@ordo-pink/oss-maoka"
+import type { ClientSDK } from "@ordo-pink/sdk-client"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 import { sweech } from "@ordo-pink/oss-sweech"
 
 import { sidebar$ } from "../workspace.state"
 
 export const workspace = maoka.create("main", ({ use, node }) => {
+	const { activities$ } = use(client_maoka.context.consume)
+
 	use(client_maoka.jabs.classes.set("workspace"))
 
-	return () => [workspace_renderer(), sidebar_padding_contractor({ parent_node: node })]
+	const get_current_activity = use(client_maoka.jabs.zags.cheat$(activities$, "current"))
+
+	return () => {
+		const activity = get_current_activity()
+
+		return [workspace_renderer({ activity }), sidebar_padding_contractor({ parent_node: node })]
+	}
 })
 
 // --- Internal ---
@@ -47,18 +56,14 @@ const sidebar_padding_contractor = maoka.create<{ parent_node: Maoka.Node }>("di
 	}
 })
 
-const workspace_renderer = maoka.create("div", ({ node, use }) => {
-	const { activities$ } = use(client_maoka.context.consume)
-
+const workspace_renderer = maoka.create<{ activity: ClientSDK.Activity.Instance | null }>("div", ({ activity, node, use }) => {
 	use(client_maoka.jabs.classes.set("h-full")) // TODO Move to CSS
-	const get_current_activity = use(client_maoka.jabs.zags.cheat$(activities$, "current"))
 
-	return async () => {
-		const current_activity = get_current_activity()
-
-		// TODO 404
-		if (current_activity && current_activity.render_workspace && maoka_dom.guards.is_dom_node(node)) {
-			await current_activity.render_workspace(node.value as HTMLDivElement)
-		} else return null
+	const handle_onmount = (n: MaokaDOM.Node<HTMLElement>) => {
+		if (activity && activity.render_workspace && maoka_dom.guards.is_dom_node(node))
+			void activity.render_workspace(node.value as HTMLDivElement)
+		else n.value.innerHTML = "" // TODO 404
 	}
+
+	use(maoka_dom.jabs.onmount(handle_onmount))
 })

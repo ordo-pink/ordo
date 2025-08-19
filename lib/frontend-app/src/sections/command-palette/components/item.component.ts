@@ -62,5 +62,5 @@ const item_main = maoka_styled.div("command-palette_item_main")
 const item_footer = maoka_styled.div("command-palette_item_footer")
 const item_icon = maoka_styled.span<{ render: ClientSDK.CommandPalette.RenderIcon }>(
 	"command-palette_item_icon",
-	({ render, use }) => use(maoka_dom.jabs.if_dom(n => void render(n.value))),
+	({ render, use }) => use(maoka_dom.jabs.hit_if_dom(n => void render(n.value))),
 )

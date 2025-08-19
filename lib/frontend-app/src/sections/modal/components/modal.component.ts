@@ -48,14 +48,14 @@ export const modal = maoka.create("div", ({ use }) => {
 
 			return content_wrapper()
 		} else {
-			use(maoka_dom.jabs.if_dom(n => (n.value.innerHTML = "")))
+			use(maoka_dom.jabs.hit_if_dom(n => (n.value.innerHTML = "")))
 		}
 	}
 })
 
 const content_wrapper = maoka.create("div", ({ use }) => {
 	const modal_instance = modal$.select("instance")
-	use(maoka_dom.jabs.if_dom(n => void modal_instance!.render(n.value as HTMLDivElement)))
+	use(maoka_dom.jabs.hit_if_dom(n => void modal_instance!.render(n.value as HTMLDivElement)))
 })
 
 namespace internal {

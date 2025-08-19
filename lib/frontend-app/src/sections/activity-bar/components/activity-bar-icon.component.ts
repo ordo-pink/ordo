@@ -29,7 +29,7 @@ export const activity_bar_icon = maoka.create<Args>("span", ({ use, is_current, 
 	const t_readable_name = use(client_maoka.jabs.translate$(readable_name))
 
 	use(client_maoka.jabs.classes.set("activity-bar_icon"))
-	use(maoka_dom.jabs.if_dom(n => void render_icon(n.value)))
+	use(maoka_dom.jabs.hit_if_dom(n => void render_icon(n.value)))
 
 	return () => {
 		use(client_maoka.jabs.set_attribute("title", t_readable_name()))

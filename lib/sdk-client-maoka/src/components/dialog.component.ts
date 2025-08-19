@@ -62,7 +62,7 @@ const dialog_base = maoka.create<Dialog.Args>(
 		use(client_maoka.jabs.classes.set("dialog", get_dialog_css_class(type)))
 
 		const handle_cancel_click = () =>
-			void (maoka_dom.guards.is_dom_node(node) && node.value.parentElement?.parentElement?.parentElement?.click())
+			void (maoka_dom.node_guard(node) && node.value.parentElement?.parentElement?.parentElement?.click())
 
 		return () => [
 			dialog_header_div(() => [dialog_icon_span({ render_icon }), dialog_title_h2(title)]),

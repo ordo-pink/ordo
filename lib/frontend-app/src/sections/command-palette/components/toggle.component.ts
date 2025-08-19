@@ -37,7 +37,7 @@ export const command_palette_toggle = maoka.create("div", ({ use, node }) => {
 		hunter.shoot("command_palette.toggle")
 	}
 	const handle_keydown = (event: KeyboardEvent) => {
-		if (maoka_dom.guards.is_dom_node(node) && event.code === "Enter") {
+		if (maoka_dom.node_guard(node) && event.code === "Enter") {
 			event.stopPropagation()
 			hunter.shoot("command_palette.toggle")
 		}

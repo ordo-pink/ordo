@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { maoka, maoka_styled } from "@ordo-pink/oss-maoka"
+import { maoka, maoka_dom, maoka_styled } from "@ordo-pink/oss-maoka"
 import { type ClientSDK } from "@ordo-pink/sdk-client"
 import type { Core } from "@ordo-pink/sdk-core"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
@@ -84,10 +84,15 @@ export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
 	const activity_bar = use(create_activity_bar_jab(command_palette_toggle, sidebar_toggle))
 	const notifications = use(create_notifications_jab)
 
-	import("@ordo-pink/function-landing")
-		.then(m => m.default)
-		.then(f => f(state))
-		.catch(logger.error)
+	// TODO Async onmount
+	use(
+		maoka_dom.jabs.onmount(() => {
+			void import("@ordo-pink/function-landing")
+				.then(m => m.default)
+				.then(f => f(state))
+				.catch(logger.error)
+		}),
+	)
 
 	return () => [
 		title(),

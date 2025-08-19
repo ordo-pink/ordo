@@ -11,7 +11,7 @@ export const listen_jab =
 		f: $Element[$Event],
 	): Maoka.Jab =>
 	({ use }) =>
-		use(maoka_dom.jabs.if_dom(n => ((n.value as any)[event] = f)))
+		use(maoka_dom.jabs.hit_if_dom(n => ((n.value as any)[event] = f)))
 
 export const listen_global_event_jab =
 	<$Key extends keyof DocumentEventMap>(key: $Key, f: (event: DocumentEventMap[$Key]) => void): Maoka.Jab =>

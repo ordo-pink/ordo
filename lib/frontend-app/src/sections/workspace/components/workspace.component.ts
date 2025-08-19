@@ -48,7 +48,7 @@ const sidebar_padding_contractor = maoka.create<{ parent_node: Maoka.Node }>("di
 	return () => {
 		const sidebar = get_sidebar()
 
-		if (maoka_dom.guards.is_dom_node(parent_node))
+		if (maoka_dom.node_guard(parent_node))
 			sweech
 				.of_true()
 				.case(sidebar.enabled && sidebar.visible, () => parent_node.value.classList.remove("no-sidebar"))
@@ -60,7 +60,7 @@ const workspace_renderer = maoka.create<{ activity: ClientSDK.Activity.Instance 
 	use(client_maoka.jabs.classes.set("h-full")) // TODO Move to CSS
 
 	const handle_onmount = (n: MaokaDOM.Node<HTMLElement>) => {
-		if (activity && activity.render_workspace && maoka_dom.guards.is_dom_node(node))
+		if (activity && activity.render_workspace && maoka_dom.node_guard(node))
 			void activity.render_workspace(node.value as HTMLDivElement)
 		else n.value.innerHTML = "" // TODO 404
 	}

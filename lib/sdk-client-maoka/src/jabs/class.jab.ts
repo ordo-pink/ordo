@@ -17,14 +17,14 @@ export namespace class_jabs {
 	export const add =
 		(...classes: string[]): Maoka.Jab =>
 		({ use }) => {
-			use(maoka_dom.jabs.if_dom(n => n.value.classList.add(...classes.flatMap(cls => cls.split(" ")))))
+			use(maoka_dom.jabs.hit_if_dom(n => n.value.classList.add(...classes.flatMap(cls => cls.split(" ")))))
 			// TODO if_string
 		}
 
 	export const remove =
 		<$Class extends string>(...classes: MaokaSDK.Pouch.NoSpaceString<$Class>[]): Maoka.Jab =>
 		({ use }) => {
-			use(maoka_dom.jabs.if_dom(n => n.value.classList.remove(...classes.flatMap(cls => cls.split(" ")))))
+			use(maoka_dom.jabs.hit_if_dom(n => n.value.classList.remove(...classes.flatMap(cls => cls.split(" ")))))
 			// TODO if_string
 		}
 
@@ -34,7 +34,7 @@ export namespace class_jabs {
 			next: MaokaSDK.Pouch.NoSpaceString<$Next>,
 		): Maoka.Jab =>
 		({ use }) => {
-			use(maoka_dom.jabs.if_dom(n => n.value.classList.replace(prev, next)))
+			use(maoka_dom.jabs.hit_if_dom(n => n.value.classList.replace(prev, next)))
 			// TODO if_string
 		}
 }

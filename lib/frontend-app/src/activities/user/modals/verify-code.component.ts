@@ -118,7 +118,7 @@ const input = maoka_styled.input("user_join-modal_email", ({ use }) => {
 	const t_placeholer = "123456" // TODO i18n
 	const value = authenticating_user$.select("code")
 
-	const handle_mount = () => use(maoka_dom.jabs.if_dom(n => n.value.focus()))
+	const handle_mount = () => use(maoka_dom.jabs.hit_if_dom(n => n.value.focus()))
 	const handle_input = (event: Event) => {
 		const target = event.target as HTMLInputElement
 		authenticating_user$.update("code", () => target.value)

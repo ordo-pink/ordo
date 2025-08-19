@@ -305,7 +305,7 @@ const search = maoka_styled.input("user_join-modal_email", ({ use }) => {
 	const t_placeholder = use(client_maoka.jabs.translate$("user_modals_join_placeholder"))
 	const value = authenticating_user$.select("email")
 
-	const handle_mount = () => use(maoka_dom.jabs.if_dom(n => n.value.focus()))
+	const handle_mount = () => use(maoka_dom.jabs.hit_if_dom(n => n.value.focus()))
 	const handle_input = (event: Event) => {
 		const target = event.target as HTMLInputElement
 		authenticating_user$.update("email", () => target.value)

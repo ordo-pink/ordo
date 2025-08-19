@@ -36,7 +36,7 @@ const default_button = maoka.create<ClientMaoka.Components.ButtonArgs>(
 
 		const handle_click = (event: MouseEvent) => {
 			event.preventDefault()
-			if (maoka_dom.guards.is_dom_node(node)) node.value.focus()
+			if (maoka_dom.node_guard(node)) node.value.focus()
 			return on_click(event)
 		}
 

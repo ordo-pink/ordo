@@ -24,7 +24,7 @@ const icon = (children: string) =>
 				}
 			}
 
-			use(maoka_dom.jabs.if_dom(handle_if_dom))
+			use(maoka_dom.jabs.hit_if_dom(handle_if_dom))
 		},
 	)
 

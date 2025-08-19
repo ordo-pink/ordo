@@ -34,7 +34,7 @@ export const command_palette_search = maoka.create("label", ({ use }) => {
 const search = maoka_styled.input("command-palette_search", ({ use }) => {
 	const t_search = "Search..." // TODO i18n
 
-	const handle_mount = () => use(maoka_dom.jabs.if_dom(n => n.value.focus()))
+	const handle_mount = () => use(maoka_dom.jabs.hit_if_dom(n => n.value.focus()))
 	const handle_input = (event: Event) => {
 		const target = event.target as HTMLInputElement
 		command_palette$.update("search_value", () => target.value)

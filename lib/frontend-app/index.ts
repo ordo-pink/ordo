@@ -36,7 +36,7 @@ import { create_rotor_jab } from "./src/state/aist"
 import { create_sidebar_jab } from "./src/sections/workspace"
 import { create_user_jab } from "./src/activities/user"
 import { init_activities_jab } from "./src/state/activities"
-import { window_title_jab } from "./src/sections/window-title"
+import { title } from "./src/sections/window-title"
 
 import "./index.css"
 
@@ -77,7 +77,6 @@ export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
 	use(client_maoka.jabs.register_translations("en", en_rrr_codes))
 	use(create_user_jab)
 
-	const title = use(window_title_jab)
 	const modal = use(create_modal_jab)
 	const { command_palette, command_palette_toggle } = use(create_command_palette_jab)
 	const { sidebar, sidebar_toggle, workspace } = use(create_sidebar_jab)
@@ -85,26 +84,26 @@ export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
 	const activity_bar = use(create_activity_bar_jab(command_palette_toggle, sidebar_toggle))
 	const notifications = use(create_notifications_jab)
 
-	void import("@ordo-pink/function-landing")
+	import("@ordo-pink/function-landing")
 		.then(m => m.default)
 		.then(f => f(state))
 		.catch(logger.error)
 
 	return () => [
+		title(),
 		screen_wrapper(() => [workspace(), sidebar()]),
 		activity_bar(),
 		background_task_status(),
 		modal(),
 		command_palette(),
 		notifications(),
-		title(),
 	]
 })
 
 const screen_wrapper = maoka_styled.div("app")
 
 const en_rrr_codes = {
-	loading_title: "Loading... | Ordo.pink",
+	loading_title: "Loading...",
 	rrr_codes_EACCES: "Access Denied",
 	rrr_codes_EAGAIN: "Try Later",
 	rrr_codes_EEXIST: "Already Exists",

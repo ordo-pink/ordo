@@ -19,15 +19,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { type Maoka } from "@ordo-pink/oss-maoka"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
+import { maoka } from "@ordo-pink/oss-maoka"
 
-import { title } from "./components/title.component"
-
-export const window_title_jab: Maoka.Jab<() => Maoka.Component> = ({ use }) => {
+/**
+ * Title div watches for "title.set_title" shots and makes changes to the DOM. This behavior is extracted into
+ * a separate Maoka component to avoid redundant rerenders of higher level DOM nodes in case the `t$` jab triggers
+ * a refresh due to changes in translations.
+ */
+export const title = maoka.create("div", ({ use }) => {
 	const { hunter } = use(client_maoka.context.consume)
+	const translate = use(client_maoka.jabs.t$)
+	const title_element = document.querySelector("title")
 
-	hunter.shoot("title.set_title", "loading_title")
+	hunter.track("title.set_title", title => {
+		if (title_element) {
+			const title_str = title ? translate(title, "404") : "404"
 
-	return () => title()
-}
+			title_element.innerHTML = `${title_str} | Ordo.pink`
+		}
+	})
+})

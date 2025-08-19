@@ -123,7 +123,7 @@ export namespace maoka_dom {
 			}
 		})
 
-		observer.observe(root_element, { childList: true, subtree: true, attributeFilter: ["onmount", "onunmount"] })
+		observer.observe(root_element, { childList: true, subtree: true, attributeFilter: ["mounted", "onmount", "onunmount"] })
 
 		await internal.render_dom_children(node)
 

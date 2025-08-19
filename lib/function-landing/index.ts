@@ -55,13 +55,13 @@ export default client_sdk.create_f(
 				fns_landing_cookie_notification_message: "Wait, what?",
 				fns_landing_cookie_notification_title: "We don't use cookies",
 				fns_landing_cta_announcement: "v11 is out!",
-				fns_landing_title: "Welcome!",
+				fns_landing_title: "Welcome to ORDO!",
 			},
 		})
 
 		state.hunter.shoot("activity.register", {
 			id: "@ordo.pink/landing",
-			readable_name: "loading_title",
+			readable_name: "fns_landing_title",
 			render_icon: span => maoka_dom.render(span, icon, create_id),
 			render_workspace: div => maoka_dom.render(div, workspace_with_state, create_id),
 			routes: ["/"],

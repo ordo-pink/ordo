@@ -44,8 +44,6 @@ export const workspace = maoka.create("div", ({ use, node }) => {
 	const t_try_now = use(client_maoka.jabs.translate$("fns_landing_buttons_try_now"))
 	const t_join = use(client_maoka.jabs.translate$("fns_landing_buttons_join"))
 
-	hunter.shoot("title.set_title", "fns_landing_title")
-
 	const handle_mouse_move = (event: MouseEvent) => {
 		const dx = (event.clientX - window.innerWidth / 2) * -0.005
 		const dy = (event.clientY - window.innerHeight / 2) * -0.01
@@ -55,6 +53,8 @@ export const workspace = maoka.create("div", ({ use, node }) => {
 	}
 
 	const handle_onmount = () => {
+		hunter.shoot("title.set_title", "fns_landing_title")
+
 		if (!is_cookie_modal_shown) {
 			is_cookie_modal_shown = true
 

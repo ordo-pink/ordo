@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { maoka, maoka_dom, maoka_styled } from "@ordo-pink/oss-maoka"
+import { maoka } from "@ordo-pink/oss-maoka"
 
 import type * as ClientMaoka from "../sdk-client-maoka.types"
 import { actionable_hotkey } from "./hotkey.component"
@@ -25,7 +25,7 @@ export const button_danger = (params: ClientMaoka.Components.ButtonArgs) =>
 
 // --- Internal ---
 
-const text_container = maoka_styled.div()
+const text_container = maoka.styled.div()
 
 const default_button = maoka.create<ClientMaoka.Components.ButtonArgs>(
 	"button",
@@ -36,7 +36,7 @@ const default_button = maoka.create<ClientMaoka.Components.ButtonArgs>(
 
 		const handle_click = (event: MouseEvent) => {
 			event.preventDefault()
-			if (maoka_dom.node_guard(node)) node.value.focus()
+			if (maoka.dom.node_guard(node)) node.value.focus()
 			return on_click(event)
 		}
 

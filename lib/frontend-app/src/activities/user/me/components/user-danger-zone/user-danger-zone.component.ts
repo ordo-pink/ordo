@@ -19,9 +19,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { maoka, maoka_styled } from "@ordo-pink/oss-maoka"
 import { NOTIFICATION } from "@ordo-pink/sdk-client"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
+import { maoka } from "@ordo-pink/oss-maoka"
 
 import {
 	user_card_body,
@@ -71,4 +71,4 @@ export const danger_zone_card = maoka.create("div", ({ use }) => {
 		])
 })
 
-const actions = maoka_styled.div("actions")
+const actions = maoka.styled.div("actions")

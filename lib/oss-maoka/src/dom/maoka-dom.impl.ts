@@ -3,16 +3,16 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import * as MAOKA_DOM from "./maoka-dom.constants.ts"
 import type * as Maoka from "../maoka/maoka.types.ts"
 import type * as MaokaDom from "./maoka-dom.types.ts"
-import * as maoka from "../maoka/maoka.impl.ts"
+import { component_guard, node_guard as maoka_node_guard } from "../maoka/maoka.impl.ts"
+import { REFRESH_EVENT_NAME } from "./maoka-dom.constants.ts"
 
 export * as jabs from "./jabs/maoka-dom-jabs.impl.ts"
 
 export const node_guard: MaokaDom.NodeGuard = <$Element extends HTMLElement = HTMLElement>(
 	x: any,
-): x is MaokaDom.Node<$Element> => maoka.node_guard(x) && globalThis.HTMLElement && x.value instanceof globalThis.HTMLElement
+): x is MaokaDom.Node<$Element> => maoka_node_guard(x) && globalThis.HTMLElement && x.value instanceof globalThis.HTMLElement
 
 export const render: MaokaDom.Render = async (root_element, component, create_id) => {
 	if (!globalThis.document) throw new Error("Couldn't find `document`. Did you attempt to render to DOM outside browser?")
@@ -43,7 +43,7 @@ export const render: MaokaDom.Render = async (root_element, component, create_id
 
 	request_idle_callback(() => void render_loop())
 
-	root_element.addEventListener(MAOKA_DOM.REFRESH_EVENT_NAME, event => {
+	root_element.addEventListener(REFRESH_EVENT_NAME, event => {
 		event.stopPropagation()
 
 		const node = (event as CustomEvent).detail as MaokaDom.Node
@@ -138,7 +138,7 @@ export const render_dom_children = async (node: Maoka.Node<HTMLElement>): Promis
 		if (typeof child === "string") nodes.push(child)
 		else if (typeof child === "number") nodes.push(String(child))
 		else if (node_guard(child)) nodes.push(await render_dom_children(child))
-		else if (maoka.component_guard(child)) nodes.push(await render_dom_children((await child(node.root)) as any))
+		else if (component_guard(child)) nodes.push(await render_dom_children((await child(node.root)) as any))
 		else if (!child) continue
 		else console.error("Unsupported maoka child", child)
 	}

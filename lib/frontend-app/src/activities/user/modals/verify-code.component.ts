@@ -20,11 +20,11 @@
  */
 
 import { type Core, core } from "@ordo-pink/sdk-core"
-import { maoka, maoka_dom, maoka_styled } from "@ordo-pink/oss-maoka"
 import { bs_question_circle } from "@ordo-pink/frontend-icons"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 import { client_rrr } from "@ordo-pink/sdk-client"
 import { get_device_info } from "@ordo-pink/_get-device-info"
+import { maoka } from "@ordo-pink/oss-maoka"
 import { oath } from "@ordo-pink/oss-oath"
 
 import { authenticating_user$ } from "../user.state"
@@ -102,11 +102,11 @@ export const verify_code_modal = maoka.create("div", ({ use }) => {
 
 // --- Internal ---
 
-const title = maoka_styled.h1("user_join-modal_title")
+const title = maoka.styled.h1("user_join-modal_title")
 
-const button_section = maoka_styled.div("user_join-modal_actions")
+const button_section = maoka.styled.div("user_join-modal_actions")
 
-const hint = maoka_styled.p()
+const hint = maoka.styled.p()
 
 const code_input = maoka.create("label", ({ use }) => {
 	use(client_maoka.jabs.classes.set("user_join-modal_email_wrapper"))
@@ -114,11 +114,11 @@ const code_input = maoka.create("label", ({ use }) => {
 	return () => [bs_question_circle({}), input()]
 })
 
-const input = maoka_styled.input("user_join-modal_email", ({ use }) => {
+const input = maoka.styled.input("user_join-modal_email", ({ use }) => {
 	const t_placeholer = "123456" // TODO i18n
 	const value = authenticating_user$.select("code")
 
-	const handle_mount = () => use(maoka_dom.jabs.hit_if_dom(n => n.value.focus()))
+	const handle_mount = () => use(maoka.dom.jabs.hit_if_dom(n => n.value.focus()))
 	const handle_input = (event: Event) => {
 		const target = event.target as HTMLInputElement
 		authenticating_user$.update("code", () => target.value)
@@ -128,7 +128,7 @@ const input = maoka_styled.input("user_join-modal_email", ({ use }) => {
 	use(client_maoka.jabs.set_attribute("type", "number"))
 	use(client_maoka.jabs.set_attribute("placeholder", t_placeholer))
 	use(client_maoka.jabs.listen("oninput", handle_input))
-	use(maoka_dom.jabs.onmount(handle_mount))
+	use(maoka.dom.jabs.onmount(handle_mount))
 
 	if (value) use(client_maoka.jabs.set_attribute("value", value))
 })

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { type Maoka, maoka, maoka_context } from "@ordo-pink/oss-maoka"
+import { type Maoka, maoka } from "@ordo-pink/oss-maoka"
 import type { ClientSDK } from "@ordo-pink/sdk-client"
 
 import type * as Lib from "./sdk-client-maoka.types"
@@ -21,7 +21,7 @@ import { is_sm_screen_jab$ } from "./jabs/is-sm-screen.jab"
 import { set_style_jab } from "./jabs/set-style.jab"
 import { zags_jabs } from "./jabs/zags.jab"
 
-export const context: Lib.Context = maoka_context.create()
+export const context: Lib.Context = maoka.context.create()
 
 export namespace components {
 	export namespace button {

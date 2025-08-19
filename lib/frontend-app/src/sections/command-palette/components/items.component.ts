@@ -19,10 +19,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { maoka, maoka_styled } from "@ordo-pink/oss-maoka"
 import { COMMAND_PALETTE } from "@ordo-pink/sdk-client"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 import { core } from "@ordo-pink/sdk-core"
+import { maoka } from "@ordo-pink/oss-maoka"
 
 import { command_palette$ } from "../command-palette.state"
 import { command_palette_item } from "./item.component"
@@ -68,7 +68,7 @@ export const command_palette_items = maoka.create("div", ({ use }) => {
 })
 
 namespace internal {
-	export const items = maoka_styled.div("command-palette_items")
+	export const items = maoka.styled.div("command-palette_items")
 
-	export const nothing_found_div = maoka_styled.div("command-palette_items_nothing-found")
+	export const nothing_found_div = maoka.styled.div("command-palette_items_nothing-found")
 }

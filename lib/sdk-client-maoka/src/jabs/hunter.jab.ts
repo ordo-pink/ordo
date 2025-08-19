@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { type Maoka, maoka_dom } from "@ordo-pink/oss-maoka"
+import { type Maoka, maoka } from "@ordo-pink/oss-maoka"
 import type { ClientSDK } from "@ordo-pink/sdk-client"
 import type { Hunt } from "@ordo-pink/oss-hunt"
 
@@ -23,7 +23,7 @@ export namespace hunter_jabs {
 
 			const release = state.hunter.track(prey, gun)
 
-			use(maoka_dom.jabs.onunmount(() => release()))
+			use(maoka.dom.jabs.onunmount(() => release()))
 		}
 
 	export const track_on_mount: <$Prey extends keyof Hunt.Pouch.ToPreys<ClientSDK.Preys>>(
@@ -43,6 +43,6 @@ export namespace hunter_jabs {
 				return () => release()
 			}
 
-			use(maoka_dom.jabs.onmount(handle_onmount))
+			use(maoka.dom.jabs.onmount(handle_onmount))
 		}
 }

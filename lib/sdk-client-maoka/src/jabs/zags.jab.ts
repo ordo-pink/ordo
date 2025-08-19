@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { type Maoka, maoka_dom } from "@ordo-pink/oss-maoka"
+import { type Maoka, maoka } from "@ordo-pink/oss-maoka"
 import type { Zags } from "@ordo-pink/oss-zags"
 
 export namespace zags_jabs {
@@ -13,10 +13,10 @@ export namespace zags_jabs {
 			let value: $State
 			const divorce = zags.marry(state => {
 				value = state
-				use(maoka_dom.jabs.refresh$)
+				use(maoka.dom.jabs.refresh$)
 			})
 
-			use(maoka_dom.jabs.onunmount(divorce))
+			use(maoka.dom.jabs.onunmount(divorce))
 
 			return () => value
 		}
@@ -31,10 +31,10 @@ export namespace zags_jabs {
 
 			const divorce = zags.cheat(dot_path, state => {
 				value = state
-				use(maoka_dom.jabs.refresh$)
+				use(maoka.dom.jabs.refresh$)
 			})
 
-			use(maoka_dom.jabs.onunmount(divorce))
+			use(maoka.dom.jabs.onunmount(divorce))
 
 			return () => value
 		}

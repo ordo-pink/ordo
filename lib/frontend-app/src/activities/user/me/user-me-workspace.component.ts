@@ -19,10 +19,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { maoka, maoka_styled } from "@ordo-pink/oss-maoka"
 import type { ClientSDK } from "@ordo-pink/sdk-client"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 import { core } from "@ordo-pink/sdk-core"
+import { maoka } from "@ordo-pink/oss-maoka"
 import { result } from "@ordo-pink/oss-result"
 
 import { user_card_body, user_card_title, user_card_under_construction } from "./components/user-card/user-card.component"
@@ -67,7 +67,7 @@ export const current_user_workspace = maoka.create<{ state: ClientSDK.F.State }>
 			.cata(result.catas.or_nothing())
 })
 
-const cards = maoka_styled.div("cards")
+const cards = maoka.styled.div("cards")
 
 const two_factor_auth_card = maoka.create("div", ({ use }) => {
 	const t_title = use(client_maoka.jabs.translate$("user_workspace_current_two_factor_auth_title"))

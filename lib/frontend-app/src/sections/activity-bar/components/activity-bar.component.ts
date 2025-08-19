@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { type Maoka, maoka, maoka_styled } from "@ordo-pink/oss-maoka"
+import { type Maoka, maoka } from "@ordo-pink/oss-maoka"
 import { type ClientSDK } from "@ordo-pink/sdk-client"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 
@@ -44,4 +44,4 @@ export const activity_bar = maoka.create<{
 const render_activity = (current: ClientSDK.Activity.Instance | null) => (item: ClientSDK.Activity.Instance) =>
 	item.render_icon && activity_bar_link({ is_current: !!current && current.id === item.id, item })
 
-const activity_bar_activities = maoka_styled.div("activity-bar_activities")
+const activity_bar_activities = maoka.styled.div("activity-bar_activities")

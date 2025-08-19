@@ -19,9 +19,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { maoka, maoka_dom } from "@ordo-pink/oss-maoka"
 import { type ClientSDK } from "@ordo-pink/sdk-client"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
+import { maoka } from "@ordo-pink/oss-maoka"
 
 import { get_readable_type } from "./utils/common"
 import { notifications$ } from "../notifications.state"
@@ -48,7 +48,7 @@ export const notification_progress = maoka.create<Args>("div", ({ id, type, dura
 	}
 
 	use(client_maoka.jabs.classes.set("notification-card_progress"))
-	use(maoka_dom.jabs.onmount(handle_onmount))
+	use(maoka.dom.jabs.onmount(handle_onmount))
 
 	return () => {
 		const progress = get_progress()

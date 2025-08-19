@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { type Maoka, maoka_dom } from "@ordo-pink/oss-maoka"
+import { type Maoka, maoka } from "@ordo-pink/oss-maoka"
 
 export const listen_jab =
 	<$Element extends HTMLElement, $Event extends keyof $Element>(
@@ -11,7 +11,7 @@ export const listen_jab =
 		f: $Element[$Event],
 	): Maoka.Jab =>
 	({ use }) =>
-		use(maoka_dom.jabs.hit_if_dom(n => ((n.value as any)[event] = f)))
+		use(maoka.dom.jabs.hit_if_dom(n => ((n.value as any)[event] = f)))
 
 export const listen_global_event_jab =
 	<$Key extends keyof DocumentEventMap>(key: $Key, f: (event: DocumentEventMap[$Key]) => void): Maoka.Jab =>
@@ -22,5 +22,5 @@ export const listen_global_event_jab =
 			return () => document.removeEventListener(key, f)
 		}
 
-		use(maoka_dom.jabs.onmount(handle_mount))
+		use(maoka.dom.jabs.onmount(handle_mount))
 	}

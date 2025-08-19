@@ -1,4 +1,9 @@
-import type { Tag } from "../maoka-styled/maoka-styled.types.ts"
+/*
+ * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ */
+
+import type { Tag } from "../styled/maoka-styled.types.ts"
 
 /** Internal id. You probably won't need it. Created with {@link CreateId root.create_id}. */
 export type Id = string | number

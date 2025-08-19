@@ -19,10 +19,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { maoka, maoka_dom, maoka_styled } from "@ordo-pink/oss-maoka"
 import { NOTIFICATION } from "@ordo-pink/sdk-client"
 import { bs_cookie } from "@ordo-pink/frontend-icons"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
+import { maoka } from "@ordo-pink/oss-maoka"
 
 import hero_layer_0 from "../../static/index-hero-layer-0.png"
 import hero_layer_1 from "../../static/index-hero-layer-1.png"
@@ -63,7 +63,7 @@ export const workspace = maoka.create("div", ({ use, node }) => {
 			hunter.shoot("notifications.show", {
 				duration: 15,
 				message: "fns_landing_cookie_notification_message",
-				render_icon: element => maoka_dom.render(element, component, node.root.create_id),
+				render_icon: element => maoka.dom.render(element, component, node.root.create_id),
 				title: "fns_landing_cookie_notification_title",
 				type: NOTIFICATION.TYPE.WARN,
 			})
@@ -73,7 +73,7 @@ export const workspace = maoka.create("div", ({ use, node }) => {
 	}
 
 	use(client_maoka.jabs.listen_global_event("mousemove", handle_mouse_move))
-	use(maoka_dom.jabs.onmount(handle_onmount))
+	use(maoka.dom.jabs.onmount(handle_onmount))
 
 	const handle_join_click = () => void hunter.shoot("user.show_request_code_modal")
 	const handle_more_click = () => console.log("HERE")
@@ -124,8 +124,8 @@ export const workspace = maoka.create("div", ({ use, node }) => {
 
 // --- Internal ---
 
-const hero_section = maoka_styled.section("hero-section")
-const hero_section_layers = maoka_styled.div("hero-layers")
+const hero_section = maoka.styled.section("hero-section")
+const hero_section_layers = maoka.styled.div("hero-layers")
 
 const hero_section_image_layer = maoka.create<{ image_path: string; index: number }>("div", ({ image_path, index, use }) => {
 	const background_image = `url(${image_path})`
@@ -133,20 +133,20 @@ const hero_section_image_layer = maoka.create<{ image_path: string; index: numbe
 	use(client_maoka.jabs.classes.set(`hero-layer hero-layer_${index}`))
 	use(client_maoka.jabs.set_style({ backgroundImage: background_image }))
 })
-const hero_card = maoka_styled.div("card-container")
-const hero_card_content = maoka_styled.div("card")
-const HeroCardLogoText = maoka_styled.span("logo_ordo-text")
-const HeroCardLogoWrapper = maoka_styled.h1("logo")
-const HeroCardLogoSection = maoka_styled.div("logo-section")
-const HeroCardLogoAction = maoka_styled.div("logo_action")
+const hero_card = maoka.styled.div("card-container")
+const hero_card_content = maoka.styled.div("card")
+const HeroCardLogoText = maoka.styled.span("logo_ordo-text")
+const HeroCardLogoWrapper = maoka.styled.h1("logo")
+const HeroCardLogoSection = maoka.styled.div("logo-section")
+const HeroCardLogoAction = maoka.styled.div("logo_action")
 
-const actions_container = maoka_styled.div("actions-container")
+const actions_container = maoka.styled.div("actions-container")
 
-const call_to_action_section = maoka_styled.div("cta")
-const call_to_action_card = maoka_styled.div("cta_card")
-const cta_logo_wrapper = maoka_styled.div()
-const cta_beta_test = maoka_styled.h3("cta_beta")
-const beta_started_string = maoka_styled.p("cta_beta_started")
+const call_to_action_section = maoka.styled.div("cta")
+const call_to_action_card = maoka.styled.div("cta_card")
+const cta_logo_wrapper = maoka.styled.div()
+const cta_beta_test = maoka.styled.h3("cta_beta")
+const beta_started_string = maoka.styled.p("cta_beta_started")
 const call_to_action_beta_logo = (t_beta_started: () => string) =>
 	cta_logo_wrapper(() => [
 		cta_beta_test(() => [
@@ -159,4 +159,4 @@ const call_to_action_beta_logo = (t_beta_started: () => string) =>
 		]),
 	])
 
-const token = (cls: string, text: string) => maoka_styled.span(cls)(() => text)
+const token = (cls: string, text: string) => maoka.styled.span(cls)(() => text)

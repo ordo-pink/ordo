@@ -19,9 +19,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { maoka, maoka_dom, maoka_styled } from "@ordo-pink/oss-maoka"
 import { bs_search } from "@ordo-pink/frontend-icons"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
+import { maoka } from "@ordo-pink/oss-maoka"
 
 import { command_palette$ } from "../command-palette.state"
 
@@ -31,10 +31,10 @@ export const command_palette_search = maoka.create("label", ({ use }) => {
 	return () => [bs_search({ classes: "" }), search()]
 })
 
-const search = maoka_styled.input("command-palette_search", ({ use }) => {
+const search = maoka.styled.input("command-palette_search", ({ use }) => {
 	const t_search = "Search..." // TODO i18n
 
-	const handle_mount = () => use(maoka_dom.jabs.hit_if_dom(n => n.value.focus()))
+	const handle_mount = () => use(maoka.dom.jabs.hit_if_dom(n => n.value.focus()))
 	const handle_input = (event: Event) => {
 		const target = event.target as HTMLInputElement
 		command_palette$.update("search_value", () => target.value)
@@ -45,5 +45,5 @@ const search = maoka_styled.input("command-palette_search", ({ use }) => {
 	use(client_maoka.jabs.set_attribute("autocomplete", "off"))
 	use(client_maoka.jabs.set_attribute("value", command_palette$.select("search_value")))
 	use(client_maoka.jabs.listen("oninput", handle_input))
-	use(maoka_dom.jabs.onmount(handle_mount))
+	use(maoka.dom.jabs.onmount(handle_mount))
 })

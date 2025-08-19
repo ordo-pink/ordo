@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { type Maoka, maoka_dom } from "@ordo-pink/oss-maoka"
+import { type Maoka, maoka } from "@ordo-pink/oss-maoka"
 import type { ClientSDK } from "@ordo-pink/sdk-client"
 import type { I18n } from "@ordo-pink/oss-i18n"
 import { core } from "@ordo-pink/sdk-core"
@@ -25,7 +25,7 @@ export const register_translations_jab: (
 
 		state.hunter.shoot("i18n.add_translations", { locale, values })
 
-		maoka_dom.jabs.onunmount(() => state.hunter.shoot("i18n.remove_translations", core.fns.keys_of(values)))
+		maoka.dom.jabs.onunmount(() => state.hunter.shoot("i18n.remove_translations", core.fns.keys_of(values)))
 	}
 
 export const t_jab$: Lib.Jabs.T$ = ({ use }) => {
@@ -37,7 +37,7 @@ export const t_jab$: Lib.Jabs.T$ = ({ use }) => {
 	const handle_mount = () => {
 		const divorce_locale = i18n$.cheat("locale", new_locale => {
 			current_locale = new_locale
-			use(maoka_dom.jabs.refresh$)
+			use(maoka.dom.jabs.refresh$)
 		})
 
 		return () => {
@@ -45,7 +45,7 @@ export const t_jab$: Lib.Jabs.T$ = ({ use }) => {
 		}
 	}
 
-	use(maoka_dom.jabs.onmount(handle_mount))
+	use(maoka.dom.jabs.onmount(handle_mount))
 
 	return (key, default_value = "") => {
 		try {
@@ -75,12 +75,12 @@ export const translate_jab$: Lib.Jabs.Translate$ =
 		const handle_mount = () => {
 			const divorce_locale = i18n$.cheat("locale", new_locale => {
 				current_locale = new_locale
-				use(maoka_dom.jabs.refresh$)
+				use(maoka.dom.jabs.refresh$)
 			})
 
 			const divorce_key = i18n$.cheat(`values.${current_locale}_${key}` as any, new_value => {
 				current_value = new_value as string
-				use(maoka_dom.jabs.refresh$)
+				use(maoka.dom.jabs.refresh$)
 			})
 
 			return () => {
@@ -89,7 +89,7 @@ export const translate_jab$: Lib.Jabs.Translate$ =
 			}
 		}
 
-		use(maoka_dom.jabs.onmount(handle_mount))
+		use(maoka.dom.jabs.onmount(handle_mount))
 
 		return default_value => current_value ?? default_value ?? key ?? ""
 	}

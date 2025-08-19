@@ -23,7 +23,7 @@ import { LOCALE } from "@ordo-pink/oss-i18n"
 import { bs_house } from "@ordo-pink/frontend-icons"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 import { client_sdk } from "@ordo-pink/sdk-client"
-import { maoka_dom } from "@ordo-pink/oss-maoka"
+import { maoka } from "@ordo-pink/oss-maoka"
 
 import { workspace } from "./src/components/workspace.component"
 
@@ -62,8 +62,8 @@ export default client_sdk.create_f(
 		state.hunter.shoot("activity.register", {
 			id: "@ordo.pink/landing",
 			readable_name: "fns_landing_title",
-			render_icon: span => maoka_dom.render(span, icon, create_id),
-			render_workspace: div => maoka_dom.render(div, workspace_with_state, create_id),
+			render_icon: span => maoka.dom.render(span, icon, create_id),
+			render_workspace: div => maoka.dom.render(div, workspace_with_state, create_id),
 			routes: ["/"],
 			start_route: "/",
 		})

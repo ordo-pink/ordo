@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ */
+
 import * as MAOKA_STYLED from "./maoka-styled.constants.ts"
 import type * as Maoka from "../maoka/maoka.types.ts"
 

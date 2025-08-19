@@ -21,7 +21,7 @@
 
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 
-import { maoka, maoka_dom } from "@ordo-pink/oss-maoka"
+import { maoka } from "@ordo-pink/oss-maoka"
 
 import { modal$ } from "../modal.state"
 
@@ -35,7 +35,7 @@ export const overlay = maoka.create("div", ({ kindergarten, use }) => {
 
 	use(client_maoka.jabs.classes.set("modal_wrapper"))
 	use(client_maoka.jabs.listen("onclick", handle_click))
-	use(maoka_dom.jabs.onmount(handle_mount))
+	use(maoka.dom.jabs.onmount(handle_mount))
 
 	return kindergarten
 })

@@ -3,6 +3,6 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-export * from "./src/maoka.constants.ts"
-export * from "./src/maoka.impl.ts"
-export * from "./src/maoka.types.ts"
+export * as MAOKA from "./src/maoka.constants.ts"
+export * as maoka from "./src/maoka.impl.ts"
+export * as Maoka from "./src/maoka.types.ts"

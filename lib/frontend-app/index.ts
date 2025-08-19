@@ -19,11 +19,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { maoka, maoka_dom, maoka_styled } from "@ordo-pink/oss-maoka"
 import { type ClientSDK } from "@ordo-pink/sdk-client"
 import type { Core } from "@ordo-pink/sdk-core"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 import { hunt } from "@ordo-pink/oss-hunt"
+import { maoka } from "@ordo-pink/oss-maoka"
 
 import { auth_jab } from "./src/state/auth"
 import { create_activity_bar_jab } from "./src/sections/activity-bar"
@@ -86,7 +86,7 @@ export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
 
 	// TODO Async onmount
 	use(
-		maoka_dom.jabs.onmount(() => {
+		maoka.dom.jabs.onmount(() => {
 			void import("@ordo-pink/function-landing")
 				.then(m => m.default)
 				.then(f => f(state))
@@ -105,7 +105,7 @@ export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
 	]
 })
 
-const screen_wrapper = maoka_styled.div("app")
+const screen_wrapper = maoka.styled.div("app")
 
 const en_rrr_codes = {
 	loading_title: "Loading...",

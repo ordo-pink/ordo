@@ -1,6 +1,11 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ */
+
+import type * as Dom from "../maoka-dom.types.ts"
 import type * as Jabs from "./maoka-dom-jabs.types.ts"
-import * as MAOKA_DOM from "../maoka-dom.constants.ts"
-import type { Node } from "../maoka-dom.types.ts"
+import { REFRESH_EVENT_NAME } from "../maoka-dom.constants.ts"
 import { node_guard } from "../maoka-dom.impl.ts"
 
 export const hit_if_dom: Jabs.HitIfDom =
@@ -12,7 +17,7 @@ export const hit_if_dom: Jabs.HitIfDom =
 export const onmount: Jabs.OnMount =
 	f =>
 	({ use }) => {
-		const handle_if_dom = (n: Node<HTMLElement>) => {
+		const handle_if_dom = (n: Dom.Node<HTMLElement>) => {
 			if (!n.value.onmount) n.value.onmount = []
 			n.value.onmount.push(() => f(n))
 		}
@@ -23,7 +28,7 @@ export const onmount: Jabs.OnMount =
 export const onunmount: Jabs.OnUnmount =
 	f =>
 	({ use }) => {
-		const handle_if_dom = (n: Node<HTMLElement>) => {
+		const handle_if_dom = (n: Dom.Node<HTMLElement>) => {
 			if (!n.value.onunmount) n.value.onunmount = []
 			n.value.onunmount.push(() => f(n))
 		}
@@ -32,5 +37,5 @@ export const onunmount: Jabs.OnUnmount =
 	}
 
 export const refresh$: Jabs.Refresh$ = ({ use }) => {
-	use(hit_if_dom(n => n.value.dispatchEvent(new CustomEvent(MAOKA_DOM.REFRESH_EVENT_NAME, { detail: n, bubbles: true }))))
+	use(hit_if_dom(n => n.value.dispatchEvent(new CustomEvent(REFRESH_EVENT_NAME, { detail: n, bubbles: true }))))
 }

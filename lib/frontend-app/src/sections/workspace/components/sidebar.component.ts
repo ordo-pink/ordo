@@ -19,8 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { maoka, maoka_dom } from "@ordo-pink/oss-maoka"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
+import { maoka } from "@ordo-pink/oss-maoka"
 
 import { sidebar$ } from "../workspace.state"
 
@@ -43,7 +43,7 @@ export const sidebar = maoka.create("aside", ({ use, node }) => {
 		if (current_activity && current_activity.render_sidebar) hunter.shoot("sidebar.enable")
 		else hunter.shoot("sidebar.disable")
 
-		if (!visible || !enabled || !maoka_dom.node_guard(node) || !node.value.parentElement) return null
+		if (!visible || !enabled || !maoka.dom.node_guard(node) || !node.value.parentElement) return null
 		else return sidebar_render_picker()
 	}
 })
@@ -60,7 +60,7 @@ const sidebar_render_picker = maoka.create("div", ({ use, node }) => {
 		const current_activity = get_current_activity()
 
 		// TODO 404
-		if (current_activity && current_activity.render_sidebar && maoka_dom.node_guard(node)) {
+		if (current_activity && current_activity.render_sidebar && maoka.dom.node_guard(node)) {
 			await current_activity.render_sidebar(node.value as HTMLDivElement)
 		} else return null
 	}

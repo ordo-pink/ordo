@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import type { Maoka, MaokaContext } from "@ordo-pink/oss-maoka"
 import type { ClientSDK } from "@ordo-pink/sdk-client"
+import type { Maoka } from "@ordo-pink/oss-maoka"
 
-export type Context = MaokaContext.Instance<ClientSDK.F.State>
+export type Context = Maoka.Context.Instance<ClientSDK.F.State>
 
 export namespace Jabs {
 	export type TranslateFn = (default_value?: string) => string

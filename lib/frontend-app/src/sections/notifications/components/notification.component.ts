@@ -19,9 +19,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { maoka, maoka_styled } from "@ordo-pink/oss-maoka"
 import type { ClientSDK } from "@ordo-pink/sdk-client"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
+import { maoka } from "@ordo-pink/oss-maoka"
 
 import { get_readable_type } from "./utils/common"
 import { hide_notification_button } from "./notification-hide-button.component"
@@ -57,7 +57,7 @@ export const notification = maoka.create<Args>("div", ({ on_click, id, message, 
 
 // --- Internal ---
 
-const create_notification_card = (card_type: string) => maoka_styled.div(`notification-card ${card_type}`)
-const notification_body = maoka_styled.div("notification-card_body")
-const notification_message = maoka_styled.p()
-const notification_title = maoka_styled.h2("notification-card_title")
+const create_notification_card = (card_type: string) => maoka.styled.div(`notification-card ${card_type}`)
+const notification_body = maoka.styled.div("notification-card_body")
+const notification_message = maoka.styled.p()
+const notification_title = maoka.styled.h2("notification-card_title")

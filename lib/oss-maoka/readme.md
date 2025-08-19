@@ -2,22 +2,21 @@
 
 [![License: Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg)](http://unlicense.org/)
 
-Maoka is a <1KB library for rendering user interfaces (and annoying JavaScript devs).
+Maoka is a 4.69KB (nice!) library for rendering user interfaces (and annoying JavaScript devs).
 
 ## Quick start
 
 Here's a canonical counter example but it actually discounts:
 
 ```javascript
-import { Maoka } from "@ordo-pink/maoka"
-import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
+import { maoka } from "@ordo-pink/maoka"
 
-const Discounter = Maoka.create("button", ({ refresh, element }) => {
+const discounter = maoka.create("button", ({ use }) => {
 	let counter_state = 0
 
 	element.onclick = () => {
 		counter_state--
-		refresh()
+		use(maoka.dom.jabs.refresh$)
 	}
 
 	return () => String(counter_state)
@@ -25,130 +24,116 @@ const Discounter = Maoka.create("button", ({ refresh, element }) => {
 
 const app = document.getElementById("app")
 
-if (app) MaokaDOM.render(app, Discounter, () => crypto.randomUUID())
+if (app) maoka.dom.render(app, discounter, () => crypto.randomUUID())
 ```
-
-### Quick Start Explained
-
-It all starts with importing the entirety of Maoka. Since it's ridiculously small, it's ok to pick it up all together.
-
-Maoka components are created with `Maoka.create` that accepts a tag and a callback function. The whole point of Maoka rendering
-is that it does exactly zero automagic tricks for detecting if anything needs to be rerendered - instead you get a good old
-`refresh` function in callback params that you call when you want something to be rerendered. You also get a reference to the
-HTML element created for your Maoka component, and some other stuff we'll discuss a bit later.
-
-Inside the callback we create a `let` variable of the counter state. YES! A `let` variable! For the state! Not an entire RxJS
-bundle, not a tuple of a getter and a setter, not even a class method - a simple `let` variable! Yay, innit?
-
-We then assign a click listener to the element where we decrement the `counter_state` and call `refresh` to update the state of
-the component.
-
-At the end of the component declaration we return a thunk of a string representation of the `counter_state`. This thunk thing is
-very important, we'll discuss it in a second.
-
-Finally, we go get a div with an id of **app** and `MaokaDOM.render` our component there. `MaokaDOM` also requires a third
-argument that will create unique identifiers for Maoka components inside the current root. And that's it - if you create an HTML
-page with this `<div id="app"></div>` and refer to this script there, it will count af.
-
-Capital letters in component names are completely optional, btw. It's not react. 😏
-
-Now, regarding the `refresh` and the thunk... Let's talk about
 
 ## Component Lifecycle
 
 ```javascript
-import { Maoka } from "@ordo-pink/maoka"
-import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
+import { maoka } from "@ordo-pink/maoka"
 
-const MyComponent = Maoka.create("div", ({ use }) => {
-	// ON_CREATE: this part is executed ONCE the component is created
+const component = maoka.create(
+	"div",
+	/* can be async */ ({ use }) => {
+		// ON_CREATE: this part is executed when the component is created.
 
-	use(
-		MaokaDOM.Jabs.onmount(() => {
-			// ON_MOUNT: this part is executed ONCE the component is mounted into the DOM
-			// This will never run if you are not rendering the component with `MaokaDOM.render`
-			// OPTIONAL: use it if you need to
-		}),
-	)
+		use(
+			maoka.dom.jabs.onmount((node /* Here you get the maoka node */) => {
+				// ON_MOUNT: this part is executed when the component is mounted into the DOM.
 
-	use(
-		MaokaDOM.Jabs.onunmount(() => {
-			// ON_UNMOUNT: this part is executed ONCE the component is removed from the DOM
-			// This will never run if you are not rendering the component with `MaokaDOM.render`
-			// OPTIONAL: use it if you need to
-		}),
-	)
+				return () => {
+					// ON_UNMOUNT: this part is executed when the component is unmounted from the DOM.
+				}
+			}),
+		)
 
-	// OPTIONAL: use it if you need to
-	return () => {
-		// ON_REFRESH: this part is executed on EVERY `refresh`
-		// Whatever is returned here will become the element children
-	}
-})
+		use(
+			MaokaDOM.Jabs.onunmount(() => {
+				// ON_UNMOUNT: alternatively, you can assign onunmount handler with a dedicated jab
+				// if you do not need access to what you did onmount.
+			}),
+		)
+
+		// Returning is optional. If nothing is returned, the DOM content does not change.
+		// Return `null` to purge current DOM node content.
+		return /* can be async */ () => {
+			// ON_REFRESH: this part is executed on first render and on every refresh.
+			// Whatever is returned here will become the DOM node children.
+			// Returning is optional. If nothing is returned, the DOM content does not change.
+			// Return `null` to purge current DOM node content.
+		}
+	},
+)
 ```
 
 > Keep in mind that whenever a component is refreshed, all its child components are unmounted and mounted again.
 
-If you want to pass additional parameters to a component, you can wrap it into a function:
+## Provision of arguments
 
-```javascript
-import { Maoka } from "@ordo-pink/maoka"
+```typescript
+import { maoka } from "@ordo-pink/maoka"
 
-const my_component = my_params =>
-	Maoka.create("div", () => {
-		return () => my_params.dont_touch_them.they_are_not_yours
-	})
+type Args = { str: string }
+const greeter = maoka.create<Args>(
+	"div",
+	({ str }) =>
+		() =>
+			`Hello, ${str}!`,
+)
+
+const wrapper = maoka.create("div", () => () => greeter({ str: "world" }))
 ```
 
 ## Maoka Component
 
 People always ask me - what a perfect component is? And here is a pro tip - make sure you hit the like button and subscribe to
-the channel - a perfect component is a function. When you call `Maoka.create`, it actually returns a function that expects the
-`root` - the top level element in the Maoka rendering hierarchy. The root element is created by the renderer of your choice - be
-it `@ordo-pink/maoka-render-dom`, `@ordo-pink/maoka-render-string` or a renderer of your own!
+the channel - a perfect component is a function. When you call `maoka.create`, it actually returns a function that lazily
+expects the `root` - the top level node in the Maoka rendering hierarchy. The root element is created by the renderer of your
+choice - be it `maoka.dom`, `maoka.string` or a renderer of your own!
 
-This function then waits until you pass it to a render function that creates first creates the root for you and passes it to
-your top level component, to then pass them to their children which in turn pass them to their children, and the circle of life
-continues until they reach you and me sitting here and reading this document. A good example of such render function is
+This function then waits until you pass it to a render function that first creates the root for you and passes it to your top
+level component, to then pass it to its children which in turn pass them to their children, and the circle of life continues
+until they reach you and me sitting here in this document. A good example of such render function is
 
-## MaokaDOM.render
+## maoka.dom.render
 
 ```javascript
-import { Maoka } from "@ordo-pink/maoka"
-import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
+import { maoka } from "@ordo-pink/maoka"
 
-import { App } from "./app"
+import { app } from "./app"
 
 const root = document.querySelector("#root")
-if (root) MaokaDOM.render(root, App, () => crypto.randomUUID())
+if (root) maoka.dom.render(root, app, () => crypto.randomUUID())
 ```
 
 As the name suggests, it renders a Maoka component to the DOM. The element itself remains untouched, the function does three
 things:
 
-1. It creates DOM structure of your component
+1. It creates DOM structure of your component from the lazy tree you define with the component structure
 2. It appends a `MutationObserver` to the root element that keeps track of mounted and unmounted nodes and executes their
    `onmount` and `onunmount` jab callbacks if they are present
-3. It listens for the `refresh` calls in components and rerenders them. Yes, the gotcha moment! Maoka does not refresh
-   components by itself, it only notifies the root that they intend to do so. It is in the area of responsibility of the root to
-   do the rerendering (or avoid rerendering if it is nested inside rerendering of a higher order)
+3. It listens for the `maoka.dom.jabs.refresh$` calls in components and rerenders them. Yes, the gotcha moment! Maoka does not
+   refresh components by itself, it only notifies the root that they intend to do so. It is in the area of responsibility of the
+   root to do the rerendering (or avoid rerendering if it is nested inside rerendering of a higher order)
 
-If you don't want a `MutationObserver` in your code, you can reimplement `MaokaDOM.render` manually from scratch - but you'll
-need to consider those three steps described above yourself.
+If you don't want a `MutationObserver` in your code, you can reimplement `maoka.dom.render` manually from scratch - but you'll
+need to consider what those three steps described above adress yourself.
 
 In fact, you can render your root Maoka component as simply as:
 
 ```javascript
-import { App } from "./app"
+import { maoka } from "@ordo-pink/maoka"
+
+import { app } from "./app"
 
 const root_element = document.querySelector("#root")
 const create_id = () => crypto.randomUUID()
-const create_element = document.createElement.bind(document)
+const create_value = document.createElement.bind(document)
 
-if (root) App(create_root(root_element, create_id, create_element))
+if (root) app({ id: create_id(), create_id, create_value })
 ```
 
-Keep in mind that in this scenario Maoka components will not rerender when you call `refresh`.
+Keep in mind that in this scenario Maoka components will not rerender when you call `maoka.dom.jabs.refresh$`.
 
 ## What Else
 

@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { type Maoka, maoka_dom } from "@ordo-pink/oss-maoka"
+import { type Maoka, maoka } from "@ordo-pink/oss-maoka"
 
 export const set_attribute_jab =
 	(key: string, value = ""): Maoka.Jab =>
 	({ use }) => {
-		use(maoka_dom.jabs.hit_if_dom(n => n.value.setAttribute(key, value)))
+		use(maoka.dom.jabs.hit_if_dom(n => n.value.setAttribute(key, value)))
 		// TODO if_string
 	}
 

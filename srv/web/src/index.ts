@@ -21,7 +21,7 @@
 
 import { type Core, core } from "@ordo-pink/sdk-core"
 import { app } from "@ordo-pink/frontend-app"
-import { maoka_dom } from "@ordo-pink/oss-maoka"
+import { maoka } from "@ordo-pink/oss-maoka"
 
 const body = document.querySelector("body")!
 
@@ -34,7 +34,7 @@ const hosts: Core.Hosts = {
 	web: import.meta.env.VITE_ORDO_WEB_HOST!,
 }
 
-void maoka_dom.render(
+void maoka.dom.render(
 	body,
 	app({
 		hosts,

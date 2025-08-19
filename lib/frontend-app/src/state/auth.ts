@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { type Maoka, maoka_dom } from "@ordo-pink/oss-maoka"
+import { type Maoka, maoka } from "@ordo-pink/oss-maoka"
 import { type Zags, create_zags } from "@ordo-pink/oss-zags"
 import type { ClientSDK } from "@ordo-pink/sdk-client"
 import type { Core } from "@ordo-pink/sdk-core"
@@ -60,7 +60,7 @@ export const auth_jab: (
 			}
 		}
 
-		use(maoka_dom.jabs.onmount(handle_mount))
+		use(maoka.dom.jabs.onmount(handle_mount))
 
 		return auth$
 	}

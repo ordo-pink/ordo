@@ -20,7 +20,7 @@
  */
 
 import { BACKGROUND_TASK, type ClientSDK } from "@ordo-pink/sdk-client"
-import { type Maoka, maoka_dom } from "@ordo-pink/oss-maoka"
+import { type Maoka, maoka } from "@ordo-pink/oss-maoka"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 
 import { background_task$ } from "./background-task.state"
@@ -43,7 +43,7 @@ export const create_background_task_status_jab: Maoka.Jab<() => Maoka.Component>
 		}
 	}
 
-	use(maoka_dom.jabs.onmount(handle_onmount))
+	use(maoka.dom.jabs.onmount(handle_onmount))
 
 	return () => background_task_status()
 }

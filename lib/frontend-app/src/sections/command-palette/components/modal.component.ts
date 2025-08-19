@@ -20,10 +20,10 @@
  */
 
 import { COMMAND_PALETTE, client_sdk } from "@ordo-pink/sdk-client"
-import { maoka, maoka_styled } from "@ordo-pink/oss-maoka"
 import { bs_question_circle } from "@ordo-pink/frontend-icons"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 import { core } from "@ordo-pink/sdk-core"
+import { maoka } from "@ordo-pink/oss-maoka"
 
 import { command_palette$ } from "../command-palette.state"
 import { command_palette_items } from "./items.component"
@@ -38,7 +38,7 @@ export const command_palette_modal = maoka.create("div", ({ use }) => {
 
 	const handle_click = (event: MouseEvent) => event.stopPropagation()
 	const handle_global_keydown = (event: KeyboardEvent) => {
-		if (internal.IGNORED_KEYS.includes(event.key)) return
+		if (IGNORED_KEYS.includes(event.key)) return
 
 		const current = get_current()
 
@@ -107,21 +107,21 @@ export const command_palette_modal = maoka.create("div", ({ use }) => {
 
 				is_mobile
 					? void 0
-					: internal.footer(() => [
+					: footer(() => [
 							bs_question_circle({ classes: "mr-2" }),
-							internal.text_span(() => "Type to search. Arrows to navigate."), // TODO i18n
+							text_span(() => "Type to search. Arrows to navigate."), // TODO i18n
 							client_maoka.components.hotkey({ hotkey: "enter", decoration_only: true }),
-							internal.text_span(() => "to select item."), // TODO i18n
+							text_span(() => "to select item."), // TODO i18n
 							client_maoka.components.hotkey({ hotkey: "escape", decoration_only: true }),
-							internal.text_span(() => "to close."), // TODO i18n
+							text_span(() => "to close."), // TODO i18n
 						]),
 			]
 		)
 	}
 })
 
-namespace internal {
-	export const IGNORED_KEYS = ["Control", "Shift", "Alt", "Meta"]
-	export const text_span = maoka_styled.span()
-	export const footer = maoka_styled.div("command-palette_footer")
-}
+// --- Internal ---
+
+const IGNORED_KEYS = ["Control", "Shift", "Alt", "Meta"]
+const text_span = maoka.styled.span()
+const footer = maoka.styled.div("command-palette_footer")

@@ -20,7 +20,7 @@
  */
 
 import { I18n, LOCALE, create_i18n } from "@ordo-pink/oss-i18n"
-import { Maoka, maoka_dom } from "@ordo-pink/oss-maoka"
+import { Maoka, maoka } from "@ordo-pink/oss-maoka"
 import { ClientSDK } from "@ordo-pink/sdk-client"
 
 export const create_i18n_jab: (hunter: ClientSDK.Hunter) => Maoka.Jab<I18n.Zags<ClientSDK.Translations.Keys>> =
@@ -40,7 +40,7 @@ export const create_i18n_jab: (hunter: ClientSDK.Hunter) => Maoka.Jab<I18n.Zags<
 			}
 		}
 
-		use(maoka_dom.jabs.onmount(handle_mount))
+		use(maoka.dom.jabs.onmount(handle_mount))
 
 		return i18n.$
 	}

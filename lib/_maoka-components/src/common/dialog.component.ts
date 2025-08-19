@@ -19,8 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { maoka, maoka_styled, type Maoka } from "@ordo-pink/oss-maoka"
-import { Button } from "@ordo-pink/_maoka-components"
+import { maoka, type Maoka } from "@ordo-pink/oss-maoka"
+import { button } from "@ordo-pink/_maoka-components"
 import { maoka_jabs } from "@ordo-pink/_maoka-jabs"
 
 import "../../maoka-components.css"
@@ -66,7 +66,7 @@ export const Dialog = ({
 		]
 	})
 
-const Header = maoka_styled.div("dialog_header")
-const Title = maoka_styled.h2("dialog_title")
-const Body = maoka_styled.div()
-const Footer = maoka_styled.div("dialog_footer")
+const Header = styled.div("dialog_header")
+const Title = styled.h2("dialog_title")
+const Body = styled.div()
+const Footer = styled.div("dialog_footer")

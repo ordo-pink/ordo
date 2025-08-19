@@ -91,7 +91,7 @@ export const render: MaokaDom.Render = async (root_element, component, create_id
 
 // --- Internal ---
 
-export const mount_element = (element: MaokaDom.NodeValue) => {
+export const mount_element = (element: MaokaDom.NodeValue): void => {
 	if (element.mounted) return
 
 	element.mounted = true
@@ -110,12 +110,12 @@ export const mount_element = (element: MaokaDom.NodeValue) => {
 	if (element.children) for (let i = 0; i < element.children.length; i++) mount_element(element.children[i] as HTMLElement)
 }
 
-export const unmount_element = (element: HTMLElement & { onunmount?: MaokaDom.OnUnmountHandler[] }) => {
+export const unmount_element = (element: HTMLElement & { onunmount?: MaokaDom.OnUnmountHandler[] }): void => {
 	if (element.onunmount) for (let i = 0; i < element.onunmount.length; i++) element.onunmount[i]()
 	if (element.children) for (let i = 0; i < element.children.length; i++) unmount_element(element.children[i] as HTMLElement)
 }
 
-export const render_dom_children = async (node: Maoka.Node<HTMLElement>) => {
+export const render_dom_children = async (node: Maoka.Node<HTMLElement>): Promise<HTMLElement> => {
 	if (!node.kindergarten) {
 		if (node.kindergarten === null) node.value.innerHTML = ""
 		return node.value

@@ -4,7 +4,7 @@ import type * as MaokaStyled from "./maoka-styled.types.ts"
 import * as maoka from "../maoka/maoka.impl.ts"
 import * as maoka_dom from "../maoka-dom/maoka-dom.impl.ts"
 
-export default MAOKA_STYLED.HTML_TAGS.reduce(
+const tags: MaokaStyled.Instance = MAOKA_STYLED.HTML_TAGS.reduce(
 	(acc, tag) => ({
 		...acc,
 		[tag]:
@@ -22,3 +22,5 @@ export default MAOKA_STYLED.HTML_TAGS.reduce(
 	}),
 	{} as MaokaStyled.Instance,
 )
+
+export default tags

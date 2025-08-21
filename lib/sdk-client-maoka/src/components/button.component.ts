@@ -3,13 +3,14 @@
  * SPDX-License-Identifier: Unlicense
  */
 
+import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 import { maoka } from "@ordo-pink/oss-maoka"
+import { maoka_styled } from "@ordo-pink/oss-maoka/styled"
 
 import type * as ClientMaoka from "../sdk-client-maoka.types"
 import { actionable_hotkey } from "./hotkey.component"
 
 import "./button.styles.css"
-import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 
 export const button_success = (params: ClientMaoka.Components.ButtonArgs) =>
 	default_button({ ...params, custom_class: add_button_type_class("success", params.custom_class) })
@@ -25,7 +26,7 @@ export const button_danger = (params: ClientMaoka.Components.ButtonArgs) =>
 
 // --- Internal ---
 
-const text_container = maoka.styled.div()
+const text_container = maoka_styled.div()
 
 const default_button = maoka.create<ClientMaoka.Components.ButtonArgs>(
 	"button",

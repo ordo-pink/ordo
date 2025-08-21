@@ -4,14 +4,15 @@
  */
 
 import type * as Maoka from "../../maoka/maoka.types.ts"
+import type * as MaokaDom from "../maoka-dom.types.ts"
 import type { Node } from "../maoka-dom.types.ts"
 
 export type HitIfDom = <$Element extends HTMLElement = HTMLElement, $Return = void>(
 	f: (node: Node<$Element>) => $Return,
 ) => Maoka.Jab<$Return | void>
 
-export type OnUnmount = (f: (node: Node) => void) => Maoka.Jab
+export type OnUnmount = (f: (node: Node) => ReturnType<MaokaDom.OnUnmountHandler>) => Maoka.Jab
 
-export type OnMount = (f: (node: Node) => void | (() => void)) => Maoka.Jab
+export type OnMount = (f: (node: Node) => ReturnType<MaokaDom.OnMountHandler>) => Maoka.Jab
 
 export type Refresh$ = Maoka.Jab

@@ -19,42 +19,43 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { BACKGROUND_TASK, type ClientSDK } from "@ordo-pink/sdk-client"
-import { type Maoka, maoka } from "@ordo-pink/oss-maoka"
+import { bs_cloud_download, bs_cloud_upload } from "@ordo-pink/frontend-icons"
+import { BACKGROUND_TASK } from "@ordo-pink/sdk-client"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
-
-import { background_task$ } from "./background-task.state"
-import { background_task_status } from "./components/background-task-status.component"
+import { maoka } from "@ordo-pink/oss-maoka"
+import { sweech } from "@ordo-pink/oss-sweech"
 
 import "./background-task.styles.css"
 
-export const create_background_task_status_jab: Maoka.Jab<() => Maoka.Component> = ({ use }) => {
+export const background_task_status = maoka.create("div", ({ use }) => {
+	let status = BACKGROUND_TASK.STATUS.NONE
+
 	const { hunter } = use(client_maoka.context.consume)
+	use(client_maoka.jabs.classes.set("background-task"))
+
+	const set_status$ = (new_status: BACKGROUND_TASK.STATUS) => {
+		status = new_status
+		use(maoka.dom.jabs.refresh$)
+	}
 
 	const handle_onmount = () => {
-		const release_loading = hunter.track("background_status.loading", handle_loading)
-		const release_none = hunter.track("background_status.none", handle_none)
-		const release_saving = hunter.track("background_status.saving", handle_saving)
+		const release_loading = hunter.track("background_status.loading", () => set_status$(BACKGROUND_TASK.STATUS.LOADING))
+		const release_saving = hunter.track("background_status.saving", () => set_status$(BACKGROUND_TASK.STATUS.SAVING))
+		const release_none = hunter.track("background_status.none", () => set_status$(BACKGROUND_TASK.STATUS.NONE))
 
 		return () => {
 			release_loading()
-			release_none()
 			release_saving()
+			release_none()
 		}
 	}
 
 	use(maoka.dom.jabs.onmount(handle_onmount))
 
-	return () => background_task_status()
-}
-
-// --- Internal ---
-
-const handle_saving: ClientSDK.GunFor<"background_status.saving"> = () =>
-	background_task$.update("status", () => BACKGROUND_TASK.STATUS.SAVING)
-
-const handle_none: ClientSDK.GunFor<"background_status.none"> = () =>
-	background_task$.update("status", () => BACKGROUND_TASK.STATUS.NONE)
-
-const handle_loading: ClientSDK.GunFor<"background_status.loading"> = () =>
-	background_task$.update("status", () => BACKGROUND_TASK.STATUS.LOADING)
+	return () =>
+		sweech
+			.match(status)
+			.case(BACKGROUND_TASK.STATUS.LOADING, () => bs_cloud_download({}))
+			.case(BACKGROUND_TASK.STATUS.SAVING, () => bs_cloud_upload({}))
+			.default(() => null)
+})

@@ -25,6 +25,7 @@ import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 import { client_rrr } from "@ordo-pink/sdk-client"
 import { get_device_info } from "@ordo-pink/_get-device-info"
 import { maoka } from "@ordo-pink/oss-maoka"
+import { maoka_styled } from "@ordo-pink/oss-maoka/styled"
 import { oath } from "@ordo-pink/oss-oath"
 
 import { authenticating_user$ } from "../user.state"
@@ -102,11 +103,11 @@ export const verify_code_modal = maoka.create("div", ({ use }) => {
 
 // --- Internal ---
 
-const title = maoka.styled.h1("user_join-modal_title")
+const title = maoka_styled.h1("user_join-modal_title")
 
-const button_section = maoka.styled.div("user_join-modal_actions")
+const button_section = maoka_styled.div("user_join-modal_actions")
 
-const hint = maoka.styled.p()
+const hint = maoka_styled.p()
 
 const code_input = maoka.create("label", ({ use }) => {
 	use(client_maoka.jabs.classes.set("user_join-modal_email_wrapper"))
@@ -114,7 +115,7 @@ const code_input = maoka.create("label", ({ use }) => {
 	return () => [bs_question_circle({}), input()]
 })
 
-const input = maoka.styled.input("user_join-modal_email", ({ use }) => {
+const input = maoka_styled.input("user_join-modal_email", ({ use }) => {
 	const t_placeholer = "123456" // TODO i18n
 	const value = authenticating_user$.select("code")
 

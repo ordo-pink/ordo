@@ -21,6 +21,7 @@
 
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 import { maoka } from "@ordo-pink/oss-maoka"
+import { maoka_styled } from "@ordo-pink/oss-maoka/styled"
 
 import { notification } from "./notification.component"
 import { notifications$ } from "../notifications.state"
@@ -53,5 +54,5 @@ export const notification_list = maoka.create("div", ({ use }) => {
 
 // --- Internal ---
 
-const hidden_notifications_block = maoka.styled.div("more-notifications_card")
-const hidden_notifications_list = maoka.styled.div("more-notifications_body")
+const hidden_notifications_block = maoka_styled.div("more-notifications_card")
+const hidden_notifications_list = maoka_styled.div("more-notifications_body")

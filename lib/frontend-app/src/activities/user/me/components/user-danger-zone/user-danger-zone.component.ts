@@ -22,6 +22,7 @@
 import { NOTIFICATION } from "@ordo-pink/sdk-client"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 import { maoka } from "@ordo-pink/oss-maoka"
+import { maoka_styled } from "@ordo-pink/oss-maoka/styled"
 
 import {
 	user_card_body,
@@ -71,4 +72,4 @@ export const danger_zone_card = maoka.create("div", ({ use }) => {
 		])
 })
 
-const actions = maoka.styled.div("actions")
+const actions = maoka_styled.div("actions")

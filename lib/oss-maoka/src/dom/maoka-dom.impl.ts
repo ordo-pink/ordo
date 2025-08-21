@@ -72,12 +72,12 @@ export const render: MaokaDom.Render = async (root_element, component, create_id
 
 			for (let i = 0; i < added_nodes.length; i++) {
 				const element = added_nodes[i]
-				mount_element(element)
+				void mount_element(element)
 			}
 
 			for (let i = 0; i < removed_nodes.length; i++) {
 				const element = removed_nodes[i]
-				unmount_element(element)
+				void unmount_element(element)
 			}
 		}
 	})
@@ -91,14 +91,14 @@ export const render: MaokaDom.Render = async (root_element, component, create_id
 
 // --- Internal ---
 
-export const mount_element = (element: MaokaDom.NodeValue): void => {
+export const mount_element = async (element: MaokaDom.NodeValue): Promise<void> => {
 	if (element.mounted) return
 
 	element.mounted = true
 
 	if (element.onmount) {
 		for (let i = 0; i < element.onmount.length; i++) {
-			const maybe_handle_unmount = element.onmount[i]()
+			const maybe_handle_unmount = await element.onmount[i]()
 
 			if (maybe_handle_unmount) {
 				if (!element.onunmount) element.onunmount = []
@@ -107,12 +107,14 @@ export const mount_element = (element: MaokaDom.NodeValue): void => {
 		}
 	}
 
-	if (element.children) for (let i = 0; i < element.children.length; i++) mount_element(element.children[i] as HTMLElement)
+	if (element.children)
+		for (let i = 0; i < element.children.length; i++) await mount_element(element.children[i] as HTMLElement)
 }
 
-export const unmount_element = (element: HTMLElement & { onunmount?: MaokaDom.OnUnmountHandler[] }): void => {
-	if (element.onunmount) for (let i = 0; i < element.onunmount.length; i++) element.onunmount[i]()
-	if (element.children) for (let i = 0; i < element.children.length; i++) unmount_element(element.children[i] as HTMLElement)
+export const unmount_element = async (element: HTMLElement & { onunmount?: MaokaDom.OnUnmountHandler[] }): Promise<void> => {
+	if (element.onunmount) for (let i = 0; i < element.onunmount.length; i++) await element.onunmount[i]()
+	if (element.children)
+		for (let i = 0; i < element.children.length; i++) await unmount_element(element.children[i] as HTMLElement)
 }
 
 export const render_dom_children = async (node: Maoka.Node<HTMLElement>): Promise<HTMLElement> => {

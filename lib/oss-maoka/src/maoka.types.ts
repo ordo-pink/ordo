@@ -4,6 +4,4 @@
  */
 
 export type * from "./maoka/maoka.types.ts"
-export type * as Context from "./context/maoka-context.types.ts"
 export type * as Dom from "./dom/maoka-dom.types.ts"
-export type * as Styled from "./styled/maoka-styled.types.ts"

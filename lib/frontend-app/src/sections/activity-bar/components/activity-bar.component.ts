@@ -22,6 +22,7 @@
 import { type Maoka, maoka } from "@ordo-pink/oss-maoka"
 import { type ClientSDK } from "@ordo-pink/sdk-client"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
+import { maoka_styled } from "@ordo-pink/oss-maoka/styled"
 
 import { activity_bar_link } from "./activity-bar-link.component"
 
@@ -44,4 +45,4 @@ export const activity_bar = maoka.create<{
 const render_activity = (current: ClientSDK.Activity.Instance | null) => (item: ClientSDK.Activity.Instance) =>
 	item.render_icon && activity_bar_link({ is_current: !!current && current.id === item.id, item })
 
-const activity_bar_activities = maoka.styled.div("activity-bar_activities")
+const activity_bar_activities = maoka_styled.div("activity-bar_activities")

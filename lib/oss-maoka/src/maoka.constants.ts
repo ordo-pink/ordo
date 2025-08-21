@@ -3,5 +3,4 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-export * as STYLED from "./styled/maoka-styled.constants.ts"
 export * as DOM from "./dom/maoka-dom.constants.ts"

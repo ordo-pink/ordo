@@ -24,6 +24,7 @@ import { type Maoka, maoka } from "@ordo-pink/oss-maoka"
 import { bs_box_arrow_in_right, bs_box_arrow_right, bs_envelope_at, bs_person_bounding_box } from "@ordo-pink/frontend-icons"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 import { core } from "@ordo-pink/sdk-core"
+import { maoka_styled } from "@ordo-pink/oss-maoka/styled"
 import { oath } from "@ordo-pink/oss-oath"
 
 import { authenticating_user$ } from "./user.state"
@@ -269,7 +270,7 @@ const email_input = maoka.create("label", ({ use }) => {
 	return () => [bs_envelope_at({}), search()]
 })
 
-const search = maoka.styled.input("user_join-modal_email", ({ use }) => {
+const search = maoka_styled.input("user_join-modal_email", ({ use }) => {
 	const t_placeholder = use(client_maoka.jabs.translate$("user_modals_join_placeholder"))
 	const value = authenticating_user$.select("email")
 

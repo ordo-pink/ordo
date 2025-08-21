@@ -24,10 +24,11 @@ import type { Core } from "@ordo-pink/sdk-core"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 import { hunt } from "@ordo-pink/oss-hunt"
 import { maoka } from "@ordo-pink/oss-maoka"
+import { maoka_styled } from "@ordo-pink/oss-maoka/styled"
 
 import { auth_jab } from "./src/state/auth"
+import { background_task_status } from "./src/sections/background-task"
 import { create_activity_bar_jab } from "./src/sections/activity-bar"
-import { create_background_task_status_jab } from "./src/sections/background-task"
 import { create_command_palette_jab } from "./src/sections/command-palette"
 import { create_i18n_jab } from "./src/state/i18n"
 import { create_modal_jab } from "./src/sections/modal"
@@ -80,7 +81,6 @@ export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
 	const modal = use(create_modal_jab)
 	const { command_palette, command_palette_toggle } = use(create_command_palette_jab)
 	const { sidebar, sidebar_toggle, workspace } = use(create_sidebar_jab)
-	const background_task_status = use(create_background_task_status_jab)
 	const activity_bar = use(create_activity_bar_jab(command_palette_toggle, sidebar_toggle))
 	const notifications = use(create_notifications_jab)
 
@@ -105,7 +105,7 @@ export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
 	]
 })
 
-const screen_wrapper = maoka.styled.div("app")
+const screen_wrapper = maoka_styled.div("app")
 
 const en_rrr_codes = {
 	loading_title: "Loading...",

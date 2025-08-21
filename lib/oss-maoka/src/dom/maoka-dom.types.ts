@@ -18,10 +18,10 @@ export type Render = (
 ) => Promise<void>
 
 /** Calls back when component mounts to the DOM. Components may have multiple `OnMountHandler`s. */
-export type OnMountHandler = (() => void) | (() => OnUnmountHandler)
+export type OnMountHandler = () => void | Promise<void> | OnUnmountHandler | Promise<OnUnmountHandler>
 
 /** Calls back when component unmounts from the DOM. Components may have multiple `OnUnmountHandler`s. */
-export type OnUnmountHandler = () => void
+export type OnUnmountHandler = () => void | Promise<void>
 
 /** DOM node type guard. Only returns `true` if node was created by maoka with `maoka_dom` renderer. */
 export type NodeGuard<$Element extends HTMLElement = HTMLElement> = (x: any) => x is Node<$Element>

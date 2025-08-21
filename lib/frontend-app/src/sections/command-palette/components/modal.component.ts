@@ -24,6 +24,7 @@ import { bs_question_circle } from "@ordo-pink/frontend-icons"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 import { core } from "@ordo-pink/sdk-core"
 import { maoka } from "@ordo-pink/oss-maoka"
+import { maoka_styled } from "@ordo-pink/oss-maoka/styled"
 
 import { command_palette$ } from "../command-palette.state"
 import { command_palette_items } from "./items.component"
@@ -123,5 +124,5 @@ export const command_palette_modal = maoka.create("div", ({ use }) => {
 // --- Internal ---
 
 const IGNORED_KEYS = ["Control", "Shift", "Alt", "Meta"]
-const text_span = maoka.styled.span()
-const footer = maoka.styled.div("command-palette_footer")
+const text_span = maoka_styled.span()
+const footer = maoka_styled.div("command-palette_footer")

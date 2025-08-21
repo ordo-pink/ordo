@@ -23,6 +23,7 @@ import { COMMAND_PALETTE } from "@ordo-pink/sdk-client"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 import { core } from "@ordo-pink/sdk-core"
 import { maoka } from "@ordo-pink/oss-maoka"
+import { maoka_styled } from "@ordo-pink/oss-maoka/styled"
 
 import { command_palette$ } from "../command-palette.state"
 import { command_palette_item } from "./item.component"
@@ -41,21 +42,18 @@ export const command_palette_items = maoka.create("div", ({ use }) => {
 			core.fns.fuzzy_check(item.readable_name, state.search_value, COMMAND_PALETTE.FUZZY_CHECK_RATIO),
 		)
 
-		if (!visible_items.length)
-			return internal.nothing_found_div(() => `Nothing matches the search term "${state.search_value}"`)
+		if (!visible_items.length) return nothing_found_div(() => `Nothing matches the search term "${state.search_value}"`)
 
 		if (!state.current.is_multiple)
-			return internal.items(() =>
-				visible_items.map((item, index) => command_palette_item({ active: state.index === index, item })),
-			)
+			return items(() => visible_items.map((item, index) => command_palette_item({ active: state.index === index, item })))
 
 		return [
-			internal.items(() =>
+			items(() =>
 				state.items.map((item, index) =>
 					command_palette_item({ active: state.location === COMMAND_PALETTE.SECTION.ITEMS && state.index === index, item }),
 				),
 			),
-			internal.items(() =>
+			items(() =>
 				state.current!.pinned_items?.map((item, index) =>
 					command_palette_item({
 						active: state.location === COMMAND_PALETTE.SECTION.PINNED_ITEMS && state.index === index,
@@ -67,8 +65,8 @@ export const command_palette_items = maoka.create("div", ({ use }) => {
 	}
 })
 
-namespace internal {
-	export const items = maoka.styled.div("command-palette_items")
+// --- Internal ---
 
-	export const nothing_found_div = maoka.styled.div("command-palette_items_nothing-found")
-}
+export const items = maoka_styled.div("command-palette_items")
+
+export const nothing_found_div = maoka_styled.div("command-palette_items_nothing-found")

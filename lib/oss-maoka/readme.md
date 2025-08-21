@@ -139,27 +139,20 @@ Keep in mind that in this scenario Maoka components will not rerender when you c
 
 ### Asynchrony & Lazy Loading
 
-Maoka supports `async/await` for both the ON_CREATE part of the component callback, and the ON_REFRESH part.
+Maoka supports `async/await` for both the ON_CREATE part of the component callback, and the ON_REFRESH part. It is also
+supported by `maoka.dom` in `maoka.dom.jabs.onmount` and `maoka.dom.jabs.onunmount`.
 
 ```javascript
-import { Maoka } from "@ordo-pink/maoka"
+import { maoka } from "@ordo-pink/maoka"
 
-const App = Maoka.create("div", async ({ refresh, onunmount }) => {
+const app = maoka.create("div", async ({ use }) => {
 	let timeout
 
-	// Force the component to wait for 2 seconds before loading
-	// idk why tho
-	await new Promise(resolve => {
-		timeout = setTimeout(resolve, 2000)
-	})
+	await new Promise(resolve => void (timeout = setTimeout(resolve, 2000)))
 
-	onunmount(() => clearTimeout(timeout))
+	use(maoka.dom.jabs.onunmount(onunmount(() => clearTimeout(timeout))))
 
 	return async () => {
-		// There is a helper function in Maoka, called `lazy`.
-		// You can use it as follows to get the same result as in the current block:
-		//
-		// return `Maoka.lazy(() => import("./my-component"))`
 		const module = await import("./my-component")
 
 		return module.default
@@ -169,23 +162,20 @@ const App = Maoka.create("div", async ({ refresh, onunmount }) => {
 
 ### Jabs
 
-Jabs are like hooks in React because they start with `use`. Similarities end here. A jab is a function that accepts props of the
-Maoka component callback. You can then pass a jab to the `use` function, which is also available via Maoka component callback
-props. It basically sets you free from the necessity of providing the callback params manually.
+Jabs are like hooks in React because they start with `use`. Similarities end here. A jab is a function that accepts base
+arguments of the Maoka component callback. You can then pass a jab to the `use` function, which is also available via Maoka
+component callback props. It basically sets you free from the necessity of providing the callback params manually.
 
 ```typescript
-import { Maoka, type TMaokaJab } from "@ordo-pink/maoka"
+import { type Maoka, maoka } from "@ordo-pink/maoka"
 
-const jab_class =
-	(cls: string): TMaokaJab =>
-	({ element }) => {
-		element.setAttribute("class", cls)
-	}
+const set_attribute: Maoka.Jab<{ class: string }> = ({ class: cls, use }) =>
+	use(maoka.dom.jabs.hit_if_dom(node => node.value.setAttribute("class", cls)))
 
-const MyComponent = Maoka.create("div", ({ use }) => {
-	use(jab_class("my-component"))
+const component = maoka.create("div", ({ use }) => {
+	use(set_attribute({ class: "baby" }))
 
-	return () => "Baby Shark do-do do-do do-do"
+	return () => "shark do-do do-do do-do"
 })
 ```
 

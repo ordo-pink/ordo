@@ -22,6 +22,7 @@
 import { bs_search } from "@ordo-pink/frontend-icons"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 import { maoka } from "@ordo-pink/oss-maoka"
+import { maoka_styled } from "@ordo-pink/oss-maoka/styled"
 
 import { command_palette$ } from "../command-palette.state"
 
@@ -31,7 +32,7 @@ export const command_palette_search = maoka.create("label", ({ use }) => {
 	return () => [bs_search({ classes: "" }), search()]
 })
 
-const search = maoka.styled.input("command-palette_search", ({ use }) => {
+const search = maoka_styled.input("command-palette_search", ({ use }) => {
 	const t_search = "Search..." // TODO i18n
 
 	const handle_mount = () => use(maoka.dom.jabs.hit_if_dom(n => n.value.focus()))

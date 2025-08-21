@@ -21,6 +21,7 @@
 
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 import { maoka } from "@ordo-pink/oss-maoka"
+import { maoka_styled } from "@ordo-pink/oss-maoka/styled"
 
 import { command_palette$ } from "../command-palette.state"
 
@@ -28,7 +29,7 @@ import { command_palette$ } from "../command-palette.state"
  * Command palette overlay that blurs out the background content and handles clicks to close
  * the command palette.
  */
-export const command_palette_overlay = maoka.styled.div("command-palette_wrapper", ({ use }) => {
+export const command_palette_overlay = maoka_styled.div("command-palette_wrapper", ({ use }) => {
 	const { hunter } = use(client_maoka.context.consume)
 
 	const handle_show = () => use(client_maoka.jabs.classes.add("active"))

@@ -23,13 +23,14 @@ import { type Core, core } from "@ordo-pink/sdk-core"
 import { bs_x } from "@ordo-pink/frontend-icons"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 import { maoka } from "@ordo-pink/oss-maoka"
+import { maoka_styled } from "@ordo-pink/oss-maoka/styled"
 
 import { user_card, user_card_body, user_card_title } from "../user-card/user-card.component"
 
 import "./user-session.styles.css"
 
-const session_device_info = maoka.styled.div("device-info")
-const session_status = maoka.styled.div("status")
+const session_device_info = maoka_styled.div("device-info")
+const session_status = maoka_styled.div("status")
 const session_display = maoka.create<{ session: Core.Session.Instance }>("div", ({ session, use }) => {
 	const state = use(client_maoka.context.consume)
 

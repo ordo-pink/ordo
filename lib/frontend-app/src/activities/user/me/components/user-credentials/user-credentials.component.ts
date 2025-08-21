@@ -22,6 +22,7 @@
 import type { Core } from "@ordo-pink/sdk-core"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 import { maoka } from "@ordo-pink/oss-maoka"
+import { maoka_styled } from "@ordo-pink/oss-maoka/styled"
 
 import { user_card, user_card_body, user_card_title } from "../user-card/user-card.component"
 
@@ -74,7 +75,7 @@ export const credentials_card = maoka.create<{ ref: Core.User.Ref; name: string;
 	},
 )
 
-const items = maoka.styled.div("items")
-const item = maoka.styled.div("item")
-const item_title = maoka.styled.div("title")
-const item_content = maoka.styled.div("content")
+const items = maoka_styled.div("items")
+const item = maoka_styled.div("item")
+const item_title = maoka_styled.div("title")
+const item_content = maoka_styled.div("content")

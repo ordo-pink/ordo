@@ -2,11 +2,11 @@
 	"name": "@ordo-pink/maoka",
 	"version": "1.0.0",
 	"exports": {
-		".": "./mod.ts",
+		".": "./index.ts",
 		"./context": "./context.ts",
 		"./dom": "./dom.ts",
 		"./styled": "./styled.ts",
-		"./bundle": "./index.ts"
+		"./mod": "./mod.ts"
 	},
 	"exclude": ["**/*.test.ts"],
 	"compilerOptions": {

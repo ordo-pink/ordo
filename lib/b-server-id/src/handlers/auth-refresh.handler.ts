@@ -37,11 +37,16 @@ export const auth_refresh: Lib.Handler = ({ env, request }) =>
 				oath
 					.from_promise(() => env.wjwt.verify(token))
 					.pipe(oath.ops.rmap(core.rrr.eio(CORE.RRR.REASON.INVALID_SERVICE_INITIALIZATION)))
+
 					.pipe(oath.ops.chain(update_user_session_if_valid(env.wjwt, env.user_repository, token as Wjwt.TokenString))),
 			),
 		)
 		.pipe(oath.ops.chain(create_response))
-		.cata(oath.catas.or_else(env.fail))
+		.cata(
+			oath.catas.or_else(() => {
+				return new Response("", { headers: { "Set-Cookie": "" } })
+			}),
+		)
 
 // --- Internal ---
 
@@ -70,6 +75,7 @@ const update_user_session = (user_repository: Server.User.Repository) => (t: Wjw
 			}),
 		)
 
+// TODO Delete dead session
 const update_user_session_if_valid =
 	(wjwt: Wjwt.Instance, user_repository: Server.User.Repository, token: Wjwt.TokenString) => (is_valid: boolean) =>
 		oath

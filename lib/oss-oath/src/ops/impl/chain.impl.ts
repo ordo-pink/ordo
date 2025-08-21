@@ -8,3 +8,6 @@ import { create } from "../../constructors"
 
 export const chain_op: Oath.Ops.Chain = on_resolve => o =>
 	create((resolve, reject) => o.cata({ reject, resolve: x => on_resolve(x).cata({ reject, resolve }) }))
+
+export const r_chain_op: Oath.Ops.RChain = on_reject => o =>
+	create((resolve, reject) => o.cata({ reject: x => on_reject(x).cata({ reject, resolve }), resolve }))

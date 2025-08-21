@@ -12,6 +12,7 @@ export namespace Oath {
 			ap: Oath.Ops.Ap
 			bimap: Oath.Ops.BiMap
 			chain: Oath.Ops.Chain
+			rchain: Oath.Ops.RChain
 			fix: Oath.Ops.Fix
 			map: Oath.Ops.Map
 			rmap: Oath.Ops.RMap
@@ -51,6 +52,10 @@ export namespace Oath {
 		export type Chain = <_Resolve, _Reject, _NewResolve, _NewReject>(
 			f: (x: _Resolve) => Oath.Instance<_NewResolve, _NewReject>,
 		) => (o: Oath.Instance<_Resolve, _Reject>) => Oath.Instance<_NewResolve, _Reject | _NewReject>
+
+		export type RChain = <_Resolve, _Reject, _NewResolve, _NewReject>(
+			f: (x: _Reject) => Oath.Instance<_NewResolve, _NewReject>,
+		) => (o: Oath.Instance<_Resolve, _Reject>) => Oath.Instance<_Resolve | _NewResolve, _NewReject>
 
 		export type Tap = <_Resolve, _Reject>(
 			f: (x: _Resolve) => any,

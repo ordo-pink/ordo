@@ -4,11 +4,11 @@
  */
 
 import { bimap_op, map_op, rejected_map_op } from "./impl/map.impl"
+import { chain_op, r_chain_op } from "./impl/chain.impl"
 import { rejected_tap_op, tap_op } from "./impl/tap.impl"
 import { type Oath } from "../oath.types"
 import { and_op } from "./impl/and.impl"
 import { ap_op } from "./impl/ap.impl"
-import { chain_op } from "./impl/chain.impl"
 import { fix_op } from "./impl/fix.impl"
 import { swap_op } from "./impl/swap.impl"
 
@@ -21,6 +21,7 @@ export const ops: Oath.Ops.Static = {
 	and: and_op,
 	ap: ap_op,
 	chain: chain_op,
+	rchain: r_chain_op,
 	bimap: bimap_op,
 	fix: fix_op,
 	map: map_op,

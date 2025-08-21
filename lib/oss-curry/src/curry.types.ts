@@ -9,6 +9,10 @@ export type Curry<$Args extends any[], $Result> = $Args["length"] extends 0
 			...args: _NewArgs extends $Args ? $Args : _NewArgs
 		) => _NewArgs["length"] extends $Args["length"] ? $Result : Curry<ExcludeTuple<$Args, _NewArgs>, $Result>
 
+export type Curried<$Fn extends (...args: any[]) => any> = $Fn extends (...args: infer _Args) => infer _Result
+	? Curry<_Args, _Result>
+	: never
+
 export type PartialTuple<$Tuple extends any[]> = $Tuple extends []
 	? never
 	: $Tuple extends [...infer _Rest, any]

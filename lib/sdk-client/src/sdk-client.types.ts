@@ -65,11 +65,13 @@ export namespace ClientSDK {
 			aist$: Aist.Stream
 		}
 
+		export type Instance = (state: State) => Promise<() => void | Promise<void>>
+
 		export type Create = (
 			name: string,
 			permissions: Permissions,
 			callback: (state: State) => void | Promise<void> | (() => void | Promise<void>) | Promise<() => void | Promise<void>>,
-		) => (state: State) => Promise<() => void | Promise<void>>
+		) => Instance
 	}
 
 	export namespace Activity {

@@ -22,7 +22,7 @@
 import { type Maoka, maoka } from "@ordo-pink/oss-maoka"
 import type { ClientSDK } from "@ordo-pink/sdk-client"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
-import { sweech } from "@ordo-pink/oss-sweech"
+import { sweech_helpers } from "@ordo-pink/oss-sweech/extensions"
 
 import { sidebar$ } from "../workspace.state"
 
@@ -49,7 +49,7 @@ const sidebar_padding_contractor = maoka.create<{ parent_node: Maoka.Node }>("di
 		const sidebar = get_sidebar()
 
 		if (maoka.dom.node_guard(parent_node))
-			sweech
+			sweech_helpers
 				.of_true()
 				.case(sidebar.enabled && sidebar.visible, () => parent_node.value.classList.remove("no-sidebar"))
 				.default(() => parent_node.value.classList.add("no-sidebar"))

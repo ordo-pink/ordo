@@ -26,6 +26,6 @@
 		"stripInternal": true,
 		"target": "ESNext"
 	},
-	"include": ["./boot/**/*.ts", "./srv/**/*.ts", "./lib/**/*.ts", "./lib/**/*.tsx"],
+	"include": ["./boot/**/*.ts", "./srv/**/*.ts", "./lib/**/*.ts", "./lib/**/*.tsx", "./lib/**/*.d.ts"],
 	"exclude": ["node_modules", "**/*.test.ts"]
 }

@@ -5,7 +5,8 @@
 
 import test from "bun:test"
 
-import { sweech } from "./sweech.impl"
+import * as sweech from "./sweech.impl"
+import * as sweech_helpers from "./helpers/helpers.impl"
 
 test.describe("sweech", () => {
 	test.it("should apply fall into case if the value matches", () => {
@@ -48,7 +49,7 @@ test.describe("sweech", () => {
 	})
 
 	test.it("should compare against true with of_true", () => {
-		const result = sweech
+		const result = sweech_helpers
 			.of_true()
 			.case(1 > 2, () => "no")
 			.case(1 === 1, () => "yes")
@@ -58,7 +59,7 @@ test.describe("sweech", () => {
 	})
 
 	test.it("should compare against false with of_false", () => {
-		const result = sweech
+		const result = sweech_helpers
 			.of_false()
 			.case(1 > 2, () => "no")
 			.case(1 === 1, () => "yes")

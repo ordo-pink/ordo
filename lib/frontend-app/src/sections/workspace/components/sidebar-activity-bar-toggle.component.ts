@@ -22,7 +22,7 @@
 import { bs_arrow_left, bs_layout_sidebar_inset_reverse } from "@ordo-pink/frontend-icons"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 import { maoka } from "@ordo-pink/oss-maoka"
-import { sweech } from "@ordo-pink/oss-sweech"
+import { sweech_helpers } from "@ordo-pink/oss-sweech/extensions"
 
 import { sidebar$ } from "../workspace.state"
 
@@ -43,9 +43,9 @@ export const sidebar_toggle = maoka.create("button", ({ use }) => {
 		if (enabled) use(client_maoka.jabs.classes.replace("hidden", "visible"))
 		else use(client_maoka.jabs.classes.replace("visible", "hidden"))
 
-		return sweech
+		return sweech_helpers
 			.of_true()
-			.case(enabled && visible, () => bs_arrow_left({ classes: "sidebar-toggle_icon" })) // TODO Extract to class name
+			.case(enabled && visible, () => bs_arrow_left({ classes: "sidebar-toggle_icon" }))
 			.case(enabled && !visible, () => bs_layout_sidebar_inset_reverse())
 			.default(() => null)
 	}

@@ -17,7 +17,7 @@ export type ToResult<$X, $Result> = (x: $X) => $Result
  *
  * @example `sweech.match(myVariableWithIDontKnowWhichThingInside)`
  */
-export type Match = <const $X = unknown>(x: $X) => Instance<$X>
+export type Match = <$X = unknown>(x: $X) => Instance<$X>
 
 /**
  * sweech is an alternative to the good (???) old switch statement. Unlike the

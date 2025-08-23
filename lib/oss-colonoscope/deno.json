@@ -1,6 +1,6 @@
 {
 	"name": "@ordo-pink/colonoscope",
 	"version": "1.0.0",
-	"exports": "./index.ts",
+	"exports": "./index.js",
 	"exclude": ["**/*.test.ts"]
 }

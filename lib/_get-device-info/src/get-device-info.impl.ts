@@ -4,22 +4,23 @@
  */
 
 import { sweech } from "@ordo-pink/oss-sweech"
+import { sweech_helpers } from "@ordo-pink/oss-sweech/extensions"
 
 import type { DeviceInfo, GetDeviceInfo, IsDeviceInfo } from "./get-device-info.types"
 
 export const is_device_info: IsDeviceInfo = (x): x is DeviceInfo => typeof x === "string" && /^.*\s\(.*\)$/.test(x)
 
 export const get_device_info: GetDeviceInfo = navigator => {
-	const device = sweech
+	const device = sweech_helpers
 		.of_true()
 		.case(/Windows/i.test(navigator.platform), () =>
-			sweech
+			sweech_helpers
 				.of_true()
 				.case(/Surface/i.test(navigator.userAgent), () => "Surface")
 				.default(() => "Windows PC"),
 		)
 		.case(/Linux/i.test(navigator.platform), () =>
-			sweech
+			sweech_helpers
 				.of_true()
 				.case(/Chromebook/i.test(navigator.userAgent), () => "Chromebook")
 				.default(() => "Linux PC"),
@@ -32,17 +33,17 @@ export const get_device_info: GetDeviceInfo = navigator => {
 		)
 		.default(() => "Unknown device")
 
-	const os = sweech
+	const os = sweech_helpers
 		.of_true()
 		.case(/Win/i.test(navigator.platform), () => "Windows")
 		.case(/Mac/i.test(navigator.platform), () => "MacOS")
 		.case(/Linux/i.test(navigator.platform), () => "Linux")
 		.default(() => "Unknown OS")
 
-	const manufacturer = sweech
+	const manufacturer = sweech_helpers
 		.of_true()
 		.case(/Windows/i.test(navigator.platform), () =>
-			sweech
+			sweech_helpers
 				.of_true()
 				.case(/Surface/i.test(navigator.userAgent), () => "Microsoft")
 				.case(/Lenovo/i.test(navigator.userAgent), () => "Lenovo")

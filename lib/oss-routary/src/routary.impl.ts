@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { type Colonoscope, colonoscope } from "@ordo-pink/oss-colonoscope"
+import { Colonoscope, colonoscope } from "@ordo-pink/oss-colonoscope"
 
 import type * as Lib from "./routary.types"
 

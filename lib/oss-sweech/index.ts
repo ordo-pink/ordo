@@ -3,5 +3,5 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-export * from "./src/sweech.impl.ts"
-export * from "./src/sweech.types.ts"
+export * as sweech from "./src/sweech.impl.ts"
+export * as Sweech from "./src/sweech.types.ts"

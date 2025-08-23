@@ -3,30 +3,9 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { Sweech } from "./sweech.types.ts"
+import type * as Sweech from "./sweech.types.ts"
 
-/**
- * Helper object that contains a pointing interface to put value
- * into sweech.
- */
-export const sweech: Sweech.Static = {
-	/**
-	 * A pointing interface to put the value into sweech.
-	 *
-	 * @example `sweech.match(myVariableWithIDontKnowWhichThingInside)`
-	 */
-	match: x => _swich(x),
-
-	/**
-	 * Create an empty switch that compares provided values against `true`.
-	 */
-	of_true: () => _swich(true),
-
-	/**
-	 * Create an empty switch that compares provided values against `false`.
-	 */
-	of_false: () => _swich(false),
-}
+export const match: Sweech.Match = x => _swich(x)
 
 // --- Internal ---
 
@@ -35,7 +14,7 @@ export const sweech: Sweech.Static = {
  *
  * @example `sweech.match(myVariableWithIDontKnowWhichThingInside)`
  */
-const _switch_matched = <$Context, $Result extends unknown[] = []>(x: $Context): Sweech.Instance<$Context, $Result> => ({
+const _switch_matched = <const $X>(x: $X): Sweech.Instance<$X> => ({
 	/**
 	 * Define cases like you would normally do with a switch statement, or use
 	 * predicate functions to validate the value held inside sweech.
@@ -60,7 +39,7 @@ const _switch_matched = <$Context, $Result extends unknown[] = []>(x: $Context):
  *
  * @example `sweech.match(myVariableWithIDontKnowWhichThingInside)`
  */
-const _swich = <$Context, $Result extends unknown[] = []>(x: $Context): Sweech.Instance<$Context, $Result> => ({
+const _swich = <const $X>(x: $X): Sweech.Instance<$X> => ({
 	/**
 	 * Define cases like you would normally do with a switch statement, or use
 	 * predicate functions to validate the value held inside sweech.

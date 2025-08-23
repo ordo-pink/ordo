@@ -137,11 +137,10 @@ export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
 						}
 					}
 				} else {
-					for (const fn of registered_fns) {
-						if (fn_disablers[fn]) await fn_disablers[fn]()
-					}
-
-					window.location.reload()
+					// for (const fn of registered_fns) {
+					// 	if (fn_disablers[fn]) await fn_disablers[fn]()
+					// }
+					// window.location.reload()
 				}
 			})
 

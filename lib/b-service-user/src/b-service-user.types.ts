@@ -23,9 +23,8 @@ import type { Core } from "@ordo-pink/sdk-core"
 import type { Curried } from "@ordo-pink/oss-curry"
 import type { Oath } from "@ordo-pink/oss-oath"
 import type { Server } from "@ordo-pink/sdk-server"
-import type { Wjwt } from "@ordo-pink/oss-wjwt"
 
-export type Args = [user_repository: Server.User.Repository, code_service: Server.Code.Service]
+export type Args = [user_repository: Server.User.Repository]
 
 export type Instance = {
 	request_auth_code: Curried<(email: Core.User.Email) => Oath.Instance<Server.User.Instance, Core.Rrr.Instance<"EIO">>>
@@ -34,7 +33,7 @@ export type Instance = {
 			email: Core.User.Email,
 			code: Server.Code.Instance,
 		) => Oath.Instance<
-			[user: Server.User.Instance, token: Wjwt.Token, token_string: Wjwt.TokenString],
+			[user: Server.User.Instance, session_id: Server.User.SessionId],
 			Core.Rrr.Instance<"EIO" | "ENOENT" | "EEXIST">
 		>
 	>

@@ -4,7 +4,7 @@
  */
 
 import * as MAOKA_STYLED from "./maoka-styled.constants.ts"
-import type * as Maoka from "../maoka/maoka.types.ts"
+import type * as Maoka from "../maoka.types.ts"
 
 export type Tag = (typeof MAOKA_STYLED.HTML_TAGS)[number]
 

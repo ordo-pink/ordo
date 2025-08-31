@@ -19,10 +19,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import * as maoka from "@ordo-pink/oss-maoka"
 import type { Core } from "@ordo-pink/sdk-core"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
-import { maoka } from "@ordo-pink/oss-maoka"
-import { maoka_styled } from "@ordo-pink/oss-maoka/styled"
+import maoka_styled from "@ordo-pink/oss-maoka/styled"
 
 import { user_card, user_card_body, user_card_title } from "../user-card/user-card.component"
 

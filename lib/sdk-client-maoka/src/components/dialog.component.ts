@@ -3,10 +3,12 @@
  * SPDX-License-Identifier: Unlicense
  */
 
+import type * as Maoka from "@ordo-pink/oss-maoka"
+import * as maoka from "@ordo-pink/oss-maoka"
+import * as maoka_dom from "@ordo-pink/oss-maoka/dom"
 import { type ClientSDK, MODAL } from "@ordo-pink/sdk-client"
-import { type Maoka, maoka } from "@ordo-pink/oss-maoka"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
-import { maoka_styled } from "@ordo-pink/oss-maoka/styled"
+import maoka_styled from "@ordo-pink/oss-maoka/styled"
 import { sweech } from "@ordo-pink/oss-sweech"
 
 import type * as ClientMaoka from "../sdk-client-maoka.types"
@@ -63,7 +65,7 @@ const dialog_base = maoka.create<Dialog.Args>(
 		use(client_maoka.jabs.classes.set("dialog", get_dialog_css_class(type)))
 
 		const handle_cancel_click = () =>
-			void (maoka.dom.node_guard(node) && node.value.parentElement?.parentElement?.parentElement?.click())
+			void (maoka_dom.node_guard(node) && node.value.parentElement?.parentElement?.parentElement?.click())
 
 		return () => [
 			dialog_header_div(() => [dialog_icon_span({ render_icon }), dialog_title_h2(title)]),
@@ -103,7 +105,7 @@ const create_dialog: (
 		const hide = () => void state.hunter.shoot("modal.hide")
 		const show = () =>
 			void state.hunter.shoot("modal.show", {
-				render: div => maoka.dom.render(div, component, node.root.create_id),
+				render: div => maoka_dom.render(div, component, node.root.create_id),
 				size: MODAL.SIZE.SM,
 			})
 
@@ -119,11 +121,11 @@ const dialog_title_h2 = maoka_styled.h2("title")
 const dialog_footer_div = maoka_styled.div("footer")
 const dialog_body_div = maoka.create<{ render_body: Dialog.BodyRenderer }>("div", ({ render_body, use }) => {
 	use(client_maoka.jabs.classes.set("body"))
-	use(maoka.dom.jabs.onmount(n => void render_body(n.value as HTMLDivElement)))
+	use(maoka.jab_onmount(n => void render_body(n.value as HTMLDivElement)))
 })
 const dialog_icon_span = maoka.create<{ render_icon: Dialog.IconRenderer }>("span", ({ render_icon, use }) => {
 	use(client_maoka.jabs.classes.set("icon"))
-	use(maoka.dom.jabs.onmount(n => void render_icon(n.value as HTMLSpanElement)))
+	use(maoka.jab_onmount(n => void render_icon(n.value as HTMLSpanElement)))
 })
 
 const get_dialog_css_class = (type: Dialog.Type) =>

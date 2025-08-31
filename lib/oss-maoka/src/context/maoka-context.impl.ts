@@ -5,8 +5,8 @@
 
 import type * as Context from "./maoka-context.types.ts"
 
-export const create: Context.Create = <$Value>() => {
-	const state = {} as Context.InternalState
+export const create_context: Context.CreateContext = <$Value>() => {
+	const state = {} as Context.ContextInternalState
 
 	return {
 		provide:

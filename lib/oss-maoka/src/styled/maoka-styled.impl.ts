@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import type * as Maoka from "../maoka/maoka.types.ts"
+import type * as Maoka from "../maoka.types.ts"
 import type * as MaokaStyled from "./maoka-styled.types.ts"
 import { HTML_TAGS } from "./maoka-styled.constants.ts"
-import { create } from "../maoka/maoka.impl.ts"
-import { hit_if_dom } from "../dom/jabs/maoka-dom-jabs.impl.ts"
+import { create } from "../maoka.impl.ts"
+import { jab_if_dom } from "../jabs/maoka-jabs.impl.ts"
 
 const tags: MaokaStyled.Instance = HTML_TAGS.reduce(
 	(acc, tag) => ({
@@ -19,7 +19,7 @@ const tags: MaokaStyled.Instance = HTML_TAGS.reduce(
 			) =>
 			(args: $Args) =>
 				create<$Args>(tag, args => {
-					if (classes) args.use(hit_if_dom(n => n.value.setAttribute("class", classes)))
+					if (classes) args.use(jab_if_dom(n => n.value.setAttribute("class", classes)))
 					on_create && on_create(args as any)
 
 					return args.kindergarten

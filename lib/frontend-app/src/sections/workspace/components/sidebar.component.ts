@@ -19,8 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import * as maoka from "@ordo-pink/oss-maoka"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
-import { maoka } from "@ordo-pink/oss-maoka"
 
 import { sidebar$ } from "../workspace.state"
 

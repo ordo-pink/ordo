@@ -19,12 +19,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { maoka_styled } from "@ordo-pink/oss-maoka/styled"
+import styled from "@ordo-pink/oss-maoka/styled"
 
 import "./user-card.styles.css"
 
-export const user_card = maoka_styled.div("user-card")
-export const user_card_body = maoka_styled.div("body")
-export const user_card_title = maoka_styled.h2("title")
-export const user_card_footer = maoka_styled.div("footer")
-export const user_card_under_construction = maoka_styled.div("user-card under-construction")
+export const user_card = styled.div("user-card")
+export const user_card_body = styled.div("body")
+export const user_card_title = styled.h2("title")
+export const user_card_footer = styled.div("footer")
+export const user_card_under_construction = styled.div("user-card under-construction")

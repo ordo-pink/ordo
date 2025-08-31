@@ -3,9 +3,8 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { type Maoka, maoka } from "@ordo-pink/oss-maoka"
+import * as maoka from "@ordo-pink/oss-maoka"
 import type { ClientSDK } from "@ordo-pink/sdk-client"
-import { maoka_context } from "@ordo-pink/oss-maoka/context"
 
 import type * as Lib from "./sdk-client-maoka.types"
 import { button_danger, button_neutral, button_primary, button_success } from "./components/button.component"
@@ -22,7 +21,7 @@ import { is_sm_screen_jab$ } from "./jabs/is-sm-screen.jab"
 import { set_style_jab } from "./jabs/set-style.jab"
 import { zags_jabs } from "./jabs/zags.jab"
 
-export const context: Lib.Context = maoka_context.create()
+export const context: Lib.Context = maoka.create_context()
 
 export namespace components {
 	export namespace button {
@@ -37,7 +36,7 @@ export namespace components {
 		export const actions = dialog_actions
 	}
 	export const hotkey = actionable_hotkey
-	export const with_state = (state: ClientSDK.F.State, component: () => Maoka.Component) =>
+	export const with_state = (state: ClientSDK.F.State, component: () => maoka.Component) =>
 		maoka.create("div", ({ use }) => {
 			use(context.provide(state))
 			return component

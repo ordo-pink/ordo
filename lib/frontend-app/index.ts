@@ -19,12 +19,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import * as maoka from "@ordo-pink/oss-maoka"
 import { type Core, core } from "@ordo-pink/sdk-core"
 import { type ClientSDK } from "@ordo-pink/sdk-client"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 import { hunt } from "@ordo-pink/oss-hunt"
-import { maoka } from "@ordo-pink/oss-maoka"
-import { maoka_styled } from "@ordo-pink/oss-maoka/styled"
+import maoka_styled from "@ordo-pink/oss-maoka/styled"
 
 import { auth_jab } from "./src/state/auth"
 import { background_task_status } from "./src/sections/background-task"

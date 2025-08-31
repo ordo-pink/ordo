@@ -3,6 +3,6 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-export * as MAOKA_STYLED from "./src/styled/maoka-styled.constants.ts"
-export { default as maoka_styled } from "./src/styled/maoka-styled.impl.ts"
-export * as MaokaStyled from "./src/styled/maoka-styled.types.ts"
+export * from "./src/styled/maoka-styled.constants.ts"
+export { default as default } from "./src/styled/maoka-styled.impl.ts"
+export * from "./src/styled/maoka-styled.types.ts"

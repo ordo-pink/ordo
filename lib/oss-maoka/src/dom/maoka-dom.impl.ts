@@ -3,12 +3,10 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import type * as Maoka from "../maoka/maoka.types.ts"
+import type * as Maoka from "../maoka.types.ts"
 import type * as MaokaDom from "./maoka-dom.types.ts"
-import { component_guard, node_guard as maoka_node_guard } from "../maoka/maoka.impl.ts"
+import { component_guard, node_guard as maoka_node_guard } from "../maoka.impl.ts"
 import { REFRESH_EVENT_NAME } from "./maoka-dom.constants.ts"
-
-export * as jabs from "./jabs/maoka-dom-jabs.impl.ts"
 
 export const node_guard: MaokaDom.NodeGuard = <$Element extends HTMLElement = HTMLElement>(
 	x: any,

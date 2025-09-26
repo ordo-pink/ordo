@@ -3,5 +3,13 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-export * as client_maoka from "./src/sdk-client-maoka.impl"
-export * as ClientMaoka from "./src/sdk-client-maoka.types"
+export type * as OrdoClientMaoka from "./src/sdk-client-maoka.types"
+export * as ordo_client_maoka from "./src/sdk-client-maoka.impl"
+
+import * as client_maoka from "./src/sdk-client-maoka.impl"
+
+declare global {
+	var ordo_client_maoka: typeof client_maoka
+}
+
+globalThis.ordo_client_maoka = client_maoka

@@ -22,3 +22,5 @@ export const rtap: Result.RTap = (f, g) => r => {
 }
 
 export const swap: Result.Swap = () => r => r.cata({ ok: x => err(x), err: x => ok(x) })
+
+export const fix: Result.Fix = f => r => ok(r.cata({ ok: x => x, err: f }))

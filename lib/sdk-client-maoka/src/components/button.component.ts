@@ -13,17 +13,19 @@ import { set_class } from "../jabs/class.jab"
 
 import "./button.styles.css"
 
-export const button_success = (params: ClientMaoka.Components.ButtonArgs) =>
-	default_button({ ...params, custom_class: add_button_type_class("success", params.custom_class) })
+export namespace button {
+	export const success = (params: ClientMaoka.Components.ButtonArgs) =>
+		default_button({ ...params, custom_class: add_button_type_class("success", params.custom_class) })
 
-export const button_neutral = (params: ClientMaoka.Components.ButtonArgs) =>
-	default_button({ ...params, custom_class: add_button_type_class("neutral", params.custom_class) })
+	export const neutral = (params: ClientMaoka.Components.ButtonArgs) =>
+		default_button({ ...params, custom_class: add_button_type_class("neutral", params.custom_class) })
 
-export const button_primary = (params: ClientMaoka.Components.ButtonArgs) =>
-	default_button({ ...params, custom_class: add_button_type_class("primary", params.custom_class) })
+	export const primary = (params: ClientMaoka.Components.ButtonArgs) =>
+		default_button({ ...params, custom_class: add_button_type_class("primary", params.custom_class) })
 
-export const button_danger = (params: ClientMaoka.Components.ButtonArgs) =>
-	default_button({ ...params, custom_class: add_button_type_class("danger", params.custom_class) })
+	export const danger = (params: ClientMaoka.Components.ButtonArgs) =>
+		default_button({ ...params, custom_class: add_button_type_class("danger", params.custom_class) })
+}
 
 // --- Internal ---
 

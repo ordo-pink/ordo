@@ -5,10 +5,8 @@
 
 import { maoka } from "@ordo-pink/oss-maoka"
 
-import type { Context } from "./sdk-client-maoka.types"
-
 export * from "./components/button.component"
 
-export const context: Context = maoka.context.create()
+export const context: OrdoClientMaoka.Context = maoka.context.create()
 
 export const with_context = (state: OrdoClient.F.State) => maoka.styled.div("", ({ use }) => void use(context.provide(state)))

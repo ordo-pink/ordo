@@ -7,14 +7,10 @@ import { type Maoka, maoka } from "@ordo-pink/oss-maoka"
 import type { I18n } from "@ordo-pink/oss-i18n"
 import { core } from "@ordo-pink/sdk-core"
 
-import type * as ClientMaoka from "../sdk-client-maoka.types"
 import { cheat$ } from "./zags.jab"
 import { context } from "../sdk-client-maoka.impl"
 
-export const register_translations_jab: (
-	locale: I18n.ISO_639_1_Locale,
-	values: Partial<Record<I18n.DefinitionToTranslationKeys<OrdoClient.Translations.Keys>, string>>,
-) => Maoka.Jab =
+export const register_translations: OrdoClientMaoka.Jabs.RegisterTranslations =
 	(locale, values) =>
 	({ use }) => {
 		const state = use(context.consume)
@@ -27,7 +23,7 @@ export const register_translations_jab: (
 		maoka.dom.jabs.onunmount(() => void state.hunter.shoot("i18n.remove_translations", core.fns.keys_of(values)))
 	}
 
-export const t_jab$: ClientMaoka.Jabs.T$ = ({ use }) => {
+export const t_jab$: OrdoClientMaoka.Jabs.T$ = ({ use }) => {
 	const { i18n$ } = use(context.consume)
 	use(cheat$(i18n$, "values"))
 
@@ -46,19 +42,19 @@ export const t_jab$: ClientMaoka.Jabs.T$ = ({ use }) => {
 
 	use(maoka.dom.jabs.onmount(handle_mount))
 
-	return (key, default_value = "") => {
+	return (k, v = "") => {
 		try {
-			return i18n$.select(`values.${current_locale}_${key}`) ?? default_value
+			return i18n$.select(`values.${current_locale}_${k}`) ?? v
 		} catch (_) {
-			return default_value
+			return v
 		}
 	}
 }
 
-export const translate_jab$: ClientMaoka.Jabs.Translate$ =
-	key =>
+export const translate_jab$: OrdoClientMaoka.Jabs.Translate$ =
+	k =>
 	({ use }) => {
-		if (!key) return default_value => default_value ?? key ?? ""
+		if (!k) return v => v ?? k ?? ""
 
 		const { i18n$ } = use(context.consume)
 
@@ -66,7 +62,7 @@ export const translate_jab$: ClientMaoka.Jabs.Translate$ =
 		let current_value: string | undefined
 
 		try {
-			current_value = i18n$.select(`values.${current_locale}_${key}`)
+			current_value = i18n$.select(`values.${current_locale}_${k}`)
 		} catch (_) {
 			current_value = undefined
 		}
@@ -77,7 +73,7 @@ export const translate_jab$: ClientMaoka.Jabs.Translate$ =
 				use(maoka.dom.jabs.refresh$)
 			})
 
-			const divorce_key = i18n$.cheat(`values.${current_locale}_${key}` as any, new_value => {
+			const divorce_key = i18n$.cheat(`values.${current_locale}_${k}` as any, new_value => {
 				current_value = new_value as string
 				use(maoka.dom.jabs.refresh$)
 			})
@@ -90,5 +86,20 @@ export const translate_jab$: ClientMaoka.Jabs.Translate$ =
 
 		use(maoka.dom.jabs.onmount(handle_mount))
 
-		return default_value => current_value ?? default_value ?? key ?? ""
+		return v => current_value ?? v ?? k ?? ""
 	}
+
+declare global {
+	export namespace OrdoClientMaoka.Jabs {
+		export type TranslateFn = (default_value?: string) => string
+		export type Translate$ = (key?: OrdoClient.Translations.Key) => Maoka.Jab<TranslateFn>
+
+		export type TFn = (key: OrdoClient.Translations.Key, default_value?: string) => string
+		export type T$ = Maoka.Jab<TFn>
+
+		export type RegisterTranslations = (
+			locale: I18n.ISO_639_1_Locale,
+			values: Partial<Record<I18n.DefinitionToTranslationKeys<OrdoClient.Translations.Keys>, string>>,
+		) => Maoka.Jab
+	}
+}

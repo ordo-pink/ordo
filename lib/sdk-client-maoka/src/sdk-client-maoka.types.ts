@@ -5,7 +5,13 @@
 
 import type { Maoka } from "@ordo-pink/oss-maoka"
 
-export type Context = Maoka.Context.Instance<OrdoClient.F.State>
+import "@ordo-pink/sdk-client"
+
+declare global {
+	namespace OrdoClientMaoka {
+		export type Context = Maoka.Context.Instance<OrdoClient.F.State>
+	}
+}
 
 export namespace Jabs {
 	export type TranslateFn = (default_value?: string) => string

@@ -5,4 +5,10 @@
 
 import type { Maoka } from "@ordo-pink/oss-maoka"
 
-export const is_darwin: Maoka.Jab<boolean> = () => navigator.appVersion.indexOf("Mac") !== -1
+export const is_darwin: OrdoClientMaoka.Jabs.IsDarwin = () => navigator.appVersion.indexOf("Mac") !== -1
+
+declare global {
+	namespace OrdoClientMaoka.Jabs {
+		export type IsDarwin = Maoka.Jab<boolean>
+	}
+}

@@ -69,6 +69,10 @@ export type RTap = <$Ok, $Err>(
 	on_ok?: (x: $Ok) => any,
 ) => (result: Instance<$Ok, $Err>) => Instance<$Ok, $Err>
 
+export type Fix = <$Ok, $Err, $NewOk>(
+	on_err: (x: $Err) => $NewOk,
+) => (result: Instance<$Ok, $Err>) => Instance<$Ok | $NewOk, never>
+
 export type Swap = <$Ok, $Err>() => (result: Instance<$Ok, $Err>) => Instance<$Err, $Ok>
 
 export type OrElse = <const $Ok, const $Err, const _NewErr>(

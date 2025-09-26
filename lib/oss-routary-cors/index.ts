@@ -3,5 +3,10 @@
  * SPDX-License-Identifier: Unlicense
  */
 
+export * from "./src/routary-cors.impl"
+export * from "./src/routary-cors.types"
+
 export * as routary_cors from "./src/routary-cors.impl"
 export * as RoutaryCors from "./src/routary-cors.types"
+
+export * as default from "./src/routary-cors.impl"

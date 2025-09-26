@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import type * as Maoka from "../maoka.types.ts"
-import type * as MaokaStyled from "./maoka-styled.types.ts"
-import { HTML_TAGS } from "./maoka-styled.constants.ts"
-import { create } from "../maoka.impl.ts"
-import { jab_if_dom } from "../jabs/maoka-jabs.impl.ts"
+import type * as Maoka from "../maoka.types"
+import type * as MaokaStyled from "./maoka-styled.types"
+import * as STYLED from "./maoka-styled.constants"
+import * as jabs from "../dom/jabs/maoka-jabs.impl"
+import * as maoka from "../maoka.impl"
 
-const tags: MaokaStyled.Instance = HTML_TAGS.reduce(
+const tags: MaokaStyled.Instance = STYLED.HTML_TAGS.reduce(
 	(acc, tag) => ({
 		...acc,
 		[tag]:
@@ -18,8 +18,8 @@ const tags: MaokaStyled.Instance = HTML_TAGS.reduce(
 				on_create?: (args: Maoka.Args<$Args> | Maoka.Kindergarten) => void,
 			) =>
 			(args: $Args) =>
-				create<$Args>(tag, args => {
-					if (classes) args.use(jab_if_dom(n => n.value.setAttribute("class", classes)))
+				maoka.create_component<$Args>(tag, args => {
+					if (classes) args.use(jabs.if_dom(n => n.value.setAttribute("class", classes)))
 					on_create && on_create(args as any)
 
 					return args.kindergarten

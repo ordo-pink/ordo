@@ -28,7 +28,7 @@ import { get_user_from_cookie } from "./get-user-from-cookie"
 export const check_if_edited_user_is_current_user = (intake: ServerID.Intake) =>
 	get_user_from_cookie(intake).pipe(
 		oath.ops.chain(({ user }) =>
-			oath.if(user.get_id() === intake.params.user_id, {
+			oath.if_else(user.get_id() === intake.params.user_id, {
 				f: () => ({ rrr: rrr.eperm("Cannot edit other user"), intake }),
 			}),
 		),

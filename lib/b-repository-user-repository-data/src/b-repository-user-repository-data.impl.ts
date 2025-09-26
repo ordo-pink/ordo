@@ -117,13 +117,13 @@ export const create: Lib.Create = (repository, uid, fid, ufid) => {
 		get_by_email: email =>
 			cache0
 				.pipe(oath.ops.chain(m => oath.from_nullable(m.email[email])))
-				.pipe(oath.ops.rmap(() => core.rrr.enoent(CORE.RRR.REASON.NO, server.user.obfuscate_email(email))))
+				.pipe(oath.ops.rmap(() => core.rrr.enoent(CORE.RRR.RRR_REASON.NO, server.user.obfuscate_email(email))))
 				.pipe(oath.ops.chain(read)),
 
 		get_by_ref: ref =>
 			cache0
 				.pipe(oath.ops.chain(m => oath.from_nullable(m.ref[ref])))
-				.pipe(oath.ops.rmap(() => core.rrr.enoent(CORE.RRR.REASON.NO, ref)))
+				.pipe(oath.ops.rmap(() => core.rrr.enoent(CORE.RRR.RRR_REASON.NO, ref)))
 				.pipe(oath.ops.chain(read)),
 	}
 }
@@ -143,7 +143,7 @@ const get_cache_promise = (repository: Server.Data.Repository, uid: Core.User.Id
 const to_stream0 =
 	<$F>(on_error: (e: unknown) => $F = e => e as any) =>
 	(x: string) =>
-		oath.try(() => new Blob([x], { type: "application/json" }).stream(), on_error)
+		oath.try_catch(() => new Blob([x], { type: "application/json" }).stream(), on_error)
 
 const from_stream0 =
 	<$T, $F = unknown>(on_error: (e: unknown) => $F) =>

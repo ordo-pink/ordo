@@ -3,16 +3,15 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import type * as Maoka from "@ordo-pink/oss-maoka"
-import type { ClientSDK } from "@ordo-pink/sdk-client"
+import type { Maoka } from "@ordo-pink/oss-maoka"
 
-export type Context = Maoka.ContextInstance<ClientSDK.F.State>
+export type Context = Maoka.Context.Instance<OrdoClient.F.State>
 
 export namespace Jabs {
 	export type TranslateFn = (default_value?: string) => string
-	export type Translate$ = (key?: ClientSDK.Translations.Key) => Maoka.Jab<Jabs.TranslateFn>
+	export type Translate$ = (key?: OrdoClient.Translations.Key) => Maoka.Jab<Jabs.TranslateFn>
 
-	export type TFn = (key: ClientSDK.Translations.Key, default_value?: string) => string
+	export type TFn = (key: OrdoClient.Translations.Key, default_value?: string) => string
 	export type T$ = Maoka.Jab<Jabs.TFn>
 }
 
@@ -35,6 +34,4 @@ export namespace Components {
 	}
 }
 
-export namespace Pouch {
-	export type NoSpaceString<$Str extends string> = $Str extends `${string} ${string}` ? never : $Str
-}
+export type NoSpaceString<$Str extends string> = $Str extends `${string} ${string}` ? never : $Str

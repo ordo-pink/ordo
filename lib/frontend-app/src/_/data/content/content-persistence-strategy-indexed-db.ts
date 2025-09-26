@@ -51,8 +51,8 @@ export const PersistenceStrategyContentIndexedDB = {
 			.of(() => db_promise)
 			.pipe(oath.ops.and(f => oath.from_promise(f).pipe(oath.ops.rmap(eio))))
 			.pipe(oath.ops.and(db => oath.from_nullable(db, () => eio(new Error("Could not establish IndexedDB connection")))))
-			.pipe(oath.ops.and(db => oath.try(() => db.transaction([store_name], "readwrite"))))
-			.pipe(oath.ops.and(transaction => oath.try(() => transaction.objectStore(store_name), eio)))
+			.pipe(oath.ops.and(db => oath.try_catch(() => db.transaction([store_name], "readwrite"))))
+			.pipe(oath.ops.and(transaction => oath.try_catch(() => transaction.objectStore(store_name), eio)))
 			.pipe(oath.ops.and(store => IndexedDBStorePromise.Of(store)))
 
 		return {

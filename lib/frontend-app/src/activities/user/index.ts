@@ -20,7 +20,7 @@
  */
 
 import { COMMAND_PALETTE, type ClientSDK, MODAL, client_rrr } from "@ordo-pink/sdk-client"
-import { type Maoka, maoka } from "@ordo-pink/oss-maoka"
+import { type Maoka, create_component } from "@ordo-pink/oss-maoka"
 import { bs_box_arrow_in_right, bs_box_arrow_right, bs_envelope_at, bs_person_bounding_box } from "@ordo-pink/frontend-icons"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 import { core } from "@ordo-pink/sdk-core"
@@ -59,7 +59,7 @@ const register_other_user_activity_jab: Maoka.Jab = ({ use }) => {
 			readable_name: "user_workspace_other_activity_name",
 			routes: ["/others/:id_or_handle"],
 			render_workspace: div =>
-				maoka.dom.render(div, client_maoka.components.with_state(state, other_user_workspace), n.root.create_id),
+				create_component.dom.render(div, client_maoka.components.with_state(state, other_user_workspace), n.root.create_id),
 		})
 
 		return () => {
@@ -67,7 +67,7 @@ const register_other_user_activity_jab: Maoka.Jab = ({ use }) => {
 		}
 	}
 
-	use(maoka.dom.jabs.onmount(handle_onmount))
+	use(create_component.dom.jabs.onmount(handle_onmount))
 }
 
 const track_prey_jab: Maoka.Jab = ({ node, use }) => {
@@ -90,7 +90,7 @@ const track_prey_jab: Maoka.Jab = ({ node, use }) => {
 				oath.ops.map(headers => ({ headers, method: "POST", body: JSON.stringify([email]), credentials: "include" as const })),
 			)
 			.pipe(oath.ops.chain(init => oath.from_promise(() => fetch(`${hosts.id}/auth/request-code`, init))))
-			.pipe(oath.ops.chain(res => oath.if(res.status < 300, { t: () => res })))
+			.pipe(oath.ops.chain(res => oath.if_else(res.status < 300, { t: () => res })))
 			.pipe(oath.ops.tap(() => hunter.shoot("user.show_verify_code_modal")))
 			.cata(oath.catas.to_promise())
 			.catch(() => void 0)
@@ -100,7 +100,8 @@ const track_prey_jab: Maoka.Jab = ({ node, use }) => {
 	const [show_join_modal, hide_modal] = use(
 		client_maoka.jabs.dialog.actions(state, {
 			actions: () => [{ hotkey: "enter", kindergarten: t_join, on_click: on_ok_click }],
-			render_body: div => maoka.dom.render(div, client_maoka.components.with_state(state, email_input), node.root.create_id),
+			render_body: div =>
+				create_component.dom.render(div, client_maoka.components.with_state(state, email_input), node.root.create_id),
 			title: t_join,
 		}),
 	)
@@ -147,7 +148,7 @@ const track_prey_jab: Maoka.Jab = ({ node, use }) => {
 				hunter.shoot("command_palette.add", {
 					id: COMMAND_PALETTE_SIGN_OUT_ID,
 					readable_name: "user_commands_sign_out_name",
-					render_icon: span => maoka.dom.render(span, bs_box_arrow_right({}), node.root.create_id),
+					render_icon: span => create_component.dom.render(span, bs_box_arrow_right({}), node.root.create_id),
 					value: () => hunter.shoot("user.sign_out"),
 					description: "user_commands_sign_out_description",
 					type: COMMAND_PALETTE.ITEM_TYPE.DESTRUCTIVE_ACTION,
@@ -156,7 +157,7 @@ const track_prey_jab: Maoka.Jab = ({ node, use }) => {
 				hunter.shoot("command_palette.add", {
 					id: COMMAND_PALETTE_GO_TO_ACCOUNT_ID,
 					readable_name: "user_commands_go_to_account_name",
-					render_icon: span => maoka.dom.render(span, bs_person_bounding_box(), node.root.create_id),
+					render_icon: span => create_component.dom.render(span, bs_person_bounding_box(), node.root.create_id),
 					value: () => hunter.shoot("user.go_to_account"),
 					description: "user_commands_go_to_account_description",
 					type: COMMAND_PALETTE.ITEM_TYPE.PAGE_OPENER,
@@ -166,8 +167,8 @@ const track_prey_jab: Maoka.Jab = ({ node, use }) => {
 					id: USER_CURRENT_ACTIVITY_ID,
 					readable_name: "user_workspace_current_activity_name",
 					routes: ["/me"],
-					render_icon: span => maoka.dom.render(span, bs_person_bounding_box(), node.root.create_id),
-					render_workspace: div => maoka.dom.render(div, current_user_workspace({ state }), node.root.create_id),
+					render_icon: span => create_component.dom.render(span, bs_person_bounding_box(), node.root.create_id),
+					render_workspace: div => create_component.dom.render(div, current_user_workspace({ state }), node.root.create_id),
 				})
 			} else {
 				release_join = hunter.track("user.show_request_code_modal", show_join_modal)
@@ -176,7 +177,11 @@ const track_prey_jab: Maoka.Jab = ({ node, use }) => {
 					hunter.shoot("modal.show", {
 						size: MODAL.SIZE.SM,
 						render: div =>
-							maoka.dom.render(div, client_maoka.components.with_state(state, verify_code_modal), node.root.create_id),
+							create_component.dom.render(
+								div,
+								client_maoka.components.with_state(state, verify_code_modal),
+								node.root.create_id,
+							),
 					})
 				})
 
@@ -186,7 +191,7 @@ const track_prey_jab: Maoka.Jab = ({ node, use }) => {
 				hunter.shoot("command_palette.add", {
 					id: COMMAND_PALETTE_JOIN_ID,
 					readable_name: "user_commands_join_name",
-					render_icon: span => maoka.dom.render(span, bs_box_arrow_in_right(), node.root.create_id),
+					render_icon: span => create_component.dom.render(span, bs_box_arrow_in_right(), node.root.create_id),
 					value: () => {
 						hunter.shoot("user.show_request_code_modal")
 						hunter.shoot("command_palette.hide")
@@ -211,7 +216,7 @@ const track_prey_jab: Maoka.Jab = ({ node, use }) => {
 		})
 	}
 
-	use(maoka.dom.jabs.onmount(handle_mount))
+	use(create_component.dom.jabs.onmount(handle_mount))
 }
 
 const USER_CURRENT_ACTIVITY_ID = "@ordo-pink/user-current"
@@ -265,16 +270,16 @@ const en_translations: ClientSDK.Translations.PickValues<"user"> = {
 	user_workspace_other_activity_name: "User Info",
 }
 
-const email_input = maoka.create("label", ({ use }) => {
+const email_input = create_component.create("label", ({ use }) => {
 	use(client_maoka.jabs.classes.set("user_join-modal_email_wrapper"))
 	return () => [bs_envelope_at({}), search()]
 })
 
-const search = maoka_styled.input("user_join-modal_email", ({ use }) => {
+const search = maoka_styled.tags.input("user_join-modal_email", ({ use }) => {
 	const t_placeholder = use(client_maoka.jabs.translate$("user_modals_join_placeholder"))
 	const value = authenticating_user$.select("email")
 
-	const handle_mount = () => use(maoka.dom.jabs.hit_if_dom(n => n.value.focus()))
+	const handle_mount = () => use(create_component.dom.jabs.hit_if_dom(n => n.value.focus()))
 	const handle_input = (event: Event) => {
 		const target = event.target as HTMLInputElement
 		authenticating_user$.update("email", () => target.value)
@@ -283,6 +288,6 @@ const search = maoka_styled.input("user_join-modal_email", ({ use }) => {
 	use(client_maoka.jabs.set_attribute("type", "email"))
 	use(client_maoka.jabs.set_attribute("placeholder", t_placeholder()))
 	use(client_maoka.jabs.listen("oninput", handle_input))
-	use(maoka.dom.jabs.onmount(handle_mount))
+	use(create_component.dom.jabs.onmount(handle_mount))
 	if (value) use(client_maoka.jabs.set_attribute("value", value))
 })

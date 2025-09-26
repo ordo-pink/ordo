@@ -32,6 +32,6 @@ export const create: Lib.Create = a => ({
 
 // --- Internal ---
 
-const RRR = CORE.RRR.REASON.HASHING_ISSUE
+const RRR = CORE.RRR.RRR_REASON.HASHING_ISSUE
 
 const eio = curry(core.rrr.eio)

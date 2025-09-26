@@ -8,5 +8,5 @@ import { type Maoka, maoka } from "@ordo-pink/oss-maoka"
 export const set_style_jab =
 	(str: Partial<Omit<CSSStyleDeclaration, "length" | "parentRule">>): Maoka.Jab =>
 	({ use }) => {
-		use(maoka.dom.jabs.hit_if_dom(n => Object.keys(str).forEach(k => ((n.value.style as any)[k] = (str as any)[k]))))
+		use(maoka.dom.jabs.if_dom(n => Object.keys(str).forEach(k => ((n.value.style as any)[k] = (str as any)[k]))))
 	}

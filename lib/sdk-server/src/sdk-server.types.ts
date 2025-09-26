@@ -20,7 +20,8 @@
  */
 
 export * from "./index/index.types"
-export * as Code from "./code/code.types"
 export * as Data from "./data/data.types"
 export * as Email from "./email/email.types"
 export * as User from "./user/user.types"
+
+export type AllowedOrigin = string

@@ -3,40 +3,37 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import type * as Maoka from "@ordo-pink/oss-maoka"
-import * as maoka from "@ordo-pink/oss-maoka"
+import { type Maoka, maoka } from "@ordo-pink/oss-maoka"
 import type { Zags } from "@ordo-pink/oss-zags"
 
-export namespace zags_jabs {
-	export const marry$ =
-		<$State extends Zags.BaseState>(zags: Zags.Instance<$State>): Maoka.Jab<() => $State> =>
-		({ use }) => {
-			let value: $State
-			const divorce = zags.marry(state => {
-				value = state
-				use(maoka.jab_refresh$)
-			})
+export const marry$ =
+	<$State extends Zags.BaseState>(zags: Zags.Instance<$State>): Maoka.Jab<() => $State> =>
+	({ use }) => {
+		let value: $State
+		const divorce = zags.marry(state => {
+			value = state
+			use(maoka.dom.jabs.refresh$)
+		})
 
-			use(maoka.jab_onunmount(divorce))
+		use(maoka.dom.jabs.onunmount(divorce))
 
-			return () => value
-		}
+		return () => value
+	}
 
-	export const cheat$ =
-		<$State extends Zags.BaseState, const $DotPath extends Zags.Pouch.RecordToDotPaths<$State>>(
-			zags: Zags.Instance<$State>,
-			dot_path: $DotPath,
-		): Maoka.Jab<() => Zags.Pouch.RecordValueByDotPath<$State, $DotPath>> =>
-		({ use }) => {
-			let value: Zags.Pouch.RecordValueByDotPath<$State, $DotPath>
+export const cheat$ =
+	<$State extends Zags.BaseState, const $DotPath extends Zags.RecordToDotPaths<$State>>(
+		zags: Zags.Instance<$State>,
+		dot_path: $DotPath,
+	): Maoka.Jab<() => Zags.RecordValueByDotPath<$State, $DotPath>> =>
+	({ use }) => {
+		let value: Zags.RecordValueByDotPath<$State, $DotPath>
 
-			const divorce = zags.cheat(dot_path, state => {
-				value = state
-				use(maoka.jab_refresh$)
-			})
+		const divorce = zags.cheat(dot_path, state => {
+			value = state
+			use(maoka.dom.jabs.refresh$)
+		})
 
-			use(maoka.jab_onunmount(divorce))
+		use(maoka.dom.jabs.onunmount(divorce))
 
-			return () => value
-		}
-}
+		return () => value
+	}

@@ -20,11 +20,11 @@
  */
 
 import { COMMAND_PALETTE } from "@ordo-pink/sdk-client"
-import { create_zags } from "@ordo-pink/oss-zags"
+import { create } from "@ordo-pink/oss-zags"
 
 import type { CommandPalette } from "./command-palette.types"
 
-export const command_palette$ = create_zags<CommandPalette.State>({
+export const command_palette$ = create<CommandPalette.State>({
 	index: 0,
 	items: [],
 	location: COMMAND_PALETTE.SECTION.ITEMS,

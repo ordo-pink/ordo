@@ -22,7 +22,6 @@
 import { BunFile } from "bun"
 import { join } from "path"
 
-import { CORE, type Core, core } from "@ordo-pink/sdk-core"
 import { oath } from "@ordo-pink/oss-oath"
 
 import type * as Lib from "./b-repository-data-fs.types"
@@ -54,14 +53,14 @@ export const create: Lib.Create = root => {
 						.pipe(oath.ops.chain(validate_file_exists))
 						.pipe(oath.ops.map(({ file }) => file))
 						.pipe(oath.ops.chain(delete_file))
-				: core.todo(),
+				: ordo.todo(),
 	}
 }
 
 // --- Internal ---
 
 const get_file = (path: string) =>
-	oath.try(() => Bun.file(path)).pipe(oath.ops.rmap(core.rrr.eio(CORE.RRR.REASON.FILE_READ_FAILED)))
+	oath.try_catch(() => Bun.file(path)).pipe(oath.ops.rmap(ordo.rrr.eio(ORDO.RRR.REASON.FILE_READ_FAILED)))
 
 const check_file_exists = (path: string) =>
 	get_file(path).pipe(
@@ -77,23 +76,23 @@ const write_file = (content: ReadableStream) => (path: BunFile | string) =>
 	oath
 		.from_promise(() => Bun.readableStreamToArrayBuffer(content) as Promise<ArrayBuffer>)
 		.pipe(oath.ops.chain(input => oath.from_promise(() => Bun.write(path, input))))
-		.pipe(oath.ops.rmap(core.rrr.eio(CORE.RRR.REASON.FILE_WRITE_FAILED)))
+		.pipe(oath.ops.rmap(ordo.rrr.eio(ORDO.RRR.REASON.FILE_WRITE_FAILED)))
 
 const delete_file = (file: BunFile) =>
-	oath.from_promise(() => file.delete()).pipe(oath.ops.rmap(core.rrr.eio(CORE.RRR.REASON.FILE_UNLINK_FAILED)))
+	oath.from_promise(() => file.delete()).pipe(oath.ops.rmap(ordo.rrr.eio(ORDO.RRR.REASON.FILE_UNLINK_FAILED)))
 
 const validate_file_exists = (path: string) =>
 	check_file_exists(path)
-		.pipe(oath.ops.chain(({ exists, file }) => oath.if(exists, { t: () => ({ path, file }) })))
-		.pipe(oath.ops.rmap(core.rrr.enoent(CORE.RRR.REASON.NO)))
+		.pipe(oath.ops.chain(({ exists, file }) => oath.if_else(exists, { t: () => ({ path, file }) })))
+		.pipe(oath.ops.rmap(ordo.rrr.enoent(ORDO.RRR.REASON.NO)))
 
 const validate_file_does_not_exist = (path: string) =>
 	check_file_exists(path)
-		.pipe(oath.ops.chain(({ exists, file }) => oath.if(!exists, { t: () => ({ path, file }) })))
-		.pipe(oath.ops.rmap(core.rrr.eexist(CORE.RRR.REASON.NO)))
+		.pipe(oath.ops.chain(({ exists, file }) => oath.if_else(!exists, { t: () => ({ path, file }) })))
+		.pipe(oath.ops.rmap(ordo.rrr.eexist(ORDO.RRR.REASON.NO)))
 
 const get_file_content = (file: BunFile) =>
-	oath.try(() => file.stream()).pipe(oath.ops.rmap(core.rrr.eio(CORE.RRR.REASON.FILE_READ_FAILED)))
+	oath.try_catch(() => file.stream()).pipe(oath.ops.rmap(ordo.rrr.eio(ORDO.RRR.REASON.FILE_READ_FAILED)))
 
-const get_path_from_root = (root: string) => (uid: Core.User.Id, fsid: Core.Data.Id) =>
-	oath.try(() => join(root, uid, fsid)).pipe(oath.ops.rmap(core.rrr.eio(CORE.RRR.REASON.INVALID_SERVICE_INITIALIZATION)))
+const get_path_from_root = (root: string) => (uid: Ordo.User.Id, fsid: Ordo.Data.Id) =>
+	oath.try_catch(() => join(root, uid, fsid)).pipe(oath.ops.rmap(ordo.rrr.eio(ORDO.RRR.REASON.INVALID_SERVICE_INITIALIZATION)))

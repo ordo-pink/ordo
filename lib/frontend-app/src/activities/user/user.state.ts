@@ -19,8 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { create_zags } from "@ordo-pink/oss-zags"
+import { create } from "@ordo-pink/oss-zags"
 
 import type { AuthenticatingUser } from "./user.types"
 
-export const authenticating_user$ = create_zags<AuthenticatingUser.State>({ code: "", email: "" })
+export const authenticating_user$ = create<AuthenticatingUser.State>({ code: "", email: "" })

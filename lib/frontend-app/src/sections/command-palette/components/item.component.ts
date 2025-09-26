@@ -21,10 +21,10 @@
 
 import type { ClientSDK } from "@ordo-pink/sdk-client"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
-import { maoka } from "@ordo-pink/oss-maoka"
+import { create_component } from "@ordo-pink/oss-maoka"
 import { maoka_styled } from "@ordo-pink/oss-maoka/styled"
 
-export const command_palette_item = maoka.create<{ item: ClientSDK.CommandPalette.Item.Instance; active: boolean }>(
+export const command_palette_item = create_component.create<{ item: ClientSDK.CommandPalette.Item.Instance; active: boolean }>(
 	"div",
 	({ active, item, use }) => {
 		const { hunter } = use(client_maoka.context.consume)
@@ -57,11 +57,11 @@ export const command_palette_item = maoka.create<{ item: ClientSDK.CommandPalett
 	},
 )
 
-const item_title = maoka_styled.div("command-palette_item_title-wrapper")
-const item_info = maoka_styled.div("command-palette_item_info")
-const item_main = maoka_styled.div("command-palette_item_main")
-const item_footer = maoka_styled.div("command-palette_item_footer")
-const item_icon = maoka_styled.span<{ render: ClientSDK.CommandPalette.RenderIcon }>(
+const item_title = maoka_styled.tags.div("command-palette_item_title-wrapper")
+const item_info = maoka_styled.tags.div("command-palette_item_info")
+const item_main = maoka_styled.tags.div("command-palette_item_main")
+const item_footer = maoka_styled.tags.div("command-palette_item_footer")
+const item_icon = maoka_styled.tags.span<{ render: ClientSDK.CommandPalette.RenderIcon }>(
 	"command-palette_item_icon",
-	({ render, use }) => use(maoka.dom.jabs.hit_if_dom(n => void render(n.value))),
+	({ render, use }) => use(create_component.dom.jabs.hit_if_dom(n => void render(n.value))),
 )

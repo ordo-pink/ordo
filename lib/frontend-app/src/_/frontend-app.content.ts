@@ -23,7 +23,7 @@ import { Metadata, NOTIFICATION_TYPE, rrr } from "@ordo-pink/_core"
 import { is_instance_of, is_string } from "@ordo-pink/_tau"
 import { R } from "@ordo-pink/oss-result"
 import { console_logger } from "@ordo-pink/logger"
-import { create_zags } from "@ordo-pink/oss-zags"
+import { create } from "@ordo-pink/oss-zags"
 import { oath } from "@ordo-pink/oss-oath"
 import { sweech } from "@ordo-pink/oss-sweech"
 
@@ -58,7 +58,7 @@ export const init_content: TF = () => {
 		},
 	)
 
-	const auth$ = create_zags({ user: null as Ordo.User.Current.Instance | null })
+	const auth$ = create({ user: null as Ordo.User.Current.Instance | null })
 	ordo_app_state.zags.cheat("user", user => auth$.update("user", () => user))
 
 	const remote_strategy = PersistenceStrategyContentOrdoBackend.Of(dt_host, fetch)

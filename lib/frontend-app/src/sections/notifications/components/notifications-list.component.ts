@@ -20,7 +20,7 @@
  */
 
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
-import { maoka } from "@ordo-pink/oss-maoka"
+import { create_component } from "@ordo-pink/oss-maoka"
 import { maoka_styled } from "@ordo-pink/oss-maoka/styled"
 
 import { notification } from "./notification.component"
@@ -28,7 +28,7 @@ import { notifications$ } from "../notifications.state"
 
 // BUG Notification duration gets reset when rerendering
 // TODO Notification stack when there are more than 5 notifications
-export const notification_list = maoka.create("div", ({ use }) => {
+export const notification_list = create_component.create("div", ({ use }) => {
 	use(client_maoka.jabs.classes.set("notification-list"))
 	const t_pending_notifications = use(client_maoka.jabs.translate$("notifications_pending_notifications"))
 
@@ -54,5 +54,5 @@ export const notification_list = maoka.create("div", ({ use }) => {
 
 // --- Internal ---
 
-const hidden_notifications_block = maoka_styled.div("more-notifications_card")
-const hidden_notifications_list = maoka_styled.div("more-notifications_body")
+const hidden_notifications_block = maoka_styled.tags.div("more-notifications_card")
+const hidden_notifications_list = maoka_styled.tags.div("more-notifications_body")

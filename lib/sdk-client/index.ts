@@ -3,9 +3,13 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import "./src/cmd"
-import "./src/t"
+import * as client from "./src/sdk-client.impl"
 
-export * from "./src/sdk-client.constants"
-export * from "./src/sdk-client.impl"
-export * from "./src/sdk-client.types"
+export type * as OrdoClient from "./src/sdk-client.types"
+export * as ordo_client from "./src/sdk-client.impl"
+
+declare global {
+	var ordo_client: typeof client
+}
+
+globalThis.ordo_client = client

@@ -5,15 +5,15 @@
 
 import { type Maoka, maoka } from "@ordo-pink/oss-maoka"
 
-export const listen_jab =
+export const listen =
 	<$Element extends HTMLElement, $Event extends keyof $Element>(
 		event: $Event extends `on${string}` ? $Event : never,
 		f: $Element[$Event],
 	): Maoka.Jab =>
 	({ use }) =>
-		use(maoka.dom.jabs.hit_if_dom(n => ((n.value as any)[event] = f)))
+		use(maoka.dom.jabs.if_dom(n => ((n.value as any)[event] = f)))
 
-export const listen_global_event_jab =
+export const document_listen =
 	<$Key extends keyof DocumentEventMap>(key: $Key, f: (event: DocumentEventMap[$Key]) => void): Maoka.Jab =>
 	({ use }) => {
 		const handle_mount = () => {

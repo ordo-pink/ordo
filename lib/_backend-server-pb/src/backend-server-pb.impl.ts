@@ -36,7 +36,7 @@ export const create_backend_server_pb = (fuel: ServerPB.Params) =>
 							oath
 								.from_promise(() => fetch(`${intake.id_host}/users/handle/${handle}`))
 								.pipe(oath.ops.chain(res => oath.from_promise(() => res.json())))
-								.pipe(oath.ops.chain(res => oath.if(res.success, { t: () => res.payload as User.Someone.DTO })))
+								.pipe(oath.ops.chain(res => oath.if_else(res.success, { t: () => res.payload as User.Someone.DTO })))
 								.pipe(oath.ops.map(user => ({ uid: user[0], fsid })))
 								.pipe(oath.ops.rmap(() => rrr.enoent("User not found"))),
 						),
@@ -83,8 +83,10 @@ export const create_backend_server_pb = (fuel: ServerPB.Params) =>
 const validate_request_params = (intake: ServerPB.Intake) =>
 	oath
 		.all([
-			oath.if(data.validations.is_id(intake.params.fsid)).pipe(oath.ops.rmap(() => rrr.einval("invalid data id"))),
-			oath.if(user.current.validations.is_handle(intake.params.handle)).pipe(oath.ops.rmap(() => rrr.einval("invalid handle"))),
+			oath.if_else(data.validations.is_id(intake.params.fsid)).pipe(oath.ops.rmap(() => rrr.einval("invalid data id"))),
+			oath
+				.if_else(user.current.validations.is_handle(intake.params.handle))
+				.pipe(oath.ops.rmap(() => rrr.einval("invalid handle"))),
 		])
 		.pipe(oath.ops.map(() => intake))
 
@@ -93,7 +95,7 @@ const check_file_exists =
 	({ uid, fsid }: TIDs) =>
 		intake.data_persistence_strategy
 			.exists(uid, fsid)
-			.pipe(oath.ops.chain(exists => oath.if(exists)))
+			.pipe(oath.ops.chain(exists => oath.if_else(exists)))
 			.pipe(oath.ops.map(() => ({ uid, fsid })))
 			.pipe(oath.ops.rmap(() => rrr.enoent("File not found")))
 

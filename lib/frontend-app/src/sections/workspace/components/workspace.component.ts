@@ -19,14 +19,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { type Maoka, maoka } from "@ordo-pink/oss-maoka"
+import { type Maoka, create_component } from "@ordo-pink/oss-maoka"
 import type { ClientSDK } from "@ordo-pink/sdk-client"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 import { sweech_helpers } from "@ordo-pink/oss-sweech/extensions"
 
 import { sidebar$ } from "../workspace.state"
 
-export const workspace = maoka.create("main", ({ use, node }) => {
+export const workspace = create_component.create("main", ({ use, node }) => {
 	const { activities$ } = use(client_maoka.context.consume)
 
 	use(client_maoka.jabs.classes.set("workspace"))
@@ -42,13 +42,13 @@ export const workspace = maoka.create("main", ({ use, node }) => {
 
 // --- Internal ---
 
-const sidebar_padding_contractor = maoka.create<{ parent_node: Maoka.Node }>("div", ({ parent_node, use }) => {
+const sidebar_padding_contractor = create_component.create<{ parent_node: Maoka.Node }>("div", ({ parent_node, use }) => {
 	const get_sidebar = use(client_maoka.jabs.zags.marry$(sidebar$))
 
 	return () => {
 		const sidebar = get_sidebar()
 
-		if (maoka.dom.node_guard(parent_node))
+		if (create_component.dom.node_guard(parent_node))
 			sweech_helpers
 				.of_true()
 				.case(sidebar.enabled && sidebar.visible, () => parent_node.value.classList.remove("no-sidebar"))
@@ -56,14 +56,17 @@ const sidebar_padding_contractor = maoka.create<{ parent_node: Maoka.Node }>("di
 	}
 })
 
-const workspace_renderer = maoka.create<{ activity: ClientSDK.Activity.Instance | null }>("div", ({ activity, node, use }) => {
-	use(client_maoka.jabs.classes.set("h-full")) // TODO Move to CSS
+const workspace_renderer = create_component.create<{ activity: ClientSDK.Activity.Instance | null }>(
+	"div",
+	({ activity, node, use }) => {
+		use(client_maoka.jabs.classes.set("h-full")) // TODO Move to CSS
 
-	const handle_onmount = (n: Maoka.Dom.Node<HTMLElement>) => {
-		if (activity && activity.render_workspace && maoka.dom.node_guard(node))
-			void activity.render_workspace(node.value as HTMLDivElement)
-		else n.value.innerHTML = "" // TODO 404
-	}
+		const handle_onmount = (n: Maoka.Dom.Node<HTMLElement>) => {
+			if (activity && activity.render_workspace && create_component.dom.node_guard(node))
+				void activity.render_workspace(node.value as HTMLDivElement)
+			else n.value.innerHTML = "" // TODO 404
+		}
 
-	use(maoka.dom.jabs.onmount(handle_onmount))
-})
+		use(create_component.dom.jabs.onmount(handle_onmount))
+	},
+)

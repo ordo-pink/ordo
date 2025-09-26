@@ -19,6 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import "@ordo-pink/oss-result/global"
+
 export * as SERVER from "./src/sdk-server.constants"
 export * as Server from "./src/sdk-server.types"
 export * as server from "./src/sdk-server.impl"

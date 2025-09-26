@@ -51,7 +51,7 @@ const get_request_body = (req: Request): Oath.Instance<any, Core.Rrr.Instance<"E
 	oath.from_promise(() => req.json()).pipe(oath.ops.rmap(error => core.rrr.eio("Failed to parse request body", error)))
 
 const validate_request_body = (body: any) =>
-	oath.if(body && body.email && core.user.email_guard(body.email), {
+	oath.if_else(body && body.email && core.user.email_guard(body.email), {
 		t: () => body.email as Core.User.Email,
 		f: () => core.rrr.einval("Provided email is invalid", body.email),
 	})

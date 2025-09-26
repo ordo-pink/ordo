@@ -5,7 +5,7 @@
 
 import { expect, test } from "bun:test"
 
-import { check, is_doctor } from "./colonoscope.js"
+import { check, is_doctor } from "./colonoscope.impl"
 
 test("colonoscope should pass", () => {
 	expect(check).toBeFunction()

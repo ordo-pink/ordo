@@ -22,12 +22,12 @@
 import { bs_cloud_download, bs_cloud_upload } from "@ordo-pink/frontend-icons"
 import { BACKGROUND_TASK } from "@ordo-pink/sdk-client"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
-import { maoka } from "@ordo-pink/oss-maoka"
+import { create_component } from "@ordo-pink/oss-maoka"
 import { sweech } from "@ordo-pink/oss-sweech"
 
 import "./background-task.styles.css"
 
-export const background_task_status = maoka.create("div", ({ use }) => {
+export const background_task_status = create_component.create("div", ({ use }) => {
 	let status = BACKGROUND_TASK.STATUS.NONE
 
 	const { hunter } = use(client_maoka.context.consume)
@@ -35,7 +35,7 @@ export const background_task_status = maoka.create("div", ({ use }) => {
 
 	const set_status$ = (new_status: BACKGROUND_TASK.STATUS) => {
 		status = new_status
-		use(maoka.dom.jabs.refresh$)
+		use(create_component.dom.jabs.refresh$)
 	}
 
 	const handle_onmount = () => {
@@ -50,7 +50,7 @@ export const background_task_status = maoka.create("div", ({ use }) => {
 		}
 	}
 
-	use(maoka.dom.jabs.onmount(handle_onmount))
+	use(create_component.dom.jabs.onmount(handle_onmount))
 
 	return () =>
 		sweech

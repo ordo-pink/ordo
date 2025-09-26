@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import type * as Context from "./maoka-context.types.ts"
+import type * as Styled from "./maoka-context.types"
 
-export const create_context: Context.CreateContext = <$Value>() => {
-	const state = {} as Context.ContextInternalState
+export const create: Styled.Create = <$Value>() => {
+	const state = {} as Styled.InternalState
 
 	return {
 		provide:

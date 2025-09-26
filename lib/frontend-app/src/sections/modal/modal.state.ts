@@ -19,8 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { create_zags } from "@ordo-pink/oss-zags"
+import { create } from "@ordo-pink/oss-zags"
 
 import { Modal } from "./modal.types"
 
-export const modal$ = create_zags<Modal.State>({})
+export const modal$ = create<Modal.State>({})

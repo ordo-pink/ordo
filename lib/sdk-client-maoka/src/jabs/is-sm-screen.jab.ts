@@ -4,11 +4,10 @@
  */
 
 import { type Maoka, maoka } from "@ordo-pink/oss-maoka"
-import { CLIENT } from "@ordo-pink/sdk-client"
 import { core } from "@ordo-pink/sdk-core"
 
-export const is_sm_screen_jab$: Maoka.Jab<() => boolean> = ({ use }) => {
-	const is_sm = core.fns.lt(CLIENT.SM_SCREEN_BREAKPOINT)
+export const is_sm_screen$: Maoka.Jab<() => boolean> = ({ use }) => {
+	const is_sm = core.fns.lt(ordo_client.SM_SCREEN_BREAKPOINT)
 
 	let value: boolean = is_sm(window.innerWidth)
 

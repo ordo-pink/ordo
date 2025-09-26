@@ -5,3 +5,5 @@
 
 export * from "./src/curry.impl"
 export * from "./src/curry.types"
+
+export { curry as default } from "./src/curry.impl"

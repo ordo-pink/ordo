@@ -3,6 +3,13 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-export * as CORE from "./src/sdk-core.constants"
-export * as Core from "./src/sdk-core.types"
+export type * as Core from "./src/sdk-core.types"
 export * as core from "./src/sdk-core.impl"
+
+import * as core from "./src/sdk-core.impl"
+
+declare global {
+	var ordo: typeof core
+}
+
+globalThis.ordo = core

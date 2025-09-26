@@ -23,7 +23,7 @@ import { COMMAND_PALETTE, client_sdk } from "@ordo-pink/sdk-client"
 import { bs_question_circle } from "@ordo-pink/frontend-icons"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 import { core } from "@ordo-pink/sdk-core"
-import { maoka } from "@ordo-pink/oss-maoka"
+import { create_component } from "@ordo-pink/oss-maoka"
 import { maoka_styled } from "@ordo-pink/oss-maoka/styled"
 
 import { command_palette$ } from "../command-palette.state"
@@ -31,7 +31,7 @@ import { command_palette_items } from "./items.component"
 import { command_palette_search } from "./search.component"
 
 // TODO create subitems if item is found with fuzzy search but the match is not exact
-export const command_palette_modal = maoka.create("div", ({ use }) => {
+export const command_palette_modal = create_component.create("div", ({ use }) => {
 	const { hunter } = use(client_maoka.context.consume)
 	const is_darwin = use(client_maoka.jabs.is_darwin)
 	const is_mobile = use(client_maoka.jabs.is_mobile)
@@ -124,5 +124,5 @@ export const command_palette_modal = maoka.create("div", ({ use }) => {
 // --- Internal ---
 
 const IGNORED_KEYS = ["Control", "Shift", "Alt", "Meta"]
-const text_span = maoka_styled.span()
-const footer = maoka_styled.div("command-palette_footer")
+const text_span = maoka_styled.tags.span()
+const footer = maoka_styled.tags.div("command-palette_footer")

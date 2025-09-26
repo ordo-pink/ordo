@@ -36,7 +36,7 @@ export const auth_refresh: Lib.Handler = ({ env, request }) =>
 			oath.ops.chain(token =>
 				oath
 					.from_promise(() => env.wjwt.verify(token))
-					.pipe(oath.ops.rmap(core.rrr.eio(CORE.RRR.REASON.INVALID_SERVICE_INITIALIZATION)))
+					.pipe(oath.ops.rmap(core.rrr.eio(CORE.RRR.RRR_REASON.INVALID_SERVICE_INITIALIZATION)))
 
 					.pipe(oath.ops.chain(update_user_session_if_valid(env.wjwt, env.user_repository, token as Wjwt.TokenString))),
 			),
@@ -56,7 +56,7 @@ const create_auth_cookie =
 		oath
 			.from_promise(() => wjwt.sign({ jti: session[0], sub: user[0] }))
 			.pipe(oath.ops.map(t => [user, t]))
-			.pipe(oath.ops.rmap(core.rrr.eio(CORE.RRR.REASON.INVALID_SERVICE_INITIALIZATION)))
+			.pipe(oath.ops.rmap(core.rrr.eio(CORE.RRR.RRR_REASON.INVALID_SERVICE_INITIALIZATION)))
 
 const update_user_session = (user_repository: Server.User.Repository) => (t: Wjwt.Token) =>
 	oath
@@ -80,8 +80,8 @@ const update_user_session_if_valid =
 	(wjwt: Wjwt.Instance, user_repository: Server.User.Repository, token: Wjwt.TokenString) => (is_valid: boolean) =>
 		oath
 			.if(is_valid)
-			.pipe(oath.ops.chain(() => oath.try(() => wjwt.decode(token))))
-			.pipe(oath.ops.rmap(core.rrr.eio(CORE.RRR.REASON.INVALID_SERVICE_INITIALIZATION)))
+			.pipe(oath.ops.chain(() => oath.try_catch(() => wjwt.decode(token))))
+			.pipe(oath.ops.rmap(core.rrr.eio(CORE.RRR.RRR_REASON.INVALID_SERVICE_INITIALIZATION)))
 			.pipe(oath.ops.chain(update_user_session(user_repository)))
 			.pipe(oath.ops.chain(create_auth_cookie(wjwt)))
 

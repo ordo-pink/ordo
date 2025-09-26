@@ -19,8 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { type Maoka, maoka } from "@ordo-pink/oss-maoka"
-import { type Zags, create_zags } from "@ordo-pink/oss-zags"
+import { type Maoka, create_component } from "@ordo-pink/oss-maoka"
+import { type Zags, create } from "@ordo-pink/oss-zags"
 import type { ClientSDK } from "@ordo-pink/sdk-client"
 import type { Core } from "@ordo-pink/sdk-core"
 import { noop } from "@ordo-pink/_tau"
@@ -60,11 +60,11 @@ export const auth_jab: (
 			}
 		}
 
-		use(maoka.dom.jabs.onmount(handle_mount))
+		use(create_component.dom.jabs.onmount(handle_mount))
 
 		return auth$
 	}
 
 // --- Internal ---
 
-const auth$ = create_zags<ClientSDK.User.State>({})
+const auth$ = create<ClientSDK.User.State>({})

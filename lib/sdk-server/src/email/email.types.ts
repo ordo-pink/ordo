@@ -19,13 +19,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { Core } from "@ordo-pink/sdk-core"
-
-export type EmailGuy = { name?: Core.User.Name; email: Core.User.Email }
+export type EmailGuy = { name?: Ordo.User.Name; email: Ordo.User.Email }
 export type IdempotencyKey = string
-export type BlindCarbonCopies = Core.User.Email[]
+export type BlindCarbonCopies = Ordo.User.Email[]
 export type Content = string
-export type CarbonCopies = Core.User.Email[]
+export type CarbonCopies = Ordo.User.Email[]
 export type From = EmailGuy
 export type Headers = Record<string, string>
 export type PreviewTitle = string

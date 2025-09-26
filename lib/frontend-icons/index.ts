@@ -4,11 +4,12 @@
  */
 
 import { type Maoka, maoka } from "@ordo-pink/oss-maoka"
+import { maoka_dom } from "@ordo-pink/oss-maoka/dom"
 
 import "./frontend-icons.styles.css"
 
 const icon = (children: string) =>
-	maoka.create<{ classes?: string; on_click?: (event: MouseEvent) => void; title?: string } | void>(
+	maoka.create_component<{ classes?: string; on_click?: (event: MouseEvent) => void; title?: string } | void>(
 		"span",
 		({ classes, on_click, title, use }: any) => {
 			const handle_if_dom = (n: Maoka.Node<HTMLSpanElement>) => {
@@ -24,7 +25,7 @@ const icon = (children: string) =>
 				}
 			}
 
-			use(maoka.dom.jabs.hit_if_dom(handle_if_dom))
+			use(maoka_dom.jabs.if_dom(handle_if_dom))
 		},
 	)
 

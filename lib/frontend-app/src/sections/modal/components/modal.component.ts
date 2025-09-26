@@ -21,12 +21,12 @@
 
 import { MODAL } from "@ordo-pink/sdk-client"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
-import { maoka } from "@ordo-pink/oss-maoka"
+import { create_component } from "@ordo-pink/oss-maoka"
 import { sweech } from "@ordo-pink/oss-sweech"
 
 import { modal$ } from "../modal.state"
 
-export const modal = maoka.create("div", ({ use }) => {
+export const modal = create_component.create("div", ({ use }) => {
 	let onunmount: (() => void) | undefined
 
 	const get_modal_instance = use(client_maoka.jabs.zags.cheat$(modal$, "instance"))
@@ -48,14 +48,14 @@ export const modal = maoka.create("div", ({ use }) => {
 
 			return content_wrapper()
 		} else {
-			use(maoka.dom.jabs.hit_if_dom(n => (n.value.innerHTML = "")))
+			use(create_component.dom.jabs.hit_if_dom(n => (n.value.innerHTML = "")))
 		}
 	}
 })
 
-const content_wrapper = maoka.create("div", ({ use }) => {
+const content_wrapper = create_component.create("div", ({ use }) => {
 	const modal_instance = modal$.select("instance")
-	use(maoka.dom.jabs.hit_if_dom(n => void modal_instance!.render(n.value as HTMLDivElement)))
+	use(create_component.dom.jabs.hit_if_dom(n => void modal_instance!.render(n.value as HTMLDivElement)))
 })
 
 namespace internal {

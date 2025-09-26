@@ -3,5 +3,10 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-export * from "./src/hunt.impl.ts"
-export * from "./src/hunt.types.ts"
+export * from "./src/hunt.impl"
+export * from "./src/hunt.types"
+
+export * as hunt from "./src/hunt.impl"
+export * as Hunt from "./src/hunt.types"
+
+export * as default from "./src/hunt.impl"

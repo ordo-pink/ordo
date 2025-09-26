@@ -3,8 +3,10 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-export * from "./src/catas/index.ts"
-export * from "./src/constructors/index.ts"
-export * from "./src/oath.impl.ts"
-export * from "./src/oath.types.ts"
-export * from "./src/ops/index.ts"
+export * from "./src/oath.impl"
+export * from "./src/oath.types"
+
+export * as oath from "./src/oath.impl"
+export * as Oath from "./src/oath.types"
+
+export * as default from "./src/oath.impl"

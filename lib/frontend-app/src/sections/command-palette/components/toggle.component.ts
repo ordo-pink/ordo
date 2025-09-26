@@ -21,14 +21,15 @@
 
 import { bs_menu_button_wide_fill } from "@ordo-pink/frontend-icons"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
-import { maoka } from "@ordo-pink/oss-maoka"
+import { create_component } from "@ordo-pink/oss-maoka"
 
 import { activity_bar_icon } from "../../activity-bar/components/activity-bar-icon.component"
 
-export const command_palette_toggle = maoka.create("div", ({ use, node }) => {
+export const command_palette_toggle = create_component.create("div", ({ use, node }) => {
 	const { hunter } = use(client_maoka.context.consume)
 
-	const render_icon = (span: HTMLSpanElement) => maoka.dom.render(span, bs_menu_button_wide_fill(), node.root.create_id)
+	const render_icon = (span: HTMLSpanElement) =>
+		create_component.dom.render(span, bs_menu_button_wide_fill(), node.root.create_id)
 	const is_current = false
 	const readable_name = "command_palette_name"
 
@@ -37,7 +38,7 @@ export const command_palette_toggle = maoka.create("div", ({ use, node }) => {
 		hunter.shoot("command_palette.toggle")
 	}
 	const handle_keydown = (event: KeyboardEvent) => {
-		if (maoka.dom.node_guard(node) && event.code === "Enter") {
+		if (create_component.dom.node_guard(node) && event.code === "Enter") {
 			event.stopPropagation()
 			hunter.shoot("command_palette.toggle")
 		}

@@ -19,60 +19,73 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { Core } from "@ordo-pink/sdk-core"
-import type { Hunt } from "@ordo-pink/oss-hunt"
 import type { Routary } from "@ordo-pink/oss-routary"
 import type { Server } from "@ordo-pink/sdk-server"
 import type { ServerRoutary } from "@ordo-pink/sdk-server-routary"
-import type { Wjwt } from "@ordo-pink/oss-wjwt"
 
-export type CodeLifetimeSeconds = number & {}
+export type Email = string & {}
 
-export type SessionLifetimeMinutes = number & {}
+export type RoutaryHandler = Routary.Handler<Env, Mut>
 
-export type AllowedOrigin = string
-
-export type Hunt = Hunt.Instance<Prey>
-
-export type Args = [
-	logger: Core.Logger,
-	user_repository: Server.User.Repository,
-	code_lifetime_seconds: CodeLifetimeSeconds,
-	session_lifetime_minutes: SessionLifetimeMinutes,
-	email_strategy: Server.Email.Strategy,
-	allowed_origins: AllowedOrigin | AllowedOrigin[],
-	codegen_strategy: Server.Code.Codegen,
-	wjwt: Wjwt.Instance,
-]
-
-export type Prey = {
-	auth: {
-		requested: { args: [email: Core.User.Email, code: Server.Code.Instance] }
-		succeeded: { args: [email: Core.User.Email, ip: string] }
-	}
-	user: {
-		update_requested: {
-			email: { args: void }
-			handle: { args: void }
-		}
-		update_completed: {
-			email: { args: void }
-			handle: { args: void }
-		}
-	}
-}
-
-export type Mut = ServerRoutary.Mut
-export type Env = ServerRoutary.Env & {
-	hunter: Hunt
-	user_repository: Server.User.Repository
-	code_service: Server.Code.Service
-	session_lifetime_minutes: SessionLifetimeMinutes
-	wjwt: Wjwt.Instance
-}
-
-export type Handler = Routary.Handler<Env, Mut>
+export type Args = []
 
 export type Instance = Routary.Instance<Env, ServerRoutary.Mut>
 
 export type Create = (...args: Args) => Instance
+
+export type Mut = ServerRoutary.Mut
+export type Env = ServerRoutary.Env & {
+	user_service: User.Service
+	session_service: Session.Service
+	auth_code_service: AuthCode.Service
+	notification_service: Server.Notification.Service
+}
+
+export namespace User {
+	export type Repository = {}
+
+	export type Service = {}
+}
+
+export namespace Session {
+	export type LifetimeMinutes = number & {}
+
+	export type Repository = {}
+
+	export type Service = {}
+}
+
+export namespace AuthCode {
+	export type LifetimeSeconds = number & {}
+
+	export type Instance = string & {}
+	export type Hash = string & {}
+
+	export type Guard = (x: any) => x is Instance
+	export type CreateServiceArgs = [
+		generation_strategy: GenerationStrategy,
+		repository: Repository,
+		lifetime_seconds: LifetimeSeconds,
+		logger: Ordo.Logger,
+	]
+	export type CreateService = (...args: CreateServiceArgs) => Service
+
+	export type Repository = {
+		create: Ordo.Fns.Curried<(email: Email, code: Hash) => Oath.Instance<void, Ordo.Rrr.Instance<"EIO" | "EEXIST">>>
+		read: (email: Email) => Oath.Instance<Hash, Ordo.Rrr.Instance<"EIO" | "ENOENT">>
+		update: Ordo.Fns.Curried<(email: Email, code: Hash) => Oath.Instance<void, Ordo.Rrr.Instance<"EIO" | "ENOENT" | "EEXIST">>>
+		delete: Ordo.Fns.Curried<(email: Email, code: Hash) => Oath.Instance<void, Ordo.Rrr.Instance<"EIO" | "ENOENT">>>
+	}
+
+	export type GenerationStrategy = {
+		hash: (code: Instance) => Oath.Instance<Hash, Ordo.Rrr.Instance<"EIO">>
+		verify: Ordo.Fns.Curried<(code: Instance, hash: Hash) => Oath.Instance<boolean, Ordo.Rrr.Instance<"EIO">>>
+	}
+
+	export type Service = Ordo.Disposable<{
+		create: (email: Ordo.User.Email) => Oath.Instance<Instance, Ordo.Rrr.Instance<"EIO" | "ENOENT">>
+		verify: Ordo.Fns.Curried<
+			(email: Ordo.User.Email, code: Instance) => Oath.Instance<boolean, Ordo.Rrr.Instance<"EIO" | "ENOENT">>
+		>
+	}>
+}

@@ -3,5 +3,10 @@
  * SPDX-License-Identifier: Unlicense
  */
 
+export * from "./src/wjwt.impl"
+export * from "./src/wjwt.types"
+
 export * as wjwt from "./src/wjwt.impl"
 export * as Wjwt from "./src/wjwt.types"
+
+export * as default from "./src/wjwt.impl"

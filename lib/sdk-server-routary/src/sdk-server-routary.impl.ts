@@ -50,16 +50,16 @@ export const fail = (logger: Core.Logger) => (rrr: Core.Rrr.Instance) => {
 
 	const status = sweech
 		.match(rrr?.type)
-		.case([CORE.RRR.TYPE.EAGAIN, CORE.RRR.TYPE.ENXIO], () => 408)
-		.case([CORE.RRR.TYPE.EFBIG, CORE.RRR.TYPE.ENOSPC], () => 413)
-		.case(CORE.RRR.TYPE.EINVAL, () => 400)
-		.case(CORE.RRR.TYPE.EACCES, () => 401)
-		.case(CORE.RRR.TYPE.EPERM, () => 403)
-		.case(CORE.RRR.TYPE.ENOENT, () => 404)
-		.case(CORE.RRR.TYPE.EEXIST, () => 409)
+		.case([CORE.RRR.RRR_TYPE.EAGAIN, CORE.RRR.RRR_TYPE.ENXIO], () => 408)
+		.case([CORE.RRR.RRR_TYPE.EFBIG, CORE.RRR.RRR_TYPE.ENOSPC], () => 413)
+		.case(CORE.RRR.RRR_TYPE.EINVAL, () => 400)
+		.case(CORE.RRR.RRR_TYPE.EACCES, () => 401)
+		.case(CORE.RRR.RRR_TYPE.EPERM, () => 403)
+		.case(CORE.RRR.RRR_TYPE.ENOENT, () => 404)
+		.case(CORE.RRR.RRR_TYPE.EEXIST, () => 409)
 		.default(() => 500)
 
-	if (rrr?.debug) logger.debug(CORE.RRR.TYPE[rrr.type], rrr.debug)
+	if (rrr?.debug) logger.debug(CORE.RRR.RRR_TYPE[rrr.type], rrr.debug)
 	if (rrr?.message) headers.set("X-Reason", String(rrr.message))
 
 	return new Response("", { status, headers })
@@ -69,17 +69,17 @@ export const fail = (logger: Core.Logger) => (rrr: Core.Rrr.Instance) => {
 
 export namespace oaths {
 	export const to_json = (x: any) =>
-		oath.try(() => JSON.stringify(x)).pipe(oath.ops.rmap(core.rrr.eio(CORE.RRR.REASON.JSON_STRINGIFY_FAILED)))
+		oath.try_catch(() => JSON.stringify(x)).pipe(oath.ops.rmap(core.rrr.eio(CORE.RRR.RRR_REASON.JSON_STRINGIFY_FAILED)))
 
 	export const get_auth_cookie = (request: Request) =>
 		oath
 			.from_nullable(request.headers.get("Cookie"))
 			.pipe(oath.ops.map(Bun.Cookie.parse))
-			.pipe(oath.ops.chain(c => oath.if(c.name === SERVER.COOKIE_NAME, { t: () => c.value })))
-			.pipe(oath.ops.rmap(() => core.rrr.einval(CORE.RRR.REASON.MISSING_REQUIRED_COOKIE, void 0)))
+			.pipe(oath.ops.chain(c => oath.if_else(c.name === SERVER.COOKIE_NAME, { t: () => c.value })))
+			.pipe(oath.ops.rmap(() => core.rrr.einval(CORE.RRR.RRR_REASON.MISSING_REQUIRED_COOKIE, void 0)))
 
 	export const get_json_body = (request: Request) =>
-		oath.from_promise(() => request.json()).pipe(oath.ops.rmap(core.rrr.einval(CORE.RRR.REASON.JSON_PARSE_FAILED)))
+		oath.from_promise(() => request.json()).pipe(oath.ops.rmap(core.rrr.einval(CORE.RRR.RRR_REASON.JSON_PARSE_FAILED)))
 }
 
 export const set_response_header = curry((key: string, value: string, response: Response) => response.headers.set(key, value))

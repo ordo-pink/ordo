@@ -21,11 +21,11 @@
 
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 
-import { maoka } from "@ordo-pink/oss-maoka"
+import { create_component } from "@ordo-pink/oss-maoka"
 
 import { modal$ } from "../modal.state"
 
-export const overlay = maoka.create("div", ({ kindergarten, use }) => {
+export const overlay = create_component.create("div", ({ kindergarten, use }) => {
 	const { hunter } = use(client_maoka.context.consume)
 
 	const handle_show = () => use(client_maoka.jabs.classes.add("active"))
@@ -35,7 +35,7 @@ export const overlay = maoka.create("div", ({ kindergarten, use }) => {
 
 	use(client_maoka.jabs.classes.set("modal_wrapper"))
 	use(client_maoka.jabs.listen("onclick", handle_click))
-	use(maoka.dom.jabs.onmount(handle_mount))
+	use(create_component.dom.jabs.onmount(handle_mount))
 
 	return kindergarten
 })

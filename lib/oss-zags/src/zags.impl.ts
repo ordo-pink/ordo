@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { deep_equals } from "@ordo-pink/oss-deep-equals/index.ts"
+import deep_equals from "@ordo-pink/oss-deep-equals"
 
-import { Zags } from "./zags.types.ts"
+import type * as Zags from "./zags.types.ts"
 
 /** @see {@link Zags.Module} */
-export const create_zags: Zags.Module = (state, partners = []) => ({
+export const create: Zags.Module = (state, partners = []) => ({
 	cheat: (path, f) => {
 		let value: any
 

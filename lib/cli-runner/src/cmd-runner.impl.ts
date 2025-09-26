@@ -28,7 +28,7 @@ export const run_async_command = (cmd: string, options?: SpawnOptions.OptionsObj
 
 type TRunCommandFn = (cmd: string, options?: SpawnOptions.OptionsObject) => Oath.Instance<void, Error>
 export const run_command: TRunCommandFn = (command, options) =>
-	oath.try(() => {
+	oath.try_catch(() => {
 		const result = Bun.spawnSync(command.trim().split(" "), options)
 		const stderr_string = result.stderr?.toString("utf8").trim()
 

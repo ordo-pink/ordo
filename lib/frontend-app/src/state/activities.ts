@@ -19,8 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { type Maoka, maoka } from "@ordo-pink/oss-maoka"
-import { type Zags, create_zags } from "@ordo-pink/oss-zags"
+import { type Maoka, create_component } from "@ordo-pink/oss-maoka"
+import { type Zags, create } from "@ordo-pink/oss-zags"
 import type { Aist } from "@ordo-pink/oss-aist"
 import type { ClientSDK } from "@ordo-pink/sdk-client"
 import { colonoscope } from "@ordo-pink/oss-colonoscope"
@@ -70,9 +70,9 @@ export const init_activities_jab: (
 			}
 		}
 
-		use(maoka.dom.jabs.onmount(handle_onmount))
+		use(create_component.dom.jabs.onmount(handle_onmount))
 
 		return activities$
 	}
 
-const activities$ = create_zags<ClientSDK.Activity.State>({ current: null, items: [] })
+const activities$ = create<ClientSDK.Activity.State>({ current: null, items: [] })

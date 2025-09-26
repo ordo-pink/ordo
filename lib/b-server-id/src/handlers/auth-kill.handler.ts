@@ -36,7 +36,7 @@ export const auth_kill: Lib.Handler = ({ env, request }) =>
 			oath.ops.chain(token =>
 				oath
 					.from_promise(() => env.wjwt.verify(token))
-					.pipe(oath.ops.rmap(core.rrr.eio(CORE.RRR.REASON.INVALID_SERVICE_INITIALIZATION)))
+					.pipe(oath.ops.rmap(core.rrr.eio(CORE.RRR.RRR_REASON.INVALID_SERVICE_INITIALIZATION)))
 					.pipe(oath.ops.chain(update_user_session_if_valid(env.wjwt, env.user_repository, token as Wjwt.TokenString))),
 			),
 		)
@@ -64,8 +64,8 @@ const update_user_session_if_valid =
 	(wjwt: Wjwt.Instance, user_repository: Server.User.Repository, token: Wjwt.TokenString) => (is_valid: boolean) =>
 		oath
 			.if(is_valid)
-			.pipe(oath.ops.chain(() => oath.try(() => wjwt.decode(token))))
-			.pipe(oath.ops.rmap(core.rrr.eio(CORE.RRR.REASON.INVALID_SERVICE_INITIALIZATION)))
+			.pipe(oath.ops.chain(() => oath.try_catch(() => wjwt.decode(token))))
+			.pipe(oath.ops.rmap(core.rrr.eio(CORE.RRR.RRR_REASON.INVALID_SERVICE_INITIALIZATION)))
 			.pipe(oath.ops.chain(update_user_session(user_repository)))
 
 const create_response = (user: Server.User.Instance) =>

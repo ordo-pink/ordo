@@ -43,7 +43,7 @@ export const verify_code: Lib.Handler = ({ env, mut, request }) =>
 				oath
 					.from_promise(() => env.wjwt.sign({ jti: user[8].at(-1)![0], sub: user[0] }))
 					.pipe(oath.ops.map(t => [user, t]))
-					.pipe(oath.ops.rmap(core.rrr.eio(CORE.RRR.REASON.INVALID_SERVICE_INITIALIZATION))),
+					.pipe(oath.ops.rmap(core.rrr.eio(CORE.RRR.RRR_REASON.INVALID_SERVICE_INITIALIZATION))),
 			),
 		)
 		.pipe(
@@ -63,7 +63,7 @@ const verify_user_code =
 	([email, code]: [Core.User.Email, Server.Code.Instance]) =>
 		code_service
 			.verify_code(email, code)
-			.pipe(oath.ops.chain(v => oath.if(v, { t: () => email, f: core.rrr.enoent(CORE.RRR.REASON.USER_NOT_FOUND) })))
+			.pipe(oath.ops.chain(v => oath.if_else(v, { t: () => email, f: core.rrr.enoent(CORE.RRR.RRR_REASON.USER_NOT_FOUND) })))
 
 const add_session = (user: Server.User.Instance) => (name: string) =>
 	user.with(8, [...user[8], [core.uuid.create(), core.timestamp.create(), name]]) as Server.User.Instance
@@ -74,7 +74,7 @@ const check_x_device_header =
 		oath
 			.if(request.headers.has("X-Device"))
 			.pipe(oath.ops.map(() => x))
-			.pipe(oath.ops.rmap(core.rrr.einval(CORE.RRR.REASON.MISSING_X_DEVICE_HEADER)))
+			.pipe(oath.ops.rmap(core.rrr.einval(CORE.RRR.RRR_REASON.MISSING_X_DEVICE_HEADER)))
 
 const persist_user_session = (request: Request, user_repository: Server.User.Repository) => (user: Server.User.Instance) =>
 	oath
@@ -86,7 +86,7 @@ const get_or_create_user = (user_repository: Server.User.Repository) => (email: 
 	user_repository.get_by_email(email).pipe(
 		oath.ops.fix(rrr =>
 			oath
-				.if(rrr.type === CORE.RRR.TYPE.ENOENT)
+				.if(rrr.type === CORE.RRR.RRR_TYPE.ENOENT)
 				.pipe(oath.ops.map(() => server.user.create(email)))
 				.pipe(oath.ops.chain(user_repository.create))
 				.pipe(oath.ops.rmap(() => rrr)),
@@ -97,24 +97,24 @@ const validate_body = (body: any) =>
 	oath
 		.if(body && core.fns.is_array(body))
 		.pipe(oath.ops.map(() => body as any[]))
-		.pipe(oath.ops.rmap(core.rrr.einval(CORE.RRR.REASON.MALFORMED_REQUEST_BODY)))
+		.pipe(oath.ops.rmap(core.rrr.einval(CORE.RRR.RRR_REASON.MALFORMED_REQUEST_BODY)))
 
 const get_body_email = (body: any) =>
-	oath.from_nullable(body[0], core.rrr.einval(CORE.RRR.REASON.EMAIL_MISSING)).pipe(
+	oath.from_nullable(body[0], core.rrr.einval(CORE.RRR.RRR_REASON.EMAIL_MISSING)).pipe(
 		oath.ops.chain(email =>
 			oath
 				.if(core.user.email_guard(email))
-				.pipe(oath.ops.rmap(() => core.rrr.einval(CORE.RRR.REASON.EMAIL_INVALID, email)))
+				.pipe(oath.ops.rmap(() => core.rrr.einval(CORE.RRR.RRR_REASON.EMAIL_INVALID, email)))
 				.pipe(oath.ops.map(() => email as Core.User.Email)),
 		),
 	)
 
 const get_body_code = (body: any) =>
-	oath.from_nullable(body[1], core.rrr.einval(CORE.RRR.REASON.EMAIL_MISSING)).pipe(
+	oath.from_nullable(body[1], core.rrr.einval(CORE.RRR.RRR_REASON.EMAIL_MISSING)).pipe(
 		oath.ops.chain(code =>
 			oath
 				.if(server.code.guard(code))
-				.pipe(oath.ops.rmap(() => core.rrr.einval(CORE.RRR.REASON.CODE_INVALID, code)))
+				.pipe(oath.ops.rmap(() => core.rrr.einval(CORE.RRR.RRR_REASON.CODE_INVALID, code)))
 				.pipe(oath.ops.map(() => code as Server.Code.Instance)),
 		),
 	)

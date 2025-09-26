@@ -3,18 +3,18 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import type { Id, Jab } from "../maoka.types.ts"
+import type * as Maoka from "../maoka.types"
 
 /** Global internal state of the context. Uses {@link Maoka.Root root} id to evaluate access rights. */
-export type ContextInternalState = Record<Id, any>
+export type InternalState = Record<Maoka.Id, any>
 
 /** Context instance. */
-export type ContextInstance<$Value> = {
+export type Instance<$Value> = {
 	/** Consume jab returns whatever was provided to the context under the current maoka root. */
-	consume: Jab<$Value>
+	consume: Maoka.Jab<$Value>
 	/** Provides whatever passed to the context under the current maoka root. */
-	provide: (value: $Value) => Jab
+	provide: (value: $Value) => Maoka.Jab
 }
 
-/** Creates context instance bound to the current {@link Maoka.Root maoka root} node. */
-export type CreateContext = <$Value>() => ContextInstance<$Value>
+/** Creates context instance bound to the current {@link Maoka..Root maoka root} node. */
+export type Create = <$Value>() => Instance<$Value>

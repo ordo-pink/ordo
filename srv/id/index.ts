@@ -113,23 +113,23 @@ const data_root = result.from_nullable(Bun.env.ORDO_ID_DATA_ROOT).cata(result.ca
 const user_file_id = result
 	.from_nullable(Bun.env.ORDO_USER_FILE_ID)
 	.pipe(result.ops.chain(id => result.if(core.uuid.guard(id), { on_true: () => id as Core.Uuid.Instance })))
-	.cata(result.catas.or_else(() => CORE.UUID.FIRSTBORN as Core.Uuid.Instance))
+	.cata(result.catas.or_else(() => CORE.UUID.UUID_FIRSTBORN as Core.Uuid.Instance))
 
 const cache_user_id = result
 	.from_nullable(Bun.env.ORDO_ID_CACHE_USER_ID)
 	.pipe(result.ops.chain(id => result.if(core.uuid.guard(id), { on_true: () => id as Core.Uuid.Instance })))
-	.cata(result.catas.or_else(() => CORE.UUID.FIRSTBORN as Core.Uuid.Instance))
+	.cata(result.catas.or_else(() => CORE.UUID.UUID_FIRSTBORN as Core.Uuid.Instance))
 
 const cache_file_id = result
 	.from_nullable(Bun.env.ORDO_ID_CACHE_FILE_ID)
 	.pipe(result.ops.chain(id => result.if(core.uuid.guard(id), { on_true: () => id as Core.Uuid.Instance })))
-	.cata(result.catas.or_else(() => CORE.UUID.THE_LAST_ONE as Core.Uuid.Instance))
+	.cata(result.catas.or_else(() => CORE.UUID.UUID_THE_LAST_ONE as Core.Uuid.Instance))
 
 const codegen_algorithm0 = oath.from_nullable(Bun.env.ORDO_ID_CODE_ALGORITHM).pipe(
 	oath.ops.chain(algorithm =>
 		oath
 			.from_nullable(Bun.env.ORDO_ID_CODE_ALGORITHM_PARAMS)
-			.pipe(oath.ops.chain(str => oath.try(() => JSON.parse(str))))
+			.pipe(oath.ops.chain(str => oath.try_catch(() => JSON.parse(str))))
 			.pipe(oath.ops.fix(() => ({})))
 			.pipe(oath.ops.map(params => ({ algorithm, ...params }))),
 	),
@@ -151,7 +151,7 @@ const wjwt_algorithm0 = oath.from_nullable(Bun.env.ORDO_ID_SESSION_TOKEN_ALGORIT
 	oath.ops.chain(name =>
 		oath
 			.from_nullable(Bun.env.ORDO_ID_SESSION_TOKEN_ALGORITHM_PARAMS)
-			.pipe(oath.ops.chain(str => oath.try(() => JSON.parse(str))))
+			.pipe(oath.ops.chain(str => oath.try_catch(() => JSON.parse(str))))
 			.pipe(oath.ops.fix(() => ({})))
 			.pipe(oath.ops.map(params => ({ name, ...params }))),
 	),

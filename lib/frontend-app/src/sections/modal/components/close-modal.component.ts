@@ -23,11 +23,11 @@ import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 
 import type { ClientSDK } from "@ordo-pink/sdk-client"
 import { bs_x } from "@ordo-pink/frontend-icons"
-import { maoka } from "@ordo-pink/oss-maoka"
+import { create_component } from "@ordo-pink/oss-maoka"
 
 import { modal$ } from "../modal.state"
 
-export const close_modal = maoka.create("div", ({ use }) => {
+export const close_modal = create_component.create("div", ({ use }) => {
 	const { hunter } = use(client_maoka.context.consume)
 
 	const handle_global_esc = (event: KeyboardEvent) => {

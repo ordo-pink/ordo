@@ -28,13 +28,13 @@ import {
 	bs_info_circle,
 	bs_question_circle,
 } from "@ordo-pink/frontend-icons"
-import { maoka } from "@ordo-pink/oss-maoka"
+import { create_component } from "@ordo-pink/oss-maoka"
 import { sweech } from "@ordo-pink/oss-sweech"
 
-export const notification_icon = maoka.create<Pick<ClientSDK.Notification.Instance, "render_icon" | "type">>(
+export const notification_icon = create_component.create<Pick<ClientSDK.Notification.Instance, "render_icon" | "type">>(
 	"div",
 	({ render_icon, type, use }) => {
-		if (render_icon) use(maoka.dom.jabs.hit_if_dom(n => void render_icon(n.value as HTMLDivElement)))
+		if (render_icon) use(create_component.dom.jabs.hit_if_dom(n => void render_icon(n.value as HTMLDivElement)))
 		else return () => render_default_icon(type)
 	},
 )

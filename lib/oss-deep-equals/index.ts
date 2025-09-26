@@ -5,3 +5,5 @@
 
 export * from "./src/deep-equals.impl.ts"
 export * from "./src/deep-equals.types.ts"
+
+export { deep_equals as default } from "./src/deep-equals.impl.ts"

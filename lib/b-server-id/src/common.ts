@@ -30,12 +30,12 @@ import type * as Lib from "./b-server-id.types"
 import type { Colonoscope } from "@ordo-pink/oss-colonoscope"
 
 export const extract_id_param = (params: Routary.RouteParams) => () =>
-	oath.from_nullable(params && params.id, core.rrr.einval(CORE.RRR.REASON.USER_ID_MISSING))
+	oath.from_nullable(params && params.id, core.rrr.einval(CORE.RRR.RRR_REASON.USER_ID_MISSING))
 
 export const check_is_executing_on_self = (request: Request) => (id: Core.User.Id) =>
 	server_routary.oaths
 		.get_auth_cookie(request)
-		.pipe(oath.ops.chain(x => oath.if(x === id, { f: core.rrr.eperm(CORE.RRR.REASON.NO), t: () => id })))
+		.pipe(oath.ops.chain(x => oath.if_else(x === id, { f: core.rrr.eperm(CORE.RRR.RRR_REASON.NO), t: () => id })))
 
 export const check_user_is_authenticated = (request: Request, env: Lib.Env) =>
 	server_routary.oaths
@@ -45,29 +45,29 @@ export const check_user_is_authenticated = (request: Request, env: Lib.Env) =>
 		.pipe(oath.ops.chain(({ sub, jti }) => env.user_repository.read(sub).pipe(oath.ops.map(user => ({ user, jti })))))
 		.pipe(oath.ops.chain(({ user, jti }) => oath.from_nullable(server.user.get_session(jti!, user)))) // TODO wjwt types
 		.pipe(oath.ops.map(core.fns.prop(1)))
-		.pipe(oath.ops.chain(t => oath.if(core.timestamp.is_after(Date.now() - env.session_lifetime_minutes * 60 * 1000, t))))
-		.pipe(oath.ops.rmap(() => core.rrr.eacces(CORE.RRR.REASON.NO, void 0)))
+		.pipe(oath.ops.chain(t => oath.if_else(core.timestamp.is_after(Date.now() - env.session_lifetime_minutes * 60 * 1000, t))))
+		.pipe(oath.ops.rmap(() => core.rrr.eacces(CORE.RRR.RRR_REASON.NO, void 0)))
 
 export const get_request_param = (params: Colonoscope.Results, name: string) => oath.from_nullable(params && params[name])
 
 export const get_param_id = (params: Colonoscope.Results) =>
 	get_request_param(params, "id")
-		.pipe(oath.ops.chain(i => oath.if(core.uuid.guard(i), { t: () => i as Core.Uuid.Instance, f: () => i })))
-		.pipe(oath.ops.rmap(core.rrr.einval(CORE.RRR.REASON.USER_ID_INVALID)))
+		.pipe(oath.ops.chain(i => oath.if_else(core.uuid.guard(i), { t: () => i as Core.Uuid.Instance, f: () => i })))
+		.pipe(oath.ops.rmap(core.rrr.einval(CORE.RRR.RRR_REASON.USER_ID_INVALID)))
 
 export const get_param_email = (params: Colonoscope.Results) =>
 	get_request_param(params, "email")
-		.pipe(oath.ops.chain(e => oath.if(core.user.email_guard(e), { t: () => e as Core.User.Email, f: () => e })))
-		.pipe(oath.ops.rmap(core.rrr.einval(CORE.RRR.REASON.EMAIL_INVALID)))
+		.pipe(oath.ops.chain(e => oath.if_else(core.user.email_guard(e), { t: () => e as Core.User.Email, f: () => e })))
+		.pipe(oath.ops.rmap(core.rrr.einval(CORE.RRR.RRR_REASON.EMAIL_INVALID)))
 
 export const get_param_ref = (params: Colonoscope.Results) =>
 	get_request_param(params, "ref")
-		.pipe(oath.ops.chain(e => oath.if(core.user.ref_guard(e), { t: () => e as Core.User.Ref, f: () => e })))
-		.pipe(oath.ops.rmap(core.rrr.einval(CORE.RRR.REASON.REF_INVALID)))
+		.pipe(oath.ops.chain(e => oath.if_else(core.user.ref_guard(e), { t: () => e as Core.User.Ref, f: () => e })))
+		.pipe(oath.ops.rmap(core.rrr.einval(CORE.RRR.RRR_REASON.REF_INVALID)))
 
 export const check_user_is_not_already_authenticated = (request: Request) =>
 	server_routary.oaths
 		.get_auth_cookie(request)
 		.pipe(oath.ops.swap)
 		.pipe(oath.ops.map(core.fns.v))
-		.pipe(oath.ops.rmap(core.rrr.eexist(CORE.RRR.REASON.ALREADY_AUTHENTICATED)))
+		.pipe(oath.ops.rmap(core.rrr.eexist(CORE.RRR.RRR_REASON.ALREADY_AUTHENTICATED)))

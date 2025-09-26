@@ -1,4 +1,4 @@
-import type { Instance } from "../sweech.types.ts"
+import type { Instance } from "../sweech.types"
 
 /**
  * Create an empty switch that compares provided values against `true`.

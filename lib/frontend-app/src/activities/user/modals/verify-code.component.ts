@@ -24,7 +24,7 @@ import { bs_question_circle } from "@ordo-pink/frontend-icons"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 import { client_rrr } from "@ordo-pink/sdk-client"
 import { get_device_info } from "@ordo-pink/_get-device-info"
-import { maoka } from "@ordo-pink/oss-maoka"
+import { create_component } from "@ordo-pink/oss-maoka"
 import { maoka_styled } from "@ordo-pink/oss-maoka/styled"
 import { oath } from "@ordo-pink/oss-oath"
 
@@ -32,7 +32,7 @@ import { authenticating_user$ } from "../user.state"
 
 import "./modal.styles.css"
 
-export const verify_code_modal = maoka.create("div", ({ use }) => {
+export const verify_code_modal = create_component.create("div", ({ use }) => {
 	const { auth$, fetch, hosts, hunter } = use(client_maoka.context.consume)
 
 	use(client_maoka.jabs.classes.set("user_join-modal"))
@@ -81,7 +81,7 @@ export const verify_code_modal = maoka.create("div", ({ use }) => {
 			.pipe(oath.ops.map(headers => ({ headers, method: "POST", credentials: "include" as const })))
 			.pipe(oath.ops.map(init => ({ ...init, body: JSON.stringify([email, code]) })))
 			.pipe(oath.ops.chain(init => oath.from_promise(() => fetch(`${hosts.id}/auth/verify-code`, init))))
-			.pipe(oath.ops.chain(res => oath.if(res.status < 300, { t: () => res })))
+			.pipe(oath.ops.chain(res => oath.if_else(res.status < 300, { t: () => res })))
 			.pipe(oath.ops.and(res => res.json() as Promise<Core.User.Instance>))
 			.pipe(oath.ops.tap(() => authenticating_user$.each({ email: () => "", code: () => "" })))
 			.pipe(oath.ops.tap(user => auth$.update("user", () => user)))
@@ -103,23 +103,23 @@ export const verify_code_modal = maoka.create("div", ({ use }) => {
 
 // --- Internal ---
 
-const title = maoka_styled.h1("user_join-modal_title")
+const title = maoka_styled.tags.h1("user_join-modal_title")
 
-const button_section = maoka_styled.div("user_join-modal_actions")
+const button_section = maoka_styled.tags.div("user_join-modal_actions")
 
-const hint = maoka_styled.p()
+const hint = maoka_styled.tags.p()
 
-const code_input = maoka.create("label", ({ use }) => {
+const code_input = create_component.create("label", ({ use }) => {
 	use(client_maoka.jabs.classes.set("user_join-modal_email_wrapper"))
 
 	return () => [bs_question_circle({}), input()]
 })
 
-const input = maoka_styled.input("user_join-modal_email", ({ use }) => {
+const input = maoka_styled.tags.input("user_join-modal_email", ({ use }) => {
 	const t_placeholer = "123456" // TODO i18n
 	const value = authenticating_user$.select("code")
 
-	const handle_mount = () => use(maoka.dom.jabs.hit_if_dom(n => n.value.focus()))
+	const handle_mount = () => use(create_component.dom.jabs.hit_if_dom(n => n.value.focus()))
 	const handle_input = (event: Event) => {
 		const target = event.target as HTMLInputElement
 		authenticating_user$.update("code", () => target.value)
@@ -129,7 +129,7 @@ const input = maoka_styled.input("user_join-modal_email", ({ use }) => {
 	use(client_maoka.jabs.set_attribute("type", "number"))
 	use(client_maoka.jabs.set_attribute("placeholder", t_placeholer))
 	use(client_maoka.jabs.listen("oninput", handle_input))
-	use(maoka.dom.jabs.onmount(handle_mount))
+	use(create_component.dom.jabs.onmount(handle_mount))
 
 	if (value) use(client_maoka.jabs.set_attribute("value", value))
 })

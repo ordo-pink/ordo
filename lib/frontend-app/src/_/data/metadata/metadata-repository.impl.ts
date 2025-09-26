@@ -20,14 +20,14 @@
  */
 
 import { result } from "@ordo-pink/oss-result"
-import { create_zags } from "@ordo-pink/oss-zags"
+import { create } from "@ordo-pink/oss-zags"
 
 import { rrr } from "../../../../core/src/rrr"
 
 // TODO Move to frontend-app
 export const MetadataRepository: Ordo.Metadata.RepositoryStatic = {
 	Of: metadata$ => {
-		const version_zags = create_zags({ version: 0 })
+		const version_zags = create({ version: 0 })
 		metadata$.marry((_, is_update) => void (is_update && version_zags.update("version", i => i + 1)))
 
 		return {

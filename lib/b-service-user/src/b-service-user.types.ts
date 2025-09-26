@@ -19,35 +19,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { Core } from "@ordo-pink/sdk-core"
-import type { Curried } from "@ordo-pink/oss-curry"
-import type { Oath } from "@ordo-pink/oss-oath"
-import type { Server } from "@ordo-pink/sdk-server"
-
-export type Args = [user_repository: Server.User.Repository]
-
-export type Instance = {
-	request_auth_code: Curried<(email: Core.User.Email) => Oath.Instance<Server.User.Instance, Core.Rrr.Instance<"EIO">>>
-	authenticate: Curried<
-		(
-			email: Core.User.Email,
-			code: Server.Code.Instance,
-		) => Oath.Instance<
-			[user: Server.User.Instance, session_id: Server.User.SessionId],
-			Core.Rrr.Instance<"EIO" | "ENOENT" | "EEXIST">
-		>
-	>
-	sign_out: Curried<
-		(user_id: Core.User.Id, session_id: Server.User.SessionId) => Oath.Instance<void, Core.Rrr.Instance<"EIO" | "ENOENT">>
-	>
-	request_email_change: (
-		id: Core.User.Id,
-		new_email: Core.User.Email,
-	) => Oath.Instance<void, Core.Rrr.Instance<"EIO" | "ENOENT" | "EEXIST">>
-	change_email: (
-		id: Core.User.Id,
-		new_email: Core.User.Email,
-	) => Oath.Instance<void, Core.Rrr.Instance<"EIO" | "ENOENT" | "EEXIST">>
+export namespace BServiceUser {
+	export type Static = "b-service-user"
 }
-
-export type Create = (...args: Args) => Instance

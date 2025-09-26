@@ -33,7 +33,7 @@ import { sessions_card } from "./components/user-session/user-session.component"
 
 import "./user-me-workspace.styles.css"
 
-export const current_user_workspace = maoka.create<{ state: ClientSDK.F.State }>("div", ({ state, use }) => {
+export const current_user_workspace = maoka.create_component<{ state: ClientSDK.F.State }>("div", ({ state, use }) => {
 	use(client_maoka.context.provide(state))
 	use(client_maoka.jabs.classes.set("current-user-workspace"))
 
@@ -70,21 +70,21 @@ export const current_user_workspace = maoka.create<{ state: ClientSDK.F.State }>
 
 const cards = styled.div("cards")
 
-const two_factor_auth_card = maoka.create("div", ({ use }) => {
+const two_factor_auth_card = maoka.create_component("div", ({ use }) => {
 	const t_title = use(client_maoka.jabs.translate$("user_workspace_current_two_factor_auth_title"))
 	const t_message = use(client_maoka.jabs.translate$("user_workspace_current_two_factor_auth_message"))
 
 	return () => user_card_under_construction(() => [user_card_title(t_title), user_card_body(t_message)])
 })
 
-const achievements_card = maoka.create("div", ({ use }) => {
+const achievements_card = maoka.create_component("div", ({ use }) => {
 	const t_title = use(client_maoka.jabs.translate$("user_workspace_current_achievements_title"))
 	const t_message = use(client_maoka.jabs.translate$("user_workspace_current_achievements_message"))
 
 	return () => user_card_under_construction(() => [user_card_title(t_title), user_card_body(t_message)])
 })
 
-const settings_card = maoka.create("div", ({ use }) => {
+const settings_card = maoka.create_component("div", ({ use }) => {
 	const t_title = use(client_maoka.jabs.translate$("user_workspace_current_settings_title"))
 	const t_message = use(client_maoka.jabs.translate$("user_workspace_current_settings_message"))
 

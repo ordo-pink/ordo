@@ -63,11 +63,11 @@ const get_request_body = (req: Request): Oath.Instance<any, Core.Rrr.Instance<"E
 
 const validate_request_body = (body: any) =>
 	oath.merge({
-		email: oath.if(body && body.email && core.user.email_guard(body.email), {
+		email: oath.if_else(body && body.email && core.user.email_guard(body.email), {
 			t: () => body.email as Core.User.Email,
 			f: () => core.rrr.einval("Provided email is invalid", body.email),
 		}),
-		code: oath.if(body && body.code && is_code(body.code), {
+		code: oath.if_else(body && body.code && is_code(body.code), {
 			t: () => body.code as Types.Code,
 			f: () => core.rrr.einval("Provided code is invalid", body.code),
 		}),
@@ -83,7 +83,7 @@ const get_code_hash =
 		oath
 			.from_nullable(intake.code_storage.get(email), not_found_rrr(email))
 			.pipe(oath.ops.chain(({ hash }) => intake.code_strategy.verify(hash, code)))
-			.pipe(oath.ops.chain(is_valid => oath.if(is_valid, { t: () => email, f: not_found_rrr(email) })))
+			.pipe(oath.ops.chain(is_valid => oath.if_else(is_valid, { t: () => email, f: not_found_rrr(email) })))
 
 const remove_auth_record =
 	(code_storage: Types.CodeStorage) =>

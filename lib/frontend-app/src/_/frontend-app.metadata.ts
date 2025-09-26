@@ -23,7 +23,7 @@ import { NOTIFICATION_TYPE, rrr } from "@ordo-pink/_core"
 import { result } from "@ordo-pink/oss-result"
 import { call_once } from "@ordo-pink/_tau"
 import { console_logger } from "@ordo-pink/logger"
-import { create_zags } from "@ordo-pink/oss-zags"
+import { create } from "@ordo-pink/oss-zags"
 import { oath } from "@ordo-pink/oss-oath"
 
 import { MetadataCommand } from "./data/metadata/metadata-command.impl"
@@ -129,4 +129,4 @@ export const init_metadata: TInitMetadataFn = call_once(content_repository => {
 
 // --- Internal ---
 
-const metadata_zags = create_zags<{ items: Ordo.Metadata.Instance[] | null }>({ items: null })
+const metadata_zags = create<{ items: Ordo.Metadata.Instance[] | null }>({ items: null })

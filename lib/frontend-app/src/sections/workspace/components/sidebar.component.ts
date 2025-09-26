@@ -25,7 +25,7 @@ import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 import { sidebar$ } from "../workspace.state"
 
 // TODO Automatically close sidebar in mobile if something was clicked
-export const sidebar = maoka.create("aside", ({ use, node }) => {
+export const sidebar = maoka.create_component("aside", ({ use, node }) => {
 	const { activities$, hunter } = use(client_maoka.context.consume)
 	const get_sidebar = use(client_maoka.jabs.zags.marry$(sidebar$))
 	const get_current_activity = use(client_maoka.jabs.zags.cheat$(activities$, "current"))
@@ -50,7 +50,7 @@ export const sidebar = maoka.create("aside", ({ use, node }) => {
 
 // --- Internal ---
 
-const sidebar_render_picker = maoka.create("div", ({ use, node }) => {
+const sidebar_render_picker = maoka.create_component("div", ({ use, node }) => {
 	const { activities$ } = use(client_maoka.context.consume)
 	use(client_maoka.jabs.classes.set("sidebar"))
 

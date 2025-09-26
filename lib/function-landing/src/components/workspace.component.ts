@@ -22,7 +22,7 @@
 import { NOTIFICATION } from "@ordo-pink/sdk-client"
 import { bs_cookie } from "@ordo-pink/frontend-icons"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
-import { maoka } from "@ordo-pink/oss-maoka"
+import { create_component } from "@ordo-pink/oss-maoka"
 import { maoka_styled } from "@ordo-pink/oss-maoka/styled"
 
 import hero_layer_0 from "../../static/index-hero-layer-0.png"
@@ -34,7 +34,7 @@ import "../f-landing.styles.css"
 let is_cookie_modal_shown = false
 
 // TODO Translations
-export const workspace = maoka.create("div", ({ use, node }) => {
+export const workspace = create_component.create("div", ({ use, node }) => {
 	const { hunter } = use(client_maoka.context.consume)
 
 	const t_bring_your_thoughts_to = "Bring your thoughts to"
@@ -64,7 +64,7 @@ export const workspace = maoka.create("div", ({ use, node }) => {
 			hunter.shoot("notifications.show", {
 				duration: 15,
 				message: "fns_landing_cookie_notification_message",
-				render_icon: element => maoka.dom.render(element, component, node.root.create_id),
+				render_icon: element => create_component.dom.render(element, component, node.root.create_id),
 				title: "fns_landing_cookie_notification_title",
 				type: NOTIFICATION.TYPE.WARN,
 			})
@@ -74,7 +74,7 @@ export const workspace = maoka.create("div", ({ use, node }) => {
 	}
 
 	use(client_maoka.jabs.listen_global_event("mousemove", handle_mouse_move))
-	use(maoka.dom.jabs.onmount(handle_onmount))
+	use(create_component.dom.jabs.onmount(handle_onmount))
 
 	const handle_join_click = () => void hunter.shoot("user.show_request_code_modal")
 	const handle_more_click = () => console.log("HERE")
@@ -125,29 +125,32 @@ export const workspace = maoka.create("div", ({ use, node }) => {
 
 // --- Internal ---
 
-const hero_section = maoka_styled.section("hero-section")
-const hero_section_layers = maoka_styled.div("hero-layers")
+const hero_section = maoka_styled.tags.section("hero-section")
+const hero_section_layers = maoka_styled.tags.div("hero-layers")
 
-const hero_section_image_layer = maoka.create<{ image_path: string; index: number }>("div", ({ image_path, index, use }) => {
-	const background_image = `url(${image_path})`
+const hero_section_image_layer = create_component.create<{ image_path: string; index: number }>(
+	"div",
+	({ image_path, index, use }) => {
+		const background_image = `url(${image_path})`
 
-	use(client_maoka.jabs.classes.set(`hero-layer hero-layer_${index}`))
-	use(client_maoka.jabs.set_style({ backgroundImage: background_image }))
-})
-const hero_card = maoka_styled.div("card-container")
-const hero_card_content = maoka_styled.div("card")
-const HeroCardLogoText = maoka_styled.span("logo_ordo-text")
-const HeroCardLogoWrapper = maoka_styled.h1("logo")
-const HeroCardLogoSection = maoka_styled.div("logo-section")
-const HeroCardLogoAction = maoka_styled.div("logo_action")
+		use(client_maoka.jabs.classes.set(`hero-layer hero-layer_${index}`))
+		use(client_maoka.jabs.set_style({ backgroundImage: background_image }))
+	},
+)
+const hero_card = maoka_styled.tags.div("card-container")
+const hero_card_content = maoka_styled.tags.div("card")
+const HeroCardLogoText = maoka_styled.tags.span("logo_ordo-text")
+const HeroCardLogoWrapper = maoka_styled.tags.h1("logo")
+const HeroCardLogoSection = maoka_styled.tags.div("logo-section")
+const HeroCardLogoAction = maoka_styled.tags.div("logo_action")
 
-const actions_container = maoka_styled.div("actions-container")
+const actions_container = maoka_styled.tags.div("actions-container")
 
-const call_to_action_section = maoka_styled.div("cta")
-const call_to_action_card = maoka_styled.div("cta_card")
-const cta_logo_wrapper = maoka_styled.div()
-const cta_beta_test = maoka_styled.h3("cta_beta")
-const beta_started_string = maoka_styled.p("cta_beta_started")
+const call_to_action_section = maoka_styled.tags.div("cta")
+const call_to_action_card = maoka_styled.tags.div("cta_card")
+const cta_logo_wrapper = maoka_styled.tags.div()
+const cta_beta_test = maoka_styled.tags.h3("cta_beta")
+const beta_started_string = maoka_styled.tags.p("cta_beta_started")
 const call_to_action_beta_logo = (t_beta_started: () => string) =>
 	cta_logo_wrapper(() => [
 		cta_beta_test(() => [
@@ -160,4 +163,4 @@ const call_to_action_beta_logo = (t_beta_started: () => string) =>
 		]),
 	])
 
-const token = (cls: string, text: string) => maoka_styled.span(cls)(() => text)
+const token = (cls: string, text: string) => maoka_styled.tags.span(cls)(() => text)

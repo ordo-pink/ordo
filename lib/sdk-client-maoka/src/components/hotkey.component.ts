@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: Unlicense
  */
 
+import * as maoka from "@ordo-pink/oss-maoka"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 import { client_sdk } from "@ordo-pink/sdk-client"
-import { maoka } from "@ordo-pink/oss-maoka"
 import { sweech } from "@ordo-pink/oss-sweech"
 import { title_case } from "@ordo-pink/_tau"
 
@@ -13,7 +13,7 @@ import type * as ClientMaoka from "../sdk-client-maoka.types"
 
 import "./hotkey.styles.css"
 
-export const actionable_hotkey = maoka.create<ClientMaoka.Components.HotkeyArgs>(
+export const actionable_hotkey = maoka.create_component<ClientMaoka.Components.HotkeyArgs>(
 	"div",
 	({ decoration_only, hotkey, node, prevent_in_contenteditable, prevent_in_inputs, show_in_mobile, use }) => {
 		const is_darwin = use(client_maoka.jabs.is_darwin)
@@ -64,7 +64,7 @@ export const actionable_hotkey = maoka.create<ClientMaoka.Components.HotkeyArgs>
 
 const IGNORED_KEYS = ["Control", "Shift", "Alt", "Meta"]
 
-const hotkey_button = maoka.create<{ key: string }>("kbd", ({ use, key }) => {
+const hotkey_button = maoka.create_component<{ key: string }>("kbd", ({ use, key }) => {
 	use(client_maoka.jabs.classes.set("key-container"))
 
 	return () =>

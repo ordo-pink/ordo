@@ -3,12 +3,13 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { client_maoka } from "@ordo-pink/sdk-client-maoka"
-import { maoka } from "@ordo-pink/oss-maoka"
-import { maoka_styled } from "@ordo-pink/oss-maoka/styled"
+import * as maoka from "@ordo-pink/oss-maoka"
 
 import type * as ClientMaoka from "../sdk-client-maoka.types"
 import { actionable_hotkey } from "./hotkey.component"
+import { listen } from "../jabs/listen.jab"
+import { set_attribute } from "../jabs/attribute.jab"
+import { set_class } from "../jabs/class.jab"
 
 import "./button.styles.css"
 
@@ -26,14 +27,14 @@ export const button_danger = (params: ClientMaoka.Components.ButtonArgs) =>
 
 // --- Internal ---
 
-const text_container = maoka_styled.div()
+const text_container = maoka.styled.div()
 
-const default_button = maoka.create<ClientMaoka.Components.ButtonArgs>(
+const default_button = maoka.create_component<ClientMaoka.Components.ButtonArgs>(
 	"button",
 	({ kindergarten, on_click, aria_label = "", custom_class = "", hotkey: hotkey_args, use, node, disabled }) => {
-		use(client_maoka.jabs.classes.set("button", custom_class))
-		use(client_maoka.jabs.set_attribute("aria-label", aria_label))
-		if (disabled) use(client_maoka.jabs.set_attribute("disabled"))
+		use(set_class("button", custom_class))
+		use(set_attribute("aria-label", aria_label))
+		if (disabled) use(set_attribute("disabled"))
 
 		const handle_click = (event: MouseEvent) => {
 			event.preventDefault()
@@ -41,7 +42,7 @@ const default_button = maoka.create<ClientMaoka.Components.ButtonArgs>(
 			return on_click(event)
 		}
 
-		use(client_maoka.jabs.listen("onclick", handle_click))
+		use(listen("onclick", handle_click))
 
 		return () => [
 			text_container(() => kindergarten()),

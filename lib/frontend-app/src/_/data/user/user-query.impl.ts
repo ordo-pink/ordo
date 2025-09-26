@@ -20,7 +20,7 @@
  */
 
 import { result } from "@ordo-pink/oss-result"
-import { create_zags } from "@ordo-pink/oss-zags"
+import { create } from "@ordo-pink/oss-zags"
 import { oath } from "@ordo-pink/oss-oath"
 import { rrr } from "@ordo-pink/_core"
 
@@ -31,7 +31,7 @@ const user_cache: Record<string, Ordo.User.Public.DTO> = {}
 
 export const UserQuery: Ordo.User.QueryStatic = {
 	Of: check_permission => {
-		const version_zags = create_zags({ version: 0 })
+		const version_zags = create({ version: 0 })
 		ordo_app_state.zags.cheat("user", (_, is_update) => is_update && version_zags.update("version", i => i + 1))
 
 		const fetch = ordo_app_state.zags.select("fetch")
@@ -67,7 +67,9 @@ export const UserQuery: Ordo.User.QueryStatic = {
 									.from_promise(() => fetch(`${id_host}/users/${id}`, { credentials: "include" }))
 									.pipe(oath.ops.and(res => res.json()))
 									.pipe(
-										oath.ops.and(res => oath.if(res.success, { t: () => res.payload, f: () => rrr.codes.eio(res.payload) })),
+										oath.ops.and(res =>
+											oath.if_else(res.success, { t: () => res.payload, f: () => rrr.codes.eio(res.payload) }),
+										),
 									)
 									.pipe(oath.ops.tap(dto => void (user_cache[dto.id] = dto))),
 						),
@@ -93,7 +95,9 @@ export const UserQuery: Ordo.User.QueryStatic = {
 									.from_promise(() => fetch(`${id_host}/users/handle/${handle}`, { credentials: "include" }))
 									.pipe(oath.ops.and(res => res.json()))
 									.pipe(
-										oath.ops.and(res => oath.if(res.success, { t: () => res.payload, f: () => rrr.codes.eio(res.payload) })),
+										oath.ops.and(res =>
+											oath.if_else(res.success, { t: () => res.payload, f: () => rrr.codes.eio(res.payload) }),
+										),
 									)
 									.pipe(oath.ops.tap(dto => void (user_cache[dto.handle] = dto))),
 						),

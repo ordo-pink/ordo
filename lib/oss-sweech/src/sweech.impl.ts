@@ -3,7 +3,11 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import type * as Sweech from "./sweech.types.ts"
+import type * as Sweech from "./sweech.types"
+
+export * from "./helpers/helpers.impl"
+
+export * as helpers from "./helpers/helpers.impl"
 
 export const match: Sweech.Match = x => _swich(x)
 

@@ -67,3 +67,58 @@ export const create: Lib.Create = (
 		.pipe(routary.ops.patch("/users/:id", handlers.update_user))
 		.pipe(routary.ops.delete("/users/:id", handlers.delete_user))
 }
+
+export const guard: T.Guard = (x): x is T.Instance =>
+	ordo.fns.is_non_empty_string(x) && Number.parseInt(x).toString() === x && x.length === 6
+
+export const create_service: T.CreateService = (codegen, lifetime_seconds, logger) => {
+	const storage: T.Storage = new Map()
+
+	const interval = setInterval(() => {
+		const now = ordo.timestamp.create()
+
+		for (const [email, values] of storage.entries()) {
+			for (const value of values) {
+				if (now - value[0] < lifetime_seconds) {
+					storage.set(email, values.toSpliced(values.indexOf(value), 1))
+					logger.debug("Removed outdated code for", user.obfuscate_email(email))
+				}
+			}
+		}
+	}, 5000).unref()
+
+	return {
+		assign_code: email => {
+			const code = generate()
+
+			return oath
+				.from_nullable(storage.get(email))
+				.pipe(oath.ops.fix(() => []))
+				.pipe(oath.ops.chain(values => codegen.hash(code).pipe(oath.ops.map(hash => [values, hash]))))
+				.pipe(oath.ops.map(([values, hash]) => [...values, [ordo.timestamp.create(), hash] as T.Value]))
+				.pipe(oath.ops.map(values => storage.set(email, values)))
+				.pipe(oath.ops.map(() => code))
+		},
+
+		verify_code: (email, code) =>
+			oath
+				.from_nullable(storage.get(email), enoent(ordo.rrr.REASON.USER_NOT_FOUND))
+				.pipe(oath.ops.map(values => values.map(v => v[1])))
+				.pipe(oath.ops.chain(hs => oath.any(hs.map(h => codegen.verify(code, h))).pipe(oath.ops.rmap(ordo.fns.head)))),
+
+		die: () => {
+			clearInterval(interval)
+			storage.clear()
+		},
+	}
+}
+
+export const generate = () =>
+	result
+		.of(new Uint8Array(6))
+		.pipe(result.ops.map(ua => crypto.getRandomValues(ua)))
+		.pipe(result.ops.map(ns => ns.join("")))
+		.pipe(result.ops.map(s => s.slice(0, 6)))
+		.cata(result.catas.expect(() => "NGH"))
+
+const enoent = ordo.fns.curry(ordo.rrr.enoent)

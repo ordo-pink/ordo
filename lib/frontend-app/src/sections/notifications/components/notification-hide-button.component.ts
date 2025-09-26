@@ -22,12 +22,12 @@
 import type { ClientSDK } from "@ordo-pink/sdk-client"
 import { bs_x } from "@ordo-pink/frontend-icons"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
-import { maoka } from "@ordo-pink/oss-maoka"
+import { create_component } from "@ordo-pink/oss-maoka"
 
 import { get_readable_type } from "./utils/common"
 
 type Args = Pick<ClientSDK.Notification.Instance, "id" | "type">
-export const hide_notification_button = maoka.create<Args>("button", ({ id, type, use }) => {
+export const hide_notification_button = create_component.create<Args>("button", ({ id, type, use }) => {
 	const { hunter } = use(client_maoka.context.consume)
 	const readable_type = get_readable_type(type)
 

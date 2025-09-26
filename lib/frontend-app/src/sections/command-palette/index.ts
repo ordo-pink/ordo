@@ -20,7 +20,7 @@
  */
 
 import { COMMAND_PALETTE, type ClientSDK } from "@ordo-pink/sdk-client"
-import { type Maoka, maoka } from "@ordo-pink/oss-maoka"
+import { type Maoka, create_component } from "@ordo-pink/oss-maoka"
 import { bs_menu_button_wide_fill } from "@ordo-pink/frontend-icons"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 
@@ -70,7 +70,7 @@ const track_prey_jab: Maoka.Jab = ({ use }) => {
 			hotkey: "mod+shift+p",
 			id: "command_palette.toggle",
 			readable_name: "command_palette_commands_toggle_name",
-			render_icon: span => maoka.dom.render(span, bs_menu_button_wide_fill(), () => crypto.randomUUID()),
+			render_icon: span => create_component.dom.render(span, bs_menu_button_wide_fill(), () => crypto.randomUUID()),
 			type: COMMAND_PALETTE.ITEM_TYPE.MODAL_OPENER,
 			value: () => hunter.shoot("command_palette.toggle"),
 		})
@@ -86,7 +86,7 @@ const track_prey_jab: Maoka.Jab = ({ use }) => {
 		}
 	}
 
-	use(maoka.dom.jabs.onmount(handle_onmount))
+	use(create_component.dom.jabs.onmount(handle_onmount))
 }
 
 const global_palette = (): ClientSDK.CommandPalette.Instance<() => void> => ({

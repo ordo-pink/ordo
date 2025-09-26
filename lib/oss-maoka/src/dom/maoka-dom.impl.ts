@@ -3,26 +3,30 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import type * as Maoka from "../maoka.types.ts"
-import type * as MaokaDom from "./maoka-dom.types.ts"
-import { component_guard, node_guard as maoka_node_guard } from "../maoka.impl.ts"
-import { REFRESH_EVENT_NAME } from "./maoka-dom.constants.ts"
+import * as DOM from "./maoka-dom.constants"
+import type * as Maoka from "../maoka.types"
+import type * as MaokaDom from "./maoka-dom.types"
+import * as maoka from "../maoka.impl"
 
-export const node_guard: MaokaDom.NodeGuard = <$Element extends HTMLElement = HTMLElement>(
+export * from "./jabs/maoka-jabs.impl"
+
+export * as jabs from "./jabs/maoka-jabs.impl"
+
+export const node_guard: MaokaDom.DomNodeGuard = <$Element extends HTMLElement = HTMLElement>(
 	x: any,
-): x is MaokaDom.Node<$Element> => maoka_node_guard(x) && globalThis.HTMLElement && x.value instanceof globalThis.HTMLElement
+): x is MaokaDom.DomNode<$Element> => maoka.node_guard(x) && globalThis.HTMLElement && x.value instanceof globalThis.HTMLElement
 
-export const render: MaokaDom.Render = async (root_element, component, create_id) => {
+export const render: MaokaDom.DomRender = async (root_element, component, create_id) => {
 	if (!globalThis.document) throw new Error("Couldn't find `document`. Did you attempt to render to DOM outside browser?")
 
-	const root: MaokaDom.Root<HTMLElement> = {
+	const root: MaokaDom.DomRoot<HTMLElement> = {
 		create_id,
 		create_value: tag => document.createElement(tag),
 		id: create_id(),
 		refresh_queue: [],
 	}
 
-	const node = (await component(root)) as MaokaDom.Node
+	const node = (await component(root)) as MaokaDom.DomNode
 
 	const request_idle_callback = globalThis.requestIdleCallback ?? setTimeout
 
@@ -41,10 +45,10 @@ export const render: MaokaDom.Render = async (root_element, component, create_id
 
 	request_idle_callback(() => void render_loop())
 
-	root_element.addEventListener(REFRESH_EVENT_NAME, event => {
+	root_element.addEventListener(DOM.REFRESH_EVENT_NAME, event => {
 		event.stopPropagation()
 
-		const node = (event as CustomEvent).detail as MaokaDom.Node
+		const node = (event as CustomEvent).detail as MaokaDom.DomNode
 		let skip = false
 
 		if (root.refresh_queue.some(n => n.id === node.id)) return
@@ -65,8 +69,8 @@ export const render: MaokaDom.Render = async (root_element, component, create_id
 
 	const observer = new MutationObserver(records => {
 		for (let i = 0; i < records.length; i++) {
-			const added_nodes = records[i].addedNodes as unknown as MaokaDom.NodeValue[]
-			const removed_nodes = records[i].removedNodes as unknown as MaokaDom.NodeValue[]
+			const added_nodes = records[i].addedNodes as unknown as MaokaDom.DomNodeValue[]
+			const removed_nodes = records[i].removedNodes as unknown as MaokaDom.DomNodeValue[]
 
 			for (let i = 0; i < added_nodes.length; i++) {
 				const element = added_nodes[i]
@@ -89,7 +93,7 @@ export const render: MaokaDom.Render = async (root_element, component, create_id
 
 // --- Internal ---
 
-export const mount_element = async (element: MaokaDom.NodeValue): Promise<void> => {
+export const mount_element = async (element: MaokaDom.DomNodeValue): Promise<void> => {
 	if (element.mounted) return
 
 	element.mounted = true
@@ -109,7 +113,7 @@ export const mount_element = async (element: MaokaDom.NodeValue): Promise<void> 
 		for (let i = 0; i < element.children.length; i++) await mount_element(element.children[i] as HTMLElement)
 }
 
-export const unmount_element = async (element: HTMLElement & { onunmount?: MaokaDom.OnUnmountHandler[] }): Promise<void> => {
+export const unmount_element = async (element: HTMLElement & { onunmount?: MaokaDom.DomOnUnmountHandler[] }): Promise<void> => {
 	if (element.onunmount) for (let i = 0; i < element.onunmount.length; i++) await element.onunmount[i]()
 	if (element.children)
 		for (let i = 0; i < element.children.length; i++) await unmount_element(element.children[i] as HTMLElement)
@@ -138,7 +142,7 @@ export const render_dom_children = async (node: Maoka.Node<HTMLElement>): Promis
 		if (typeof child === "string") nodes.push(child)
 		else if (typeof child === "number") nodes.push(String(child))
 		else if (node_guard(child)) nodes.push(await render_dom_children(child))
-		else if (component_guard(child)) nodes.push(await render_dom_children((await child(node.root)) as any))
+		else if (maoka.component_guard(child)) nodes.push(await render_dom_children((await child(node.root)) as any))
 		else if (!child) continue
 		else console.error("Unsupported maoka child", child)
 	}

@@ -4,17 +4,16 @@
  */
 
 import { type Maoka, maoka } from "@ordo-pink/oss-maoka"
-import type { ClientSDK } from "@ordo-pink/sdk-client"
 import type { I18n } from "@ordo-pink/oss-i18n"
 import { core } from "@ordo-pink/sdk-core"
 
-import type * as Lib from "../sdk-client-maoka.types"
+import type * as ClientMaoka from "../sdk-client-maoka.types"
+import { cheat$ } from "./zags.jab"
 import { context } from "../sdk-client-maoka.impl"
-import { zags_jabs } from "./zags.jab"
 
 export const register_translations_jab: (
 	locale: I18n.ISO_639_1_Locale,
-	values: Partial<Record<I18n.DefinitionToTranslationKeys<ClientSDK.Translations.Keys>, string>>,
+	values: Partial<Record<I18n.DefinitionToTranslationKeys<OrdoClient.Translations.Keys>, string>>,
 ) => Maoka.Jab =
 	(locale, values) =>
 	({ use }) => {
@@ -25,12 +24,12 @@ export const register_translations_jab: (
 
 		state.hunter.shoot("i18n.add_translations", { locale, values })
 
-		maoka.dom.jabs.onunmount(() => state.hunter.shoot("i18n.remove_translations", core.fns.keys_of(values)))
+		maoka.dom.jabs.onunmount(() => void state.hunter.shoot("i18n.remove_translations", core.fns.keys_of(values)))
 	}
 
-export const t_jab$: Lib.Jabs.T$ = ({ use }) => {
+export const t_jab$: ClientMaoka.Jabs.T$ = ({ use }) => {
 	const { i18n$ } = use(context.consume)
-	use(zags_jabs.cheat$(i18n$, "values"))
+	use(cheat$(i18n$, "values"))
 
 	let current_locale: I18n.ISO_639_1_Locale = i18n$.select("locale")
 
@@ -56,7 +55,7 @@ export const t_jab$: Lib.Jabs.T$ = ({ use }) => {
 	}
 }
 
-export const translate_jab$: Lib.Jabs.Translate$ =
+export const translate_jab$: ClientMaoka.Jabs.Translate$ =
 	key =>
 	({ use }) => {
 		if (!key) return default_value => default_value ?? key ?? ""

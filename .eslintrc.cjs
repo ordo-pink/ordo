@@ -49,5 +49,6 @@ module.exports = {
 		indent: "off",
 		quotes: ["error", "double"],
 		semi: ["error", "never"],
+		"no-var": "off",
 	},
 }

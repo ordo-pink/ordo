@@ -88,14 +88,14 @@ const validate_file_exists = (s3: S3Client) => (path: string) =>
 	oath
 		.resolve(check_file_exists(s3))
 		.pipe(oath.ops.chain(f => f(path)))
-		.pipe(oath.ops.chain(({ exists, file }) => oath.if(exists, { t: () => ({ path, file }) })))
+		.pipe(oath.ops.chain(({ exists, file }) => oath.if_else(exists, { t: () => ({ path, file }) })))
 		.pipe(oath.ops.rmap(not_found_rrr))
 
 const validate_file_does_not_exist = (s3: S3Client) => (path: string) =>
 	oath
 		.resolve(check_file_exists(s3))
 		.pipe(oath.ops.chain(f => f(path)))
-		.pipe(oath.ops.chain(({ exists, file }) => oath.if(!exists, { t: () => ({ path, file }) })))
+		.pipe(oath.ops.chain(({ exists, file }) => oath.if_else(!exists, { t: () => ({ path, file }) })))
 		.pipe(oath.ops.rmap(already_exists_rrr))
 
 const write_file = (s3: S3Client, content: ReadableStream) => (path: string) =>
@@ -106,6 +106,6 @@ const write_file = (s3: S3Client, content: ReadableStream) => (path: string) =>
 
 const delete_file = (file: S3File) => oath.from_promise(() => file.delete()).pipe(oath.ops.rmap(io_rrr))
 
-const get_file_content = (file: S3File) => oath.try(() => file.readable).pipe(oath.ops.rmap(io_rrr))
+const get_file_content = (file: S3File) => oath.try_catch(() => file.readable).pipe(oath.ops.rmap(io_rrr))
 
 const get_key = (uid: Core.User.Id, fsid: Core.Data.Id) => oath.resolve(`${uid}/${fsid}`)

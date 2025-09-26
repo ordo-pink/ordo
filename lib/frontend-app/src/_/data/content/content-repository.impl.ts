@@ -21,13 +21,13 @@
 
 import { METADATA_CONTENT_FSID } from "@ordo-pink/_core"
 import { T } from "@ordo-pink/_tau"
-import { create_zags } from "@ordo-pink/oss-zags"
+import { create } from "@ordo-pink/oss-zags"
 import { oath } from "@ordo-pink/oss-oath"
 
 // TODO !!! Sync storages
 export const ContentRepository: Ordo.Content.RepositoryStatic = {
 	Of: (auth$, local_strategy, remote_strategy) => {
-		const $ = create_zags({ version: 0 })
+		const $ = create({ version: 0 })
 
 		const divorce = auth$.marry(({ user }) => {
 			// Quit from syncing with remote since the user is not authenticated
@@ -41,14 +41,14 @@ export const ContentRepository: Ordo.Content.RepositoryStatic = {
 						.pipe(oath.ops.and(oath.from_nullable))
 						.pipe(oath.ops.and(stream => new Response(stream as ReadableStream).arrayBuffer()))
 						.pipe(oath.ops.and(x => new TextDecoder().decode(x)))
-						.pipe(oath.ops.and(x => oath.try(() => JSON.parse(x) as Ordo.Metadata.DTO[])))
+						.pipe(oath.ops.and(x => oath.try_catch(() => JSON.parse(x) as Ordo.Metadata.DTO[])))
 						.pipe(oath.ops.fix(() => [])),
 					local: local_strategy
 						.get(user.get_uid(), METADATA_CONTENT_FSID)
 						.pipe(oath.ops.and(oath.from_nullable))
 						.pipe(oath.ops.and(content => new Response(content as ReadableStream).arrayBuffer()))
 						.pipe(oath.ops.and(x => new TextDecoder().decode(x)))
-						.pipe(oath.ops.and(content => oath.try(() => JSON.parse(content) as Ordo.Metadata.DTO[])))
+						.pipe(oath.ops.and(content => oath.try_catch(() => JSON.parse(content) as Ordo.Metadata.DTO[])))
 						.pipe(oath.ops.fix(() => [])),
 				})
 				// Filter out unchanged items to avoid redundant pending updates

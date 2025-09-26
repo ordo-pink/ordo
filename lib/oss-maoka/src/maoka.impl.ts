@@ -3,23 +3,32 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import type * as Maoka from "./maoka.types.ts"
+import type * as Maoka from "./maoka.types"
 
-const NODE_MARK = Symbol("@maoka/node")
-const COMPONENT_MARK = Symbol("@maoka/component")
+export * from "./context/maoka-context.impl"
+export * from "./dom/maoka-dom.impl"
+export * from "./styled/maoka-styled.impl"
 
-export const component_guard: Maoka.ComponentGuard = (x): x is Maoka.Component => typeof x === "function" && !!x[COMPONENT_MARK]
+export * as context from "./context/maoka-context.impl"
+export * as dom from "./dom/maoka-dom.impl"
+export { default as styled } from "./styled/maoka-styled.impl"
 
-export const node_guard: Maoka.NodeGuard = (x: any): x is Maoka.Node => !!x && typeof x === "object" && !!x[NODE_MARK]
+const MAOKA_NODE_MARK = Symbol("@maoka/node")
+const MAOKA_COMPONENT_MARK = Symbol("@maoka/component")
 
-export const create: Maoka.CreateComponent = (tag, callback) => args => {
+export const component_guard: Maoka.ComponentGuard = (x): x is Maoka.Component =>
+	typeof x === "function" && !!x[MAOKA_COMPONENT_MARK]
+
+export const node_guard: Maoka.NodeGuard = (x: any): x is Maoka.Node => !!x && typeof x === "object" && !!x[MAOKA_NODE_MARK]
+
+export const create_component: Maoka.CreateComponent = (tag, callback) => args => {
 	const component = async (root: Maoka.Root) => {
 		const value = root.create_value(tag)
 		const node: Maoka.Node = {
 			id: root.create_id(),
 			kindergarten: () => null,
 			value,
-			[NODE_MARK as any]: true,
+			[MAOKA_NODE_MARK as any]: true,
 			root,
 		}
 		const use: Maoka.Use = jab => jab({ use, node })
@@ -32,7 +41,7 @@ export const create: Maoka.CreateComponent = (tag, callback) => args => {
 		return node
 	}
 
-	component[COMPONENT_MARK] = true as const
+	component[MAOKA_COMPONENT_MARK] = true as const
 
 	return component
 }

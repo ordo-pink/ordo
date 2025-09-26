@@ -21,14 +21,14 @@
 
 import { type ClientSDK } from "@ordo-pink/sdk-client"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
-import { maoka } from "@ordo-pink/oss-maoka"
+import { create_component } from "@ordo-pink/oss-maoka"
 
 import { get_readable_type } from "./utils/common"
 import { notifications$ } from "../notifications.state"
 
 type Args = Pick<ClientSDK.Notification.Instance, "id" | "type"> & Required<Pick<ClientSDK.Notification.Instance, "duration">>
 
-export const notification_progress = maoka.create<Args>("div", ({ id, type, duration, use }) => {
+export const notification_progress = create_component.create<Args>("div", ({ id, type, duration, use }) => {
 	const get_progress = use(client_maoka.jabs.zags.cheat$(notifications$, `progress_bars.${id}` as const))
 
 	const { hunter } = use(client_maoka.context.consume)
@@ -48,7 +48,7 @@ export const notification_progress = maoka.create<Args>("div", ({ id, type, dura
 	}
 
 	use(client_maoka.jabs.classes.set("notification-card_progress"))
-	use(maoka.dom.jabs.onmount(handle_onmount))
+	use(create_component.dom.jabs.onmount(handle_onmount))
 
 	return () => {
 		const progress = get_progress()
@@ -66,7 +66,7 @@ export const notification_progress = maoka.create<Args>("div", ({ id, type, dura
 // --- Internal ---
 
 type P = Pick<ClientSDK.Notification.Instance, "type"> & { progress: number }
-const progress_bar_foreground = maoka.create<P>("div", ({ progress, type, use }) => {
+const progress_bar_foreground = create_component.create<P>("div", ({ progress, type, use }) => {
 	if (!progress) return
 
 	use(client_maoka.jabs.classes.set("notification-card_progress_foreground", get_readable_type(type)))

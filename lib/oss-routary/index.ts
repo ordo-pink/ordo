@@ -3,5 +3,10 @@
  * SPDX-License-Identifier: Unlicense
  */
 
+export * from "./src/routary.impl"
+export * from "./src/routary.types"
+
 export * as routary from "./src/routary.impl"
 export * as Routary from "./src/routary.types"
+
+export * as default from "./src/routary.impl"

@@ -6,9 +6,9 @@
 import type * as Maoka from "@ordo-pink/oss-maoka"
 import * as maoka from "@ordo-pink/oss-maoka"
 import * as maoka_dom from "@ordo-pink/oss-maoka/dom"
+import * as maoka_styled from "@ordo-pink/oss-maoka/styled"
 import { type ClientSDK, MODAL } from "@ordo-pink/sdk-client"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
-import maoka_styled from "@ordo-pink/oss-maoka/styled"
 import { sweech } from "@ordo-pink/oss-sweech"
 
 import type * as ClientMaoka from "../sdk-client-maoka.types"
@@ -44,7 +44,7 @@ export namespace Dialog {
 			title: () => string
 		}
 
-		export type Jab = (state: ClientSDK.F.State, args: Dialog.Info.Args) => Maoka.Jab<[show: () => void, hide: () => void]>
+		export type Jab = (state: ClientSDK.F.State, args: Dialog.Info.Args) => Maoka.MaokaJab<[show: () => void, hide: () => void]>
 	}
 
 	export namespace Actions {
@@ -55,11 +55,14 @@ export namespace Dialog {
 			title: () => string
 		}
 
-		export type Jab = (state: ClientSDK.F.State, args: Dialog.Actions.Args) => Maoka.Jab<[show: () => void, hide: () => void]>
+		export type Jab = (
+			state: ClientSDK.F.State,
+			args: Dialog.Actions.Args,
+		) => Maoka.MaokaJab<[show: () => void, hide: () => void]>
 	}
 }
 
-const dialog_base = maoka.create<Dialog.Args>(
+const dialog_base = maoka.create_component<Dialog.Args>(
 	"div",
 	({ actions = () => [], node, render_body, render_icon, title, type, use }) => {
 		use(client_maoka.jabs.classes.set("dialog", get_dialog_css_class(type)))
@@ -98,8 +101,8 @@ export const dialog_actions = ({ actions, title, render_body, render_icon }: Dia
 
 const create_dialog: (
 	state: ClientSDK.F.State,
-	component: Maoka.Component,
-) => Maoka.Jab<[show: () => void, hide: () => void]> =
+	component: Maoka.MaokaComponent,
+) => Maoka.MaokaJab<[show: () => void, hide: () => void]> =
 	(state, component) =>
 	({ node }) => {
 		const hide = () => void state.hunter.shoot("modal.hide")
@@ -116,16 +119,16 @@ export const create_dialog_info: Dialog.Info.Jab = (state, args) => create_dialo
 
 export const create_dialog_actions: Dialog.Actions.Jab = (state, args) => create_dialog(state, dialog_actions(args))
 
-const dialog_header_div = maoka_styled.div("header")
-const dialog_title_h2 = maoka_styled.h2("title")
-const dialog_footer_div = maoka_styled.div("footer")
-const dialog_body_div = maoka.create<{ render_body: Dialog.BodyRenderer }>("div", ({ render_body, use }) => {
+const dialog_header_div = maoka_styled.tags.div("header")
+const dialog_title_h2 = maoka_styled.tags.h2("title")
+const dialog_footer_div = maoka_styled.tags.div("footer")
+const dialog_body_div = maoka.create_component<{ render_body: Dialog.BodyRenderer }>("div", ({ render_body, use }) => {
 	use(client_maoka.jabs.classes.set("body"))
-	use(maoka.jab_onmount(n => void render_body(n.value as HTMLDivElement)))
+	use(maoka_dom.onmount(n => void render_body(n.value as HTMLDivElement)))
 })
-const dialog_icon_span = maoka.create<{ render_icon: Dialog.IconRenderer }>("span", ({ render_icon, use }) => {
+const dialog_icon_span = maoka.create_component<{ render_icon: Dialog.IconRenderer }>("span", ({ render_icon, use }) => {
 	use(client_maoka.jabs.classes.set("icon"))
-	use(maoka.jab_onmount(n => void render_icon(n.value as HTMLSpanElement)))
+	use(maoka_dom.onmount(n => void render_icon(n.value as HTMLSpanElement)))
 })
 
 const get_dialog_css_class = (type: Dialog.Type) =>

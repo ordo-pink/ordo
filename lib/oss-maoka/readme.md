@@ -11,8 +11,10 @@ Here's a canonical counter example but it actually discounts:
 ```javascript
 import { maoka } from "@ordo-pink/maoka"
 
-const discounter = maoka.create("button", ({ use }) => {
+const discounter = maoka.create("button", ({ use, node }) => {
 	let counter_state = 0
+
+	const element = node.value
 
 	element.onclick = () => {
 		counter_state--

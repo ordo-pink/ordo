@@ -21,13 +21,9 @@
 
 import type { Server } from "@ordo-pink/sdk-server"
 
-import type * as LIB from "./b-email-strategy-rusender.constants"
-
-export type ApiKey = string
+export type ApiKey = string & {}
 export type From = Server.Email.EmailGuy
 export type Args = [api_key: ApiKey, sender: From]
 export type Instance = Server.Email.Strategy
 
 export type Create = (...args: Args) => Instance
-
-export type CreateApiKeyHeader = (key: ApiKey) => [typeof LIB.X_API_KEY_HEADER_KEY, ApiKey]

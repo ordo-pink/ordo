@@ -35,8 +35,8 @@ export const get_user_from_cookie = (intake: ServerID.Intake) => {
 			oath.ops.chain(([uid, sid]) =>
 				oath
 					.merge({
-						uid: oath.if(user.current.validations.is_id(uid), { t: () => uid as User.ID }),
-						sid: oath.if(user.current.validations.is_id(sid), { t: () => sid as Session.ID }),
+						uid: oath.if_else(user.current.validations.is_id(uid), { t: () => uid as User.ID }),
+						sid: oath.if_else(user.current.validations.is_id(sid), { t: () => sid as Session.ID }),
 					})
 					.pipe(oath.ops.tap(debug("Cookie extracted", ({ uid }) => uid)))
 					.pipe(
@@ -45,7 +45,7 @@ export const get_user_from_cookie = (intake: ServerID.Intake) => {
 								.read(uid)
 								.pipe(
 									oath.ops.chain(user =>
-										oath.if(
+										oath.if_else(
 											user.get_sessions().some(session => session.has_id(sid)),
 											{ t: () => ({ user, uid, sid }) },
 										),

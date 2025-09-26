@@ -19,14 +19,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { type Maoka, maoka } from "@ordo-pink/oss-maoka"
+import { type Maoka, create_component } from "@ordo-pink/oss-maoka"
 import { type ClientSDK } from "@ordo-pink/sdk-client"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 import { maoka_styled } from "@ordo-pink/oss-maoka/styled"
 
 import { activity_bar_link } from "./activity-bar-link.component"
 
-export const activity_bar = maoka.create<{
+export const activity_bar = create_component.create<{
 	sidebar_toggle: () => Maoka.Component
 	command_palette_toggle: () => Maoka.Component
 }>("div", ({ command_palette_toggle, sidebar_toggle, use }) => {
@@ -45,4 +45,4 @@ export const activity_bar = maoka.create<{
 const render_activity = (current: ClientSDK.Activity.Instance | null) => (item: ClientSDK.Activity.Instance) =>
 	item.render_icon && activity_bar_link({ is_current: !!current && current.id === item.id, item })
 
-const activity_bar_activities = maoka_styled.div("activity-bar_activities")
+const activity_bar_activities = maoka_styled.tags.div("activity-bar_activities")

@@ -19,5 +19,5 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export * as user_service from "./src/b-service-user.impl"
-export * as UserService from "./src/b-service-user.types"
+export * from "./src/b-service-user.impl"
+export * from "./src/b-service-user.types"

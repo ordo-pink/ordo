@@ -3,14 +3,14 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import * as MAOKA_STYLED from "./maoka-styled.constants.ts"
-import type * as Maoka from "../maoka.types.ts"
+import type * as Maoka from "../maoka.types"
+import type * as STYLED from "./maoka-styled.constants"
 
-export type Tag = (typeof MAOKA_STYLED.HTML_TAGS)[number]
+export type Tag = (typeof STYLED.HTML_TAGS)[number]
 
-export type CreateStyledComponent = <$Args extends Maoka.BaseArgs | void = void>(
+export type Create = <$Args extends Maoka.BaseArgs | void = void>(
 	classes?: string,
 	f?: (args: Maoka.Args<$Args>) => void,
 ) => (args: $Args | Maoka.Kindergarten) => Maoka.Component
 
-export type Instance = Record<Tag, CreateStyledComponent>
+export type Instance = Record<Tag, Create>

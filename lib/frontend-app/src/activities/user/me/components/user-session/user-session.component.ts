@@ -29,9 +29,9 @@ import { user_card, user_card_body, user_card_title } from "../user-card/user-ca
 
 import "./user-session.styles.css"
 
-const session_device_info = maoka_styled.div("device-info")
-const session_status = maoka_styled.div("status")
-const session_display = maoka.create<{ session: Core.Session.Instance }>("div", ({ session, use }) => {
+const session_device_info = maoka_styled.tags.div("device-info")
+const session_status = maoka_styled.tags.div("status")
+const session_display = maoka.create_component<{ session: Core.Session.Instance }>("div", ({ session, use }) => {
 	const state = use(client_maoka.context.consume)
 
 	use(client_maoka.jabs.classes.set("session"))
@@ -58,7 +58,7 @@ const session_display = maoka.create<{ session: Core.Session.Instance }>("div", 
 	]
 })
 
-export const sessions_card = maoka.create<{ sessions: Core.Session.Instance[] }>("div", ({ sessions, use }) => {
+export const sessions_card = maoka.create_component<{ sessions: Core.Session.Instance[] }>("div", ({ sessions, use }) => {
 	const t_title = use(client_maoka.jabs.translate$("user_workspace_current_sessions_title"))
 
 	return () =>

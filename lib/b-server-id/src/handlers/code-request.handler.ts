@@ -41,12 +41,12 @@ export const request_code: Lib.Handler = ({ env, request }) =>
 const get_body_email = (body: any) =>
 	oath
 		.if(body && core.fns.is_array(body) && body[0])
-		.pipe(oath.ops.bimap(() => body[0], core.rrr.einval(CORE.RRR.REASON.EMAIL_MISSING)))
+		.pipe(oath.ops.bimap(() => body[0], core.rrr.einval(CORE.RRR.RRR_REASON.EMAIL_MISSING)))
 		.pipe(
 			oath.ops.chain(email =>
 				oath
 					.if(core.user.email_guard(email))
-					.pipe(oath.ops.rmap(() => core.rrr.einval(CORE.RRR.REASON.EMAIL_INVALID, email)))
+					.pipe(oath.ops.rmap(() => core.rrr.einval(CORE.RRR.RRR_REASON.EMAIL_INVALID, email)))
 					.pipe(oath.ops.map(() => email as Core.User.Email)),
 			),
 		)

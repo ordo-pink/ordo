@@ -5,3 +5,5 @@
 
 export * from "./src/rickroll.impl"
 export * from "./src/rickroll.types"
+
+export * as default from "./src/rickroll.impl"

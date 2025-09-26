@@ -40,7 +40,7 @@ export const MetadataManager = {
 			.get(user?.get_uid() ?? null, METADATA_CONTENT_FSID)
 			.pipe(oath.ops.and(oath.from_nullable))
 			.pipe(oath.ops.and(content => new TextDecoder().decode(content as ArrayBuffer)))
-			.pipe(oath.ops.and(content => oath.try(() => JSON.parse(content) as Ordo.Metadata.DTO[])))
+			.pipe(oath.ops.and(content => oath.try_catch(() => JSON.parse(content) as Ordo.Metadata.DTO[])))
 			.pipe(oath.ops.fix(() => [] as Ordo.Metadata.DTO[]))
 			.pipe(oath.ops.and(dtos => dtos.map(Metadata.FromDTO)))
 			.pipe(oath.ops.and(metadata_repository.put))
@@ -57,7 +57,7 @@ export const MetadataManager = {
 				.get(user?.get_uid() ?? null, METADATA_CONTENT_FSID)
 				.pipe(oath.ops.and(stream => new Response(stream as ArrayBuffer)))
 				.pipe(oath.ops.and(res => res.json()))
-				.pipe(oath.ops.and(items => oath.if(is_array(items), { t: () => items })))
+				.pipe(oath.ops.and(items => oath.if_else(is_array(items), { t: () => items })))
 				.pipe(oath.ops.and(items => items.map(Metadata.FromDTO)))
 				.pipe(oath.ops.and(json => metadata_repository.put(json)))
 				.cata(oath.catas.unwrap())
@@ -112,7 +112,7 @@ export const MetadataManager = {
 						)
 						.pipe(
 							oath.ops.and(dtos =>
-								oath.try(
+								oath.try_catch(
 									() => JSON.stringify(dtos),
 									e => rrr.codes.eio("Failed to get content", e),
 								),

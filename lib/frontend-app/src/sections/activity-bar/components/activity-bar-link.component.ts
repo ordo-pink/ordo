@@ -21,12 +21,12 @@
 
 import type { ClientSDK } from "@ordo-pink/sdk-client"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
-import { maoka } from "@ordo-pink/oss-maoka"
+import { create_component } from "@ordo-pink/oss-maoka"
 
 import { activity_bar_icon } from "./activity-bar-icon.component"
 
 type Args = { item: ClientSDK.Activity.Instance; is_current: boolean }
-export const activity_bar_link = maoka.create<Args>("a", ({ is_current, item, use }) => {
+export const activity_bar_link = create_component.create<Args>("a", ({ is_current, item, use }) => {
 	const { hunter } = use(client_maoka.context.consume)
 
 	const url = item.start_route ?? item.routes[0]

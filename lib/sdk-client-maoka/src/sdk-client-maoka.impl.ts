@@ -5,7 +5,8 @@
 
 import { maoka } from "@ordo-pink/oss-maoka"
 
-export * from "./components/button.component"
+export * as components from "./components"
+export * as jabs from "./jabs"
 
 export const context: OrdoClientMaoka.Context = maoka.context.create()
 

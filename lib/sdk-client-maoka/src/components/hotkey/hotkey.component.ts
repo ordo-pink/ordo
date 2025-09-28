@@ -7,14 +7,13 @@ import { maoka } from "@ordo-pink/oss-maoka"
 import { sweech } from "@ordo-pink/oss-sweech"
 import { title_case } from "@ordo-pink/_tau"
 
-import type * as ClientMaoka from "../sdk-client-maoka.types"
-import { add_class, set_class } from "../jabs/class.jab"
-import { is_darwin } from "../jabs/is-darwin.jab"
-import { listen_global_event } from "../jabs/listen.jab"
+import { add_class, set_class } from "../../jabs/class.jab"
+import { is_darwin } from "../../jabs/is-darwin.jab"
+import { listen_global_event } from "../../jabs/listen.jab"
 
 import "./hotkey.styles.css"
 
-export const actionable_hotkey = maoka.create_component<ClientMaoka.Components.HotkeyArgs>(
+export const actionable_hotkey = maoka.create_component<OrdoClientMaoka.Components.HotkeyArgs>(
 	"div",
 	({ decoration_only, hotkey, node, prevent_in_contenteditable, prevent_in_inputs, show_in_mobile, use }) => {
 		const darwin = use(is_darwin)
@@ -81,3 +80,15 @@ const hotkey_button = maoka.create_component<{ key: string }>("kbd", ({ use, key
 			.case("arrowdown", () => "↓")
 			.default(() => title_case(key))
 })
+
+declare global {
+	namespace OrdoClientMaoka.Components {
+		export type HotkeyArgs = {
+			decoration_only?: boolean
+			hotkey: string
+			prevent_in_contenteditable?: boolean
+			prevent_in_inputs?: boolean
+			show_in_mobile?: boolean
+		}
+	}
+}

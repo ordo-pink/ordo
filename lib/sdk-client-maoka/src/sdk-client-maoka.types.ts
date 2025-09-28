@@ -10,34 +10,6 @@ import "@ordo-pink/sdk-client"
 declare global {
 	namespace OrdoClientMaoka {
 		export type Context = Maoka.Context.Instance<OrdoClient.F.State>
+		export type NoSpaceString<$Str extends string> = $Str extends `${string} ${string}` ? never : $Str
 	}
 }
-
-export namespace Jabs {
-	export type TranslateFn = (default_value?: string) => string
-	export type Translate$ = (key?: OrdoClient.Translations.Key) => Maoka.Jab<Jabs.TranslateFn>
-
-	export type TFn = (key: OrdoClient.Translations.Key, default_value?: string) => string
-	export type T$ = Maoka.Jab<Jabs.TFn>
-}
-
-export namespace Components {
-	export type ButtonArgs = {
-		aria_label?: string
-		custom_class?: string
-		disabled?: boolean
-		hotkey?: HotkeyArgs | string
-		kindergarten: Maoka.Kindergarten
-		on_click: (event: MouseEvent) => void | Promise<void>
-	}
-
-	export type HotkeyArgs = {
-		decoration_only?: boolean
-		hotkey: string
-		prevent_in_contenteditable?: boolean
-		prevent_in_inputs?: boolean
-		show_in_mobile?: boolean
-	}
-}
-
-export type NoSpaceString<$Str extends string> = $Str extends `${string} ${string}` ? never : $Str

@@ -1,0 +1,72 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ */
+
+import { type Maoka, maoka } from "@ordo-pink/oss-maoka"
+
+import { actionable_hotkey } from "../hotkey/hotkey.component"
+import { listen } from "../../jabs/listen.jab"
+import { set_attribute } from "../../jabs/attribute.jab"
+import { set_class } from "../../jabs/class.jab"
+
+import "./button.styles.css"
+
+export const success: OrdoClientMaoka.Components.Button.Component = params =>
+	button({ ...params, custom_class: add_button_type_class("success", params.custom_class) })
+
+export const neutral: OrdoClientMaoka.Components.Button.Component = params =>
+	button({ ...params, custom_class: add_button_type_class("neutral", params.custom_class) })
+
+export const primary: OrdoClientMaoka.Components.Button.Component = params =>
+	button({ ...params, custom_class: add_button_type_class("primary", params.custom_class) })
+
+export const danger: OrdoClientMaoka.Components.Button.Component = params =>
+	button({ ...params, custom_class: add_button_type_class("danger", params.custom_class) })
+
+// --- Internal ---
+
+const text_container = maoka.styled.div()
+
+export const button: OrdoClientMaoka.Components.Button.Component = maoka.create_component(
+	"button",
+	({ kindergarten, on_click, aria_label = "", custom_class = "", hotkey: hotkey_args, use, node, disabled }) => {
+		use(set_class("button", custom_class))
+		use(set_attribute("aria-label", aria_label))
+		if (disabled) use(set_attribute("disabled"))
+
+		const handle_click = (event: MouseEvent) => {
+			event.preventDefault()
+			if (maoka.dom.node_guard(node)) node.value.focus()
+			return on_click(event)
+		}
+
+		use(listen("onclick", handle_click))
+
+		return () => [
+			text_container(() => kindergarten()),
+			hotkey_args && actionable_hotkey(typeof hotkey_args === "string" ? { hotkey: hotkey_args } : hotkey_args),
+		]
+	},
+)
+
+const add_button_type_class = (type: string, custom_class?: string): string => {
+	if (!custom_class) return type
+
+	return `${type} ${custom_class}`
+}
+
+declare global {
+	namespace OrdoClientMaoka.Components.Button {
+		export type Args = {
+			aria_label?: string
+			custom_class?: string
+			disabled?: boolean
+			hotkey?: HotkeyArgs | string
+			kindergarten: Maoka.Kindergarten
+			on_click: (event: MouseEvent) => void | Promise<void>
+		}
+
+		type Component = (args: Args) => Maoka.Component
+	}
+}

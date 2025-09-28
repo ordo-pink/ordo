@@ -1,6 +1,5 @@
 import { Maoka, maoka } from "@ordo-pink/oss-maoka"
 
-import type { NoSpaceString } from "../sdk-client-maoka.types"
 import { set_attribute } from "./attribute.jab"
 
 export const set_class: OrdoClientMaoka.Jabs.SetClass =
@@ -27,7 +26,7 @@ declare global {
 	namespace OrdoClientMaoka.Jabs {
 		export type SetClass = (...classes: string[]) => Maoka.Jab
 		export type AddClass = (...classes: string[]) => Maoka.Jab
-		export type RemoveClass = <$Class extends string>(...classes: NoSpaceString<$Class>[]) => Maoka.Jab
+		export type RemoveClass = <$Class extends string>(...classes: OrdoClientMaoka.NoSpaceString<$Class>[]) => Maoka.Jab
 		export type ReplaceClass = <$Prev extends string, $Next extends string>(
 			prev: NoSpaceString<$Prev>,
 			next: NoSpaceString<$Next>,

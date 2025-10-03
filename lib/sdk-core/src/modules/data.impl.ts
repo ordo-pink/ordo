@@ -66,7 +66,8 @@ declare global {
 		type Fields = Record<string, unknown>
 		type Permissions = [user: Ordo.Permission.Instance, group: Ordo.Permission.Instance, other: Ordo.Permission.Instance]
 		type Location = LOCATION
-		type Size = number
+		type Size = number & {}
+		type Content = ReadableStream & {}
 
 		type Instance = [
 			id: Id,

@@ -77,8 +77,8 @@ export const workspace = create.create("div", ({ use, node }) => {
 	use(create.dom.jabs.onmount(handle_onmount))
 
 	const handle_join_click = () => void hunter.shoot("user.show_request_code_modal")
-	const handle_more_click = () => console.log("HERE")
-	const handle_try_click = () => console.log("THERE")
+	const handle_more_click = () => ordo.logger.info("HERE")
+	const handle_try_click = () => ordo.logger.info("THERE")
 
 	return () => {
 		return hero_section(() => [

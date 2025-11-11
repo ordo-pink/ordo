@@ -97,7 +97,7 @@ export default function Board({ content, metadata }: Ordo.FileAssociation.Render
 
 			commands
 				.naga("cmd.metadata.create", { name: random_name, parent })
-				.pipe(oath.ops.tap(console.log))
+				.pipe(oath.ops.tap(ordo.logger.info))
 				.pipe(
 					oath.ops.chain(() =>
 						metadata_query.get_by_name(random_name, parent, { show_hidden: true }).cata({ Ok: oath.resolve, Err: oath.reject }),

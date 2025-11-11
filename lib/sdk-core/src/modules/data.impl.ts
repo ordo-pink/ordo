@@ -3,48 +3,46 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import * as uuid from "./uuid.impl"
-import * as validations from "./validations.impl"
+import { impl as uuid } from "./uuid.impl"
+import { impl as validations } from "./validations.impl"
 
-// --- Constants ---
+export namespace CONSTANTS {
+	export enum LABEL_COLOR {
+		DEFAULT,
+		AMBER,
+		BLUE,
+		CYAN,
+		EMERALD,
+		FUSCHSIA,
+		GRAY,
+		GREEN,
+		INDIGO,
+		LIME,
+		ORANGE,
+		PINK,
+		PURPLE,
+		RED,
+		ROSE,
+		SKY,
+		TEAL,
+		VIOLET,
+		YELLOW,
+		length,
+	}
 
-export enum LABEL_COLOR {
-	DEFAULT,
-	AMBER,
-	BLUE,
-	CYAN,
-	EMERALD,
-	FUSCHSIA,
-	GRAY,
-	GREEN,
-	INDIGO,
-	LIME,
-	ORANGE,
-	PINK,
-	PURPLE,
-	RED,
-	ROSE,
-	SKY,
-	TEAL,
-	VIOLET,
-	YELLOW,
-	length,
+	export enum LOCATION {
+		LOCAL_AND_REMOTE,
+		LOCAL_ONLY,
+		REMOTE_ONLY,
+	}
 }
 
-export enum LOCATION {
-	LOCAL_AND_REMOTE,
-	LOCAL_ONLY,
-	REMOTE_ONLY,
+export namespace impl {
+	export const name_guard: Ordo.Data.NameGuard = (x): x is Ordo.Data.Name => validations.is_string(x)
+	export const parent_guard: Ordo.Data.ParentGuard = (x): x is Ordo.Data.Parent => uuid.guard(x) || validations.is_null(x)
+
+	export const create_label: Ordo.Data.CreateLabel = (t, c = CONSTANTS.LABEL_COLOR.DEFAULT) => [t, c]
 }
-
-// --- Impl ---
-
-export const name_guard: Ordo.Data.NameGuard = (x): x is Ordo.Data.Name => validations.is_string(x)
-export const parent_guard: Ordo.Data.ParentGuard = (x): x is Ordo.Data.Parent => uuid.guard(x) || validations.is_null(x)
-
-export const create_label: Ordo.Data.CreateLabel = (t, c = LABEL_COLOR.DEFAULT) => [t, c]
-
-// --- Types ---
 
 declare global {
 	namespace Ordo.Data {
@@ -58,14 +56,19 @@ declare global {
 		type CreatedBy = Uuid.Instance
 		type UpdatedBy = Uuid.Instance
 		type LabelText = string
-		type LabelColor = LABEL_COLOR
+		type LabelColor = CONSTANTS.LABEL_COLOR
 		type Label = [LabelText, LabelColor]
 		type Labels = Label[]
 		type Link = Id
 		type Links = Link[]
 		type Fields = Record<string, unknown>
-		type Permissions = [user: Ordo.Permission.Instance, group: Ordo.Permission.Instance, other: Ordo.Permission.Instance]
-		type Location = LOCATION
+		type Permissions = [
+			owner: Ordo.Permission.Instance,
+			group: Ordo.Permission.Instance,
+			f: Ordo.Permission.Instance,
+			other: Ordo.Permission.Instance,
+		]
+		type Location = CONSTANTS.LOCATION
 		type Size = number & {}
 		type Content = ReadableStream & {}
 
@@ -139,5 +142,29 @@ declare global {
 		type SetParent = Ordo.Fns.Curried<(value: Parent, data: Instance) => Instance>
 		type SetPermissions = Ordo.Fns.Curried<(value: Permissions, data: Instance) => Instance>
 		type SetSize = Ordo.Fns.Curried<(value: Size, data: Instance) => Instance>
+
+		type ReadQuery = Partial<{
+			[_Key in "name" | "parent" | "id" | "label" | "link" | "limit"]: _Key extends "name"
+				? Ordo.Data.Name
+				: _Key extends "parent" | "id"
+					? Ordo.Data.Id
+					: _Key extends "label"
+						? string[]
+						: _Key extends "link"
+							? Ordo.Data.Id[]
+							: _Key extends "limit"
+								? number
+								: never
+		}>
+
+		type Repository = {
+			create: (user: Ordo.Data.Instance) => Oath.Instance<Ordo.Data.Instance, Ordo.Rrr.Instance<"EIO" | "EEXIST">>
+			read: (query?: ReadQuery) => Oath.Instance<Ordo.Data.Instance[], Ordo.Rrr.Instance<"EIO">>
+			update: Ordo.Fns.Curried<
+				(id: Ordo.Data.Id, user: Ordo.Data.Instance) => Oath.Instance<Ordo.Data.Instance, Ordo.Rrr.Instance<"EIO" | "ENOENT">>
+			>
+			delete: (id: Ordo.Data.Id) => Oath.Instance<Ordo.Data.Instance, Ordo.Rrr.Instance<"EIO" | "ENOENT">>
+			kill: () => void
+		}
 	}
 }

@@ -1,19 +1,26 @@
-export const FUZZY_CHECK_RATIO = 0.7
+/*
+ * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ */
 
-export enum ITEM_TYPE {
-	PAGE_OPENER,
-	MODAL_OPENER,
-	FILE_CREATOR,
-	AUTOMATION_ACTION,
-	COMMON_ACTION,
-	INFORMATION,
-	DESTRUCTIVE_ACTION,
-	length,
-}
+export namespace CONSTANTS {
+	export const FUZZY_CHECK_RATIO = 0.7
 
-export enum SECTION {
-	ITEMS,
-	PINNED_ITEMS,
+	export enum ITEM_TYPE {
+		PAGE_OPENER,
+		MODAL_OPENER,
+		FILE_CREATOR,
+		AUTOMATION_ACTION,
+		COMMON_ACTION,
+		INFORMATION,
+		DESTRUCTIVE_ACTION,
+		length,
+	}
+
+	export enum SECTION {
+		ITEMS,
+		PINNED_ITEMS,
+	}
 }
 
 declare global {
@@ -47,7 +54,7 @@ declare global {
 
 			description?: OrdoClient.Translations.Key
 
-			type?: ITEM_TYPE
+			type?: CONSTANTS.ITEM_TYPE
 		}
 
 		export type Instance<$Value = any> = {

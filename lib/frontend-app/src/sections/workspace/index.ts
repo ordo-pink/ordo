@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { type Maoka, create_component } from "@ordo-pink/oss-maoka"
+import { type Maoka, create } from "@ordo-pink/oss-maoka"
 import { COMMAND_PALETTE } from "@ordo-pink/sdk-client"
 import { LOCALE } from "@ordo-pink/oss-i18n"
 import { bs_layout_sidebar_inset_reverse } from "@ordo-pink/frontend-icons"
@@ -54,7 +54,7 @@ export const create_sidebar_jab: Maoka.Jab<{
 			type: COMMAND_PALETTE.ITEM_TYPE.COMMON_ACTION,
 			readable_name: "sidebar_commands_toggle_title",
 			description: "sidebar_commands_toggle_description",
-			render_icon: span => create_component.dom.render(span, bs_layout_sidebar_inset_reverse(), () => crypto.randomUUID()),
+			render_icon: span => create.dom.render(span, bs_layout_sidebar_inset_reverse(), () => crypto.randomUUID()),
 		})
 
 		hunter.shoot("i18n.add_translations", {
@@ -97,7 +97,7 @@ export const create_sidebar_jab: Maoka.Jab<{
 		}
 	}
 
-	use(create_component.dom.jabs.onmount(handle_mount))
+	use(create.dom.jabs.onmount(handle_mount))
 
 	return { sidebar, sidebar_toggle, workspace }
 }

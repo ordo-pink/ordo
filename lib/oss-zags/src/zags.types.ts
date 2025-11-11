@@ -259,26 +259,45 @@ export type Select<$State extends BaseState> = <$DotPath extends RecordToDotPath
  */
 export type Unwrap<$State extends BaseState> = () => $State
 
+export type Concat<$State extends BaseState> = <_NewState extends BaseState>(
+	o: Instance<_NewState> | ReadableInstance<_NewState>,
+) => Instance<$State & _NewState>
+
+export type Kill = () => void
+
+export type OnKill = (handler: KillHandler) => void
+
+export type KillHandler = () => void
+
 /**
  * Zags instance.
  */
 export type Instance<$State extends BaseState> = {
-	/** @see {@link Cheat} */
 	cheat: Cheat<$State>
-	/** @see {@link Divorce} */
 	divorce: Divorce<$State>
-	/** @see {@link Marry} */
 	marry: Marry<$State>
-	/** @see {@link Select} */
 	select: Select<$State>
-	/** @see {@link Replace} */
+	concat: Concat<$State>
 	replace: Replace<$State>
-	/** @see {@link Unwrap} */
 	unwrap: Unwrap<$State>
-	/** @see {@link Update} */
 	update: Update<$State>
-	/** @see {@link Each} */
 	each: Each<$State>
+	kill: Kill
+	on_kill: OnKill
+	to_readable: () => ReadableInstance<$State>
+}
+
+/**
+ * Zags instance.
+ */
+export type ReadableInstance<$State extends BaseState> = {
+	cheat: Cheat<$State>
+	divorce: Divorce<$State>
+	marry: Marry<$State>
+	select: Select<$State>
+	unwrap: Unwrap<$State>
+	on_kill: OnKill
+	kill: Kill
 }
 
 /**

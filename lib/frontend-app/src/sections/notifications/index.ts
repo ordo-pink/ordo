@@ -20,7 +20,7 @@
  */
 
 import { type ClientSDK, NOTIFICATION } from "@ordo-pink/sdk-client"
-import { type Maoka, create_component } from "@ordo-pink/oss-maoka"
+import { type Maoka, create } from "@ordo-pink/oss-maoka"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 import { core } from "@ordo-pink/sdk-core"
 
@@ -60,7 +60,7 @@ const track_prey_jab: Maoka.Jab = ({ use, node }) => {
 		}
 	}
 
-	use(create_component.dom.jabs.onmount(handle_onmount))
+	use(create.dom.jabs.onmount(handle_onmount))
 }
 
 const handle_hide: ClientSDK.GunFor<"notifications.hide"> = id =>
@@ -69,8 +69,6 @@ const handle_hide: ClientSDK.GunFor<"notifications.hide"> = id =>
 const handle_rrr_with_id_creator: (create_id: Maoka.CreateId) => ClientSDK.GunFor<"notifications.rrr"> =
 	create_id =>
 	({ type, message, debug }) => {
-		console.debug(debug)
-
 		notifications$.update("items", items =>
 			items.concat([
 				{

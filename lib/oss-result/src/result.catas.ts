@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ */
+
 import * as Result from "./result.types"
 
 export const or_nothing: Result.OrNothing = () => ({ ok: x => x, err: () => void 0 })

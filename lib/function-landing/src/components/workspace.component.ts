@@ -22,7 +22,7 @@
 import { NOTIFICATION } from "@ordo-pink/sdk-client"
 import { bs_cookie } from "@ordo-pink/frontend-icons"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
-import { create_component } from "@ordo-pink/oss-maoka"
+import { create } from "@ordo-pink/oss-maoka"
 import { maoka_styled } from "@ordo-pink/oss-maoka/styled"
 
 import hero_layer_0 from "../../static/index-hero-layer-0.png"
@@ -34,7 +34,7 @@ import "../f-landing.styles.css"
 let is_cookie_modal_shown = false
 
 // TODO Translations
-export const workspace = create_component.create("div", ({ use, node }) => {
+export const workspace = create.create("div", ({ use, node }) => {
 	const { hunter } = use(client_maoka.context.consume)
 
 	const t_bring_your_thoughts_to = "Bring your thoughts to"
@@ -64,7 +64,7 @@ export const workspace = create_component.create("div", ({ use, node }) => {
 			hunter.shoot("notifications.show", {
 				duration: 15,
 				message: "fns_landing_cookie_notification_message",
-				render_icon: element => create_component.dom.render(element, component, node.root.create_id),
+				render_icon: element => create.dom.render(element, component, node.root.create_id),
 				title: "fns_landing_cookie_notification_title",
 				type: NOTIFICATION.TYPE.WARN,
 			})
@@ -74,7 +74,7 @@ export const workspace = create_component.create("div", ({ use, node }) => {
 	}
 
 	use(client_maoka.jabs.listen_global_event("mousemove", handle_mouse_move))
-	use(create_component.dom.jabs.onmount(handle_onmount))
+	use(create.dom.jabs.onmount(handle_onmount))
 
 	const handle_join_click = () => void hunter.shoot("user.show_request_code_modal")
 	const handle_more_click = () => console.log("HERE")
@@ -128,15 +128,12 @@ export const workspace = create_component.create("div", ({ use, node }) => {
 const hero_section = maoka_styled.tags.section("hero-section")
 const hero_section_layers = maoka_styled.tags.div("hero-layers")
 
-const hero_section_image_layer = create_component.create<{ image_path: string; index: number }>(
-	"div",
-	({ image_path, index, use }) => {
-		const background_image = `url(${image_path})`
+const hero_section_image_layer = create.create<{ image_path: string; index: number }>("div", ({ image_path, index, use }) => {
+	const background_image = `url(${image_path})`
 
-		use(client_maoka.jabs.classes.set(`hero-layer hero-layer_${index}`))
-		use(client_maoka.jabs.set_style({ backgroundImage: background_image }))
-	},
-)
+	use(client_maoka.jabs.classes.set(`hero-layer hero-layer_${index}`))
+	use(client_maoka.jabs.set_style({ backgroundImage: background_image }))
+})
 const hero_card = maoka_styled.tags.div("card-container")
 const hero_card_content = maoka_styled.tags.div("card")
 const HeroCardLogoText = maoka_styled.tags.span("logo_ordo-text")

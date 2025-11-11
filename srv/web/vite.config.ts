@@ -45,7 +45,7 @@ export default defineConfig({
 	publicDir: "./static",
 
 	build: {
-		outDir: "../../var/out/my",
+		outDir: "../../var/out/web",
 		emptyOutDir: true,
 		cssMinify: true,
 		minify: true,

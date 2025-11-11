@@ -3,7 +3,9 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { type Maoka, maoka } from "@ordo-pink/oss-maoka"
+import maoka, { type Maoka } from "@ordo-pink/oss-maoka"
+import maoka_dom from "@ordo-pink/oss-maoka/dom"
+import maoka_styled from "@ordo-pink/oss-maoka-styled"
 import { sweech } from "@ordo-pink/oss-sweech"
 
 import { neutral, primary } from "../button/button.component"
@@ -17,13 +19,13 @@ export enum TYPE {
 	ACTIONS,
 }
 
-const base = maoka.create_component<OrdoClientMaoka.Components.Dialog.Args>(
+const base = maoka.create<OrdoClientMaoka.Components.Dialog.Args>(
 	"div",
 	({ actions = () => [], node, render_body, render_icon, title, type, use }) => {
 		use(set_class("dialog", get_dialog_css_class(type)))
 
 		const handle_cancel_click = () =>
-			void (maoka.dom.node_guard(node) && node.value.parentElement?.parentElement?.parentElement?.click())
+			void (maoka_dom.node_guard(node) && node.value.parentElement?.parentElement?.parentElement?.click())
 
 		return () => [
 			dialog_header_div(() => [dialog_icon_span({ render_icon }), dialog_title_h2(title)]),
@@ -63,7 +65,7 @@ const create_dialog: (
 		const hide = () => void state.hunter.shoot("modal.hide")
 		const show = () =>
 			void state.hunter.shoot("modal.show", {
-				render: div => maoka.dom.render(div, component, node.root.create_id),
+				render: div => maoka_dom.render(div, component, node.root.create_id),
 				size: ordo_client.modal.SIZE.SM,
 			})
 
@@ -75,21 +77,21 @@ export const create_dialog_info: OrdoClientMaoka.Components.Dialog.Info.Jab = (s
 export const create_dialog_actions: OrdoClientMaoka.Components.Dialog.Actions.Jab = (state, args) =>
 	create_dialog(state, actions(args))
 
-const dialog_header_div = maoka.styled.div("header")
-const dialog_title_h2 = maoka.styled.h2("title")
-const dialog_footer_div = maoka.styled.div("footer")
-const dialog_body_div = maoka.create_component<{ render_body: OrdoClientMaoka.Components.Dialog.BodyRenderer }>(
+const dialog_header_div = maoka_styled.div("header")
+const dialog_title_h2 = maoka_styled.h2("title")
+const dialog_footer_div = maoka_styled.div("footer")
+const dialog_body_div = maoka.create<{ render_body: OrdoClientMaoka.Components.Dialog.BodyRenderer }>(
 	"div",
 	({ render_body, use }) => {
 		use(set_class("body"))
-		use(maoka.dom.onmount(n => void render_body(n.value as HTMLDivElement)))
+		use(maoka_dom.onmount(n => void render_body(n.value as HTMLDivElement)))
 	},
 )
-const dialog_icon_span = maoka.create_component<{ render_icon: OrdoClientMaoka.Components.Dialog.IconRenderer }>(
+const dialog_icon_span = maoka.create<{ render_icon: OrdoClientMaoka.Components.Dialog.IconRenderer }>(
 	"span",
 	({ render_icon, use }) => {
 		use(set_class("icon"))
-		use(maoka.dom.onmount(n => void render_icon(n.value as HTMLSpanElement)))
+		use(maoka_dom.onmount(n => void render_icon(n.value as HTMLSpanElement)))
 	},
 )
 

@@ -6,15 +6,6 @@
 import type { Node } from "@xyflow/react"
 
 declare global {
-	interface t {
-		board: {
-			file_association: {
-				description: () => string
-				readable_name: () => string
-			}
-		}
-	}
-
 	// interface cmd {
 	// 	board: {
 	// 		context_menu: {

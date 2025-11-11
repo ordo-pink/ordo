@@ -19,16 +19,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { Core } from "@ordo-pink/sdk-core"
 import type { Routary } from "@ordo-pink/oss-routary"
 
 import type * as RequestIP from "./request-ip/request-ip.types"
 import type * as RequestId from "./request-id/request-id.types"
-import type * as RequestLang from "./request-lang/request-lang.types"
 import type * as ResponseTimer from "./response-timer/response-timer.types"
 
-export type ArgsEnv = Routary.Env & { logger: Core.Logger }
-export type Mut = Routary.Mut & RequestId.Mut & ResponseTimer.Mut & RequestLang.Mut & RequestIP.Mut
+export type ArgsEnv = Routary.Env & { logger: Ordo.Logger }
+export type Mut = Routary.Mut & RequestId.Mut & ResponseTimer.Mut & RequestIP.Mut
 export type Env = ArgsEnv & { fail: Fail }
 
 export type Create = <$Env extends ArgsEnv, $Mut extends Routary.Mut>(
@@ -36,7 +34,7 @@ export type Create = <$Env extends ArgsEnv, $Mut extends Routary.Mut>(
 	mut?: $Mut,
 ) => Routary.Instance<$Env & Env, $Mut & Mut>
 
-export type Fail = (rrr: Core.Rrr.Instance) => Response
+export type Fail = (rrr: Ordo.Rrr.Instance, headers?: Headers) => Response
 
 export type CreateCookieParams = {
 	http_only?: boolean

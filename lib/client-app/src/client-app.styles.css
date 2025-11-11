@@ -1,0 +1,7 @@
+#app {
+	@apply overflow-hidden;
+}
+
+main {
+	@apply flex h-svh p-2;
+}

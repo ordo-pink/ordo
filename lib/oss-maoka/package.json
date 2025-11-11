@@ -1,0 +1,13 @@
+{
+	"name": "maoka",
+	"version": "1.0.1",
+	"description": "On demand rendering of user interfaces",
+	"main": "index.js",
+	"author": {
+		"email": "sergei_orlov@ordo.pink",
+		"name": "谢尔盖 ||↓",
+		"url": "https://orlow.dev"
+	},
+	"license": "Unlicense",
+	"types": "./index.d.ts"
+}

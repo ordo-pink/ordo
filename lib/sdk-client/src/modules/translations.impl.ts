@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ */
+
 import type { I18n } from "@ordo-pink/oss-i18n"
 
 declare global {
@@ -6,7 +11,7 @@ declare global {
 			add_translations: {
 				args: {
 					locale: I18n.ISO_639_1_Locale
-					values: Partial<Record<I18n.DefinitionToTranslationKeys<OrdoClient.Translations.Keys>, string>>
+					values: Record<string, string>
 				}
 			}
 			remove_translations: { args: OrdoClient.Translations.Key[] }
@@ -15,7 +20,7 @@ declare global {
 	}
 
 	namespace OrdoClient.Translations {
-		export type Keys = Pick<t, keyof t>
+		export type Keys = Record<string, string>
 		export type Key = I18n.DefinitionToTranslationKeys<Keys>
 		export type Values = Record<I18n.DefinitionToTranslationKeys<Keys>, string>
 

@@ -33,7 +33,7 @@ import {
 
 import "./user-danger-zone.styles.css"
 
-export const danger_zone_card = maoka.create_component("div", ({ use }) => {
+export const danger_zone_card = maoka.create("div", ({ use }) => {
 	use(client_maoka.jabs.classes.set("danger-zone"))
 
 	const { hunter } = use(client_maoka.context.consume)

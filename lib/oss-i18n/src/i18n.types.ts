@@ -3,43 +3,24 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import type { Zags as LibZags } from "@ordo-pink/oss-zags"
+import type { Zags } from "@ordo-pink/oss-zags"
 
 import type { LOCALE } from "./i18n.constants"
 
 export type ISO_639_1_Locale = `${LOCALE}`
 
-export type DefinitionToTranslationKeys<
-	$Record extends Record<string, unknown>,
-	$Prefix extends string = "",
-	$Key extends keyof $Record = keyof $Record,
-> = $Key extends string
-	? $Record[$Key] extends string
-		? $Prefix extends ""
-			? $Key
-			: `${$Prefix}_${$Key}`
-		: $Record[$Key] extends Record<string, unknown>
-			? DefinitionToTranslationKeys<$Record[$Key], $Prefix extends "" ? $Key : `${$Prefix}_${$Key}`, keyof $Record[$Key]>
-			: never
-	: never
+export type Values = Record<`${ISO_639_1_Locale}_${string}`, string>
 
-export type Key<$Record extends Record<string, unknown>> = DefinitionToTranslationKeys<$Record>
+export type State = { i18n: { locale: ISO_639_1_Locale; values: Partial<Record<`${ISO_639_1_Locale}_${string}`, string>> } }
 
-export type Values<$Record extends Record<string, unknown>> = Record<`${LOCALE}_${Key<$Record>}`, string>
+export type Stream = Zags.Instance<State>
 
-export type State<$Record extends Record<string, unknown>> = { locale: ISO_639_1_Locale; values: Values<$Record> }
-
-export type Zags<$Record extends Record<string, unknown>> = LibZags.Instance<State<$Record>>
-
-export type Instance<$Record extends Record<string, unknown>> = {
-	$: Zags<State<$Record>>
-	add: (locale: ISO_639_1_Locale, values: Partial<Record<DefinitionToTranslationKeys<$Record>, string>>) => void
-	remove: (values: (keyof Partial<Record<DefinitionToTranslationKeys<$Record>, string>>)[]) => void
+export type Instance = {
+	$: Stream
+	add: (locale: ISO_639_1_Locale, values: Record<string, string>) => void
+	remove: (values: string[]) => void
 	set_locale: (locale: ISO_639_1_Locale) => void
-	translate: (key: Key<$Record>, default_value?: string) => string
+	translate: (key: string, default_value?: string) => string
 }
 
-export type CreateFn = <$Record extends Record<string, unknown>>(
-	initial_locale: ISO_639_1_Locale,
-	initial_values?: Partial<Values<$Record>>,
-) => Instance<$Record>
+export type CreateFn = (initial_locale: ISO_639_1_Locale, initial_values?: Partial<Values>) => Instance

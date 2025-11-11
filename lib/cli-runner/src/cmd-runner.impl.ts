@@ -21,7 +21,7 @@
 
 import { SpawnOptions } from "bun"
 
-import { Oath, oath } from "@ordo-pink/oss-oath"
+import { type Oath, oath } from "@ordo-pink/oss-oath"
 
 export const run_async_command = (cmd: string, options?: SpawnOptions.OptionsObject) =>
 	oath.of(Bun.spawn(cmd.trim().split(" "), { ...options, stdout: "inherit", stderr: "inherit", stdin: "inherit" }))

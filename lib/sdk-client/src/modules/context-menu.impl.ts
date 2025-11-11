@@ -1,15 +1,22 @@
-/**
- * Context menu item type. This impacts two things:
- *
- * 1. Grouping items in the context menu.
- * 2. Given type can be hidden when showing context menu.
+/*
+ * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
  */
-export enum ITEM_TYPE {
-	CREATE,
-	READ,
-	UPDATE,
-	DELETE,
-	length,
+
+export namespace CONSTANTS {
+	/**
+	 * Context menu item type. This impacts two things:
+	 *
+	 * 1. Grouping items in the context menu.
+	 * 2. Given type can be hidden when showing context menu.
+	 */
+	export enum ITEM_TYPE {
+		CREATE,
+		READ,
+		UPDATE,
+		DELETE,
+		length,
+	}
 }
 
 declare global {
@@ -26,7 +33,7 @@ declare global {
 			/**
 			 * @see ItemType
 			 */
-			type: ITEM_TYPE
+			type: CONSTANTS.ITEM_TYPE
 
 			on_select: () => void | Promise<void>
 

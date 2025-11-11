@@ -19,8 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { create_component } from "@ordo-pink/oss-maoka"
+import { create } from "@ordo-pink/oss-maoka"
 
-export const other_user_workspace = create_component.create("div", () => {
+export const other_user_workspace = create.create("div", () => {
 	return () => "HELLO OTHER USER"
 })

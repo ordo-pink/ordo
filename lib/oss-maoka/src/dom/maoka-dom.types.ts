@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import type * as Maoka from "../maoka.types"
+import type * as Maoka from "../maoka.types.ts"
 
-export * from "./jabs/maoka-jabs.types"
+export * from "./jabs/maoka-jabs.types.ts"
 
-export * as Jabs from "./jabs/maoka-jabs.types"
+export * as Jabs from "./jabs/maoka-jabs.types.ts"
 
 /** Maoka DOM renderer. */
 export type DomRender = (

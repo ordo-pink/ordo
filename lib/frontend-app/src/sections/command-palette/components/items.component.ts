@@ -22,13 +22,13 @@
 import { COMMAND_PALETTE } from "@ordo-pink/sdk-client"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 import { core } from "@ordo-pink/sdk-core"
-import { create_component } from "@ordo-pink/oss-maoka"
+import { create } from "@ordo-pink/oss-maoka"
 import { maoka_styled } from "@ordo-pink/oss-maoka/styled"
 
 import { command_palette$ } from "../command-palette.state"
 import { command_palette_item } from "./item.component"
 
-export const command_palette_items = create_component.create("div", ({ use }) => {
+export const command_palette_items = create.create("div", ({ use }) => {
 	const get_state = use(client_maoka.jabs.zags.marry$(command_palette$))
 
 	use(client_maoka.jabs.classes.set("command-palette_items_multiple-wrapper"))

@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { type Maoka, create_component } from "@ordo-pink/oss-maoka"
+import { type Maoka, create } from "@ordo-pink/oss-maoka"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
 
 import { close_modal } from "./components/close-modal.component"
@@ -49,6 +49,6 @@ namespace internal {
 			}
 		}
 
-		use(create_component.dom.jabs.onmount(handle_mount))
+		use(create.dom.jabs.onmount(handle_mount))
 	}
 }

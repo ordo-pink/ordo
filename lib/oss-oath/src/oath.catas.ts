@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ */
+
 import type * as Oath from "./oath.types"
 
 export const if_ok: Oath.IfOk = resolve => ({ reject: () => void 0, resolve })

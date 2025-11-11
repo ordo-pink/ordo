@@ -31,33 +31,6 @@ import { type TColumnName } from "./src/database.types"
 import db_styles from "./src/database.css?inline"
 
 declare global {
-	interface t {
-		database: {
-			columns: () => string
-			file_association: {
-				readable_name: () => string
-				description: () => string
-			}
-			column_names: {
-				name: () => string
-				labels: () => string
-				created_at: () => string
-				updated_at: () => string
-				size: () => string
-				outgoing_links: () => string
-				incoming_links: () => string
-				parent: () => string
-				created_by: () => string
-			}
-			sorting_modal: {
-				context_menu: () => string
-			}
-			columns_modal: {
-				context_menu: () => string
-			}
-		}
-	}
-
 	// interface cmd {
 	// 	database: {
 	// 		show_sorting_modal: () => void

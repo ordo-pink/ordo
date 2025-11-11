@@ -28,7 +28,7 @@ import { user_card, user_card_body, user_card_title } from "../user-card/user-ca
 
 import "./user-credentials.styles.css"
 
-export const credentials_card = maoka.create_component<{ ref: Core.User.Ref; name: string; email: Core.User.Email }>(
+export const credentials_card = maoka.create<{ ref: Core.User.Ref; name: string; email: Core.User.Email }>(
 	"div",
 	({ ref, email, name, use }) => {
 		const state = use(client_maoka.context.consume)

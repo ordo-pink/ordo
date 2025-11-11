@@ -1,0 +1,7 @@
+.loader {
+	@apply flex h-full w-full items-center justify-center;
+}
+
+.loader_icon {
+	@apply animate-pulse text-6xl text-pink-500;
+}

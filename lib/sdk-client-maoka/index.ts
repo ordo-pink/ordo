@@ -12,4 +12,4 @@ declare global {
 	var ordo_client_maoka: typeof client_maoka
 }
 
-globalThis.ordo_client_maoka = client_maoka
+if (!globalThis.ordo_client_maoka) globalThis.ordo_client_maoka = client_maoka

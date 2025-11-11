@@ -48,36 +48,6 @@ import { create_selection } from "./src/rte.utils"
 import rte_styles from "./src/rte.css?inline"
 
 declare global {
-	interface t {
-		rte: {
-			file_association: {
-				readable_name: () => string
-				description: () => string
-			}
-			commands: {
-				turn_to_h1: () => string
-				turn_to_h2: () => string
-				turn_to_h3: () => string
-				turn_to_h4: () => string
-				turn_to_h5: () => string
-				turn_to_h6: () => string
-				turn_to_paragraph: () => string
-				turn_to_blockquote: () => string
-				turn_to_incoming_links: () => string
-				turn_to_callout: () => string
-				turn_to_embed: () => string
-			}
-			callout: {
-				rrr: () => string
-				question: () => string
-				info: () => string
-				success: () => string
-				default: () => string
-				warn: () => string
-			}
-		}
-	}
-
 	// interface cmd {
 	// rte: {
 	// 	add_block: () => { fsid: Ordo.Metadata.FSID; block: TRTENode; block_index: number; preserve_caret_position?: boolean }

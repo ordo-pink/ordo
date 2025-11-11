@@ -1,11 +1,18 @@
-export enum TYPE {
-	DEFAULT,
-	SUCCESS,
-	INFO,
-	WARN,
-	QUESTION,
-	RRR,
-	length,
+/*
+ * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ */
+
+export namespace CONSTANTS {
+	export enum TYPE {
+		DEFAULT,
+		SUCCESS,
+		INFO,
+		WARN,
+		QUESTION,
+		RRR,
+		length,
+	}
 }
 
 declare global {
@@ -22,7 +29,7 @@ declare global {
 
 		export type Instance = {
 			id: Ordo.Uuid.Instance
-			type?: TYPE
+			type?: CONSTANTS.TYPE
 			title?: OrdoClient.Translations.Key
 			message: OrdoClient.Translations.Key
 			render_icon?: (div: HTMLDivElement) => void | Promise<void>

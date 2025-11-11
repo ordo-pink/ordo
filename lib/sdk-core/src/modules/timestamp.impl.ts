@@ -3,19 +3,17 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import * as fns from "./fns.impl"
-import * as validations from "./validations.impl"
+import { impl as fns } from "./fns.impl"
+import { impl as validations } from "./validations.impl"
 
-// --- Impl ---
+export namespace impl {
+	export const create: Ordo.Timestamp.Create = Date.now
+	export const guard: Ordo.Timestamp.Guard = validations.is_non_negative_integer
 
-export const create: Ordo.Timestamp.Create = Date.now
-export const guard: Ordo.Timestamp.Guard = validations.is_non_negative_integer
-
-export const is_after: Ordo.Timestamp.IsAfter = fns.gte
-export const is_before: Ordo.Timestamp.IsBefore = fns.lt
-export const is_within: Ordo.Timestamp.IsWithin = (s, e, v) => is_after(s, v) && is_before(e, v)
-
-// --- Types ---
+	export const is_after: Ordo.Timestamp.IsAfter = fns.gte
+	export const is_before: Ordo.Timestamp.IsBefore = fns.lt
+	export const is_within: Ordo.Timestamp.IsWithin = (s, e, v) => is_after(s, v) && is_before(e, v)
+}
 
 declare global {
 	namespace Ordo.Timestamp {

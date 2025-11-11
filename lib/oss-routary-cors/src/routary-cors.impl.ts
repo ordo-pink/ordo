@@ -5,9 +5,9 @@
 
 import { type Routary } from "@ordo-pink/oss-routary"
 
-import type * as Lib from "./routary-cors.types"
+import type * as RoutaryCors from "./routary-cors.types"
 
-export const create: Lib.Create =
+export const create: RoutaryCors.Create =
 	(allowed_origins, allowed_headers = [], allow_credentials = false, max_age = 0, status = 204) =>
 	({ structure }) => {
 		const options = {} as Record<string, string[]>
@@ -46,7 +46,9 @@ export const create: Lib.Create =
 				if (typeof allowed_origins === "string") allowed_origins = [allowed_origins]
 				const origin = params.request.headers.get("origin")
 
-				if (!origin || (!allowed_origins.includes(origin) && !allowed_origins.includes("*"))) return
+				if (!origin) throw ordo.rrr.einval("Missing 'origin' header")
+				if (!allowed_origins.includes(origin) && !allowed_origins.includes("*"))
+					throw ordo.rrr.eperm("Provided 'origin' is not allowed")
 
 				params.response.headers.set("Access-Control-Allow-Origin", origin)
 

@@ -19,9 +19,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { die, run_async_command } from "@ordo-pink/cli-runner"
-import { oath } from "@ordo-pink/oss-oath"
+// import { die, run_async_command } from "@ordo-pink/cli-runner"
+// import { oath } from "@ordo-pink/oss-oath"
 
-void run_async_command("opt/bun run --watch srv/id/index.ts", { env: { ...process.env, FORCE_COLOR: "1" } }).cata(
-	oath.catas.or_else(die()),
-)
+// void run_async_command("opt/bun run --watch srv/id/index.ts", { env: { ...process.env, FORCE_COLOR: "1" } }).cata(
+// 	oath.catas.or_else(die()),
+// )

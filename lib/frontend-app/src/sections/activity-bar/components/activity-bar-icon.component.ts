@@ -21,15 +21,15 @@
 
 import type { ClientSDK } from "@ordo-pink/sdk-client"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
-import { create_component } from "@ordo-pink/oss-maoka"
+import { create } from "@ordo-pink/oss-maoka"
 
 type Args = Required<Pick<ClientSDK.Activity.Instance, "render_icon" | "readable_name">> & { is_current: boolean }
 
-export const activity_bar_icon = create_component.create<Args>("span", ({ use, is_current, render_icon, readable_name }) => {
+export const activity_bar_icon = create.create<Args>("span", ({ use, is_current, render_icon, readable_name }) => {
 	const t_readable_name = use(client_maoka.jabs.translate$(readable_name))
 
 	use(client_maoka.jabs.classes.set("activity-bar_icon"))
-	use(create_component.dom.jabs.hit_if_dom(n => void render_icon(n.value)))
+	use(create.dom.jabs.hit_if_dom(n => void render_icon(n.value)))
 
 	return () => {
 		use(client_maoka.jabs.set_attribute("title", t_readable_name()))

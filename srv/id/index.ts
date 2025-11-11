@@ -19,11 +19,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { CORE, type Core, core } from "@ordo-pink/sdk-core"
-import { type Server, server } from "@ordo-pink/sdk-server"
 import type { Routary } from "@ordo-pink/oss-routary"
 import type { ServerRoutary } from "@ordo-pink/sdk-server-routary"
-import { codegen_strategy_bun } from "@ordo-pink/b-strategy-codegen-bun"
+import { codegen_strategy_bun } from "@ordo-pink/b-strategy-hashing-bun"
 import { data_repository_fs } from "@ordo-pink/b-repository-data-fs"
 import { oath } from "@ordo-pink/oss-oath"
 import { result } from "@ordo-pink/oss-result"
@@ -39,23 +37,27 @@ const main = async () => {
 	const pub = await public_key0.cata(oath.catas.to_promise())
 
 	// TODO Real email strategy
-	const email_strategy: Server.Email.Strategy = { send: (_, __, content) => Promise.resolve(logger.debug(content)) }
+	const email_strategy: Ordo.Server.Email.Strategy = { send: (_, __, content) => Promise.resolve(logger.debug(content)) }
+	const auth_code_repository = null
+	const session_repository = null
 	const data_repository = data_repository_fs.create(data_root)
 	const user_repository = user_repository_data.create(data_repository, cache_user_id, cache_file_id, user_file_id)
-	const codegen_strategy = codegen_strategy_bun.create(codegen_algorithm)
-	const wjwt = wjwt_lib.create(wjwt_alg, priv, pub, allowed_origins, "http://localhost:3001", session_lifetime_minutes)
+	const auth_code_generation_strategy = codegen_strategy_bun.create(codegen_algorithm)
+	const wjwt = wjwt_lib.create(wjwt_alg, priv, pub, default_allowed_origins, "http://localhost:3001", session_lifetime_minutes)
 
 	const fetch = server_id
-		.create(
-			logger,
-			user_repository,
-			code_lifetime_seconds,
-			session_lifetime_minutes,
+		.create({
+			auth_code_generation_strategy,
+			auth_code_lifetime_seconds,
+			auth_code_repository,
+			default_allowed_origins,
 			email_strategy,
-			allowed_origins,
-			codegen_strategy,
+			logger,
+			session_repository,
+			session_lifetime_minutes,
+			user_repository,
 			wjwt,
-		)
+		})
 		.or_else(() => rickroll, catcher)
 
 	const bun_server = Bun.serve({ fetch, port })
@@ -65,15 +67,15 @@ const main = async () => {
 
 // --- Internal ---
 
-const logger: Core.Logger = {
-	alert: (...message) => core.logger.stout.alert("[ID]", ...message),
-	crit: (...message) => core.logger.stout.crit("[ID]", ...message),
-	debug: (...message) => core.logger.stout.debug("[ID]", ...message),
-	error: (...message) => core.logger.stout.error("[ID]", ...message),
-	info: (...message) => core.logger.stout.info("[ID]", ...message),
-	notice: (...message) => core.logger.stout.notice("[ID]", ...message),
-	panic: (...message) => core.logger.stout.panic("[ID]", ...message),
-	warn: (...message) => core.logger.stout.warn("[ID]", ...message),
+const logger: Ordo.Logger = {
+	alert: (...message) => ordo.logger.alert("[ID]", ...message),
+	crit: (...message) => ordo.logger.crit("[ID]", ...message),
+	debug: (...message) => ordo.logger.debug("[ID]", ...message),
+	error: (...message) => ordo.logger.error("[ID]", ...message),
+	info: (...message) => ordo.logger.info("[ID]", ...message),
+	notice: (...message) => ordo.logger.notice("[ID]", ...message),
+	panic: (...message) => ordo.logger.panic("[ID]", ...message),
+	warn: (...message) => ordo.logger.warn("[ID]", ...message),
 }
 
 const get_alg = () => oath.from_nullable(Bun.env.ORDO_ID_SESSION_TOKEN_ALGORITHM)
@@ -98,32 +100,32 @@ const public_key0 = oath
 		),
 	)
 
-const allowed_origins = result
+const default_allowed_origins = result
 	.from_nullable(Bun.env.ORDO_ID_ALLOW_ORIGIN)
 	.pipe(result.ops.map(str => str.split(", ")))
 	.cata(result.catas.or_else(() => "http://localhost:3000"))
 
 const port = result
 	.from_nullable(Bun.env.ORDO_ID_PORT)
-	.pipe(result.ops.chain(port => result.if(server.is_port(port), { on_true: () => port })))
+	.pipe(result.ops.chain(port => result.if_else(ordo.validations.is_port(port), { on_true: () => port })))
 	.cata(result.catas.or_else(() => "3001"))
 
 const data_root = result.from_nullable(Bun.env.ORDO_ID_DATA_ROOT).cata(result.catas.or_else(() => "var/dt1"))
 
 const user_file_id = result
 	.from_nullable(Bun.env.ORDO_USER_FILE_ID)
-	.pipe(result.ops.chain(id => result.if(core.uuid.guard(id), { on_true: () => id as Core.Uuid.Instance })))
-	.cata(result.catas.or_else(() => CORE.UUID.UUID_FIRSTBORN as Core.Uuid.Instance))
+	.pipe(result.ops.chain(id => result.if_else(ordo.uuid.guard(id), { on_true: () => id as Ordo.Uuid.Instance })))
+	.cata(result.catas.or_else(() => ordo.uuid.FIRSTBORN))
 
 const cache_user_id = result
 	.from_nullable(Bun.env.ORDO_ID_CACHE_USER_ID)
-	.pipe(result.ops.chain(id => result.if(core.uuid.guard(id), { on_true: () => id as Core.Uuid.Instance })))
-	.cata(result.catas.or_else(() => CORE.UUID.UUID_FIRSTBORN as Core.Uuid.Instance))
+	.pipe(result.ops.chain(id => result.if_else(ordo.uuid.guard(id), { on_true: () => id as Ordo.Uuid.Instance })))
+	.cata(result.catas.or_else(() => ordo.uuid.FIRSTBORN))
 
 const cache_file_id = result
 	.from_nullable(Bun.env.ORDO_ID_CACHE_FILE_ID)
-	.pipe(result.ops.chain(id => result.if(core.uuid.guard(id), { on_true: () => id as Core.Uuid.Instance })))
-	.cata(result.catas.or_else(() => CORE.UUID.UUID_THE_LAST_ONE as Core.Uuid.Instance))
+	.pipe(result.ops.chain(id => result.if_else(ordo.uuid.guard(id), { on_true: () => id as Ordo.Uuid.Instance })))
+	.cata(result.catas.or_else(() => ordo.uuid.THE_LAST_ONE))
 
 const codegen_algorithm0 = oath.from_nullable(Bun.env.ORDO_ID_CODE_ALGORITHM).pipe(
 	oath.ops.chain(algorithm =>
@@ -135,16 +137,16 @@ const codegen_algorithm0 = oath.from_nullable(Bun.env.ORDO_ID_CODE_ALGORITHM).pi
 	),
 )
 
-const code_lifetime_seconds = result
+const auth_code_lifetime_seconds = result
 	.from_nullable(Bun.env.ORDO_ID_CODE_LIFETIME_SECONDS)
 	.pipe(result.ops.map(str => Number.parseInt(str, 10)))
-	.pipe(result.ops.chain(n => result.if(core.fns.is_non_negative_integer(n), { on_true: () => n })))
+	.pipe(result.ops.chain(n => result.if_else(ordo.validations.is_non_negative_integer(n), { on_true: () => n })))
 	.cata(result.catas.or_else(() => 60 * 5))
 
 const session_lifetime_minutes = result
 	.from_nullable(Bun.env.ORDO_ID_SESSION_LIFETIME_MINUTES)
 	.pipe(result.ops.map(str => Number.parseInt(str, 10)))
-	.pipe(result.ops.chain(n => result.if(core.fns.is_non_negative_integer(n), { on_true: () => n })))
+	.pipe(result.ops.chain(n => result.if_else(ordo.validations.is_non_negative_integer(n), { on_true: () => n })))
 	.cata(result.catas.or_else(() => 60 * 24 * 30))
 
 const wjwt_algorithm0 = oath.from_nullable(Bun.env.ORDO_ID_SESSION_TOKEN_ALGORITHM).pipe(

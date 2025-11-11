@@ -8,23 +8,27 @@ import { create } from "@ordo-pink/oss-zags"
 import type * as I18n from "./i18n.types"
 
 export const create_i18n: I18n.CreateFn = (locale, values = {}) => {
-	const $ = create<I18n.State<Record<string, string>>>({ locale, values })
+	const $ = create<I18n.State>({ i18n: { locale, values } })
 
 	return {
 		$,
+
 		add: (locale, values) =>
-			$.update("values", prev_values => ({
+			$.update("i18n.values", prev_values => ({
 				...prev_values,
-				...Object.keys(values).reduce((acc, key) => ({ ...acc, [`${locale}_${key}`]: (values as any)[key] }), {}),
+				...Object.keys(values).reduce((acc, key) => ({ ...acc, [`${locale}_${key}`]: values[key] }), {}),
 			})),
-		set_locale: locale => $.update("locale", () => locale),
+
+		set_locale: locale => $.update("i18n.locale", () => locale),
+
 		remove: values =>
-			$.update("values", prev_values =>
+			$.update("i18n.values", prev_values =>
 				Object.keys(prev_values).reduce(
 					(acc, key) => (values.includes(key as any) ? acc : { ...acc, [key]: (prev_values as any)[key] }),
 					{},
 				),
 			),
-		translate: (key, default_value = "") => $.select(`values.${$.select("locale")}_${key as string}`) ?? default_value,
+
+		translate: (key, default_value = "") => $.select(`i18n.values.${$.select("i18n.locale")}_${key}`) ?? default_value,
 	}
 }

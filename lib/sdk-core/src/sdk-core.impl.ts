@@ -6,14 +6,19 @@
 import "@ordo-pink/oss-oath/global"
 import "@ordo-pink/oss-result/global"
 
-export * as data from "./modules/data.impl"
-export * as fns from "./modules/fns.impl"
-export * as rrr from "./modules/rrr.impl"
-export * as sem_ver from "./modules/sem-ver.impl"
-export * as timestamp from "./modules/timestamp.impl"
-export * as user from "./modules/user.impl"
-export * as uuid from "./modules/uuid.impl"
-export * as validations from "./modules/validations.impl"
+export * as content from "./modules/content.impl"
+export { impl as code } from "./modules/code.impl"
+export { impl as data } from "./modules/data.impl"
+export { impl as fns } from "./modules/fns.impl"
+export { impl as rrr } from "./modules/rrr.impl"
+export * as notification from "./modules/notification.impl"
+export { impl as permission } from "./modules/permission.impl"
+export { impl as sem_ver } from "./modules/sem-ver.impl"
+export { impl as session } from "./modules/session.impl"
+export { impl as timestamp } from "./modules/timestamp.impl"
+export { impl as user } from "./modules/user.impl"
+export { impl as uuid } from "./modules/uuid.impl"
+export { impl as validations } from "./modules/validations.impl"
 
 export const todo: Ordo.Todo = () => {
 	ordo.logger.alert("Not Implemented")
@@ -21,13 +26,17 @@ export const todo: Ordo.Todo = () => {
 	else throw new Error("Todo reached!")
 }
 
+const out = console
+
+;(globalThis as any).console = undefined
+
 export const logger: Ordo.Logger = {
-	alert: (...args: any[]) => console.error("🚨 [ALRT]:", ...args),
-	crit: (...args: any[]) => console.error("🚑️ [CRIT]:", ...args),
-	debug: (...args: any[]) => console.debug("🔨 [DEBG]:", ...args),
-	error: (...args: any[]) => console.error("💥 [ERRR]:", ...args),
-	notice: (...args: any[]) => console.info("📝 [NOTE]:", ...args),
-	info: (...args: any[]) => console.info("✅ [INFO]:", ...args),
-	panic: (...args: any[]) => console.error("🔥 [PANC]:", ...args),
-	warn: (...args: any[]) => console.warn("⚠️ [WARN]:", ...args),
+	alert: (...args: any[]) => out.error("🚨 [ALRT]:", ...args),
+	crit: (...args: any[]) => out.error("🚑️ [CRIT]:", ...args),
+	debug: (...args: any[]) => out.debug("🔨 [DEBG]:", ...args),
+	error: (...args: any[]) => out.error("💥 [ERRR]:", ...args),
+	notice: (...args: any[]) => out.info("📝 [NOTE]:", ...args),
+	info: (...args: any[]) => out.info("✅ [INFO]:", ...args),
+	panic: (...args: any[]) => out.error("🔥 [PANC]:", ...args),
+	warn: (...args: any[]) => out.warn("⚠️ [WARN]:", ...args),
 }

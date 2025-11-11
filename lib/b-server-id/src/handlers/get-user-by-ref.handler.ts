@@ -19,16 +19,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { oath } from "@ordo-pink/oss-oath"
-import { server } from "@ordo-pink/sdk-server"
+import type * as ServerId from "../b-server-id.types"
+import * as common from "../common"
 
-import type * as Lib from "../b-server-id.types"
-import * as id_common from "../common"
-
-export const get_user_by_ref: Lib.Handler = ({ env, params }) =>
-	id_common
-		.get_param_ref(params)
-		.pipe(oath.ops.chain(env.user_repository.get_by_ref))
-		.pipe(oath.ops.map(server.user.serialize_other))
+export const get_user_by_ref0: ServerId.RoutaryHandler = ({ env, params }) =>
+	common
+		.get_param_ref0(params)
+		.pipe(oath.ops.chain(env.user_service.get_public_user_by_ref0))
+		.pipe(oath.ops.map(ordo.user.to_other_user))
 		.pipe(oath.ops.map(Response.json))
 		.cata(oath.catas.or_else(env.fail))

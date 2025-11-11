@@ -5,18 +5,22 @@
 
 declare global {
 	namespace Ordo {
-		export type Disposable<$X extends object> = Ordo.Prettify<$X & { [Symbol.dispose]: () => void }>
+		type Disposable<$X extends object> = Ordo.Prettify<$X & { [Symbol.dispose]: () => void }>
 
-		export type Prettify<$Type> = { [$Key in keyof $Type]: $Type[$Key] } & {}
+		type Prettify<$Type> = { [$Key in keyof $Type]: $Type[$Key] } & {}
 
-		export type GenericGuard<$T> = (x: any) => x is $T
+		type GenericGuard<$T> = (x: any) => x is $T
 
-		export type Todo = (...args: any[]) => any
+		type Replace<$Arr extends any[], $Type, $NewType> = $Arr extends [infer _This, ...infer _Rest]
+			? _This extends $Type
+				? [$NewType, ..._Rest]
+				: [_This, ...Replace<_Rest, $Type, $NewType>]
+			: never
 
-		/**
-		 * Logger definition in accordance with {@link https://www.rfc-editor.org/rfc/rfc5424 RFC5424}.
-		 */
-		export type Logger = {
+		type Todo = (...args: any[]) => any
+
+		/** Logger definition in accordance with {@link https://www.rfc-editor.org/rfc/rfc5424 RFC5424}. */
+		type Logger = {
 			/** Severity Level 0: Emergency: system is unusable. */
 			panic: (...message: any[]) => void
 
@@ -45,15 +49,7 @@ declare global {
 		/**
 		 * Ordo backend hostnames.
 		 */
-		export type Hosts = {
-			/**
-			 * AU is Ordo authentication server.
-			 *
-			 * @constant - Should never be overriden. If you want a fully self-hosted instance, reach out our
-			 * enter_price team for help at {@link "hello@ordo.pink"}.
-			 */
-			au: string
-
+		type Hosts = {
 			/**
 			 * FN is Ordo FStore.
 			 *

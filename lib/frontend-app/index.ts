@@ -55,7 +55,7 @@ globalThis.window.fetch = undefined as any
 globalThis.XMLHttpRequest = undefined as any
 globalThis.XMLHttpRequestUpload = undefined as any
 
-export const app = maoka.create_component<AppOptions>("div", ({ hosts, logger, use }) => {
+export const app = maoka.create<AppOptions>("div", ({ hosts, logger, use }) => {
 	const fn_disablers = {} as Record<Core.User.InstalledFunction, void | (() => void | Promise<void>)>
 	const hunter = hunt.begin<ClientSDK.Preys>()
 	const fetch: ClientSDK.Fetch = (input, init) => {

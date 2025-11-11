@@ -1,0 +1,12 @@
+{
+	"name": "zags",
+	"version": "1.0.0",
+	"description": "Reactive engagement done officially.",
+	"main": "index.js",
+	"author": {
+		"email": "sergei_orlov@ordo.pink",
+		"name": "谢尔盖 ||↓",
+		"url": "https://orlow.dev"
+	},
+	"license": "Unlicense"
+}

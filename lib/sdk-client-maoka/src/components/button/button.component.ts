@@ -3,7 +3,9 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { type Maoka, maoka } from "@ordo-pink/oss-maoka"
+import maoka, { type Maoka } from "@ordo-pink/oss-maoka"
+import maoka_dom from "@ordo-pink/oss-maoka/dom"
+import styled from "@ordo-pink/oss-maoka-styled"
 
 import { actionable_hotkey } from "../hotkey/hotkey.component"
 import { listen } from "../../jabs/listen.jab"
@@ -26,9 +28,9 @@ export const danger: OrdoClientMaoka.Components.Button.Component = params =>
 
 // --- Internal ---
 
-const text_container = maoka.styled.div()
+const text_container = styled.div()
 
-export const button: OrdoClientMaoka.Components.Button.Component = maoka.create_component(
+export const button: OrdoClientMaoka.Components.Button.Component = maoka.create(
 	"button",
 	({ kindergarten, on_click, aria_label = "", custom_class = "", hotkey: hotkey_args, use, node, disabled }) => {
 		use(set_class("button", custom_class))
@@ -37,7 +39,7 @@ export const button: OrdoClientMaoka.Components.Button.Component = maoka.create_
 
 		const handle_click = (event: MouseEvent) => {
 			event.preventDefault()
-			if (maoka.dom.node_guard(node)) node.value.focus()
+			if (maoka_dom.node_guard(node)) node.value.focus()
 			return on_click(event)
 		}
 

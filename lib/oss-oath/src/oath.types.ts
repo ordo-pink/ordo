@@ -10,7 +10,7 @@ export type Fix = <_Resolve, _Reject, _NewResolve>(
 ) => (
 	o: Instance<_Resolve, _Reject>,
 ) => _NewResolve extends PromiseLike<infer _Resolved>
-	? Instance<_Resolved, _Reject>
+	? Instance<_Resolved, unknown>
 	: _NewResolve extends Instance<infer _Resolve, infer __NewReject>
 		? Instance<_Resolve, __NewReject>
 		: Instance<_Resolve | _NewResolve, never>

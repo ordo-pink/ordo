@@ -20,7 +20,7 @@
  */
 
 import { type Aist, aist } from "@ordo-pink/oss-aist"
-import { type Maoka, create_component } from "@ordo-pink/oss-maoka"
+import { type Maoka, create } from "@ordo-pink/oss-maoka"
 import { type ClientSDK } from "@ordo-pink/sdk-client"
 import { core } from "@ordo-pink/sdk-core"
 
@@ -50,7 +50,7 @@ export const create_rotor_jab: (hunter: ClientSDK.Hunter) => Maoka.Jab<Aist.Stre
 			}
 		}
 
-		use(create_component.dom.jabs.onmount(handle_onmount))
+		use(create.dom.jabs.onmount(handle_onmount))
 
 		return rotor.$
 	}

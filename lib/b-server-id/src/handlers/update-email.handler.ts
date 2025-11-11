@@ -19,8 +19,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { core } from "@ordo-pink/sdk-core"
+import type * as ServerId from "../b-server-id.types"
 
-import type * as Lib from "../b-server-id.types"
-
-export const update_email: Lib.Handler = core.todo
+export const update_email: ServerId.RoutaryHandler = ordo.todo

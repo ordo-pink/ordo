@@ -3,9 +3,8 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { maoka } from "@ordo-pink/oss-maoka"
+import maoka from "@ordo-pink/oss-maoka"
 import { sweech } from "@ordo-pink/oss-sweech"
-import { title_case } from "@ordo-pink/_tau"
 
 import { add_class, set_class } from "../../jabs/class.jab"
 import { is_darwin } from "../../jabs/is-darwin.jab"
@@ -13,7 +12,7 @@ import { listen_global_event } from "../../jabs/listen.jab"
 
 import "./hotkey.styles.css"
 
-export const actionable_hotkey = maoka.create_component<OrdoClientMaoka.Components.HotkeyArgs>(
+export const actionable_hotkey = maoka.create<OrdoClientMaoka.Components.HotkeyArgs>(
 	"div",
 	({ decoration_only, hotkey, node, prevent_in_contenteditable, prevent_in_inputs, show_in_mobile, use }) => {
 		const darwin = use(is_darwin)
@@ -64,7 +63,7 @@ export const actionable_hotkey = maoka.create_component<OrdoClientMaoka.Componen
 
 const IGNORED_KEYS = ["Control", "Shift", "Alt", "Meta"]
 
-const hotkey_button = maoka.create_component<{ key: string }>("kbd", ({ use, key }) => {
+const hotkey_button = maoka.create<{ key: string }>("kbd", ({ use, key }) => {
 	use(set_class("key-container"))
 
 	return () =>
@@ -92,3 +91,9 @@ declare global {
 		}
 	}
 }
+
+const title_case = (str: string) =>
+	str
+		.split(" ")
+		.map(word => word.at(0)?.toUpperCase() + word.substring(1).toLowerCase())
+		.join(" ")

@@ -3,12 +3,13 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { type Maoka, maoka } from "@ordo-pink/oss-maoka"
+import type { Maoka } from "@ordo-pink/oss-maoka"
+import { maoka_dom } from "@ordo-pink/oss-maoka/dom"
 
 export const set_style: OrdoClientMaoka.Jabs.SetStyle =
 	s =>
 	({ use }) => {
-		use(maoka.dom.jabs.if_dom(n => Object.keys(s).forEach(k => ((n.value.style as any)[k] = (s as any)[k]))))
+		use(maoka_dom.jabs.if_dom(n => Object.keys(s).forEach(k => ((n.value.style as any)[k] = (s as any)[k]))))
 	}
 
 declare global {

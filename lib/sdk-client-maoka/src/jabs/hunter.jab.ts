@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { Maoka, maoka } from "@ordo-pink/oss-maoka"
 import type { Hunt } from "@ordo-pink/oss-hunt"
+import type { Maoka } from "@ordo-pink/oss-maoka"
+import { maoka_dom } from "@ordo-pink/oss-maoka/dom"
 
 import { context } from "../sdk-client-maoka.impl"
 
@@ -17,7 +18,7 @@ export const track_on_create: OrdoClientMaoka.Jabs.TrackOnCreate =
 
 		const release = state.hunter.track(p, g)
 
-		use(maoka.dom.jabs.onunmount(release))
+		use(maoka_dom.jabs.onunmount(release))
 	}
 
 export const track_on_mount: OrdoClientMaoka.Jabs.TrackOnMount =
@@ -29,7 +30,7 @@ export const track_on_mount: OrdoClientMaoka.Jabs.TrackOnMount =
 
 		const handle_onmount = () => state.hunter.track(p, g)
 
-		use(maoka.dom.jabs.onmount(handle_onmount))
+		use(maoka_dom.jabs.onmount(handle_onmount))
 	}
 
 declare global {

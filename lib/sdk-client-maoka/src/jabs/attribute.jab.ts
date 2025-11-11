@@ -1,10 +1,15 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ */
+
 import type { Maoka } from "@ordo-pink/oss-maoka"
-import { if_dom } from "@ordo-pink/oss-maoka"
+import { maoka_dom } from "@ordo-pink/oss-maoka/dom"
 
 export const set_attribute: OrdoClientMaoka.Jabs.SetAttribute =
 	(k, v = "") =>
 	({ use }) =>
-		use(if_dom(n => n.value.setAttribute(k, v)))
+		use(maoka_dom.jabs.if_dom(n => n.value.setAttribute(k, v)))
 
 export const set_id: OrdoClientMaoka.Jabs.SetId =
 	id =>

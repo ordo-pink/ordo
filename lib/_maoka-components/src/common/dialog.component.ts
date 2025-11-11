@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { create_component, type Maoka } from "@ordo-pink/oss-maoka"
+import { create, type Maoka } from "@ordo-pink/oss-maoka"
 import { button } from "@ordo-pink/_maoka-components"
 import { maoka_jabs } from "@ordo-pink/_maoka-jabs"
 
@@ -46,10 +46,10 @@ export const Dialog = ({
 	action_hotkey,
 	action_disabled = () => false,
 }: TDialogParams) =>
-	create_component.create("div", ({ use }) => {
+	create.create("div", ({ use }) => {
 		use(maoka_jabs.set_class("dialog", custom_class))
 
-		const Icon = render_icon ? create_component.create("div", () => render_icon) : void 0
+		const Icon = render_icon ? create.create("div", () => render_icon) : void 0
 
 		return () => [
 			Header(() => [Icon, Title(() => title)]),

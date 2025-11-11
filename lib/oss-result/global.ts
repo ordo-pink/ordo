@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ */
+
 import * as lib from "./src/result.impl"
 
 declare global {
@@ -102,4 +107,4 @@ declare global {
 	}
 }
 
-globalThis.result = lib
+if (!globalThis.result) globalThis.result = lib

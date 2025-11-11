@@ -19,27 +19,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { type Core, core } from "@ordo-pink/sdk-core"
-import { app } from "@ordo-pink/frontend-app"
-import { create_component } from "@ordo-pink/oss-maoka"
+import { client_app } from "@ordo-pink/client-app"
+import { maoka_dom } from "@ordo-pink/oss-maoka/dom"
 
-const body = document.querySelector("body")!
+const body = document.querySelector("body")
 
-const hosts: Core.Hosts = {
+const hosts: Ordo.Hosts = {
 	id: import.meta.env.VITE_ORDO_ID_HOST!,
 	dt: import.meta.env.VITE_ORDO_DT_HOST!,
 	pb: import.meta.env.VITE_ORDO_PB_HOST!,
-	au: import.meta.env.VITE_ORDO_AU_HOST!,
 	fn: import.meta.env.VITE_ORDO_FN_HOST!,
 	web: import.meta.env.VITE_ORDO_WEB_HOST!,
 }
 
-void create_component.dom.render(
-	body,
-	app({
-		hosts,
-		logger: core.logger.stout,
-		local_persistence_strategy: null as any,
-	}),
-	() => crypto.randomUUID(),
-)
+const create_id = () => {
+	let id = 0
+	return () => id++
+}
+
+const native_fetch = globalThis.fetch
+
+globalThis.window.fetch = undefined as any
+globalThis.XMLHttpRequest = undefined as any
+globalThis.XMLHttpRequestUpload = undefined as any
+
+body && maoka_dom.render(body, client_app.create({ hosts, fetch: native_fetch }), create_id()).catch(ordo.logger.error)

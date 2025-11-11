@@ -19,9 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { Server } from "@ordo-pink/sdk-server"
-
 export type Args = [root: string]
-export type Instance = Server.Data.Repository
+export type Instance = Ordo.Content.Repository<ReadableStream>
 
 export type Create = (...args: Args) => Instance

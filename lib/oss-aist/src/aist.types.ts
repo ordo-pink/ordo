@@ -9,7 +9,7 @@ export type Hash = string & {}
 export type Pathname = `/${string}` & {}
 export type Search = string & {}
 
-export type State = { hash: Hash; pathname: Pathname; search: Search }
+export type State = { aist: { hash: Hash; pathname: Pathname; search: Search } }
 
 export type Stream = Zags.Instance<State>
 

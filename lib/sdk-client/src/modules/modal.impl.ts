@@ -1,9 +1,16 @@
-export enum SIZE {
-	SM,
-	MD,
-	LG,
-	XL,
-	XXL,
+/*
+ * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ */
+
+export namespace CONSTANTS {
+	export enum SIZE {
+		SM,
+		MD,
+		LG,
+		XL,
+		XXL,
+	}
 }
 
 declare global {
@@ -15,6 +22,6 @@ declare global {
 	}
 
 	namespace OrdoClient.Modal {
-		type Params = { onunmount?: () => void; render: (div: HTMLDivElement) => void | Promise<void>; size?: SIZE }
+		type Params = { onunmount?: () => void; render: (div: HTMLDivElement) => void | Promise<void>; size?: CONSTANTS.SIZE }
 	}
 }

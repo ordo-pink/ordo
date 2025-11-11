@@ -3,34 +3,35 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { type Maoka, maoka } from "@ordo-pink/oss-maoka"
+import type { Maoka } from "@ordo-pink/oss-maoka"
 import type { Zags } from "@ordo-pink/oss-zags"
+import { maoka_dom } from "@ordo-pink/oss-maoka/dom"
 
 export const marry$: OrdoClientMaoka.Jabs.Marry$ =
 	zags =>
-	({ use }) => {
+	({ use, refresh$ }) => {
 		let value: any
 		const divorce = zags.marry(state => {
 			value = state
-			use(maoka.dom.jabs.refresh$)
+			refresh$()
 		})
 
-		use(maoka.dom.jabs.onunmount(divorce))
+		use(maoka_dom.jabs.onunmount(divorce))
 
 		return () => value
 	}
 
 export const cheat$: OrdoClientMaoka.Jabs.Cheat$ =
 	(zags, dot_path) =>
-	({ use }) => {
+	({ use, refresh$ }) => {
 		let value: any
 
 		const divorce = zags.cheat(dot_path, state => {
 			value = state
-			use(maoka.dom.jabs.refresh$)
+			refresh$()
 		})
 
-		use(maoka.dom.jabs.onunmount(divorce))
+		use(maoka_dom.jabs.onunmount(divorce))
 
 		return () => value
 	}
@@ -38,10 +39,12 @@ export const cheat$: OrdoClientMaoka.Jabs.Cheat$ =
 declare global {
 	namespace OrdoClientMaoka.Jabs {
 		type Cheat$ = <$State extends Zags.BaseState, const $DotPath extends Zags.RecordToDotPaths<$State>>(
-			zags: Zags.Instance<$State>,
+			zags: Zags.Instance<$State> | Zags.ReadableInstance<$State>,
 			dot_path: $DotPath,
 		) => Maoka.Jab<() => Zags.RecordValueByDotPath<$State, $DotPath>>
 
-		type Marry$ = <$State extends Zags.BaseState>(zags: Zags.Instance<$State>) => Maoka.Jab<() => $State>
+		type Marry$ = <$State extends Zags.BaseState>(
+			zags: Zags.Instance<$State> | Zags.ReadableInstance<$State>,
+		) => Maoka.Jab<() => $State>
 	}
 }

@@ -1,0 +1,3 @@
+.background-task {
+	@apply animate-pulse text-neutral-500;
+}

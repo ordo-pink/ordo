@@ -1,0 +1,163 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2024, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ *
+ * Ordo.pink is an all-in-one team workspace.
+ * Copyright (C) 2024  谢尔盖 ||↓ and the Ordo.pink contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+	font-family: system-ui;
+	font-style: normal;
+	font-weight: 300;
+	src:
+		local(".SFNS-Light"), local(".SFNSText-Light"), local(".HelveticaNeueDeskInterface-Light"), local(".LucidaGrandeUI"),
+		local("Segoe UI Light"), local("Ubuntu Light"), local("Roboto-Light"), local("DroidSans"), local("Tahoma");
+}
+
+@font-face {
+	font-family: system-ui;
+	font-style: italic;
+	font-weight: 300;
+	src:
+		local(".SFNS-LightItalic"), local(".SFNSText-LightItalic"), local(".HelveticaNeueDeskInterface-Italic"),
+		local(".LucidaGrandeUI"), local("Segoe UI Light Italic"), local("Ubuntu Light Italic"), local("Roboto-LightItalic"),
+		local("DroidSans"), local("Tahoma");
+}
+
+@font-face {
+	font-family: system-ui;
+	font-style: normal;
+	font-weight: 400;
+	src:
+		local(".SFNS-Regular"), local(".SFNSText-Regular"), local(".HelveticaNeueDeskInterface-Regular"), local(".LucidaGrandeUI"),
+		local("Segoe UI"), local("Ubuntu"), local("Roboto-Regular"), local("DroidSans"), local("Tahoma");
+}
+
+@font-face {
+	font-family: system-ui;
+	font-style: italic;
+	font-weight: 400;
+	src:
+		local(".SFNS-Italic"), local(".SFNSText-Italic"), local(".HelveticaNeueDeskInterface-Italic"), local(".LucidaGrandeUI"),
+		local("Segoe UI Italic"), local("Ubuntu Italic"), local("Roboto-Italic"), local("DroidSans"), local("Tahoma");
+}
+
+@font-face {
+	font-family: system-ui;
+	font-style: normal;
+	font-weight: 500;
+	src:
+		local(".SFNS-Medium"), local(".SFNSText-Medium"), local(".HelveticaNeueDeskInterface-MediumP4"), local(".LucidaGrandeUI"),
+		local("Segoe UI Semibold"), local("Ubuntu Medium"), local("Roboto-Medium"), local("DroidSans-Bold"), local("Tahoma Bold");
+}
+
+@font-face {
+	font-family: system-ui;
+	font-style: italic;
+	font-weight: 500;
+	src:
+		local(".SFNS-MediumItalic"), local(".SFNSText-MediumItalic"), local(".HelveticaNeueDeskInterface-MediumItalicP4"),
+		local(".LucidaGrandeUI"), local("Segoe UI Semibold Italic"), local("Ubuntu Medium Italic"), local("Roboto-MediumItalic"),
+		local("DroidSans-Bold"), local("Tahoma Bold");
+}
+
+@font-face {
+	font-family: system-ui;
+	font-style: normal;
+	font-weight: 700;
+	src:
+		local(".SFNS-Bold"), local(".SFNSText-Bold"), local(".HelveticaNeueDeskInterface-Bold"), local(".LucidaGrandeUI"),
+		local("Segoe UI Bold"), local("Ubuntu Bold"), local("Roboto-Bold"), local("DroidSans-Bold"), local("Tahoma Bold");
+}
+
+@font-face {
+	font-family: system-ui;
+	font-style: italic;
+	font-weight: 700;
+	src:
+		local(".SFNS-BoldItalic"), local(".SFNSText-BoldItalic"), local(".HelveticaNeueDeskInterface-BoldItalic"),
+		local(".LucidaGrandeUI"), local("Segoe UI Bold Italic"), local("Ubuntu Bold Italic"), local("Roboto-BoldItalic"),
+		local("DroidSans-Bold"), local("Tahoma Bold");
+}
+
+:root {
+	--font-system: system-ui;
+	--font-sans: Jost;
+	--font-mono: Jost;
+	--font-serif: Jost;
+	--index: calc(1vw + 1vh);
+	--transition: 0.5s cubic-bezier(0.05, 0.5, 0, 1);
+	font-family: var(--font-sans), system-ui;
+}
+
+body {
+	font-family: "Jost", sans-serif;
+	@apply text-neutral-800 dark:text-neutral-200;
+	@apply bg-gradient-to-br from-stone-50 via-neutral-50 to-slate-50 dark:from-stone-900 dark:via-neutral-900 dark:to-zinc-900;
+}
+
+*::-webkit-scrollbar {
+	width: 5px;
+	height: 5px;
+	@apply bg-transparent transition-colors duration-300;
+}
+
+*::-webkit-scrollbar-thumb {
+	@apply bg-neutral-200 transition-opacity dark:bg-neutral-500;
+}
+
+*:hover::-webkit-scrollbar-thumb {
+	@apply opacity-100;
+}
+
+*::-webkit-scrollbar-track {
+	@apply bg-transparent;
+}
+
+*::-moz-focus-inner {
+	border: 0;
+}
+
+.context-menu {
+	@apply absolute z-40 w-[320px] rounded-sm bg-white shadow-lg dark:bg-neutral-700;
+}
+
+.context-menu_divider {
+	@apply my-1 h-px border-0 bg-neutral-200 dark:bg-neutral-600;
+}
+
+/* TODO Move to File Editor */
+
+.file-editor_empty {
+	@apply flex h-full w-full flex-col items-center justify-center gap-4;
+}
+
+.file-editor_empty_section_title {
+	@apply text-xl font-bold;
+}
+
+.file-editor_empty_buttons-section {
+	@apply flex flex-col;
+}
+
+.file-editor_empty_logo {
+	@apply h-48 w-48 opacity-50 grayscale;
+}

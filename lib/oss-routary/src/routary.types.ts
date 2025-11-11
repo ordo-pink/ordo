@@ -5,9 +5,9 @@
 
 import type { Colonoscope } from "@ordo-pink/oss-colonoscope"
 
-export type Env = Record<string, unknown>
+export type Env = {}
 
-export type Mut = Record<string, unknown>
+export type Mut = {}
 
 export type Method = "get" | "head" | "post" | "put" | "patch" | "delete" | "options" | (string & {})
 

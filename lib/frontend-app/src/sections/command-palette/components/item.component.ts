@@ -21,10 +21,10 @@
 
 import type { ClientSDK } from "@ordo-pink/sdk-client"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
-import { create_component } from "@ordo-pink/oss-maoka"
+import { create } from "@ordo-pink/oss-maoka"
 import { maoka_styled } from "@ordo-pink/oss-maoka/styled"
 
-export const command_palette_item = create_component.create<{ item: ClientSDK.CommandPalette.Item.Instance; active: boolean }>(
+export const command_palette_item = create.create<{ item: ClientSDK.CommandPalette.Item.Instance; active: boolean }>(
 	"div",
 	({ active, item, use }) => {
 		const { hunter } = use(client_maoka.context.consume)
@@ -63,5 +63,5 @@ const item_main = maoka_styled.tags.div("command-palette_item_main")
 const item_footer = maoka_styled.tags.div("command-palette_item_footer")
 const item_icon = maoka_styled.tags.span<{ render: ClientSDK.CommandPalette.RenderIcon }>(
 	"command-palette_item_icon",
-	({ render, use }) => use(create_component.dom.jabs.hit_if_dom(n => void render(n.value))),
+	({ render, use }) => use(create.dom.jabs.hit_if_dom(n => void render(n.value))),
 )

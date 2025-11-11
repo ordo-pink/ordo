@@ -20,14 +20,14 @@
  */
 
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
-import { create_component } from "@ordo-pink/oss-maoka"
+import { create } from "@ordo-pink/oss-maoka"
 
 /**
  * Title div watches for "title.set_title" shots and makes changes to the DOM. This behavior is extracted into
  * a separate Maoka component to avoid redundant rerenders of higher level DOM nodes in case the `t$` jab triggers
  * a refresh due to changes in translations.
  */
-export const title = create_component.create("div", ({ use }) => {
+export const title = create.create("div", ({ use }) => {
 	const { hunter } = use(client_maoka.context.consume)
 	const translate = use(client_maoka.jabs.t$)
 	const title_element = document.querySelector("title")

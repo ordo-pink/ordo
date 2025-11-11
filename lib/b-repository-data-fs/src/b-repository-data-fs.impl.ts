@@ -19,10 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { BunFile } from "bun"
-import { join } from "path"
-
-import { oath } from "@ordo-pink/oss-oath"
+import * as path from "node:path"
 
 import type * as Lib from "./b-repository-data-fs.types"
 
@@ -33,13 +30,13 @@ export const create: Lib.Create = root => {
 		create: (uid, fsid, content) =>
 			get_path(uid, fsid)
 				.pipe(oath.ops.chain(validate_file_does_not_exist))
-				.pipe(oath.ops.map(({ path }) => path))
+				.pipe(oath.ops.map(ordo.fns.prop("path")))
 				.pipe(oath.ops.chain(write_file(content))),
 
 		read: (uid, fsid) =>
 			get_path(uid, fsid)
 				.pipe(oath.ops.chain(validate_file_exists))
-				.pipe(oath.ops.map(({ file }) => file))
+				.pipe(oath.ops.map(ordo.fns.prop("file")))
 				.pipe(oath.ops.chain(get_file_content)),
 
 		update: (uid, fsid, content) =>
@@ -48,19 +45,17 @@ export const create: Lib.Create = root => {
 				.pipe(oath.ops.chain(write_file(content))),
 
 		delete: (uid, fsid) =>
-			fsid
-				? get_path(uid, fsid)
-						.pipe(oath.ops.chain(validate_file_exists))
-						.pipe(oath.ops.map(({ file }) => file))
-						.pipe(oath.ops.chain(delete_file))
-				: ordo.todo(),
+			get_path(uid, fsid)
+				.pipe(oath.ops.chain(validate_file_exists))
+				.pipe(oath.ops.map(ordo.fns.prop("file")))
+				.pipe(oath.ops.chain(delete_file)),
 	}
 }
 
 // --- Internal ---
 
 const get_file = (path: string) =>
-	oath.try_catch(() => Bun.file(path)).pipe(oath.ops.rmap(ordo.rrr.eio(ORDO.RRR.REASON.FILE_READ_FAILED)))
+	oath.try_catch(() => Bun.file(path)).pipe(oath.ops.rmap(ordo.rrr.eio(ordo.rrr.REASON.FILE_READ_FAILED)))
 
 const check_file_exists = (path: string) =>
 	get_file(path).pipe(
@@ -72,27 +67,30 @@ const check_file_exists = (path: string) =>
 		),
 	)
 
-const write_file = (content: ReadableStream) => (path: BunFile | string) =>
+const write_file = (content: ReadableStream) => (path: Bun.BunFile | string) =>
 	oath
 		.from_promise(() => Bun.readableStreamToArrayBuffer(content) as Promise<ArrayBuffer>)
 		.pipe(oath.ops.chain(input => oath.from_promise(() => Bun.write(path, input))))
-		.pipe(oath.ops.rmap(ordo.rrr.eio(ORDO.RRR.REASON.FILE_WRITE_FAILED)))
+		.pipe(oath.ops.rmap(ordo.rrr.eio(ordo.rrr.REASON.FILE_WRITE_FAILED)))
 
-const delete_file = (file: BunFile) =>
-	oath.from_promise(() => file.delete()).pipe(oath.ops.rmap(ordo.rrr.eio(ORDO.RRR.REASON.FILE_UNLINK_FAILED)))
+const delete_file = (file: Bun.BunFile) =>
+	oath.from_promise(() => file.delete()).pipe(oath.ops.rmap(ordo.rrr.eio(ordo.rrr.REASON.FILE_UNLINK_FAILED)))
 
 const validate_file_exists = (path: string) =>
 	check_file_exists(path)
 		.pipe(oath.ops.chain(({ exists, file }) => oath.if_else(exists, { t: () => ({ path, file }) })))
-		.pipe(oath.ops.rmap(ordo.rrr.enoent(ORDO.RRR.REASON.NO)))
+		.pipe(oath.ops.rmap(ordo.rrr.enoent(ordo.rrr.REASON.NO)))
 
 const validate_file_does_not_exist = (path: string) =>
 	check_file_exists(path)
 		.pipe(oath.ops.chain(({ exists, file }) => oath.if_else(!exists, { t: () => ({ path, file }) })))
-		.pipe(oath.ops.rmap(ordo.rrr.eexist(ORDO.RRR.REASON.NO)))
+		.pipe(oath.ops.rmap(ordo.rrr.eexist(ordo.rrr.REASON.NO)))
 
-const get_file_content = (file: BunFile) =>
-	oath.try_catch(() => file.stream()).pipe(oath.ops.rmap(ordo.rrr.eio(ORDO.RRR.REASON.FILE_READ_FAILED)))
+const get_file_content = (file: Bun.BunFile) =>
+	oath.try_catch(() => file.stream()).pipe(oath.ops.rmap(ordo.rrr.eio(ordo.rrr.REASON.FILE_READ_FAILED)))
 
-const get_path_from_root = (root: string) => (uid: Ordo.User.Id, fsid: Ordo.Data.Id) =>
-	oath.try_catch(() => join(root, uid, fsid)).pipe(oath.ops.rmap(ordo.rrr.eio(ORDO.RRR.REASON.INVALID_SERVICE_INITIALIZATION)))
+const get_path_from_root = ordo.fns.curry((root: string, uid: Ordo.User.Id, fsid: Ordo.Data.Id) =>
+	oath
+		.try_catch(() => path.join(root, uid, fsid))
+		.pipe(oath.ops.rmap(ordo.rrr.eio(ordo.rrr.REASON.INVALID_SERVICE_INITIALIZATION))),
+)

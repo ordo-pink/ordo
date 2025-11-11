@@ -3,27 +3,25 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import * as validations from "./validations.impl"
+import { impl as validations } from "./validations.impl"
 
-// --- Constants ---
-
-export const FIRSTBORN = "0.1.0"
-
-// --- Impl ---
-
-export const rx =
-	/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/
-
-export const guard: Ordo.SemVer.Guard = (x): x is Ordo.SemVer.Instance => validations.is_string(x) && rx.test(x)
-
-export const create: Ordo.SemVer.Create = (major = "0", minor = "1", patch = "0", pre_release, build) => {
-	if (pre_release && build) return `${major}.${minor}.${patch}-${pre_release}+${build}`
-	if (pre_release) return `${major}.${minor}.${patch}-${pre_release}`
-	if (build) return `${major}.${minor}.${patch}+${build}`
-	return `${major}.${minor}.${patch}`
+export namespace CONSTANTS {
+	export const FIRSTBORN = "0.1.0"
 }
 
-// --- Types ---
+export namespace impl {
+	export const rx =
+		/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/
+
+	export const guard: Ordo.SemVer.Guard = (x): x is Ordo.SemVer.Instance => validations.is_string(x) && rx.test(x)
+
+	export const create: Ordo.SemVer.Create = (major = "0", minor = "1", patch = "0", pre_release, build) => {
+		if (pre_release && build) return `${major}.${minor}.${patch}-${pre_release}+${build}`
+		if (pre_release) return `${major}.${minor}.${patch}-${pre_release}`
+		if (build) return `${major}.${minor}.${patch}+${build}`
+		return `${major}.${minor}.${patch}`
+	}
+}
 
 declare global {
 	namespace Ordo.SemVer {

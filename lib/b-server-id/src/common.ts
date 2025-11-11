@@ -19,55 +19,66 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { CORE, type Core, core } from "@ordo-pink/sdk-core"
-import type { Routary } from "@ordo-pink/oss-routary"
-import type { Wjwt } from "@ordo-pink/oss-wjwt"
-import { oath } from "@ordo-pink/oss-oath"
-import { server } from "@ordo-pink/sdk-server"
-import { server_routary } from "@ordo-pink/sdk-server-routary"
-
-import type * as Lib from "./b-server-id.types"
 import type { Colonoscope } from "@ordo-pink/oss-colonoscope"
+import type { Wjwt } from "@ordo-pink/oss-wjwt"
 
-export const extract_id_param = (params: Routary.RouteParams) => () =>
-	oath.from_nullable(params && params.id, core.rrr.einval(CORE.RRR.RRR_REASON.USER_ID_MISSING))
+import type * as ServerId from "./b-server-id.types"
 
-export const check_is_executing_on_self = (request: Request) => (id: Core.User.Id) =>
-	server_routary.oaths
-		.get_auth_cookie(request)
-		.pipe(oath.ops.chain(x => oath.if_else(x === id, { f: core.rrr.eperm(CORE.RRR.RRR_REASON.NO), t: () => id })))
+export const get_auth_token0 = (request: Request) =>
+	oath
+		.from_nullable(request.headers.get("Cookie"))
+		.pipe(oath.ops.map(Bun.Cookie.parse))
+		.pipe(oath.ops.chain(c => oath.if_else(c.name === "ordo", { t: () => c.value })))
+		.pipe(oath.ops.rmap(() => ordo.rrr.einval(ORDO.RRR.REASON.MISSING_REQUIRED_COOKIE, void 0)))
 
-export const check_user_is_authenticated = (request: Request, env: Lib.Env) =>
-	server_routary.oaths
-		.get_auth_cookie(request)
-		.pipe(oath.ops.chain(x => oath.from_promise(() => env.wjwt.verify(x)).pipe(oath.ops.map(() => x as Wjwt.TokenString))))
-		.pipe(oath.ops.map(x => env.wjwt.decode(x).payload))
-		.pipe(oath.ops.chain(({ sub, jti }) => env.user_repository.read(sub).pipe(oath.ops.map(user => ({ user, jti })))))
-		.pipe(oath.ops.chain(({ user, jti }) => oath.from_nullable(server.user.get_session(jti!, user)))) // TODO wjwt types
-		.pipe(oath.ops.map(core.fns.prop(1)))
-		.pipe(oath.ops.chain(t => oath.if_else(core.timestamp.is_after(Date.now() - env.session_lifetime_minutes * 60 * 1000, t))))
-		.pipe(oath.ops.rmap(() => core.rrr.eacces(CORE.RRR.RRR_REASON.NO, void 0)))
+export const set_auth_cookie = ordo.fns.curry((response: Response, expires: Wjwt.Exp, token_string: Wjwt.TokenString) => {
+	response.headers.set(
+		"Set-Cookie",
+		new Bun.Cookie("ordo", token_string, { expires, httpOnly: true, secure: true }).serialize(),
+	)
 
-export const get_request_param = (params: Colonoscope.Results, name: string) => oath.from_nullable(params && params[name])
+	return response
+})
 
-export const get_param_id = (params: Colonoscope.Results) =>
-	get_request_param(params, "id")
-		.pipe(oath.ops.chain(i => oath.if_else(core.uuid.guard(i), { t: () => i as Core.Uuid.Instance, f: () => i })))
-		.pipe(oath.ops.rmap(core.rrr.einval(CORE.RRR.RRR_REASON.USER_ID_INVALID)))
+/**
+ * Get the JWT token from the cookie (lol what?) and check whether it is a
+ * valid token and the user with `sub` id has a `jti`-identified session.
+ * Return the user or an error occured along the way.
+ *
+ * **RRRs**:
+ * - `EINVAL` - Auth token, session id, or user id are invalid
+ * - `ENOENT` - Session or user not found
+ * - `EIO` - Panic! at the Service
+ */
+export const get_authenticated_user0 = (
+	request: Request,
+	env: ServerId.Env,
+): Oath.Instance<[Ordo.Session.Server.Instance, Ordo.User.Instance], Ordo.Rrr.Instance<"EIO" | "ENOENT" | "EINVAL">> =>
+	get_auth_token0(request)
+		.pipe(oath.ops.chain(env.token_service.verify0))
+		.pipe(oath.ops.map(ordo.fns.prop("payload")))
+		.pipe(oath.ops.map(({ sub, jti }) => [sub, jti]))
+		.pipe(oath.ops.chain(([id, sid]) => oath.all([env.session_service.verify0(id, sid), env.user_service.get_user_by_id0(id)])))
 
-export const get_param_email = (params: Colonoscope.Results) =>
-	get_request_param(params, "email")
-		.pipe(oath.ops.chain(e => oath.if_else(core.user.email_guard(e), { t: () => e as Core.User.Email, f: () => e })))
-		.pipe(oath.ops.rmap(core.rrr.einval(CORE.RRR.RRR_REASON.EMAIL_INVALID)))
-
-export const get_param_ref = (params: Colonoscope.Results) =>
-	get_request_param(params, "ref")
-		.pipe(oath.ops.chain(e => oath.if_else(core.user.ref_guard(e), { t: () => e as Core.User.Ref, f: () => e })))
-		.pipe(oath.ops.rmap(core.rrr.einval(CORE.RRR.RRR_REASON.REF_INVALID)))
-
-export const check_user_is_not_already_authenticated = (request: Request) =>
-	server_routary.oaths
-		.get_auth_cookie(request)
+export const check_user_is_not_already_authenticated0 = (request: Request) =>
+	get_auth_token0(request)
 		.pipe(oath.ops.swap)
-		.pipe(oath.ops.map(core.fns.v))
-		.pipe(oath.ops.rmap(core.rrr.eexist(CORE.RRR.RRR_REASON.ALREADY_AUTHENTICATED)))
+		.pipe(oath.ops.bimap(ordo.fns.v, ordo.rrr.eexist(ORDO.RRR.REASON.ALREADY_AUTHENTICATED)))
+
+export const get_param_id0 = (params: Colonoscope.Results) =>
+	oath
+		.from_nullable(params?.id, ordo.rrr.enoent(ORDO.RRR.REASON.USER_ID_MISSING))
+		.pipe(oath.ops.chain(i => oath.if_else(ordo.uuid.guard(i), { t: () => i as Ordo.Uuid.Instance, f: () => i })))
+		.pipe(oath.ops.rmap(ordo.rrr.einval(ORDO.RRR.REASON.USER_ID_INVALID)))
+
+export const get_param_email0 = (params: Colonoscope.Results) =>
+	oath
+		.from_nullable(params?.email, ordo.rrr.enoent(ORDO.RRR.REASON.EMAIL_MISSING))
+		.pipe(oath.ops.chain(e => oath.if_else(ordo.user.email_guard(e), { t: () => e as Ordo.User.Email, f: () => e })))
+		.pipe(oath.ops.rmap(ordo.rrr.einval(ORDO.RRR.REASON.EMAIL_INVALID)))
+
+export const get_param_ref0 = (params: Colonoscope.Results) =>
+	oath
+		.from_nullable(params?.ref, ordo.rrr.enoent(ORDO.RRR.REASON.REF_MISSING))
+		.pipe(oath.ops.chain(e => oath.if_else(ordo.user.ref_guard(e), { t: () => e as Ordo.User.Ref, f: () => e })))
+		.pipe(oath.ops.rmap(ordo.rrr.einval(ORDO.RRR.REASON.REF_INVALID)))

@@ -3,62 +3,63 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-// --- Impl ---
+export namespace impl {
+	export const curry = <$Args extends any[], $Result>(fn: (...args: $Args) => $Result): Ordo.Fns.Curry<$Args, $Result> =>
+		function curried(...args: $Args): any {
+			if (args.length >= fn.length) return fn(...args)
+			else return (...args2: any[]) => curried(...([...args, ...args2] as $Args))
+		} as any
 
-export const curry = <$Args extends any[], $Result>(fn: (...args: $Args) => $Result): Ordo.Fns.Curry<$Args, $Result> =>
-	function curried(...args: $Args): any {
-		if (args.length >= fn.length) return fn(...args)
-		else return (...args2: any[]) => curried(...([...args, ...args2] as $Args))
-	} as any
+	export const t: Ordo.Fns.T = () => true
+	export const f: Ordo.Fns.F = () => false
+	export const n: Ordo.Fns.N = () => null
+	export const u: Ordo.Fns.U = () => {}
+	export const v: Ordo.Fns.V = u
+	export const lazy: Ordo.Fns.Lazy = x => () => x
+	export const eq: Ordo.Fns.Eq = curry((target, val) => target === val)
+	export const gt: Ordo.Fns.Gt = curry((min, val) => val > min)
+	export const lt: Ordo.Fns.Lt = curry((max, val) => val < max)
+	export const gte: Ordo.Fns.Gte = curry((min, val) => eq(min, val) || gt(min, val))
+	export const lte: Ordo.Fns.Lte = curry((max, val) => eq(max, val) || lt(max, val))
 
-export const t: Ordo.Fns.T = () => true
-export const f: Ordo.Fns.F = () => false
-export const n: Ordo.Fns.N = () => null
-export const u: Ordo.Fns.U = () => {}
-export const v: Ordo.Fns.V = u
-export const lazy: Ordo.Fns.Lazy = x => () => x
-export const eq: Ordo.Fns.Eq = curry((target, val) => target === val)
-export const gt: Ordo.Fns.Gt = curry((min, val) => val > min)
-export const lt: Ordo.Fns.Lt = curry((max, val) => val < max)
-export const gte: Ordo.Fns.Gte = curry((min, val) => eq(min, val) || gt(min, val))
-export const lte: Ordo.Fns.Lte = curry((max, val) => eq(max, val) || lt(max, val))
+	export const keys_of: Ordo.Fns.KeysOf = o => Object.keys(o) as any
+	export const fuzzy_check: Ordo.Fns.Fuzz = curry((source, target, ratio) => {
+		const clean_source = source.trim().toLowerCase()
+		const clean_target = target.trim().toLowerCase()
+		let hits = 0
 
-export const keys_of: Ordo.Fns.KeysOf = o => Object.keys(o) as any
-export const fuzzy_check: Ordo.Fns.Fuzz = curry((source, target, ratio) => {
-	const clean_source = source.trim().toLowerCase()
-	const clean_target = target.trim().toLowerCase()
-	let hits = 0
+		if (!clean_target || clean_source.indexOf(clean_target) > -1) return true
 
-	if (!clean_target || clean_source.indexOf(clean_target) > -1) return true
+		for (let i = 0; i < clean_target.length; i++) clean_source.indexOf(clean_target[i]) > -1 ? hits++ : hits--
 
-	for (let i = 0; i < clean_target.length; i++) clean_source.indexOf(clean_target[i]) > -1 ? hits++ : hits--
+		return hits / source.length >= ratio
+	})
 
-	return hits / source.length >= ratio
-})
+	export const head = <$Xs extends any[]>(xs: $Xs) => xs.at(0)
+	export const pipe = <$Arg, $Result>(
+		f: (arg: $Arg) => $Result,
+		...fs: ((arg: any) => any)[]
+	): Ordo.Fns.Pipe<$Arg, $Result> => {
+		const pub_f: any = (arg: any) => [f, ...fs].reduce((r, f) => f(r), arg)
+		const _pipe = (new_f: any) => pipe(f, ...fs, new_f)
 
-export const head = <$Xs extends any[]>(xs: $Xs) => xs.at(0)
-export const pipe = <$Arg, $Result>(f: (arg: $Arg) => $Result, ...fs: ((arg: any) => any)[]): Ordo.Fns.Pipe<$Arg, $Result> => {
-	const pub_f: any = (arg: any) => [f, ...fs].reduce((r, f) => f(r), arg)
-	const _pipe = (new_f: any) => pipe(f, ...fs, new_f)
+		pub_f.pipe = _pipe as any
 
-	pub_f.pipe = _pipe as any
+		return pub_f
+	}
 
-	return pub_f
+	export const contra =
+		<$A, $B, $Result>(f: (a: $A) => (b: $B) => $Result) =>
+		(b: $B) =>
+		(a: $A) =>
+			f(a)(b)
+
+	export const prop: Ordo.Fns.Prop = key => obj => obj[key]
+
+	export const replace: Ordo.Fns.Replace = index => (value, arr) => arr.with(index, value) as any
+
+	export const construct: Ordo.Fns.Construct = ctor => ((...args: any[]) => new ctor(...args)) as any
 }
-
-export const contra =
-	<$A, $B, $Result>(f: (a: $A) => (b: $B) => $Result) =>
-	(b: $B) =>
-	(a: $A) =>
-		f(a)(b)
-
-export const prop: Ordo.Fns.Prop = key => obj => obj[key]
-
-export const replace: Ordo.Fns.Replace = index => (value, arr) => arr.with(index, value) as any
-
-export const construct: Ordo.Fns.Construct = ctor => ((...args: any[]) => new ctor(...args)) as any
-
-// --- Types ---
 
 declare global {
 	namespace Ordo.Fns {

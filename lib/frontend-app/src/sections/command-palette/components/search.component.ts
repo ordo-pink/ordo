@@ -21,12 +21,12 @@
 
 import { bs_search } from "@ordo-pink/frontend-icons"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
-import { create_component } from "@ordo-pink/oss-maoka"
+import { create } from "@ordo-pink/oss-maoka"
 import { maoka_styled } from "@ordo-pink/oss-maoka/styled"
 
 import { command_palette$ } from "../command-palette.state"
 
-export const command_palette_search = create_component.create("label", ({ use }) => {
+export const command_palette_search = create.create("label", ({ use }) => {
 	use(client_maoka.jabs.classes.set("command-palette_search_wrapper"))
 
 	return () => [bs_search({ classes: "" }), search()]
@@ -35,7 +35,7 @@ export const command_palette_search = create_component.create("label", ({ use })
 const search = maoka_styled.tags.input("command-palette_search", ({ use }) => {
 	const t_search = "Search..." // TODO i18n
 
-	const handle_mount = () => use(create_component.dom.jabs.hit_if_dom(n => n.value.focus()))
+	const handle_mount = () => use(create.dom.jabs.hit_if_dom(n => n.value.focus()))
 	const handle_input = (event: Event) => {
 		const target = event.target as HTMLInputElement
 		command_palette$.update("search_value", () => target.value)
@@ -46,5 +46,5 @@ const search = maoka_styled.tags.input("command-palette_search", ({ use }) => {
 	use(client_maoka.jabs.set_attribute("autocomplete", "off"))
 	use(client_maoka.jabs.set_attribute("value", command_palette$.select("search_value")))
 	use(client_maoka.jabs.listen("oninput", handle_input))
-	use(create_component.dom.jabs.onmount(handle_mount))
+	use(create.dom.jabs.onmount(handle_mount))
 })

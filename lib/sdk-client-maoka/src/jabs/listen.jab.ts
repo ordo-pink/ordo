@@ -3,12 +3,13 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { type Maoka, maoka } from "@ordo-pink/oss-maoka"
+import type { Maoka } from "@ordo-pink/oss-maoka"
+import { maoka_dom } from "@ordo-pink/oss-maoka/dom"
 
 export const listen: OrdoClientMaoka.Jabs.Listen =
 	(e, f) =>
 	({ use }) =>
-		use(maoka.dom.jabs.if_dom(n => ((n.value as any)[e] = f)))
+		use(maoka_dom.jabs.if_dom(n => ((n.value as any)[e] = f)))
 
 export const listen_global_event: OrdoClientMaoka.Jabs.ListenGlobalEvent =
 	(k, f) =>
@@ -19,7 +20,7 @@ export const listen_global_event: OrdoClientMaoka.Jabs.ListenGlobalEvent =
 			return () => document.removeEventListener(k, f)
 		}
 
-		use(maoka.dom.jabs.onmount(handle_mount))
+		use(maoka_dom.jabs.onmount(handle_mount))
 	}
 
 declare global {

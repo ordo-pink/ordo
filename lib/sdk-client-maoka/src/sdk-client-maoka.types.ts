@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import type { Maoka } from "@ordo-pink/oss-maoka"
+import type { MaokaContext } from "@ordo-pink/oss-maoka-context"
 
 import "@ordo-pink/sdk-client"
 
 declare global {
 	namespace OrdoClientMaoka {
-		export type Context = Maoka.Context.Instance<OrdoClient.F.State>
+		export type Context = MaokaContext.Instance<OrdoClient.F.State>
 		export type NoSpaceString<$Str extends string> = $Str extends `${string} ${string}` ? never : $Str
 	}
 }

@@ -3,20 +3,20 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { Colonoscope, colonoscope } from "@ordo-pink/oss-colonoscope"
+import { type Colonoscope, colonoscope } from "@ordo-pink/oss-colonoscope"
 
-import type * as Lib from "./routary.types"
+import type * as Routary from "./routary.types"
 
-const get: Lib.MethodHandler = (url, handler) => each(["get"], url, handler)
-const head: Lib.MethodHandler = (url, handler) => each(["head"], url, handler)
-const post: Lib.MethodHandler = (url, handler) => each(["post"], url, handler)
-const put: Lib.MethodHandler = (url, handler) => each(["put"], url, handler)
-const patch: Lib.MethodHandler = (url, handler) => each(["patch"], url, handler)
-const delit: Lib.MethodHandler = (url, handler) => each(["delete"], url, handler)
-const options: Lib.MethodHandler = (url, handler) => each(["options"], url, handler)
-const custom: Lib.CustomMethodHandler = (method, url, handler) => each([method], url, handler)
+const get: Routary.MethodHandler = (url, handler) => each(["get"], url, handler)
+const head: Routary.MethodHandler = (url, handler) => each(["head"], url, handler)
+const post: Routary.MethodHandler = (url, handler) => each(["post"], url, handler)
+const put: Routary.MethodHandler = (url, handler) => each(["put"], url, handler)
+const patch: Routary.MethodHandler = (url, handler) => each(["patch"], url, handler)
+const delit: Routary.MethodHandler = (url, handler) => each(["delete"], url, handler)
+const options: Routary.MethodHandler = (url, handler) => each(["options"], url, handler)
+const custom: Routary.CustomMethodHandler = (method, url, handler) => each([method], url, handler)
 
-const each: Lib.EachMethodHandler =
+const each: Routary.EachMethodHandler =
 	(methods, url, handler) => (env, mut, structure, before_handlers, after_handlers, on_creates) => {
 		for (const method of methods) {
 			if (!structure[method]) structure[method] = {}
@@ -26,16 +26,23 @@ const each: Lib.EachMethodHandler =
 		return create(env, mut, structure, before_handlers, after_handlers, on_creates)
 	}
 
-const before_each: Lib.BeforeEach = callback => (env, mut, structure, before_handlers, after_handlers, on_creates) =>
+const before_each: Routary.BeforeEach = callback => (env, mut, structure, before_handlers, after_handlers, on_creates) =>
 	create(env, mut, structure, [...before_handlers, callback as any], after_handlers, on_creates) as any
 
-const after_each: Lib.AfterEach = callback => (env, mut, structure, before_handlers, after_handlers, on_creates) =>
+const after_each: Routary.AfterEach = callback => (env, mut, structure, before_handlers, after_handlers, on_creates) =>
 	create(env, mut, structure, before_handlers, [...after_handlers, callback as any], on_creates) as any
 
-const once: Lib.Once = callback => (env, mut, structure, before_handlers, after_handlers, on_creates) =>
+const once: Routary.Once = callback => (env, mut, structure, before_handlers, after_handlers, on_creates) =>
 	create(env, mut, structure, before_handlers, after_handlers, [...on_creates, callback])
 
-export const create: Lib.Create = (env, initial_mut = {} as any, structure = {}, before = [], after = [], on_creates = []) => ({
+export const create: Routary.Create = (
+	env,
+	initial_mut = {} as any,
+	structure = {},
+	before = [],
+	after = [],
+	on_creates = [],
+) => ({
 	pipe: op => op(env, initial_mut, structure, before, after, on_creates),
 	or_else: (on_none_matched, catcher) => {
 		const before_handlers = [...before]
@@ -48,13 +55,13 @@ export const create: Lib.Create = (env, initial_mut = {} as any, structure = {},
 		}
 
 		return async (request, server) => {
-			const method = request.method.toLowerCase() as Lib.Method
+			const method = request.method.toLowerCase() as Routary.Method
 			let mut = { ...initial_mut }
-			let current_path = new URL(request.url).pathname as Lib.Route
+			let current_path = new URL(request.url).pathname as Routary.Route
 			let params = null as Colonoscope.Results
 			let response: Response = null as any
 
-			if (current_path.endsWith("/") && current_path.length > 1) current_path = current_path.slice(0, -1) as Lib.Route
+			if (current_path.endsWith("/") && current_path.length > 1) current_path = current_path.slice(0, -1) as Routary.Route
 
 			if (!structure[method]) return on_none_matched({ env, mut, request, server, params: null })
 
@@ -69,7 +76,7 @@ export const create: Lib.Create = (env, initial_mut = {} as any, structure = {},
 				}
 
 				return route === current_path
-			}) as Lib.Route | undefined
+			}) as Routary.Route | undefined
 
 			try {
 				if (before_handlers.length)
@@ -98,7 +105,7 @@ export const create: Lib.Create = (env, initial_mut = {} as any, structure = {},
 	},
 })
 
-export const ops: Lib.Ops = {
+export const ops: Routary.Ops = {
 	after_each,
 	before_each,
 	custom,

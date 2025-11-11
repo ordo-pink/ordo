@@ -3,11 +3,9 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { maoka } from "@ordo-pink/oss-maoka"
+import { maoka_context } from "@ordo-pink/oss-maoka-context"
 
 export * as components from "./components"
 export * as jabs from "./jabs"
 
-export const context: OrdoClientMaoka.Context = maoka.context.create()
-
-export const with_context = (state: OrdoClient.F.State) => maoka.styled.div("", ({ use }) => void use(context.provide(state)))
+export const context: OrdoClientMaoka.Context = maoka_context.create()

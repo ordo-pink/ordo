@@ -1,4 +1,11 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ */
+
 import * as lib from "./src/oath.impl"
+
+if (!globalThis.oath) globalThis.oath = lib
 
 declare global {
 	var oath: typeof lib
@@ -189,5 +196,3 @@ declare global {
 		export type RecordToUnion<T extends Record<string, unknown>> = { [P in keyof T]: T[P] }[keyof T]
 	}
 }
-
-globalThis.oath = lib

@@ -19,75 +19,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { CORE, core } from "@ordo-pink/sdk-core"
-import { type Server, server } from "@ordo-pink/sdk-server"
-import type { Wjwt } from "@ordo-pink/oss-wjwt"
-import { oath } from "@ordo-pink/oss-oath"
-import { server_routary } from "@ordo-pink/sdk-server-routary"
+import type * as ServerId from "../b-server-id.types"
+import * as common from "../common"
 
-import type * as Lib from "../b-server-id.types"
-import * as id_common from "../common"
-
-export const auth_refresh: Lib.Handler = ({ env, request }) =>
-	id_common
-		.check_user_is_authenticated(request, env)
-		.pipe(oath.ops.chain(() => server_routary.oaths.get_auth_cookie(request)))
+export const auth_refresh: ServerId.RoutaryHandler = async ({ env, request }) =>
+	common
+		.get_authenticated_user0(request, env)
+		.pipe(oath.ops.chain(([s, u]) => env.session_service.refresh0(ordo.user.get_id(u), ordo.session.server.get_id(s))))
 		.pipe(
-			oath.ops.chain(token =>
-				oath
-					.from_promise(() => env.wjwt.verify(token))
-					.pipe(oath.ops.rmap(core.rrr.eio(CORE.RRR.RRR_REASON.INVALID_SERVICE_INITIALIZATION)))
-
-					.pipe(oath.ops.chain(update_user_session_if_valid(env.wjwt, env.user_repository, token as Wjwt.TokenString))),
+			oath.ops.chain(([s, u]) =>
+				env.token_service.create0(ordo.user.get_id(u), ordo.session.server.get_id(s)).pipe(oath.ops.map(t => [u, t])),
 			),
 		)
-		.pipe(oath.ops.chain(create_response))
-		.cata(
-			oath.catas.or_else(() => {
-				return new Response("", { headers: { "Set-Cookie": "" } })
-			}),
-		)
-
-// --- Internal ---
-
-const create_auth_cookie =
-	(wjwt: Wjwt.Instance) =>
-	([user, session]: readonly [Server.User.Instance, session: Server.User.Session]) =>
-		oath
-			.from_promise(() => wjwt.sign({ jti: session[0], sub: user[0] }))
-			.pipe(oath.ops.map(t => [user, t]))
-			.pipe(oath.ops.rmap(core.rrr.eio(CORE.RRR.RRR_REASON.INVALID_SERVICE_INITIALIZATION)))
-
-const update_user_session = (user_repository: Server.User.Repository) => (t: Wjwt.Token) =>
-	oath
-		.of(t.payload.sub)
-		.pipe(oath.ops.chain(user_repository.read))
 		.pipe(
-			oath.ops.map(user => {
-				const index = user[8].findIndex(session => t.payload.jti && session[0] === t.payload.jti)
-				return [
-					user.with(
-						8,
-						user[8].toSpliced(index, 1, [core.uuid.create(), core.timestamp.create(), user[8][index][2]]),
-					) as Server.User.Instance,
-					user[8][index],
-				]
-			}),
+			oath.ops.chain(([u, t]) => oath.of(Response.json(u)).pipe(oath.ops.tap(r => common.set_auth_cookie(r, t[1].exp!, t[0])))),
 		)
-
-// TODO Delete dead session
-const update_user_session_if_valid =
-	(wjwt: Wjwt.Instance, user_repository: Server.User.Repository, token: Wjwt.TokenString) => (is_valid: boolean) =>
-		oath
-			.if(is_valid)
-			.pipe(oath.ops.chain(() => oath.try_catch(() => wjwt.decode(token))))
-			.pipe(oath.ops.rmap(core.rrr.eio(CORE.RRR.RRR_REASON.INVALID_SERVICE_INITIALIZATION)))
-			.pipe(oath.ops.chain(update_user_session(user_repository)))
-			.pipe(oath.ops.chain(create_auth_cookie(wjwt)))
-
-const create_response = ([user, t]: readonly [Server.User.Instance, t: Wjwt.SignResult]) =>
-	oath
-		.of(user)
-		.pipe(oath.ops.map(server.user.serialize))
-		.pipe(oath.ops.map(Response.json))
-		.pipe(oath.ops.tap(res => server_routary.set_auth_cookie(res, t[1].exp!, t[0])))
+		.cata(oath.catas.or_else(rrr => env.fail(rrr, new Headers({ "Set-Cookie": "" }))))

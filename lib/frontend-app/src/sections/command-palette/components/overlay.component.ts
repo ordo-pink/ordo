@@ -20,7 +20,7 @@
  */
 
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
-import { create_component } from "@ordo-pink/oss-maoka"
+import { create } from "@ordo-pink/oss-maoka"
 import { maoka_styled } from "@ordo-pink/oss-maoka/styled"
 
 import { command_palette$ } from "../command-palette.state"
@@ -38,5 +38,5 @@ export const command_palette_overlay = maoka_styled.tags.div("command-palette_wr
 	const handle_mount = () => command_palette$.cheat("current", current => (current ? handle_show() : handle_hide()))
 
 	use(client_maoka.jabs.listen("onclick", handle_click))
-	use(create_component.dom.jabs.onmount(handle_mount))
+	use(create.dom.jabs.onmount(handle_mount))
 })

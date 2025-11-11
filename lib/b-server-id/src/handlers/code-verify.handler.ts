@@ -19,17 +19,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { CORE, type Core, core } from "@ordo-pink/sdk-core"
-import { type Server, server } from "@ordo-pink/sdk-server"
-import { oath } from "@ordo-pink/oss-oath"
 import { server_routary } from "@ordo-pink/sdk-server-routary"
 
-import type * as Lib from "../b-server-id.types"
-import * as id_common from "../common"
+import type * as ServerId from "../b-server-id.types"
+import * as common from "../common"
 
-export const verify_code: Lib.Handler = ({ env, mut, request }) =>
-	id_common
-		.check_user_is_not_already_authenticated(request)
+export const verify_code: ServerId.RoutaryHandler = ({ env, mut, request }) =>
+	common
+		.check_user_is_not_already_authenticated0(request)
 		.pipe(oath.ops.chain(check_x_device_header(request)))
 		.pipe(oath.ops.chain(() => server_routary.oaths.get_json_body(request)))
 		.pipe(oath.ops.chain(validate_body))

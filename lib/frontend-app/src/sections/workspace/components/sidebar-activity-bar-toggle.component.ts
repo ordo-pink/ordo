@@ -21,12 +21,12 @@
 
 import { bs_arrow_left, bs_layout_sidebar_inset_reverse } from "@ordo-pink/frontend-icons"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
-import { create_component } from "@ordo-pink/oss-maoka"
+import { create } from "@ordo-pink/oss-maoka"
 import { sweech_helpers } from "@ordo-pink/oss-sweech/extensions"
 
 import { sidebar$ } from "../workspace.state"
 
-export const sidebar_toggle = create_component.create("button", ({ use }) => {
+export const sidebar_toggle = create.create("button", ({ use }) => {
 	const { hunter } = use(client_maoka.context.consume)
 	const get_sidebar = use(client_maoka.jabs.zags.marry$(sidebar$))
 	const translate = use(client_maoka.jabs.t$)

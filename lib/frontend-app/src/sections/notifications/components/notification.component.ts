@@ -21,7 +21,7 @@
 
 import type { ClientSDK } from "@ordo-pink/sdk-client"
 import { client_maoka } from "@ordo-pink/sdk-client-maoka"
-import { create_component } from "@ordo-pink/oss-maoka"
+import { create } from "@ordo-pink/oss-maoka"
 import { maoka_styled } from "@ordo-pink/oss-maoka/styled"
 
 import { get_readable_type } from "./utils/common"
@@ -30,34 +30,31 @@ import { notification_icon } from "./notification-icon.component"
 import { notification_progress } from "./notification-progress.component"
 
 type Args = ClientSDK.Notification.Instance
-export const notification = create_component.create<Args>(
-	"div",
-	({ on_click, id, message, duration, render_icon, title, type, use }) => {
-		const t_title = use(client_maoka.jabs.translate$(title))
-		const t_message = use(client_maoka.jabs.translate$(message))
+export const notification = create.create<Args>("div", ({ on_click, id, message, duration, render_icon, title, type, use }) => {
+	const t_title = use(client_maoka.jabs.translate$(title))
+	const t_message = use(client_maoka.jabs.translate$(message))
 
-		use(client_maoka.jabs.classes.set("notification-card_container"))
+	use(client_maoka.jabs.classes.set("notification-card_container"))
 
-		if (on_click) {
-			use(client_maoka.jabs.classes.add("interactive"))
-			use(client_maoka.jabs.listen("onclick", on_click))
-		} else {
-			use(client_maoka.jabs.classes.remove("interactive"))
-			use(client_maoka.jabs.listen("onclick", () => void 0))
-		}
+	if (on_click) {
+		use(client_maoka.jabs.classes.add("interactive"))
+		use(client_maoka.jabs.listen("onclick", on_click))
+	} else {
+		use(client_maoka.jabs.classes.remove("interactive"))
+		use(client_maoka.jabs.listen("onclick", () => void 0))
+	}
 
-		const card_type = get_readable_type(type)
-		const notification_card = create_notification_card(card_type)
+	const card_type = get_readable_type(type)
+	const notification_card = create_notification_card(card_type)
 
-		return () =>
-			notification_card(() => [
-				notification_icon({ render_icon, type }),
-				notification_body(() => [title ? notification_title(t_title) : void 0, notification_message(t_message)]),
-				duration ? notification_progress({ id, duration, type }) : void 0,
-				hide_notification_button({ id, type }),
-			])
-	},
-)
+	return () =>
+		notification_card(() => [
+			notification_icon({ render_icon, type }),
+			notification_body(() => [title ? notification_title(t_title) : void 0, notification_message(t_message)]),
+			duration ? notification_progress({ id, duration, type }) : void 0,
+			hide_notification_button({ id, type }),
+		])
+})
 
 // --- Internal ---
 

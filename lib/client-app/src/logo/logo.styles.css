@@ -1,0 +1,8 @@
+.logo {
+	@apply font-black;
+}
+
+.logo.bright {
+	@apply bg-gradient-to-tr bg-clip-text text-transparent;
+	@apply from-sky-400 via-pink-500 to-amber-400 dark:from-amber-500 dark:via-pink-500 dark:to-purple-500;
+}

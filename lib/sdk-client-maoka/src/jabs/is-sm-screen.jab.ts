@@ -3,22 +3,22 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { type Maoka, maoka } from "@ordo-pink/oss-maoka"
-import { core } from "@ordo-pink/sdk-core"
+import type { Maoka } from "@ordo-pink/oss-maoka"
+import { maoka_dom } from "@ordo-pink/oss-maoka/dom"
 
-export const is_sm_screen$: OrdoClientMaoka.Jabs.IsSmScreen$ = ({ use }) => {
-	const is_sm = core.fns.lt(ordo_client.SM_SCREEN_BREAKPOINT)
+export const is_sm_screen$: OrdoClientMaoka.Jabs.IsSmScreen$ = ({ use, refresh$ }) => {
+	const is_sm = ordo.fns.lt(ORDO_CLIENT.SM_SCREEN_BREAKPOINT)
 
 	let value: boolean = is_sm(window.innerWidth)
 
 	use(
-		maoka.dom.jabs.onmount(() => {
+		maoka_dom.jabs.onmount(() => {
 			const handle_resize = () => {
 				const is_sm_screen = is_sm(window.innerWidth)
 
 				if (value !== is_sm_screen) {
 					value = is_sm_screen
-					use(maoka.dom.jabs.refresh$)
+					refresh$()
 				}
 			}
 

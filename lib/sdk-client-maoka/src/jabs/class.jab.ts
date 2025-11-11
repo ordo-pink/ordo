@@ -1,4 +1,10 @@
-import { Maoka, maoka } from "@ordo-pink/oss-maoka"
+/*
+ * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ */
+
+import type { Maoka } from "@ordo-pink/oss-maoka"
+import { maoka_dom } from "@ordo-pink/oss-maoka/dom"
 
 import { set_attribute } from "./attribute.jab"
 
@@ -10,17 +16,17 @@ export const set_class: OrdoClientMaoka.Jabs.SetClass =
 export const add_class: OrdoClientMaoka.Jabs.AddClass =
 	(...cs) =>
 	({ use }) =>
-		use(maoka.dom.jabs.if_dom(n => n.value.classList.add(...cs.flatMap(cls => cls.split(" ")))))
+		use(maoka_dom.jabs.if_dom(n => n.value.classList.add(...cs.flatMap(cls => cls.split(" ")))))
 
 export const remove_class: OrdoClientMaoka.Jabs.RemoveClass =
 	(...cs) =>
 	({ use }) =>
-		use(maoka.dom.jabs.if_dom(n => n.value.classList.remove(...cs.flatMap(cls => cls.split(" ")))))
+		use(maoka_dom.jabs.if_dom(n => n.value.classList.remove(...cs.flatMap(cls => cls.split(" ")))))
 
 export const replace_class: OrdoClientMaoka.Jabs.ReplaceClass =
 	(p, n) =>
 	({ use }) =>
-		use(maoka.dom.jabs.if_dom(x => x.value.classList.replace(p, n)))
+		use(maoka_dom.jabs.if_dom(x => x.value.classList.replace(p, n)))
 
 declare global {
 	namespace OrdoClientMaoka.Jabs {

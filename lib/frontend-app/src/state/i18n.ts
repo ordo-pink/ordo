@@ -20,10 +20,10 @@
  */
 
 import { I18n, LOCALE, create_i18n } from "@ordo-pink/oss-i18n"
-import { Maoka, create_component } from "@ordo-pink/oss-maoka"
+import { Maoka, create } from "@ordo-pink/oss-maoka"
 import { ClientSDK } from "@ordo-pink/sdk-client"
 
-export const create_i18n_jab: (hunter: ClientSDK.Hunter) => Maoka.Jab<I18n.Zags<ClientSDK.Translations.Keys>> =
+export const create_i18n_jab: (hunter: ClientSDK.Hunter) => Maoka.Jab<I18n.Stream<ClientSDK.Translations.Keys>> =
 	hunter =>
 	({ use }) => {
 		const i18n = create_i18n<ClientSDK.Translations.Keys>(LOCALE.ENGLISH)
@@ -40,7 +40,7 @@ export const create_i18n_jab: (hunter: ClientSDK.Hunter) => Maoka.Jab<I18n.Zags<
 			}
 		}
 
-		use(create_component.dom.jabs.onmount(handle_mount))
+		use(create.dom.jabs.onmount(handle_mount))
 
 		return i18n.$
 	}

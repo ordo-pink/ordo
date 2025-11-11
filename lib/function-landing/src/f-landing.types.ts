@@ -19,26 +19,4 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-declare global {
-	interface t {
-		fns: {
-			landing: {
-				title: string
-				cookie_notification: {
-					title: string
-					message: string
-				}
-				buttons: {
-					join: string
-					learn_more: string
-					try_now: string
-				}
-				cta: {
-					announcement: string
-				}
-			}
-		}
-	}
-}
-
 export namespace FLanding {}

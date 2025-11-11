@@ -3,21 +3,18 @@ import { maoka } from "@ordo-pink/oss-maoka"
 import "./logo.styles.css"
 
 export const ordo_logo = maoka.create("a", ({ use }) => {
+	const handle_click = ordo.fns
+		.pipe(ordo_client.fns.prevent_default)
+		.pipe(ordo_client.fns.stop_propagation)
+		.pipe(() => void hunter.shoot("router.set_pathname", "/"))
+
 	const { hunter } = use(ordo_client_maoka.context.consume)
-	use(ordo_client_maoka.jabs.set_attribute("href", "/"))
-
-	const t_logo = use(ordo_client_maoka.jabs.translate$)
 	const get_pathname = use(ordo_client_maoka.jabs.router_pathname$)
+	const t_logo = use(ordo_client_maoka.jabs.translate$)
 
+	use(ordo_client_maoka.jabs.set_attribute("href", "/"))
 	use(ordo_client_maoka.jabs.set_class("logo"))
-	use(ordo_client_maoka.jabs.listen("onclick", e => handle_click(e)))
-
-	const prevent_default = (e: Event) => {
-		e.preventDefault()
-		return e
-	}
-
-	const handle_click = ordo.fns.pipe(prevent_default).pipe(() => hunter.shoot("router.set_pathname", "/"))
+	use(ordo_client_maoka.jabs.listen("onclick", handle_click))
 
 	return () => {
 		const pathname = get_pathname()

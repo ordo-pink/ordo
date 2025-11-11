@@ -6,6 +6,16 @@
 import { sweech } from "@ordo-pink/oss-sweech"
 
 export namespace impl {
+	export const prevent_default = (e: Event) => {
+		e.preventDefault()
+		return e
+	}
+
+	export const stop_propagation = (e: Event) => {
+		e.stopPropagation()
+		return e
+	}
+
 	export const create_hotkey_from_event: OrdoClient.Fns.CreateHotkeyFromEvent = (event, is_darwin) => {
 		let hotkey = ""
 

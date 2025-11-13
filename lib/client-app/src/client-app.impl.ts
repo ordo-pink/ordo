@@ -65,38 +65,46 @@ export const create = maoka.create<ClientApp.Args>("div", ({ use, fetch }) => {
 		}
 	}
 
-	// TODO Fs
+	// TODO Modal
+	// TODO Command Palette
+	// TODO Activity Bar
+	// TODO Workspace
+	// TODO Sidebar
+	// TODO Data storage
+	// TODO Content storage
+	// TODO Quick Search
+	// TODO Settings
+	// TODO Activity Data
 	// TODO Activities
+	// TODO Notification history
 	// TODO File Associations
+	// TODO Installed Functions
+	// TODO Fs
+	// TODO 404
 	// TODO Auth
+	// TODO User Info
+	// TODO Avatars
 	// TODO Data sync
-
+	// TODO Rich Text Editor
+	// TODO Public sharing
+	// TODO Live sharing
+	// TODO Access sharing
 	// TODO F Store
+	// TODO Billing
 	// TODO Achievements
+	// TODO Activity & File Association details
+	// TODO Background processes
+	// TODO Activity Panel
 	// TODO Drag'n'drop
+	// TODO Command palette access via router
+	// TODO Modal access via router
 
 	return () => {
 		return [
-			titan_panel(() => [
-				ordo_logo(),
-				breadcrumbs(),
-				user(), // TODO User Info, Achievements, Installed Functions, Billing
-				// TODO Settings
-			]),
-			main(() => [
-				page_loading(),
-				// TODO Workspace
-				// TODO Sidebar
-				// TODO Activity Bar (+ F Store)
-			]),
-			status_bar(() => [
-				background_task_status(), // TODO Background processes
-				details(), // TODO Activity & File Association details
-				notifications(),
-			]),
-			// TODO Command Palette
-			// TODO Notifications Stack
-			// TODO Modal
+			titan_panel(() => [ordo_logo(), breadcrumbs(), user()]),
+			main(() => [page_loading()]),
+			status_bar(() => [background_task_status(), details()]),
+			notifications(),
 			title(),
 		]
 	}

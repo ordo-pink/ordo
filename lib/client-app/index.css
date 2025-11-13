@@ -111,7 +111,7 @@
 body {
 	font-family: "Jost", sans-serif;
 	@apply text-neutral-800 dark:text-neutral-200;
-	@apply bg-gradient-to-br from-stone-50 via-neutral-50 to-slate-50 dark:from-stone-900 dark:via-neutral-900 dark:to-zinc-900;
+	@apply bg-white dark:bg-black;
 }
 
 *::-webkit-scrollbar {

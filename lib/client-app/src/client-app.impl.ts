@@ -24,6 +24,7 @@ import { title } from "./title/title.component"
 import { user } from "./user/user.component"
 
 import "./client-app.styles.css"
+import { command_palette } from "./command-palette/command-palette.component"
 
 export const create = maoka.create<ClientApp.Args>("div", ({ use, fetch }) => {
 	const hunter: OrdoClient.Command.Hunter = hunt.create(ordo.logger.debug)
@@ -66,7 +67,6 @@ export const create = maoka.create<ClientApp.Args>("div", ({ use, fetch }) => {
 		}
 	}
 
-	// TODO Command Palette
 	// TODO Activity Bar
 	// TODO Workspace
 	// TODO Sidebar
@@ -105,6 +105,7 @@ export const create = maoka.create<ClientApp.Args>("div", ({ use, fetch }) => {
 			main(() => [page_loading()]),
 			status_bar(() => [background_task_status(), details()]),
 			modal(),
+			command_palette(),
 			notifications(),
 			title(),
 		]

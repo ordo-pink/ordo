@@ -37,6 +37,10 @@ declare global {
 	namespace OrdoClient.CommandPalette {
 		export type Id = string | number
 
+		export type Section = CONSTANTS.SECTION
+
+		export type Type = CONSTANTS.ITEM_TYPE
+
 		export type Item<$Value = any> = {
 			id: Id
 			/** Readable name of the command palette item. Put a translation key here, if you use i18n. */
@@ -54,7 +58,7 @@ declare global {
 
 			description?: OrdoClient.Translations.Key
 
-			type?: CONSTANTS.ITEM_TYPE
+			type?: Type
 		}
 
 		export type Instance<$Value = any> = {

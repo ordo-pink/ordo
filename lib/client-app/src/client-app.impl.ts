@@ -14,15 +14,16 @@ import type * as ClientApp from "./client-app.types"
 import { background_task_status } from "./background-task-indicator/background-task-indicator.component"
 import { breadcrumbs } from "./breadcrumbs/breadcrumbs.component"
 import { details } from "./details/details.component"
+import { modal } from "./modal/modal.component"
 import { notifications } from "./notifications/notifications.component"
 import { ordo_logo } from "./logo/logo.component"
 import { page_loading } from "./loading/loading.component"
 import { status_bar } from "./status-bar/status-bar.component"
 import { titan_panel } from "./titan-panel/titan-panel.component"
+import { title } from "./title/title.component"
 import { user } from "./user/user.component"
 
 import "./client-app.styles.css"
-import { title } from "./title/title.component"
 
 export const create = maoka.create<ClientApp.Args>("div", ({ use, fetch }) => {
 	const hunter: OrdoClient.Command.Hunter = hunt.create(ordo.logger.debug)
@@ -65,7 +66,6 @@ export const create = maoka.create<ClientApp.Args>("div", ({ use, fetch }) => {
 		}
 	}
 
-	// TODO Modal
 	// TODO Command Palette
 	// TODO Activity Bar
 	// TODO Workspace
@@ -104,6 +104,7 @@ export const create = maoka.create<ClientApp.Args>("div", ({ use, fetch }) => {
 			titan_panel(() => [ordo_logo(), breadcrumbs(), user()]),
 			main(() => [page_loading()]),
 			status_bar(() => [background_task_status(), details()]),
+			modal(),
 			notifications(),
 			title(),
 		]

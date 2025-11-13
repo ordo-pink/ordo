@@ -17,11 +17,13 @@ declare global {
 	interface cmd {
 		modal: {
 			hide: { args: void }
-			show: { args: OrdoClient.Modal.Params }
+			show: { args: OrdoClient.Modal.Instance }
 		}
 	}
 
 	namespace OrdoClient.Modal {
-		type Params = { onunmount?: () => void; render: (div: HTMLDivElement) => void | Promise<void>; size?: CONSTANTS.SIZE }
+		export type Size = (typeof CONSTANTS.SIZE)[keyof typeof CONSTANTS.SIZE]
+
+		type Instance = { onunmount?: () => void; render: (div: HTMLDivElement) => void | Promise<void>; size?: CONSTANTS.SIZE }
 	}
 }

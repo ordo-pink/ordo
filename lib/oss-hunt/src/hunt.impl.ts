@@ -27,8 +27,11 @@ const handle_barrage_updates =
 
 				Promise.all(guns.map(gun => gun(shot.bullet)))
 					.then(() => shot.callback())
-					.then(() => debug && debug("Hit", `"${shot.prey as string}"`, "with", shot.bullet))
-					.catch(shot.callback)
+					.then(() => debug && debug("[HUNT] 🟢 Hit", `"${shot.prey as string}"`, "with", shot.bullet))
+					.catch(e => {
+						debug && debug("[HUNT] 🔴 Failed", `"${shot.prey as string}"`, "with", shot.bullet, e)
+						return shot.callback(e)
+					})
 			}
 		}
 	}
@@ -39,7 +42,7 @@ const shoot =
 		debug?: (...message: any[]) => void,
 	): Hunt.Shoot<$Preys> =>
 	(prey, bullet) => {
-		debug && debug("Fired shot", `"${prey as string}"`, "with", bullet)
+		debug && debug("[HUNT] ⚪ Fired shot", `"${prey as string}"`, "with", bullet)
 
 		const result_zags = zags.create<{ error?: unknown; status: SHOT_STATUS }>({
 			error: void 0,
@@ -78,16 +81,13 @@ const track =
 		debug?: (...message: any[]) => void,
 	): Hunt.Track<$Preys> =>
 	(prey, new_gun) => {
-		debug && debug("Started tracking", `"${String(prey)}"`)
+		debug && debug("[HUNT] 🔵 Started tracking", `"${String(prey)}"`)
 
 		hunt$.update("gun_storage", storage => {
 			const guns = storage[prey as string]
 
-			if (!guns) {
-				storage[prey as string] = [new_gun]
-			} else if (!guns.some(gun => gun.toString() === new_gun.toString())) {
-				storage[prey as string].unshift(new_gun)
-			}
+			if (!guns) storage[prey as string] = [new_gun]
+			else if (!guns.some(gun => gun.toString() === new_gun.toString())) storage[prey as string].push(new_gun)
 
 			const barrage = hunt$.select("barrage")
 
@@ -98,6 +98,8 @@ const track =
 		})
 
 		return () => {
+			debug && debug("[HUNT] 🟣 Finished tracking", `"${String(prey)}"`)
+
 			hunt$.update("gun_storage", storage => {
 				if (!storage[prey as string]) return storage
 

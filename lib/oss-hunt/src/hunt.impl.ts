@@ -9,15 +9,15 @@ import deep_equals from "@ordo-pink/oss-deep-equals"
 import type * as Hunt from "./hunt.types.ts"
 
 /** @see {@link Hunt.Create } */
-export const create: Hunt.Create = () => {
+export const create: Hunt.Create = debug => {
 	const hunt$ = zags.create<Hunt.State<any>>({ barrage: [], gun_storage: {} })
-	hunt$.marry(handle_barrage_updates(hunt$))
+	hunt$.marry(handle_barrage_updates(hunt$, debug))
 
-	return { shoot: shoot(hunt$), track: track(hunt$) }
+	return { shoot: shoot(hunt$, debug), track: track(hunt$, debug) }
 }
 
 const handle_barrage_updates =
-	<$Preys extends Hunt.BasePreys>(hunt$: Zags.Instance<Hunt.State<$Preys>>) =>
+	<$Preys extends Hunt.BasePreys>(hunt$: Zags.Instance<Hunt.State<$Preys>>, debug?: (...message: any[]) => void) =>
 	({ barrage, gun_storage }: Hunt.State<$Preys>) => {
 		for (const shot of barrage) {
 			const guns = gun_storage[shot.prey as string]
@@ -27,14 +27,20 @@ const handle_barrage_updates =
 
 				Promise.all(guns.map(gun => gun(shot.bullet)))
 					.then(() => shot.callback())
+					.then(() => debug && debug("Hit", `"${shot.prey as string}"`, "with", shot.bullet))
 					.catch(shot.callback)
 			}
 		}
 	}
 
 const shoot =
-	<$Preys extends Record<string, unknown>>(hunt$: Zags.Instance<Hunt.State<$Preys>>): Hunt.Shoot<$Preys> =>
+	<$Preys extends Record<string, unknown>>(
+		hunt$: Zags.Instance<Hunt.State<$Preys>>,
+		debug?: (...message: any[]) => void,
+	): Hunt.Shoot<$Preys> =>
 	(prey, bullet) => {
+		debug && debug("Fired shot", `"${prey as string}"`, "with", bullet)
+
 		const result_zags = zags.create<{ error?: unknown; status: SHOT_STATUS }>({
 			error: void 0,
 			status: SHOT_STATUS.PENDING,
@@ -67,8 +73,13 @@ const shoot =
 	}
 
 const track =
-	<$Preys extends Record<string, unknown>>(hunt$: Zags.Instance<Hunt.State<$Preys>>): Hunt.Track<$Preys> =>
+	<$Preys extends Record<string, unknown>>(
+		hunt$: Zags.Instance<Hunt.State<$Preys>>,
+		debug?: (...message: any[]) => void,
+	): Hunt.Track<$Preys> =>
 	(prey, new_gun) => {
+		debug && debug("Started tracking", `"${String(prey)}"`)
+
 		hunt$.update("gun_storage", storage => {
 			const guns = storage[prey as string]
 
@@ -77,6 +88,11 @@ const track =
 			} else if (!guns.some(gun => gun.toString() === new_gun.toString())) {
 				storage[prey as string].unshift(new_gun)
 			}
+
+			const barrage = hunt$.select("barrage")
+
+			hunt$.update("barrage", () => barrage.filter(shot => shot.prey !== prey))
+			barrage.filter(shot => shot.prey === prey).forEach(shot => shoot(hunt$)(prey, shot.bullet))
 
 			return storage
 		})

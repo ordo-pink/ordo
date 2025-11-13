@@ -25,15 +25,17 @@ declare global {
 	}
 
 	namespace OrdoClient.Notification {
+		export type Type = (typeof ORDO_CLIENT.NOTIFICATION.TYPE)[keyof typeof ORDO_CLIENT.NOTIFICATION.TYPE]
+
 		export type ShowArgs = Ordo.Prettify<Partial<Instance> & Required<Pick<Instance, "message">>>
 
 		export type Instance = {
 			id: Ordo.Uuid.Instance
 			type?: CONSTANTS.TYPE
-			title?: OrdoClient.Translations.Key
-			message: OrdoClient.Translations.Key
+			title?: string
+			message: string
 			render_icon?: (div: HTMLDivElement) => void | Promise<void>
-			duration?: number
+			duration_s?: number
 			on_click?: () => void
 			// persist?: boolean
 			// payload?: T

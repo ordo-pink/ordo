@@ -14,6 +14,7 @@ import type * as ClientApp from "./client-app.types"
 import { background_task_status } from "./background-task-indicator/background-task-indicator.component"
 import { breadcrumbs } from "./breadcrumbs/breadcrumbs.component"
 import { details } from "./details/details.component"
+import { notifications } from "./notifications/notifications.component"
 import { ordo_logo } from "./logo/logo.component"
 import { page_loading } from "./loading/loading.component"
 import { status_bar } from "./status-bar/status-bar.component"
@@ -23,13 +24,14 @@ import { user } from "./user/user.component"
 import "./client-app.styles.css"
 
 export const create = maoka.create<ClientApp.Args>("div", ({ use, fetch }) => {
-	const hunter: OrdoClient.Command.Hunter = hunt.create()
+	const hunter: OrdoClient.Command.Hunter = hunt.create(ordo.logger.debug)
 	const aist$ = aist.create(window)
 	const i18n$ = i18n.create_i18n("en")
 	const query: OrdoClient.Query = aist$.$.concat(i18n$.$).to_readable()
 
 	use(ordo_client_maoka.jabs.set_id("app"))
 	use(ordo_client_maoka.context.provide({ hunter, logger: ordo.logger, fetch, query }))
+
 	use(maoka_dom.jabs.onmount(() => handle_onmount()))
 
 	const handle_onmount = () => {
@@ -87,7 +89,7 @@ export const create = maoka.create<ClientApp.Args>("div", ({ use, fetch }) => {
 			status_bar(() => [
 				background_task_status(), // TODO Background processes
 				details(), // TODO Activity & File Association details
-				// TODO Notification Bell
+				notifications(),
 			]),
 			// TODO Command Palette
 			// TODO Notifications Stack

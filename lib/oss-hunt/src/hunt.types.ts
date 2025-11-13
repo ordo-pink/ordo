@@ -131,7 +131,9 @@ export type State<$Preys extends BasePreys> = {
  *
  * Let the hunt begin!
  */
-export type Create = <$Preys extends Record<string, unknown> = Record<string, { args: any }>>() => Instance<$Preys>
+export type Create = <$Preys extends Record<string, unknown> = Record<string, { args: any }>>(
+	debug?: (...message: any[]) => void,
+) => Instance<$Preys>
 
 export type Instance<$Preys extends Record<string, unknown>> = {
 	/** @see {@link Track} */

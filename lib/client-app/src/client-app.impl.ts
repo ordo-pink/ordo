@@ -22,6 +22,7 @@ import { titan_panel } from "./titan-panel/titan-panel.component"
 import { user } from "./user/user.component"
 
 import "./client-app.styles.css"
+import { title } from "./title/title.component"
 
 export const create = maoka.create<ClientApp.Args>("div", ({ use, fetch }) => {
 	const hunter: OrdoClient.Command.Hunter = hunt.create(ordo.logger.debug)
@@ -33,6 +34,8 @@ export const create = maoka.create<ClientApp.Args>("div", ({ use, fetch }) => {
 	use(ordo_client_maoka.context.provide({ hunter, logger: ordo.logger, fetch, query }))
 
 	use(maoka_dom.jabs.onmount(() => handle_onmount()))
+
+	hunter.shoot("title.set_title", "loading")
 
 	const handle_onmount = () => {
 		// I18n commands
@@ -48,7 +51,7 @@ export const create = maoka.create<ClientApp.Args>("div", ({ use, fetch }) => {
 			ordo.validations.is_string(x) ? aist$.set_search(x) : aist$.set_search_params(x),
 		)
 
-		hunter.shoot("i18n.add_translations", { locale: "en", values: { logo: "ORDO" } })
+		hunter.shoot("i18n.add_translations", { locale: "en", values: { logo: "ORDO", loading: "Loading..." } })
 
 		return () => {
 			drop_add_translations()
@@ -94,7 +97,7 @@ export const create = maoka.create<ClientApp.Args>("div", ({ use, fetch }) => {
 			// TODO Command Palette
 			// TODO Notifications Stack
 			// TODO Modal
-			// TODO Title
+			title(),
 		]
 	}
 })

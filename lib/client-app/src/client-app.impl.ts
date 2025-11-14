@@ -4,15 +4,19 @@
  */
 
 import { aist } from "@ordo-pink/oss-aist"
+import { colonoscope } from "@ordo-pink/oss-colonoscope"
 import { hunt } from "@ordo-pink/oss-hunt"
 import { i18n } from "@ordo-pink/oss-i18n"
 import { maoka } from "@ordo-pink/oss-maoka"
 import { maoka_dom } from "@ordo-pink/oss-maoka/dom"
 import { maoka_styled } from "@ordo-pink/oss-maoka-styled"
+import { zags } from "@ordo-pink/oss-zags"
 
 import type * as ClientApp from "./client-app.types"
+import { activity_bar } from "./activity-bar/activity-bar.component"
 import { background_task_status } from "./background-task-indicator/background-task-indicator.component"
 import { breadcrumbs } from "./breadcrumbs/breadcrumbs.component"
+import { command_palette } from "./command-palette/command-palette.component"
 import { details } from "./details/details.component"
 import { modal } from "./modal/modal.component"
 import { notifications } from "./notifications/notifications.component"
@@ -24,13 +28,16 @@ import { title } from "./title/title.component"
 import { user } from "./user/user.component"
 
 import "./client-app.styles.css"
-import { command_palette } from "./command-palette/command-palette.component"
+
+// TODO Remove
+import { bs_check_circle } from "@ordo-pink/frontend-icons"
 
 export const create = maoka.create<ClientApp.Args>("div", ({ use, fetch }) => {
 	const hunter: OrdoClient.Command.Hunter = hunt.create(ordo.logger.debug)
 	const aist$ = aist.create(window)
 	const i18n$ = i18n.create_i18n("en")
-	const query: OrdoClient.Query = aist$.$.concat(i18n$.$).to_readable()
+	const activities$ = zags.create<OrdoClient.Activity.State>({ items: [] })
+	const query: OrdoClient.Query = aist$.$.concat(i18n$.$).concat(activities$).to_readable()
 
 	use(ordo_client_maoka.jabs.set_id("app"))
 	use(ordo_client_maoka.context.provide({ hunter, logger: ordo.logger, fetch, query }))
@@ -53,9 +60,50 @@ export const create = maoka.create<ClientApp.Args>("div", ({ use, fetch }) => {
 			ordo.validations.is_string(x) ? aist$.set_search(x) : aist$.set_search_params(x),
 		)
 
+		const drop_register_activity = hunter.track("activity.register", item => {
+			activities$.update("items", items => (items.some(i => i.id === item.id) ? items : items.concat(item)))
+
+			const pathname = aist$.$.select("aist.pathname")
+
+			for (const route of item.routes) {
+				if ((colonoscope.is_doctor(route) && colonoscope.check(route, pathname)) || route === pathname) {
+					activities$.update("current", () => item)
+					break
+				}
+			}
+		})
+
+		const divorce_rotor = aist$.$.cheat("aist.pathname", pathname => {
+			const items = activities$.select("items")
+
+			activities$.update("current", () =>
+				items.find(item => {
+					for (const route of item.routes) {
+						if (colonoscope.is_doctor(route)) {
+							if (colonoscope.check(route, pathname)) return true
+						}
+						if (route === pathname) return true
+					}
+
+					return false
+				}),
+			)
+		})
+
 		hunter.shoot("i18n.add_translations", { locale: "en", values: { logo: "ORDO", loading: "Loading..." } })
+		hunter.shoot("activity.register", {
+			id: "test",
+			readable_name: "Test",
+			routes: ["/test"],
+			render_icon: div => void maoka_dom.render(div, bs_check_circle(), () => crypto.randomUUID()),
+			render_workspace: div => void maoka_dom.render(div, maoka_styled.div()(), () => crypto.randomUUID()),
+		})
 
 		return () => {
+			divorce_rotor()
+
+			hunter.shoot("i18n.remove_translations", ["logo", "loading"])
+
 			drop_add_translations()
 			drop_remove_translations()
 			drop_set_locale()
@@ -64,38 +112,42 @@ export const create = maoka.create<ClientApp.Args>("div", ({ use, fetch }) => {
 			drop_set_href()
 			drop_set_pathname()
 			drop_set_search()
+
+			drop_register_activity()
 		}
 	}
 
-	// TODO Activity Bar
 	// TODO Workspace
 	// TODO Sidebar
 	// TODO Data storage
 	// TODO Content storage
 	// TODO Quick Search
 	// TODO Settings
-	// TODO Activity Data
 	// TODO Activities
+	// TODO Activity & File Association details + "Breadcrumbs"
 	// TODO Notification history
 	// TODO File Associations
 	// TODO Installed Functions
 	// TODO Fs
+	// TODO F Data Files
 	// TODO 404
+	// TODO Rich Text Editor
+	// TODO File Uploading
+	// TODO PDF FA
+	// TODO Image FA
+	// TODO Drag'n'drop
+	// TODO F Store
+	// TODO Live sharing
 	// TODO Auth
 	// TODO User Info
 	// TODO Avatars
 	// TODO Data sync
-	// TODO Rich Text Editor
 	// TODO Public sharing
-	// TODO Live sharing
 	// TODO Access sharing
-	// TODO F Store
 	// TODO Billing
 	// TODO Achievements
-	// TODO Activity & File Association details
 	// TODO Background processes
 	// TODO Activity Panel
-	// TODO Drag'n'drop
 	// TODO Command palette access via router
 	// TODO Modal access via router
 
@@ -103,6 +155,7 @@ export const create = maoka.create<ClientApp.Args>("div", ({ use, fetch }) => {
 		return [
 			titan_panel(() => [ordo_logo(), breadcrumbs(), user()]),
 			main(() => [page_loading()]),
+			activity_bar({ activities$, command_palette_toggle: maoka_styled.div(), sidebar_toggle: maoka_styled.div() }),
 			status_bar(() => [background_task_status(), details()]),
 			modal(),
 			command_palette(),

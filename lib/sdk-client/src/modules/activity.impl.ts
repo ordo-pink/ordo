@@ -14,7 +14,7 @@ declare global {
 	export namespace OrdoClient.Activity {
 		export type State = {
 			items: Instance[]
-			current: Instance | null
+			current?: Instance
 		}
 
 		export type Route = `/${string}`

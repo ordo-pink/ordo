@@ -4,7 +4,7 @@
  */
 
 import type * as Zags from "./zags.types.ts"
-import { deep_equals } from "./deep-equals.impl.ts"
+import { clone_deep, deep_equals } from "./deep-equals.impl.ts"
 
 /** @see {@link Zags.Module} */
 export const create: Zags.Module = (state, partners = []) => {
@@ -83,8 +83,8 @@ export const create: Zags.Module = (state, partners = []) => {
 		concat: o => {
 			const n = create({ ...unwrap(), ...o.unwrap() })
 
-			const divorce_this = marry(state => n.replace(prev_state => ({ ...prev_state, ...structuredClone(state) })))
-			const divorce_that = o.marry(state => n.replace(prev_state => ({ ...prev_state, ...structuredClone(state) })))
+			const divorce_this = marry(state => n.replace(prev_state => ({ ...prev_state, ...clone_deep(state) })))
+			const divorce_that = o.marry(state => n.replace(prev_state => ({ ...prev_state, ...clone_deep(state) })))
 
 			n.on_kill(() => {
 				divorce_this()

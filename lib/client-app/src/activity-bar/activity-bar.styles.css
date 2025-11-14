@@ -7,9 +7,13 @@
 }
 
 .activity-bar_link {
-	@apply size-6 cursor-pointer text-2xl text-neutral-800 no-underline outline-none transition-all hover:scale-110 hover:text-pink-700 focus:scale-110 focus:text-pink-700 dark:text-neutral-200 hover:dark:text-pink-300 focus:dark:text-pink-300;
+	@apply no-underline outline-none;
 }
 
-.activity-bar_link.active {
+.activity-bar_icon {
+	@apply text-2xl transition-colors hover:text-pink-500 focus:text-pink-500;
+}
+
+.activity-bar_icon.active {
 	@apply text-pink-500;
 }

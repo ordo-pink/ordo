@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { DeepEquals } from "./deep-equals.types.ts"
+export type DeepEquals = (x: unknown, y: unknown) => boolean
+export type CloneDeep = <$T>(x: $T) => $T
 
 export const deep_equals: DeepEquals = (x, y) => {
 	if (typeof x !== typeof y) return false
@@ -25,6 +26,12 @@ export const deep_equals: DeepEquals = (x, y) => {
 	}
 
 	return x === y
+}
+
+export const clone_deep: CloneDeep = x => {
+	if (is_arr(x)) return x.map(i => clone_deep(i))
+	if (is_obj(x)) return keys(x).reduce((acc, k) => ({ ...acc, [k]: clone_deep(x[k]) }), {} as any)
+	return x
 }
 
 const is_arr = Array.isArray

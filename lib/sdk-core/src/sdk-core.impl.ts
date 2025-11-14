@@ -28,7 +28,7 @@ export const todo: Ordo.Todo = () => {
 
 const out = console
 
-;(globalThis as any).console = undefined
+// ;(globalThis as any).console = undefined
 
 export const logger: Ordo.Logger = {
 	alert: (...args: any[]) => out.error("🚨 [ALRT]:", ...args),

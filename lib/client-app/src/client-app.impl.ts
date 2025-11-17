@@ -15,10 +15,10 @@ import { zags } from "@ordo-pink/oss-zags"
 
 import type * as ClientApp from "./client-app.types"
 import { command_palette, command_palette_toggle } from "./command-palette/command-palette.component"
+import { sidebar, sidebar_toggle, workspace } from "./main/main.component"
 import { activity_bar } from "./activity-bar/activity-bar.component"
 import { background_task_status } from "./background-task-indicator/background-task-indicator.component"
 import { breadcrumbs } from "./breadcrumbs/breadcrumbs.component"
-import { create_workspace } from "./main/main.component"
 import { details } from "./details/details.component"
 import { modal } from "./modal/modal.component"
 import { notifications } from "./notifications/notifications.component"
@@ -29,8 +29,6 @@ import { title } from "./title/title.component"
 import { user } from "./user/user.component"
 
 import "./client-app.styles.css"
-
-// TODO Remove
 
 export const create = maoka.create<ClientApp.Args>("div", ({ use, fetch }) => {
 	const hunter: OrdoClient.Command.Hunter = hunt.create(ordo.logger.debug)
@@ -43,15 +41,11 @@ export const create = maoka.create<ClientApp.Args>("div", ({ use, fetch }) => {
 	use(ordo_client_maoka.context.provide({ hunter, logger: ordo.logger, fetch, query }))
 	use(maoka_dom.jabs.onmount(() => handle_onmount()))
 
-	const { sidebar, sidebar_toggle, workspace } = use(create_workspace)
-
 	const handle_onmount = () => {
-		// I18n commands
 		const drop_add_translations = hunter.track("i18n.add_translations", ({ locale, values }) => i18n$.add(locale, values))
 		const drop_remove_translations = hunter.track("i18n.remove_translations", i18n$.remove)
 		const drop_set_locale = hunter.track("i18n.set_locale", i18n$.set_locale)
 
-		// Aist commands
 		const drop_set_hash = hunter.track("router.set_hash", aist$.set_hash)
 		const drop_set_href = hunter.track("router.set_href", href => void open(href, "_blank")?.focus())
 		const drop_set_pathname = hunter.track("router.set_pathname", aist$.set_pathname)

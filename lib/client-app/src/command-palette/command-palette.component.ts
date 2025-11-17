@@ -82,31 +82,27 @@ export const command_palette = maoka.create("div", ({ use }) => {
 	return () => command_palette_modal()
 })
 
-// const command_palette_toggle = maoka.create("div", ({ use, node }) => {
-// 	const { hunter } = use(ordo_client_maoka.context.consume)
+export const command_palette_toggle = maoka.create("div", ({ use, node }) => {
+	const { hunter } = use(ordo_client_maoka.context.consume)
 
-// 	const render_icon = (span: HTMLSpanElement) => maoka_dom.render(span, bs_menu_button_wide_fill(), node.root.create_id)
-// 	const is_current = false
-// 	const readable_name = "command_palette_name"
+	const handle_click = (event: MouseEvent) => {
+		event.preventDefault()
+		hunter.shoot("command_palette.toggle")
+	}
+	const handle_keydown = (event: KeyboardEvent) => {
+		if (maoka_dom.node_guard(node) && event.code === "Enter") {
+			event.stopPropagation()
+			hunter.shoot("command_palette.toggle")
+		}
+	}
 
-// 	const handle_click = (event: MouseEvent) => {
-// 		event.preventDefault()
-// 		hunter.shoot("command_palette.toggle")
-// 	}
-// 	const handle_keydown = (event: KeyboardEvent) => {
-// 		if (maoka_dom.node_guard(node) && event.code === "Enter") {
-// 			event.stopPropagation()
-// 			hunter.shoot("command_palette.toggle")
-// 		}
-// 	}
+	use(ordo_client_maoka.jabs.set_class("activity-bar_icon"))
+	use(ordo_client_maoka.jabs.set_attribute("tabindex", "1"))
+	use(ordo_client_maoka.jabs.listen("onclick", handle_click))
+	use(ordo_client_maoka.jabs.listen("onkeydown", handle_keydown))
 
-// 	use(ordo_client_maoka.jabs.set_class("activity-bar_link"))
-// 	use(ordo_client_maoka.jabs.set_attribute("tabindex", "1"))
-// 	use(ordo_client_maoka.jabs.listen("onclick", handle_click))
-// 	use(ordo_client_maoka.jabs.listen("onkeydown", handle_keydown))
-
-// 	return () => activity_bar_icon({ is_current, render_icon, readable_name })
-// })
+	return () => bs_menu_button_wide_fill()
+})
 
 // --- Internal ---
 

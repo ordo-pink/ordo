@@ -11,7 +11,7 @@ declare global {
 	namespace OrdoClient {
 		export type Fetch = (input: string | URL | Request, init?: RequestInit) => Promise<Response>
 
-		export type Query = Zags.ReadableInstance<Aist.State & I18n.State>
+		export type Query = Zags.ReadableInstance<Aist.State & I18n.State & OrdoClient.Activity.State>
 	}
 }
 

@@ -36,6 +36,71 @@ export const auth_jab: (
 ) => Maoka.Jab<Zags.Instance<ClientSDK.User.State>> =
 	(fetch, hosts, hunter) =>
 	({ use }) => {
+		use(
+			maoka.dom.jabs.onmount(async () => {
+				// TODO Store fns locally
+				await import("@ordo-pink/function-landing")
+					.then(m => m.default)
+					.then(f => f(state))
+					.then(core.fns.v)
+					.catch(logger.error)
+
+				const divorce_user = auth$.cheat("user", async u => {
+					const registered_fns = core.fns.keys_of(fn_disablers)
+
+					if (u) {
+						const fns = core.user.get_installed_functions(u)
+
+						if (!registered_fns.length) {
+							for (const fn of fns) {
+								// TODO Store fns locally
+								const disable_fn = await import(`${hosts.fn}/${fn}`)
+									.then(m => m.default)
+									.then((f: ClientSDK.F.Instance) => f(state))
+									.catch(logger.error)
+
+								fn_disablers[fn] = disable_fn
+							}
+						} else {
+							let needs_reload = false
+
+							for (const fn of registered_fns) {
+								if (!fns.includes(fn)) {
+									needs_reload = true
+									if (fn_disablers[fn]) await fn_disablers[fn]()
+								}
+							}
+
+							if (needs_reload) {
+								window.location.reload()
+							} else {
+								for (const fn of fns) {
+									if (registered_fns.includes(fn)) continue
+
+									// TODO Store fns locally
+									const disable_fn = await import(`${hosts.fn}/${fn}`)
+										.then(m => m.default)
+										.then((f: ClientSDK.F.Instance) => f(state))
+										.catch(logger.error)
+
+									fn_disablers[fn] = disable_fn
+								}
+							}
+						}
+					} else {
+						// for (const fn of registered_fns) {
+						// 	if (fn_disablers[fn]) await fn_disablers[fn]()
+						// }
+						// window.location.reload()
+					}
+				})
+
+				return () => {
+					divorce_user()
+				}
+			}),
+		)
+
 		const handle_mount = () => {
 			const refresh_session0 = oath
 				.of(new Headers())

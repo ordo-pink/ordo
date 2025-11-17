@@ -117,7 +117,7 @@ declare global {
 			logger: Ordo.Logger
 			fetch: OrdoClient.Fetch
 			activity$: Zags.Instance<OrdoClient.Activity.State>
-			i18n$: I18n.Stream<OrdoClient.Translations.Keys>
+			i18n$: I18n.Stream
 			aist$: Aist.Stream
 			data$: Zags.Instance<{ data: Ordo.Data.Instance[] }>
 			user$: Zags.Instance<{ user?: Ordo.User.Instance }>

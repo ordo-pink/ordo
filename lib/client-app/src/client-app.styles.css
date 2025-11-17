@@ -3,6 +3,6 @@
 	@apply bg-gradient-to-br from-stone-50 via-neutral-50 to-slate-50 dark:from-stone-800 dark:via-neutral-800 dark:to-zinc-800;
 }
 
-main {
-	@apply flex h-svh p-2;
+.workspace-wrapper {
+	@apply flex h-svh;
 }

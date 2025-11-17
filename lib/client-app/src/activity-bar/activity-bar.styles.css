@@ -11,7 +11,7 @@
 }
 
 .activity-bar_icon {
-	@apply text-2xl transition-colors hover:text-pink-500 focus:text-pink-500;
+	@apply cursor-pointer text-2xl transition-colors hover:text-pink-500;
 }
 
 .activity-bar_icon.active {

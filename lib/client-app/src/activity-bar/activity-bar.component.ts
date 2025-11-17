@@ -10,8 +10,10 @@ export const activity_bar = maoka.create<{
 	activities$: Zags.Instance<OrdoClient.Activity.State>
 	command_palette_toggle: () => Maoka.Component
 	sidebar_toggle: () => Maoka.Component
-}>("div", ({ activities$, command_palette_toggle, sidebar_toggle, use }) => {
-	const get_state = use(ordo_client_maoka.jabs.marry$(activities$))
+}>("div", ({ command_palette_toggle, sidebar_toggle, use }) => {
+	const { query } = use(ordo_client_maoka.context.consume)
+
+	const get_state = use(ordo_client_maoka.jabs.cheat$(query, "activities"))
 
 	use(ordo_client_maoka.jabs.set_class("activity-bar"))
 

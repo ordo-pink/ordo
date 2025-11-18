@@ -129,10 +129,10 @@ export const create = maoka.create<ClientApp.Args>("div", ({ use, fetch }) => {
 
 	// TODO Data storage
 	// TODO Content storage
+	// TODO Breadcrumbs
 	// TODO Quick Search
 	// TODO Settings
 	// TODO Activities
-	// TODO Activity & File Association details + "Breadcrumbs"
 	// TODO Notification history
 	// TODO File Associations
 	// TODO Installed Functions

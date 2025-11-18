@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ */
+
 import { type Maoka, maoka } from "@ordo-pink/oss-maoka"
 import { maoka_dom } from "@ordo-pink/oss-maoka/dom"
 import { maoka_styled } from "@ordo-pink/oss-maoka-styled"

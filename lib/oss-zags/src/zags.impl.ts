@@ -83,8 +83,8 @@ export const create: Zags.Module = (state, partners = []) => {
 		concat: o => {
 			const n = create({ ...unwrap(), ...o.unwrap() })
 
-			const divorce_this = marry(state => n.replace(prev_state => ({ ...prev_state, ...clone_deep(state) })))
-			const divorce_that = o.marry(state => n.replace(prev_state => ({ ...prev_state, ...clone_deep(state) })))
+			const divorce_this = marry(state => n.replace(prev_state => clone_deep({ ...prev_state, ...state })))
+			const divorce_that = o.marry(state => n.replace(prev_state => clone_deep({ ...prev_state, ...state })))
 
 			n.on_kill(() => {
 				divorce_this()
@@ -94,10 +94,8 @@ export const create: Zags.Module = (state, partners = []) => {
 			return n
 		},
 		replace: f => {
-			const state_copy = { ...state }
-			const updated_state = f(state_copy)
-
-			state = updated_state
+			const state_copy = clone_deep(state)
+			state = f(state_copy)
 
 			partners.forEach(f => f(state, true))
 		},

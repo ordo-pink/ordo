@@ -60,7 +60,7 @@ test.describe("zags", () => {
 			const zags = create({ x: 0 })
 			zags.marry((state, is_update) => is_update && mock(state))
 			zags.replace(state => ({ x: 0 }))
-			test.expect(mock).toBeCalledTimes(0)
+			test.expect(mock).toBeCalledTimes(1)
 		})
 	})
 

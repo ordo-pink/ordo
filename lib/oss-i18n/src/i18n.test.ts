@@ -5,16 +5,17 @@
 
 import test from "bun:test"
 
-import { LOCALE, create_i18n } from "./i18n.impl"
+import { create_i18n } from "./i18n.impl"
+import { LOCALE } from "./i18n.constants"
 
 test.describe("i18n", () => {
 	test.it("should create an instance", () => {
-		const i18n = create_i18n<{ hello: { world: string } }>(LOCALE.ENGLISH, { en_hello_world: "Hello World!" })
+		const i18n = create_i18n(LOCALE.ENGLISH, { en_hello_world: "Hello World!" })
 		test.expect(i18n.translate("hello_world")).toBe("Hello World!")
 	})
 
 	test.it("should add translations", () => {
-		const i18n = create_i18n<{ hello: { world: string } }>(LOCALE.ENGLISH)
+		const i18n = create_i18n(LOCALE.ENGLISH)
 		test.expect(i18n.translate("hello_world", "oops")).toBe("oops")
 
 		i18n.add(LOCALE.ENGLISH, { hello_world: "Hello World!" })
@@ -22,7 +23,7 @@ test.describe("i18n", () => {
 	})
 
 	test.it("should switch locale", () => {
-		const i18n = create_i18n<{ hello: { world: string } }>(LOCALE.ENGLISH)
+		const i18n = create_i18n(LOCALE.ENGLISH)
 		i18n.add(LOCALE.ENGLISH, { hello_world: "Hello World!" })
 		i18n.add(LOCALE.KOREAN, { hello_world: "안녕하세요!" })
 		i18n.set_locale(LOCALE.KOREAN)

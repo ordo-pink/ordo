@@ -5,13 +5,13 @@
 
 import test from "bun:test"
 
-import { hunt } from "./hunt.impl"
+import { create } from "./hunt.impl"
 
 test.describe("hunter", () => {
 	test.it("should fire shots", () => {
 		const x = { hello: "world" }
 
-		const hunter = hunt.begin<{ test: { args: string; ret: boolean } }>()
+		const hunter = create<{ test: { args: string; ret: boolean } }>()
 
 		hunter.track("test", str => void (x.hello = str))
 		hunter.shoot("test", "world1")
@@ -19,21 +19,21 @@ test.describe("hunter", () => {
 		test.expect(x.hello).toBe("world1")
 	})
 
-	test.it("should fire a barrage of shots", () => {
+	test.it("should fire a barrage of shots", async () => {
 		const x = { hello: "world" } as Record<string, string>
 
-		const hunter = hunt.begin<{ test: { args: string; ret: boolean } }>()
+		const hunter = create<{ test: { args: string; ret: boolean } }>()
 
 		hunter.track("test", str => void (x.hello = str))
 		hunter.track("test", str => void (x[str] = str))
-		hunter.shoot("test", "world1")
+		await hunter.shoot("test", "world1").to_promise()
 
 		test.expect(x.world1).toBe("world1")
 	})
 
 	test.it("should disengage", () => {
 		const x = { hello: "world" } as Record<string, string>
-		const hunter = hunt.begin<{ test: { args: string } }>()
+		const hunter = create<{ test: { args: string } }>()
 		hunter.track("test", str => void (x.hello = str))
 		const putdown = hunter.track("test", str => void (x[str] = str))
 		putdown()
@@ -43,24 +43,24 @@ test.describe("hunter", () => {
 	})
 
 	test.it("should not require bullet if it is void", () => {
-		const hunter = hunt.begin<{ test: { args: void } }>()
+		const hunter = create<{ test: { args: void } }>()
 
 		hunter.shoot("test")
 	})
 
-	test.it("should work without type suggestions", () => {
-		const hunter = hunt.begin<Record<string, { args: any }>>()
+	test.it("should work without type suggestions", async () => {
+		const hunter = create<Record<string, { args: any }>>()
 		let y = 0
 
 		hunter.track("hey", x => void (y = x))
-		hunter.shoot("hey", 1)
+		await hunter.shoot("hey", 1).to_promise()
 
 		test.expect(y).toBe(1)
 	})
 
 	test.it("should promise the prey is shot", () => {
 		const x = { hello: "world" } as Record<string, string>
-		const hunter = hunt.begin<{ test: { args: string } }>()
+		const hunter = create<{ test: { args: string } }>()
 		hunter.track(
 			"test",
 			str =>

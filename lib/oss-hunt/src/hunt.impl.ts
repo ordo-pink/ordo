@@ -27,9 +27,18 @@ const handle_barrage_updates =
 
 				Promise.all(guns.map(gun => gun(shot.bullet)))
 					.then(() => shot.callback())
-					.then(() => debug && debug("[HUNT] 🟢 Hit", `"${shot.prey as string}"`, "with", shot.bullet))
+					.then(() => {
+						if (debug)
+							shot.bullet
+								? debug("[HUNT] 🟢 Hit", `"${shot.prey as string}"`, "::", shot.bullet)
+								: debug("[HUNT] 🟢 Hit", `"${shot.prey as string}"`)
+					})
 					.catch(e => {
-						debug && debug("[HUNT] 🔴 Failed", `"${shot.prey as string}"`, "with", shot.bullet, e)
+						if (debug)
+							shot.bullet
+								? debug("[HUNT] 🔴 Failed", `"${shot.prey as string}"`, "::", shot.bullet, e)
+								: debug("[HUNT] 🔴 Failed", `"${shot.prey as string}"`, e)
+
 						return shot.callback(e)
 					})
 			}
@@ -42,7 +51,10 @@ const shoot =
 		debug?: (...message: any[]) => void,
 	): Hunt.Shoot<$Preys> =>
 	(prey, bullet) => {
-		debug && debug("[HUNT] ⚪ Fired shot", `"${prey as string}"`, "with", bullet)
+		if (debug)
+			bullet
+				? debug("[HUNT] ⚪ Fired shot", `"${prey as string}"`, "::", bullet)
+				: debug("[HUNT] ⚪ Fired shot", `"${prey as string}"`)
 
 		const result_zags = zags.create<{ error?: unknown; status: SHOT_STATUS }>({
 			error: void 0,

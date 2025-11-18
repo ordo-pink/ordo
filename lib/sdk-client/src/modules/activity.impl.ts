@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: Unlicense
  */
 
+import type { Colonoscope } from "@ordo-pink/oss-colonoscope"
+
 declare global {
 	interface cmd {
 		activity: {
@@ -12,7 +14,7 @@ declare global {
 	}
 
 	export namespace OrdoClient.Activity {
-		export type State = { activities: { items: Instance[]; current?: Instance } }
+		export type State = { activities: { items: Instance[]; current?: Instance & { params: Colonoscope.Results } } }
 
 		export type Route = `/${string}`
 

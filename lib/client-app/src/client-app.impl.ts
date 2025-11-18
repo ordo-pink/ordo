@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: Unlicense
  */
 
+import { type Colonoscope, colonoscope } from "@ordo-pink/oss-colonoscope"
 import { aist } from "@ordo-pink/oss-aist"
 import { bs_check_circle } from "@ordo-pink/frontend-icons"
-import { colonoscope } from "@ordo-pink/oss-colonoscope"
 import { hunt } from "@ordo-pink/oss-hunt"
 import { i18n } from "@ordo-pink/oss-i18n"
 import { maoka } from "@ordo-pink/oss-maoka"
@@ -53,34 +53,56 @@ export const create = maoka.create<ClientApp.Args>("div", ({ use, fetch }) => {
 			ordo.validations.is_string(x) ? aist$.set_search(x) : aist$.set_search_params(x),
 		)
 
+		/**
+		 * Listen for registerring activities. If a newly registered activity turns
+		 * out to be serving the current route - set is as `current`.
+		 */
 		const drop_register_activity = hunter.track("activity.register", item => {
 			activities$.update("activities.items", items => (items.some(i => i.id === item.id) ? items : items.concat(item)))
 
 			const pathname = aist$.$.select("aist.pathname")
 
 			for (const route of item.routes) {
-				if ((colonoscope.is_doctor(route) && colonoscope.check(route, pathname)) || route === pathname) {
-					activities$.update("activities.current", () => item)
+				if (colonoscope.is_doctor(route)) {
+					const params = colonoscope.check(route, pathname)
+					activities$.update("activities.current", () => ({ ...item, params }))
+					break
+				} else if (route === pathname) {
+					activities$.update("activities.current", () => ({ ...item, params: null }))
 					break
 				}
 			}
 		})
 
+		/**
+		 * Listen for pathname changes and change current activity.
+		 */
 		const divorce_rotor = aist$.$.cheat("aist.pathname", pathname => {
 			const items = activities$.select("activities.items")
 
-			activities$.update("activities.current", () =>
-				items.find(item => {
+			activities$.update("activities.current", () => {
+				let params: Colonoscope.Results = null
+
+				const item = items.find(item => {
 					for (const route of item.routes) {
 						if (colonoscope.is_doctor(route)) {
-							if (colonoscope.check(route, pathname)) return true
+							const results = colonoscope.check(route, pathname)
+
+							if (results) {
+								params = results
+								return true
+							}
 						}
-						if (route === pathname) return true
+						if (route === pathname) {
+							return true
+						}
 					}
 
 					return false
-				}),
-			)
+				})
+
+				return item && { ...item, params }
+			})
 		})
 
 		hunter.shoot("title.set_title", "loading")

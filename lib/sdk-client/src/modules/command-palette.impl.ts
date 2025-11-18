@@ -39,7 +39,7 @@ declare global {
 
 		export type Section = CONSTANTS.SECTION
 
-		export type Type = CONSTANTS.ITEM_TYPE
+		export type ItemType = CONSTANTS.ITEM_TYPE
 
 		export type Item<$Value = any> = {
 			id: Id
@@ -58,7 +58,7 @@ declare global {
 
 			description?: OrdoClient.Translations.Key
 
-			type?: Type
+			type?: ItemType
 		}
 
 		export type Instance<$Value = any> = {

@@ -17,7 +17,7 @@ declare global {
 		background_status: {
 			saving: { args: void }
 			loading: { args: void }
-			none: { args: void }
+			reset: { args: void }
 		}
 	}
 

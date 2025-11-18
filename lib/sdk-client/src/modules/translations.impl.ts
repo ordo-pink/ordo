@@ -21,8 +21,9 @@ declare global {
 
 	namespace OrdoClient.Translations {
 		export type Keys = Record<string, string>
-		export type Key = I18n.DefinitionToTranslationKeys<Keys>
-		export type Values = Record<I18n.DefinitionToTranslationKeys<Keys>, string>
+		export type Key = string
+		export type Locale = I18n.ISO_639_1_Locale
+		export type Values = Record<string, string>
 
 		type HasPrefix<T extends string, P extends string> = T extends `${P}${string}` ? T : never
 

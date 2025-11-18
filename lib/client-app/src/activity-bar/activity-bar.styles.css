@@ -1,19 +1,19 @@
-.activity-bar {
+#activity-bar {
 	@apply fixed bottom-0 left-0 right-0 z-30 m-2 flex items-center justify-between space-x-4 self-center rounded-lg p-2 shadow-lg backdrop-blur-lg sm:left-auto sm:top-0 sm:flex-col sm:space-x-0 sm:space-y-4 sm:shadow-none sm:backdrop-blur-none;
 }
 
-.activity-bar_activities {
+#activity-bar .activities {
 	@apply flex items-center justify-center space-x-4 self-center sm:flex-col sm:space-x-0 sm:space-y-4;
 }
 
-.activity-bar_link {
-	@apply no-underline outline-none;
+#activity-bar .link {
+	@apply no-underline outline-none transition-all hover:scale-125 hover:text-pink-500 focus-visible:scale-125 focus-visible:text-pink-500;
 }
 
-.activity-bar_icon {
-	@apply cursor-pointer text-2xl transition-colors hover:text-pink-500;
+#activity-bar .icon {
+	@apply cursor-pointer text-2xl outline-none ring-0 transition-all hover:scale-125 hover:text-pink-500 focus-visible:scale-125 focus-visible:text-pink-500;
 }
 
-.activity-bar_icon.active {
+#activity-bar .icon.active {
 	@apply text-pink-500;
 }

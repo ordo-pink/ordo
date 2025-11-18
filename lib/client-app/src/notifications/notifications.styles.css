@@ -1,4 +1,4 @@
-.notification-list {
+#notification-list {
 	@apply pointer-events-none fixed top-2 z-50 flex w-full flex-col-reverse gap-y-1 md:bottom-2 md:right-2 md:top-auto md:w-auto md:flex-col;
 }
 

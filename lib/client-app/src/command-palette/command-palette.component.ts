@@ -9,135 +9,82 @@ import "./command-palette.styles.css"
 export const command_palette = maoka.create("div", ({ use }) => {
 	const { hunter } = use(ordo_client_maoka.context.consume)
 
-	const handle_show = () => use(ordo_client_maoka.jabs.add_class("active"))
-	const handle_hide = () => use(ordo_client_maoka.jabs.remove_class("active"))
 	const handle_click = () => hunter.shoot("command_palette.hide")
-	const handle_mount = () => {
-		const divorce_current = $.cheat("current", current => (current ? handle_show() : handle_hide()))
 
-		const release_add = hunter.track("command_palette.add", item =>
-			$.update("items", items => (items.some(i => i.id === item.id) ? items : [...items, item])),
-		)
+	const handle_add: OrdoClient.Command.GunFor<"command_palette.add"> = new_item =>
+		$.update("items", items => (items.some(item => item.id === new_item.id) ? items : [...items, new_item]))
+	const handle_remove: OrdoClient.Command.GunFor<"command_palette.remove"> = id =>
+		$.update("items", items => items.filter(item => item.id !== id))
+	const handle_show: OrdoClient.Command.GunFor<"command_palette.show"> = state =>
+		$.update("current", () => state ?? global_palette())
+	const handle_hide: OrdoClient.Command.GunFor<"command_palette.hide"> = () =>
+		$.each({ current: () => void 0, index: () => 0, location: () => SECTION.ITEMS, search_value: () => "" })
+	const handle_toggle: OrdoClient.Command.GunFor<"command_palette.toggle"> = () =>
+		$.update("current", current_state => (current_state ? void 0 : global_palette()))
 
-		const release_hide = hunter.track("command_palette.hide", () => {
-			$.each({
-				current: () => void 0,
-				index: () => 0,
-				location: () => ORDO_CLIENT.COMMAND_PALETTE.SECTION.ITEMS,
-				search_value: () => "",
-			})
-		})
-
-		const release_remove = hunter.track("command_palette.remove", id =>
-			$.update("items", items => items.filter(i => i.id !== id)),
-		)
-
-		const release_show = hunter.track("command_palette.show", new_current => {
-			$.update("current", () => new_current ?? global_palette())
-		})
-
-		const release_toggle = hunter.track("command_palette.toggle", () => {
-			$.update("current", current => {
-				if (current) return
-				return global_palette()
-			})
-		})
-
-		hunter.shoot("i18n.add_translations", {
-			locale: "en",
-			values: {
-				command_palette_name: "Command Palette",
-				command_palette_commands_toggle_description:
-					"Show or hide command palette. If you read this, doing this will hide the palette.",
-				command_palette_commands_toggle_name: "Toggle Command Palette",
-			},
-		})
-
-		hunter.shoot("command_palette.add", {
-			description: "command_palette_commands_toggle_description",
-			hotkey: "meta+shift+p",
-			id: "command_palette.toggle",
-			readable_name: "command_palette_commands_toggle_name",
-			render_icon: span => maoka_dom.render(span, bs_menu_button_wide_fill(), () => crypto.randomUUID()),
-			type: ORDO_CLIENT.COMMAND_PALETTE.ITEM_TYPE.MODAL_OPENER,
-			value: () => hunter.shoot("command_palette.toggle"),
-		})
-
-		return () => {
-			hunter.shoot("command_palette.remove", "command_palette.toggle")
-			divorce_current()
-
-			release_add()
-			release_hide()
-			release_remove()
-			release_show()
-			release_toggle()
-		}
+	const handle_toggle_cp_select = () => hunter.shoot("command_palette.toggle")
+	const render_toggle_cp_icon: OrdoClient.CommandPalette.RenderIcon = span =>
+		maoka_dom.render(span, bs_menu_button_wide_fill(), () => crypto.randomUUID())
+	const toggle_params = {
+		hotkey: "meta+shift+p",
+		render_icon: render_toggle_cp_icon,
+		type: ITEM_TYPE.MODAL_OPENER,
+		description: "cp_toggle_desc",
 	}
 
-	use(ordo_client_maoka.jabs.set_class("command-palette_wrapper"))
-	use(ordo_client_maoka.jabs.listen("onclick", handle_click))
-	use(maoka_dom.jabs.onmount(handle_mount))
+	const handle_mount = () =>
+		$.cheat("current", current => {
+			if (current) use(ordo_client_maoka.jabs.add_class("active"))
+			else use(ordo_client_maoka.jabs.remove_class("active"))
+		})
 
-	return () => command_palette_modal()
+	use(maoka_dom.jabs.onmount(handle_mount))
+	use(ordo_client_maoka.jabs.set_id("cp-overlay"))
+	use(ordo_client_maoka.jabs.listen("onclick", handle_click))
+	use(ordo_client_maoka.jabs.handle_command("command_palette.add", handle_add))
+	use(ordo_client_maoka.jabs.handle_command("command_palette.remove", handle_remove))
+	use(ordo_client_maoka.jabs.handle_command("command_palette.show", handle_show))
+	use(ordo_client_maoka.jabs.handle_command("command_palette.hide", handle_hide))
+	use(ordo_client_maoka.jabs.handle_command("command_palette.toggle", handle_toggle))
+	use(ordo_client_maoka.jabs.add_translations("en", en))
+	use(ordo_client_maoka.jabs.add_command_palette_item("cp_toggle_name", handle_toggle_cp_select, toggle_params))
+
+	return command_palette_modal
 })
 
-export const command_palette_toggle = maoka.create("div", ({ use, node }) => {
+export const command_palette_toggle = maoka.create("div", ({ use }) => {
 	const { hunter } = use(ordo_client_maoka.context.consume)
 
 	const handle_click = (event: MouseEvent) => {
 		event.preventDefault()
 		hunter.shoot("command_palette.toggle")
 	}
+
 	const handle_keydown = (event: KeyboardEvent) => {
-		if (maoka_dom.node_guard(node) && event.code === "Enter") {
+		if (event.code === "Enter") {
 			event.stopPropagation()
 			hunter.shoot("command_palette.toggle")
 		}
 	}
 
-	use(ordo_client_maoka.jabs.set_class("activity-bar_icon"))
+	use(ordo_client_maoka.jabs.set_class("icon"))
 	use(ordo_client_maoka.jabs.set_attribute("tabindex", "1"))
 	use(ordo_client_maoka.jabs.listen("onclick", handle_click))
 	use(ordo_client_maoka.jabs.listen("onkeydown", handle_keydown))
 
-	return () => bs_menu_button_wide_fill()
+	return bs_menu_button_wide_fill
 })
 
 // --- Internal ---
 
-const command_palette_item = maoka.create<{ item: OrdoClient.CommandPalette.Item; active: boolean }>(
-	"div",
-	({ active, item, use }) => {
-		const { hunter } = use(ordo_client_maoka.context.consume)
+const { SECTION, ITEM_TYPE, FUZZY_CHECK_RATIO } = ORDO_CLIENT.COMMAND_PALETTE
 
-		const handle_click = () => {
-			hunter.shoot("command_palette.hide")
-			item.value()
-		}
-		const translate = use(ordo_client_maoka.jabs.translate$)
+const IGNORED_KEYS = ["Control", "Shift", "Alt", "Meta"]
 
-		use(ordo_client_maoka.jabs.set_id(String(item.id)))
-		use(ordo_client_maoka.jabs.set_class("command-palette_item"))
-		use(ordo_client_maoka.jabs.listen("onclick", handle_click))
-
-		if (active) use(ordo_client_maoka.jabs.add_class("active"))
-		else use(ordo_client_maoka.jabs.remove_class("active"))
-
-		return () => {
-			use(ordo_client_maoka.jabs.set_attribute("title", translate(item.description)))
-
-			return [
-				item_main(() => [
-					item_title(() => [item.render_icon && item_icon({ render: item.render_icon }), translate(item.readable_name)]),
-					item.hotkey &&
-						item_info(() => ordo_client_maoka.components.actionable_hotkey({ hotkey: item.hotkey!, decoration_only: true })),
-				]),
-				item_footer(() => translate(item.description)),
-			]
-		}
-	},
-)
+const global_palette = (): OrdoClient.CommandPalette.Instance<() => void> => ({
+	items: $.select("items"),
+	on_select: item => item.value(),
+})
 
 const $ = zags.create<{
 	current?: OrdoClient.CommandPalette.Instance
@@ -146,59 +93,14 @@ const $ = zags.create<{
 	location: OrdoClient.CommandPalette.Section
 	index: number
 	search_value: string
-}>({
-	index: 0,
-	items: [],
-	location: ORDO_CLIENT.COMMAND_PALETTE.SECTION.ITEMS,
-	search_value: "",
-})
-
-const command_palette_items = maoka.create("div", ({ use }) => {
-	const get_state = use(ordo_client_maoka.jabs.marry$($))
-
-	use(ordo_client_maoka.jabs.set_class("command-palette_items_multiple-wrapper"))
-
-	return () => {
-		const state = get_state()
-
-		if (!state.current) return null
-
-		const visible_items = state.current.items.filter(item =>
-			ordo.fns.fuzzy_check(item.readable_name, state.search_value, ORDO_CLIENT.COMMAND_PALETTE.FUZZY_CHECK_RATIO),
-		)
-
-		if (!visible_items.length) return nothing_found_div(() => `Nothing matches the search term "${state.search_value}"`)
-
-		if (!state.current.is_multiple)
-			return items(() => visible_items.map((item, index) => command_palette_item({ active: state.index === index, item })))
-
-		return [
-			items(() =>
-				state.items.map((item, index) =>
-					command_palette_item({
-						active: state.location === ORDO_CLIENT.COMMAND_PALETTE.SECTION.ITEMS && state.index === index,
-						item,
-					}),
-				),
-			),
-			items(() =>
-				state.current!.pinned_items?.map((item, index) =>
-					command_palette_item({
-						active: state.location === ORDO_CLIENT.COMMAND_PALETTE.SECTION.PINNED_ITEMS && state.index === index,
-						item,
-					}),
-				),
-			),
-		]
-	}
-})
+}>({ index: 0, items: [], location: SECTION.ITEMS, search_value: "" })
 
 const command_palette_modal = maoka.create("div", ({ use }) => {
 	const { hunter } = use(ordo_client_maoka.context.consume)
 	const is_darwin = use(ordo_client_maoka.jabs.is_darwin)
 	const is_mobile = use(ordo_client_maoka.jabs.is_mobile)
-
-	const get_current = use(ordo_client_maoka.jabs.cheat$($, "current" as const))
+	const translate = use(ordo_client_maoka.jabs.translate$)
+	const get_current = use(ordo_client_maoka.jabs.cheat$($, "current"))
 
 	const handle_click = (event: MouseEvent) => event.stopPropagation()
 	const handle_global_keydown = (event: KeyboardEvent) => {
@@ -212,15 +114,11 @@ const command_palette_modal = maoka.create("div", ({ use }) => {
 
 		if (current) {
 			const filtered_items = current.items.filter(i =>
-				ordo.fns.fuzzy_check(i.readable_name, $.select("search_value"), ORDO_CLIENT.COMMAND_PALETTE.FUZZY_CHECK_RATIO),
+				ordo.fns.fuzzy_check(i.readable_name, $.select("search_value"), FUZZY_CHECK_RATIO),
 			)
 
 			if (current.is_multiple && event.code === "Tab")
-				return $.update("location", l =>
-					l === ORDO_CLIENT.COMMAND_PALETTE.SECTION.ITEMS
-						? ORDO_CLIENT.COMMAND_PALETTE.SECTION.PINNED_ITEMS
-						: ORDO_CLIENT.COMMAND_PALETTE.SECTION.ITEMS,
-				)
+				return $.update("location", l => (l === SECTION.ITEMS ? SECTION.PINNED_ITEMS : SECTION.ITEMS))
 			else if (event.code === "ArrowDown") {
 				event.preventDefault()
 				return $.update("index", i => (i >= filtered_items.length - 1 ? 0 : i + 1))
@@ -258,7 +156,6 @@ const command_palette_modal = maoka.create("div", ({ use }) => {
 	}
 
 	use(ordo_client_maoka.jabs.set_id("cp"))
-	use(ordo_client_maoka.jabs.set_class("command-palette"))
 	use(ordo_client_maoka.jabs.listen("onclick", handle_click))
 	use(ordo_client_maoka.jabs.listen_global_event("keydown", handle_global_keydown))
 
@@ -275,56 +172,136 @@ const command_palette_modal = maoka.create("div", ({ use }) => {
 					? void 0
 					: footer(() => [
 							bs_question_circle({ classes: "mr-2" }),
-							text_span(() => "Type to search. Arrows to navigate."), // TODO i18n
+							text_span(() => translate("cp_hint_1")),
 							ordo_client_maoka.components.actionable_hotkey({ hotkey: "enter", decoration_only: true }),
-							text_span(() => "to select item."), // TODO i18n
+							text_span(() => translate("cp_hint_2")),
 							ordo_client_maoka.components.actionable_hotkey({ hotkey: "escape", decoration_only: true }),
-							text_span(() => "to close."), // TODO i18n
+							text_span(() => translate("cp_hint_3")),
 						]),
 			]
 		)
 	}
 })
 
-const command_palette_search = maoka.create("label", ({ use }) => {
-	use(ordo_client_maoka.jabs.set_class("command-palette_search_wrapper"))
+const command_palette_items = maoka.create("div", ({ use }) => {
+	const get_state = use(ordo_client_maoka.jabs.marry$($))
 
-	return () => [bs_search({ classes: "" }), search()]
+	use(ordo_client_maoka.jabs.set_class("items_multiple-wrapper"))
+
+	return () => {
+		const state = get_state()
+
+		if (!state.current) return null
+
+		const visible_items = state.current.items.filter(item =>
+			ordo.fns.fuzzy_check(item.readable_name, state.search_value, FUZZY_CHECK_RATIO),
+		)
+
+		if (!visible_items.length) return nothing_found_div(() => `Nothing matches the search term "${state.search_value}"`)
+
+		if (!state.current.is_multiple)
+			return items(() => visible_items.map((item, index) => command_palette_item({ active: state.index === index, item })))
+
+		return [
+			items(() =>
+				state.items.map((item, index) =>
+					command_palette_item({
+						active: state.location === SECTION.ITEMS && state.index === index,
+						item,
+					}),
+				),
+			),
+			items(() =>
+				state.current!.pinned_items?.map((item, index) =>
+					command_palette_item({
+						active: state.location === SECTION.PINNED_ITEMS && state.index === index,
+						item,
+					}),
+				),
+			),
+		]
+	}
 })
 
-const search = maoka_styled.input("command-palette_search", ({ use }) => {
-	const t_search = "Search..." // TODO i18n
+type CommandPaletteItemArgs = { item: OrdoClient.CommandPalette.Item; active: boolean }
+const command_palette_item = maoka.create<CommandPaletteItemArgs>("div", ({ active, item, use }) => {
+	const { hunter } = use(ordo_client_maoka.context.consume)
+	const translate = use(ordo_client_maoka.jabs.translate$)
 
-	const handle_mount = () => use(maoka_dom.jabs.if_dom(n => n.value.focus()))
+	const handle_click = () => {
+		hunter.shoot("command_palette.hide")
+		item.value()
+	}
+
+	use(ordo_client_maoka.jabs.set_id(String(item.id)))
+	use(ordo_client_maoka.jabs.set_class("item"))
+	use(ordo_client_maoka.jabs.listen("onclick", handle_click))
+
+	if (active) use(ordo_client_maoka.jabs.add_class("active"))
+	else use(ordo_client_maoka.jabs.remove_class("active"))
+
+	return () => {
+		const t_description = translate(item.description)
+
+		use(ordo_client_maoka.jabs.set_attribute("title", t_description))
+
+		return [
+			item_main(() => [
+				item_title(() => [item.render_icon && item_icon({ render: item.render_icon }), translate(item.readable_name)]),
+				item.hotkey &&
+					item_info(() => ordo_client_maoka.components.actionable_hotkey({ hotkey: item.hotkey!, decoration_only: true })),
+			]),
+			item_footer(() => translate(item.description)),
+		]
+	}
+})
+
+const command_palette_search = maoka.create("label", ({ use }) => {
+	use(ordo_client_maoka.jabs.set_class("search_wrapper"))
+
+	return () => [bs_search(), search()]
+})
+
+const search = maoka_styled.input("search", ({ use }) => {
+	const translate = use(ordo_client_maoka.jabs.translate$)
+
+	const handle_onmount = () => use(maoka_dom.jabs.if_dom(n => n.value.focus()))
 	const handle_input = (event: Event) => {
 		const target = event.target as HTMLInputElement
 		$.update("search_value", () => target.value)
 	}
 
 	use(ordo_client_maoka.jabs.set_id("cp-input"))
-	use(ordo_client_maoka.jabs.set_attribute("placeholder", t_search))
 	use(ordo_client_maoka.jabs.set_attribute("autocomplete", "off"))
 	use(ordo_client_maoka.jabs.set_attribute("value", $.select("search_value")))
 	use(ordo_client_maoka.jabs.listen("oninput", handle_input))
-	use(maoka_dom.jabs.onmount(handle_mount))
+	use(ordo_client_maoka.jabs.set_attribute("placeholder", translate("cp_search_placeholder")))
+	use(maoka_dom.jabs.onmount(handle_onmount))
+
+	return () => {
+		use(ordo_client_maoka.jabs.set_attribute("placeholder", translate("cp_search_placeholder")))
+	}
 })
 
-const IGNORED_KEYS = ["Control", "Shift", "Alt", "Meta"]
-
-const global_palette = (): OrdoClient.CommandPalette.Instance<() => void> => ({
-	items: $.select("items"),
-	on_select: item => item.value(),
+type ItemIconArgs = { render: OrdoClient.CommandPalette.RenderIcon }
+const item_icon = maoka_styled.span<ItemIconArgs>("icon", ({ render, use }) => {
+	use(maoka_dom.jabs.if_dom(n => void render(n.value)))
 })
 
-const item_title = maoka_styled.div("command-palette_item_title-wrapper")
-const item_info = maoka_styled.div("command-palette_item_info")
-const item_main = maoka_styled.div("command-palette_item_main")
-const item_footer = maoka_styled.div("command-palette_item_footer")
-const item_icon = maoka_styled.span<{ render: OrdoClient.CommandPalette.RenderIcon }>(
-	"command-palette_item_icon",
-	({ render, use }) => use(maoka_dom.jabs.if_dom(n => void render(n.value))),
-)
+const item_title = maoka_styled.div("title-wrapper")
+const item_info = maoka_styled.div("info")
+const item_main = maoka_styled.div("main")
+const item_footer = maoka_styled.div("footer")
 const text_span = maoka_styled.span()
-const footer = maoka_styled.div("command-palette_footer")
-const items = maoka_styled.div("command-palette_items")
-const nothing_found_div = maoka_styled.div("command-palette_items_nothing-found")
+const footer = maoka_styled.div("footer")
+const items = maoka_styled.div("items")
+const nothing_found_div = maoka_styled.div("nothing-found")
+
+const en = {
+	cp_toggle_name: "Toggle Command Palette",
+	cp_toggle_desc: "Show or hide Command Palette. If you see this, it is most probably opened.",
+	cp_hint_1: "Type to search. Arrows to navigate.",
+	cp_hint_2: "to select item.",
+	cp_hint_3: "to close.",
+	cp_search_placeholder: "Search...",
+}

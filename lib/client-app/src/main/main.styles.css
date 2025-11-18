@@ -4,15 +4,11 @@
 }
 
 .sidebar-toggle {
-	@apply size-6;
+	@apply rotate-180;
 }
 
 .sidebar-toggle.hidden {
 	@apply invisible;
-}
-
-.sidebar-toggle_icon {
-	@apply rotate-180;
 }
 
 .workspace {

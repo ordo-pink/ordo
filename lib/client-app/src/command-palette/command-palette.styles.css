@@ -1,65 +1,65 @@
-.command-palette {
-	@apply z-40 m-4 flex size-full h-dvh max-h-96 max-w-screen-md cursor-default flex-col space-y-1 rounded-md bg-neutral-200 shadow-lg dark:bg-neutral-900;
-}
-
-.command-palette_wrapper {
+#cp-overlay {
 	@apply fixed bottom-0 left-0 right-0 top-0 hidden items-center justify-center backdrop-blur-sm;
 }
 
-.command-palette_wrapper.active {
+#cp-overlay.active {
 	@apply flex cursor-pointer;
 }
 
-.command-palette_search_wrapper {
+#cp {
+	@apply z-40 m-4 flex size-full h-dvh max-h-96 max-w-screen-md cursor-default flex-col space-y-1 rounded-md bg-neutral-200 shadow-lg dark:bg-neutral-900;
+}
+
+#cp .search_wrapper {
 	@apply flex cursor-text items-center gap-x-2 p-2;
 }
 
-.command-palette_search {
+#cp .search {
 	@apply w-full bg-transparent shadow-none outline-none placeholder:text-neutral-500 focus:outline-none;
 }
 
-.command-palette_items_multiple-wrapper {
+#cp .items_multiple-wrapper {
 	@apply flex size-full grow justify-items-center;
 }
 
-.command-palette_items {
+#cp .items {
 	@apply w-full grow overflow-y-auto;
 }
 
-.command-palette_item {
+#cp .item {
 	@apply flex cursor-pointer flex-col px-2 py-1;
 	@apply hover:bg-neutral-300 hover:dark:bg-neutral-700;
 }
 
-.command-palette_item.active {
+#cp .item.active {
 	@apply bg-gradient-to-r from-pink-300 via-purple-300 to-violet-300 dark:from-blue-950/50 dark:via-purple-950/50 dark:to-violet-950/50;
 	@apply hover:from-pink-300/30 hover:via-pink-300/30 hover:to-violet-300/30 dark:hover:from-blue-950/20 dark:hover:via-purple-950/20 dark:hover:to-violet-950/20;
 }
 
-.command-palette_items_nothing-found {
+#cp .nothing-found {
 	@apply w-full px-2 text-center text-sm text-neutral-500;
 }
 
-.command-palette_item_main {
+#cp .item .main {
 	@apply flex items-center;
 }
 
-.command-palette_item_footer {
+#cp .item .footer {
 	@apply text-xs text-neutral-500;
 }
 
-.command-palette_item_title-wrapper {
+#cp .item .title-wrapper {
 	@apply flex flex-grow items-center gap-x-2;
 }
 
-.command-palette_item_info {
+#cp .item .info {
 	@apply text-xs;
 }
 
-.command-palette_footer {
+#cp > .footer {
 	@apply flex items-center justify-center p-2 text-center text-xs text-neutral-600 dark:text-neutral-400;
 }
 
-.command-palette_create-new-item-hint {
+#cp .create-new-item-hint {
 	@apply flex w-full items-center justify-center space-x-1 text-center text-sm text-neutral-600 dark:text-neutral-400;
 }

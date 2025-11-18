@@ -19,11 +19,9 @@ import { sidebar, sidebar_toggle, workspace } from "./main/main.component"
 import { activity_bar } from "./activity-bar/activity-bar.component"
 import { background_task_status } from "./background-task-indicator/background-task-indicator.component"
 import { breadcrumbs } from "./breadcrumbs/breadcrumbs.component"
-import { details } from "./details/details.component"
 import { modal } from "./modal/modal.component"
 import { notifications } from "./notifications/notifications.component"
 import { ordo_logo } from "./logo/logo.component"
-import { status_bar } from "./status-bar/status-bar.component"
 import { titan_panel } from "./titan-panel/titan-panel.component"
 import { title } from "./title/title.component"
 import { user } from "./user/user.component"
@@ -31,52 +29,14 @@ import { user } from "./user/user.component"
 import "./client-app.styles.css"
 
 export const create = maoka.create<ClientApp.Args>("div", ({ use, fetch }) => {
+	const logger = ordo.logger
 	const hunter: OrdoClient.Command.Hunter = hunt.create(ordo.logger.debug)
 	const aist$ = aist.create(window)
 	const i18n$ = i18n.create_i18n("en")
 	const activities$ = zags.create<OrdoClient.Activity.State>({ activities: { items: [] } })
 	const query: OrdoClient.Query = aist$.$.concat(i18n$.$).concat(activities$).to_readable()
 
-	use(ordo_client_maoka.jabs.set_id("app"))
-	use(ordo_client_maoka.context.provide({ hunter, logger: ordo.logger, fetch, query }))
-	use(maoka_dom.jabs.onmount(() => handle_onmount()))
-
 	const handle_onmount = () => {
-		const drop_add_translations = hunter.track("i18n.add_translations", ({ locale, values }) => i18n$.add(locale, values))
-		const drop_remove_translations = hunter.track("i18n.remove_translations", i18n$.remove)
-		const drop_set_locale = hunter.track("i18n.set_locale", i18n$.set_locale)
-
-		const drop_set_hash = hunter.track("router.set_hash", aist$.set_hash)
-		const drop_set_href = hunter.track("router.set_href", href => void open(href, "_blank")?.focus())
-		const drop_set_pathname = hunter.track("router.set_pathname", aist$.set_pathname)
-		const drop_set_search = hunter.track("router.set_search", x =>
-			ordo.validations.is_string(x) ? aist$.set_search(x) : aist$.set_search_params(x),
-		)
-
-		/**
-		 * Listen for registerring activities. If a newly registered activity turns
-		 * out to be serving the current route - set is as `current`.
-		 */
-		const drop_register_activity = hunter.track("activity.register", item => {
-			activities$.update("activities.items", items => (items.some(i => i.id === item.id) ? items : items.concat(item)))
-
-			const pathname = aist$.$.select("aist.pathname")
-
-			for (const route of item.routes) {
-				if (colonoscope.is_doctor(route)) {
-					const params = colonoscope.check(route, pathname)
-					activities$.update("activities.current", () => ({ ...item, params }))
-					break
-				} else if (route === pathname) {
-					activities$.update("activities.current", () => ({ ...item, params: null }))
-					break
-				}
-			}
-		})
-
-		/**
-		 * Listen for pathname changes and change current activity.
-		 */
 		const divorce_rotor = aist$.$.cheat("aist.pathname", pathname => {
 			const items = activities$.select("activities.items")
 
@@ -122,19 +82,50 @@ export const create = maoka.create<ClientApp.Args>("div", ({ use, fetch }) => {
 			divorce_rotor()
 
 			hunter.shoot("i18n.remove_translations", ["logo", "loading"])
-
-			drop_add_translations()
-			drop_remove_translations()
-			drop_set_locale()
-
-			drop_set_hash()
-			drop_set_href()
-			drop_set_pathname()
-			drop_set_search()
-
-			drop_register_activity()
 		}
 	}
+
+	const handle_set_search: OrdoClient.Command.GunFor<"router.set_search"> = s =>
+		ordo.validations.is_string(s) ? aist$.set_search(s) : aist$.set_search_params(s)
+
+	const handle_register_activity: OrdoClient.Command.GunFor<"activity.register"> = item => {
+		activities$.update("activities.items", items => (items.some(i => i.id === item.id) ? items : items.concat(item)))
+
+		const pathname = aist$.$.select("aist.pathname")
+
+		for (const route of item.routes) {
+			if (colonoscope.is_doctor(route)) {
+				const params = colonoscope.check(route, pathname)
+				activities$.update("activities.current", () => ({ ...item, params }))
+				break
+			} else if (route === pathname) {
+				activities$.update("activities.current", () => ({ ...item, params: null }))
+				break
+			}
+		}
+	}
+
+	const handle_unregister_activity: OrdoClient.Command.GunFor<"activity.unregister"> = id => {
+		activities$.update("activities.items", items => items.filter(i => i.id !== id))
+	}
+
+	const handle_set_href: OrdoClient.Command.GunFor<"router.set_href"> = href => void open(href, "_blank")?.focus()
+
+	const handle_add_translations: OrdoClient.Command.GunFor<"i18n.add_translations"> = ({ locale, values }) =>
+		i18n$.add(locale, values)
+
+	use(ordo_client_maoka.context.provide({ fetch, hunter, logger, query }))
+	use(maoka_dom.jabs.onmount(() => handle_onmount()))
+	use(ordo_client_maoka.jabs.set_id("app"))
+	use(ordo_client_maoka.jabs.handle_command("activity.register", handle_register_activity))
+	use(ordo_client_maoka.jabs.handle_command("activity.unregister", handle_unregister_activity))
+	use(ordo_client_maoka.jabs.handle_command("i18n.add_translations", handle_add_translations))
+	use(ordo_client_maoka.jabs.handle_command("i18n.remove_translations", i18n$.remove))
+	use(ordo_client_maoka.jabs.handle_command("i18n.set_locale", i18n$.set_locale))
+	use(ordo_client_maoka.jabs.handle_command("router.set_hash", aist$.set_hash))
+	use(ordo_client_maoka.jabs.handle_command("router.set_href", handle_set_href))
+	use(ordo_client_maoka.jabs.handle_command("router.set_pathname", aist$.set_pathname))
+	use(ordo_client_maoka.jabs.handle_command("router.set_search", handle_set_search))
 
 	// TODO Data storage
 	// TODO Content storage
@@ -168,20 +159,18 @@ export const create = maoka.create<ClientApp.Args>("div", ({ use, fetch }) => {
 	// TODO Command palette access via router
 	// TODO Modal access via router
 
-	return () => {
-		return [
-			title(),
-			workspace_wrapper(() => [workspace(), sidebar()]),
-			titan_panel(() => [ordo_logo(), breadcrumbs(), user()]),
-			activity_bar({ activities$, command_palette_toggle, sidebar_toggle }),
-			status_bar(() => [background_task_status(), details()]),
-			modal(),
-			command_palette(),
-			notifications(),
-		]
-	}
+	return () => [
+		title(),
+		workspace_wrapper(() => [workspace(), sidebar()]),
+		titan_panel(() => [logo_wrapper(() => [ordo_logo(), background_task_status()]), breadcrumbs(), user()]),
+		activity_bar({ command_palette_toggle, sidebar_toggle }),
+		modal(),
+		command_palette(),
+		notifications(),
+	]
 })
 
 // --- Internal ---
 
+const logo_wrapper = maoka_styled.div("logo-wrapper")
 const workspace_wrapper = maoka_styled.div("workspace-wrapper")

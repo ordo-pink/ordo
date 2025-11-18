@@ -8,59 +8,46 @@ import { zags } from "@ordo-pink/oss-zags"
 import "./notifications.styles.css"
 
 export const notifications = maoka.create("div", ({ use }) => {
-	const { hunter } = use(ordo_client_maoka.context.consume)
 	const translate = use(ordo_client_maoka.jabs.translate$)
-	const get_list = use(ordo_client_maoka.jabs.cheat$(notifications$, "items" as const))
+	const get_list = use(ordo_client_maoka.jabs.cheat$(notifications$, "items"))
 
-	use(ordo_client_maoka.jabs.set_class("notification-list"))
-	use(maoka_dom.jabs.onmount(() => handle_onmount()))
+	const handle_hide: OrdoClient.Command.GunFor<"notification.hide"> = id =>
+		notifications$.update("items", items => items.filter(item => item.id !== id))
 
-	const handle_onmount = () => {
-		hunter.shoot("i18n.add_translations", {
-			locale: "en",
-			values: { notifications_pending_notifications: "Pending notifications:" },
-		})
-
-		const release_hide = hunter.track("notification.hide", id =>
-			notifications$.update("items", items => items.filter(item => item.id !== id)),
+	const handle_rrr: OrdoClient.Command.GunFor<"notification.rrr"> = ({ type, message }) =>
+		notifications$.update("items", items =>
+			items.concat([
+				{
+					id: crypto.randomUUID(),
+					message,
+					title: `rrr_codes_${ordo.rrr.to_readable(type)}`,
+					duration_s: 30,
+					type: ORDO_CLIENT.NOTIFICATION.TYPE.RRR,
+				},
+			]),
 		)
 
-		const release_rrr = hunter.track("notification.rrr", ({ type, message }) => {
-			notifications$.update("items", items =>
-				items.concat([
-					{
-						id: crypto.randomUUID(),
-						message,
-						title: `rrr_codes_${ordo.rrr.to_readable(type)}`,
-						duration_s: 30,
-						type: ORDO_CLIENT.NOTIFICATION.TYPE.RRR,
-					},
-				]),
-			)
+	const handle_show: OrdoClient.Command.GunFor<"notification.show"> = item =>
+		notifications$.update("items", items => {
+			items = item.id
+				? items.some(i => i.id === item.id)
+					? items
+					: items.concat(item as OrdoClient.Notification.Instance)
+				: items.concat({ ...item, id: crypto.randomUUID(), type: item.type })
+
+			return items
 		})
 
-		const release_show = hunter.track("notification.show", item => {
-			notifications$.update("items", items => {
-				items = item.id
-					? items.some(i => i.id === item.id)
-						? items
-						: items.concat(item as OrdoClient.Notification.Instance)
-					: items.concat({ ...item, id: crypto.randomUUID(), type: item.type })
-
-				return items
-			})
-		})
-
-		return () => {
-			release_hide()
-			release_rrr()
-			release_show()
-		}
-	}
+	use(ordo_client_maoka.jabs.add_translations("en", en))
+	use(ordo_client_maoka.jabs.handle_command("notification.hide", handle_hide))
+	use(ordo_client_maoka.jabs.handle_command("notification.rrr", handle_rrr))
+	use(ordo_client_maoka.jabs.handle_command("notification.show", handle_show))
+	use(ordo_client_maoka.jabs.set_id("notification-list"))
 
 	return () => {
 		const notifications = get_list()
 		const has_pending_notifications = notifications.length > 5
+		const t_pending_notifications = translate("notifications_pending_notifications")
 
 		return [
 			...get_list()
@@ -69,7 +56,7 @@ export const notifications = maoka.create("div", ({ use }) => {
 
 			has_pending_notifications
 				? hidden_notifications_block(() =>
-						hidden_notifications_list(() => [translate("notifications_pending_notifications"), " ", notifications.length - 5]),
+						hidden_notifications_list(() => [t_pending_notifications, " ", notifications.length - 5]),
 					)
 				: void 0,
 		]
@@ -83,9 +70,6 @@ export const notifications$ = zags.create<{
 	progress_bars: Record<string, number>
 }>({ items: [], progress_bars: {} })
 
-const hidden_notifications_block = maoka_styled.div("more-notifications_card")
-const hidden_notifications_list = maoka_styled.div("more-notifications_body")
-
 const notification = maoka.create<OrdoClient.Notification.Instance>(
 	"div",
 	({ on_click, id, message, duration_s: duration, render_icon, title, type, use }) => {
@@ -97,8 +81,8 @@ const notification = maoka.create<OrdoClient.Notification.Instance>(
 			use(ordo_client_maoka.jabs.add_class("interactive"))
 			use(ordo_client_maoka.jabs.listen("onclick", on_click))
 		} else {
-			use(ordo_client_maoka.jabs.remove_class("interactive"))
 			use(ordo_client_maoka.jabs.listen("onclick", () => void 0))
+			use(ordo_client_maoka.jabs.remove_class("interactive"))
 		}
 
 		const card_type = get_readable_type(type)
@@ -117,19 +101,11 @@ const notification = maoka.create<OrdoClient.Notification.Instance>(
 	},
 )
 
-// --- Internal ---
-
-const create_notification_card = (card_type: string) => maoka_styled.div(`notification-card ${card_type}`)
-const notification_body = maoka_styled.div("notification-card_body")
-const notification_message = maoka_styled.p()
-const notification_title = maoka_styled.h2("notification-card_title")
-
 const notification_progress = maoka.create<
-	Pick<OrdoClient.Notification.Instance, "id" | "type"> & Required<Pick<OrdoClient.Notification.Instance, "duration">>
->("div", ({ id, type, duration_s: duration, use }) => {
-	const get_progress = use(ordo_client_maoka.jabs.cheat$(notifications$, `progress_bars.${id}` as const))
-
+	Pick<OrdoClient.Notification.Instance, "id" | "type"> & Required<Pick<OrdoClient.Notification.Instance, "duration_s">>
+>("div", ({ id, type, duration_s, use }) => {
 	const { hunter } = use(ordo_client_maoka.context.consume)
+	const get_progress = use(ordo_client_maoka.jabs.cheat$(notifications$, `progress_bars.${id}` as const))
 
 	const handle_onmount = () => {
 		const update_progress_bar = () => {
@@ -140,13 +116,13 @@ const notification_progress = maoka.create<
 		}
 
 		update_progress_bar()
-		const interval = setInterval(update_progress_bar, duration * 10)
+		const interval = setInterval(update_progress_bar, duration_s * 10)
 
 		return () => clearInterval(interval)
 	}
 
-	use(ordo_client_maoka.jabs.set_class("notification-card_progress"))
 	use(maoka_dom.jabs.onmount(handle_onmount))
+	use(ordo_client_maoka.jabs.set_class("notification-card_progress"))
 
 	return () => {
 		const progress = get_progress()
@@ -160,8 +136,6 @@ const notification_progress = maoka.create<
 		return progress_bar_foreground({ progress, type })
 	}
 })
-
-// --- Internal ---
 
 const progress_bar_foreground = maoka.create<Pick<OrdoClient.Notification.Instance, "type"> & { progress: number }>(
 	"div",
@@ -211,7 +185,7 @@ const hide_notification_button = maoka.create<Pick<OrdoClient.Notification.Insta
 	},
 )
 
-export const get_readable_type = (type = ORDO_CLIENT.NOTIFICATION.TYPE.DEFAULT) =>
+const get_readable_type = (type = ORDO_CLIENT.NOTIFICATION.TYPE.DEFAULT) =>
 	sweech
 		.match(type)
 		.case(ORDO_CLIENT.NOTIFICATION.TYPE.INFO, () => "info")
@@ -220,3 +194,12 @@ export const get_readable_type = (type = ORDO_CLIENT.NOTIFICATION.TYPE.DEFAULT) 
 		.case(ORDO_CLIENT.NOTIFICATION.TYPE.SUCCESS, () => "success")
 		.case(ORDO_CLIENT.NOTIFICATION.TYPE.WARN, () => "warn")
 		.default(() => "default")
+
+const create_notification_card = (card_type: string) => maoka_styled.div(`notification-card ${card_type}`)
+const notification_body = maoka_styled.div("notification-card_body")
+const notification_message = maoka_styled.p()
+const notification_title = maoka_styled.h2("notification-card_title")
+const hidden_notifications_block = maoka_styled.div("more-notifications_card")
+const hidden_notifications_list = maoka_styled.div("more-notifications_body")
+
+const en = { notifications_pending_notifications: "Pending notifications:" }

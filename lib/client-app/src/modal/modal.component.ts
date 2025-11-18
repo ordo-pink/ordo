@@ -9,42 +9,33 @@ import "./modal.styles.css"
 export const modal = maoka.create("div", ({ use }) => {
 	const { hunter } = use(ordo_client_maoka.context.consume)
 
-	use(ordo_client_maoka.jabs.set_class("modal_wrapper"))
-	use(ordo_client_maoka.jabs.listen("onclick", () => handle_click()))
-	use(maoka_dom.jabs.onmount(() => handle_mount()))
-
-	const handle_show = () => use(ordo_client_maoka.jabs.add_class("active"))
-	const handle_hide = () => use(ordo_client_maoka.jabs.remove_class("active"))
 	const handle_click = () => hunter.shoot("modal.hide")
-	const handle_mount = () => {
-		const divorce_modal = modal$.cheat("instance", instance => (instance ? handle_show() : handle_hide()))
-
-		const release_show = hunter.track("modal.show", params => modal$.update("instance", () => params))
-		const release_hide = hunter.track("modal.hide", () => modal$.update("instance", () => void 0))
-
-		hunter.shoot("i18n.add_translations", {
-			locale: "en",
-			values: { modal_close_hint: "Click here, or anywhere else outside the modal window, or press Escape to close." },
+	const handle_show: OrdoClient.Command.GunFor<"modal.show"> = params => $.update("instance", () => params)
+	const handle_hide: OrdoClient.Command.GunFor<"modal.hide"> = () => $.update("instance", () => void 0)
+	const handle_mount = () =>
+		$.cheat("instance", instance => {
+			if (instance) use(ordo_client_maoka.jabs.add_class("active"))
+			else use(ordo_client_maoka.jabs.remove_class("active"))
 		})
 
-		return () => {
-			divorce_modal()
-			release_hide()
-			release_show()
-		}
-	}
+	use(maoka_dom.jabs.onmount(handle_mount))
+	use(ordo_client_maoka.jabs.set_id("modal-overlay"))
+	use(ordo_client_maoka.jabs.listen("onclick", handle_click))
+	use(ordo_client_maoka.jabs.handle_command("modal.hide", handle_hide))
+	use(ordo_client_maoka.jabs.handle_command("modal.show", handle_show))
+	use(ordo_client_maoka.jabs.add_translations("en", en))
 
 	return () => [modal_window(), close_modal()]
 })
 
 // --- Internal ---
 
-const modal$ = zags.create<{ instance?: OrdoClient.Modal.Instance }>({})
+const $ = zags.create<{ instance?: OrdoClient.Modal.Instance }>({})
 
 const modal_window = maoka.create("div", ({ use }) => {
 	let onunmount: (() => void) | undefined
 
-	const get_modal_instance = use(ordo_client_maoka.jabs.cheat$(modal$, "instance"))
+	const get_modal_instance = use(ordo_client_maoka.jabs.cheat$($, "instance"))
 
 	use(ordo_client_maoka.jabs.set_class("modal"))
 	use(ordo_client_maoka.jabs.listen("onclick", event => event.stopPropagation()))
@@ -69,7 +60,7 @@ const modal_window = maoka.create("div", ({ use }) => {
 })
 
 const content_wrapper = maoka.create("div", ({ use }) => {
-	const modal_instance = modal$.select("instance")
+	const modal_instance = $.select("instance")
 
 	use(maoka_dom.jabs.if_dom(n => void modal_instance!.render(n.value as HTMLDivElement)))
 })
@@ -92,7 +83,7 @@ const close_modal = maoka.create("div", ({ use }) => {
 	use(ordo_client_maoka.jabs.listen_global_event("keydown", e => handle_global_esc(e)))
 
 	const handle_global_esc = (event: KeyboardEvent) => {
-		if (event.code !== "Escape" || !modal$.select("instance")) return
+		if (event.code !== "Escape" || !$.select("instance")) return
 
 		event.stopImmediatePropagation()
 		hunter.shoot("modal.hide")
@@ -106,3 +97,5 @@ const close_modal = maoka.create("div", ({ use }) => {
 		return bs_x()
 	}
 })
+
+const en = { modal_close_hint: "Click here, or anywhere else outside the modal window, or press Escape to close." }

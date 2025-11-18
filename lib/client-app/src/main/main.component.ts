@@ -11,7 +11,8 @@ export const sidebar_toggle = maoka.create("button", ({ use }) => {
 	const get_sidebar = use(ordo_client_maoka.jabs.marry$(sidebar$))
 	const translate = use(ordo_client_maoka.jabs.translate$)
 
-	use(ordo_client_maoka.jabs.set_class("activity-bar_icon sidebar-toggle hidden"))
+	use(ordo_client_maoka.jabs.set_class("icon sidebar-toggle"))
+	use(ordo_client_maoka.jabs.set_attribute("tabindex", "3"))
 	use(ordo_client_maoka.jabs.listen("onclick", () => hunter.shoot("sidebar.toggle")))
 
 	return () => {

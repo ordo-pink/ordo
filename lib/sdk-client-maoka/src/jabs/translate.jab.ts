@@ -15,16 +15,16 @@ export const translate$: OrdoClientMaoka.Jabs.Translate$ = ({ use }) => {
 	return (k, v) => {
 		try {
 			const { values, locale } = get_locale()
-			return values[`${locale}_${k}`] ?? v ?? k
+			return values[`${locale}_${k}`] ?? v ?? k ?? ""
 		} catch (_) {
-			return v ?? k
+			return v ?? k ?? ""
 		}
 	}
 }
 
 declare global {
 	export namespace OrdoClientMaoka.Jabs {
-		export type TFn = (key: OrdoClient.Translations.Key, default_value?: string) => string
+		export type TFn = (key?: OrdoClient.Translations.Key, default_value?: string) => string
 		export type Translate$ = Maoka.Jab<TFn>
 
 		export type RegisterTranslations = (locale: I18n.ISO_639_1_Locale, values: Partial<I18n.Values>) => Maoka.Jab

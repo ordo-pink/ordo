@@ -5,6 +5,7 @@
 
 export * from "./attribute.jab"
 export * from "./class.jab"
+export * from "./client.jab"
 export * from "./hunter.jab"
 export * from "./is-darwin.jab"
 export * from "./is-mobile.jab"

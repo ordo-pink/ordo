@@ -22,12 +22,12 @@
 import type { Routary } from "@ordo-pink/oss-routary"
 import type { ServerRoutary } from "@ordo-pink/sdk-server-routary"
 import { codegen_strategy_bun } from "@ordo-pink/b-strategy-hashing-bun"
-import { data_repository_fs } from "@ordo-pink/b-repository-data-fs"
+import { data_repository_fs } from "@ordo-pink/_b-repository-data-fs"
 import { oath } from "@ordo-pink/oss-oath"
 import { result } from "@ordo-pink/oss-result"
 import { rickroll } from "@ordo-pink/oss-rickroll"
-import { server_id } from "@ordo-pink/b-server-id"
-import { user_repository_data } from "@ordo-pink/b-repository-user-repository-data"
+import { server_id } from "@ordo-pink/_b-server-id"
+import { user_repository_data } from "@ordo-pink/_b-repository-user-repository-data"
 import { wjwt as wjwt_lib } from "@ordo-pink/oss-wjwt"
 
 const main = async () => {

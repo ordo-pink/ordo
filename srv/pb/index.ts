@@ -21,7 +21,7 @@
 
 import { Core, core } from "@ordo-pink/sdk-core"
 import { create_backend_server_pb } from "@ordo-pink/_backend-server-pb"
-import { create_persistence_strategy_data_fs } from "@ordo-pink/b-repository-data-fs"
+import { create_persistence_strategy_data_fs } from "@ordo-pink/_b-repository-data-fs"
 import { is_port } from "@ordo-pink/_tau"
 import { oath } from "@ordo-pink/oss-oath"
 

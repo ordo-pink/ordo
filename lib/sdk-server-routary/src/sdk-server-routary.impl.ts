@@ -19,7 +19,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { Wjwt } from "@ordo-pink/oss-wjwt"
 import { curry } from "@ordo-pink/oss-curry"
 import { oath } from "@ordo-pink/oss-oath"
 import { routary } from "@ordo-pink/oss-routary"

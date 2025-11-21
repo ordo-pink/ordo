@@ -9,14 +9,31 @@ import type { Hunt } from "@ordo-pink/oss-hunt"
 import type { I18n } from "@ordo-pink/oss-i18n"
 
 export namespace impl {
-	// TODO Compose queries into a single zags with what is permitted instead of providing them separately
 	export const create: OrdoClient.F.Create = (name, permissions, callback) => async global_state => {
-		let query = zags.create({} as OrdoClient.F.State)
+		const query = zags.create({
+			activities: { items: [] },
+			data: { root: {}, vaults: {} },
+			i18n: { locale: "", values: {} },
+			router: { hash: "", pathname: "", search: "" },
+		} as unknown as OrdoClient.F.QueryState)
+
+		const divorces = [] as (() => void)[]
 
 		for (const permission of permissions.queries) {
-			if (permission.type === "i18n") query = query.concat(global_state.i18n$)
-			if (permission.type === "user") query = query.concat(global_state.user$)
-			if (permission.type === "router") query = query.concat(global_state.aist$)
+			if (permission.type === "i18n")
+				divorces.push(global_state.query.cheat("i18n", state => query.update("i18n", () => state)))
+
+			if (permission.type === "router")
+				divorces.push(global_state.query.cheat("router", state => query.update("router", () => state)))
+
+			if (permission.type === "activities" && permission.details.includes("current"))
+				divorces.push(global_state.query.cheat("activities.current", state => query.update("activities.current", () => state)))
+
+			if (permission.type === "activities" && permission.details.includes("all"))
+				divorces.push(global_state.query.cheat("activities.items", state => query.update("activities.items", () => state)))
+
+			if (permission.type === "data")
+				divorces.push(global_state.query.cheat("data", state => query.update("data", () => state)))
 		}
 
 		const state: OrdoClient.F.State = {
@@ -56,7 +73,8 @@ export namespace impl {
 
 			hunter: {
 				shoot: (prey, bullet) => {
-					if (!permissions.commands.includes(prey)) throw ordo.rrr.eperm("f_rrr_not_permitted_shot", prey)
+					if (!permissions.commands.map(ordo.fns.prop("command")).includes(prey))
+						throw ordo.rrr.eperm("f_rrr_not_permitted_shot", prey)
 
 					return global_state.hunter.shoot(prey, bullet as any)
 				},
@@ -78,70 +96,41 @@ export namespace impl {
 
 declare global {
 	namespace OrdoClient.F {
-		// TODO permissions for data and user queries
+		type Fetch = (input: string | URL | Request, init?: RequestInit) => Promise<Response>
 
 		type FetchPermission = {
 			type: "fetch"
 			destinations: { url: string; method: "get" | "head" | "post" | "put" | "patch" | "delete" | "options" }[]
 		}
 
-		type SettingsPermission = { type: "settings"; access: "f" | "all" }
-
 		type I18nPermission = { type: "i18n" }
 
-		type AchievementsPermission = { type: "achievements" }
-
-		type UserPermission = { type: "user"; details: ("is_authenticated" | "name" | "email" | "id" | "handle" | "created_at")[] }
-
-		type DataPermission = { type: "data"; details: ("metadata" | "custom_metadata" | "content")[] }
+		type DataPermission = { type: "data" }
 
 		type RouterPermission = { type: "router" }
 
-		type QueryPermission =
-			| FetchPermission
-			| SettingsPermission
-			| I18nPermission
-			| AchievementsPermission
-			| UserPermission
-			| RouterPermission
+		type ActivityPermission = { type: "activities"; details: ("current" | "all")[] }
 
-		type HuntingTicket = keyof Hunt.ToPreys<OrdoClient.Command.Preys>
+		type QueryPermission = FetchPermission | I18nPermission | ActivityPermission | DataPermission | RouterPermission
+
+		type HuntingTicket = { command: keyof Hunt.ToPreys<OrdoClient.Command.Preys> }
 
 		type Permissions = {
 			queries: QueryPermission[]
 			commands: HuntingTicket[]
 		}
 
-		type InternalState = {
-			hunter: OrdoClient.Command.Hunter
-			logger: Ordo.Logger
-			fetch: OrdoClient.Fetch
-			activity$: Zags.Instance<OrdoClient.Activity.State>
-			i18n$: I18n.Stream
-			aist$: Aist.Stream
-			data$: Zags.Instance<{ data: Ordo.Data.Instance[] }>
-			user$: Zags.Instance<{ user?: Ordo.User.Instance }>
-			// workspace$
-			// context_menu$
-			// modal$
-			// notification$
-			// background_task$
-			// achievement$
-			// command_palette$
-			// file_association$
-			// settings$
-			// installed_fs$
-			// session$
-		}
+		type QueryState = Aist.State & I18n.State & OrdoClient.Activity.State & OrdoClient.Data.State
+		type Query = Zags.ReadableInstance<QueryState>
 
 		export type State = {
 			hunter: OrdoClient.Command.Hunter
 			logger: Ordo.Logger
-			fetch: OrdoClient.Fetch
-			query: OrdoClient.Query
+			fetch: Fetch
+			query: Query
 		}
 
-		export type Instance = (state: InternalState) => Promise<() => void | Promise<void>>
+		export type Instance = (state: State) => Promise<() => void | Promise<void>>
 
 		export type Create = (
 			name: string,

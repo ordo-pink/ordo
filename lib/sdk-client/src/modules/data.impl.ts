@@ -25,7 +25,7 @@ declare global {
 	}
 
 	namespace OrdoClient.Data {
-		type State = { root: Ordo.Data.Vault; vaults: Record<Ordo.Data.Id, Ordo.Data.Vault> }
+		type State = { data: { root: Ordo.Data.Vault; vaults: Record<Ordo.Data.Id, Ordo.Data.Vault> } }
 
 		type Repository = {
 			read: (id?: Ordo.Data.Id) => Oath.Instance<Ordo.Data.Vault | null, Ordo.Rrr.Instance<"EIO">>

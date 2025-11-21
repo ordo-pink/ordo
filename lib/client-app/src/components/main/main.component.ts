@@ -108,8 +108,13 @@ export const sidebar = maoka.create("aside", ({ use, node }) => {
 		if (current_activity && current_activity.render_sidebar) hunter.shoot("sidebar.enable")
 		else hunter.shoot("sidebar.disable")
 
-		if (!visible || !enabled || !maoka_dom.node_guard(node) || !node.value.parentElement) return null
-		else return sidebar_render_picker()
+		if (!visible || !enabled || !maoka_dom.node_guard(node) || !node.value.parentElement) {
+			use(ordo_client_maoka.jabs.add_class("hidden"))
+			return null
+		} else {
+			use(ordo_client_maoka.jabs.remove_class("hidden"))
+			return sidebar_render_picker()
+		}
 	}
 })
 

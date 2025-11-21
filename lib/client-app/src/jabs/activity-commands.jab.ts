@@ -10,13 +10,16 @@ export const activity_commands =
 		const handle_register_activity: OrdoClient.Command.GunFor<"activity.register"> = item => {
 			activities$.update("activities.items", items => (items.some(i => i.id === item.id) ? items : items.concat(item)))
 
-			const pathname = aist$.$.select("aist.pathname")
+			const pathname = aist$.$.select("router.pathname")
 
 			for (const route of item.routes) {
 				if (colonoscope.is_doctor(route)) {
 					const params = colonoscope.check(route, pathname)
-					activities$.update("activities.current", () => ({ ...item, params }))
-					break
+
+					if (params) {
+						activities$.update("activities.current", () => ({ ...item, params }))
+						break
+					}
 				} else if (route === pathname) {
 					activities$.update("activities.current", () => ({ ...item, params: null }))
 					break
@@ -33,7 +36,7 @@ export const activity_commands =
 		const handle_set_href: OrdoClient.Command.GunFor<"router.set_href"> = href => void open(href, "_blank")?.focus()
 
 		const handle_onmount = () =>
-			aist$.$.cheat("aist.pathname", pathname => {
+			aist$.$.cheat("router.pathname", pathname => {
 				const items = activities$.select("activities.items")
 
 				activities$.update("activities.current", () => {

@@ -14,7 +14,7 @@ export const data_commands =
 
 		const handle_onmount = () =>
 			$.cheat(
-				"root",
+				"data.root",
 				(data, is_update) =>
 					is_update && void repo.write(data).cata(oath.catas.or_else(rrr => hunter.shoot("notification.rrr", rrr))),
 			)
@@ -42,7 +42,7 @@ export const data_commands =
 // TODO Check permissions
 
 const handle_create: Handler<"data.create"> = $ => params =>
-	$.update("root", items => {
+	$.update("data.root", items => {
 		const new_item = ordo.data.create(params, uid())
 		const new_item_id = ordo.data.get_id(new_item)
 
@@ -54,7 +54,7 @@ const handle_create: Handler<"data.create"> = $ => params =>
 const handle_delete: Handler<"data.delete"> =
 	$ =>
 	({ id }) =>
-		$.update("root", items => {
+		$.update("data.root", items => {
 			if (!items[id]) throw ordo.rrr.enoent(ORDO.RRR.REASON.DATA_NOT_FOUND, [id, "data.delete"])
 			if (!check_permissions()) throw ordo.rrr.eperm(ORDO.RRR.REASON.DATA_UPDATE_PERMISSION_DENIED, [id])
 
@@ -64,7 +64,7 @@ const handle_delete: Handler<"data.delete"> =
 const handle_delete_field: Handler<"data.fields.delete"> =
 	$ =>
 	({ id, key }) =>
-		$.update("root", items => {
+		$.update("data.root", items => {
 			if (!items[id]) throw ordo.rrr.enoent(ORDO.RRR.REASON.DATA_NOT_FOUND, [id, "data.fields.delete"])
 			if (!check_permissions()) throw ordo.rrr.eperm(ORDO.RRR.REASON.DATA_UPDATE_PERMISSION_DENIED, [id])
 
@@ -77,7 +77,7 @@ const handle_delete_field: Handler<"data.fields.delete"> =
 const handle_set_field: Handler<"data.fields.set"> =
 	$ =>
 	({ id, key, value }) =>
-		$.update("root", items => {
+		$.update("data.root", items => {
 			if (!items[id]) throw ordo.rrr.enoent(ORDO.RRR.REASON.DATA_NOT_FOUND, [id, "data.fields.set"])
 			if (!check_permissions()) throw ordo.rrr.eperm(ORDO.RRR.REASON.DATA_UPDATE_PERMISSION_DENIED, [id])
 
@@ -90,7 +90,7 @@ const handle_set_field: Handler<"data.fields.set"> =
 const handle_add_label: Handler<"data.labels.add"> =
 	$ =>
 	({ id, labels: new_labels }) =>
-		$.update("root", items => {
+		$.update("data.root", items => {
 			if (!items[id]) throw ordo.rrr.enoent(ORDO.RRR.REASON.DATA_NOT_FOUND, [id, "data.labels.add"])
 			if (!check_permissions()) throw ordo.rrr.eperm(ORDO.RRR.REASON.DATA_UPDATE_PERMISSION_DENIED, [id])
 
@@ -105,7 +105,7 @@ const handle_add_label: Handler<"data.labels.add"> =
 const handle_delete_label: Handler<"data.labels.delete"> =
 	$ =>
 	({ id, labels: labels_to_remove }) =>
-		$.update("root", items => {
+		$.update("data.root", items => {
 			if (!items[id]) throw ordo.rrr.enoent(ORDO.RRR.REASON.DATA_NOT_FOUND, [id, "data.labels.delete"])
 			if (!check_permissions()) throw ordo.rrr.eperm(ORDO.RRR.REASON.DATA_UPDATE_PERMISSION_DENIED, [id])
 
@@ -119,7 +119,7 @@ const handle_delete_label: Handler<"data.labels.delete"> =
 const handle_add_link: Handler<"data.links.add"> =
 	$ =>
 	({ id, links: new_links }) =>
-		$.update("root", items => {
+		$.update("data.root", items => {
 			if (!items[id]) throw ordo.rrr.enoent(ORDO.RRR.REASON.DATA_NOT_FOUND, [id, "data.links.add"])
 			if (!check_permissions()) throw ordo.rrr.eperm(ORDO.RRR.REASON.DATA_UPDATE_PERMISSION_DENIED, [id])
 
@@ -134,7 +134,7 @@ const handle_add_link: Handler<"data.links.add"> =
 const handle_delete_link: Handler<"data.links.delete"> =
 	$ =>
 	({ id, links: links_to_remove }) =>
-		$.update("root", items => {
+		$.update("data.root", items => {
 			if (!items[id]) throw ordo.rrr.enoent(ORDO.RRR.REASON.DATA_NOT_FOUND, [id, "data.links.delete"])
 			if (!check_permissions()) throw ordo.rrr.eperm(ORDO.RRR.REASON.DATA_UPDATE_PERMISSION_DENIED, [id])
 
@@ -148,7 +148,7 @@ const handle_delete_link: Handler<"data.links.delete"> =
 const handle_move: Handler<"data.move"> =
 	$ =>
 	({ id, parent }) =>
-		$.update("root", items => {
+		$.update("data.root", items => {
 			if (!items[id]) throw ordo.rrr.enoent(ORDO.RRR.REASON.DATA_NOT_FOUND, [id, "data.move"])
 			if (!check_permissions()) throw ordo.rrr.eperm(ORDO.RRR.REASON.DATA_UPDATE_PERMISSION_DENIED, [id])
 
@@ -177,7 +177,7 @@ const handle_move: Handler<"data.move"> =
 const handle_rename: Handler<"data.rename"> =
 	$ =>
 	({ id, name }) =>
-		$.update("root", items => {
+		$.update("data.root", items => {
 			if (!items[id]) throw ordo.rrr.enoent(ORDO.RRR.REASON.DATA_NOT_FOUND, [id, "data.rename"])
 			if (!check_permissions()) throw ordo.rrr.eperm(ORDO.RRR.REASON.DATA_UPDATE_PERMISSION_DENIED, [id])
 
@@ -195,7 +195,7 @@ const handle_rename: Handler<"data.rename"> =
 const handle_set_group: Handler<"data.set_group"> =
 	$ =>
 	({ id /*group*/ }) =>
-		$.update("root", items => {
+		$.update("data.root", items => {
 			if (!items[id]) throw ordo.rrr.enoent(ORDO.RRR.REASON.DATA_NOT_FOUND, [id, "data.set_group"])
 			if (!check_permissions()) throw ordo.rrr.eperm(ORDO.RRR.REASON.DATA_UPDATE_PERMISSION_DENIED, [id])
 
@@ -207,7 +207,7 @@ const handle_set_group: Handler<"data.set_group"> =
 const handle_set_location: Handler<"data.set_location"> =
 	$ =>
 	({ id, location }) =>
-		$.update("root", items => {
+		$.update("data.root", items => {
 			if (!items[id]) throw ordo.rrr.enoent(ORDO.RRR.REASON.DATA_NOT_FOUND, [id, "data.set_location"])
 			if (!check_permissions()) throw ordo.rrr.eperm(ORDO.RRR.REASON.DATA_UPDATE_PERMISSION_DENIED, [id])
 
@@ -223,7 +223,7 @@ const handle_set_location: Handler<"data.set_location"> =
 const handle_set_owner: Handler<"data.set_owner"> =
 	$ =>
 	({ id /*owner*/ }) =>
-		$.update("root", items => {
+		$.update("data.root", items => {
 			if (!items[id]) throw ordo.rrr.enoent(ORDO.RRR.REASON.DATA_NOT_FOUND, [id, "data.set_owner"])
 			if (!check_permissions()) throw ordo.rrr.eperm(ORDO.RRR.REASON.DATA_UPDATE_PERMISSION_DENIED, [id])
 
@@ -236,7 +236,7 @@ const handle_set_owner: Handler<"data.set_owner"> =
 const handle_set_permissions: Handler<"data.set_permissions"> =
 	$ =>
 	({ id /*permissions*/ }) =>
-		$.update("root", items => {
+		$.update("data.root", items => {
 			if (!items[id]) throw ordo.rrr.enoent(ORDO.RRR.REASON.DATA_NOT_FOUND, [id, "data.set_permissions"])
 			if (!check_permissions()) throw ordo.rrr.eperm(ORDO.RRR.REASON.DATA_UPDATE_PERMISSION_DENIED, [id])
 

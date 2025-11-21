@@ -4,11 +4,9 @@
  */
 
 import { aist } from "@ordo-pink/oss-aist"
-import { bs_check_circle } from "@ordo-pink/frontend-icons"
 import { hunt } from "@ordo-pink/oss-hunt"
 import { i18n } from "@ordo-pink/oss-i18n"
 import { maoka } from "@ordo-pink/oss-maoka"
-import { maoka_dom } from "@ordo-pink/oss-maoka/dom"
 import { maoka_styled } from "@ordo-pink/oss-maoka-styled"
 import { zags } from "@ordo-pink/oss-zags"
 
@@ -36,24 +34,18 @@ export const create = maoka.create<ClientApp.Args>("div", async ({ use, fetch, d
 	const aist$ = aist.create(window)
 	const i18n$ = i18n.create_i18n("en")
 	const activities$ = zags.create<OrdoClient.Activity.State>({ activities: { items: [] } })
-	const data$ = zags.create<OrdoClient.Data.State>({ root: {}, vaults: {} })
-	const query: OrdoClient.Query = aist$.$.concat(i18n$.$).concat(activities$).concat(data$).to_readable()
+	const data$ = zags.create<OrdoClient.Data.State>({ data: { root: {}, vaults: {} } })
+	const query: OrdoClient.F.Query = aist$.$.concat(i18n$.$).concat(activities$).concat(data$).to_readable()
+
+	const state = { fetch, hunter, logger, query }
 
 	await data_repository
 		.read()
-		.cata({ reject: e => hunter.shoot("notification.rrr", e), resolve: data => data$.update("root", () => data ?? {}) })
+		.cata({ reject: e => hunter.shoot("notification.rrr", e), resolve: data => data$.update("data.root", () => data ?? {}) })
 
 	hunter.shoot("title.set_title", "loading")
-	hunter.shoot("activity.register", {
-		id: "test",
-		readable_name: "Test",
-		routes: ["/test"],
-		render_icon: div => void maoka_dom.render(div, bs_check_circle(), ordo.uuid.create),
-		render_workspace: div => void maoka_dom.render(div, maoka.create("div", () => () => "HELLO WORKSPACE")(), ordo.uuid.create),
-		render_sidebar: div => void maoka_dom.render(div, maoka.create("div", () => () => "HELLO SIDEBAR")(), ordo.uuid.create),
-	})
 
-	use(ordo_client_maoka.context.provide({ fetch, hunter, logger, query }))
+	use(ordo_client_maoka.context.provide(state))
 	use(ordo_client_maoka.jabs.set_id("app"))
 	use(ordo_client_maoka.jabs.add_translations("en", en))
 
@@ -61,7 +53,8 @@ export const create = maoka.create<ClientApp.Args>("div", async ({ use, fetch, d
 	use(data_commands(data$, data_repository))
 	use(activity_commands(activities$, aist$))
 
-	// TODO Fs
+	await import("./fs/filet/filet.f").then(module => module.default(state)).catch(rrr => hunter.shoot("notification.rrr", rrr))
+
 	// TODO Breadcrumbs
 	// TODO Content storage
 	// TODO Quick Search

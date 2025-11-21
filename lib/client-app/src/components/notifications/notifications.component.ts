@@ -24,8 +24,8 @@ export const notifications = maoka.create("div", ({ use }) => {
 			items.concat([
 				{
 					id: crypto.randomUUID(),
-					message,
-					title: `rrr_codes_${ordo.rrr.to_readable(type)}`,
+					message: String(message),
+					title: `rrr_codes_${ordo.rrr.to_readable(type).toLocaleLowerCase()}`,
 					duration_s: 30,
 					type: ORDO_CLIENT.NOTIFICATION.TYPE.RRR,
 				},

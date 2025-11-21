@@ -14,13 +14,13 @@ export const create: Aist.Create = window => {
 	const initial_pathname = window.location.pathname as Aist.Pathname
 	const initial_search = window.location.search.startsWith("?") ? window.location.search.slice(1) : window.location.search
 
-	const $ = zags.create<Aist.State>({ aist: { hash: initial_hash, pathname: initial_pathname, search: initial_search } })
+	const $ = zags.create<Aist.State>({ router: { hash: initial_hash, pathname: initial_pathname, search: initial_search } })
 
 	const push_state = window.history.pushState.bind(window.history)
-	const handle_popstate = (e: PopStateEvent) => $.update("aist", () => e.state)
+	const handle_popstate = (e: PopStateEvent) => $.update("router", () => e.state)
 
 	window.addEventListener("popstate", handle_popstate)
-	window.history.pushState = state => $.update("aist", () => state)
+	window.history.pushState = state => $.update("router", () => state)
 
 	return {
 		$,
@@ -29,7 +29,7 @@ export const create: Aist.Create = window => {
 			history.pushState = push_state
 		},
 		set_hash: hash =>
-			$.update("aist", state => {
+			$.update("router", state => {
 				if (hash === state.hash) return state
 
 				const url = ""
@@ -42,7 +42,7 @@ export const create: Aist.Create = window => {
 				return { ...state, hash }
 			}),
 		set_pathname: pathname =>
-			$.update("aist", state => {
+			$.update("router", state => {
 				if (pathname === state.pathname) return state
 
 				const url = ""
@@ -56,7 +56,7 @@ export const create: Aist.Create = window => {
 			}),
 
 		set_search: search =>
-			$.update("aist", state => {
+			$.update("router", state => {
 				if (search === state.search) return state
 
 				const url = ""
@@ -70,7 +70,7 @@ export const create: Aist.Create = window => {
 			}),
 
 		set_search_params: params =>
-			$.update("aist", state => {
+			$.update("router", state => {
 				const search = new URLSearchParams(params).toString()
 				if (search === state.search) return state
 

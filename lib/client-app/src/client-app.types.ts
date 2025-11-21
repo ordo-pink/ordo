@@ -10,6 +10,6 @@ export type GlobalState = {
 export type Args = {
 	hosts: Ordo.Hosts
 	fetch: OrdoClient.Fetch
-	data_repository: Ordo.Data.Repository
+	data_repository: OrdoClient.Data.Repository
 	content_repository: Ordo.Content.Repository
 }

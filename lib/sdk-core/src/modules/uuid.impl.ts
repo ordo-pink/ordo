@@ -17,7 +17,7 @@ export namespace impl {
 
 declare global {
 	namespace Ordo.Uuid {
-		export type Instance = `${string}-${string}-${string}-${string}-${string}` & {}
+		export type Instance = `${string}-${string}-${string}-${string}-${string}`
 
 		export type Guard = GenericGuard<Instance>
 

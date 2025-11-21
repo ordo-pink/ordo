@@ -49,7 +49,7 @@ export namespace CONSTANTS {
 
 	/** Action to be applied on a file. */
 	export enum ACTION {
-		EXECUTE = VALUE.____X,
+		ACCESS = VALUE.____X,
 		READ = VALUE.___R_,
 		WRITE = VALUE.__W__,
 		UNLINK = VALUE._U___,

@@ -43,4 +43,72 @@ globalThis.window.fetch = undefined as any
 globalThis.XMLHttpRequest = undefined as any
 globalThis.XMLHttpRequestUpload = undefined as any
 
-body && maoka_dom.render(body, client_app.create({ hosts, fetch: native_fetch }), create_id()).catch(ordo.logger.error)
+const idb_promise = new Promise<IDBDatabase>((resolve, reject) => {
+	const req = window.indexedDB.open("ordo", 1)
+
+	req.onupgradeneeded = () => {
+		const db = req.result
+		db.createObjectStore("data")
+		db.createObjectStore("content")
+	}
+
+	req.onsuccess = () => resolve(req.result)
+	req.onerror = () => reject(req.error)
+})
+
+const idb0 = oath.from_promise(() => idb_promise).pipe(oath.ops.rmap(ordo.rrr.eio(ORDO.RRR.REASON.REPOSITORY_ISSUE)))
+
+const ROOT_DATA_ID = ORDO.UUID.FIRSTBORN
+
+const create_data_repository = (): OrdoClient.Data.Repository => {
+	void idb0.cata(oath.catas.to_promise())
+
+	return {
+		kill: () => {
+			idb0.cancel("DataRepository killed")
+			void idb_promise.then(db => db.close())
+		},
+
+		read: (id = ROOT_DATA_ID) =>
+			idb0.pipe(
+				oath.ops.chain(db =>
+					oath.create((resolve, reject) => {
+						const idb_request = db.transaction("data", "readonly").objectStore("data").get(id)
+
+						idb_request.onsuccess = () => resolve(idb_request.result ?? null)
+						idb_request.onerror = () => reject(ordo.rrr.eio(ORDO.RRR.REASON.REPOSITORY_ISSUE, idb_request.error))
+					}),
+				),
+			),
+
+		write: ordo.fns.curry((data, id = ROOT_DATA_ID) =>
+			idb0.pipe(
+				oath.ops.chain(db =>
+					oath.create((resolve, reject) => {
+						const idb_request = db
+							.transaction("data", "readwrite")
+							.objectStore("data")
+							.put(data, id as string)
+
+						idb_request.onsuccess = () => resolve()
+						idb_request.onerror = () => reject(ordo.rrr.eio(ORDO.RRR.REASON.REPOSITORY_ISSUE, idb_request.error))
+					}),
+				),
+			),
+		),
+	}
+}
+
+body &&
+	maoka_dom
+		.render(
+			body,
+			client_app.create({
+				hosts,
+				fetch: native_fetch,
+				content_repository: null as any,
+				data_repository: create_data_repository(),
+			}),
+			create_id(),
+		)
+		.catch(ordo.logger.error)

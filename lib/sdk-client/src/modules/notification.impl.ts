@@ -20,7 +20,7 @@ declare global {
 		notification: {
 			hide: { args: Ordo.Uuid.Instance }
 			show: { args: OrdoClient.Notification.ShowArgs }
-			rrr: { args: Ordo.Rrr.Instance & { message: OrdoClient.Translations.Key } }
+			rrr: { args: Ordo.Rrr.Instance }
 		}
 	}
 

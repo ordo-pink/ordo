@@ -7,6 +7,7 @@ import * as lib from "./src/result.impl"
 
 declare global {
 	var result: typeof lib
+	var r: typeof lib
 
 	namespace Result {
 		export type ArrayToUnion<$> = $ extends Array<infer U> ? U : $
@@ -108,3 +109,4 @@ declare global {
 }
 
 if (!globalThis.result) globalThis.result = lib
+if (!globalThis.r) globalThis.r = lib

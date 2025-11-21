@@ -29,7 +29,7 @@ export const deep_equals: DeepEquals = (x, y) => {
 }
 
 export const clone_deep: CloneDeep = x => {
-	if (is_arr(x)) return x.map(i => clone_deep(i))
+	if (is_arr(x)) return x.map(clone_deep)
 	if (is_obj(x)) return keys(x).reduce((acc, k) => ({ ...acc, [k]: clone_deep(x[k]) }), {} as any)
 	return x
 }

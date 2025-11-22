@@ -12,6 +12,8 @@ export const filet_workspace = maoka.create<Args>("div", ({ state, use }) => {
 	return () => [create_button(() => bs_plus())]
 })
 
+// --- Internal ---
+
 const create_button = maoka_styled.button("create-button", ({ use }) => {
 	const handle_click = () => alert("yay!")
 

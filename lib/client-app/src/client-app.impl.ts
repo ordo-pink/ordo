@@ -53,7 +53,7 @@ export const create = maoka.create<ClientApp.Args>("div", async ({ use, fetch, d
 		.pipe(oath.ops.map(data => data$.update("data.root", () => data ?? {})))
 		.cata(oath.catas.or_else(e => hunter.shoot("notification.rrr", e)))
 
-	await import("./fs/filet/filet.f")
+	await import("./fs/filet/filet.impl")
 		.then(module => module.default)
 		.then(creator => creator(state))
 		.catch(rrr => hunter.shoot("notification.rrr", rrr))
@@ -102,6 +102,7 @@ export const create = maoka.create<ClientApp.Args>("div", async ({ use, fetch, d
 	// TODO Notification history (+ achievement)
 	// TODO Background processes (+ achievement)
 	// TODO Activity Panel (+ achievement)
+	// TODO Store translations as Content
 	// TODO Command palette access via router
 	// TODO Modal access via router
 

@@ -78,7 +78,10 @@ export namespace impl {
 
 					return global_state.hunter.shoot(prey, bullet as any)
 				},
-				track: global_state.hunter.track,
+				track: (prey, gun) => {
+					permissions.commands.push({ command: prey })
+					return global_state.hunter.track(prey, gun)
+				},
 			},
 
 			query: query.to_readable(),

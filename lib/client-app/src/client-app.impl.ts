@@ -59,6 +59,8 @@ export const create = maoka.create<ClientApp.Args>("div", async ({ use, fetch, d
 		.catch(rrr => hunter.shoot("notification.rrr", rrr))
 
 	// TODO Filet workspace
+	// TODO Prefix all main commands with "ordo.main"
+	// TODO Async for other intensive hooks
 	// TODO 404 (+ achievement)
 	// TODO [BUG] Command palette does not sort items by item type
 	// TODO Landing page (+ hidden achievement with the arrow)

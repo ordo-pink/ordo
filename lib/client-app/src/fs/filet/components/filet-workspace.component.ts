@@ -15,7 +15,10 @@ export const filet_workspace = maoka.create<Args>("div", ({ state, use }) => {
 // --- Internal ---
 
 const create_button = maoka_styled.button("create-button", ({ use }) => {
-	const handle_click = () => alert("yay!")
+	const { hunter } = use(ordo_client_maoka.context.consume)
+
+	// TODO Get parent from route params
+	const handle_click = () => hunter.shoot("data.show_create_modal", { parent: null })
 
 	use(ordo_client_maoka.jabs.listen("onclick", handle_click))
 })

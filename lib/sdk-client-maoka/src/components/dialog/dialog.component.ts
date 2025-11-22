@@ -8,7 +8,7 @@ import maoka_dom from "@ordo-pink/oss-maoka/dom"
 import maoka_styled from "@ordo-pink/oss-maoka-styled"
 import { sweech } from "@ordo-pink/oss-sweech"
 
-import { neutral, primary } from "../button/button.component"
+import { button } from "../button/button.component"
 import { set_class } from "../../jabs/class.jab"
 
 import "./dialog.styles.css"
@@ -18,6 +18,50 @@ export enum TYPE {
 	DANGER,
 	ACTIONS,
 }
+
+export namespace dialog {
+	export const info = ({ title, render_body, render_icon }: OrdoClientMaoka.Components.Dialog.Info.Args) =>
+		base({
+			actions: () => [],
+			render_body,
+			render_icon: render_icon ? render_icon : () => void 0, // TODO
+			title,
+			type: TYPE.INFO,
+		})
+
+	export const actions = ({ actions, title, render_body, render_icon }: OrdoClientMaoka.Components.Dialog.Actions.Args) =>
+		base({
+			actions,
+			render_body,
+			render_icon: render_icon ? render_icon : () => void 0, // TODO
+			title,
+			type: TYPE.ACTIONS,
+		})
+}
+
+const create_dialog: (
+	state: OrdoClient.F.State,
+	component: Maoka.Component,
+) => Maoka.Jab<[show: () => void, hide: () => void]> =
+	(state, component) =>
+	({ node }) => {
+		const hide = () => void state.hunter.shoot("modal.hide")
+		const show = () =>
+			void state.hunter.shoot("modal.show", {
+				render: div => maoka_dom.render(div, component, node.root.create_id),
+				size: ORDO_CLIENT.MODAL.SIZE.SM,
+			})
+
+		return [show, hide]
+	}
+
+export const create_dialog_info: OrdoClientMaoka.Components.Dialog.Info.Jab = (state, args) =>
+	create_dialog(state, dialog.info(args))
+
+export const create_dialog_actions: OrdoClientMaoka.Components.Dialog.Actions.Jab = (state, args) =>
+	create_dialog(state, dialog.actions(args))
+
+// --- Internal ---
 
 const base = maoka.create<OrdoClientMaoka.Components.Dialog.Args>(
 	"div",
@@ -31,51 +75,12 @@ const base = maoka.create<OrdoClientMaoka.Components.Dialog.Args>(
 			dialog_header_div(() => [dialog_icon_span({ render_icon }), dialog_title_h2(title)]),
 			render_body ? dialog_body_div({ render_body }) : void 0,
 			dialog_footer_div(() => [
-				neutral({ hotkey: "escape", kindergarten: () => "OK", on_click: handle_cancel_click }),
-				...actions().map(action => primary(action)),
+				button.neutral({ hotkey: "escape", kindergarten: () => "OK", on_click: handle_cancel_click }),
+				...actions().map(action => button.primary(action)),
 			]),
 		]
 	},
 )
-
-export const info = ({ title, render_body, render_icon }: OrdoClientMaoka.Components.Dialog.Info.Args) =>
-	base({
-		actions: () => [],
-		render_body,
-		render_icon: render_icon ? render_icon : () => void 0, // TODO
-		title,
-		type: TYPE.INFO,
-	})
-
-export const actions = ({ actions, title, render_body, render_icon }: OrdoClientMaoka.Components.Dialog.Actions.Args) =>
-	base({
-		actions,
-		render_body,
-		render_icon: render_icon ? render_icon : () => void 0, // TODO
-		title,
-		type: TYPE.ACTIONS,
-	})
-
-const create_dialog: (
-	state: OrdoClient.F.State,
-	component: Maoka.Component,
-) => Maoka.Jab<[show: () => void, hide: () => void]> =
-	(state, component) =>
-	({ node }) => {
-		const hide = () => void state.hunter.shoot("modal.hide")
-		const show = () =>
-			void state.hunter.shoot("modal.show", {
-				render: div => maoka_dom.render(div, component, node.root.create_id),
-				size: ordo_client.modal.SIZE.SM,
-			})
-
-		return [show, hide]
-	}
-
-export const create_dialog_info: OrdoClientMaoka.Components.Dialog.Info.Jab = (state, args) => create_dialog(state, info(args))
-
-export const create_dialog_actions: OrdoClientMaoka.Components.Dialog.Actions.Jab = (state, args) =>
-	create_dialog(state, actions(args))
 
 const dialog_header_div = maoka_styled.div("header")
 const dialog_title_h2 = maoka_styled.h2("title")
@@ -102,10 +107,6 @@ const get_dialog_css_class = (type: OrdoClientMaoka.Components.Dialog.Type) =>
 		.case(TYPE.DANGER, () => "danger")
 		.case(TYPE.INFO, () => "info")
 		.default(() => "")
-
-declare global {
-	namespace OrdoClientMaoka.Components {}
-}
 
 declare global {
 	namespace OrdoClientMaoka.Components.Dialog {

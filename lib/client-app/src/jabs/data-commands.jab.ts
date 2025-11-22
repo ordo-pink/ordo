@@ -3,20 +3,24 @@ import type { Maoka } from "@ordo-pink/oss-maoka"
 import type { Zags } from "@ordo-pink/oss-zags"
 import { maoka_dom } from "@ordo-pink/oss-maoka/dom"
 
+import { create_file_modal } from "../components/data-modals/create-file-modal/create-file-modal.component"
+
 type Stream = Zags.Instance<OrdoClient.Data.State>
 type Repo = OrdoClient.Data.Repository
-type Handler<$Prey extends keyof Hunt.ToPreys<OrdoClient.Command.Preys>> = ($: Stream) => OrdoClient.Command.GunFor<$Prey>
+type Gun<$Prey extends keyof Hunt.ToPreys<OrdoClient.Command.Preys>> = OrdoClient.Command.GunFor<$Prey>
+type DataHandler<$Prey extends keyof Hunt.ToPreys<OrdoClient.Command.Preys>> = ($: Stream) => Gun<$Prey>
+type ViewHandler<$Prey extends keyof Hunt.ToPreys<OrdoClient.Command.Preys>> = (state: OrdoClient.F.State) => Gun<$Prey>
 
 export const data_commands =
 	($: Stream, repo: Repo): Maoka.Jab =>
 	({ use }) => {
-		const { hunter } = use(ordo_client_maoka.context.consume)
+		const state = use(ordo_client_maoka.context.consume)
 
 		const handle_onmount = () =>
 			$.cheat(
 				"data.root",
 				(data, is_update) =>
-					is_update && void repo.write(data).cata(oath.catas.or_else(rrr => hunter.shoot("notification.rrr", rrr))),
+					is_update && void repo.write(data).cata(oath.catas.or_else(rrr => state.hunter.shoot("notification.rrr", rrr))),
 			)
 
 		use(maoka_dom.jabs.onmount(handle_onmount))
@@ -34,24 +38,39 @@ export const data_commands =
 		use(ordo_client_maoka.jabs.handle_command("data.set_location", handle_set_location($)))
 		use(ordo_client_maoka.jabs.handle_command("data.set_owner", handle_set_owner($)))
 		use(ordo_client_maoka.jabs.handle_command("data.set_permissions", handle_set_permissions($)))
+		use(ordo_client_maoka.jabs.handle_command("data.show_create_modal", handle_show_create_modal(state)))
 	}
 
 // --- Internal ---
 
+const handle_show_create_modal: ViewHandler<"data.show_create_modal"> =
+	state =>
+	({ parent }) => {
+		state.hunter.shoot("modal.show", {
+			size: ORDO_CLIENT.MODAL.SIZE.SM,
+			render: div => maoka_dom.render(div, create_file_modal({ state, parent }), ordo.uuid.create),
+		})
+	}
+
 // TODO Get proper author when auth is ready
 // TODO Check permissions
 
-const handle_create: Handler<"data.create"> = $ => params =>
+const handle_create: DataHandler<"data.create"> = $ => params =>
 	$.update("data.root", items => {
 		const new_item = ordo.data.create(params, uid())
 		const new_item_id = ordo.data.get_id(new_item)
+		const new_item_name = ordo.data.get_name(new_item)
+		const new_item_parent = ordo.data.get_parent(new_item)
+
+		if (Object.values(items).some(i => ordo.data.get_name(i) === new_item_name && ordo.data.get_parent(i) === new_item_parent))
+			throw ordo.rrr.eexist(ORDO.RRR.REASON.DATA_ALREADY_EXISTS, [new_item_name, new_item_parent, "data.create"])
 
 		if (items[new_item_id]) throw ordo.rrr.eexist(ORDO.RRR.REASON.DATA_ALREADY_EXISTS, [new_item_id, "data.create"])
 
 		return { ...items, [new_item_id]: new_item }
 	})
 
-const handle_delete: Handler<"data.delete"> =
+const handle_delete: DataHandler<"data.delete"> =
 	$ =>
 	({ id }) =>
 		$.update("data.root", items => {
@@ -61,7 +80,7 @@ const handle_delete: Handler<"data.delete"> =
 			return { ...items, [id]: undefined }
 		})
 
-const handle_delete_field: Handler<"data.fields.delete"> =
+const handle_delete_field: DataHandler<"data.fields.delete"> =
 	$ =>
 	({ id, key }) =>
 		$.update("data.root", items => {
@@ -74,7 +93,7 @@ const handle_delete_field: Handler<"data.fields.delete"> =
 			return { ...items, [id]: new_item }
 		})
 
-const handle_set_field: Handler<"data.fields.set"> =
+const handle_set_field: DataHandler<"data.fields.set"> =
 	$ =>
 	({ id, key, value }) =>
 		$.update("data.root", items => {
@@ -87,7 +106,7 @@ const handle_set_field: Handler<"data.fields.set"> =
 			return { ...items, [id]: new_item }
 		})
 
-const handle_add_label: Handler<"data.labels.add"> =
+const handle_add_label: DataHandler<"data.labels.add"> =
 	$ =>
 	({ id, labels: new_labels }) =>
 		$.update("data.root", items => {
@@ -102,7 +121,7 @@ const handle_add_label: Handler<"data.labels.add"> =
 			return { ...items, [id]: new_item }
 		})
 
-const handle_delete_label: Handler<"data.labels.delete"> =
+const handle_delete_label: DataHandler<"data.labels.delete"> =
 	$ =>
 	({ id, labels: labels_to_remove }) =>
 		$.update("data.root", items => {
@@ -116,7 +135,7 @@ const handle_delete_label: Handler<"data.labels.delete"> =
 			return { ...items, [id]: new_item }
 		})
 
-const handle_add_link: Handler<"data.links.add"> =
+const handle_add_link: DataHandler<"data.links.add"> =
 	$ =>
 	({ id, links: new_links }) =>
 		$.update("data.root", items => {
@@ -131,7 +150,7 @@ const handle_add_link: Handler<"data.links.add"> =
 			return { ...items, [id]: new_item }
 		})
 
-const handle_delete_link: Handler<"data.links.delete"> =
+const handle_delete_link: DataHandler<"data.links.delete"> =
 	$ =>
 	({ id, links: links_to_remove }) =>
 		$.update("data.root", items => {
@@ -145,7 +164,7 @@ const handle_delete_link: Handler<"data.links.delete"> =
 			return { ...items, [id]: new_item }
 		})
 
-const handle_move: Handler<"data.move"> =
+const handle_move: DataHandler<"data.move"> =
 	$ =>
 	({ id, parent }) =>
 		$.update("data.root", items => {
@@ -174,7 +193,7 @@ const handle_move: Handler<"data.move"> =
 			return { ...items, [id]: new_item }
 		})
 
-const handle_rename: Handler<"data.rename"> =
+const handle_rename: DataHandler<"data.rename"> =
 	$ =>
 	({ id, name }) =>
 		$.update("data.root", items => {
@@ -192,7 +211,7 @@ const handle_rename: Handler<"data.rename"> =
 			return { ...items, [id]: new_item }
 		})
 
-const handle_set_group: Handler<"data.set_group"> =
+const handle_set_group: DataHandler<"data.set_group"> =
 	$ =>
 	({ id /*group*/ }) =>
 		$.update("data.root", items => {
@@ -204,7 +223,7 @@ const handle_set_group: Handler<"data.set_group"> =
 			return items
 		})
 
-const handle_set_location: Handler<"data.set_location"> =
+const handle_set_location: DataHandler<"data.set_location"> =
 	$ =>
 	({ id, location }) =>
 		$.update("data.root", items => {
@@ -220,7 +239,7 @@ const handle_set_location: Handler<"data.set_location"> =
 			return { ...items, [id]: new_item }
 		})
 
-const handle_set_owner: Handler<"data.set_owner"> =
+const handle_set_owner: DataHandler<"data.set_owner"> =
 	$ =>
 	({ id /*owner*/ }) =>
 		$.update("data.root", items => {
@@ -233,7 +252,7 @@ const handle_set_owner: Handler<"data.set_owner"> =
 			return items
 		})
 
-const handle_set_permissions: Handler<"data.set_permissions"> =
+const handle_set_permissions: DataHandler<"data.set_permissions"> =
 	$ =>
 	({ id /*permissions*/ }) =>
 		$.update("data.root", items => {

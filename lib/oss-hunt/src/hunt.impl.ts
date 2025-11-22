@@ -25,7 +25,7 @@ const handle_barrage_updates =
 			if (guns) {
 				hunt$.update("barrage", shots => shots.filter(is_different_shot(shot)))
 
-				Promise.all(guns.map(gun => gun(shot.bullet)))
+				Promise.all(guns.map(async gun => await gun(shot.bullet)))
 					.then(() => shot.callback())
 					.then(() => {
 						if (debug)

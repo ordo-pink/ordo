@@ -44,15 +44,16 @@ export const add_command_palette_item =
 	}
 
 export const add_translations =
-	(locale: OrdoClient.Translations.Locale, values: OrdoClient.Translations.Values): Maoka.Jab =>
+	<$Async extends "async" | undefined>(
+		locale: OrdoClient.Translations.Locale,
+		values: OrdoClient.Translations.Values,
+		async?: $Async,
+	): $Async extends void ? Maoka.Jab<void> : Maoka.Jab<Promise<void>> =>
 	({ use }) => {
 		const { hunter } = use(context.consume)
+		const result = hunter.shoot("i18n.add_translations", { locale, values })
 
-		const handle_onmount = () => {
-			hunter.shoot("i18n.add_translations", { locale, values })
+		use(maoka_dom.jabs.onunmount(() => void hunter.shoot("i18n.remove_translations", Object.keys(values))))
 
-			return () => void hunter.shoot("i18n.remove_translations", Object.keys(values))
-		}
-
-		use(maoka_dom.jabs.onmount(handle_onmount))
+		if (async) return result.to_promise() as any
 	}

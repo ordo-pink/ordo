@@ -14,23 +14,25 @@ import { set_class } from "../../jabs/class.jab"
 
 import "./button.styles.css"
 
-export const success: OrdoClientMaoka.Components.Button.Component = params =>
-	button({ ...params, custom_class: add_button_type_class("success", params.custom_class) })
+export namespace button {
+	export const success: OrdoClientMaoka.Components.Button.Component = params =>
+		base({ ...params, custom_class: add_button_type_class("success", params.custom_class) })
 
-export const neutral: OrdoClientMaoka.Components.Button.Component = params =>
-	button({ ...params, custom_class: add_button_type_class("neutral", params.custom_class) })
+	export const neutral: OrdoClientMaoka.Components.Button.Component = params =>
+		base({ ...params, custom_class: add_button_type_class("neutral", params.custom_class) })
 
-export const primary: OrdoClientMaoka.Components.Button.Component = params =>
-	button({ ...params, custom_class: add_button_type_class("primary", params.custom_class) })
+	export const primary: OrdoClientMaoka.Components.Button.Component = params =>
+		base({ ...params, custom_class: add_button_type_class("primary", params.custom_class) })
 
-export const danger: OrdoClientMaoka.Components.Button.Component = params =>
-	button({ ...params, custom_class: add_button_type_class("danger", params.custom_class) })
+	export const danger: OrdoClientMaoka.Components.Button.Component = params =>
+		base({ ...params, custom_class: add_button_type_class("danger", params.custom_class) })
+}
 
 // --- Internal ---
 
 const text_container = styled.div()
 
-export const button: OrdoClientMaoka.Components.Button.Component = maoka.create(
+const base: OrdoClientMaoka.Components.Button.Component = maoka.create(
 	"button",
 	({ kindergarten, on_click, aria_label = "", custom_class = "", hotkey: hotkey_args, use, node, disabled }) => {
 		use(set_class("button", custom_class))

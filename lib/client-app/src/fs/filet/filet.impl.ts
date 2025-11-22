@@ -10,25 +10,26 @@ export default ordo_client.f.create(
 		commands: [
 			{ command: "activity.register" },
 			{ command: "activity.unregister" },
-			{ command: "title.set_title" },
-			{ command: "i18n.add_translations" },
-			{ command: "i18n.remove_translations" },
 			{ command: "command_palette.add" },
 			{ command: "command_palette.remove" },
+			{ command: "data.show_create_modal" },
+			{ command: "i18n.add_translations" },
+			{ command: "i18n.remove_translations" },
 			{ command: "router.set_pathname" },
+			{ command: "title.set_title" },
 		],
 		queries: [{ type: "data" }],
 	},
 	state => {
 		const { hunter } = state
 
-		const release_open = hunter.track("filet.open", () => void hunter.shoot("router.set_pathname", "/filet"))
+		const release_open = hunter.track("ordo.filet.open", () => void hunter.shoot("router.set_pathname", "/filet"))
 		const release_open_vault = hunter.track(
-			"filet.open_vault",
+			"ordo.filet.open_vault",
 			id => void hunter.shoot("router.set_pathname", `/filet/vaults/${id}` as const),
 		)
 		const release_open_file = hunter.track(
-			"filet.open_file",
+			"ordo.filet.open_file",
 			({ id, vault }) =>
 				void hunter.shoot("router.set_pathname", vault ? (`/filet/vaults/${id}` as const) : (`/filet/${id}` as const)),
 		)
@@ -45,7 +46,7 @@ export default ordo_client.f.create(
 
 		hunter.shoot("command_palette.add", {
 			readable_name: "filet_cp_open_name",
-			value: () => hunter.shoot("filet.open"),
+			value: () => hunter.shoot("ordo.filet.open"),
 			id: FILET.CP_OPEN_ID,
 			render_icon: div => maoka_dom.render(div, bs_folder_open(), ordo.uuid.create),
 			description: "filet_cp_open_description",

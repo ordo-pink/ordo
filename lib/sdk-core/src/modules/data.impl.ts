@@ -185,6 +185,7 @@ declare global {
 		]
 		type Location = CONSTANTS.LOCATION
 		type Size = number & {}
+		type VaultId = Ordo.Data.Id
 
 		type Instance = [
 			id: Id,

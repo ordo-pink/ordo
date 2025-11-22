@@ -1,0 +1,9 @@
+#filet-workspace {
+	@apply relative px-2;
+}
+
+#filet-workspace .create-button {
+	@apply fixed bottom-4 left-4 p-2;
+	@apply bg-pink-200 hover:bg-pink-300 dark:bg-pink-600 dark:hover:bg-pink-500;
+	@apply rounded-full text-xl shadow-inner transition-all hover:shadow-xl;
+}

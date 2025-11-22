@@ -5,12 +5,12 @@ import type { Zags } from "@ordo-pink/oss-zags"
 import { maoka_dom } from "@ordo-pink/oss-maoka/dom"
 
 export const activity_commands =
-	(activities$: Zags.Instance<OrdoClient.Activity.State>, aist$: Aist.Instance): Maoka.Jab =>
+	(activities$: Zags.Instance<OrdoClient.Activity.State>, router: Aist.Instance): Maoka.Jab =>
 	({ use }) => {
 		const handle_register_activity: OrdoClient.Command.GunFor<"activity.register"> = item => {
 			activities$.update("activities.items", items => (items.some(i => i.id === item.id) ? items : items.concat(item)))
 
-			const pathname = aist$.$.select("router.pathname")
+			const pathname = router.$.select("router.pathname")
 
 			for (const route of item.routes) {
 				if (colonoscope.is_doctor(route)) {
@@ -31,12 +31,12 @@ export const activity_commands =
 			activities$.update("activities.items", items => items.filter(i => i.id !== id))
 
 		const handle_set_search: OrdoClient.Command.GunFor<"router.set_search"> = s =>
-			ordo.validations.is_string(s) ? aist$.set_search(s) : aist$.set_search_params(s)
+			ordo.validations.is_string(s) ? router.set_search(s) : router.set_search_params(s)
 
 		const handle_set_href: OrdoClient.Command.GunFor<"router.set_href"> = href => void open(href, "_blank")?.focus()
 
 		const handle_onmount = () =>
-			aist$.$.cheat("router.pathname", pathname => {
+			router.$.cheat("router.pathname", pathname => {
 				const items = activities$.select("activities.items")
 
 				activities$.update("activities.current", () => {
@@ -69,8 +69,8 @@ export const activity_commands =
 		use(ordo_client_maoka.jabs.handle_command("activity.register", handle_register_activity))
 		use(ordo_client_maoka.jabs.handle_command("activity.unregister", handle_unregister_activity))
 
-		use(ordo_client_maoka.jabs.handle_command("router.set_hash", aist$.set_hash))
+		use(ordo_client_maoka.jabs.handle_command("router.set_hash", router.set_hash))
 		use(ordo_client_maoka.jabs.handle_command("router.set_href", handle_set_href))
-		use(ordo_client_maoka.jabs.handle_command("router.set_pathname", aist$.set_pathname))
+		use(ordo_client_maoka.jabs.handle_command("router.set_pathname", router.set_pathname))
 		use(ordo_client_maoka.jabs.handle_command("router.set_search", handle_set_search))
 	}

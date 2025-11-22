@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { BsPlus } from "@ordo-pink/frontend-icons"
+import { bs_plus } from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/oss-maoka"
 import { maoka_jabs } from "@ordo-pink/maoka-jabs"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
@@ -45,7 +45,7 @@ const DatabaseCreateEntryButton = (fsid: Ordo.Metadata.FSID) =>
 		const handle_click = () => commands.emit("cmd.metadata.show_create_modal", fsid)
 
 		return () => [
-			BsPlus(),
+			bs_plus(),
 			Maoka.create("div", () => () => "New"), // TODO: i18n
 		]
 	})

@@ -31,56 +31,77 @@ import "./client-app.styles.css"
 export const create = maoka.create<ClientApp.Args>("div", async ({ use, fetch, data_repository }) => {
 	const logger = ordo.logger
 	const hunter: OrdoClient.Command.Hunter = hunt.create(ordo.logger.debug)
-	const aist$ = aist.create(window)
-	const i18n$ = i18n.create_i18n("en")
+	const router = aist.create(window)
+	const translator = i18n.create_i18n("en")
 	const activities$ = zags.create<OrdoClient.Activity.State>({ activities: { items: [] } })
 	const data$ = zags.create<OrdoClient.Data.State>({ data: { root: {}, vaults: {} } })
-	const query: OrdoClient.F.Query = aist$.$.concat(i18n$.$).concat(activities$).concat(data$).to_readable()
-
+	const query: OrdoClient.F.Query = router.$.concat(translator.$).concat(activities$).concat(data$).to_readable()
 	const state = { fetch, hunter, logger, query }
-
-	await data_repository
-		.read()
-		.cata({ reject: e => hunter.shoot("notification.rrr", e), resolve: data => data$.update("data.root", () => data ?? {}) })
-
-	hunter.shoot("title.set_title", "loading")
 
 	use(ordo_client_maoka.context.provide(state))
 	use(ordo_client_maoka.jabs.set_id("app"))
 	use(ordo_client_maoka.jabs.add_translations("en", en))
 
-	use(i18n_commands(i18n$))
+	use(i18n_commands(translator))
 	use(data_commands(data$, data_repository))
-	use(activity_commands(activities$, aist$))
+	use(activity_commands(activities$, router))
 
-	await import("./fs/filet/filet.f").then(module => module.default(state)).catch(rrr => hunter.shoot("notification.rrr", rrr))
+	hunter.shoot("title.set_title", "loading")
 
-	// TODO Breadcrumbs
+	await data_repository
+		.read()
+		.pipe(oath.ops.map(data => data$.update("data.root", () => data ?? {})))
+		.cata(oath.catas.or_else(e => hunter.shoot("notification.rrr", e)))
+
+	await import("./fs/filet/filet.f")
+		.then(module => module.default)
+		.then(creator => creator(state))
+		.catch(rrr => hunter.shoot("notification.rrr", rrr))
+
+	// TODO Filet workspace
+	// TODO 404 (+ achievement)
+	// TODO [BUG] Command palette does not sort items by item type
+	// TODO Landing page (+ hidden achievement with the arrow)
+	// TODO Label helpers (+ achievements)
+	// TODO Link helpers (+ achievements)
+	// TODO Move/rename/create/delete file
+	// TODO Breadcrumbs -> Quick Search (+ achievements)
 	// TODO Content storage
-	// TODO Quick Search
-	// TODO Notification history
+	// TODO Filet file upload + drag'n'drop (+ achievement)
 	// TODO File Associations
-	// TODO Installed Functions
-	// TODO Settings
-	// TODO F Data Files
-	// TODO 404
-	// TODO Rich Text Editor
-	// TODO File Uploading
+	// TODO Ediot (Rich text editing) (+ achievement Dostoyevsky)
+	// TODO Installed Functions (+ achievement)
 	// TODO PDF FA
 	// TODO Image FA
-	// TODO Drag'n'drop
-	// TODO F Store
-	// TODO Live sharing
-	// TODO Auth
-	// TODO User Info
-	// TODO Avatars
-	// TODO Data sync
-	// TODO Public sharing
-	// TODO Access sharing
-	// TODO Billing
+	// TODO Ediot sidebar
+	// TODO Ediot file upload + drag'n'drop (+ achievement)
+	// TODO Support via CP (+ achievement)
+	// TODO Social networks via CP (+ achievement)
+	// TODO Docs!
+
+	// TODO F Data Files
+	// TODO Filet recent files
+	// TODO Ediot collapse/expand history
+	// TODO Ediot undo/redo history (+ achievement)
+	// TODO Filet favourite files (+ achievement)
 	// TODO Achievements
-	// TODO Background processes
-	// TODO Activity Panel
+	// TODO Settings (+ achievement)
+
+	// TODO F Store
+	// TODO Live sharing (+ achievement)
+	// TODO Auth (+ achievement)
+	// TODO Data sync
+	// TODO User Info (+ achievement)
+	// TODO Avatars (+ achievement)
+
+	// TODO Access sharing (+ achievement)
+	// TODO Public sharing (+ achievement)
+
+	// TODO Billing (+ achievement)
+
+	// TODO Notification history (+ achievement)
+	// TODO Background processes (+ achievement)
+	// TODO Activity Panel (+ achievement)
 	// TODO Command palette access via router
 	// TODO Modal access via router
 

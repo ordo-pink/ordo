@@ -1,10 +1,11 @@
 import { bs_folder_open } from "@ordo-pink/frontend-icons"
 import { maoka_dom } from "@ordo-pink/oss-maoka/dom"
 
+import * as FILET from "./filet.constants"
 import { filet_workspace } from "./components/filet-workspace.component"
 
 export default ordo_client.f.create(
-	"@ordo-pink/file-explorer",
+	FILET.NAME,
 	{
 		commands: [
 			{ command: "activity.register" },
@@ -22,37 +23,62 @@ export default ordo_client.f.create(
 		const { hunter } = state
 
 		hunter.shoot("activity.register", {
-			id: FILET_ACTIVITY_ID,
-			readable_name: "file_explorer_title",
-			routes: ["/files", "/files/:id", "/files/:vault/:id"],
+			id: FILET.NAME,
+			readable_name: "filet_title",
+			routes: ["/filet", "/filet/:id", "/filet/vaults/:vault", "/filet/vaults/:vault/:id"],
 			render_icon: div => maoka_dom.render(div, bs_folder_open(), ordo.uuid.create),
 			render_workspace: div => maoka_dom.render(div, filet_workspace({ state }), ordo.uuid.create),
 		})
 
-		hunter.shoot("i18n.add_translations", { locale: "en", values: en })
+		hunter.shoot("i18n.add_translations", { locale: "en", values: en_values })
 
 		hunter.shoot("command_palette.add", {
 			readable_name: "filet_cp_open_name",
-			value: () => hunter.shoot("router.set_pathname", "/files"),
-			id: FILET_COMMAND_PALETTE_OPEN,
+			value: () => hunter.shoot("router.set_pathname", "/filet"),
+			id: FILET.CP_OPEN_ID,
 			render_icon: div => maoka_dom.render(div, bs_folder_open(), ordo.uuid.create),
 			description: "filet_cp_open_description",
 			hotkey: "mod+shift+f",
+			type: ORDO_CLIENT.COMMAND_PALETTE.ITEM_TYPE.PAGE_OPENER,
 		})
 
+		// hunter.shoot("command_palette.add", {
+		// 	readable_name: "filet_cp_open_as_directory_name",
+		// 	value: ordo.todo,
+		// 	id: FILET.CP_OPEN_AS_DIRECTORY_ID,
+		// 	render_icon: div => maoka_dom.render(div, bs_files(), ordo.uuid.create),
+		// 	description: "filet_cp_open_as_directory_description",
+		// 	hotkey: "mod+o",
+		// 	type: ORDO_CLIENT.COMMAND_PALETTE.ITEM_TYPE.MODAL_OPENER,
+		// })
+
+		// hunter.shoot("command_palette.add", {
+		// 	readable_name: "filet_cp_open_vault_name",
+		// 	value: ordo.todo,
+		// 	id: FILET.CP_OPEN_VAULT_ID,
+		// 	render_icon: div => maoka_dom.render(div, bs_safe_2(), ordo.uuid.create),
+		// 	description: "filet_cp_open_vault_description",
+		// 	hotkey: "meta+v",
+		// 	type: ORDO_CLIENT.COMMAND_PALETTE.ITEM_TYPE.MODAL_OPENER,
+		// })
+
 		return () => {
-			hunter.shoot("activity.unregister", FILET_ACTIVITY_ID)
-			hunter.shoot("command_palette.remove", FILET_COMMAND_PALETTE_OPEN)
-			hunter.shoot("i18n.remove_translations", ordo.fns.keys_of(en))
+			hunter.shoot("activity.unregister", FILET.NAME)
+			hunter.shoot("command_palette.remove", FILET.CP_OPEN_ID)
+			// hunter.shoot("command_palette.remove", FILET.CP_OPEN_AS_DIRECTORY_ID)
+			// hunter.shoot("command_palette.remove", FILET.CP_OPEN_VAULT_ID)
+			hunter.shoot("i18n.remove_translations", ordo.fns.keys_of(en_values))
 		}
 	},
 )
 
-const FILET_ACTIVITY_ID = "@ordo-pink/file-explorer"
-const FILET_COMMAND_PALETTE_OPEN = "@ordo-pink/file-explorer/command-palette/open"
-
-const en = {
-	file_explorer_title: "Filet",
+const en_values = {
+	filet_title: "Filet",
 	filet_cp_open_name: "Go to Filet",
 	filet_cp_open_description: "Filet provides common file explorer/file manager/finder experience for your Ordo files.",
+	filet_cp_open_vault_name: "Open Vault...",
+	filet_cp_open_vault_description: "Switch between different vaults without the need to look for them in the file tree.",
+	filet_cp_open_as_directory_name: "Open as Directory...",
+	filet_cp_open_as_directory_description:
+		"Filet allows you to look inside a file as a directory. Yes, confusingly enough, Ordo files are also directories.",
 }

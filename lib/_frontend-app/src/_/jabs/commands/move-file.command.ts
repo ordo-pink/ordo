@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { BsFilesAlt, BsSlash } from "@ordo-pink/frontend-icons"
+import { bs_files, BsSlash } from "@ordo-pink/frontend-icons"
 import { CONTEXT_MENU_ITEM_TYPE, Metadata } from "@ordo-pink/_core"
 import { R, type TResult } from "@ordo-pink/oss-result"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
@@ -51,7 +51,7 @@ export const move_file_command: TMaokaJab = ({ use }) => {
 		command: "cmd.metadata.show_move_palette",
 		payload_creator: ({ payload }) => (payload as Ordo.Metadata.Instance).get_fsid(),
 		readable_name: "t.common.components.modals.move.title",
-		render_icon: BsFilesAlt,
+		render_icon: bs_files,
 		should_show: ({ payload }) => Metadata.Validations.is_metadata(payload),
 		type: CONTEXT_MENU_ITEM_TYPE.UPDATE,
 	})

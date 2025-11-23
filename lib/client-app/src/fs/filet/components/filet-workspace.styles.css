@@ -1,9 +1,39 @@
 #filet-workspace {
-	@apply relative px-2;
+	@apply relative flex flex-col gap-y-2;
 }
 
 #filet-workspace .create-button {
 	@apply fixed bottom-4 left-4 p-2;
 	@apply bg-pink-200 hover:bg-pink-300 dark:bg-pink-600 dark:hover:bg-pink-500;
 	@apply rounded-full text-xl shadow-inner transition-all hover:shadow-xl;
+}
+
+#filet-workspace .header {
+	@apply flex flex-wrap gap-2;
+	@apply px-8 py-24 pb-4;
+	@apply bg-gradient-to-br from-neutral-100 to-stone-100 dark:from-neutral-900 dark:to-stone-900;
+}
+
+#filet-workspace .header .ancestor-link {
+	@apply cursor-pointer rounded-md bg-neutral-500 px-4 py-0.5 text-sm;
+}
+
+#filet-workspace .header .ancestor-link.current {
+	@apply bg-gradient-to-br from-pink-500 to-rose-500;
+}
+
+#filet-workspace .data-grid {
+	@apply flex flex-wrap px-2;
+}
+
+#filet-workspace .data-grid .item {
+	@apply flex w-24 cursor-pointer flex-col items-center gap-y-2 rounded-md p-2 hover:bg-neutral-200 dark:hover:bg-neutral-700;
+}
+
+#filet-workspace .data-grid .item .icon {
+	@apply text-4xl;
+}
+
+#filet-workspace .data-grid .item .filename {
+	@apply line-clamp-2 text-ellipsis text-center leading-5;
 }

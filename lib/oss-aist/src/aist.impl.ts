@@ -17,7 +17,7 @@ export const create: Aist.Create = window => {
 	const $ = zags.create<Aist.State>({ router: { hash: initial_hash, pathname: initial_pathname, search: initial_search } })
 
 	const push_state = window.history.pushState.bind(window.history)
-	const handle_popstate = (e: PopStateEvent) => $.update("router", () => e.state)
+	const handle_popstate = (e: PopStateEvent) => $.update("router", state => e.state ?? state)
 
 	window.addEventListener("popstate", handle_popstate)
 	window.history.pushState = state => $.update("router", () => state)

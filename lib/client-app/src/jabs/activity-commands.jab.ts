@@ -44,6 +44,8 @@ export const activity_commands =
 
 					const item = items.find(item => {
 						for (const route of item.routes) {
+							if (!pathname) return false
+
 							if (colonoscope.is_doctor(route)) {
 								const results = colonoscope.check(route, pathname)
 

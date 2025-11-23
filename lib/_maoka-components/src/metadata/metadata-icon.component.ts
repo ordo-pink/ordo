@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { BsFileEarmark, BsFileEarmarkBinary, bs_folder_open } from "@ordo-pink/frontend-icons"
+import { bs_file_earmark, BsFileEarmarkBinary, bs_folder_open } from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/oss-maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { maoka_jabs } from "@ordo-pink/maoka-jabs"
@@ -127,7 +127,7 @@ const Icon = ({ metadata, custom_class, has_children }: P2) =>
 			return sweech
 				.of_true()
 				.case(!fa && has_children, () => bs_folder_open(custom_class))
-				.case(metadata.get_type() === "text/ordo" && metadata.get_size() === 0, () => BsFileEarmark(custom_class))
+				.case(metadata.get_type() === "text/ordo" && metadata.get_size() === 0, () => bs_file_earmark(custom_class))
 				.case(!!fa && !!fa.render_icon, () => fa!.render_icon!())
 				.default(() => BsFileEarmarkBinary(custom_class))
 		}

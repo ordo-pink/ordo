@@ -18,7 +18,7 @@ export default ordo_client.f.create(
 			{ command: "router.set_pathname" },
 			{ command: "title.set_title" },
 		],
-		queries: [{ type: "data" }],
+		queries: [{ type: "data" }, { type: "activities", details: ["current"] }],
 	},
 	state => {
 		const { hunter } = state

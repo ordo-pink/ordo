@@ -58,8 +58,10 @@ export const create = maoka.create<ClientApp.Args>("div", async ({ use, fetch, d
 		.then(creator => creator(state))
 		.catch(rrr => hunter.shoot("notification.rrr", rrr))
 
-	// TODO Filet workspace
+	// TODO Automatically provide context
 	// TODO Prefix all main commands with "ordo.main"
+	// TODO Inherit params from parent on creation
+	// TODO Translations for error reasons and titles
 	// TODO Async for other intensive hooks
 	// TODO 404 (+ achievement)
 	// TODO [BUG] Command palette does not sort items by item type

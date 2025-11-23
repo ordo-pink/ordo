@@ -9,6 +9,15 @@ import { maoka_dom } from "@ordo-pink/oss-maoka/dom"
 
 import { context } from "../sdk-client-maoka.impl"
 
+/**
+ * @state
+ */
+export const hunter: Maoka.Jab<OrdoClient.Command.Hunter> = ({ use }) => {
+	const state = use(context.consume)
+
+	return state.hunter
+}
+
 export const track_on_create: OrdoClientMaoka.Jabs.TrackOnCreate =
 	(p, g) =>
 	({ use }) => {

@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ */
+
 import { type Colonoscope, colonoscope } from "@ordo-pink/oss-colonoscope"
 import type { Aist } from "@ordo-pink/oss-aist"
 import type { Maoka } from "@ordo-pink/oss-maoka"

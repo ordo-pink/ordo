@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ */
+
 import type { Hunt } from "@ordo-pink/oss-hunt"
 import type { Maoka } from "@ordo-pink/oss-maoka"
 import type { Zags } from "@ordo-pink/oss-zags"

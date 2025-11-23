@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ */
+
 import type { Maoka } from "@ordo-pink/oss-maoka"
 
 export const get_children$: (parent: Ordo.Data.Parent | Ordo.Data.Instance) => Maoka.Jab<() => Ordo.Data.Instance[]> =

@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Unlicense
  */
 
+import { type Maoka, maoka } from "@ordo-pink/oss-maoka"
 import { bs_menu_button_wide_fill, bs_question_circle, bs_search } from "@ordo-pink/frontend-icons"
-import { maoka } from "@ordo-pink/oss-maoka"
 import { maoka_dom } from "@ordo-pink/oss-maoka/dom"
 import { maoka_styled } from "@ordo-pink/oss-maoka-styled"
 import { zags } from "@ordo-pink/oss-zags"
@@ -238,9 +238,15 @@ const command_palette_item = maoka.create<CommandPaletteItemArgs>("div", ({ acti
 		item.value()
 	}
 
+	const handle_onmount = (node: Maoka.Node<HTMLElement>) => {
+		if (active && !is_in_view(node.value, node.value.parentElement!))
+			node.value.scrollIntoView({ behavior: "smooth", inline: "center", block: "center" })
+	}
+
 	use(ordo_client_maoka.jabs.set_id(String(item.id)))
 	use(ordo_client_maoka.jabs.set_class("item"))
 	use(ordo_client_maoka.jabs.listen("onclick", handle_click))
+	use(maoka_dom.jabs.onmount(handle_onmount))
 
 	if (active) use(ordo_client_maoka.jabs.add_class("active"))
 	else use(ordo_client_maoka.jabs.remove_class("active"))
@@ -301,6 +307,12 @@ const text_span = maoka_styled.span()
 const footer = maoka_styled.div("footer")
 const items = maoka_styled.div("items")
 const nothing_found_div = maoka_styled.div("nothing-found")
+
+const is_in_view = (element: Element, wrapper: Element) => {
+	const { left, top, bottom, right } = element.getBoundingClientRect()
+
+	return top >= 0 && left >= 0 && bottom <= wrapper?.clientHeight && right <= wrapper?.clientWidth
+}
 
 const en = {
 	cp_toggle_name: "Toggle Command Palette",

@@ -19,7 +19,7 @@
 }
 
 #cp .items_multiple-wrapper {
-	@apply flex size-full grow justify-items-center;
+	@apply flex max-h-72 w-full grow justify-items-center;
 }
 
 #cp .items {

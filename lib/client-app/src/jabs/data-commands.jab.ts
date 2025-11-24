@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: Unlicense
  */
 
+import { type Maoka, maoka } from "@ordo-pink/oss-maoka"
 import type { Hunt } from "@ordo-pink/oss-hunt"
-import type { Maoka } from "@ordo-pink/oss-maoka"
 import type { Zags } from "@ordo-pink/oss-zags"
+import { bs_slash } from "@ordo-pink/frontend-icons"
 import { maoka_dom } from "@ordo-pink/oss-maoka/dom"
 
 import { create_file_modal } from "../components/data-modals/create-file-modal/create-file-modal.component"
@@ -48,6 +49,7 @@ export const data_commands =
 		use(ordo_client_maoka.jabs.handle_command("data.show_create_modal", handle_show_create_modal(state)))
 		use(ordo_client_maoka.jabs.handle_command("data.show_delete_modal", handle_show_delete_modal(state)))
 		use(ordo_client_maoka.jabs.handle_command("data.show_rename_modal", handle_show_rename_modal(state)))
+		use(ordo_client_maoka.jabs.handle_command("data.show_move_modal", handle_show_move_modal(state)))
 	}
 
 // --- Internal ---
@@ -76,6 +78,57 @@ const handle_show_rename_modal: ViewHandler<"data.show_rename_modal"> =
 		state.hunter.shoot("modal.show", {
 			size: ORDO_CLIENT.MODAL.SIZE.SM,
 			render: div => maoka_dom.render(div, rename_file_modal({ state, id }), ordo.uuid.create),
+		})
+	}
+
+const handle_show_move_modal: ViewHandler<"data.show_move_modal"> =
+	state =>
+	({ id }) => {
+		const data = state.query.select("data.root")
+		const descs = ordo.data.get_descendents(id, data, []).map(ordo.data.get_id)
+		const current_item = data[id]
+
+		// TODO Check if current_item exists
+
+		const items = Object.values(data)
+			.filter(i => !ordo.data.has_id(id, i) && !descs.includes(ordo.data.get_id(i)))
+			.map(item => {
+				const id = ordo.data.get_id(item)
+				const ancestors = ordo.data.get_ancestors(id, data)
+				const ances_tree = ancestors.map(ordo.data.get_name).join("/")
+				const name = ordo.data.get_name(item)
+
+				return {
+					id: ordo.data.get_id(item),
+					value: ordo.data.get_id(item),
+					readable_name: ordo.data.get_name(item),
+					description: ances_tree === "" ? `/${name}` : `/${ances_tree}/${name}`,
+					type: ORDO_CLIENT.COMMAND_PALETTE.ITEM_TYPE.CONSTRUCTIVE_ACTION,
+					render_icon: span => maoka_dom.render(span, icon({ item }), ordo.uuid.create),
+				} as OrdoClient.CommandPalette.Item
+			})
+
+		if (ordo.data.get_parent(current_item)) {
+			items.unshift({
+				id: "root",
+				value: null,
+				readable_name: "ordo_main_move_modal_move_to_root",
+				render_icon: span => maoka_dom.render(span, bs_slash(), ordo.uuid.create),
+			} as OrdoClient.CommandPalette.Item)
+		}
+
+		const icon = maoka.create<{ item: Ordo.Data.Instance }>("div", ({ item, use }) => {
+			use(ordo_client_maoka.context.provide(state))
+
+			return () => ordo_client_maoka.components.file_icon({ item })
+		})
+
+		state.hunter.shoot("command_palette.show", {
+			on_select: ({ value }) => {
+				state.hunter.shoot("data.move", { id, parent: value })
+				state.hunter.shoot("command_palette.hide")
+			},
+			items,
 		})
 	}
 

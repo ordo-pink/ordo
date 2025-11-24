@@ -3,21 +3,19 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { bs_file_earmark, bs_folder_open } from "@ordo-pink/frontend-icons"
 import { maoka } from "@ordo-pink/oss-maoka"
 import { maoka_styled } from "@ordo-pink/oss-maoka-styled"
 
 import "./filet-workspace.styles.css"
 
-type Args = { state: OrdoClient.F.State }
-export const filet_workspace = maoka.create<Args>("div", ({ state, use }) => {
+export const filet_workspace = maoka.create<{ state: OrdoClient.F.State }>("div", ({ state, use }) => {
 	use(ordo_client_maoka.context.provide(state))
 	use(ordo_client_maoka.jabs.set_id("filet-workspace"))
 	const get_params = use(ordo_client_maoka.jabs.route_params$)
 
-	// TODO Moving
 	// TODO Labels
 	// TODO Links
+
 	// TODO Access
 	// TODO Fields
 
@@ -85,16 +83,23 @@ const header = maoka.create<{ id: Ordo.Data.Parent }>("div", ({ id, use }) => {
 			action_buttons(() => [
 				id &&
 					ordo_client_maoka.components.button.neutral({
-						kindergarten: () => "Delete", // TODO Icon
+						kindergarten: () => translate("filet_delete_file"),
 						on_click: () => void hunter.shoot("data.show_delete_modal", { id }),
 						hotkey: "mod+shift+backspace",
 						small: true,
 					}),
 				id &&
 					ordo_client_maoka.components.button.neutral({
-						kindergarten: () => "Rename", // TODO Icon
+						kindergarten: () => translate("filet_rename_file"),
 						on_click: () => void hunter.shoot("data.show_rename_modal", { id }),
 						hotkey: "meta+shift+n",
+						small: true,
+					}),
+				id &&
+					ordo_client_maoka.components.button.neutral({
+						kindergarten: () => translate("filet_move_file"),
+						on_click: () => void hunter.shoot("data.show_move_modal", { id }),
+						hotkey: "mod+shift+m",
 						small: true,
 					}),
 				ordo_client_maoka.components.button.neutral({
@@ -108,22 +113,6 @@ const header = maoka.create<{ id: Ordo.Data.Parent }>("div", ({ id, use }) => {
 	}
 })
 
-type FileIconArgs = { item: Ordo.Data.Instance }
-const file_icon = maoka.create<FileIconArgs>("div", ({ item, use }) => {
-	const id = ordo.data.get_id(item)
-
-	const get_children = use(ordo_client_maoka.jabs.data.get_children$(id))
-
-	return () => {
-		const children = get_children()
-
-		// TODO Show as folder only if it is an ordo file with children
-		if (children.some(ordo.data.has_parent(id))) return bs_folder_open()
-		// TODO File association icon
-		else return bs_file_earmark()
-	}
-})
-
 type GridItemArgs = { item: Ordo.Data.Instance }
 const grid_item = maoka.create<GridItemArgs>("div", ({ item, use }) => {
 	const hunter = use(ordo_client_maoka.jabs.hunter)
@@ -134,7 +123,7 @@ const grid_item = maoka.create<GridItemArgs>("div", ({ item, use }) => {
 	use(ordo_client_maoka.jabs.add_class("item"))
 	use(ordo_client_maoka.jabs.listen("onclick", handle_click))
 
-	return () => [file_icon({ item }), filename(() => ordo.data.get_name(item))]
+	return () => [ordo_client_maoka.components.file_icon({ item }), filename(() => ordo.data.get_name(item))]
 })
 
 const filename = maoka_styled.div("filename")

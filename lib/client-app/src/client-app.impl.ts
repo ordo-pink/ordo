@@ -128,4 +128,4 @@ export const create = maoka.create<ClientApp.Args>("div", async ({ use, fetch, d
 const logo_wrapper = maoka_styled.div("logo-wrapper")
 const workspace_wrapper = maoka_styled.div("workspace-wrapper")
 
-const en = { logo: "ORDO", loading: "Loading..." }
+const en = { logo: "ORDO", loading: "Loading...", ordo_main_move_modal_move_to_root: "Move to root directory" }

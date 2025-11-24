@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { bs_files, BsSlash } from "@ordo-pink/frontend-icons"
+import { bs_files, bs_slash } from "@ordo-pink/frontend-icons"
 import { CONTEXT_MENU_ITEM_TYPE, Metadata } from "@ordo-pink/_core"
 import { R, type TResult } from "@ordo-pink/oss-result"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
@@ -91,7 +91,7 @@ const unshift_move_to_root_r =
 			.pipe(R.ops.map(metadata => (metadata?.is_root_child() ? items : [create_to_root_item(fsid), ...items])))
 
 const create_to_root_item = (fsid: Ordo.Metadata.FSID): Ordo.CommandPalette.Item => ({
-	render_icon: BsSlash,
+	render_icon: bs_slash,
 	value: { fsid, new_parent: null },
 	readable_name: "t.common.components.modals.move.move_to_root",
 })

@@ -5,4 +5,5 @@
 
 export * from "./button/button.component"
 export * from "./dialog/dialog.component"
+export * from "./file-icon/file-icon.component"
 export * from "./hotkey/hotkey.component"

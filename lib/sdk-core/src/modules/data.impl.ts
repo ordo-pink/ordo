@@ -88,8 +88,8 @@ export namespace impl {
 		({ fields, group, labels, links, location, name, owner, parent, permissions, size }, author, data) =>
 			[
 				data[0],
-				name ?? data[1],
-				parent ?? data[2],
+				name || data[1],
+				parent !== void 0 ? parent : data[2],
 				size ?? data[3],
 				owner ?? data[4],
 				group ?? data[5],
@@ -159,6 +159,22 @@ export namespace impl {
 	export const get_children: Ordo.Data.GetChildren = fns.curry((parent, vault) =>
 		Object.values(vault).filter(has_parent(parent)),
 	)
+
+	export const get_ancestors: Ordo.Data.GetAncestors = fns.curry((id, vault) => {
+		const ancestors = [] as Ordo.Data.Instance[]
+		if (!id) return ancestors
+
+		let item = vault[id]
+		let parent = item ? ordo.data.get_parent(item) : null
+
+		while (parent !== null) {
+			item = vault[parent]
+			parent = item ? ordo.data.get_parent(item) : null
+			ancestors.push(item)
+		}
+
+		return ancestors
+	})
 }
 
 declare global {
@@ -258,6 +274,7 @@ declare global {
 		type Exists = Ordo.Fns.Curried<(item: Instance, vault: Vault) => boolean>
 		type GetDescendents = Ordo.Fns.Curried<(id: Id, vault: Vault, descendents: Instance[]) => Instance[]>
 		type GetChildren = Ordo.Fns.Curried<(parent: Parent, vault: Vault) => Instance[]>
+		type GetAncestors = Ordo.Fns.Curried<(id: Id, vault: Vault) => Instance[]>
 
 		type GetCreatedAt = (data: Instance) => CreatedAt
 		type GetCreatedBy = (data: Instance) => CreatedBy

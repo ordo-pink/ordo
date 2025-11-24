@@ -141,6 +141,8 @@ export namespace impl {
 	export const get_descendents: Ordo.Data.GetDescendents = fns.curry(
 		(id: Ordo.Data.Id, vault: Ordo.Data.Vault, descendents: Ordo.Data.Instance[]) => {
 			for (const item of Object.values(vault)) {
+				if (!item) continue
+
 				const item_parent = ordo.data.get_parent(item)
 
 				if (item_parent === id) {

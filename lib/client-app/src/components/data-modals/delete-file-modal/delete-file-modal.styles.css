@@ -1,0 +1,16 @@
+#delete-file-modal {
+	@apply flex flex-col gap-y-8 p-8;
+}
+
+#delete-file-modal input {
+	@apply w-full outline-none;
+	@apply rounded-md bg-neutral-200 px-2 py-1 dark:bg-neutral-800;
+}
+
+#delete-file-modal .title {
+	@apply text-2xl font-bold;
+}
+
+#delete-file-modal .button-group {
+	@apply flex items-center justify-end gap-x-4;
+}

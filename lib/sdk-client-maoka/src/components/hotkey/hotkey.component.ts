@@ -14,11 +14,12 @@ import "./hotkey.styles.css"
 
 export const actionable_hotkey = maoka.create<OrdoClientMaoka.Components.HotkeyArgs>(
 	"div",
-	({ decoration_only, hotkey, node, prevent_in_contenteditable, prevent_in_inputs, show_in_mobile, use }) => {
+	({ decoration_only, hotkey, node, prevent_in_contenteditable, prevent_in_inputs, show_in_mobile, small, use }) => {
 		const darwin = use(is_darwin)
 
 		use(set_class("hotkey"))
 		if (show_in_mobile) use(add_class("mobile"))
+		if (small) use(add_class("small"))
 		if (!decoration_only) use(listen_global_event("keydown", e => handle_keydown(e)))
 
 		const split = hotkey.split("+")
@@ -88,6 +89,7 @@ declare global {
 			prevent_in_contenteditable?: boolean
 			prevent_in_inputs?: boolean
 			show_in_mobile?: boolean
+			small?: boolean
 		}
 	}
 }

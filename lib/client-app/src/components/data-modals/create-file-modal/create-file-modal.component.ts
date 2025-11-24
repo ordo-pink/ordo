@@ -4,13 +4,13 @@
  */
 
 import { maoka } from "@ordo-pink/oss-maoka"
-
-import "./create-file-modal.styles.css"
 import { maoka_dom } from "@ordo-pink/oss-maoka/dom"
 import { maoka_styled } from "@ordo-pink/oss-maoka-styled"
 
-type CreateModalArgs = { state: OrdoClient.F.State; parent: Ordo.Data.Parent }
-export const create_file_modal = maoka.create<CreateModalArgs>("div", async ({ parent, state, use }) => {
+import "./create-file-modal.styles.css"
+
+type CreateFileModalArgs = { state: OrdoClient.F.State; parent: Ordo.Data.Parent }
+export const create_file_modal = maoka.create<CreateFileModalArgs>("div", async ({ parent, state, use }) => {
 	let value = ""
 
 	use(ordo_client_maoka.context.provide(state))

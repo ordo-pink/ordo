@@ -9,6 +9,7 @@ import type { Zags } from "@ordo-pink/oss-zags"
 import { maoka_dom } from "@ordo-pink/oss-maoka/dom"
 
 import { create_file_modal } from "../components/data-modals/create-file-modal/create-file-modal.component"
+import { delete_file_modal } from "../components/data-modals/delete-file-modal/delete-file-modal.component"
 
 type Stream = Zags.Instance<OrdoClient.Data.State>
 type Repo = OrdoClient.Data.Repository
@@ -44,6 +45,7 @@ export const data_commands =
 		use(ordo_client_maoka.jabs.handle_command("data.set_owner", handle_set_owner($)))
 		use(ordo_client_maoka.jabs.handle_command("data.set_permissions", handle_set_permissions($)))
 		use(ordo_client_maoka.jabs.handle_command("data.show_create_modal", handle_show_create_modal(state)))
+		use(ordo_client_maoka.jabs.handle_command("data.show_delete_modal", handle_show_delete_modal(state)))
 	}
 
 // --- Internal ---
@@ -54,6 +56,15 @@ const handle_show_create_modal: ViewHandler<"data.show_create_modal"> =
 		state.hunter.shoot("modal.show", {
 			size: ORDO_CLIENT.MODAL.SIZE.SM,
 			render: div => maoka_dom.render(div, create_file_modal({ state, parent }), ordo.uuid.create),
+		})
+	}
+
+const handle_show_delete_modal: ViewHandler<"data.show_delete_modal"> =
+	state =>
+	({ id }) => {
+		state.hunter.shoot("modal.show", {
+			size: ORDO_CLIENT.MODAL.SIZE.SM,
+			render: div => maoka_dom.render(div, delete_file_modal({ state, id }), ordo.uuid.create),
 		})
 	}
 
@@ -83,9 +94,18 @@ const handle_delete: DataHandler<"data.delete"> =
 			if (!check_permissions()) throw ordo.rrr.eperm(ORDO.RRR.REASON.DATA_DELETE_PERMISSION_DENIED, [id])
 
 			const descendents = ordo.data.get_descendents(id, items, [])
-			const new_items = descendents.reduce((items, item) => ({ ...items, [ordo.data.get_id(item)]: undefined }), { ...items })
+			const new_items = descendents.reduce(
+				(items, item) => {
+					const id = ordo.data.get_id(item)
+					delete items[id]
 
-			return { ...new_items, [id]: undefined }
+					return items
+				},
+				{ ...items },
+			)
+			delete new_items[id]
+
+			return new_items
 		})
 
 const handle_delete_field: DataHandler<"data.fields.delete"> =

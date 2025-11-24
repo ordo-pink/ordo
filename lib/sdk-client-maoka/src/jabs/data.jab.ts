@@ -35,11 +35,11 @@ export const get_ancestors$: (id: Ordo.Data.Id | null) => Maoka.Jab<() => Ordo.D
 				if (!id) return ancestors
 
 				let item = items[id]
-				let parent = ordo.data.get_parent(item)
+				let parent = item ? ordo.data.get_parent(item) : null
 
 				while (parent !== null) {
 					item = items[parent]
-					parent = ordo.data.get_parent(item)
+					parent = item ? ordo.data.get_parent(item) : null
 					ancestors.push(item)
 				}
 

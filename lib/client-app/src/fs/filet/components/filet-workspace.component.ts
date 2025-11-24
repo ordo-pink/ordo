@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { bs_file_earmark, bs_folder_open, bs_plus } from "@ordo-pink/frontend-icons"
+import { bs_file_earmark, bs_folder_open } from "@ordo-pink/frontend-icons"
 import { maoka } from "@ordo-pink/oss-maoka"
 import { maoka_styled } from "@ordo-pink/oss-maoka-styled"
 
@@ -14,22 +14,31 @@ export const filet_workspace = maoka.create<Args>("div", ({ state, use }) => {
 	use(ordo_client_maoka.context.provide(state))
 	use(ordo_client_maoka.jabs.set_id("filet-workspace"))
 	const get_params = use(ordo_client_maoka.jabs.route_params$)
+	const hunter = use(ordo_client_maoka.jabs.hunter)
+	const translate = use(ordo_client_maoka.jabs.translate$)
 
-	// TODO CP show create modal
-	// TODO Removing
 	// TODO Renaming
 	// TODO Moving
 	// TODO Labels
 	// TODO Links
 	// TODO Access
 	// TODO Fields
+	// TODO CP show create modal
 
-	// TODO Tiling
 	return () => {
 		const id = get_params()?.id ?? null
 		if (!ordo.data.parent_guard(id)) return null // TODO 404
 
-		return [header({ id }), grid({ id }), create_button({ id })]
+		return [
+			header({ id }),
+			grid({ id }),
+			ordo_client_maoka.components.button.primary({
+				custom_class: "create-button",
+				kindergarten: () => translate("filet_create_file"),
+				on_click: () => void hunter.shoot("data.show_create_modal", { parent: id }),
+				hotkey: "meta+n",
+			}),
+		]
 	}
 })
 
@@ -62,20 +71,38 @@ const ancestor_link = maoka.create<{ item: Ordo.Data.Instance | null; is_current
 	},
 )
 
+const action_buttons = maoka_styled.div("action-buttons")
+
+const navigation = maoka_styled.div("navigation")
+
 const header = maoka.create<{ id: Ordo.Data.Parent }>("div", ({ id, use }) => {
 	use(ordo_client_maoka.jabs.add_class("header"))
 
+	const hunter = use(ordo_client_maoka.jabs.hunter)
 	const get_data = use(ordo_client_maoka.jabs.data.get_by_id$(id))
 	const get_ancestors = use(ordo_client_maoka.jabs.data.get_ancestors$(id))
+	const get_params = use(ordo_client_maoka.jabs.route_params$)
 
 	return () => {
 		const data = get_data()
 		const ancestors = get_ancestors()
 
 		return [
-			ancestor_link({ item: null }),
-			...ancestors.map(item => ancestor_link({ item })),
-			data && ancestor_link({ item: data, is_current: true }),
+			navigation(() => [
+				ancestor_link({ item: null, is_current: !get_params()?.id }),
+				...ancestors.map(item => ancestor_link({ item })),
+				data && ancestor_link({ item: data, is_current: true }),
+			]),
+
+			id &&
+				action_buttons(() => [
+					ordo_client_maoka.components.button.neutral({
+						kindergarten: () => "Delete", // TODO Icon
+						on_click: () => void hunter.shoot("data.show_delete_modal", { id }),
+						hotkey: "mod+shift+backspace",
+						small: true,
+					}),
+				]),
 		]
 	}
 })
@@ -122,16 +149,4 @@ const grid = maoka.create<GridArgs>("div", ({ id, use }) => {
 
 		return Object.values(data).map(item => grid_item({ item }))
 	}
-})
-
-type CreateButtonArgs = { id: Ordo.Data.Parent }
-const create_button = maoka.create<CreateButtonArgs>("button", ({ id, use }) => {
-	const { hunter } = use(ordo_client_maoka.context.consume)
-
-	const handle_click = () => hunter.shoot("data.show_create_modal", { parent: id })
-
-	use(ordo_client_maoka.jabs.set_class("create-button"))
-	use(ordo_client_maoka.jabs.listen("onclick", handle_click))
-
-	return () => bs_plus()
 })

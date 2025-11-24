@@ -3,15 +3,23 @@
 }
 
 #filet-workspace .create-button {
-	@apply fixed bottom-4 left-4 p-2;
-	@apply bg-pink-200 hover:bg-pink-300 dark:bg-pink-600 dark:hover:bg-pink-500;
-	@apply rounded-full text-xl shadow-inner transition-all hover:shadow-xl;
+	@apply fixed bottom-4 left-4;
+	@apply bg-pink-200 text-neutral-800 hover:bg-pink-300 dark:bg-pink-600 dark:text-neutral-200 dark:hover:bg-pink-500;
+	@apply rounded-full text-base font-normal;
+}
+
+#filet-workspace .create-button .create-button-text {
+	@apply flex items-center gap-x-1;
 }
 
 #filet-workspace .header {
-	@apply flex flex-wrap gap-2;
-	@apply px-8 py-24 pb-4;
+	@apply flex items-center justify-between;
+	@apply px-2 py-24 pb-4;
 	@apply bg-gradient-to-br from-neutral-100 to-stone-100 dark:from-neutral-900 dark:to-stone-900;
+}
+
+#filet-workspace .header .navigation {
+	@apply flex flex-wrap gap-2;
 }
 
 #filet-workspace .header .ancestor-link {

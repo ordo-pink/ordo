@@ -18,12 +18,13 @@ export default ordo_client.f.create(
 			{ command: "command_palette.add" },
 			{ command: "command_palette.remove" },
 			{ command: "data.show_create_modal" },
+			{ command: "data.show_delete_modal" },
 			{ command: "i18n.add_translations" },
 			{ command: "i18n.remove_translations" },
 			{ command: "router.set_pathname" },
 			{ command: "title.set_title" },
 		],
-		queries: [{ type: "data" }, { type: "activities", details: ["current"] }],
+		queries: [{ type: "data" }, { type: "activities", details: ["current"] }, { type: "i18n" }],
 	},
 	state => {
 		const { hunter } = state
@@ -94,6 +95,8 @@ export default ordo_client.f.create(
 
 const en_values = {
 	filet_title: "Filet",
+	filet_create_file: "Create",
+	filet_delete_file: "Delete",
 	filet_cp_open_name: "Go to Filet",
 	filet_cp_open_description: "Filet provides common file explorer/file manager/finder experience for your Ordo files.",
 	filet_cp_open_vault_name: "Open Vault...",

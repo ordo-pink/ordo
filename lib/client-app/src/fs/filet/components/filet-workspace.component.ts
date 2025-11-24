@@ -17,7 +17,6 @@ export const filet_workspace = maoka.create<Args>("div", ({ state, use }) => {
 	const hunter = use(ordo_client_maoka.jabs.hunter)
 	const translate = use(ordo_client_maoka.jabs.translate$)
 
-	// TODO Renaming
 	// TODO Moving
 	// TODO Labels
 	// TODO Links
@@ -100,6 +99,12 @@ const header = maoka.create<{ id: Ordo.Data.Parent }>("div", ({ id, use }) => {
 						kindergarten: () => "Delete", // TODO Icon
 						on_click: () => void hunter.shoot("data.show_delete_modal", { id }),
 						hotkey: "mod+shift+backspace",
+						small: true,
+					}),
+					ordo_client_maoka.components.button.neutral({
+						kindergarten: () => "Rename", // TODO Icon
+						on_click: () => void hunter.shoot("data.show_rename_modal", { id }),
+						hotkey: "meta+shift+n",
 						small: true,
 					}),
 				]),

@@ -10,6 +10,7 @@ import { maoka_dom } from "@ordo-pink/oss-maoka/dom"
 
 import { create_file_modal } from "../components/data-modals/create-file-modal/create-file-modal.component"
 import { delete_file_modal } from "../components/data-modals/delete-file-modal/delete-file-modal.component"
+import { rename_file_modal } from "../components/data-modals/rename-file-modal/rename-file-modal.component"
 
 type Stream = Zags.Instance<OrdoClient.Data.State>
 type Repo = OrdoClient.Data.Repository
@@ -46,6 +47,7 @@ export const data_commands =
 		use(ordo_client_maoka.jabs.handle_command("data.set_permissions", handle_set_permissions($)))
 		use(ordo_client_maoka.jabs.handle_command("data.show_create_modal", handle_show_create_modal(state)))
 		use(ordo_client_maoka.jabs.handle_command("data.show_delete_modal", handle_show_delete_modal(state)))
+		use(ordo_client_maoka.jabs.handle_command("data.show_rename_modal", handle_show_rename_modal(state)))
 	}
 
 // --- Internal ---
@@ -65,6 +67,15 @@ const handle_show_delete_modal: ViewHandler<"data.show_delete_modal"> =
 		state.hunter.shoot("modal.show", {
 			size: ORDO_CLIENT.MODAL.SIZE.SM,
 			render: div => maoka_dom.render(div, delete_file_modal({ state, id }), ordo.uuid.create),
+		})
+	}
+
+const handle_show_rename_modal: ViewHandler<"data.show_rename_modal"> =
+	state =>
+	({ id }) => {
+		state.hunter.shoot("modal.show", {
+			size: ORDO_CLIENT.MODAL.SIZE.SM,
+			render: div => maoka_dom.render(div, rename_file_modal({ state, id }), ordo.uuid.create),
 		})
 	}
 

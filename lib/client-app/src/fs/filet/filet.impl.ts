@@ -19,6 +19,7 @@ export default ordo_client.f.create(
 			{ command: "command_palette.remove" },
 			{ command: "data.show_create_modal" },
 			{ command: "data.show_delete_modal" },
+			{ command: "data.show_rename_modal" },
 			{ command: "i18n.add_translations" },
 			{ command: "i18n.remove_translations" },
 			{ command: "router.set_pathname" },

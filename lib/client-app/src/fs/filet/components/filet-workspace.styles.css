@@ -18,6 +18,10 @@
 	@apply bg-gradient-to-br from-neutral-100 to-stone-100 dark:from-neutral-900 dark:to-stone-900;
 }
 
+#filet-workspace .header .action-buttons {
+	@apply flex justify-end gap-2;
+}
+
 #filet-workspace .header .navigation {
 	@apply flex flex-wrap gap-2;
 }

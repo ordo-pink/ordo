@@ -2,16 +2,6 @@
 	@apply relative flex flex-col gap-y-2;
 }
 
-#filet-workspace .create-button {
-	@apply fixed bottom-4 left-4;
-	@apply bg-pink-200 text-neutral-800 hover:bg-pink-300 dark:bg-pink-600 dark:text-neutral-200 dark:hover:bg-pink-500;
-	@apply rounded-full text-base font-normal;
-}
-
-#filet-workspace .create-button .create-button-text {
-	@apply flex items-center gap-x-1;
-}
-
 #filet-workspace .header {
 	@apply flex items-center justify-between;
 	@apply px-2 py-24 pb-4;

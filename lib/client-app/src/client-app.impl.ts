@@ -59,6 +59,7 @@ export const create = maoka.create<ClientApp.Args>("div", async ({ use, fetch, d
 		.catch(rrr => hunter.shoot("notification.rrr", rrr))
 
 	// TODO Automatically provide context
+	// TODO CP create/delete/rename/move/labels/links/access/fields
 	// TODO Prefix all main commands with "ordo.main"
 	// TODO Inherit params from parent on creation
 	// TODO Translations for error reasons and titles

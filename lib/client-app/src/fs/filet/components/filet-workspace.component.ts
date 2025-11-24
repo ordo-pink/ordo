@@ -14,35 +14,24 @@ export const filet_workspace = maoka.create<Args>("div", ({ state, use }) => {
 	use(ordo_client_maoka.context.provide(state))
 	use(ordo_client_maoka.jabs.set_id("filet-workspace"))
 	const get_params = use(ordo_client_maoka.jabs.route_params$)
-	const hunter = use(ordo_client_maoka.jabs.hunter)
-	const translate = use(ordo_client_maoka.jabs.translate$)
 
 	// TODO Moving
 	// TODO Labels
 	// TODO Links
 	// TODO Access
 	// TODO Fields
-	// TODO CP show create modal
 
 	return () => {
 		const id = get_params()?.id ?? null
 		if (!ordo.data.parent_guard(id)) return null // TODO 404
 
-		return [
-			header({ id }),
-			grid({ id }),
-			ordo_client_maoka.components.button.primary({
-				custom_class: "create-button",
-				kindergarten: () => translate("filet_create_file"),
-				on_click: () => void hunter.shoot("data.show_create_modal", { parent: id }),
-				hotkey: "meta+n",
-			}),
-		]
+		return [header({ id }), grid({ id })]
 	}
 })
 
 // --- Internal ---
 
+// TODO Outline
 const ancestor_link = maoka.create<{ item: Ordo.Data.Instance | null; is_current?: boolean }>(
 	"a",
 	({ item, is_current, use }) => {
@@ -71,12 +60,12 @@ const ancestor_link = maoka.create<{ item: Ordo.Data.Instance | null; is_current
 )
 
 const action_buttons = maoka_styled.div("action-buttons")
-
 const navigation = maoka_styled.div("navigation")
 
 const header = maoka.create<{ id: Ordo.Data.Parent }>("div", ({ id, use }) => {
 	use(ordo_client_maoka.jabs.add_class("header"))
 
+	const translate = use(ordo_client_maoka.jabs.translate$)
 	const hunter = use(ordo_client_maoka.jabs.hunter)
 	const get_data = use(ordo_client_maoka.jabs.data.get_by_id$(id))
 	const get_ancestors = use(ordo_client_maoka.jabs.data.get_ancestors$(id))
@@ -93,21 +82,28 @@ const header = maoka.create<{ id: Ordo.Data.Parent }>("div", ({ id, use }) => {
 				data && ancestor_link({ item: data, is_current: true }),
 			]),
 
-			id &&
-				action_buttons(() => [
+			action_buttons(() => [
+				id &&
 					ordo_client_maoka.components.button.neutral({
 						kindergarten: () => "Delete", // TODO Icon
 						on_click: () => void hunter.shoot("data.show_delete_modal", { id }),
 						hotkey: "mod+shift+backspace",
 						small: true,
 					}),
+				id &&
 					ordo_client_maoka.components.button.neutral({
 						kindergarten: () => "Rename", // TODO Icon
 						on_click: () => void hunter.shoot("data.show_rename_modal", { id }),
 						hotkey: "meta+shift+n",
 						small: true,
 					}),
-				]),
+				ordo_client_maoka.components.button.neutral({
+					kindergarten: () => translate("filet_create_file"),
+					on_click: () => void hunter.shoot("data.show_create_modal", { parent: id }),
+					hotkey: "meta+n",
+					small: true,
+				}),
+			]),
 		]
 	}
 })

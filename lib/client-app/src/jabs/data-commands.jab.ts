@@ -80,9 +80,12 @@ const handle_delete: DataHandler<"data.delete"> =
 	({ id }) =>
 		$.update("data.root", items => {
 			if (!items[id]) throw ordo.rrr.enoent(ORDO.RRR.REASON.DATA_NOT_FOUND, [id, "data.delete"])
-			if (!check_permissions()) throw ordo.rrr.eperm(ORDO.RRR.REASON.DATA_UPDATE_PERMISSION_DENIED, [id])
+			if (!check_permissions()) throw ordo.rrr.eperm(ORDO.RRR.REASON.DATA_DELETE_PERMISSION_DENIED, [id])
 
-			return { ...items, [id]: undefined }
+			const descendents = ordo.data.get_descendents(id, items, [])
+			const new_items = descendents.reduce((items, item) => ({ ...items, [ordo.data.get_id(item)]: undefined }), { ...items })
+
+			return { ...new_items, [id]: undefined }
 		})
 
 const handle_delete_field: DataHandler<"data.fields.delete"> =

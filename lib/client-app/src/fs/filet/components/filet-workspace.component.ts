@@ -15,12 +15,16 @@ export const filet_workspace = maoka.create<Args>("div", ({ state, use }) => {
 	use(ordo_client_maoka.jabs.set_id("filet-workspace"))
 	const get_params = use(ordo_client_maoka.jabs.route_params$)
 
+	// TODO CP show create modal
+	// TODO Removing
 	// TODO Renaming
 	// TODO Moving
 	// TODO Labels
 	// TODO Links
 	// TODO Access
 	// TODO Fields
+
+	// TODO Tiling
 	return () => {
 		const id = get_params()?.id ?? null
 		if (!ordo.data.parent_guard(id)) return null // TODO 404

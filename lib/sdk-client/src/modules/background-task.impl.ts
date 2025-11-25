@@ -13,14 +13,6 @@ export namespace CONSTANTS {
 }
 
 declare global {
-	interface cmd {
-		background_status: {
-			saving: { args: void }
-			loading: { args: void }
-			reset: { args: void }
-		}
-	}
-
 	namespace OrdoClient.BackgroundTask {
 		type Status = CONSTANTS.STATUS
 	}

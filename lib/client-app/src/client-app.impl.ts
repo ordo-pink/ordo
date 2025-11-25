@@ -46,21 +46,18 @@ export const create = maoka.create<ClientApp.Args>("div", async ({ use, fetch, d
 	use(data_commands(data$, data_repository))
 	use(activity_commands(activities$, router))
 
-	hunter.shoot("title.set_title", "loading")
+	hunter.shoot("ordo_main.title.set_title", "loading")
 
 	await data_repository
 		.read()
 		.pipe(oath.ops.map(data => data$.update("data.root", () => data ?? {})))
-		.cata(oath.catas.or_else(e => hunter.shoot("notification.rrr", e)))
+		.cata(oath.catas.or_else(e => hunter.shoot("ordo_main.notification.rrr", e)))
 
 	await import("./fs/filet/filet.impl")
 		.then(module => module.default)
 		.then(creator => creator(state))
-		.catch(rrr => hunter.shoot("notification.rrr", rrr))
+		.catch(rrr => hunter.shoot("ordo_main.notification.rrr", rrr))
 
-	// TODO Automatically provide context
-	// TODO CP create/delete/rename/move/labels/links/access/fields
-	// TODO Prefix all main commands with "ordo.main"
 	// TODO Inherit params from parent on creation
 	// TODO Translations for error reasons and titles
 	// TODO Async for other intensive hooks

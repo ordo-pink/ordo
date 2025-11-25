@@ -19,9 +19,9 @@ export const delete_file_modal = maoka.create<DeleteFileModalArgs>("div", async 
 
 	const hunter = use(ordo_client_maoka.jabs.hunter)
 	const translate = use(ordo_client_maoka.jabs.translate$)
-	const handle_cancel = () => void state.hunter.shoot("modal.hide")
+	const handle_cancel = () => void state.hunter.shoot("ordo_main.modal.hide")
 	const notify_success = () =>
-		state.hunter.shoot("notification.show", {
+		state.hunter.shoot("ordo_main.notification.show", {
 			title: "delete_file_modal_notification_title",
 			message: ordo.data.get_name(item!),
 			type: ORDO_CLIENT.NOTIFICATION.TYPE.SUCCESS,
@@ -29,17 +29,16 @@ export const delete_file_modal = maoka.create<DeleteFileModalArgs>("div", async 
 		})
 	const handle_ok = () =>
 		void state.hunter
-			.shoot("data.delete", { id })
+			.shoot("ordo_main.data.delete", { id })
 			.to_promise()
 			.then(notify_success)
 			.then(() => ordo.data.get_parent(item!))
-			.then(id => (id ? hunter.shoot("ordo.filet.open_file", { id }) : hunter.shoot("ordo.filet.open")))
-			.catch(rrr => state.hunter.shoot("notification.rrr", rrr))
-			.finally(() => state.hunter.shoot("modal.hide"))
+			.catch(rrr => state.hunter.shoot("ordo_main.notification.rrr", rrr))
+			.finally(() => state.hunter.shoot("ordo_main.modal.hide"))
 
 	if (!item) {
-		hunter.shoot("notification.rrr", ordo.rrr.enoent(ORDO.RRR.REASON.DATA_NOT_FOUND, id))
-		hunter.shoot("modal.hide")
+		hunter.shoot("ordo_main.notification.rrr", ordo.rrr.enoent(ORDO.RRR.REASON.DATA_NOT_FOUND, id))
+		hunter.shoot("ordo_main.modal.hide")
 	}
 
 	return () => [

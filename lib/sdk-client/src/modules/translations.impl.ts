@@ -6,19 +6,6 @@
 import type { I18n } from "@ordo-pink/oss-i18n"
 
 declare global {
-	interface cmd {
-		i18n: {
-			add_translations: {
-				args: {
-					locale: I18n.ISO_639_1_Locale
-					values: Record<string, string>
-				}
-			}
-			remove_translations: { args: OrdoClient.Translations.Key[] }
-			set_locale: { args: I18n.ISO_639_1_Locale }
-		}
-	}
-
 	namespace OrdoClient.Translations {
 		export type Keys = Record<string, string>
 		export type Key = string

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-export const NAME = "ordo.filet"
+export const NAME = "ordo_filet"
 
 export const CP_OPEN_ID = `${NAME}.cp.open`
 export const CP_OPEN_VAULT_ID = `${NAME}.cp.open-vault`

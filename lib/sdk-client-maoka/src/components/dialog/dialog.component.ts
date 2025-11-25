@@ -45,9 +45,9 @@ const create_dialog: (
 ) => Maoka.Jab<[show: () => void, hide: () => void]> =
 	(state, component) =>
 	({ node }) => {
-		const hide = () => void state.hunter.shoot("modal.hide")
+		const hide = () => void state.hunter.shoot("ordo_main.modal.hide")
 		const show = () =>
-			void state.hunter.shoot("modal.show", {
+			void state.hunter.shoot("ordo_main.modal.show", {
 				render: div => maoka_dom.render(div, component, node.root.create_id),
 				size: ORDO_CLIENT.MODAL.SIZE.SM,
 			})

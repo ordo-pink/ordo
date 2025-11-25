@@ -39,8 +39,6 @@ export const actionable_hotkey = maoka.create<OrdoClientMaoka.Components.HotkeyA
 
 			const parsed_hotkey = ordo_client.fns.create_hotkey_from_event(e, darwin)
 
-			// TODO Accept handler
-
 			if (parsed_hotkey === hotkey) {
 				e.preventDefault()
 

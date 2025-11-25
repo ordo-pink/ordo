@@ -74,14 +74,14 @@ export namespace impl {
 			hunter: {
 				shoot: (prey, bullet) => {
 					if (!permissions.commands.map(ordo.fns.prop("command")).includes(prey))
-						global_state.hunter.shoot("notification.rrr", ordo.rrr.eperm("f_rrr_not_permitted_shot", prey))
+						global_state.hunter.shoot("ordo_main.notification.rrr", ordo.rrr.eperm("f_rrr_not_permitted_shot", prey))
 
 					return global_state.hunter.shoot(prey, bullet as any)
 				},
 				track: (prey, gun) => {
 					if (prey.startsWith(name)) permissions.commands.push({ command: prey })
 					if (!permissions.commands.map(ordo.fns.prop("command")).includes(prey))
-						global_state.hunter.shoot("notification.rrr", ordo.rrr.eperm("f_rrr_not_permitted_track", prey))
+						global_state.hunter.shoot("ordo_main.notification.rrr", ordo.rrr.eperm("f_rrr_not_permitted_track", prey))
 
 					return global_state.hunter.track(prey, gun)
 				},

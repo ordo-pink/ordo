@@ -4,21 +4,17 @@
  */
 
 import { maoka } from "@ordo-pink/oss-maoka"
-import { maoka_dom } from "@ordo-pink/oss-maoka/dom"
 
 export const title = maoka.create("div", ({ use }) => {
-	const { hunter } = use(ordo_client_maoka.context.consume)
 	const translate = use(ordo_client_maoka.jabs.translate$)
 	const title_element = document.querySelector("title")
+	const handle_set_title: OrdoClient.Command.GunFor<"ordo_main.title.set_title"> = title => {
+		if (title_element) {
+			const title_str = title ? translate(title) : "404"
 
-	use(maoka_dom.jabs.onmount(() => handle_mount()))
+			title_element.innerHTML = `${title_str} | Ordo.pink`
+		}
+	}
 
-	const handle_mount = () =>
-		hunter.track("title.set_title", title => {
-			if (title_element) {
-				const title_str = title ? translate(title) : "404"
-
-				title_element.innerHTML = `${title_str} | Ordo.pink`
-			}
-		})
+	use(ordo_client_maoka.jabs.handle_command("ordo_main.title.set_title", handle_set_title))
 })

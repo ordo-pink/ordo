@@ -22,9 +22,9 @@ export const background_task_status = maoka.create("div", ({ use, refresh$ }) =>
 	const handle_saving = () => set_status$(STATUS.SAVING)
 
 	use(ordo_client_maoka.jabs.set_id("bts"))
-	use(ordo_client_maoka.jabs.handle_command("background_status.loading", handle_loading))
-	use(ordo_client_maoka.jabs.handle_command("background_status.reset", handle_reset))
-	use(ordo_client_maoka.jabs.handle_command("background_status.saving", handle_saving))
+	use(ordo_client_maoka.jabs.handle_command("ordo_main.background_status.loading", handle_loading))
+	use(ordo_client_maoka.jabs.handle_command("ordo_main.background_status.reset", handle_reset))
+	use(ordo_client_maoka.jabs.handle_command("ordo_main.background_status.saving", handle_saving))
 
 	return () =>
 		sweech

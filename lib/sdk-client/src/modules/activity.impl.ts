@@ -6,13 +6,6 @@
 import type { Colonoscope } from "@ordo-pink/oss-colonoscope"
 
 declare global {
-	interface cmd {
-		activity: {
-			register: { args: OrdoClient.Activity.Instance; description?: string }
-			unregister: { args: OrdoClient.Activity.ID }
-		}
-	}
-
 	export namespace OrdoClient.Activity {
 		export type State = { activities: { items: Instance[]; current?: Instance & { params: Colonoscope.Results } } }
 

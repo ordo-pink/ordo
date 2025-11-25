@@ -14,9 +14,9 @@ import "./modal.styles.css"
 export const modal = maoka.create("div", ({ use }) => {
 	const { hunter } = use(ordo_client_maoka.context.consume)
 
-	const handle_click = () => hunter.shoot("modal.hide")
-	const handle_show: OrdoClient.Command.GunFor<"modal.show"> = params => $.update("instance", () => params)
-	const handle_hide: OrdoClient.Command.GunFor<"modal.hide"> = () => $.update("instance", () => void 0)
+	const handle_click = () => hunter.shoot("ordo_main.modal.hide")
+	const handle_show: OrdoClient.Command.GunFor<"ordo_main.modal.show"> = params => $.update("instance", () => params)
+	const handle_hide: OrdoClient.Command.GunFor<"ordo_main.modal.hide"> = () => $.update("instance", () => void 0)
 	const handle_mount = () =>
 		$.cheat("instance", instance => {
 			if (instance) use(ordo_client_maoka.jabs.add_class("active"))
@@ -26,8 +26,8 @@ export const modal = maoka.create("div", ({ use }) => {
 	use(maoka_dom.jabs.onmount(handle_mount))
 	use(ordo_client_maoka.jabs.set_id("modal-overlay"))
 	use(ordo_client_maoka.jabs.listen("onclick", handle_click))
-	use(ordo_client_maoka.jabs.handle_command("modal.hide", handle_hide))
-	use(ordo_client_maoka.jabs.handle_command("modal.show", handle_show))
+	use(ordo_client_maoka.jabs.handle_command("ordo_main.modal.hide", handle_hide))
+	use(ordo_client_maoka.jabs.handle_command("ordo_main.modal.show", handle_show))
 	use(ordo_client_maoka.jabs.add_translations("en", en))
 
 	return () => [modal_window(), close_modal()]
@@ -91,10 +91,10 @@ const close_modal = maoka.create("div", ({ use }) => {
 		if (event.code !== "Escape" || !$.select("instance")) return
 
 		event.stopImmediatePropagation()
-		hunter.shoot("modal.hide")
+		hunter.shoot("ordo_main.modal.hide")
 	}
 
-	const handle_click = () => void hunter.shoot("modal.hide")
+	const handle_click = () => void hunter.shoot("ordo_main.modal.hide")
 
 	return () => {
 		use(ordo_client_maoka.jabs.set_attribute("title", translate("modal_close_hint")))

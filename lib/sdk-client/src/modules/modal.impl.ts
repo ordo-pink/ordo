@@ -14,13 +14,6 @@ export namespace CONSTANTS {
 }
 
 declare global {
-	interface cmd {
-		modal: {
-			hide: { args: void }
-			show: { args: OrdoClient.Modal.Instance }
-		}
-	}
-
 	namespace OrdoClient.Modal {
 		export type Size = (typeof CONSTANTS.SIZE)[keyof typeof CONSTANTS.SIZE]
 

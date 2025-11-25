@@ -35,9 +35,17 @@ export const add_command_palette_item =
 		const { hunter } = use(context.consume)
 
 		const handle_onmount = () => {
-			hunter.shoot("command_palette.add", { description, hotkey, id, readable_name, render_icon, type, value: on_select })
+			hunter.shoot("ordo_main.command_palette.add", {
+				description,
+				hotkey,
+				id,
+				readable_name,
+				render_icon,
+				type,
+				value: on_select,
+			})
 
-			return () => void hunter.shoot("command_palette.remove", id)
+			return () => void hunter.shoot("ordo_main.command_palette.remove", id)
 		}
 
 		use(maoka_dom.jabs.onmount(handle_onmount))
@@ -51,9 +59,9 @@ export const add_translations =
 	): $Async extends void ? Maoka.Jab<void> : Maoka.Jab<Promise<void>> =>
 	({ use }) => {
 		const { hunter } = use(context.consume)
-		const result = hunter.shoot("i18n.add_translations", { locale, values })
+		const result = hunter.shoot("ordo_main.i18n.add_translations", { locale, values })
 
-		use(maoka_dom.jabs.onunmount(() => void hunter.shoot("i18n.remove_translations", Object.keys(values))))
+		use(maoka_dom.jabs.onunmount(() => void hunter.shoot("ordo_main.i18n.remove_translations", Object.keys(values))))
 
 		if (async) return result.to_promise() as any
 	}

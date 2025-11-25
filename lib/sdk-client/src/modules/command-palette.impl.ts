@@ -25,16 +25,6 @@ export namespace CONSTANTS {
 }
 
 declare global {
-	interface cmd {
-		command_palette: {
-			add: { args: OrdoClient.CommandPalette.Item<() => void> }
-			hide: { args: void }
-			remove: { args: string | number }
-			show: { args: OrdoClient.CommandPalette.Instance | undefined }
-			toggle: { args: void }
-		}
-	}
-
 	namespace OrdoClient.CommandPalette {
 		export type Id = string | number
 

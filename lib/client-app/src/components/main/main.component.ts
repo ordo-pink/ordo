@@ -18,7 +18,7 @@ export const sidebar_toggle = maoka.create("button", ({ use }) => {
 
 	use(ordo_client_maoka.jabs.set_class("icon sidebar-toggle"))
 	use(ordo_client_maoka.jabs.set_attribute("tabindex", "3"))
-	use(ordo_client_maoka.jabs.listen("onclick", () => hunter.shoot("sidebar.toggle")))
+	use(ordo_client_maoka.jabs.listen("onclick", () => hunter.shoot("ordo_main.sidebar.toggle")))
 
 	return () => {
 		const { visible, enabled } = get_sidebar()
@@ -43,21 +43,21 @@ export const sidebar = maoka.create("aside", ({ use, node }) => {
 	const get_sidebar$ = use(ordo_client_maoka.jabs.marry$(sidebar$))
 	const get_current_activity$ = use(ordo_client_maoka.jabs.cheat$(query, "activities.current"))
 
-	const handle_click = () => is_mobile && hunter.shoot("sidebar.hide")
+	const handle_click = () => is_mobile && hunter.shoot("ordo_main.sidebar.hide")
 
-	const handle_disable: OrdoClient.Command.GunFor<"sidebar.disable"> = () => sidebar$.update("enabled", () => false)
-	const handle_enable: OrdoClient.Command.GunFor<"sidebar.enable"> = () => sidebar$.update("enabled", () => true)
-	const handle_hide: OrdoClient.Command.GunFor<"sidebar.hide"> = () => sidebar$.update("visible", () => false)
-	const handle_show: OrdoClient.Command.GunFor<"sidebar.show"> = () => sidebar$.update("visible", () => true)
-	const handle_toggle: OrdoClient.Command.GunFor<"sidebar.toggle"> = () =>
+	const handle_disable: OrdoClient.Command.GunFor<"ordo_main.sidebar.disable"> = () => sidebar$.update("enabled", () => false)
+	const handle_enable: OrdoClient.Command.GunFor<"ordo_main.sidebar.enable"> = () => sidebar$.update("enabled", () => true)
+	const handle_hide: OrdoClient.Command.GunFor<"ordo_main.sidebar.hide"> = () => sidebar$.update("visible", () => false)
+	const handle_show: OrdoClient.Command.GunFor<"ordo_main.sidebar.show"> = () => sidebar$.update("visible", () => true)
+	const handle_toggle: OrdoClient.Command.GunFor<"ordo_main.sidebar.toggle"> = () =>
 		void (sidebar$.select("enabled") && sidebar$.update("visible", prev => !prev))
 
 	use(ordo_client_maoka.jabs.listen("onclick", () => handle_click()))
-	use(ordo_client_maoka.jabs.handle_command("sidebar.disable", handle_disable))
-	use(ordo_client_maoka.jabs.handle_command("sidebar.enable", handle_enable))
-	use(ordo_client_maoka.jabs.handle_command("sidebar.hide", handle_hide))
-	use(ordo_client_maoka.jabs.handle_command("sidebar.show", handle_show))
-	use(ordo_client_maoka.jabs.handle_command("sidebar.toggle", handle_toggle))
+	use(ordo_client_maoka.jabs.handle_command("ordo_main.sidebar.disable", handle_disable))
+	use(ordo_client_maoka.jabs.handle_command("ordo_main.sidebar.enable", handle_enable))
+	use(ordo_client_maoka.jabs.handle_command("ordo_main.sidebar.hide", handle_hide))
+	use(ordo_client_maoka.jabs.handle_command("ordo_main.sidebar.show", handle_show))
+	use(ordo_client_maoka.jabs.handle_command("ordo_main.sidebar.toggle", handle_toggle))
 	use(ordo_client_maoka.jabs.add_translations("en", en_values))
 
 	return () => {
@@ -65,21 +65,21 @@ export const sidebar = maoka.create("aside", ({ use, node }) => {
 
 		const current_activity = get_current_activity$()
 
-		if (current_activity && current_activity.render_sidebar) hunter.shoot("sidebar.enable")
-		else hunter.shoot("sidebar.disable")
+		if (current_activity && current_activity.render_sidebar) hunter.shoot("ordo_main.sidebar.enable")
+		else hunter.shoot("ordo_main.sidebar.disable")
 
 		if (!visible || !enabled || !maoka_dom.node_guard(node) || !node.value.parentElement) {
 			// TODO Add or remove cp sidebar toggler
 			use(ordo_client_maoka.jabs.add_class("hidden"))
-			hunter.shoot("command_palette.remove", "sidebar.toggle")
+			hunter.shoot("ordo_main.command_palette.remove", "sidebar.toggle")
 
 			return null
 		} else {
 			use(ordo_client_maoka.jabs.remove_class("hidden"))
-			hunter.shoot("command_palette.add", {
+			hunter.shoot("ordo_main.command_palette.add", {
 				id: "sidebar.toggle",
 				readable_name: "sidebar_commands_toggle_title",
-				value: () => hunter.shoot("sidebar.toggle"),
+				value: () => hunter.shoot("ordo_main.sidebar.toggle"),
 				hotkey: "mod+b",
 				type: ORDO_CLIENT.COMMAND_PALETTE.ITEM_TYPE.COMMON_ACTION,
 				description: "sidebar_commands_toggle_description",

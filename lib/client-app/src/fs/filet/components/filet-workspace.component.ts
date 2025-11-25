@@ -18,6 +18,7 @@ export const filet_workspace = maoka.create<{ state: OrdoClient.F.State }>("div"
 
 	// TODO Access
 	// TODO Fields
+	// TODO CP create/delete/rename/move/labels/links/access/fields
 
 	return () => {
 		const id = get_params()?.id ?? null
@@ -42,12 +43,12 @@ const ancestor_link = maoka.create<{ item: Ordo.Data.Instance | null; is_current
 			const id = ordo.data.get_id(item)
 			const handle_click = ordo.fns
 				.pipe(ordo_client.fns.prevent_default)
-				.pipe(() => hunter.shoot("ordo.filet.open_file", { id }))
+				.pipe(() => hunter.shoot("ordo_filet.open_file", { id }))
 
 			use(ordo_client_maoka.jabs.set_attribute("href", `/filet/${id}`)) // TODO Vaults
 			use(ordo_client_maoka.jabs.listen("onclick", handle_click))
 		} else {
-			const handle_click = ordo.fns.pipe(ordo_client.fns.prevent_default).pipe(() => hunter.shoot("ordo.filet.open"))
+			const handle_click = ordo.fns.pipe(ordo_client.fns.prevent_default).pipe(() => hunter.shoot("ordo_filet.open"))
 
 			use(ordo_client_maoka.jabs.set_attribute("href", "/filet"))
 			use(ordo_client_maoka.jabs.listen("onclick", handle_click))
@@ -84,27 +85,27 @@ const header = maoka.create<{ id: Ordo.Data.Parent }>("div", ({ id, use }) => {
 				id &&
 					ordo_client_maoka.components.button.neutral({
 						kindergarten: () => translate("filet_delete_file"),
-						on_click: () => void hunter.shoot("data.show_delete_modal", { id }),
+						on_click: () => void hunter.shoot("ordo_main.data.show_delete_modal", { id }),
 						hotkey: "mod+shift+backspace",
 						small: true,
 					}),
 				id &&
 					ordo_client_maoka.components.button.neutral({
 						kindergarten: () => translate("filet_rename_file"),
-						on_click: () => void hunter.shoot("data.show_rename_modal", { id }),
+						on_click: () => void hunter.shoot("ordo_main.data.show_rename_modal", { id }),
 						hotkey: "meta+shift+n",
 						small: true,
 					}),
 				id &&
 					ordo_client_maoka.components.button.neutral({
 						kindergarten: () => translate("filet_move_file"),
-						on_click: () => void hunter.shoot("data.show_move_modal", { id }),
+						on_click: () => void hunter.shoot("ordo_main.data.show_move_modal", { id }),
 						hotkey: "mod+shift+m",
 						small: true,
 					}),
 				ordo_client_maoka.components.button.neutral({
 					kindergarten: () => translate("filet_create_file"),
-					on_click: () => void hunter.shoot("data.show_create_modal", { parent: id }),
+					on_click: () => void hunter.shoot("ordo_main.data.show_create_modal", { parent: id }),
 					hotkey: "meta+n",
 					small: true,
 				}),
@@ -118,7 +119,7 @@ const grid_item = maoka.create<GridItemArgs>("div", ({ item, use }) => {
 	const hunter = use(ordo_client_maoka.jabs.hunter)
 
 	const id = ordo.data.get_id(item)
-	const handle_click = () => hunter.shoot("ordo.filet.open_file", { id })
+	const handle_click = () => hunter.shoot("ordo_filet.open_file", { id })
 
 	use(ordo_client_maoka.jabs.add_class("item"))
 	use(ordo_client_maoka.jabs.listen("onclick", handle_click))

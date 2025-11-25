@@ -44,7 +44,9 @@ const activity_bar_link = maoka.create<ActivityBarLinkArgs>("a", ({ is_current, 
 	const { hunter } = use(ordo_client_maoka.context.consume)
 	const translate = use(ordo_client_maoka.jabs.translate$)
 
-	const handle_click = ordo.fns.pipe(ordo_client.fns.prevent_default).pipe(() => hunter.shoot("router.set_pathname", url))
+	const handle_click = ordo.fns
+		.pipe(ordo_client.fns.prevent_default)
+		.pipe(() => hunter.shoot("ordo_main.router.set_pathname", url))
 
 	use(ordo_client_maoka.jabs.set_attribute("href", url))
 	use(ordo_client_maoka.jabs.set_attribute("tabindex", "2"))

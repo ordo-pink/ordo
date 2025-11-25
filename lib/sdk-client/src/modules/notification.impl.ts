@@ -16,14 +16,6 @@ export namespace CONSTANTS {
 }
 
 declare global {
-	interface cmd {
-		notification: {
-			hide: { args: Ordo.Uuid.Instance }
-			show: { args: OrdoClient.Notification.ShowArgs }
-			rrr: { args: Ordo.Rrr.Instance }
-		}
-	}
-
 	namespace OrdoClient.Notification {
 		export type Type = (typeof ORDO_CLIENT.NOTIFICATION.TYPE)[keyof typeof ORDO_CLIENT.NOTIFICATION.TYPE]
 

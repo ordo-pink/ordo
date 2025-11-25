@@ -11,7 +11,7 @@ export const get_children$: (parent: Ordo.Data.Parent | Ordo.Data.Instance) => M
 		const { query } = use(ordo_client_maoka.context.consume)
 		const parent = ordo.data.parent_guard(p) ? p : ordo.data.get_parent(p)
 
-		return use(ordo_client_maoka.jabs.cheat$(query, "data.root", is => Object.values(is).filter(ordo.data.has_parent(parent))))
+		return use(ordo_client_maoka.jabs.cheat$(query, "data.root", ordo.data.get_children(parent)))
 	}
 
 export const get_by_id$: (id: Ordo.Data.Id | null) => Maoka.Jab<() => Ordo.Data.Instance | null> =
@@ -29,21 +29,5 @@ export const get_ancestors$: (id: Ordo.Data.Id | null) => Maoka.Jab<() => Ordo.D
 	({ use }) => {
 		const { query } = use(ordo_client_maoka.context.consume)
 
-		return use(
-			ordo_client_maoka.jabs.cheat$(query, "data.root", items => {
-				const ancestors = [] as Ordo.Data.Instance[]
-				if (!id) return ancestors
-
-				let item = items[id]
-				let parent = item ? ordo.data.get_parent(item) : null
-
-				while (parent !== null) {
-					item = items[parent]
-					parent = item ? ordo.data.get_parent(item) : null
-					ancestors.push(item)
-				}
-
-				return ancestors
-			}),
-		)
+		return id ? use(ordo_client_maoka.jabs.cheat$(query, "data.root", ordo.data.get_ancestors(id))) : () => []
 	}

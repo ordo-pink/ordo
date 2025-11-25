@@ -173,7 +173,7 @@ export namespace impl {
 			ancestors.push(item)
 		}
 
-		return ancestors
+		return ancestors.toReversed()
 	})
 }
 

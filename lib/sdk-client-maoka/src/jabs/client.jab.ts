@@ -20,21 +20,13 @@ export const handle_command =
 		use(maoka_dom.jabs.onmount(() => hunter.track(command, handler)))
 	}
 
-export type AddCommandPaletteItemParams = {
-	description?: string
-	hotkey?: string
-	id?: string
-	render_icon?: OrdoClient.CommandPalette.RenderIcon
-	type?: OrdoClient.CommandPalette.ItemType
-}
-
 /**
  * @state
  * @command ordo_main.command_palette.add
  * @command ordo_main.command_palette.remove
  */
 export const add_command_palette_item =
-	(readable_name: string, on_select: () => void, params?: AddCommandPaletteItemParams): Maoka.Jab =>
+	(readable_name: string, on_select: () => void, params?: OrdoClientMaoka.Jabs.AddCommandPaletteItem.Params): Maoka.Jab =>
 	({ use }) => {
 		const id = params?.id ?? crypto.randomUUID()
 		const type = params?.type
@@ -90,4 +82,16 @@ export const hunter: Maoka.Jab<OrdoClient.Command.Hunter> = ({ use }) => {
 	const state = use(context.consume)
 
 	return state.hunter
+}
+
+declare global {
+	namespace OrdoClientMaoka.Jabs.AddCommandPaletteItem {
+		type Params = {
+			description?: string
+			hotkey?: string
+			id?: string
+			render_icon?: OrdoClient.CommandPalette.RenderIcon
+			type?: OrdoClient.CommandPalette.ItemType
+		}
+	}
 }

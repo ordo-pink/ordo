@@ -32,6 +32,8 @@ declare global {
 
 		export type ItemType = CONSTANTS.ITEM_TYPE
 
+		type Handler<$Value = any> = (item: Item<$Value>) => void
+
 		export type Item<$Value = any> = {
 			id: Id
 			/** Readable name of the command palette item. Put a translation key here, if you use i18n. */
@@ -56,8 +58,8 @@ declare global {
 			items: Item<$Value>[]
 			on_new_item?: (input: string) => Item<$Value>
 			is_multiple?: boolean
-			on_select: (item: Item<$Value>) => void
-			on_deselect?: (item: Item<$Value>) => void
+			on_select: Handler<$Value>
+			on_deselect?: Handler<$Value>
 			pinned_items?: Item<$Value>[]
 			max_items?: number
 		}

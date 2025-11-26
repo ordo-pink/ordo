@@ -59,7 +59,6 @@ const header = maoka.create<{ id: Ordo.Data.Parent }>("div", ({ id, use }) => {
 	const hunter = use(ordo_client_maoka.jabs.hunter)
 	const get_data = use(ordo_client_maoka.jabs.data.get_by_id$(id))
 	const get_ancestors = use(ordo_client_maoka.jabs.data.get_ancestors$(id))
-	const get_params = use(ordo_client_maoka.jabs.route_params$)
 
 	const handle_onmount = () => {
 		const data = get_data()
@@ -80,7 +79,7 @@ const header = maoka.create<{ id: Ordo.Data.Parent }>("div", ({ id, use }) => {
 
 		return [
 			navigation(() => [
-				ancestor_link({ item: null, is_current: !get_params()?.id }),
+				ancestor_link({ item: null, is_current: !id }),
 				...ancestors.map(item => ancestor_link({ item })),
 				data && ancestor_link({ item: data, is_current: true }),
 			]),

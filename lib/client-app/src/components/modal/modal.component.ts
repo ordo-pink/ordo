@@ -25,7 +25,7 @@ export const modal = maoka.create("div", ({ use }) => {
 
 	use(maoka_dom.jabs.onmount(handle_mount))
 	use(ordo_client_maoka.jabs.set_id("modal-overlay"))
-	use(ordo_client_maoka.jabs.listen("onclick", handle_click))
+	use(ordo_client_maoka.jabs.listen("click", handle_click))
 	use(ordo_client_maoka.jabs.handle_command("ordo_main.modal.hide", handle_hide))
 	use(ordo_client_maoka.jabs.handle_command("ordo_main.modal.show", handle_show))
 	use(ordo_client_maoka.jabs.add_translations("en", en))
@@ -43,7 +43,7 @@ const modal_window = maoka.create("div", ({ use }) => {
 	const get_modal_instance = use(ordo_client_maoka.jabs.cheat$($, "instance"))
 
 	use(ordo_client_maoka.jabs.set_class("modal"))
-	use(ordo_client_maoka.jabs.listen("onclick", event => event.stopPropagation()))
+	use(ordo_client_maoka.jabs.listen("click", event => event.stopPropagation()))
 
 	return () => {
 		const modal_instance = get_modal_instance()
@@ -84,7 +84,7 @@ const close_modal = maoka.create("div", ({ use }) => {
 	const translate = use(ordo_client_maoka.jabs.translate$)
 
 	use(ordo_client_maoka.jabs.set_class("modal_close"))
-	use(ordo_client_maoka.jabs.listen("onclick", () => handle_click()))
+	use(ordo_client_maoka.jabs.listen("click", () => handle_click()))
 	use(ordo_client_maoka.jabs.listen_global_event("keydown", e => handle_global_esc(e)))
 
 	const handle_global_esc = (event: KeyboardEvent) => {

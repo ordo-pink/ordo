@@ -84,9 +84,9 @@ const notification = maoka.create<OrdoClient.Notification.Instance>(
 
 		if (on_click) {
 			use(ordo_client_maoka.jabs.add_class("interactive"))
-			use(ordo_client_maoka.jabs.listen("onclick", on_click))
+			use(ordo_client_maoka.jabs.listen("click", on_click))
 		} else {
-			use(ordo_client_maoka.jabs.listen("onclick", () => void 0))
+			use(ordo_client_maoka.jabs.listen("click", () => void 0))
 			use(ordo_client_maoka.jabs.remove_class("interactive"))
 		}
 
@@ -184,7 +184,7 @@ const hide_notification_button = maoka.create<Pick<OrdoClient.Notification.Insta
 
 		use(ordo_client_maoka.jabs.set_attribute("aria-label", "Close"))
 		use(ordo_client_maoka.jabs.set_class("notification-card_close", readable_type))
-		use(ordo_client_maoka.jabs.listen("onclick", handle_click))
+		use(ordo_client_maoka.jabs.listen("click", handle_click))
 
 		return () => icons.bs_x()
 	},

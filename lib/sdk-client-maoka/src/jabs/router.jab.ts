@@ -19,6 +19,7 @@ export const router_pathname$: Maoka.Jab<() => Aist.Pathname> = ({ use }) => {
 
 /**
  * @context
+ * @query router
  * @query activities.current
  */
 export const route_params$: Maoka.Jab<() => Colonoscope.Results> = ({ use }) => {

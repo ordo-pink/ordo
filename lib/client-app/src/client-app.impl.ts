@@ -58,11 +58,10 @@ export const create = maoka.create<ClientApp.Args>("div", async ({ use, fetch, d
 		.then(creator => creator(state))
 		.catch(rrr => hunter.shoot("ordo_main.notification.rrr", rrr))
 
-	// TODO Inherit params from parent on creation
-	// TODO Translations for error reasons and titles
-	// TODO Async for other intensive hooks
-	// TODO 404 (+ achievement)
 	// TODO [BUG] Command palette does not sort items by item type
+	// TODO 404 (+ achievement)
+	// TODO Move ordo_main behavior to "ordo_main" f
+	// TODO Dropdown menu
 	// TODO Landing page (+ hidden achievement with the arrow)
 	// TODO Label helpers (+ achievements)
 	// TODO Link helpers (+ achievements)
@@ -79,10 +78,11 @@ export const create = maoka.create<ClientApp.Args>("div", async ({ use, fetch, d
 	// TODO Ediot file upload + drag'n'drop (+ achievement)
 	// TODO Support via CP (+ achievement)
 	// TODO Social networks via CP (+ achievement)
-	// TODO Docs!
+	// TODO Translations for error reasons and titles
 
 	// TODO F Data Files
 	// TODO Filet recent files
+	// TODO Async for other intensive hooks
 	// TODO Ediot collapse/expand history
 	// TODO Ediot undo/redo history (+ achievement)
 	// TODO Filet favourite files (+ achievement)
@@ -90,8 +90,10 @@ export const create = maoka.create<ClientApp.Args>("div", async ({ use, fetch, d
 	// TODO Settings (+ achievement)
 
 	// TODO F Store
+	// TODO Docs!
 	// TODO Live sharing (+ achievement)
 	// TODO Auth (+ achievement)
+	// TODO Inherit permissions and group from parent on creation
 	// TODO Data sync
 	// TODO User Info (+ achievement)
 	// TODO Avatars (+ achievement)

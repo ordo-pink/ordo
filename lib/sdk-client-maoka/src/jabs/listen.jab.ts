@@ -6,33 +6,27 @@
 import type { Maoka } from "@ordo-pink/oss-maoka"
 import { maoka_dom } from "@ordo-pink/oss-maoka/dom"
 
-export const listen: OrdoClientMaoka.Jabs.Listen =
+export const listen: <$Event extends keyof GlobalEventHandlersEventMap>(
+	event: $Event,
+	listener: (event: GlobalEventHandlersEventMap[$Event]) => void,
+) => Maoka.Jab =
 	(e, f) =>
 	({ use }) =>
-		use(maoka_dom.jabs.if_dom(n => ((n.value as any)[e] = f)))
+		use(maoka_dom.jabs.if_dom(n => ((n.value as any)[`on${e}`] = f)))
 
-export const listen_global_event: OrdoClientMaoka.Jabs.ListenGlobalEvent =
+export const listen_global_event: <$Event extends keyof DocumentEventMap>(
+	key: $Event,
+	listener: (event: DocumentEventMap[$Event]) => void,
+) => Maoka.Jab =
 	(k, f) =>
 	({ use }) => {
 		const handle_mount = () => {
 			document.addEventListener(k, f)
 
-			return () => document.removeEventListener(k, f)
+			return () => {
+				document.removeEventListener(k, f)
+			}
 		}
 
 		use(maoka_dom.jabs.onmount(handle_mount))
 	}
-
-declare global {
-	namespace OrdoClientMaoka.Jabs {
-		type Listen = <$Element extends HTMLElement, $Event extends keyof $Element>(
-			event: $Event extends `on${string}` ? $Event : never,
-			listener: $Element[$Event],
-		) => Maoka.Jab
-
-		type ListenGlobalEvent = <$Key extends keyof DocumentEventMap>(
-			key: $Key,
-			listener: (event: DocumentEventMap[$Key]) => void,
-		) => Maoka.Jab
-	}
-}

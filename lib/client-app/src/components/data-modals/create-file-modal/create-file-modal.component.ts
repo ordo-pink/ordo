@@ -57,7 +57,7 @@ const input = maoka.create<{ value: string; handle_input_change: (value: string)
 		use(ordo_client_maoka.jabs.set_attribute("value", value))
 		use(ordo_client_maoka.jabs.set_attribute("type", "text"))
 		use(ordo_client_maoka.jabs.set_attribute("placeholder", placeholder))
-		use(ordo_client_maoka.jabs.listen("onchange", e => handle_input_change((e.target as any).value)))
+		use(ordo_client_maoka.jabs.listen("change", e => handle_input_change((e.target as any).value)))
 		use(maoka_dom.jabs.onmount(n => n.value.focus()))
 	},
 )

@@ -45,7 +45,7 @@ export const command_palette = maoka.create("div", ({ use }) => {
 
 	use(maoka_dom.jabs.onmount(handle_mount))
 	use(ordo_client_maoka.jabs.set_id("cp-overlay"))
-	use(ordo_client_maoka.jabs.listen("onclick", handle_click))
+	use(ordo_client_maoka.jabs.listen("click", handle_click))
 	use(ordo_client_maoka.jabs.handle_command("ordo_main.command_palette.add", handle_add))
 	use(ordo_client_maoka.jabs.handle_command("ordo_main.command_palette.remove", handle_remove))
 	use(ordo_client_maoka.jabs.handle_command("ordo_main.command_palette.show", handle_show))
@@ -74,8 +74,8 @@ export const command_palette_toggle = maoka.create("div", ({ use }) => {
 
 	use(ordo_client_maoka.jabs.set_class("icon"))
 	use(ordo_client_maoka.jabs.set_attribute("tabindex", "1"))
-	use(ordo_client_maoka.jabs.listen("onclick", handle_click))
-	use(ordo_client_maoka.jabs.listen("onkeydown", handle_keydown))
+	use(ordo_client_maoka.jabs.listen("click", handle_click))
+	use(ordo_client_maoka.jabs.listen("keydown", handle_keydown))
 
 	return bs_menu_button_wide_fill
 })
@@ -161,7 +161,7 @@ const command_palette_modal = maoka.create("div", ({ use }) => {
 	}
 
 	use(ordo_client_maoka.jabs.set_id("cp"))
-	use(ordo_client_maoka.jabs.listen("onclick", handle_click))
+	use(ordo_client_maoka.jabs.listen("click", handle_click))
 	use(ordo_client_maoka.jabs.listen_global_event("keydown", handle_global_keydown))
 
 	return () => {
@@ -245,7 +245,7 @@ const command_palette_item = maoka.create<CommandPaletteItemArgs>("div", ({ acti
 
 	use(ordo_client_maoka.jabs.set_id(String(item.id)))
 	use(ordo_client_maoka.jabs.set_class("item"))
-	use(ordo_client_maoka.jabs.listen("onclick", handle_click))
+	use(ordo_client_maoka.jabs.listen("click", handle_click))
 	use(maoka_dom.jabs.onmount(handle_onmount))
 
 	if (active) use(ordo_client_maoka.jabs.add_class("active"))
@@ -285,7 +285,7 @@ const search = maoka_styled.input("search", ({ use }) => {
 	use(ordo_client_maoka.jabs.set_id("cp-input"))
 	use(ordo_client_maoka.jabs.set_attribute("autocomplete", "off"))
 	use(ordo_client_maoka.jabs.set_attribute("value", $.select("search_value")))
-	use(ordo_client_maoka.jabs.listen("oninput", handle_input))
+	use(ordo_client_maoka.jabs.listen("input", handle_input))
 	use(ordo_client_maoka.jabs.set_attribute("placeholder", translate("cp_search_placeholder")))
 	use(maoka_dom.jabs.onmount(handle_onmount))
 

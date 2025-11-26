@@ -6,14 +6,8 @@
 import type { Maoka } from "@ordo-pink/oss-maoka"
 import { maoka_dom } from "@ordo-pink/oss-maoka/dom"
 
-export const set_style: OrdoClientMaoka.Jabs.SetStyle =
+export const set_style: (str: Partial<Omit<CSSStyleDeclaration, "length" | "parentRule">>) => Maoka.Jab =
 	s =>
 	({ use }) => {
 		use(maoka_dom.jabs.if_dom(n => Object.keys(s).forEach(k => ((n.value.style as any)[k] = (s as any)[k]))))
 	}
-
-declare global {
-	namespace OrdoClientMaoka.Jabs {
-		export type SetStyle = (str: Partial<Omit<CSSStyleDeclaration, "length" | "parentRule">>) => Maoka.Jab
-	}
-}

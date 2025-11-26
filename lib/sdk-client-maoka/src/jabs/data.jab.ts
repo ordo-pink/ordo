@@ -5,6 +5,10 @@
 
 import type { Maoka } from "@ordo-pink/oss-maoka"
 
+/**
+ * @state
+ * @query data
+ */
 export const get_children$: (parent: Ordo.Data.Parent | Ordo.Data.Instance) => Maoka.Jab<() => Ordo.Data.Instance[]> =
 	p =>
 	({ use }) => {
@@ -14,6 +18,10 @@ export const get_children$: (parent: Ordo.Data.Parent | Ordo.Data.Instance) => M
 		return use(ordo_client_maoka.jabs.cheat$(query, "data.root", ordo.data.get_children(parent)))
 	}
 
+/**
+ * @state
+ * @query data
+ */
 export const get_by_id$: (id: Ordo.Data.Id | null) => Maoka.Jab<() => Ordo.Data.Instance | null> =
 	id =>
 	({ use }) => {
@@ -24,6 +32,10 @@ export const get_by_id$: (id: Ordo.Data.Id | null) => Maoka.Jab<() => Ordo.Data.
 		return use(ordo_client_maoka.jabs.cheat$(query, `data.root.${id}`, i => i ?? null))
 	}
 
+/**
+ * @state
+ * @query data
+ */
 export const get_ancestors$: (id: Ordo.Data.Id | null) => Maoka.Jab<() => Ordo.Data.Instance[]> =
 	id =>
 	({ use }) => {

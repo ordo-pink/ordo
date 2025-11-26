@@ -18,7 +18,7 @@ export const sidebar_toggle = maoka.create("button", ({ use }) => {
 
 	use(ordo_client_maoka.jabs.set_class("icon sidebar-toggle"))
 	use(ordo_client_maoka.jabs.set_attribute("tabindex", "3"))
-	use(ordo_client_maoka.jabs.listen("onclick", () => hunter.shoot("ordo_main.sidebar.toggle")))
+	use(ordo_client_maoka.jabs.listen("click", () => hunter.shoot("ordo_main.sidebar.toggle")))
 
 	return () => {
 		const { visible, enabled } = get_sidebar()
@@ -52,7 +52,7 @@ export const sidebar = maoka.create("aside", ({ use, node }) => {
 	const handle_toggle: OrdoClient.Command.GunFor<"ordo_main.sidebar.toggle"> = () =>
 		void (sidebar$.select("enabled") && sidebar$.update("visible", prev => !prev))
 
-	use(ordo_client_maoka.jabs.listen("onclick", () => handle_click()))
+	use(ordo_client_maoka.jabs.listen("click", () => handle_click()))
 	use(ordo_client_maoka.jabs.handle_command("ordo_main.sidebar.disable", handle_disable))
 	use(ordo_client_maoka.jabs.handle_command("ordo_main.sidebar.enable", handle_enable))
 	use(ordo_client_maoka.jabs.handle_command("ordo_main.sidebar.hide", handle_hide))

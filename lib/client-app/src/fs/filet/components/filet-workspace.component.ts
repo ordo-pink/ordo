@@ -46,12 +46,12 @@ const ancestor_link = maoka.create<{ item: Ordo.Data.Instance | null; is_current
 				.pipe(() => hunter.shoot("ordo_filet.open_file", { id }))
 
 			use(ordo_client_maoka.jabs.set_attribute("href", `/filet/${id}`)) // TODO Vaults
-			use(ordo_client_maoka.jabs.listen("onclick", handle_click))
+			use(ordo_client_maoka.jabs.listen("click", handle_click))
 		} else {
 			const handle_click = ordo.fns.pipe(ordo_client.fns.prevent_default).pipe(() => hunter.shoot("ordo_filet.open"))
 
 			use(ordo_client_maoka.jabs.set_attribute("href", "/filet"))
-			use(ordo_client_maoka.jabs.listen("onclick", handle_click))
+			use(ordo_client_maoka.jabs.listen("click", handle_click))
 		}
 
 		return () => (item ? ordo.data.get_name(item) : "/")
@@ -122,7 +122,7 @@ const grid_item = maoka.create<GridItemArgs>("div", ({ item, use }) => {
 	const handle_click = () => hunter.shoot("ordo_filet.open_file", { id })
 
 	use(ordo_client_maoka.jabs.add_class("item"))
-	use(ordo_client_maoka.jabs.listen("onclick", handle_click))
+	use(ordo_client_maoka.jabs.listen("click", handle_click))
 
 	return () => [ordo_client_maoka.components.file_icon({ item }), filename(() => ordo.data.get_name(item))]
 })

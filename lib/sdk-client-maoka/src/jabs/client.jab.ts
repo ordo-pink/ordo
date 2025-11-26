@@ -8,6 +8,10 @@ import { maoka_dom } from "@ordo-pink/oss-maoka/dom"
 
 import { context } from "../sdk-client-maoka.impl"
 
+/**
+ * @state
+ * @command {command}
+ */
 export const handle_command =
 	<$Prey extends OrdoClient.Command.Prey>(command: $Prey, handler: OrdoClient.Command.GunFor<$Prey>): Maoka.Jab =>
 	({ use }) => {
@@ -23,6 +27,12 @@ export type AddCommandPaletteItemParams = {
 	render_icon?: OrdoClient.CommandPalette.RenderIcon
 	type?: OrdoClient.CommandPalette.ItemType
 }
+
+/**
+ * @state
+ * @command ordo_main.command_palette.add
+ * @command ordo_main.command_palette.remove
+ */
 export const add_command_palette_item =
 	(readable_name: string, on_select: () => void, params?: AddCommandPaletteItemParams): Maoka.Jab =>
 	({ use }) => {
@@ -45,12 +55,19 @@ export const add_command_palette_item =
 				value: on_select,
 			})
 
-			return () => void hunter.shoot("ordo_main.command_palette.remove", id)
+			return () => {
+				hunter.shoot("ordo_main.command_palette.remove", id)
+			}
 		}
 
 		use(maoka_dom.jabs.onmount(handle_onmount))
 	}
 
+/**
+ * @state
+ * @command ordo_main.i18n.add_translations
+ * @command ordo_main.i18n.remove_translations
+ */
 export const add_translations =
 	<$Async extends "async" | undefined>(
 		locale: OrdoClient.Translations.Locale,
@@ -65,3 +82,12 @@ export const add_translations =
 
 		if (async) return result.to_promise() as any
 	}
+
+/**
+ * @state
+ */
+export const hunter: Maoka.Jab<OrdoClient.Command.Hunter> = ({ use }) => {
+	const state = use(context.consume)
+
+	return state.hunter
+}

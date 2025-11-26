@@ -21,7 +21,7 @@ export const ordo_logo = maoka.create("a", ({ use }) => {
 	use(ordo_client_maoka.jabs.set_id("logo"))
 	use(ordo_client_maoka.jabs.set_attribute("href", "/"))
 	use(ordo_client_maoka.jabs.set_attribute("tabindex", "1"))
-	use(ordo_client_maoka.jabs.listen("onclick", handle_click))
+	use(ordo_client_maoka.jabs.listen("click", handle_click))
 
 	return () => {
 		const pathname = get_pathname()

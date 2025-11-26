@@ -7,10 +7,13 @@ import type { Maoka } from "@ordo-pink/oss-maoka"
 import type { Zags } from "@ordo-pink/oss-zags"
 import { maoka_dom } from "@ordo-pink/oss-maoka/dom"
 
-export const marry$: OrdoClientMaoka.Jabs.Marry$ =
+export const marry$: <$State extends Zags.BaseState>(
+	zags: Zags.Instance<$State> | Zags.ReadableInstance<$State>,
+) => Maoka.Jab<() => $State> =
 	zags =>
 	({ use, refresh$ }) => {
 		let value: any
+
 		const divorce = zags.marry(state => {
 			value = state
 			refresh$()
@@ -21,7 +24,15 @@ export const marry$: OrdoClientMaoka.Jabs.Marry$ =
 		return () => value
 	}
 
-export const cheat$: OrdoClientMaoka.Jabs.Cheat$ =
+export const cheat$: <
+	$State extends Zags.BaseState,
+	const $DotPath extends Zags.RecordToDotPaths<$State>,
+	$Result = Zags.RecordValueByDotPath<$State, $DotPath>,
+>(
+	zags: Zags.Instance<$State> | Zags.ReadableInstance<$State>,
+	dot_path: $DotPath,
+	f?: (state: Zags.RecordValueByDotPath<$State, $DotPath>) => $Result,
+) => Maoka.Jab<() => $Result> =
 	(zags, dot_path, handler = x => x as any) =>
 	({ use, refresh$ }) => {
 		let value: any
@@ -35,21 +46,3 @@ export const cheat$: OrdoClientMaoka.Jabs.Cheat$ =
 
 		return () => value
 	}
-
-declare global {
-	namespace OrdoClientMaoka.Jabs {
-		type Cheat$ = <
-			$State extends Zags.BaseState,
-			const $DotPath extends Zags.RecordToDotPaths<$State>,
-			$Result = Zags.RecordValueByDotPath<$State, $DotPath>,
-		>(
-			zags: Zags.Instance<$State> | Zags.ReadableInstance<$State>,
-			dot_path: $DotPath,
-			f?: (state: Zags.RecordValueByDotPath<$State, $DotPath>) => $Result,
-		) => Maoka.Jab<() => $Result>
-
-		type Marry$ = <$State extends Zags.BaseState>(
-			zags: Zags.Instance<$State> | Zags.ReadableInstance<$State>,
-		) => Maoka.Jab<() => $State>
-	}
-}

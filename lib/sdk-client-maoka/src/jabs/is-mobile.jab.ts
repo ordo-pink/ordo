@@ -5,13 +5,7 @@
 
 import type { Maoka } from "@ordo-pink/oss-maoka"
 
-export const is_mobile: OrdoClientMaoka.Jabs.IsMobile = () =>
+export const is_mobile: Maoka.Jab<boolean> = () =>
 	["Android", "webOS", "iPhone", "iPad", "iPod", "BlackBerry", "IEMobile", "Opera Mini"].some(platform =>
 		navigator.userAgent.includes(platform),
 	)
-
-declare global {
-	namespace OrdoClientMaoka.Jabs {
-		type IsMobile = Maoka.Jab<boolean>
-	}
-}

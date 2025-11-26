@@ -51,7 +51,7 @@ const activity_bar_link = maoka.create<ActivityBarLinkArgs>("a", ({ is_current, 
 	use(ordo_client_maoka.jabs.set_attribute("href", url))
 	use(ordo_client_maoka.jabs.set_attribute("tabindex", "2"))
 	use(ordo_client_maoka.jabs.set_class("link"))
-	use(ordo_client_maoka.jabs.listen("onclick", handle_click))
+	use(ordo_client_maoka.jabs.listen("click", handle_click))
 
 	return () => {
 		use(ordo_client_maoka.jabs.set_attribute("title", translate(readable_name)))

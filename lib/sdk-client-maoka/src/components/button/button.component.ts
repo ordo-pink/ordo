@@ -46,7 +46,7 @@ const base: OrdoClientMaoka.Components.Button.Component = maoka.create(
 			return on_click(event)
 		}
 
-		use(listen("onclick", handle_click))
+		use(listen("click", handle_click))
 
 		return () => [
 			text_container(() => kindergarten()),

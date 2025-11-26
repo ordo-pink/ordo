@@ -4,35 +4,26 @@
  */
 
 import type { Maoka } from "@ordo-pink/oss-maoka"
-import { maoka_dom } from "@ordo-pink/oss-maoka/dom"
 
-export const is_sm_screen$: OrdoClientMaoka.Jabs.IsSmScreen$ = ({ use, refresh$ }) => {
-	const is_sm = ordo.fns.lt(ORDO_CLIENT.SM_SCREEN_BREAKPOINT)
+import { listen_global_event } from "./listen.jab"
 
+export const is_sm_screen$: Maoka.Jab<() => boolean> = ({ use, refresh$ }) => {
 	let value: boolean = is_sm(window.innerWidth)
 
-	use(
-		maoka_dom.jabs.onmount(() => {
-			const handle_resize = () => {
-				const is_sm_screen = is_sm(window.innerWidth)
+	const handle_resize = () => {
+		const is_sm_screen = is_sm(window.innerWidth)
 
-				if (value !== is_sm_screen) {
-					value = is_sm_screen
-					refresh$()
-				}
-			}
+		if (value !== is_sm_screen) {
+			value = is_sm_screen
+			refresh$()
+		}
+	}
 
-			window.addEventListener("resize", handle_resize)
-
-			return () => window.removeEventListener("resize", handle_resize)
-		}),
-	)
+	use(listen_global_event("resize", handle_resize))
 
 	return () => value
 }
 
-declare global {
-	namespace OrdoClientMaoka.Jabs {
-		type IsSmScreen$ = Maoka.Jab<() => boolean>
-	}
-}
+// --- Internal ---
+
+const is_sm = ordo.fns.lt(ORDO_CLIENT.SM_SCREEN_BREAKPOINT)

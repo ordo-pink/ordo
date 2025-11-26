@@ -3,10 +3,12 @@
  * SPDX-License-Identifier: Unlicense
  */
 
+import { bs_envelope_at, bs_question_circle, bs_telegram } from "@ordo-pink/frontend-icons"
 import { aist } from "@ordo-pink/oss-aist"
 import { hunt } from "@ordo-pink/oss-hunt"
 import { i18n } from "@ordo-pink/oss-i18n"
 import { maoka } from "@ordo-pink/oss-maoka"
+import { maoka_dom } from "@ordo-pink/oss-maoka/dom"
 import { maoka_styled } from "@ordo-pink/oss-maoka-styled"
 import { zags } from "@ordo-pink/oss-zags"
 
@@ -39,12 +41,46 @@ export const create = maoka.create<ClientApp.Args>("div", async ({ use, fetch, d
 	const state = { name: "ordo_main", fetch, hunter, logger, query }
 
 	use(ordo_client_maoka.context.provide(state))
+
 	use(ordo_client_maoka.jabs.set_id("app"))
 	use(ordo_client_maoka.jabs.add_translations("en", en))
-
 	use(i18n_commands(translator))
 	use(data_commands(data$, data_repository))
 	use(activity_commands(activities$, router))
+	use(
+		ordo_client_maoka.jabs.add_command_palette_item(
+			"cp_support_name",
+			() =>
+				hunter.shoot("ordo_main.command_palette.show", {
+					items: [
+						{
+							id: "telegram",
+							readable_name: "Telegram",
+							value: "https://t.me/ordo_pink",
+							hotkey: "t",
+							render_icon: span => maoka_dom.render(span, bs_telegram(), ordo.uuid.create),
+						},
+						{
+							id: "email",
+							readable_name: "Email",
+							value: "mailto:support@ordo.pink",
+							hotkey: "e",
+							render_icon: span => maoka_dom.render(span, bs_envelope_at(), ordo.uuid.create),
+						},
+					],
+					on_select: item => {
+						hunter.shoot("ordo_main.router.set_href", item.value)
+						hunter.shoot("ordo_main.command_palette.hide")
+					},
+				}),
+			{
+				description: "cp_support_description",
+				render_icon: span => maoka_dom.render(span, bs_question_circle(), ordo.uuid.create),
+				type: ORDO_CLIENT.COMMAND_PALETTE.ITEM_TYPE.INFORMATION,
+				hotkey: "mod+shift+h",
+			},
+		),
+	)
 
 	hunter.shoot("ordo_main.title.set_title", "loading")
 
@@ -61,7 +97,6 @@ export const create = maoka.create<ClientApp.Args>("div", async ({ use, fetch, d
 		.pipe(oath.ops.map(data => data$.update("data.root", () => data ?? {})))
 		.cata(oath.catas.or_else(e => hunter.shoot("ordo_main.notification.rrr", e)))
 
-	// TODO Support via CP
 	// TODO Social networks via CP
 	// TODO Breadcrumbs -> Quick Search
 	// TODO Content storage
@@ -136,4 +171,10 @@ export const create = maoka.create<ClientApp.Args>("div", async ({ use, fetch, d
 const logo_wrapper = maoka_styled.div("logo-wrapper")
 const workspace_wrapper = maoka_styled.div("workspace-wrapper")
 
-const en = { logo: "ORDO", loading: "Loading...", ordo_main_move_modal_move_to_root: "Move to root directory" }
+const en = {
+	logo: "ORDO",
+	loading: "Loading...",
+	ordo_main_move_modal_move_to_root: "Move to root directory",
+	cp_support_name: "Support...",
+	cp_support_description: "Ask our support if you have any questions or problems.",
+}

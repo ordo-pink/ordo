@@ -33,7 +33,7 @@ export const command_palette = maoka.create("div", ({ use }) => {
 	const toggle_params = {
 		hotkey: "meta+shift+p",
 		render_icon: render_toggle_cp_icon,
-		type: ITEM_TYPE.MODAL_OPENER,
+		type: ITEM_TYPE.length,
 		description: "cp_toggle_desc",
 	}
 
@@ -132,7 +132,6 @@ const command_palette_modal = maoka.create("div", ({ use }) => {
 				return $.update("index", i => (i <= 0 ? filtered_items.length - 1 : i - 1))
 			} else if (event.code === "Enter") {
 				current.on_select(filtered_items[$.select("index")])
-				hunter.shoot("ordo_main.command_palette.hide")
 			}
 
 			for (let i = 0; i < current.items.length; i++) {
@@ -230,13 +229,7 @@ const command_palette_items = maoka.create("div", ({ use }) => {
 
 type CommandPaletteItemArgs = { item: OrdoClient.CommandPalette.Item; active: boolean }
 const command_palette_item = maoka.create<CommandPaletteItemArgs>("div", ({ active, item, use }) => {
-	const { hunter } = use(ordo_client_maoka.context.consume)
 	const translate = use(ordo_client_maoka.jabs.translate$)
-
-	const handle_click = () => {
-		hunter.shoot("ordo_main.command_palette.hide")
-		item.value()
-	}
 
 	const handle_onmount = (node: Maoka.Node<HTMLElement>) => {
 		if (active && !is_in_view(node.value, node.value.parentElement!))
@@ -245,7 +238,7 @@ const command_palette_item = maoka.create<CommandPaletteItemArgs>("div", ({ acti
 
 	use(ordo_client_maoka.jabs.set_id(String(item.id)))
 	use(ordo_client_maoka.jabs.set_class("item"))
-	use(ordo_client_maoka.jabs.listen("click", handle_click))
+	use(ordo_client_maoka.jabs.listen("click", item.value))
 	use(maoka_dom.jabs.onmount(handle_onmount))
 
 	if (active) use(ordo_client_maoka.jabs.add_class("active"))

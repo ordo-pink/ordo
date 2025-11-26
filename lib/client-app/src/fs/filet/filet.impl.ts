@@ -17,6 +17,7 @@ export default ordo_client.f.create(
 			{ command: "ordo_main.activity.unregister" },
 			{ command: "ordo_main.command_palette.add" },
 			{ command: "ordo_main.command_palette.remove" },
+			{ command: "ordo_main.command_palette.hide" },
 			{ command: "ordo_main.data.show_create_modal" },
 			{ command: "ordo_main.data.show_delete_modal" },
 			{ command: "ordo_main.data.show_move_modal" },
@@ -57,7 +58,10 @@ export default ordo_client.f.create(
 
 		hunter.shoot("ordo_main.command_palette.add", {
 			readable_name: "filet_cp_open_name",
-			value: () => hunter.shoot("ordo_filet.open"),
+			value: () => {
+				hunter.shoot("ordo_filet.open")
+				hunter.shoot("ordo_main.command_palette.hide")
+			},
 			id: FILET.CP_OPEN_ID,
 			render_icon: div => maoka_dom.render(div, bs_folder_open(), ordo.uuid.create),
 			description: "filet_cp_open_description",

@@ -73,6 +73,7 @@ const header = maoka.create<{ id: Ordo.Data.Parent }>("div", ({ id, use }) => {
 	return () => {
 		const data = get_data()
 		const ancestors = get_ancestors()
+		const parent = data ? ordo.data.get_parent(data) : null
 
 		return [
 			navigation(() => [
@@ -85,7 +86,12 @@ const header = maoka.create<{ id: Ordo.Data.Parent }>("div", ({ id, use }) => {
 				id &&
 					ordo_client_maoka.components.button.neutral({
 						kindergarten: () => translate("filet_delete_file"),
-						on_click: () => void hunter.shoot("ordo_main.data.show_delete_modal", { id }),
+						on_click: () =>
+							void hunter.shoot("ordo_main.data.show_delete_modal", {
+								id,
+								on_deleted: () =>
+									parent ? hunter.shoot("ordo_filet.open_file", { id: parent }) : hunter.shoot("ordo_filet.open"),
+							}),
 						hotkey: "mod+shift+backspace",
 						small: true,
 					}),

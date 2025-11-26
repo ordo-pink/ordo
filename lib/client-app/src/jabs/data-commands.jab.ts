@@ -57,19 +57,19 @@ export const data_commands =
 
 const handle_show_create_modal: ViewHandler<"ordo_main.data.show_create_modal"> =
 	state =>
-	({ parent }) => {
+	({ parent, on_created }) => {
 		state.hunter.shoot("ordo_main.modal.show", {
 			size: ORDO_CLIENT.MODAL.SIZE.SM,
-			render: div => maoka_dom.render(div, create_file_modal({ state, parent }), ordo.uuid.create),
+			render: div => maoka_dom.render(div, create_file_modal({ state, parent, on_created }), ordo.uuid.create),
 		})
 	}
 
 const handle_show_delete_modal: ViewHandler<"ordo_main.data.show_delete_modal"> =
 	state =>
-	({ id }) => {
+	({ id, on_deleted }) => {
 		state.hunter.shoot("ordo_main.modal.show", {
 			size: ORDO_CLIENT.MODAL.SIZE.SM,
-			render: div => maoka_dom.render(div, delete_file_modal({ state, id }), ordo.uuid.create),
+			render: div => maoka_dom.render(div, delete_file_modal({ state, id, on_deleted }), ordo.uuid.create),
 		})
 	}
 

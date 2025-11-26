@@ -8,8 +8,8 @@ import { maoka_styled } from "@ordo-pink/oss-maoka-styled"
 
 import "./delete-file-modal.styles.css"
 
-type DeleteFileModalArgs = { state: OrdoClient.F.State; id: Ordo.Data.Id }
-export const delete_file_modal = maoka.create<DeleteFileModalArgs>("div", async ({ id, state, use }) => {
+type DeleteFileModalArgs = { state: OrdoClient.F.State; id: Ordo.Data.Id; on_deleted?: () => void }
+export const delete_file_modal = maoka.create<DeleteFileModalArgs>("div", async ({ id, on_deleted, state, use }) => {
 	use(ordo_client_maoka.context.provide(state))
 	use(ordo_client_maoka.jabs.set_id("delete-file-modal"))
 	await use(ordo_client_maoka.jabs.add_translations("en", en_values, "async"))
@@ -31,6 +31,7 @@ export const delete_file_modal = maoka.create<DeleteFileModalArgs>("div", async 
 		void state.hunter
 			.shoot("ordo_main.data.delete", { id })
 			.to_promise()
+			.then(() => on_deleted && on_deleted())
 			.then(notify_success)
 			.then(() => ordo.data.get_parent(item!))
 			.catch(rrr => state.hunter.shoot("ordo_main.notification.rrr", rrr))

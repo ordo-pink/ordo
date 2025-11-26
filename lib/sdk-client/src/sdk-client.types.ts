@@ -26,12 +26,12 @@ declare global {
 				toggle: { args: void }
 			}
 			data: {
-				show_create_modal: { args: { parent: Ordo.Data.Parent; vault_id?: Ordo.Data.VaultId } }
+				show_create_modal: { args: { parent: Ordo.Data.Parent; vault_id?: Ordo.Data.VaultId; on_created?: () => void } }
 				show_move_modal: { args: { id: Ordo.Data.Id; vault_id?: Ordo.Data.VaultId } }
 				show_rename_modal: { args: { id: Ordo.Data.Id; vault_id?: Ordo.Data.VaultId } }
 				show_labels_modal: { args: { id: Ordo.Data.Id; vault_id?: Ordo.Data.VaultId } }
 				show_links_modal: { args: { id: Ordo.Data.Id; vault_id?: Ordo.Data.VaultId } }
-				show_delete_modal: { args: { id: Ordo.Data.Id; vault_id?: Ordo.Data.VaultId } }
+				show_delete_modal: { args: { id: Ordo.Data.Id; vault_id?: Ordo.Data.VaultId; on_deleted?: () => void } }
 				show_access_modal: { args: { id: Ordo.Data.Id; vault_id?: Ordo.Data.VaultId } }
 				show_fields_modal: { args: { id: Ordo.Data.Id; vault_id?: Ordo.Data.VaultId } }
 				create: { args: Omit<Ordo.Data.CreateParams, "author"> }

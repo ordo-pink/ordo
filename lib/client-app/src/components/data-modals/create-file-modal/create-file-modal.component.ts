@@ -9,8 +9,8 @@ import { maoka_styled } from "@ordo-pink/oss-maoka-styled"
 
 import "./create-file-modal.styles.css"
 
-type CreateFileModalArgs = { state: OrdoClient.F.State; parent: Ordo.Data.Parent }
-export const create_file_modal = maoka.create<CreateFileModalArgs>("div", async ({ parent, state, use }) => {
+type CreateFileModalArgs = { state: OrdoClient.F.State; parent: Ordo.Data.Parent; on_created?: () => void }
+export const create_file_modal = maoka.create<CreateFileModalArgs>("div", async ({ on_created, parent, state, use }) => {
 	let value = ""
 
 	use(ordo_client_maoka.context.provide(state))
@@ -31,6 +31,7 @@ export const create_file_modal = maoka.create<CreateFileModalArgs>("div", async 
 		void state.hunter
 			.shoot("ordo_main.data.create", { name: value, parent })
 			.to_promise()
+			.then(() => on_created && on_created())
 			.then(notify_success)
 			.catch(rrr => state.hunter.shoot("ordo_main.notification.rrr", rrr))
 			.finally(() => state.hunter.shoot("ordo_main.modal.hide"))

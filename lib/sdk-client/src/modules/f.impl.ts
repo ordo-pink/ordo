@@ -10,6 +10,8 @@ import type { I18n } from "@ordo-pink/oss-i18n"
 
 export namespace impl {
 	export const create: OrdoClient.F.Create = (name, permissions, callback) => async global_state => {
+		if (name.startsWith("ordo_main")) throw ordo.rrr.einval(ORDO.RRR.REASON.RESERVED_F_NAME, name)
+
 		const query = zags.create({
 			activities: { items: [] },
 			data: { root: {}, vaults: {} },

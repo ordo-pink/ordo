@@ -48,18 +48,20 @@ export const create = maoka.create<ClientApp.Args>("div", async ({ use, fetch, d
 
 	hunter.shoot("ordo_main.title.set_title", "loading")
 
-	await data_repository
-		.read()
-		.pipe(oath.ops.map(data => data$.update("data.root", () => data ?? {})))
-		.cata(oath.catas.or_else(e => hunter.shoot("ordo_main.notification.rrr", e)))
-
+	// TODO Separate user functions (installed globally, installed locally, got but not installed)
+	// TODO Load installed user functions
 	await import("./fs/filet/filet.impl")
 		.then(module => module.default)
 		.then(creator => creator(state))
 		.catch(rrr => hunter.shoot("ordo_main.notification.rrr", rrr))
 
-	// TODO 404 (+ achievement)
-	// TODO Move ordo_main behavior to "ordo_main" f
+	// TODO Merge diffs among different repositories
+	await data_repository
+		.read()
+		.pipe(oath.ops.map(data => data$.update("data.root", () => data ?? {})))
+		.cata(oath.catas.or_else(e => hunter.shoot("ordo_main.notification.rrr", e)))
+
+	// TODO Scope translations to f
 	// TODO Dropdown menu
 	// TODO Landing page (+ hidden achievement with the arrow)
 	// TODO Label helpers (+ achievements)
@@ -78,6 +80,7 @@ export const create = maoka.create<ClientApp.Args>("div", async ({ use, fetch, d
 	// TODO Support via CP (+ achievement)
 	// TODO Social networks via CP (+ achievement)
 	// TODO Translations for error reasons and titles
+	// TODO 404 (+ achievement)
 
 	// TODO F Data Files
 	// TODO Filet recent files

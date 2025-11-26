@@ -15,5 +15,9 @@
 	@apply h-dvh w-full overflow-auto pb-10 sm:pb-0;
 }
 
+.workspace .renderer {
+	@apply h-full;
+}
+
 .workspace.no-sidebar {
 }

@@ -69,7 +69,6 @@ export const sidebar = maoka.create("aside", ({ use, node }) => {
 		else hunter.shoot("ordo_main.sidebar.disable")
 
 		if (!visible || !enabled || !maoka_dom.node_guard(node) || !node.value.parentElement) {
-			// TODO Add or remove cp sidebar toggler
 			use(ordo_client_maoka.jabs.add_class("hidden"))
 			hunter.shoot("ordo_main.command_palette.remove", "sidebar.toggle")
 
@@ -138,7 +137,7 @@ const sidebar_padding_contractor = maoka.create<{ parent_node: Maoka.Node }>("di
 })
 
 const workspace_renderer = maoka.create<{ activity?: OrdoClient.Activity.Instance }>("div", ({ activity, node, use }) => {
-	use(ordo_client_maoka.jabs.set_class("h-full")) // TODO Move to CSS
+	use(ordo_client_maoka.jabs.set_class("renderer"))
 
 	const handle_onmount = (n: MaokaDom.DomNode<HTMLElement>) => {
 		if (activity && activity.render_workspace && maoka_dom.node_guard(node))

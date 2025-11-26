@@ -87,7 +87,7 @@ const { SECTION, ITEM_TYPE, FUZZY_CHECK_RATIO } = ORDO_CLIENT.COMMAND_PALETTE
 const IGNORED_KEYS = ["Control", "Shift", "Alt", "Meta"]
 
 const global_palette = (): OrdoClient.CommandPalette.Instance<() => void> => ({
-	items: $.select("items"),
+	items: $.select("items").sort((a, b) => (!a.type ? 1 : !b.type ? -1 : a.type < b.type ? -1 : 1)),
 	on_select: item => item.value(),
 })
 

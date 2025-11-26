@@ -7,6 +7,7 @@ import { maoka } from "@ordo-pink/oss-maoka"
 import { maoka_styled } from "@ordo-pink/oss-maoka-styled"
 
 import "./filet-workspace.styles.css"
+import { maoka_dom } from "@ordo-pink/oss-maoka/dom"
 
 export const filet_workspace = maoka.create<{ state: OrdoClient.F.State }>("div", ({ state, use }) => {
 	use(ordo_client_maoka.context.provide(state))
@@ -54,16 +55,26 @@ const action_buttons = maoka_styled.div("action-buttons")
 const navigation = maoka_styled.div("navigation")
 
 const header = maoka.create<{ id: Ordo.Data.Parent }>("div", ({ id, use }) => {
-	use(ordo_client_maoka.jabs.add_class("header"))
-
 	const translate = use(ordo_client_maoka.jabs.translate$)
 	const hunter = use(ordo_client_maoka.jabs.hunter)
 	const get_data = use(ordo_client_maoka.jabs.data.get_by_id$(id))
 	const get_ancestors = use(ordo_client_maoka.jabs.data.get_ancestors$(id))
 	const get_params = use(ordo_client_maoka.jabs.route_params$)
 
+	const handle_onmount = () => {
+		const data = get_data()
+		const name = data ? ordo.data.get_name(data) : null
+		const title = translate("filet_title")
+
+		hunter.shoot("ordo_main.title.set_title", name ? `${name} | ${title}` : title)
+	}
+
+	use(ordo_client_maoka.jabs.add_class("header"))
+	use(maoka_dom.jabs.onmount(handle_onmount))
+
 	return () => {
 		const data = get_data()
+
 		const ancestors = get_ancestors()
 		const parent = data ? ordo.data.get_parent(data) : null
 

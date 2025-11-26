@@ -18,7 +18,6 @@ import { sidebar, sidebar_toggle, workspace } from "./components/main/main.compo
 import { activity_bar } from "./components/activity-bar/activity-bar.component"
 import { activity_commands } from "./jabs/activity-commands.jab"
 import { background_task_status } from "./components/background-task-indicator/background-task-indicator.component"
-import { breadcrumbs } from "./components/breadcrumbs/breadcrumbs.component"
 import { data_commands } from "./jabs/data-commands.jab"
 import { i18n_commands } from "./jabs/i18n-commands.jabs"
 import { modal } from "./components/modal/modal.component"
@@ -72,7 +71,6 @@ export const create = maoka.create<ClientApp.Args>("div", async ({ use, fetch, d
 		.pipe(oath.ops.map(data => data$.update("data.root", () => data ?? {})))
 		.cata(oath.catas.or_else(e => hunter.shoot("ordo_main.notification.rrr", e)))
 
-	// TODO Breadcrumbs -> Quick Search
 	// TODO Content storage
 	// TODO Vaults
 	// TODO Installed Functions
@@ -95,6 +93,7 @@ export const create = maoka.create<ClientApp.Args>("div", async ({ use, fetch, d
 	// TODO Dropdown menu
 	// TODO 404
 	// TODO Translations for error reasons and titles
+	// TODO Ancestor chain in create modal
 
 	// TODO F Data Files
 	// TODO Filet recent files
@@ -132,7 +131,7 @@ export const create = maoka.create<ClientApp.Args>("div", async ({ use, fetch, d
 	return () => [
 		title(),
 		workspace_wrapper(() => [workspace(), sidebar()]),
-		titan_panel(() => [logo_wrapper(() => [ordo_logo(), background_task_status()]), breadcrumbs(), user()]),
+		titan_panel(() => [logo_wrapper(() => [ordo_logo(), background_task_status()]), user()]),
 		activity_bar({ command_palette_toggle, sidebar_toggle }),
 		modal(),
 		command_palette(),
@@ -192,5 +191,4 @@ const cp_social_params: OrdoClientMaoka.Jabs.AddCommandPaletteItem.Params = {
 	description: "cp_social_description",
 	render_icon: span => maoka_dom.render(span, bs_share(), ordo.uuid.create),
 	type: ORDO_CLIENT.COMMAND_PALETTE.ITEM_TYPE.INFORMATION,
-	hotkey: "mod+shift+h",
 }

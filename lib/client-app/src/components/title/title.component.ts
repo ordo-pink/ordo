@@ -6,11 +6,10 @@
 import { maoka } from "@ordo-pink/oss-maoka"
 
 export const title = maoka.create("div", ({ use }) => {
-	const translate = use(ordo_client_maoka.jabs.translate$)
 	const title_element = document.querySelector("title")
 	const handle_set_title: OrdoClient.Command.GunFor<"ordo_main.title.set_title"> = title => {
 		if (title_element) {
-			const title_str = title ? translate(title) : "404"
+			const title_str = title || "404"
 
 			title_element.innerHTML = `${title_str} | Ordo.pink`
 		}

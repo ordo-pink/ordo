@@ -36,7 +36,7 @@ export const create = maoka.create<ClientApp.Args>("div", async ({ use, fetch, d
 	const activities$ = zags.create<OrdoClient.Activity.State>({ activities: { items: [] } })
 	const data$ = zags.create<OrdoClient.Data.State>({ data: { root: {}, vaults: {} } })
 	const query: OrdoClient.F.Query = router.$.concat(translator.$).concat(activities$).concat(data$).to_readable()
-	const state = { fetch, hunter, logger, query }
+	const state = { name: "ordo_main", fetch, hunter, logger, query }
 
 	use(ordo_client_maoka.context.provide(state))
 	use(ordo_client_maoka.jabs.set_id("app"))
@@ -61,26 +61,24 @@ export const create = maoka.create<ClientApp.Args>("div", async ({ use, fetch, d
 		.pipe(oath.ops.map(data => data$.update("data.root", () => data ?? {})))
 		.cata(oath.catas.or_else(e => hunter.shoot("ordo_main.notification.rrr", e)))
 
-	// TODO Scope translations to f
-	// TODO Dropdown menu
-	// TODO Landing page (+ hidden achievement with the arrow)
-	// TODO Label helpers (+ achievements)
-	// TODO Link helpers (+ achievements)
-	// TODO Move/rename/create/delete file
-	// TODO Breadcrumbs -> Quick Search (+ achievements)
-	// TODO Content storage
-	// TODO Filet file upload + drag'n'drop (+ achievement)
-	// TODO File Associations
-	// TODO Ediot (Rich text editing) (+ achievement Dostoyevsky)
-	// TODO Installed Functions (+ achievement)
-	// TODO PDF FA
-	// TODO Image FA
-	// TODO Ediot sidebar
-	// TODO Ediot file upload + drag'n'drop (+ achievement)
 	// TODO Support via CP (+ achievement)
 	// TODO Social networks via CP (+ achievement)
-	// TODO Translations for error reasons and titles
+	// TODO Breadcrumbs -> Quick Search (+ achievements)
+	// TODO Content storage
+	// TODO Installed Functions (+ achievement)
+	// TODO File Associations
+	// TODO Ediot (Rich text editing) (+ achievement Dostoyevsky)
+	// TODO Ediot sidebar
+	// TODO Filet file upload + drag'n'drop (+ achievement)
+	// TODO Ediot file upload + drag'n'drop (+ achievement)
+	// TODO PDF FA
+	// TODO Image FA
+	// TODO Label helpers (+ achievements)
+	// TODO Link helpers (+ achievements)
+	// TODO Landing page (+ hidden achievement with the arrow)
+	// TODO Dropdown menu
 	// TODO 404 (+ achievement)
+	// TODO Translations for error reasons and titles
 
 	// TODO F Data Files
 	// TODO Filet recent files
@@ -91,6 +89,7 @@ export const create = maoka.create<ClientApp.Args>("div", async ({ use, fetch, d
 	// TODO Achievements
 	// TODO Settings (+ achievement)
 
+	// TODO Scope translations to f
 	// TODO F Store
 	// TODO Docs!
 	// TODO Live sharing (+ achievement)
@@ -104,14 +103,14 @@ export const create = maoka.create<ClientApp.Args>("div", async ({ use, fetch, d
 	// TODO Public sharing (+ achievement)
 
 	// TODO Workspace tiling (+ achievement)
-	// TODO Billing (+ achievement)
-
 	// TODO Notification history (+ achievement)
 	// TODO Background processes (+ achievement)
 	// TODO Activity Panel (+ achievement)
 	// TODO Store translations as Content
 	// TODO Command palette access via router
 	// TODO Modal access via router
+
+	// TODO Billing + Payments (+ achievement)
 
 	return () => [
 		title(),

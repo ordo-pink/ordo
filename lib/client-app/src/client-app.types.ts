@@ -8,6 +8,7 @@ export type GlobalState = {
 }
 
 export type Args = {
+	name: string
 	hosts: Ordo.Hosts
 	fetch: OrdoClient.F.Fetch
 	data_repository: OrdoClient.Data.Repository

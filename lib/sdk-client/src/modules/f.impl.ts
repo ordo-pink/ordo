@@ -39,10 +39,11 @@ export namespace impl {
 		}
 
 		const state: OrdoClient.F.State = {
+			name,
 			fetch: (...args) => {
 				const fetch_permission = permissions.queries.find(p => p.type === "fetch")
 
-				if (!fetch_permission) return Promise.reject(ordo.rrr.eperm("f_rrr_not_permitted_fetch"))
+				if (!fetch_permission) return Promise.reject(ordo.rrr.eperm(ORDO.RRR.REASON.FETCH_NOT_PERMITTED, null))
 
 				const url = args[0] instanceof Request ? args[0].url : args[0]
 				const requested_method = args[1] ? (args[1].method ?? "get") : args[0] instanceof Request ? args[0].method : "get"
@@ -59,7 +60,7 @@ export namespace impl {
 						return global_state.fetch(...args)
 				}
 
-				return Promise.reject(ordo.rrr.eperm("f_rrr_not_permitted_fetch"))
+				return Promise.reject(ordo.rrr.eperm(ORDO.RRR.REASON.FETCH_NOT_PERMITTED, null))
 			},
 
 			logger: {
@@ -132,6 +133,7 @@ declare global {
 		type Query = Zags.ReadableInstance<QueryState>
 
 		export type State = {
+			name: string
 			hunter: OrdoClient.Command.Hunter
 			logger: Ordo.Logger
 			fetch: Fetch

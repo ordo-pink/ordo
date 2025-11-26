@@ -89,7 +89,7 @@ const handle_show_move_modal: ViewHandler<"ordo_main.data.show_move_modal"> =
 		const descs = ordo.data.get_descendents(id, data, []).map(ordo.data.get_id)
 		const current_item = data[id]
 
-		// TODO Check if current_item exists
+		if (!current_item) return
 
 		const items = Object.values(data)
 			.filter(i => !!i && !ordo.data.has_id(id, i) && !descs.includes(ordo.data.get_id(i)))
@@ -132,9 +132,6 @@ const handle_show_move_modal: ViewHandler<"ordo_main.data.show_move_modal"> =
 			items,
 		})
 	}
-
-// TODO Get proper author when auth is ready
-// TODO Check permissions
 
 const handle_create: DataHandler<"ordo_main.data.create"> = $ => params =>
 	$.update("data.root", items => {
@@ -340,7 +337,6 @@ const handle_set_owner: DataHandler<"ordo_main.data.set_owner"> =
 			if (!check_permissions()) throw ordo.rrr.eperm(ORDO.RRR.REASON.DATA_UPDATE_PERMISSION_DENIED, [id])
 
 			// TODO Throw error if editor is not owner
-			// TODO Pass to new owner
 
 			return items
 		})

@@ -144,8 +144,6 @@ body {
 	@apply my-1 h-px border-0 bg-neutral-200 dark:bg-neutral-600;
 }
 
-/* TODO Move to File Editor */
-
 .file-editor_empty {
 	@apply flex h-full w-full flex-col items-center justify-center gap-4;
 }

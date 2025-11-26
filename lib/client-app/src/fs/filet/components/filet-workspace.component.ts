@@ -13,13 +13,6 @@ export const filet_workspace = maoka.create<{ state: OrdoClient.F.State }>("div"
 	use(ordo_client_maoka.jabs.set_id("filet-workspace"))
 	const get_params = use(ordo_client_maoka.jabs.route_params$)
 
-	// TODO Labels
-	// TODO Links
-
-	// TODO Access
-	// TODO Fields
-	// TODO CP create/delete/rename/move/labels/links/access/fields
-
 	return () => {
 		const id = get_params()?.id ?? null
 		if (!ordo.data.parent_guard(id)) return null // TODO 404
@@ -30,7 +23,6 @@ export const filet_workspace = maoka.create<{ state: OrdoClient.F.State }>("div"
 
 // --- Internal ---
 
-// TODO Outline
 const ancestor_link = maoka.create<{ item: Ordo.Data.Instance | null; is_current?: boolean }>(
 	"a",
 	({ item, is_current, use }) => {
@@ -45,7 +37,7 @@ const ancestor_link = maoka.create<{ item: Ordo.Data.Instance | null; is_current
 				.pipe(ordo_client.fns.prevent_default)
 				.pipe(() => hunter.shoot("ordo_filet.open_file", { id }))
 
-			use(ordo_client_maoka.jabs.set_attribute("href", `/filet/${id}`)) // TODO Vaults
+			use(ordo_client_maoka.jabs.set_attribute("href", `/filet/${id}`))
 			use(ordo_client_maoka.jabs.listen("click", handle_click))
 		} else {
 			const handle_click = ordo.fns.pipe(ordo_client.fns.prevent_default).pipe(() => hunter.shoot("ordo_filet.open"))

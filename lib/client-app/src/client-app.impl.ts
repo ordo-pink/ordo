@@ -61,56 +61,64 @@ export const create = maoka.create<ClientApp.Args>("div", async ({ use, fetch, d
 		.pipe(oath.ops.map(data => data$.update("data.root", () => data ?? {})))
 		.cata(oath.catas.or_else(e => hunter.shoot("ordo_main.notification.rrr", e)))
 
-	// TODO Support via CP (+ achievement)
-	// TODO Social networks via CP (+ achievement)
-	// TODO Breadcrumbs -> Quick Search (+ achievements)
+	// TODO Support via CP
+	// TODO Social networks via CP
+	// TODO Breadcrumbs -> Quick Search
 	// TODO Content storage
-	// TODO Installed Functions (+ achievement)
+	// TODO Vaults
+	// TODO Installed Functions
+	// TODO Check permissions
 	// TODO File Associations
-	// TODO Ediot (Rich text editing) (+ achievement Dostoyevsky)
+	// TODO Ediot (Rich text editing)
+	// TODO Move styles from client-app to Ediot
 	// TODO Ediot sidebar
-	// TODO Filet file upload + drag'n'drop (+ achievement)
-	// TODO Ediot file upload + drag'n'drop (+ achievement)
+	// TODO Filet ancestor link outline
+	// TODO Filet file upload + drag'n'drop
+	// TODO Ediot file upload + drag'n'drop
 	// TODO PDF FA
 	// TODO Image FA
-	// TODO Label helpers (+ achievements)
-	// TODO Link helpers (+ achievements)
-	// TODO Landing page (+ hidden achievement with the arrow)
+	// TODO Label helpers
+	// TODO Link helpers
+	// TODO Access
+	// TODO Fields
+	// TODO Filet CP create/delete/rename/move/labels/links/access/fields
+	// TODO Landing page
 	// TODO Dropdown menu
-	// TODO 404 (+ achievement)
+	// TODO 404
 	// TODO Translations for error reasons and titles
 
 	// TODO F Data Files
 	// TODO Filet recent files
 	// TODO Async for other intensive hooks
 	// TODO Ediot collapse/expand history
-	// TODO Ediot undo/redo history (+ achievement)
-	// TODO Filet favourite files (+ achievement)
+	// TODO Ediot undo/redo history
+	// TODO Filet favourite files
 	// TODO Achievements
-	// TODO Settings (+ achievement)
+	// TODO Settings
 
 	// TODO Scope translations to f
 	// TODO F Store
 	// TODO Docs!
-	// TODO Live sharing (+ achievement)
-	// TODO Auth (+ achievement)
+	// TODO Live sharing
+	// TODO Auth
+	// TODO Get proper author when auth is ready
 	// TODO Inherit permissions and group from parent on creation
 	// TODO Data sync
-	// TODO User Info (+ achievement)
-	// TODO Avatars (+ achievement)
+	// TODO User Info
+	// TODO Avatars
 
-	// TODO Access sharing (+ achievement)
-	// TODO Public sharing (+ achievement)
+	// TODO Access sharing
+	// TODO Public sharing
 
-	// TODO Workspace tiling (+ achievement)
-	// TODO Notification history (+ achievement)
-	// TODO Background processes (+ achievement)
-	// TODO Activity Panel (+ achievement)
+	// TODO Workspace tiling
+	// TODO Notification history
+	// TODO Background processes
+	// TODO Activity Panel
 	// TODO Store translations as Content
 	// TODO Command palette access via router
 	// TODO Modal access via router
 
-	// TODO Billing + Payments (+ achievement)
+	// TODO Billing + Payments
 
 	return () => [
 		title(),

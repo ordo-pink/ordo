@@ -28,116 +28,107 @@ import { title } from "./components/title/title.component"
 import { user } from "./components/user/user.component"
 
 import "./client-app.styles.css"
+import { f_commands } from "./jabs/f-commands.jab"
 
-export const create = maoka.create<ClientApp.Args>("div", async ({ use, fetch, data_repository }) => {
-	const logger = ordo.logger
-	const hunter: OrdoClient.Command.Hunter = hunt.create(ordo.logger.debug)
-	const router = aist.create(window)
-	const translator = i18n.create_i18n("en")
-	const activities$ = zags.create<OrdoClient.Activity.State>({ activities: { items: [] } })
-	const data$ = zags.create<OrdoClient.Data.State>({ data: { root: {}, vaults: {} } })
-	const query: OrdoClient.F.Query = router.$.concat(translator.$).concat(activities$).concat(data$).to_readable()
-	const state = { name: "ordo_main", fetch, hunter, logger, query }
+export const create = maoka.create<Omit<ClientApp.Args, "name">>(
+	"div",
+	({ use, fetch, content_repository, data_repository }) => {
+		const logger = ordo.logger
+		const hunter: OrdoClient.Command.Hunter = hunt.create(ordo.logger.debug)
+		const router = aist.create(window)
+		const translator = i18n.create_i18n("en")
+		const activities$ = zags.create<OrdoClient.Activity.State>({ activities: { items: [] } })
+		const data$ = zags.create<OrdoClient.Data.State>({ data: { root: {}, vaults: {} } })
+		const f$ = zags.create<OrdoClient.F.State>({ fs: { owned: [], enabled: [] } })
+		const query: OrdoClient.F.Query = router.$.concat(translator.$).concat(activities$).concat(data$).concat(f$).to_readable()
+		const state = { name: "@ordo/main", fetch, hunter, logger, query }
 
-	use(ordo_client_maoka.context.provide(state))
+		use(ordo_client_maoka.context.provide(state))
 
-	const on_select: OrdoClient.CommandPalette.Handler = item => {
-		hunter.shoot("ordo_main.router.set_href", item.value)
-		hunter.shoot("ordo_main.command_palette.hide")
-	}
+		const on_select: OrdoClient.CommandPalette.Handler = item => {
+			hunter.shoot("@ordo/main.router.set_href", item.value)
+			hunter.shoot("@ordo/main.command_palette.hide")
+		}
 
-	const handle_select_social = () => hunter.shoot("ordo_main.command_palette.show", { items: [cp_social_x], on_select })
-	const handle_select_support = () =>
-		hunter.shoot("ordo_main.command_palette.show", { items: [cp_support_tg, cp_support_email], on_select })
+		const handle_select_social = () => hunter.shoot("@ordo/main.command_palette.show", { items: [cp_social_x], on_select })
+		const handle_select_support = () =>
+			hunter.shoot("@ordo/main.command_palette.show", { items: [cp_support_tg, cp_support_email], on_select })
 
-	use(ordo_client_maoka.jabs.set_id("app"))
-	use(ordo_client_maoka.jabs.add_translations("en", en))
-	use(i18n_commands(translator))
-	use(data_commands(data$, data_repository))
-	use(activity_commands(activities$, router))
-	use(ordo_client_maoka.jabs.add_command_palette_item("cp_support_name", handle_select_support, cp_support_params))
-	use(ordo_client_maoka.jabs.add_command_palette_item("cp_social_name", handle_select_social, cp_social_params))
+		use(ordo_client_maoka.jabs.set_id("app"))
+		use(ordo_client_maoka.jabs.add_translations("en", en))
+		use(i18n_commands(translator))
+		use(data_commands(data$, data_repository))
+		use(f_commands(f$, content_repository))
+		use(activity_commands(activities$, router))
+		use(ordo_client_maoka.jabs.add_command_palette_item("cp_support_name", handle_select_support, cp_support_params))
+		use(ordo_client_maoka.jabs.add_command_palette_item("cp_social_name", handle_select_social, cp_social_params))
 
-	// TODO Separate user functions (installed globally, installed locally, got but not installed)
-	// TODO Load installed user functions
-	await import("./fs/filet/filet.impl")
-		.then(module => module.default)
-		.then(creator => creator(state))
-		.catch(rrr => hunter.shoot("ordo_main.notification.rrr", rrr))
+		// TODO Check permissions
+		// TODO File Associations
+		// TODO Ediot (Rich text editing)
+		// TODO Move styles from client-app to Ediot
+		// TODO Ediot sidebar
+		// TODO Filet ancestor link outline
+		// TODO Filet file upload + drag'n'drop
+		// TODO Ediot file upload + drag'n'drop
+		// TODO PDF FA
+		// TODO Image FA
+		// TODO Label helpers
+		// TODO Link helpers
+		// TODO Access
+		// TODO Fields
+		// TODO Filet CP create/delete/rename/move/labels/links/access/fields
+		// TODO Landing page
+		// TODO Dropdown menu
+		// TODO 404
+		// TODO Translations for error reasons and titles
+		// TODO Ancestor chain in create modal
 
-	// TODO Merge diffs among different repositories
-	await data_repository
-		.read()
-		.pipe(oath.ops.map(data => data$.update("data.root", () => data ?? {})))
-		.cata(oath.catas.or_else(e => hunter.shoot("ordo_main.notification.rrr", e)))
+		// TODO F Data Files
+		// TODO Filet recent files
+		// TODO Async for other intensive hooks
+		// TODO Ediot collapse/expand history
+		// TODO Ediot undo/redo history
+		// TODO Filet favourite files
+		// TODO Achievements
+		// TODO Settings
 
-	// TODO Content storage
-	// TODO Vaults
-	// TODO Installed Functions
-	// TODO Check permissions
-	// TODO File Associations
-	// TODO Ediot (Rich text editing)
-	// TODO Move styles from client-app to Ediot
-	// TODO Ediot sidebar
-	// TODO Filet ancestor link outline
-	// TODO Filet file upload + drag'n'drop
-	// TODO Ediot file upload + drag'n'drop
-	// TODO PDF FA
-	// TODO Image FA
-	// TODO Label helpers
-	// TODO Link helpers
-	// TODO Access
-	// TODO Fields
-	// TODO Filet CP create/delete/rename/move/labels/links/access/fields
-	// TODO Landing page
-	// TODO Dropdown menu
-	// TODO 404
-	// TODO Translations for error reasons and titles
-	// TODO Ancestor chain in create modal
+		// TODO Scope translations to f
+		// TODO F Store
+		// TODO Docs!
+		// TODO Live sharing
+		// TODO Auth
+		// TODO Get proper author when auth is ready
+		// TODO Inherit permissions and group from parent on creation
+		// TODO Data sync
+		// TODO User Info
+		// TODO Avatars
 
-	// TODO F Data Files
-	// TODO Filet recent files
-	// TODO Async for other intensive hooks
-	// TODO Ediot collapse/expand history
-	// TODO Ediot undo/redo history
-	// TODO Filet favourite files
-	// TODO Achievements
-	// TODO Settings
+		// TODO Vaults
+		// TODO Access sharing
+		// TODO Public sharing
 
-	// TODO Scope translations to f
-	// TODO F Store
-	// TODO Docs!
-	// TODO Live sharing
-	// TODO Auth
-	// TODO Get proper author when auth is ready
-	// TODO Inherit permissions and group from parent on creation
-	// TODO Data sync
-	// TODO User Info
-	// TODO Avatars
+		// TODO Workspace tiling
+		// TODO Notification history
+		// TODO Background processes
+		// TODO Activity Panel
+		// TODO Store translations as Content
+		// TODO Command palette access via router
+		// TODO Modal access via router
 
-	// TODO Access sharing
-	// TODO Public sharing
+		// TODO Billing + Payments
 
-	// TODO Workspace tiling
-	// TODO Notification history
-	// TODO Background processes
-	// TODO Activity Panel
-	// TODO Store translations as Content
-	// TODO Command palette access via router
-	// TODO Modal access via router
-
-	// TODO Billing + Payments
-
-	return () => [
-		title(),
-		workspace_wrapper(() => [workspace(), sidebar()]),
-		titan_panel(() => [logo_wrapper(() => [ordo_logo(), background_task_status()]), user()]),
-		activity_bar({ command_palette_toggle, sidebar_toggle }),
-		modal(),
-		command_palette(),
-		notifications(),
-	]
-})
+		return () => [
+			title(),
+			workspace_wrapper(() => [workspace(), sidebar()]),
+			titan_panel(() => [logo_wrapper(() => [ordo_logo(), background_task_status()]), user()]),
+			activity_bar({ command_palette_toggle, sidebar_toggle }),
+			modal(),
+			command_palette(),
+			notifications(),
+		]
+	},
+)
 
 // --- Internal ---
 
@@ -147,7 +138,7 @@ const workspace_wrapper = maoka_styled.div("workspace-wrapper")
 const en = {
 	logo: "ORDO",
 	loading: "Loading...",
-	ordo_main_move_modal_move_to_root: "Move to root directory",
+	move_modal_move_to_root: "Move to root directory",
 	cp_support_name: "Support...",
 	cp_support_description: "Ask our support if you have any questions or problems.",
 	cp_social_name: "Social Media...",

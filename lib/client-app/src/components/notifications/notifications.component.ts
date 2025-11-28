@@ -16,10 +16,10 @@ export const notifications = maoka.create("div", ({ use }) => {
 	const translate = use(ordo_client_maoka.jabs.translate$)
 	const get_list = use(ordo_client_maoka.jabs.cheat$(notifications$, "items"))
 
-	const handle_hide: OrdoClient.Command.GunFor<"ordo_main.notification.hide"> = id =>
+	const handle_hide: OrdoClient.Command.GunFor<"@ordo/main.notification.hide"> = id =>
 		notifications$.update("items", items => items.filter(item => item.id !== id))
 
-	const handle_rrr: OrdoClient.Command.GunFor<"ordo_main.notification.rrr"> = ({ type, message }) =>
+	const handle_rrr: OrdoClient.Command.GunFor<"@ordo/main.notification.rrr"> = ({ type, message }) =>
 		notifications$.update("items", items =>
 			items.concat([
 				{
@@ -32,7 +32,7 @@ export const notifications = maoka.create("div", ({ use }) => {
 			]),
 		)
 
-	const handle_show: OrdoClient.Command.GunFor<"ordo_main.notification.show"> = item =>
+	const handle_show: OrdoClient.Command.GunFor<"@ordo/main.notification.show"> = item =>
 		notifications$.update("items", items => {
 			items = item.id
 				? items.some(i => i.id === item.id)
@@ -44,9 +44,9 @@ export const notifications = maoka.create("div", ({ use }) => {
 		})
 
 	use(ordo_client_maoka.jabs.add_translations("en", en))
-	use(ordo_client_maoka.jabs.handle_command("ordo_main.notification.hide", handle_hide))
-	use(ordo_client_maoka.jabs.handle_command("ordo_main.notification.rrr", handle_rrr))
-	use(ordo_client_maoka.jabs.handle_command("ordo_main.notification.show", handle_show))
+	use(ordo_client_maoka.jabs.handle_command("@ordo/main.notification.hide", handle_hide))
+	use(ordo_client_maoka.jabs.handle_command("@ordo/main.notification.rrr", handle_rrr))
+	use(ordo_client_maoka.jabs.handle_command("@ordo/main.notification.show", handle_show))
 	use(ordo_client_maoka.jabs.set_id("notification-list"))
 
 	return () => {
@@ -134,7 +134,7 @@ const notification_progress = maoka.create<
 		const notifications = notifications$.select("items")
 
 		if (progress === 0 && notifications.some(notification => notification.id === id)) {
-			hunter.shoot("ordo_main.notification.hide", id)
+			hunter.shoot("@ordo/main.notification.hide", id)
 			return
 		}
 
@@ -179,7 +179,7 @@ const hide_notification_button = maoka.create<Pick<OrdoClient.Notification.Insta
 			event.preventDefault()
 			event.stopPropagation()
 
-			hunter.shoot("ordo_main.notification.hide", id)
+			hunter.shoot("@ordo/main.notification.hide", id)
 		}
 
 		use(ordo_client_maoka.jabs.set_attribute("aria-label", "Close"))

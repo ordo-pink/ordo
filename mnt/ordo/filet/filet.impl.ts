@@ -4,46 +4,45 @@
  */
 
 import { bs_files, bs_folder_open } from "@ordo-pink/frontend-icons"
+import { maoka } from "@ordo-pink/oss-maoka"
 import { maoka_dom } from "@ordo-pink/oss-maoka/dom"
 
-import * as FILET from "./filet.constants"
 import { filet_workspace } from "./components/filet-workspace.component"
-import { maoka } from "@ordo-pink/oss-maoka"
 
 export default ordo_client.f.create(
-	FILET.NAME,
+	"@ordo/filet",
 	{
 		commands: [
-			{ command: "ordo_main.activity.register" },
-			{ command: "ordo_main.activity.unregister" },
-			{ command: "ordo_main.command_palette.add" },
-			{ command: "ordo_main.command_palette.hide" },
-			{ command: "ordo_main.command_palette.remove" },
-			{ command: "ordo_main.command_palette.show" },
-			{ command: "ordo_main.data.show_create_modal" },
-			{ command: "ordo_main.data.show_delete_modal" },
-			{ command: "ordo_main.data.show_move_modal" },
-			{ command: "ordo_main.data.show_rename_modal" },
-			{ command: "ordo_main.i18n.add_translations" },
-			{ command: "ordo_main.i18n.remove_translations" },
-			{ command: "ordo_main.router.set_pathname" },
-			{ command: "ordo_main.title.set_title" },
+			{ command: "@ordo/main.activity.register" },
+			{ command: "@ordo/main.activity.unregister" },
+			{ command: "@ordo/main.command_palette.add" },
+			{ command: "@ordo/main.command_palette.hide" },
+			{ command: "@ordo/main.command_palette.remove" },
+			{ command: "@ordo/main.command_palette.show" },
+			{ command: "@ordo/main.data.show_create_modal" },
+			{ command: "@ordo/main.data.show_delete_modal" },
+			{ command: "@ordo/main.data.show_move_modal" },
+			{ command: "@ordo/main.data.show_rename_modal" },
+			{ command: "@ordo/main.i18n.add_translations" },
+			{ command: "@ordo/main.i18n.remove_translations" },
+			{ command: "@ordo/main.router.set_pathname" },
+			{ command: "@ordo/main.title.set_title" },
 		],
 		queries: [{ type: "data" }, { type: "activities", details: ["current"] }, { type: "i18n" }],
 	},
 	state => {
 		const { hunter } = state
 
-		const release_open = hunter.track("ordo_filet.open", () => void hunter.shoot("ordo_main.router.set_pathname", "/filet"))
+		const release_open = hunter.track("@ordo/filet.open", () => void hunter.shoot("@ordo/main.router.set_pathname", "/filet"))
 		const release_open_vault = hunter.track(
-			"ordo_filet.open_vault",
-			id => void hunter.shoot("ordo_main.router.set_pathname", `/filet/vaults/${id}` as const),
+			"@ordo/filet.open_vault",
+			id => void hunter.shoot("@ordo/main.router.set_pathname", `/filet/vaults/${id}` as const),
 		)
 		const release_open_file = hunter.track(
-			"ordo_filet.open_file",
+			"@ordo/filet.open_file",
 			({ id, vault }) =>
 				void hunter.shoot(
-					"ordo_main.router.set_pathname",
+					"@ordo/main.router.set_pathname",
 					vault ? (`/filet/vaults/${id}` as const) : (`/filet/${id}` as const),
 				),
 		)
@@ -54,35 +53,35 @@ export default ordo_client.f.create(
 			return () => ordo_client_maoka.components.file_icon({ item })
 		})
 
-		hunter.shoot("ordo_main.i18n.add_translations", { locale: "en", values: en_values })
+		hunter.shoot("@ordo/main.i18n.add_translations", { locale: "en", values: en_values })
 
-		hunter.shoot("ordo_main.activity.register", {
-			id: FILET.NAME,
+		hunter.shoot("@ordo/main.activity.register", {
+			id: "ordo.filet",
 			readable_name: "filet_title",
 			routes: ["/filet", "/filet/:id", "/filet/vaults/:vault", "/filet/vaults/:vault/:id"],
 			render_icon: div => maoka_dom.render(div, bs_folder_open(), ordo.uuid.create),
 			render_workspace: div => maoka_dom.render(div, filet_workspace({ state }), ordo.uuid.create),
 		})
 
-		hunter.shoot("ordo_main.command_palette.add", {
+		hunter.shoot("@ordo/main.command_palette.add", {
 			readable_name: "filet_cp_open_name",
 			value: () => {
-				hunter.shoot("ordo_filet.open")
-				hunter.shoot("ordo_main.command_palette.hide")
+				hunter.shoot("@ordo/filet.open")
+				hunter.shoot("@ordo/main.command_palette.hide")
 			},
-			id: FILET.CP_OPEN_ID,
+			id: "filet_open",
 			render_icon: div => maoka_dom.render(div, bs_folder_open(), ordo.uuid.create),
 			description: "filet_cp_open_description",
 			hotkey: "mod+shift+f",
 			type: ORDO_CLIENT.COMMAND_PALETTE.ITEM_TYPE.PAGE_OPENER,
 		})
 
-		hunter.shoot("ordo_main.command_palette.add", {
+		hunter.shoot("@ordo/main.command_palette.add", {
 			readable_name: "filet_cp_open_as_directory_name",
 			value: () => {
 				const data = state.query.select("data.root")
 
-				hunter.shoot("ordo_main.command_palette.show", {
+				hunter.shoot("@ordo/main.command_palette.show", {
 					items: Object.values(data).map(item => {
 						const id = ordo.data.get_id(item)
 						const readable_name = ordo.data.get_name(item)
@@ -98,26 +97,26 @@ export default ordo_client.f.create(
 						}
 					}),
 					on_select: item => {
-						hunter.shoot("ordo_filet.open_file", { id: item.value })
-						hunter.shoot("ordo_main.command_palette.hide")
+						hunter.shoot("@ordo/filet.open_file", { id: item.value })
+						hunter.shoot("@ordo/main.command_palette.hide")
 					},
 				})
 			},
-			id: FILET.CP_OPEN_AS_DIRECTORY_ID,
+			id: "filet_open_as_directory",
 			render_icon: div => maoka_dom.render(div, bs_files(), ordo.uuid.create),
 			description: "filet_cp_open_as_directory_description",
 			hotkey: "mod+o",
-			type: ORDO_CLIENT.COMMAND_PALETTE.ITEM_TYPE.MODAL_OPENER,
+			type: ORDO_CLIENT.COMMAND_PALETTE.ITEM_TYPE.PAGE_OPENER,
 		})
 
 		return () => {
 			release_open()
 			release_open_file()
 			release_open_vault()
-			hunter.shoot("ordo_main.activity.unregister", FILET.NAME)
-			hunter.shoot("ordo_main.command_palette.remove", FILET.CP_OPEN_ID)
-			hunter.shoot("ordo_main.command_palette.remove", FILET.CP_OPEN_AS_DIRECTORY_ID)
-			hunter.shoot("ordo_main.i18n.remove_translations", ordo.fns.keys_of(en_values))
+			hunter.shoot("@ordo/main.activity.unregister", "ordo.filet")
+			hunter.shoot("@ordo/main.command_palette.remove", "filet_open")
+			hunter.shoot("@ordo/main.command_palette.remove", "filet_open_as_directory")
+			hunter.shoot("@ordo/main.i18n.remove_translations", ordo.fns.keys_of(en_values))
 		}
 	},
 )

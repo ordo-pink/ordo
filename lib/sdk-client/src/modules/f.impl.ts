@@ -10,7 +10,7 @@ import type { I18n } from "@ordo-pink/oss-i18n"
 
 export namespace impl {
 	export const create: OrdoClient.F.Create = (name, permissions, callback) => async global_state => {
-		if (name.startsWith("ordo_main")) throw ordo.rrr.einval(ORDO.RRR.REASON.RESERVED_F_NAME, name)
+		if (!ordo.f.name_guard(name)) throw ordo.rrr.einval(ORDO.RRR.REASON.INVALID_F_NAME, name)
 
 		const query = zags.create({
 			activities: { items: [] },
@@ -38,7 +38,7 @@ export namespace impl {
 				divorces.push(global_state.query.cheat("data", state => query.update("data", () => state)))
 		}
 
-		const state: OrdoClient.F.State = {
+		const state: OrdoClient.F.GlobalState = {
 			name,
 			fetch: (...args) => {
 				const fetch_permission = permissions.queries.find(p => p.type === "fetch")
@@ -77,13 +77,13 @@ export namespace impl {
 			hunter: {
 				shoot: (prey, bullet) => {
 					if (!prey.startsWith(name) && !permissions.commands.map(ordo.fns.prop("command")).includes(prey))
-						global_state.hunter.shoot("ordo_main.notification.rrr", ordo.rrr.eperm("f_rrr_not_permitted_shot", prey))
+						global_state.hunter.shoot("@ordo/main.notification.rrr", ordo.rrr.eperm("f_rrr_not_permitted_shot", prey))
 
 					return global_state.hunter.shoot(prey, bullet as any)
 				},
 				track: (prey, gun) => {
 					if (!prey.startsWith(name) && !permissions.commands.map(ordo.fns.prop("command")).includes(prey))
-						global_state.hunter.shoot("ordo_main.notification.rrr", ordo.rrr.eperm("f_rrr_not_permitted_track", prey))
+						global_state.hunter.shoot("@ordo/main.notification.rrr", ordo.rrr.eperm("f_rrr_not_permitted_track", prey))
 
 					return global_state.hunter.track(prey, gun)
 				},
@@ -128,10 +128,12 @@ declare global {
 			commands: HuntingTicket[]
 		}
 
-		type QueryState = Aist.State & I18n.State & OrdoClient.Activity.State & OrdoClient.Data.State
+		type State = { fs: { owned: Ordo.F.Instance[]; enabled: Ordo.F.Instance[] } }
+
+		type QueryState = Aist.State & I18n.State & OrdoClient.Activity.State & OrdoClient.Data.State & State
 		type Query = Zags.ReadableInstance<QueryState>
 
-		export type State = {
+		export type GlobalState = {
 			name: string
 			hunter: OrdoClient.Command.Hunter
 			logger: Ordo.Logger
@@ -139,13 +141,13 @@ declare global {
 			query: Query
 		}
 
-		export type Instance = (state: State) => Promise<() => void | Promise<void>>
+		export type Instance = (state: GlobalState) => Promise<() => void | Promise<void>>
 
 		export type Create = (
-			name: string,
+			name: Ordo.F.Name,
 			permissions: Permissions,
 			callback: (
-				state: OrdoClient.F.State,
+				state: OrdoClient.F.GlobalState,
 			) => void | Promise<void> | (() => void | Promise<void>) | Promise<() => void | Promise<void>>,
 		) => Instance
 	}

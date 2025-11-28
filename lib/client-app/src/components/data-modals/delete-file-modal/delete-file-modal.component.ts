@@ -8,7 +8,7 @@ import { maoka_styled } from "@ordo-pink/oss-maoka-styled"
 
 import "./delete-file-modal.styles.css"
 
-type DeleteFileModalArgs = { state: OrdoClient.F.State; id: Ordo.Data.Id; on_deleted?: () => void }
+type DeleteFileModalArgs = { state: OrdoClient.F.GlobalState; id: Ordo.Data.Id; on_deleted?: () => void }
 export const delete_file_modal = maoka.create<DeleteFileModalArgs>("div", async ({ id, on_deleted, state, use }) => {
 	use(ordo_client_maoka.context.provide(state))
 	use(ordo_client_maoka.jabs.set_id("delete-file-modal"))
@@ -19,9 +19,9 @@ export const delete_file_modal = maoka.create<DeleteFileModalArgs>("div", async 
 
 	const hunter = use(ordo_client_maoka.jabs.hunter)
 	const translate = use(ordo_client_maoka.jabs.translate$)
-	const handle_cancel = () => void state.hunter.shoot("ordo_main.modal.hide")
+	const handle_cancel = () => void state.hunter.shoot("@ordo/main.modal.hide")
 	const notify_success = () =>
-		state.hunter.shoot("ordo_main.notification.show", {
+		state.hunter.shoot("@ordo/main.notification.show", {
 			title: "delete_file_modal_notification_title",
 			message: ordo.data.get_name(item!),
 			type: ORDO_CLIENT.NOTIFICATION.TYPE.SUCCESS,
@@ -29,17 +29,17 @@ export const delete_file_modal = maoka.create<DeleteFileModalArgs>("div", async 
 		})
 	const handle_ok = () =>
 		void state.hunter
-			.shoot("ordo_main.data.delete", { id })
+			.shoot("@ordo/main.data.delete", { id })
 			.to_promise()
 			.then(() => on_deleted && on_deleted())
 			.then(notify_success)
 			.then(() => ordo.data.get_parent(item!))
-			.catch(rrr => state.hunter.shoot("ordo_main.notification.rrr", rrr))
-			.finally(() => state.hunter.shoot("ordo_main.modal.hide"))
+			.catch(rrr => state.hunter.shoot("@ordo/main.notification.rrr", rrr))
+			.finally(() => state.hunter.shoot("@ordo/main.modal.hide"))
 
 	if (!item) {
-		hunter.shoot("ordo_main.notification.rrr", ordo.rrr.enoent(ORDO.RRR.REASON.DATA_NOT_FOUND, id))
-		hunter.shoot("ordo_main.modal.hide")
+		hunter.shoot("@ordo/main.notification.rrr", ordo.rrr.enoent(ORDO.RRR.REASON.DATA_NOT_FOUND, id))
+		hunter.shoot("@ordo/main.modal.hide")
 	}
 
 	return () => [

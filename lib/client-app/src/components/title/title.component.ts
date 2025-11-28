@@ -7,7 +7,7 @@ import { maoka } from "@ordo-pink/oss-maoka"
 
 export const title = maoka.create("div", ({ use }) => {
 	const title_element = document.querySelector("title")
-	const handle_set_title: OrdoClient.Command.GunFor<"ordo_main.title.set_title"> = title => {
+	const handle_set_title: OrdoClient.Command.GunFor<"@ordo/main.title.set_title"> = title => {
 		if (title_element) {
 			const title_str = title || "404"
 
@@ -15,5 +15,5 @@ export const title = maoka.create("div", ({ use }) => {
 		}
 	}
 
-	use(ordo_client_maoka.jabs.handle_command("ordo_main.title.set_title", handle_set_title))
+	use(ordo_client_maoka.jabs.handle_command("@ordo/main.title.set_title", handle_set_title))
 })

@@ -6,12 +6,11 @@
 import "@ordo-pink/oss-oath/global"
 import "@ordo-pink/oss-result/global"
 
-export * as content from "./modules/content.impl"
 export { impl as code } from "./modules/code.impl"
 export { impl as data } from "./modules/data.impl"
 export { impl as fns } from "./modules/fns.impl"
 export { impl as rrr } from "./modules/rrr.impl"
-export * as notification from "./modules/notification.impl"
+export { impl as f } from "./modules/f.impl"
 export { impl as permission } from "./modules/permission.impl"
 export { impl as sem_ver } from "./modules/sem-ver.impl"
 export { impl as session } from "./modules/session.impl"

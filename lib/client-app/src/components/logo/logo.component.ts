@@ -12,7 +12,7 @@ export const ordo_logo = maoka.create("a", ({ use }) => {
 		.pipe(ordo_client.fns.prevent_default)
 		.pipe(ordo_client.fns.stop_propagation)
 		.pipe(() => get_pathname())
-		.pipe(p => p !== "/" && void hunter.shoot("ordo_main.router.set_pathname", "/"))
+		.pipe(p => p !== "/" && void hunter.shoot("@ordo/main.router.set_pathname", "/"))
 
 	const { hunter } = use(ordo_client_maoka.context.consume)
 	const get_pathname = use(ordo_client_maoka.jabs.router_pathname$)

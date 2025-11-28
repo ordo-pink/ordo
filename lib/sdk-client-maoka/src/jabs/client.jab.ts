@@ -22,8 +22,8 @@ export const handle_command =
 
 /**
  * @state
- * @command ordo_main.command_palette.add
- * @command ordo_main.command_palette.remove
+ * @command @ordo/main.command_palette.add
+ * @command @ordo/main.command_palette.remove
  */
 export const add_command_palette_item =
 	(readable_name: string, on_select: () => void, params?: OrdoClientMaoka.Jabs.AddCommandPaletteItem.Params): Maoka.Jab =>
@@ -37,7 +37,7 @@ export const add_command_palette_item =
 		const { hunter } = use(context.consume)
 
 		const handle_onmount = () => {
-			hunter.shoot("ordo_main.command_palette.add", {
+			hunter.shoot("@ordo/main.command_palette.add", {
 				description,
 				hotkey,
 				id,
@@ -48,7 +48,7 @@ export const add_command_palette_item =
 			})
 
 			return () => {
-				hunter.shoot("ordo_main.command_palette.remove", id)
+				hunter.shoot("@ordo/main.command_palette.remove", id)
 			}
 		}
 
@@ -57,8 +57,8 @@ export const add_command_palette_item =
 
 /**
  * @state
- * @command ordo_main.i18n.add_translations
- * @command ordo_main.i18n.remove_translations
+ * @command @ordo/main.i18n.add_translations
+ * @command @ordo/main.i18n.remove_translations
  */
 export const add_translations =
 	<$Async extends "async" | undefined>(
@@ -68,9 +68,9 @@ export const add_translations =
 	): $Async extends void ? Maoka.Jab<void> : Maoka.Jab<Promise<void>> =>
 	({ use }) => {
 		const { hunter } = use(context.consume)
-		const result = hunter.shoot("ordo_main.i18n.add_translations", { locale, values })
+		const result = hunter.shoot("@ordo/main.i18n.add_translations", { locale, values })
 
-		use(maoka_dom.jabs.onunmount(() => void hunter.shoot("ordo_main.i18n.remove_translations", Object.keys(values))))
+		use(maoka_dom.jabs.onunmount(() => void hunter.shoot("@ordo/main.i18n.remove_translations", Object.keys(values))))
 
 		if (async) return result.to_promise() as any
 	}

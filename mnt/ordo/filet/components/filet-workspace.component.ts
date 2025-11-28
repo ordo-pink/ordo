@@ -4,12 +4,12 @@
  */
 
 import { maoka } from "@ordo-pink/oss-maoka"
+import { maoka_dom } from "@ordo-pink/oss-maoka/dom"
 import { maoka_styled } from "@ordo-pink/oss-maoka-styled"
 
 import "./filet-workspace.styles.css"
-import { maoka_dom } from "@ordo-pink/oss-maoka/dom"
 
-export const filet_workspace = maoka.create<{ state: OrdoClient.F.State }>("div", ({ state, use }) => {
+export const filet_workspace = maoka.create<{ state: OrdoClient.F.GlobalState }>("div", ({ state, use }) => {
 	use(ordo_client_maoka.context.provide(state))
 	use(ordo_client_maoka.jabs.set_id("filet-workspace"))
 	const get_params = use(ordo_client_maoka.jabs.route_params$)
@@ -36,12 +36,12 @@ const ancestor_link = maoka.create<{ item: Ordo.Data.Instance | null; is_current
 			const id = ordo.data.get_id(item)
 			const handle_click = ordo.fns
 				.pipe(ordo_client.fns.prevent_default)
-				.pipe(() => hunter.shoot("ordo_filet.open_file", { id }))
+				.pipe(() => hunter.shoot("@ordo/filet.open_file", { id }))
 
 			use(ordo_client_maoka.jabs.set_attribute("href", `/filet/${id}`))
 			use(ordo_client_maoka.jabs.listen("click", handle_click))
 		} else {
-			const handle_click = ordo.fns.pipe(ordo_client.fns.prevent_default).pipe(() => hunter.shoot("ordo_filet.open"))
+			const handle_click = ordo.fns.pipe(ordo_client.fns.prevent_default).pipe(() => hunter.shoot("@ordo/filet.open"))
 
 			use(ordo_client_maoka.jabs.set_attribute("href", "/filet"))
 			use(ordo_client_maoka.jabs.listen("click", handle_click))
@@ -65,7 +65,7 @@ const header = maoka.create<{ id: Ordo.Data.Parent }>("div", ({ id, use }) => {
 		const name = data ? ordo.data.get_name(data) : null
 		const title = translate("filet_title")
 
-		hunter.shoot("ordo_main.title.set_title", name ? `${name} | ${title}` : title)
+		hunter.shoot("@ordo/main.title.set_title", name ? `${name} | ${title}` : title)
 	}
 
 	use(ordo_client_maoka.jabs.add_class("header"))
@@ -89,10 +89,10 @@ const header = maoka.create<{ id: Ordo.Data.Parent }>("div", ({ id, use }) => {
 					ordo_client_maoka.components.button.neutral({
 						kindergarten: () => translate("filet_delete_file"),
 						on_click: () =>
-							void hunter.shoot("ordo_main.data.show_delete_modal", {
+							void hunter.shoot("@ordo/main.data.show_delete_modal", {
 								id,
 								on_deleted: () =>
-									parent ? hunter.shoot("ordo_filet.open_file", { id: parent }) : hunter.shoot("ordo_filet.open"),
+									parent ? hunter.shoot("@ordo/filet.open_file", { id: parent }) : hunter.shoot("@ordo/filet.open"),
 							}),
 						hotkey: "mod+shift+backspace",
 						small: true,
@@ -100,20 +100,20 @@ const header = maoka.create<{ id: Ordo.Data.Parent }>("div", ({ id, use }) => {
 				id &&
 					ordo_client_maoka.components.button.neutral({
 						kindergarten: () => translate("filet_rename_file"),
-						on_click: () => void hunter.shoot("ordo_main.data.show_rename_modal", { id }),
+						on_click: () => void hunter.shoot("@ordo/main.data.show_rename_modal", { id }),
 						hotkey: "meta+shift+n",
 						small: true,
 					}),
 				id &&
 					ordo_client_maoka.components.button.neutral({
 						kindergarten: () => translate("filet_move_file"),
-						on_click: () => void hunter.shoot("ordo_main.data.show_move_modal", { id }),
+						on_click: () => void hunter.shoot("@ordo/main.data.show_move_modal", { id }),
 						hotkey: "mod+shift+m",
 						small: true,
 					}),
 				ordo_client_maoka.components.button.neutral({
 					kindergarten: () => translate("filet_create_file"),
-					on_click: () => void hunter.shoot("ordo_main.data.show_create_modal", { parent: id }),
+					on_click: () => void hunter.shoot("@ordo/main.data.show_create_modal", { parent: id }),
 					hotkey: "meta+n",
 					small: true,
 				}),
@@ -127,7 +127,7 @@ const grid_item = maoka.create<GridItemArgs>("div", ({ item, use }) => {
 	const hunter = use(ordo_client_maoka.jabs.hunter)
 
 	const id = ordo.data.get_id(item)
-	const handle_click = () => hunter.shoot("ordo_filet.open_file", { id })
+	const handle_click = () => hunter.shoot("@ordo/filet.open_file", { id })
 
 	use(ordo_client_maoka.jabs.add_class("item"))
 	use(ordo_client_maoka.jabs.listen("click", handle_click))

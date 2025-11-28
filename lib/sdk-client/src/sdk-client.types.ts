@@ -8,7 +8,7 @@ import type { I18n } from "@ordo-pink/oss-i18n"
 
 declare global {
 	interface cmd {
-		ordo_main: {
+		"@ordo/main": {
 			activity: {
 				register: { args: OrdoClient.Activity.Instance; description?: string }
 				unregister: { args: OrdoClient.Activity.ID }
@@ -24,6 +24,10 @@ declare global {
 				remove: { args: string | number }
 				show: { args: OrdoClient.CommandPalette.Instance | undefined }
 				toggle: { args: void }
+			}
+			content: {
+				upload: { args: { name: Ordo.Data.Name; parent: Ordo.Data.Parent; content: FormData; vault_id?: Ordo.Data.VaultId } }
+				set: { args: { id: Ordo.Data.Id; content: Blob; vault_id?: Ordo.Data.VaultId } }
 			}
 			data: {
 				show_create_modal: { args: { parent: Ordo.Data.Parent; vault_id?: Ordo.Data.VaultId; on_created?: () => void } }
@@ -54,6 +58,11 @@ declare global {
 					add: { args: { id: Ordo.Data.Id; links: Ordo.Data.Link[]; vault_id?: Ordo.Data.VaultId } }
 					delete: { args: { id: Ordo.Data.Id; links: Ordo.Data.Link[]; vault_id?: Ordo.Data.VaultId } }
 				}
+			}
+			f: {
+				disable: { args: { f: Ordo.F.Instance } }
+				enable: { args: { f: Ordo.F.Instance } }
+				delete: { args: { f: Ordo.F.Instance } }
 			}
 			modal: {
 				hide: { args: void }

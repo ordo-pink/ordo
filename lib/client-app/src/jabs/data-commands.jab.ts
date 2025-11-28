@@ -17,11 +17,11 @@ type Stream = Zags.Instance<OrdoClient.Data.State>
 type Repo = OrdoClient.Data.Repository
 type Gun<$Prey extends keyof Hunt.ToPreys<OrdoClient.Command.Preys>> = OrdoClient.Command.GunFor<$Prey>
 type DataHandler<$Prey extends keyof Hunt.ToPreys<OrdoClient.Command.Preys>> = ($: Stream) => Gun<$Prey>
-type ViewHandler<$Prey extends keyof Hunt.ToPreys<OrdoClient.Command.Preys>> = (state: OrdoClient.F.State) => Gun<$Prey>
+type ViewHandler<$Prey extends keyof Hunt.ToPreys<OrdoClient.Command.Preys>> = (state: OrdoClient.F.GlobalState) => Gun<$Prey>
 
 export const data_commands =
 	($: Stream, repo: Repo): Maoka.Jab =>
-	({ use }) => {
+	async ({ use }) => {
 		const state = use(ordo_client_maoka.context.consume)
 
 		const handle_onmount = () =>
@@ -29,60 +29,70 @@ export const data_commands =
 				"data.root",
 				(data, is_update) =>
 					is_update &&
-					void repo.write(data).cata(oath.catas.or_else(rrr => state.hunter.shoot("ordo_main.notification.rrr", rrr))),
+					void repo
+						.write(DATA_FILE_ID, data)
+						.cata(oath.catas.or_else(rrr => state.hunter.shoot("@ordo/main.notification.rrr", rrr))),
 			)
 
+		// TODO Merge diffs among different repositories
+		await repo
+			.read(DATA_FILE_ID)
+			.pipe(oath.ops.map(data => $.update("data.root", () => data ?? {})))
+			.cata(oath.catas.or_else(e => state.hunter.shoot("@ordo/main.notification.rrr", e)))
+
 		use(maoka_dom.jabs.onmount(handle_onmount))
-		use(ordo_client_maoka.jabs.handle_command("ordo_main.data.create", handle_create($)))
-		use(ordo_client_maoka.jabs.handle_command("ordo_main.data.delete", handle_delete($)))
-		use(ordo_client_maoka.jabs.handle_command("ordo_main.data.fields.delete", handle_delete_field($)))
-		use(ordo_client_maoka.jabs.handle_command("ordo_main.data.fields.set", handle_set_field($)))
-		use(ordo_client_maoka.jabs.handle_command("ordo_main.data.labels.add", handle_add_label($)))
-		use(ordo_client_maoka.jabs.handle_command("ordo_main.data.labels.delete", handle_delete_label($)))
-		use(ordo_client_maoka.jabs.handle_command("ordo_main.data.links.add", handle_add_link($)))
-		use(ordo_client_maoka.jabs.handle_command("ordo_main.data.links.delete", handle_delete_link($)))
-		use(ordo_client_maoka.jabs.handle_command("ordo_main.data.move", handle_move($)))
-		use(ordo_client_maoka.jabs.handle_command("ordo_main.data.rename", handle_rename($)))
-		use(ordo_client_maoka.jabs.handle_command("ordo_main.data.set_group", handle_set_group($)))
-		use(ordo_client_maoka.jabs.handle_command("ordo_main.data.set_location", handle_set_location($)))
-		use(ordo_client_maoka.jabs.handle_command("ordo_main.data.set_owner", handle_set_owner($)))
-		use(ordo_client_maoka.jabs.handle_command("ordo_main.data.set_permissions", handle_set_permissions($)))
-		use(ordo_client_maoka.jabs.handle_command("ordo_main.data.show_create_modal", handle_show_create_modal(state)))
-		use(ordo_client_maoka.jabs.handle_command("ordo_main.data.show_delete_modal", handle_show_delete_modal(state)))
-		use(ordo_client_maoka.jabs.handle_command("ordo_main.data.show_rename_modal", handle_show_rename_modal(state)))
-		use(ordo_client_maoka.jabs.handle_command("ordo_main.data.show_move_modal", handle_show_move_modal(state)))
+		use(ordo_client_maoka.jabs.handle_command("@ordo/main.data.create", handle_create($)))
+		use(ordo_client_maoka.jabs.handle_command("@ordo/main.data.delete", handle_delete($)))
+		use(ordo_client_maoka.jabs.handle_command("@ordo/main.data.fields.delete", handle_delete_field($)))
+		use(ordo_client_maoka.jabs.handle_command("@ordo/main.data.fields.set", handle_set_field($)))
+		use(ordo_client_maoka.jabs.handle_command("@ordo/main.data.labels.add", handle_add_label($)))
+		use(ordo_client_maoka.jabs.handle_command("@ordo/main.data.labels.delete", handle_delete_label($)))
+		use(ordo_client_maoka.jabs.handle_command("@ordo/main.data.links.add", handle_add_link($)))
+		use(ordo_client_maoka.jabs.handle_command("@ordo/main.data.links.delete", handle_delete_link($)))
+		use(ordo_client_maoka.jabs.handle_command("@ordo/main.data.move", handle_move($)))
+		use(ordo_client_maoka.jabs.handle_command("@ordo/main.data.rename", handle_rename($)))
+		use(ordo_client_maoka.jabs.handle_command("@ordo/main.data.set_group", handle_set_group($)))
+		use(ordo_client_maoka.jabs.handle_command("@ordo/main.data.set_location", handle_set_location($)))
+		use(ordo_client_maoka.jabs.handle_command("@ordo/main.data.set_owner", handle_set_owner($)))
+		use(ordo_client_maoka.jabs.handle_command("@ordo/main.data.set_permissions", handle_set_permissions($)))
+		use(ordo_client_maoka.jabs.handle_command("@ordo/main.data.show_create_modal", handle_show_create_modal(state)))
+		use(ordo_client_maoka.jabs.handle_command("@ordo/main.data.show_delete_modal", handle_show_delete_modal(state)))
+		use(ordo_client_maoka.jabs.handle_command("@ordo/main.data.show_rename_modal", handle_show_rename_modal(state)))
+		use(ordo_client_maoka.jabs.handle_command("@ordo/main.data.show_move_modal", handle_show_move_modal(state)))
 	}
 
 // --- Internal ---
 
-const handle_show_create_modal: ViewHandler<"ordo_main.data.show_create_modal"> =
+const DATA_FILE_ID = "00000000-0000-4000-8000-00000000000d"
+
+const handle_show_create_modal: ViewHandler<"@ordo/main.data.show_create_modal"> =
 	state =>
 	({ parent, on_created }) => {
-		state.hunter.shoot("ordo_main.modal.show", {
+		state.hunter.shoot("@ordo/main.modal.show", {
 			size: ORDO_CLIENT.MODAL.SIZE.SM,
 			render: div => maoka_dom.render(div, create_file_modal({ state, parent, on_created }), ordo.uuid.create),
 		})
 	}
 
-const handle_show_delete_modal: ViewHandler<"ordo_main.data.show_delete_modal"> =
+const handle_show_delete_modal: ViewHandler<"@ordo/main.data.show_delete_modal"> =
 	state =>
 	({ id, on_deleted }) => {
-		state.hunter.shoot("ordo_main.modal.show", {
+		state.hunter.shoot("@ordo/main.modal.show", {
 			size: ORDO_CLIENT.MODAL.SIZE.SM,
 			render: div => maoka_dom.render(div, delete_file_modal({ state, id, on_deleted }), ordo.uuid.create),
 		})
 	}
 
-const handle_show_rename_modal: ViewHandler<"ordo_main.data.show_rename_modal"> =
+const handle_show_rename_modal: ViewHandler<"@ordo/main.data.show_rename_modal"> =
 	state =>
 	({ id }) => {
-		state.hunter.shoot("ordo_main.modal.show", {
+		state.hunter.shoot("@ordo/main.modal.show", {
 			size: ORDO_CLIENT.MODAL.SIZE.SM,
 			render: div => maoka_dom.render(div, rename_file_modal({ state, id }), ordo.uuid.create),
 		})
 	}
 
-const handle_show_move_modal: ViewHandler<"ordo_main.data.show_move_modal"> =
+const handle_show_move_modal: ViewHandler<"@ordo/main.data.show_move_modal"> =
 	state =>
 	({ id }) => {
 		const data = state.query.select("data.root")
@@ -113,7 +123,7 @@ const handle_show_move_modal: ViewHandler<"ordo_main.data.show_move_modal"> =
 			items.unshift({
 				id: "root",
 				value: null,
-				readable_name: "ordo_main_move_modal_move_to_root",
+				readable_name: "move_modal_move_to_root",
 				render_icon: span => maoka_dom.render(span, bs_slash(), ordo.uuid.create),
 			} as OrdoClient.CommandPalette.Item)
 		}
@@ -124,16 +134,16 @@ const handle_show_move_modal: ViewHandler<"ordo_main.data.show_move_modal"> =
 			return () => ordo_client_maoka.components.file_icon({ item })
 		})
 
-		state.hunter.shoot("ordo_main.command_palette.show", {
+		state.hunter.shoot("@ordo/main.command_palette.show", {
 			on_select: ({ value }) => {
-				state.hunter.shoot("ordo_main.data.move", { id, parent: value })
-				state.hunter.shoot("ordo_main.command_palette.hide")
+				state.hunter.shoot("@ordo/main.data.move", { id, parent: value })
+				state.hunter.shoot("@ordo/main.command_palette.hide")
 			},
 			items,
 		})
 	}
 
-const handle_create: DataHandler<"ordo_main.data.create"> = $ => params =>
+const handle_create: DataHandler<"@ordo/main.data.create"> = $ => params =>
 	$.update("data.root", items => {
 		const new_item = ordo.data.create(params, uid())
 		const new_item_id = ordo.data.get_id(new_item)
@@ -148,7 +158,7 @@ const handle_create: DataHandler<"ordo_main.data.create"> = $ => params =>
 		return { ...items, [new_item_id]: new_item }
 	})
 
-const handle_delete: DataHandler<"ordo_main.data.delete"> =
+const handle_delete: DataHandler<"@ordo/main.data.delete"> =
 	$ =>
 	({ id }) =>
 		$.update("data.root", items => {
@@ -170,7 +180,7 @@ const handle_delete: DataHandler<"ordo_main.data.delete"> =
 			return new_items
 		})
 
-const handle_delete_field: DataHandler<"ordo_main.data.fields.delete"> =
+const handle_delete_field: DataHandler<"@ordo/main.data.fields.delete"> =
 	$ =>
 	({ id, key }) =>
 		$.update("data.root", items => {
@@ -183,7 +193,7 @@ const handle_delete_field: DataHandler<"ordo_main.data.fields.delete"> =
 			return { ...items, [id]: new_item }
 		})
 
-const handle_set_field: DataHandler<"ordo_main.data.fields.set"> =
+const handle_set_field: DataHandler<"@ordo/main.data.fields.set"> =
 	$ =>
 	({ id, key, value }) =>
 		$.update("data.root", items => {
@@ -196,7 +206,7 @@ const handle_set_field: DataHandler<"ordo_main.data.fields.set"> =
 			return { ...items, [id]: new_item }
 		})
 
-const handle_add_label: DataHandler<"ordo_main.data.labels.add"> =
+const handle_add_label: DataHandler<"@ordo/main.data.labels.add"> =
 	$ =>
 	({ id, labels: new_labels }) =>
 		$.update("data.root", items => {
@@ -211,7 +221,7 @@ const handle_add_label: DataHandler<"ordo_main.data.labels.add"> =
 			return { ...items, [id]: new_item }
 		})
 
-const handle_delete_label: DataHandler<"ordo_main.data.labels.delete"> =
+const handle_delete_label: DataHandler<"@ordo/main.data.labels.delete"> =
 	$ =>
 	({ id, labels: labels_to_remove }) =>
 		$.update("data.root", items => {
@@ -225,7 +235,7 @@ const handle_delete_label: DataHandler<"ordo_main.data.labels.delete"> =
 			return { ...items, [id]: new_item }
 		})
 
-const handle_add_link: DataHandler<"ordo_main.data.links.add"> =
+const handle_add_link: DataHandler<"@ordo/main.data.links.add"> =
 	$ =>
 	({ id, links: new_links }) =>
 		$.update("data.root", items => {
@@ -240,7 +250,7 @@ const handle_add_link: DataHandler<"ordo_main.data.links.add"> =
 			return { ...items, [id]: new_item }
 		})
 
-const handle_delete_link: DataHandler<"ordo_main.data.links.delete"> =
+const handle_delete_link: DataHandler<"@ordo/main.data.links.delete"> =
 	$ =>
 	({ id, links: links_to_remove }) =>
 		$.update("data.root", items => {
@@ -254,7 +264,7 @@ const handle_delete_link: DataHandler<"ordo_main.data.links.delete"> =
 			return { ...items, [id]: new_item }
 		})
 
-const handle_move: DataHandler<"ordo_main.data.move"> =
+const handle_move: DataHandler<"@ordo/main.data.move"> =
 	$ =>
 	({ id, parent }) =>
 		$.update("data.root", items => {
@@ -283,7 +293,7 @@ const handle_move: DataHandler<"ordo_main.data.move"> =
 			return { ...items, [id]: new_item }
 		})
 
-const handle_rename: DataHandler<"ordo_main.data.rename"> =
+const handle_rename: DataHandler<"@ordo/main.data.rename"> =
 	$ =>
 	({ id, name }) =>
 		$.update("data.root", items => {
@@ -301,7 +311,7 @@ const handle_rename: DataHandler<"ordo_main.data.rename"> =
 			return { ...items, [id]: new_item }
 		})
 
-const handle_set_group: DataHandler<"ordo_main.data.set_group"> =
+const handle_set_group: DataHandler<"@ordo/main.data.set_group"> =
 	$ =>
 	({ id /*group*/ }) =>
 		$.update("data.root", items => {
@@ -313,7 +323,7 @@ const handle_set_group: DataHandler<"ordo_main.data.set_group"> =
 			return items
 		})
 
-const handle_set_location: DataHandler<"ordo_main.data.set_location"> =
+const handle_set_location: DataHandler<"@ordo/main.data.set_location"> =
 	$ =>
 	({ id, location }) =>
 		$.update("data.root", items => {
@@ -329,7 +339,7 @@ const handle_set_location: DataHandler<"ordo_main.data.set_location"> =
 			return { ...items, [id]: new_item }
 		})
 
-const handle_set_owner: DataHandler<"ordo_main.data.set_owner"> =
+const handle_set_owner: DataHandler<"@ordo/main.data.set_owner"> =
 	$ =>
 	({ id /*owner*/ }) =>
 		$.update("data.root", items => {
@@ -341,7 +351,7 @@ const handle_set_owner: DataHandler<"ordo_main.data.set_owner"> =
 			return items
 		})
 
-const handle_set_permissions: DataHandler<"ordo_main.data.set_permissions"> =
+const handle_set_permissions: DataHandler<"@ordo/main.data.set_permissions"> =
 	$ =>
 	({ id /*permissions*/ }) =>
 		$.update("data.root", items => {

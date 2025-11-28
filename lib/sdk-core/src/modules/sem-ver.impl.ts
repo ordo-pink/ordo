@@ -25,11 +25,11 @@ export namespace impl {
 
 declare global {
 	namespace Ordo.SemVer {
-		export type Major = `${number}` & {}
-		export type Minor = `${number}` & {}
-		export type Patch = `${number}` & {}
-		export type Build = string & {}
-		export type PreRelease = string & {}
+		export type Major = `${number}`
+		export type Minor = `${number}`
+		export type Patch = `${number}`
+		export type Build = string
+		export type PreRelease = string
 
 		export type Instance =
 			| `${Major}.${Minor}.${Patch}`

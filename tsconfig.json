@@ -15,7 +15,8 @@
 		"noFallthroughCasesInSwitch": true,
 		"outDir": "./var/out",
 		"paths": {
-			"@ordo-pink/*": ["./lib/*"]
+			"@ordo-pink/*": ["./lib/*"],
+			"@ordo-f/*": ["./mnt/ordo/*"]
 		},
 		"skipLibCheck": true,
 		"strict": true,
@@ -26,6 +27,6 @@
 		"stripInternal": true,
 		"target": "ESNext"
 	},
-	"include": ["./boot/**/*.ts", "./srv/**/*.ts", "./lib/**/*.ts", "./lib/**/*.tsx", "./lib/**/*.d.ts"],
+	"include": ["./boot/**/*.ts", "./srv/**/*.ts", "./lib/**/*.ts", "./lib/**/*.tsx", "./lib/**/*.d.ts", "mnt/**/*.ts"],
 	"exclude": ["node_modules", "**/*.test.ts"]
 }

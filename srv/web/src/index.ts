@@ -37,14 +37,16 @@ const create_id = () => {
 	return () => id++
 }
 
+const native_indexed_db = window.indexedDB
 const native_fetch = globalThis.fetch
 
-globalThis.window.fetch = undefined as any
-globalThis.XMLHttpRequest = undefined as any
-globalThis.XMLHttpRequestUpload = undefined as any
+delete (globalThis as any).indexedDB
+delete (globalThis as any).fetch
+delete (globalThis as any).XMLHttpRequest
+delete (globalThis as any).XMLHttpRequestUpload
 
 const idb_promise = new Promise<IDBDatabase>((resolve, reject) => {
-	const req = window.indexedDB.open("ordo", 1)
+	const req = native_indexed_db.open("ordo", 1)
 
 	req.onupgradeneeded = () => {
 		const db = req.result
@@ -58,7 +60,47 @@ const idb_promise = new Promise<IDBDatabase>((resolve, reject) => {
 
 const idb0 = oath.from_promise(() => idb_promise).pipe(oath.ops.rmap(ordo.rrr.eio(ORDO.RRR.REASON.REPOSITORY_ISSUE)))
 
-const ROOT_DATA_ID = ORDO.UUID.FIRSTBORN
+const create_content_repository = (): OrdoClient.Content.Repository => {
+	void idb0.cata(oath.catas.to_promise())
+
+	return {
+		kill: () => {
+			idb0.cancel("DataRepository killed")
+			void idb_promise.then(db => db.close())
+		},
+
+		read: (owner, id) =>
+			idb0.pipe(
+				oath.ops.chain(db =>
+					oath.create((resolve, reject) => {
+						const idb_request = db
+							.transaction("content", "readonly")
+							.objectStore("content")
+							.get(owner ? `${owner}-${id}` : id)
+
+						idb_request.onsuccess = () => resolve(idb_request.result ?? null)
+						idb_request.onerror = () => reject(ordo.rrr.eio(ORDO.RRR.REASON.REPOSITORY_ISSUE, idb_request.error))
+					}),
+				),
+			),
+
+		write: ordo.fns.curry((owner, id, data) =>
+			idb0.pipe(
+				oath.ops.chain(db =>
+					oath.create((resolve, reject) => {
+						const idb_request = db
+							.transaction("content", "readwrite")
+							.objectStore("content")
+							.put(data, owner ? `${owner}-${id}` : (id as string))
+
+						idb_request.onsuccess = () => resolve(data.size)
+						idb_request.onerror = () => reject(ordo.rrr.eio(ORDO.RRR.REASON.REPOSITORY_ISSUE, idb_request.error))
+					}),
+				),
+			),
+		),
+	}
+}
 
 const create_data_repository = (): OrdoClient.Data.Repository => {
 	void idb0.cata(oath.catas.to_promise())
@@ -69,7 +111,7 @@ const create_data_repository = (): OrdoClient.Data.Repository => {
 			void idb_promise.then(db => db.close())
 		},
 
-		read: (id = ROOT_DATA_ID) =>
+		read: id =>
 			idb0.pipe(
 				oath.ops.chain(db =>
 					oath.create((resolve, reject) => {
@@ -81,7 +123,7 @@ const create_data_repository = (): OrdoClient.Data.Repository => {
 				),
 			),
 
-		write: ordo.fns.curry((data, id = ROOT_DATA_ID) =>
+		write: ordo.fns.curry((id, data) =>
 			idb0.pipe(
 				oath.ops.chain(db =>
 					oath.create((resolve, reject) => {
@@ -106,7 +148,7 @@ body &&
 			client_app.create({
 				hosts,
 				fetch: native_fetch,
-				content_repository: null as any,
+				content_repository: create_content_repository(),
 				data_repository: create_data_repository(),
 			}),
 			create_id(),

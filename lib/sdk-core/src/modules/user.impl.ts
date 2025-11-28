@@ -15,8 +15,6 @@ export namespace impl {
 		// eslint-disable-next-line no-useless-escape
 		/^[a-z0-9!#$%&'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+\/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/
 
-	// export const function_name_rx = /^@[a-z0-9_.-]+\/[a-z0-9_.-]+$/
-
 	export const create_ref: Ordo.User.CreateRef = (id, email) => email.split("@")[0].concat(id.split("-")[0])
 
 	export const create: Ordo.User.Create = (email, _ref, _name) => {
@@ -35,13 +33,6 @@ export namespace impl {
 	export const ref_guard: Ordo.User.RefGuard = (x): x is Ordo.User.Ref => validations.is_string(x) && ref_rx.test(x)
 	export const name_guard: Ordo.User.NameGuard = (x): x is Ordo.User.Name => validations.is_string(x) && fns.lt(256, x.length)
 	export const email_guard: Ordo.User.EmailGuard = (x): x is Ordo.User.Email => validations.is_string(x) && email_rx.test(x)
-	// export const installed_function_guard: Ordo.User.InstalledFunctionGuard = (x): x is Ordo.User.InstalledFunction =>
-	//	result
-	// 		.if_else(validations.is_string(x), { on_true: () => x as string })
-	// 		.pipe(result.ops.map(x => x.split(":")))
-	// 		.pipe(result.ops.chain(parts => result.if_else(parts.length === 2, { on_true: () => parts })))
-	// 		.pipe(result.ops.map(([name, version]) => function_name_rx.test(name) && sem_ver.guard(version)))
-	// 		.cata(result.catas.or_else(() => false))
 
 	export const get_id: Ordo.User.GetId = fns.prop(0)
 	export const get_ref: Ordo.User.GetRef = fns.prop(1)
@@ -49,7 +40,6 @@ export namespace impl {
 	export const get_created_at: Ordo.User.GetCreatedAt = fns.prop(3)
 	export const get_updated_at: Ordo.User.GetUpdatedAt = fns.prop(4)
 	export const get_email: Ordo.User.GetEmail = fns.prop(5)
-	// export const get_installed_functions: Ordo.User.GetInstalledFunctions = fns.prop(7)
 
 	export const has_the_name: Ordo.User.HasTheName = (x, dto) => fns.eq(get_name(dto), x)
 	export const has_the_id: Ordo.User.HasTheId = (x, dto) => fns.eq(get_id(dto), x)
@@ -79,12 +69,6 @@ export namespace impl {
 			.concat(domainTrimSize ? higherLevelDomain.slice(-domainTrimSize / 2) : "")
 			.concat(topLevelDomain) as Ordo.User.Email
 	}
-
-	// export const has_installed_function: Ordo.User.HasInstalledFunction = (f, dto) => get_installed_functions(dto).includes(f)
-	// export const has_installed_functions: Ordo.User.HasInstalledFunctions = fns
-	// 	.pipe(get_installed_functions)
-	// 	.pipe(fns.prop("length"))
-	// 	.pipe(fns.gt(0))
 }
 
 declare global {
@@ -96,9 +80,6 @@ declare global {
 		export type CreatedAt = Timestamp.Instance & {}
 		export type UpdatedAt = Timestamp.Instance & {}
 		export type Email = `${string}@${string}.${string}` & {}
-		// export type InstalledFunctionName = `@${string}/${string}` & {}
-		// export type InstalledFunction = `${InstalledFunctionName}:${SemVer.Instance}` & {}
-		// export type InstalledFunctions = InstalledFunction[]
 
 		export type OtherUserInstance = [id: Id, ref: Ref, name: Name]
 		export type Instance = [...OtherUserInstance, created_at: CreatedAt, updated_at: UpdatedAt, email: Email]
@@ -111,12 +92,10 @@ declare global {
 		export type ToOtherUser = (user: Instance | OtherUserInstance) => OtherUserInstance
 
 		export type DefaultName = () => Name
-		// export type DefaultInstalledFunctions = () => InstalledFunctions
 
 		export type RefGuard = GenericGuard<Ref>
 		export type NameGuard = GenericGuard<Name>
 		export type EmailGuard = GenericGuard<Email>
-		// export type InstalledFunctionGuard = GenericGuard<InstalledFunction>
 
 		export type GetRef = (user: OtherUserInstance | Instance) => Ref
 		export type GetName = (user: OtherUserInstance | Instance) => Name
@@ -124,8 +103,6 @@ declare global {
 		export type GetCreatedAt = (user: Instance) => CreatedAt
 		export type GetUpdatedAt = (user: Instance) => UpdatedAt
 		export type GetEmail = (user: Instance) => Email
-		// export type GetInstalledFunctions = (user: Instance) => InstalledFunctions
-		// export type GetSessions = (user: Instance) => Sessions
 
 		export type HasTheName = (name: Name, user: OtherUserInstance | Instance) => boolean
 		export type HasTheId = (id: Id, user: OtherUserInstance | Instance) => boolean
@@ -136,8 +113,6 @@ declare global {
 		export type IsFree = (user: OtherUserInstance | Instance) => boolean
 		export type HasName = (user: OtherUserInstance | Instance) => boolean
 		export type HasSessions = (user: Instance) => boolean
-		// export type HasInstalledFunction = (f: InstalledFunction, user: Instance) => boolean
-		// export type HasInstalledFunctions = (user: Instance) => boolean
 
 		export type ObfuscateEmail = (email: Ordo.User.Email) => Ordo.User.Email
 	}

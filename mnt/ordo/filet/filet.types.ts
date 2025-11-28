@@ -5,7 +5,7 @@
 
 declare global {
 	interface cmd {
-		ordo_filet: {
+		"@ordo/filet": {
 			open: { args: void }
 			open_vault: { args: Ordo.Data.VaultId }
 			open_file: { args: { id: Ordo.Data.Id; vault?: Ordo.Data.VaultId } }

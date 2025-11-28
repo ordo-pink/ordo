@@ -60,6 +60,7 @@ export default defineConfig({
 		alias: {
 			"@ordo-pink": resolve(__dirname, "../../lib"),
 			"@static": resolve(__dirname, "./static"),
+			"@ordo-f": resolve("../../mnt/ordo"),
 		},
 	},
 	clearScreen: false,

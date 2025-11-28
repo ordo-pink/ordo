@@ -14,20 +14,20 @@ import "./command-palette.styles.css"
 export const command_palette = maoka.create("div", ({ use }) => {
 	const { hunter } = use(ordo_client_maoka.context.consume)
 
-	const handle_click = () => hunter.shoot("ordo_main.command_palette.hide")
+	const handle_click = () => hunter.shoot("@ordo/main.command_palette.hide")
 
-	const handle_add: OrdoClient.Command.GunFor<"ordo_main.command_palette.add"> = new_item =>
+	const handle_add: OrdoClient.Command.GunFor<"@ordo/main.command_palette.add"> = new_item =>
 		$.update("items", items => (items.some(item => item.id === new_item.id) ? items : [...items, new_item]))
-	const handle_remove: OrdoClient.Command.GunFor<"ordo_main.command_palette.remove"> = id =>
+	const handle_remove: OrdoClient.Command.GunFor<"@ordo/main.command_palette.remove"> = id =>
 		$.update("items", items => items.filter(item => item.id !== id))
-	const handle_show: OrdoClient.Command.GunFor<"ordo_main.command_palette.show"> = state =>
+	const handle_show: OrdoClient.Command.GunFor<"@ordo/main.command_palette.show"> = state =>
 		$.update("current", () => state ?? global_palette())
-	const handle_hide: OrdoClient.Command.GunFor<"ordo_main.command_palette.hide"> = () =>
+	const handle_hide: OrdoClient.Command.GunFor<"@ordo/main.command_palette.hide"> = () =>
 		$.each({ current: () => void 0, index: () => 0, location: () => SECTION.ITEMS, search_value: () => "" })
-	const handle_toggle: OrdoClient.Command.GunFor<"ordo_main.command_palette.toggle"> = () =>
+	const handle_toggle: OrdoClient.Command.GunFor<"@ordo/main.command_palette.toggle"> = () =>
 		$.update("current", current_state => (current_state ? void 0 : global_palette()))
 
-	const handle_toggle_cp_select = () => hunter.shoot("ordo_main.command_palette.toggle")
+	const handle_toggle_cp_select = () => hunter.shoot("@ordo/main.command_palette.toggle")
 	const render_toggle_cp_icon: OrdoClient.CommandPalette.RenderIcon = span =>
 		maoka_dom.render(span, bs_menu_button_wide_fill(), () => crypto.randomUUID())
 	const toggle_params = {
@@ -46,11 +46,11 @@ export const command_palette = maoka.create("div", ({ use }) => {
 	use(maoka_dom.jabs.onmount(handle_mount))
 	use(ordo_client_maoka.jabs.set_id("cp-overlay"))
 	use(ordo_client_maoka.jabs.listen("click", handle_click))
-	use(ordo_client_maoka.jabs.handle_command("ordo_main.command_palette.add", handle_add))
-	use(ordo_client_maoka.jabs.handle_command("ordo_main.command_palette.remove", handle_remove))
-	use(ordo_client_maoka.jabs.handle_command("ordo_main.command_palette.show", handle_show))
-	use(ordo_client_maoka.jabs.handle_command("ordo_main.command_palette.hide", handle_hide))
-	use(ordo_client_maoka.jabs.handle_command("ordo_main.command_palette.toggle", handle_toggle))
+	use(ordo_client_maoka.jabs.handle_command("@ordo/main.command_palette.add", handle_add))
+	use(ordo_client_maoka.jabs.handle_command("@ordo/main.command_palette.remove", handle_remove))
+	use(ordo_client_maoka.jabs.handle_command("@ordo/main.command_palette.show", handle_show))
+	use(ordo_client_maoka.jabs.handle_command("@ordo/main.command_palette.hide", handle_hide))
+	use(ordo_client_maoka.jabs.handle_command("@ordo/main.command_palette.toggle", handle_toggle))
 	use(ordo_client_maoka.jabs.add_translations("en", en))
 	use(ordo_client_maoka.jabs.add_command_palette_item("cp_toggle_name", handle_toggle_cp_select, toggle_params))
 
@@ -62,13 +62,13 @@ export const command_palette_toggle = maoka.create("div", ({ use }) => {
 
 	const handle_click = (event: MouseEvent) => {
 		event.preventDefault()
-		hunter.shoot("ordo_main.command_palette.toggle")
+		hunter.shoot("@ordo/main.command_palette.toggle")
 	}
 
 	const handle_keydown = (event: KeyboardEvent) => {
 		if (event.code === "Enter") {
 			event.stopPropagation()
-			hunter.shoot("ordo_main.command_palette.toggle")
+			hunter.shoot("@ordo/main.command_palette.toggle")
 		}
 	}
 
@@ -113,7 +113,7 @@ const command_palette_modal = maoka.create("div", ({ use }) => {
 
 		const current = get_current()
 
-		if (current && event.code === "Escape") return void hunter.shoot("ordo_main.command_palette.hide")
+		if (current && event.code === "Escape") return void hunter.shoot("@ordo/main.command_palette.hide")
 
 		const parsed_hotkey = ordo_client.fns.create_hotkey_from_event(event, is_darwin)
 
@@ -140,7 +140,7 @@ const command_palette_modal = maoka.create("div", ({ use }) => {
 				if (parsed_hotkey === item.hotkey) {
 					event.preventDefault()
 					current.on_select(item)
-					hunter.shoot("ordo_main.command_palette.hide")
+					hunter.shoot("@ordo/main.command_palette.hide")
 					break
 				}
 			}

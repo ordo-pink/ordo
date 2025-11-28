@@ -12,5 +12,5 @@ export type Args = {
 	hosts: Ordo.Hosts
 	fetch: OrdoClient.F.Fetch
 	data_repository: OrdoClient.Data.Repository
-	content_repository: Ordo.Content.Repository
+	content_repository: OrdoClient.Content.Repository
 }

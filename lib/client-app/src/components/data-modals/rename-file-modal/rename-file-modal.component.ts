@@ -9,7 +9,7 @@ import { maoka_styled } from "@ordo-pink/oss-maoka-styled"
 
 import "./rename-file-modal.styles.css"
 
-type RenameFileModalArgs = { state: OrdoClient.F.State; id: Ordo.Data.Id }
+type RenameFileModalArgs = { state: OrdoClient.F.GlobalState; id: Ordo.Data.Id }
 export const rename_file_modal = maoka.create<RenameFileModalArgs>("div", async ({ id, state, use }) => {
 	use(ordo_client_maoka.context.provide(state))
 	use(ordo_client_maoka.jabs.set_id("rename-file-modal"))
@@ -22,9 +22,9 @@ export const rename_file_modal = maoka.create<RenameFileModalArgs>("div", async 
 
 	const translate = use(ordo_client_maoka.jabs.translate$)
 	const handle_input_change = (new_value: string) => void (value = new_value)
-	const handle_cancel = () => void state.hunter.shoot("ordo_main.modal.hide")
+	const handle_cancel = () => void state.hunter.shoot("@ordo/main.modal.hide")
 	const notify_success = () =>
-		state.hunter.shoot("ordo_main.notification.show", {
+		state.hunter.shoot("@ordo/main.notification.show", {
 			title: "rename_file_modal_notification_title",
 			message: value,
 			type: ORDO_CLIENT.NOTIFICATION.TYPE.SUCCESS,
@@ -32,11 +32,11 @@ export const rename_file_modal = maoka.create<RenameFileModalArgs>("div", async 
 		})
 	const handle_ok = () =>
 		void state.hunter
-			.shoot("ordo_main.data.rename", { name: value, id })
+			.shoot("@ordo/main.data.rename", { name: value, id })
 			.to_promise()
 			.then(notify_success)
-			.catch(rrr => state.hunter.shoot("ordo_main.notification.rrr", rrr))
-			.finally(() => state.hunter.shoot("ordo_main.modal.hide"))
+			.catch(rrr => state.hunter.shoot("@ordo/main.notification.rrr", rrr))
+			.finally(() => state.hunter.shoot("@ordo/main.modal.hide"))
 
 	return () => [
 		title(() => translate("rename_file_modal_title")),

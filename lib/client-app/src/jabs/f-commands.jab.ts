@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
+ * SPDX-License-Identifier: Unlicense
+ */
+
 import type { Maoka } from "@ordo-pink/oss-maoka"
 import type { Zags } from "@ordo-pink/oss-zags"
 import { maoka_dom } from "@ordo-pink/oss-maoka/dom"
@@ -19,8 +24,14 @@ export const f_commands: (
 				.pipe(oath.ops.rtap(rrr => rrr && state.hunter.shoot("@ordo/main.notification.rrr", rrr)))
 				.cata(oath.catas.or_else(() => null))
 
-			if (!initial_fs) state.hunter.shoot("@ordo/main.f.enable", { f: "@ordo-f/filet:v1.0.0" })
-			else for (const f of initial_fs.fs.enabled) state.hunter.shoot("@ordo/main.f.enable", { f })
+			if (!initial_fs) {
+				state.hunter.shoot("@ordo/main.f.enable", { f: "@ordo-f/filet:v1.0.0" })
+				state.hunter.shoot("@ordo/main.f.enable", { f: "@ordo-f/ediot:v1.0.0" })
+			} else {
+				for (const f of initial_fs.fs.enabled) {
+					state.hunter.shoot("@ordo/main.f.enable", { f })
+				}
+			}
 
 			return $.marry((s, is_update) => {
 				is_update &&
@@ -29,7 +40,6 @@ export const f_commands: (
 		}
 
 		const handle_enable: OrdoClient.Command.GunFor<"@ordo/main.f.enable"> = async ({ f }) => {
-			console.log(f, installed_fs[f])
 			if (installed_fs[f]) return
 
 			const uninstall = await import(f.split(":v")[0].replace("@ordo-f", "../../../../mnt/ordo").concat("/index.ts"))
@@ -58,9 +68,9 @@ export const f_commands: (
 			$.update("fs.enabled", fs => fs.filter(prev_f => prev_f !== f))
 		}
 
+		use(maoka_dom.jabs.onmount(handle_onmount))
 		use(ordo_client_maoka.jabs.handle_command("@ordo/main.f.enable", handle_enable))
 		use(ordo_client_maoka.jabs.handle_command("@ordo/main.f.disable", handle_disable))
-		use(maoka_dom.jabs.onmount(handle_onmount))
 	}
 
 // --- Internal ---

@@ -56,7 +56,7 @@ export default ordo_client.f.create(
 		hunter.shoot("@ordo/main.i18n.add_translations", { locale: "en", values: en_values })
 
 		hunter.shoot("@ordo/main.activity.register", {
-			id: "ordo.filet",
+			id: "@ordo/filet.explorer",
 			readable_name: "filet_title",
 			routes: ["/filet", "/filet/:id", "/filet/vaults/:vault", "/filet/vaults/:vault/:id"],
 			render_icon: div => maoka_dom.render(div, bs_folder_open(), ordo.uuid.create),
@@ -113,7 +113,7 @@ export default ordo_client.f.create(
 			release_open()
 			release_open_file()
 			release_open_vault()
-			hunter.shoot("@ordo/main.activity.unregister", "ordo.filet")
+			hunter.shoot("@ordo/main.activity.unregister", "@ordo/filet.explorer")
 			hunter.shoot("@ordo/main.command_palette.remove", "filet_open")
 			hunter.shoot("@ordo/main.command_palette.remove", "filet_open_as_directory")
 			hunter.shoot("@ordo/main.i18n.remove_translations", ordo.fns.keys_of(en_values))

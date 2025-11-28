@@ -9,7 +9,7 @@ import { maoka_styled } from "@ordo-pink/oss-maoka-styled"
 
 import "./rename-file-modal.styles.css"
 
-type RenameFileModalArgs = { state: OrdoClient.F.GlobalState; id: Ordo.Data.Id }
+type RenameFileModalArgs = { state: OrdoClient.F.InstanceState; id: Ordo.Data.Id }
 export const rename_file_modal = maoka.create<RenameFileModalArgs>("div", async ({ id, state, use }) => {
 	use(ordo_client_maoka.context.provide(state))
 	use(ordo_client_maoka.jabs.set_id("rename-file-modal"))

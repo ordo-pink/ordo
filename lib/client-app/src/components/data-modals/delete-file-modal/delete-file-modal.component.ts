@@ -8,7 +8,7 @@ import { maoka_styled } from "@ordo-pink/oss-maoka-styled"
 
 import "./delete-file-modal.styles.css"
 
-type DeleteFileModalArgs = { state: OrdoClient.F.GlobalState; id: Ordo.Data.Id; on_deleted?: () => void }
+type DeleteFileModalArgs = { state: OrdoClient.F.InstanceState; id: Ordo.Data.Id; on_deleted?: () => void }
 export const delete_file_modal = maoka.create<DeleteFileModalArgs>("div", async ({ id, on_deleted, state, use }) => {
 	use(ordo_client_maoka.context.provide(state))
 	use(ordo_client_maoka.jabs.set_id("delete-file-modal"))

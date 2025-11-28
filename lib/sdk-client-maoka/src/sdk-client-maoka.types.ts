@@ -9,7 +9,7 @@ import "@ordo-pink/sdk-client"
 
 declare global {
 	namespace OrdoClientMaoka {
-		export type Context = MaokaContext.Instance<OrdoClient.F.GlobalState>
+		export type Context = MaokaContext.Instance<OrdoClient.F.InstanceState>
 		export type NoSpaceString<$Str extends string> = $Str extends `${string} ${string}` ? never : $Str
 	}
 }

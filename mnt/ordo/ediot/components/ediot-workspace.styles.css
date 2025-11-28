@@ -1,0 +1,37 @@
+#ediot-workspace .empty {
+	@apply flex h-full w-full flex-col items-center justify-center gap-4;
+}
+
+#ediot-workspace .empty_section_title {
+	@apply text-xl font-bold;
+}
+
+#ediot-workspace .empty_buttons-section {
+	@apply flex flex-col;
+}
+
+#ediot-workspace .empty_logo {
+	@apply h-48 w-48 opacity-50 grayscale;
+}
+
+#ediot-workspace .header {
+	@apply flex items-center justify-between;
+	@apply px-2 py-24 pb-4;
+	@apply bg-gradient-to-br from-neutral-100 to-stone-100 dark:from-neutral-900 dark:to-stone-900;
+}
+
+#ediot-workspace .header .action-buttons {
+	@apply flex justify-end gap-2;
+}
+
+#ediot-workspace .header .navigation {
+	@apply flex flex-wrap gap-2;
+}
+
+#ediot-workspace .header .ancestor-link {
+	@apply cursor-pointer rounded-md bg-neutral-200 px-4 py-0.5 text-sm dark:bg-neutral-500;
+}
+
+#ediot-workspace .header .ancestor-link.current {
+	@apply bg-gradient-to-br from-sky-300 to-indigo-300 dark:from-sky-500 dark:to-indigo-500;
+}

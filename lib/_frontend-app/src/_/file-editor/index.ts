@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { BsBoxArrowUp, BsCloudMinus, BsCloudPlus, BsLayoutTextWindow } from "@ordo-pink/frontend-icons"
+import { BsBoxArrowUp, BsCloudMinus, BsCloudPlus, bs_layout_text_window } from "@ordo-pink/frontend-icons"
 import { COMMAND_PALETTE_ITEM_TYPE, CONTEXT_MENU_ITEM_TYPE, Metadata, create_function, rrr } from "@ordo-pink/_core"
 import { MaokaStyled } from "@ordo-pink/maoka-styled"
 import { MetadataIcon } from "@ordo-pink/maoka-components"
@@ -102,7 +102,7 @@ export default create_function(
 			readable_name: "t.file_editor.command_palette.open",
 			type: COMMAND_PALETTE_ITEM_TYPE.PAGE_OPENER,
 			hotkey: "mod+e",
-			render_icon: BsLayoutTextWindow,
+			render_icon: bs_layout_text_window,
 		})
 
 		cmd.on(
@@ -260,13 +260,13 @@ export default create_function(
 			type: COMMAND_PALETTE_ITEM_TYPE.PAGE_OPENER,
 			readable_name: "t.file_editor.command_palette.open_file",
 			hotkey: "mod+p",
-			render_icon: BsLayoutTextWindow,
+			render_icon: bs_layout_text_window,
 		})
 
 		cmd.emit("cmd.functions.activities.register", {
 			name: "pink.ordo.editor.activity",
 			routes: ["/editor", "/editor/:fsid"],
-			render_icon: BsLayoutTextWindow,
+			render_icon: bs_layout_text_window,
 			render_workspace: () => FileEditorWorkspace,
 			render_sidebar: () => FileEditorSidebar,
 		})

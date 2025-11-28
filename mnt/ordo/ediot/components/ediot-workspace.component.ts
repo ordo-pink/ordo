@@ -1,24 +1,21 @@
-/*
- * SPDX-FileCopyrightText: Copyright 2025, 谢尔盖 ||↓ and the Ordo.pink contributors
- * SPDX-License-Identifier: Unlicense
- */
-
 import { maoka } from "@ordo-pink/oss-maoka"
 import { maoka_dom } from "@ordo-pink/oss-maoka/dom"
 import { maoka_styled } from "@ordo-pink/oss-maoka-styled"
 
-import "./filet-workspace.styles.css"
+import "./ediot-workspace.styles.css"
 
-export const filet_workspace = maoka.create<{ state: OrdoClient.F.InstanceState }>("div", ({ state, use }) => {
+export const ediot_workspace = maoka.create<{ state: OrdoClient.F.InstanceState }>("div", ({ state, use }) => {
 	use(ordo_client_maoka.context.provide(state))
-	use(ordo_client_maoka.jabs.set_id("filet-workspace"))
+	use(ordo_client_maoka.jabs.set_id("ediot-workspace"))
+
 	const get_params = use(ordo_client_maoka.jabs.route_params$)
 
 	return () => {
 		const id = get_params()?.id ?? null
 		if (!ordo.data.parent_guard(id)) return null // TODO 404
 
-		return [header({ id }), grid({ id })]
+		// TODO Empty editor
+		return [header({ id })]
 	}
 })
 
@@ -36,14 +33,14 @@ const ancestor_link = maoka.create<{ item: Ordo.Data.Instance | null; is_current
 			const id = ordo.data.get_id(item)
 			const handle_click = ordo.fns
 				.pipe(ordo_client.fns.prevent_default)
-				.pipe(() => hunter.shoot("@ordo/filet.open_file", { id }))
+				.pipe(() => hunter.shoot("@ordo/ediot.open_file", { id }))
 
-			use(ordo_client_maoka.jabs.set_attribute("href", `/filet/${id}`))
+			use(ordo_client_maoka.jabs.set_attribute("href", `/ediot/${id}`))
 			use(ordo_client_maoka.jabs.listen("click", handle_click))
 		} else {
-			const handle_click = ordo.fns.pipe(ordo_client.fns.prevent_default).pipe(() => hunter.shoot("@ordo/filet.open"))
+			const handle_click = ordo.fns.pipe(ordo_client.fns.prevent_default).pipe(() => hunter.shoot("@ordo/ediot.open"))
 
-			use(ordo_client_maoka.jabs.set_attribute("href", "/filet"))
+			use(ordo_client_maoka.jabs.set_attribute("href", "/ediot"))
 			use(ordo_client_maoka.jabs.listen("click", handle_click))
 		}
 
@@ -63,7 +60,7 @@ const header = maoka.create<{ id: Ordo.Data.Parent }>("div", ({ id, use }) => {
 	const handle_onmount = () => {
 		const data = get_data()
 		const name = data ? ordo.data.get_name(data) : null
-		const title = translate("filet_title")
+		const title = translate("ediot_title")
 
 		hunter.shoot("@ordo/main.title.set_title", name ? `${name} | ${title}` : title)
 	}
@@ -87,65 +84,37 @@ const header = maoka.create<{ id: Ordo.Data.Parent }>("div", ({ id, use }) => {
 			action_buttons(() => [
 				id &&
 					ordo_client_maoka.components.button.neutral({
-						kindergarten: () => translate("filet_delete_file"),
+						kindergarten: () => translate("ediot_delete_file"),
 						on_click: () =>
 							void hunter.shoot("@ordo/main.data.show_delete_modal", {
 								id,
 								on_deleted: () =>
-									parent ? hunter.shoot("@ordo/filet.open_file", { id: parent }) : hunter.shoot("@ordo/filet.open"),
+									parent ? hunter.shoot("@ordo/ediot.open_file", { id: parent }) : hunter.shoot("@ordo/ediot.open"),
 							}),
 						hotkey: "mod+shift+backspace",
 						small: true,
 					}),
 				id &&
 					ordo_client_maoka.components.button.neutral({
-						kindergarten: () => translate("filet_rename_file"),
+						kindergarten: () => translate("ediot_rename_file"),
 						on_click: () => void hunter.shoot("@ordo/main.data.show_rename_modal", { id }),
 						hotkey: "meta+shift+n",
 						small: true,
 					}),
 				id &&
 					ordo_client_maoka.components.button.neutral({
-						kindergarten: () => translate("filet_move_file"),
+						kindergarten: () => translate("ediot_move_file"),
 						on_click: () => void hunter.shoot("@ordo/main.data.show_move_modal", { id }),
 						hotkey: "mod+shift+m",
 						small: true,
 					}),
 				ordo_client_maoka.components.button.neutral({
-					kindergarten: () => translate("filet_create_file"),
+					kindergarten: () => translate("ediot_create_file"),
 					on_click: () => void hunter.shoot("@ordo/main.data.show_create_modal", { parent: id }),
 					hotkey: "meta+n",
 					small: true,
 				}),
 			]),
 		]
-	}
-})
-
-type GridItemArgs = { item: Ordo.Data.Instance }
-const grid_item = maoka.create<GridItemArgs>("div", ({ item, use }) => {
-	const hunter = use(ordo_client_maoka.jabs.hunter)
-
-	const id = ordo.data.get_id(item)
-	const handle_click = () => hunter.shoot("@ordo/filet.open_file", { id })
-
-	use(ordo_client_maoka.jabs.add_class("item"))
-	use(ordo_client_maoka.jabs.listen("click", handle_click))
-
-	return () => [ordo_client_maoka.components.file_icon({ item }), filename(() => ordo.data.get_name(item))]
-})
-
-const filename = maoka_styled.div("filename")
-
-type GridArgs = { id: Ordo.Data.Parent }
-const grid = maoka.create<GridArgs>("div", ({ id, use }) => {
-	const get_data = use(ordo_client_maoka.jabs.data.get_children$(id))
-
-	use(ordo_client_maoka.jabs.add_class("data-grid"))
-
-	return () => {
-		const data = get_data()
-
-		return Object.values(data).map(item => grid_item({ item }))
 	}
 })

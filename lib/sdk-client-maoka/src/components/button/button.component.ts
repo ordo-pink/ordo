@@ -43,7 +43,7 @@ const base: OrdoClientMaoka.Components.Button.Component = maoka.create(
 		const handle_click = (event: MouseEvent) => {
 			event.preventDefault()
 			if (maoka_dom.node_guard(node)) node.value.focus()
-			return on_click(event)
+			return void on_click(event)
 		}
 
 		use(listen("click", handle_click))

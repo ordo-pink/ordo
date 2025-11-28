@@ -17,7 +17,7 @@ type Stream = Zags.Instance<OrdoClient.Data.State>
 type Repo = OrdoClient.Data.Repository
 type Gun<$Prey extends keyof Hunt.ToPreys<OrdoClient.Command.Preys>> = OrdoClient.Command.GunFor<$Prey>
 type DataHandler<$Prey extends keyof Hunt.ToPreys<OrdoClient.Command.Preys>> = ($: Stream) => Gun<$Prey>
-type ViewHandler<$Prey extends keyof Hunt.ToPreys<OrdoClient.Command.Preys>> = (state: OrdoClient.F.GlobalState) => Gun<$Prey>
+type ViewHandler<$Prey extends keyof Hunt.ToPreys<OrdoClient.Command.Preys>> = (state: OrdoClient.F.InstanceState) => Gun<$Prey>
 
 export const data_commands =
 	($: Stream, repo: Repo): Maoka.Jab =>

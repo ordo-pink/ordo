@@ -38,7 +38,7 @@ export namespace impl {
 				divorces.push(global_state.query.cheat("data", state => query.update("data", () => state)))
 		}
 
-		const state: OrdoClient.F.GlobalState = {
+		const state: OrdoClient.F.InstanceState = {
 			name,
 			fetch: (...args) => {
 				const fetch_permission = permissions.queries.find(p => p.type === "fetch")
@@ -77,13 +77,15 @@ export namespace impl {
 			hunter: {
 				shoot: (prey, bullet) => {
 					if (!prey.startsWith(name) && !permissions.commands.map(ordo.fns.prop("command")).includes(prey))
-						global_state.hunter.shoot("@ordo/main.notification.rrr", ordo.rrr.eperm("f_rrr_not_permitted_shot", prey))
+						return global_state.hunter.shoot("@ordo/main.notification.rrr", ordo.rrr.eperm("f_rrr_not_permitted_shot", prey))
 
 					return global_state.hunter.shoot(prey, bullet as any)
 				},
 				track: (prey, gun) => {
-					if (!prey.startsWith(name) && !permissions.commands.map(ordo.fns.prop("command")).includes(prey))
+					if (!prey.startsWith(name) && !permissions.commands.map(ordo.fns.prop("command")).includes(prey)) {
 						global_state.hunter.shoot("@ordo/main.notification.rrr", ordo.rrr.eperm("f_rrr_not_permitted_track", prey))
+						return () => void 0
+					}
 
 					return global_state.hunter.track(prey, gun)
 				},
@@ -133,7 +135,7 @@ declare global {
 		type QueryState = Aist.State & I18n.State & OrdoClient.Activity.State & OrdoClient.Data.State & State
 		type Query = Zags.ReadableInstance<QueryState>
 
-		export type GlobalState = {
+		export type InstanceState = {
 			name: string
 			hunter: OrdoClient.Command.Hunter
 			logger: Ordo.Logger
@@ -141,13 +143,13 @@ declare global {
 			query: Query
 		}
 
-		export type Instance = (state: GlobalState) => Promise<() => void | Promise<void>>
+		export type Instance = (state: InstanceState) => Promise<() => void | Promise<void>>
 
 		export type Create = (
 			name: Ordo.F.Name,
 			permissions: Permissions,
 			callback: (
-				state: OrdoClient.F.GlobalState,
+				state: OrdoClient.F.InstanceState,
 			) => void | Promise<void> | (() => void | Promise<void>) | Promise<() => void | Promise<void>>,
 		) => Instance
 	}

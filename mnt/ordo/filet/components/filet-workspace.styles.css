@@ -1,5 +1,5 @@
 #filet-workspace {
-	@apply relative flex flex-col gap-y-2;
+	@apply flex flex-col gap-y-2;
 }
 
 #filet-workspace .header {

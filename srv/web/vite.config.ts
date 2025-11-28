@@ -53,8 +53,12 @@ export default defineConfig({
 		assetsInlineLimit: 4096,
 	},
 	assetsInclude: "./static/*",
+
 	server: {
 		port: Number(process.env.ORDO_WEB_PORT),
+		fs: {
+			allow: [".", "../../mnt"],
+		},
 	},
 	resolve: {
 		alias: {

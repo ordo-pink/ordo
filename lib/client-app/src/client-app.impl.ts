@@ -63,14 +63,14 @@ export const create = maoka.create<Omit<ClientApp.Args, "name">>(
 		use(ordo_client_maoka.jabs.add_command_palette_item("cp_support_name", handle_select_support, cp_support_params))
 		use(ordo_client_maoka.jabs.add_command_palette_item("cp_social_name", handle_select_social, cp_social_params))
 
-		// TODO Check permissions
-		// TODO File Associations
 		// TODO Ediot (Rich text editing)
+		// TODO File Associations
 		// TODO Move styles from client-app to Ediot
 		// TODO Ediot sidebar
 		// TODO Filet ancestor link outline
 		// TODO Filet file upload + drag'n'drop
 		// TODO Ediot file upload + drag'n'drop
+		// TODO Check permissions
 		// TODO PDF FA
 		// TODO Image FA
 		// TODO Label helpers

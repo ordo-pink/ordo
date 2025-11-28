@@ -13,13 +13,15 @@ import { zags } from "@ordo-pink/oss-zags"
 import "./notifications.styles.css"
 
 export const notifications = maoka.create("div", ({ use }) => {
+	const { logger } = use(ordo_client_maoka.context.consume)
 	const translate = use(ordo_client_maoka.jabs.translate$)
 	const get_list = use(ordo_client_maoka.jabs.cheat$(notifications$, "items"))
 
 	const handle_hide: OrdoClient.Command.GunFor<"@ordo/main.notification.hide"> = id =>
 		notifications$.update("items", items => items.filter(item => item.id !== id))
 
-	const handle_rrr: OrdoClient.Command.GunFor<"@ordo/main.notification.rrr"> = ({ type, message }) =>
+	const handle_rrr: OrdoClient.Command.GunFor<"@ordo/main.notification.rrr"> = ({ type, message, debug }) => {
+		logger.error(`Caught rrr "${translate(String(message))}":`, debug)
 		notifications$.update("items", items =>
 			items.concat([
 				{
@@ -31,6 +33,7 @@ export const notifications = maoka.create("div", ({ use }) => {
 				},
 			]),
 		)
+	}
 
 	const handle_show: OrdoClient.Command.GunFor<"@ordo/main.notification.show"> = item =>
 		notifications$.update("items", items => {

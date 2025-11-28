@@ -9,7 +9,7 @@ import { maoka_styled } from "@ordo-pink/oss-maoka-styled"
 
 import "./create-file-modal.styles.css"
 
-type CreateFileModalArgs = { state: OrdoClient.F.GlobalState; parent: Ordo.Data.Parent; on_created?: () => void }
+type CreateFileModalArgs = { state: OrdoClient.F.InstanceState; parent: Ordo.Data.Parent; on_created?: () => void }
 export const create_file_modal = maoka.create<CreateFileModalArgs>("div", async ({ on_created, parent, state, use }) => {
 	let value = ""
 

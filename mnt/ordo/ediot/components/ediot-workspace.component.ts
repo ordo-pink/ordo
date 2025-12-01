@@ -29,11 +29,11 @@ export const ediot_workspace = maoka.create<{ state: OrdoClient.F.InstanceState 
 const render_picker = maoka.create<{ id: Ordo.Data.Id }>("div", ({ id, node, refresh$, use }) => {
 	let current_file_association: OrdoClient.FileAssociation.Instance
 
-	const query = use(ordo_client_maoka.jabs.query)
+	const state = use(ordo_client_maoka.context.consume)
 	const get_data = use(ordo_client_maoka.jabs.data.get_by_id$(id))
 
 	const handle_mount = () =>
-		query.cheat("fa", fas => {
+		state.query.cheat("fa", fas => {
 			const data = get_data()
 
 			if (!data) return
@@ -53,6 +53,7 @@ const render_picker = maoka.create<{ id: Ordo.Data.Id }>("div", ({ id, node, ref
 
 	return async () => {
 		const data = get_data()
+		const content = await state.get_content(null, id).cata(oath.catas.or_else(() => null))
 
 		// TODO 404
 		if (!data) return "Not Found"
@@ -61,7 +62,14 @@ const render_picker = maoka.create<{ id: Ordo.Data.Id }>("div", ({ id, node, ref
 
 		if (maoka_dom.node_guard(node))
 			// TODO Check edit permissions
-			await current_file_association.render({ data, div: node.value as HTMLDivElement, is_editable: true, is_embedded: false })
+			await current_file_association.render({
+				content,
+				data,
+				div: node.value as HTMLDivElement,
+				is_editable: true,
+				is_embedded: false,
+				state,
+			})
 	}
 })
 

@@ -20,6 +20,16 @@ export namespace impl {
 		} as unknown as OrdoClient.F.QueryState)
 
 		const divorces = [] as (() => void)[]
+		const logger: Ordo.Logger = {
+			alert: (...message) => global_state.logger.alert(`f(${name}) =>`, ...message),
+			crit: (...message) => global_state.logger.crit(`f(${name}) =>`, ...message),
+			debug: (...message) => global_state.logger.debug(`f(${name}) =>`, ...message),
+			error: (...message) => global_state.logger.error(`f(${name}) =>`, ...message),
+			info: (...message) => global_state.logger.info(`f(${name}) =>`, ...message),
+			notice: (...message) => global_state.logger.notice(`f(${name}) =>`, ...message),
+			panic: (...message) => global_state.logger.alert(`f(${name}) =>`, ...message),
+			warn: (...message) => global_state.logger.warn(`f(${name}) =>`, ...message),
+		}
 
 		for (const permission of permissions.queries) {
 			if (permission.type === "i18n")
@@ -41,18 +51,28 @@ export namespace impl {
 				divorces.push(global_state.query.cheat("fa", state => query.update("fa", () => state)))
 		}
 
+		// TODO Use RRR.REASON
 		const state: OrdoClient.F.InstanceState = {
 			name,
 			fetch: (...args) => {
 				const fetch_permission = permissions.queries.find(p => p.type === "fetch")
 
-				if (!fetch_permission) return Promise.reject(ordo.rrr.eperm(ORDO.RRR.REASON.FETCH_NOT_PERMITTED, null))
+				if (!fetch_permission) {
+					global_state.hunter.shoot("@ordo/main.notification.rrr", ordo.rrr.eperm(ORDO.RRR.REASON.FETCH_NOT_PERMITTED, [name]))
+					return Promise.reject(ordo.rrr.eperm(ORDO.RRR.REASON.FETCH_NOT_PERMITTED, null))
+				}
 
 				const url = args[0] instanceof Request ? args[0].url : args[0]
 				const requested_method = args[1] ? (args[1].method ?? "get") : args[0] instanceof Request ? args[0].method : "get"
 				const requested_url = new URL(url)
 
-				if (requested_url.protocol === "http:") return Promise.reject("f_rrr_insecure_connection")
+				if (requested_url.protocol === "http:") {
+					global_state.hunter.shoot(
+						"@ordo/main.notification.rrr",
+						ordo.rrr.eperm("f_rrr_insecure_connection", [name, requested_url.protocol]),
+					)
+					return Promise.reject("f_rrr_insecure_connection")
+				}
 
 				for (const destination of fetch_permission.destinations) {
 					if (requested_method.toLowerCase() !== destination.method.toLowerCase()) continue
@@ -66,27 +86,21 @@ export namespace impl {
 				return Promise.reject(ordo.rrr.eperm(ORDO.RRR.REASON.FETCH_NOT_PERMITTED, null))
 			},
 
-			logger: {
-				alert: (...message) => global_state.logger.alert(`f(${name}) =>`, ...message),
-				crit: (...message) => global_state.logger.crit(`f(${name}) =>`, ...message),
-				debug: (...message) => global_state.logger.debug(`f(${name}) =>`, ...message),
-				error: (...message) => global_state.logger.error(`f(${name}) =>`, ...message),
-				info: (...message) => global_state.logger.info(`f(${name}) =>`, ...message),
-				notice: (...message) => global_state.logger.notice(`f(${name}) =>`, ...message),
-				panic: (...message) => global_state.logger.alert(`f(${name}) =>`, ...message),
-				warn: (...message) => global_state.logger.warn(`f(${name}) =>`, ...message),
-			},
+			logger,
 
 			hunter: {
 				shoot: (prey, bullet) => {
 					if (!prey.startsWith(name) && !permissions.commands.map(ordo.fns.prop("command")).includes(prey))
-						return global_state.hunter.shoot("@ordo/main.notification.rrr", ordo.rrr.eperm("f_rrr_not_permitted_shot", prey))
+						return global_state.hunter.shoot(
+							"@ordo/main.notification.rrr",
+							ordo.rrr.eperm("f_rrr_not_permitted_shot", [name, prey]),
+						)
 
 					return global_state.hunter.shoot(prey, bullet as any)
 				},
 				track: (prey, gun) => {
 					if (!prey.startsWith(name) && !permissions.commands.map(ordo.fns.prop("command")).includes(prey)) {
-						global_state.hunter.shoot("@ordo/main.notification.rrr", ordo.rrr.eperm("f_rrr_not_permitted_track", prey))
+						global_state.hunter.shoot("@ordo/main.notification.rrr", ordo.rrr.eperm("f_rrr_not_permitted_track", [name, prey]))
 						return () => void 0
 					}
 
@@ -95,6 +109,20 @@ export namespace impl {
 			},
 
 			query: query.to_readable(),
+
+			get_content: (owner, id) => {
+				const permission_granted = permissions.queries.find(p => p.type === "content")
+
+				if (!permission_granted) {
+					global_state.hunter.shoot(
+						"@ordo/main.notification.rrr",
+						ordo.rrr.eperm("f_rrr_not_permitted_content_request", [name, id]),
+					)
+					return oath.reject(ordo.rrr.eperm("f_rrr_not_permitted_content_request", [name, id]))
+				}
+
+				return global_state.get_content(owner, id)
+			},
 		}
 
 		const destroy = await callback(state)
@@ -125,6 +153,8 @@ declare global {
 
 		type FileAssociationPermission = { type: "file-associations" }
 
+		type ContentPermission = { type: "content"; details: ("vaults" | "root")[] }
+
 		type QueryPermission =
 			| FetchPermission
 			| I18nPermission
@@ -132,6 +162,7 @@ declare global {
 			| DataPermission
 			| RouterPermission
 			| FileAssociationPermission
+			| ContentPermission
 
 		type HuntingTicket = { command: keyof Hunt.ToPreys<OrdoClient.Command.Preys> }
 
@@ -157,6 +188,7 @@ declare global {
 			logger: Ordo.Logger
 			fetch: Fetch
 			query: Query
+			get_content: OrdoClient.Content.Repository["read"]
 		}
 
 		export type Instance = (state: InstanceState) => Promise<() => void | Promise<void>>

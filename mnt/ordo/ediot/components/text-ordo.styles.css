@@ -1,0 +1,11 @@
+.taxed {
+	@apply flex h-full cursor-default flex-col items-center px-2 py-4 outline-none;
+}
+
+.taxed .lines-wrapper {
+	@apply flex w-full max-w-4xl cursor-text flex-col px-4 py-2 hover:bg-neutral-100/50 dark:hover:bg-neutral-900/20;
+}
+
+.taxed .placeholder {
+	@apply text-neutral-500;
+}

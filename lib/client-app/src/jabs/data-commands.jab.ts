@@ -14,13 +14,12 @@ import { delete_file_modal } from "../components/data-modals/delete-file-modal/d
 import { rename_file_modal } from "../components/data-modals/rename-file-modal/rename-file-modal.component"
 
 type Stream = Zags.Instance<OrdoClient.Data.State>
-type Repo = OrdoClient.Data.Repository
 type Gun<$Prey extends keyof Hunt.ToPreys<OrdoClient.Command.Preys>> = OrdoClient.Command.GunFor<$Prey>
 type DataHandler<$Prey extends keyof Hunt.ToPreys<OrdoClient.Command.Preys>> = ($: Stream) => Gun<$Prey>
 type ViewHandler<$Prey extends keyof Hunt.ToPreys<OrdoClient.Command.Preys>> = (state: OrdoClient.F.InstanceState) => Gun<$Prey>
 
 export const data_commands =
-	($: Stream, repo: Repo): Maoka.Jab =>
+	($: Stream, data_repository: OrdoClient.Data.Repository, content_repository: OrdoClient.Content.Repository): Maoka.Jab =>
 	async ({ use }) => {
 		const state = use(ordo_client_maoka.context.consume)
 
@@ -29,13 +28,13 @@ export const data_commands =
 				"data.root",
 				(data, is_update) =>
 					is_update &&
-					void repo
+					void data_repository
 						.write(DATA_FILE_ID, data)
 						.cata(oath.catas.or_else(rrr => state.hunter.shoot("@ordo/main.notification.rrr", rrr))),
 			)
 
 		// TODO Merge diffs among different repositories
-		await repo
+		await data_repository
 			.read(DATA_FILE_ID)
 			.pipe(oath.ops.map(data => $.update("data.root", () => data ?? {})))
 			.cata(oath.catas.or_else(e => state.hunter.shoot("@ordo/main.notification.rrr", e)))
@@ -59,11 +58,38 @@ export const data_commands =
 		use(ordo_client_maoka.jabs.handle_command("@ordo/main.data.show_delete_modal", handle_show_delete_modal(state)))
 		use(ordo_client_maoka.jabs.handle_command("@ordo/main.data.show_rename_modal", handle_show_rename_modal(state)))
 		use(ordo_client_maoka.jabs.handle_command("@ordo/main.data.show_move_modal", handle_show_move_modal(state)))
+		use(ordo_client_maoka.jabs.handle_command("@ordo/main.content.set", handle_set_content(content_repository)))
+		use(ordo_client_maoka.jabs.handle_command("@ordo/main.content.upload", handle_upload_content(content_repository, $, state)))
 	}
 
 // --- Internal ---
 
 const DATA_FILE_ID = "00000000-0000-4000-8000-00000000000d"
+
+const handle_set_content: (repo: OrdoClient.Content.Repository) => Gun<"@ordo/main.content.set"> =
+	repo =>
+	({ id, content }) =>
+		repo.write(null, id, content).pipe(oath.ops.map(ordo.fns.v)).cata(oath.catas.to_promise())
+
+const handle_upload_content: (
+	content_repository: OrdoClient.Content.Repository,
+	$: Stream,
+	state: OrdoClient.F.InstanceState,
+) => Gun<"@ordo/main.content.upload"> =
+	(repo, $, state) =>
+	async ({ content, content_type, name, parent }) => {
+		const data = $.select("data.root")
+		let item = Object.values(data).find(i => ordo.data.has_name(name, i) && ordo.data.has_parent(parent, i))
+
+		if (!item) {
+			await state.hunter.shoot("@ordo/main.data.create", { name, parent, content_type, size: content.size }).to_promise()
+			item = Object.values(data).find(i => ordo.data.has_name(name, i) && ordo.data.has_parent(parent, i))!
+		}
+
+		const id = ordo.data.get_id(item)
+
+		return handle_set_content(repo)({ id, content })
+	}
 
 const handle_show_create_modal: ViewHandler<"@ordo/main.data.show_create_modal"> =
 	state =>

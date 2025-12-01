@@ -20,6 +20,7 @@ import { activity_commands } from "./jabs/activity-commands.jab"
 import { background_task_status } from "./components/background-task-indicator/background-task-indicator.component"
 import { data_commands } from "./jabs/data-commands.jab"
 import { f_commands } from "./jabs/f-commands.jab"
+import { fa_commands } from "./jabs/fa-commands.jab"
 import { i18n_commands } from "./jabs/i18n-commands.jabs"
 import { modal } from "./components/modal/modal.component"
 import { notifications } from "./components/notifications/notifications.component"
@@ -29,7 +30,6 @@ import { title } from "./components/title/title.component"
 import { user } from "./components/user/user.component"
 
 import "./client-app.styles.css"
-import { fa_commands } from "./jabs/fa-commands.jab"
 
 export const create = maoka.create<Omit<ClientApp.Args, "name">>(
 	"div",
@@ -49,7 +49,7 @@ export const create = maoka.create<Omit<ClientApp.Args, "name">>(
 			.concat(fa$)
 			.to_readable()
 
-		const state = { name: "@ordo/main", fetch, hunter, logger, query }
+		const state = { name: "@ordo/main", fetch, hunter, logger, query, get_content: content_repository.read }
 
 		use(ordo_client_maoka.context.provide(state))
 
@@ -65,7 +65,7 @@ export const create = maoka.create<Omit<ClientApp.Args, "name">>(
 		use(ordo_client_maoka.jabs.set_id("app"))
 		use(ordo_client_maoka.jabs.add_translations("en", en))
 		use(i18n_commands(translator))
-		use(data_commands(data$, data_repository))
+		use(data_commands(data$, data_repository, content_repository))
 		use(f_commands(f$, content_repository))
 		use(fa_commands(fa$))
 		use(activity_commands(activities$, router))

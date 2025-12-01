@@ -15,6 +15,7 @@ export default ordo_client.f.create(
 			{ command: "@ordo/main.command_palette.delete" },
 			{ command: "@ordo/main.command_palette.hide" },
 			{ command: "@ordo/main.command_palette.show" },
+			{ command: "@ordo/main.content.set" },
 			{ command: "@ordo/main.data.delete" },
 			{ command: "@ordo/main.data.show_create_modal" },
 			{ command: "@ordo/main.data.show_delete_modal" },
@@ -33,6 +34,7 @@ export default ordo_client.f.create(
 			{ type: "file-associations" },
 			{ type: "i18n" },
 			{ type: "router" },
+			{ type: "content", details: ["root"] },
 		],
 	},
 	state => {
@@ -60,7 +62,8 @@ export default ordo_client.f.create(
 
 		hunter.shoot("@ordo/main.file_association.add", {
 			id: "@ordo/ediot.text_ordo",
-			render: ({ div, data }) => maoka_dom.render(div, text_ordo({ data }), ordo.uuid.create),
+			render: ({ content, data, div, is_editable, is_embedded }) =>
+				maoka_dom.render(div, text_ordo({ content, data, is_editable, is_embedded, state }), ordo.uuid.create),
 			types: [{ type: "text/ordo" }],
 			render_file_icon: span => maoka_dom.render(span, bs_file_earmark_rich_text(), ordo.uuid.create),
 		})

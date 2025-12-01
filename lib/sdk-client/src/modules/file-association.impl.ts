@@ -22,12 +22,15 @@ declare global {
 			types: Type[]
 		}
 
-		export type RenderParams = {
-			div: HTMLDivElement
+		export type ComponentArgs = {
+			content: OrdoClient.Content.Instance
+			data: Ordo.Data.Instance
 			is_editable: boolean
 			is_embedded: boolean
-			data: Ordo.Data.Instance
+			state: OrdoClient.F.InstanceState
 		}
+
+		export type RenderParams = ComponentArgs & { div: HTMLDivElement }
 	}
 }
 

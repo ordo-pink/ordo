@@ -26,8 +26,16 @@ declare global {
 				toggle: { args: void }
 			}
 			content: {
-				upload: { args: { name: Ordo.Data.Name; parent: Ordo.Data.Parent; content: FormData; vault_id?: Ordo.Data.VaultId } }
-				set: { args: { id: Ordo.Data.Id; content: Blob; vault_id?: Ordo.Data.VaultId } }
+				upload: {
+					args: {
+						name: Ordo.Data.Name
+						content: Blob
+						content_type: string
+						parent: Ordo.Data.Parent
+						vault_id?: Ordo.Data.VaultId
+					}
+				}
+				set: { args: { id: Ordo.Data.Id; content: OrdoClient.Content.Instance; vault_id?: Ordo.Data.VaultId } }
 			}
 			data: {
 				show_create_modal: { args: { parent: Ordo.Data.Parent; vault_id?: Ordo.Data.VaultId; on_created?: () => void } }

@@ -5,16 +5,18 @@
 
 declare global {
 	namespace OrdoClient.Content {
+		type Instance = Blob | null
+
 		type Repository = {
 			read: (
 				owner: Ordo.Data.OwnerUserId,
 				data_id: Ordo.Data.Id,
-			) => Oath.Instance<Blob | null, Ordo.Rrr.Instance<"EIO" | "ENOENT">>
+			) => Oath.Instance<Instance, Ordo.Rrr.Instance<"EIO" | "ENOENT" | "EPERM">>
 
 			write: (
 				owner: Ordo.Data.OwnerUserId,
 				data_id: Ordo.Data.Id,
-				input: Blob,
+				input: Instance,
 			) => Oath.Instance<number, Ordo.Rrr.Instance<"EIO" | "ENOENT">>
 
 			kill: () => void

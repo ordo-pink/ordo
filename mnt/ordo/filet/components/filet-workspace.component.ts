@@ -3,12 +3,13 @@
  * SPDX-License-Identifier: Unlicense
  */
 
+import { bs_file_earmark_minus, bs_file_earmark_plus, bs_files, bs_input_cursor_text } from "@ordo-pink/frontend-icons"
 import { maoka } from "@ordo-pink/oss-maoka"
 import { maoka_dom } from "@ordo-pink/oss-maoka/dom"
 import { maoka_styled } from "@ordo-pink/oss-maoka-styled"
+import { sweech } from "@ordo-pink/oss-sweech"
 
 import "./filet-workspace.styles.css"
-import { bs_file_earmark_minus, bs_file_earmark_plus, bs_files, bs_input_cursor_text } from "@ordo-pink/frontend-icons"
 
 export const filet_workspace = maoka.create<{ state: OrdoClient.F.InstanceState }>("div", ({ state, use }) => {
 	use(ordo_client_maoka.context.provide(state))
@@ -126,6 +127,61 @@ const header = maoka.create<{ id: Ordo.Data.Parent }>("div", ({ id, use }) => {
 		}
 	}
 
+	const handle_actions_click = () => {
+		hunter.shoot("@ordo/main.command_palette.show", {
+			items: [
+				{
+					id: "create",
+					readable_name: "filet_create_file",
+					value: ACTION_ITEM.CREATE,
+					hotkey: "meta+n",
+					render_icon: span => maoka_dom.render(span, bs_file_earmark_plus(), ordo.uuid.create),
+					type: ORDO_CLIENT.COMMAND_PALETTE.ITEM_TYPE.CONSTRUCTIVE_ACTION,
+				} as OrdoClient.CommandPalette.Item,
+			].concat(
+				id
+					? [
+							{
+								id: "delete",
+								readable_name: "filet_delete_file",
+								value: ACTION_ITEM.DELETE,
+								hotkey: "mod+shift+backspace",
+								render_icon: span => maoka_dom.render(span, bs_file_earmark_minus(), ordo.uuid.create),
+								type: ORDO_CLIENT.COMMAND_PALETTE.ITEM_TYPE.DESTRUCTIVE_ACTION,
+							},
+							{
+								id: "rename",
+								readable_name: "filet_rename_file",
+								value: ACTION_ITEM.RENAME,
+								hotkey: "meta+shift+n",
+								render_icon: span => maoka_dom.render(span, bs_input_cursor_text(), ordo.uuid.create),
+								type: ORDO_CLIENT.COMMAND_PALETTE.ITEM_TYPE.CHANGE_ACTION,
+							},
+							{
+								id: "move",
+								readable_name: "filet_move_file",
+								value: ACTION_ITEM.MOVE,
+								hotkey: "mod+shift+m",
+								render_icon: span => maoka_dom.render(span, bs_files(), ordo.uuid.create),
+								type: ORDO_CLIENT.COMMAND_PALETTE.ITEM_TYPE.CHANGE_ACTION,
+							},
+						]
+					: [],
+			),
+			on_select: ({ value }) => {
+				hunter.shoot("@ordo/main.command_palette.hide")
+
+				sweech
+					.match(value)
+					.case(ACTION_ITEM.CREATE, () => void hunter.shoot("@ordo/main.data.show_create_modal", { parent: id }))
+					.case(ACTION_ITEM.DELETE, () => void hunter.shoot("@ordo/main.data.show_delete_modal", { id: id! }))
+					.case(ACTION_ITEM.RENAME, () => void hunter.shoot("@ordo/main.data.show_rename_modal", { id: id! }))
+					.case(ACTION_ITEM.MOVE, () => void hunter.shoot("@ordo/main.data.show_move_modal", { id: id! }))
+					.default(ordo.fns.v)
+			},
+		})
+	}
+
 	use(ordo_client_maoka.jabs.add_class("header"))
 	use(maoka_dom.jabs.onmount(handle_onmount))
 
@@ -140,40 +196,15 @@ const header = maoka.create<{ id: Ordo.Data.Parent }>("div", ({ id, use }) => {
 				data && ancestor_link({ item: data, is_current: true }),
 			]),
 
-			action_buttons(() => [
-				id &&
-					ordo_client_maoka.components.button.neutral({
-						kindergarten: () => translate("filet_delete_file"),
-						on_click: () => void hunter.shoot("@ordo/main.data.show_delete_modal", { id }),
-						hotkey: "mod+shift+backspace",
-						small: true,
-					}),
-				id &&
-					ordo_client_maoka.components.button.neutral({
-						kindergarten: () => translate("filet_rename_file"),
-						on_click: () => void hunter.shoot("@ordo/main.data.show_rename_modal", { id }),
-						hotkey: "meta+shift+n",
-						small: true,
-					}),
-				id &&
-					ordo_client_maoka.components.button.neutral({
-						kindergarten: () => translate("filet_move_file"),
-						on_click: () => void hunter.shoot("@ordo/main.data.show_move_modal", { id }),
-						hotkey: "mod+shift+m",
-						small: true,
-					}),
-				ordo_client_maoka.components.button.neutral({
-					kindergarten: () => translate("filet_create_file"),
-					on_click: () => void hunter.shoot("@ordo/main.data.show_create_modal", { parent: id }),
-					hotkey: "meta+n",
-					small: true,
-				}),
-			]),
+			ordo_client_maoka.components.button.neutral({
+				kindergarten: () => translate("filet_actions"),
+				on_click: handle_actions_click,
+				hotkey: "mod+e",
+			}),
 		]
 	}
 })
 
-const action_buttons = maoka_styled.div("action-buttons")
 const navigation = maoka_styled.div("navigation")
 const ancestor_link = maoka.create<{ item: Ordo.Data.Instance | null; is_current?: boolean }>(
 	"a",
@@ -231,3 +262,10 @@ const grid_item = maoka.create<GridItemArgs>("div", ({ item, use }) => {
 })
 
 const filename = maoka_styled.div("filename")
+
+enum ACTION_ITEM {
+	CREATE,
+	RENAME,
+	MOVE,
+	DELETE,
+}

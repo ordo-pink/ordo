@@ -124,10 +124,7 @@ export default ordo_client.f.create(
 
 const en_values = {
 	filet_title: "Filet",
-	filet_create_file: "Create",
-	filet_delete_file: "Delete",
-	filet_rename_file: "Rename",
-	filet_move_file: "Move",
+	filet_actions: "Actions",
 	filet_cp_open_name: "Go to Filet",
 	filet_cp_open_description: "Filet provides common file explorer/file manager/finder experience for your Ordo files.",
 	filet_cp_open_vault_name: "Open Vault...",
@@ -143,4 +140,8 @@ const en_values = {
 	filet_cp_rename_file_description: "Rename currently opened file.",
 	filet_cp_move_file_name: "Move file...",
 	filet_cp_move_file_description: "Move currently opened file to a different directory.",
+	filet_create_file: "Create a file in this directory",
+	filet_delete_file: "Delete current file",
+	filet_move_file: "Move current file to...",
+	filet_rename_file: "Rename current file",
 }

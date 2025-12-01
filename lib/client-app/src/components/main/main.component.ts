@@ -70,7 +70,7 @@ export const sidebar = maoka.create("aside", ({ use, node }) => {
 
 		if (!visible || !enabled || !maoka_dom.node_guard(node) || !node.value.parentElement) {
 			use(ordo_client_maoka.jabs.add_class("hidden"))
-			hunter.shoot("@ordo/main.command_palette.remove", "sidebar.toggle")
+			hunter.shoot("@ordo/main.command_palette.delete", "sidebar.toggle")
 
 			return null
 		} else {

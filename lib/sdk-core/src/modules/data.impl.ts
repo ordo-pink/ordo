@@ -59,6 +59,7 @@ export namespace impl {
 			links = [],
 			fields = {},
 			permissions = [PERMISSION.VALUE.SUWRX, PERMISSION.VALUE.__WRX, PERMISSION.VALUE.____X, PERMISSION.VALUE._____],
+			content_type = "text/ordo",
 		},
 		author,
 	) => {
@@ -81,6 +82,7 @@ export namespace impl {
 			fields,
 			permissions,
 			location,
+			content_type,
 		] satisfies Ordo.Data.Instance
 	}
 
@@ -102,6 +104,7 @@ export namespace impl {
 				fields ?? data[12],
 				permissions ?? data[13],
 				location ?? data[14],
+				data[15],
 			] satisfies Ordo.Data.Instance,
 	)
 
@@ -122,6 +125,7 @@ export namespace impl {
 	export const get_fields: Ordo.Data.GetFields = fns.prop(12)
 	export const get_permissions: Ordo.Data.GetPermissions = fns.prop(13)
 	export const get_location: Ordo.Data.GetLocation = fns.prop(14)
+	export const get_content_type: Ordo.Data.GetContentType = fns.prop(15)
 
 	export const exists: Ordo.Data.Exists = fns.curry((new_item, vault) =>
 		Object.values(vault).some(
@@ -137,6 +141,7 @@ export namespace impl {
 	export const has_label: Ordo.Data.HasLabel = fns.curry((nl, d) =>
 		get_labels(d).some(l => l.color === nl.color && l.text === nl.text),
 	)
+	export const has_content_type: Ordo.Data.HasContentType = fns.curry((t, d) => get_content_type(d) === t)
 
 	export const get_descendents: Ordo.Data.GetDescendents = fns.curry(
 		(id: Ordo.Data.Id, vault: Ordo.Data.Vault, descendents: Ordo.Data.Instance[]) => {
@@ -202,7 +207,8 @@ declare global {
 			other: Ordo.Permission.Instance,
 		]
 		type Location = CONSTANTS.LOCATION
-		type Size = number & {}
+		type ContentType = string
+		type Size = number
 		type VaultId = Ordo.Data.Id
 
 		type Instance = [
@@ -221,6 +227,7 @@ declare global {
 			fields: Fields,
 			permissions: Permissions,
 			location: Location,
+			content_type: ContentType,
 		]
 
 		type FieldsGuard = GenericGuard<Fields>
@@ -248,6 +255,7 @@ declare global {
 			links?: Links
 			fields?: Fields
 			permissions?: Permissions
+			content_type?: ContentType
 		}
 		type Create = (params: CreateParams, created_by: CreatedBy) => Instance
 
@@ -270,6 +278,7 @@ declare global {
 		type HasLabel = Ordo.Fns.Curried<(label: Label, data: Instance) => boolean>
 		type HasLink = Ordo.Fns.Curried<(link: Link, data: Instance) => boolean>
 		type HasName = Ordo.Fns.Curried<(name: Name, data: Instance) => boolean>
+		type HasContentType = Ordo.Fns.Curried<(type: ContentType, data: Instance) => boolean>
 
 		type Exists = Ordo.Fns.Curried<(item: Instance, vault: Vault) => boolean>
 		type GetDescendents = Ordo.Fns.Curried<(id: Id, vault: Vault, descendents: Instance[]) => Instance[]>
@@ -291,6 +300,7 @@ declare global {
 		type GetSize = (data: Instance) => Size
 		type GetUpdatedAt = (data: Instance) => UpdatedAt
 		type GetUpdatedBy = (data: Instance) => UpdatedBy
+		type GetContentType = (data: Instance) => ContentType
 
 		type Vault = Record<Ordo.Data.Id, Ordo.Data.Instance>
 	}

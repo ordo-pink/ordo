@@ -112,9 +112,9 @@ const track_prey_jab: Maoka.Jab = ({ node, use }) => {
 		let release_go_to_account = core.fns.v
 
 		const divorce_user = auth$.cheat("user", user => {
-			hunter.shoot("command_palette.remove", COMMAND_PALETTE_JOIN_ID)
-			hunter.shoot("command_palette.remove", COMMAND_PALETTE_SIGN_OUT_ID)
-			hunter.shoot("command_palette.remove", COMMAND_PALETTE_GO_TO_ACCOUNT_ID)
+			hunter.shoot("command_palette.delete", COMMAND_PALETTE_JOIN_ID)
+			hunter.shoot("command_palette.delete", COMMAND_PALETTE_SIGN_OUT_ID)
+			hunter.shoot("command_palette.delete", COMMAND_PALETTE_GO_TO_ACCOUNT_ID)
 
 			release_join()
 			release_verify_code()
@@ -200,9 +200,9 @@ const track_prey_jab: Maoka.Jab = ({ node, use }) => {
 			}
 
 			return () => {
-				hunter.shoot("command_palette.remove", COMMAND_PALETTE_JOIN_ID)
-				hunter.shoot("command_palette.remove", COMMAND_PALETTE_SIGN_OUT_ID)
-				hunter.shoot("command_palette.remove", COMMAND_PALETTE_GO_TO_ACCOUNT_ID)
+				hunter.shoot("command_palette.delete", COMMAND_PALETTE_JOIN_ID)
+				hunter.shoot("command_palette.delete", COMMAND_PALETTE_SIGN_OUT_ID)
+				hunter.shoot("command_palette.delete", COMMAND_PALETTE_GO_TO_ACCOUNT_ID)
 				release_join()
 				release_verify_code()
 				release_sign_out()

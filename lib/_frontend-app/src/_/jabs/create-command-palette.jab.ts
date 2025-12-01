@@ -36,7 +36,7 @@ export const create_command_palette: TMaokaJab = ({ use }) => {
 	commands.on("cmd.application.command_palette.show", handle_show)
 	commands.on("cmd.application.command_palette.hide", handle_hide)
 	commands.on("cmd.application.command_palette.add", handle_add)
-	commands.on("cmd.application.command_palette.remove", handle_remove)
+	commands.on("cmd.application.command_palette.delete", handle_remove)
 	commands.on("cmd.application.command_palette.toggle", handle_toggle)
 
 	commands.emit("cmd.application.command_palette.add", {
@@ -73,10 +73,10 @@ export const create_command_palette: TMaokaJab = ({ use }) => {
 				commands.off("cmd.application.command_palette.show", handle_show)
 				commands.off("cmd.application.command_palette.hide", handle_hide)
 				commands.off("cmd.application.command_palette.add", handle_add)
-				commands.off("cmd.application.command_palette.remove", handle_remove)
+				commands.off("cmd.application.command_palette.delete", handle_remove)
 				commands.off("cmd.application.command_palette.toggle", handle_toggle)
 
-				commands.emit("cmd.application.command_palette.remove", "t.common.components.command_palette.reset")
+				commands.emit("cmd.application.command_palette.delete", "t.common.components.command_palette.reset")
 			}
 		}),
 	)

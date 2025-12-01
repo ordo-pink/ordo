@@ -33,8 +33,8 @@ export default client_sdk.create_f(
 		commands: [
 			"activity.register",
 			"user.show_request_code_modal",
-			"i18n.add_translations",
-			"i18n.remove_translations",
+			"i18n.add",
+			"i18n.delete",
 			"notifications.show",
 			"sidebar.hide",
 			"title.set_title",
@@ -46,7 +46,7 @@ export default client_sdk.create_f(
 		const icon = bs_house()
 		const workspace_with_state = client_maoka.components.with_state(state, workspace)
 
-		state.hunter.shoot("i18n.add_translations", {
+		state.hunter.shoot("i18n.add", {
 			locale: LOCALE.ENGLISH,
 			values: {
 				fns_landing_buttons_join: "Join",
@@ -70,7 +70,7 @@ export default client_sdk.create_f(
 
 		return () => {
 			state.hunter.shoot("activity.unregister", "@ordo.pink/landing") // TODO Drop current activity if it was unregistered
-			state.hunter.shoot("i18n.remove_translations", [
+			state.hunter.shoot("i18n.delete", [
 				"fns_landing_buttons_join",
 				"fns_landing_buttons_learn_more",
 				"fns_landing_buttons_try_now",

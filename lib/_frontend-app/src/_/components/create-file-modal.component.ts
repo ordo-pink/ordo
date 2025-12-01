@@ -20,7 +20,7 @@
  */
 
 import { Dialog, Input } from "@ordo-pink/maoka-components"
-import { BsFileEarmarkPlus } from "@ordo-pink/frontend-icons"
+import { bs_file_earmark_plus } from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/oss-maoka"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { maoka_jabs } from "@ordo-pink/maoka-jabs"
@@ -42,7 +42,7 @@ export const CreateFileModal = (parent: Ordo.Metadata.FSID | null = null) =>
 		return () =>
 			Dialog({
 				title: t_title,
-				render_icon: BsFileEarmarkPlus,
+				render_icon: bs_file_earmark_plus,
 				action: () => {
 					void commands
 						.naga("cmd.metadata.create", { name: state.name, parent, type })
@@ -141,7 +141,7 @@ const SelectItem = (
 		const Icon = sweech
 			.of_true()
 			.case(!!file_association.render_icon, () => Maoka.create("span", () => async () => file_association.render_icon!()))
-			.default(() => BsFileEarmarkPlus())
+			.default(() => bs_file_earmark_plus())
 
 		return () => [
 			Maoka.create("div", ({ use }) => {

@@ -20,7 +20,7 @@
  */
 
 import { Dialog, Input } from "@ordo-pink/maoka-components"
-import { BsFileEarmarkRichText } from "@ordo-pink/frontend-icons"
+import { bs_file_earmark_rich_text } from "@ordo-pink/frontend-icons"
 import { Maoka } from "@ordo-pink/oss-maoka"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 
@@ -58,7 +58,7 @@ export const RenameFileModal = (fsid: Ordo.Metadata.FSID) =>
 							state.name = target.value
 						},
 					}),
-				render_icon: BsFileEarmarkRichText,
+				render_icon: bs_file_earmark_rich_text,
 			})
 		}
 	})

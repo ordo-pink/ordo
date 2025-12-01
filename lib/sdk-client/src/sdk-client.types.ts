@@ -10,8 +10,8 @@ declare global {
 	interface cmd {
 		"@ordo/main": {
 			activity: {
-				register: { args: OrdoClient.Activity.Instance; description?: string }
-				unregister: { args: OrdoClient.Activity.ID }
+				add: { args: OrdoClient.Activity.Instance; description?: string }
+				delete: { args: OrdoClient.Activity.ID }
 			}
 			background_status: {
 				saving: { args: void }
@@ -21,7 +21,7 @@ declare global {
 			command_palette: {
 				add: { args: OrdoClient.CommandPalette.Item<() => void> }
 				hide: { args: void }
-				remove: { args: string | number }
+				delete: { args: string | number }
 				show: { args: OrdoClient.CommandPalette.Instance | undefined }
 				toggle: { args: void }
 			}
@@ -64,6 +64,10 @@ declare global {
 				enable: { args: { f: Ordo.F.Instance } }
 				delete: { args: { f: Ordo.F.Instance } }
 			}
+			file_association: {
+				add: { args: OrdoClient.FileAssociation.Instance }
+				delete: { args: OrdoClient.FileAssociation.Id }
+			}
 			modal: {
 				hide: { args: void }
 				show: { args: OrdoClient.Modal.Instance }
@@ -90,13 +94,8 @@ declare global {
 				set_title: { args: OrdoClient.Translations.Key }
 			}
 			i18n: {
-				add_translations: {
-					args: {
-						locale: I18n.ISO_639_1_Locale
-						values: Record<string, string>
-					}
-				}
-				remove_translations: { args: OrdoClient.Translations.Key[] }
+				add: { args: { locale: I18n.ISO_639_1_Locale; values: Record<string, string> } }
+				delete: { args: OrdoClient.Translations.Key[] }
 				set_locale: { args: I18n.ISO_639_1_Locale }
 			}
 			user: {

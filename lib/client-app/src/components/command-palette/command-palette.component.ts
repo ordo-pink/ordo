@@ -18,7 +18,7 @@ export const command_palette = maoka.create("div", ({ use }) => {
 
 	const handle_add: OrdoClient.Command.GunFor<"@ordo/main.command_palette.add"> = new_item =>
 		$.update("items", items => (items.some(item => item.id === new_item.id) ? items : [...items, new_item]))
-	const handle_remove: OrdoClient.Command.GunFor<"@ordo/main.command_palette.remove"> = id =>
+	const handle_remove: OrdoClient.Command.GunFor<"@ordo/main.command_palette.delete"> = id =>
 		$.update("items", items => items.filter(item => item.id !== id))
 	const handle_show: OrdoClient.Command.GunFor<"@ordo/main.command_palette.show"> = state =>
 		$.update("current", () => state ?? global_palette())
@@ -47,7 +47,7 @@ export const command_palette = maoka.create("div", ({ use }) => {
 	use(ordo_client_maoka.jabs.set_id("cp-overlay"))
 	use(ordo_client_maoka.jabs.listen("click", handle_click))
 	use(ordo_client_maoka.jabs.handle_command("@ordo/main.command_palette.add", handle_add))
-	use(ordo_client_maoka.jabs.handle_command("@ordo/main.command_palette.remove", handle_remove))
+	use(ordo_client_maoka.jabs.handle_command("@ordo/main.command_palette.delete", handle_remove))
 	use(ordo_client_maoka.jabs.handle_command("@ordo/main.command_palette.show", handle_show))
 	use(ordo_client_maoka.jabs.handle_command("@ordo/main.command_palette.hide", handle_hide))
 	use(ordo_client_maoka.jabs.handle_command("@ordo/main.command_palette.toggle", handle_toggle))
@@ -87,7 +87,7 @@ const { SECTION, ITEM_TYPE, FUZZY_CHECK_RATIO } = ORDO_CLIENT.COMMAND_PALETTE
 const IGNORED_KEYS = ["Control", "Shift", "Alt", "Meta"]
 
 const global_palette = (): OrdoClient.CommandPalette.Instance<() => void> => ({
-	items: $.select("items").sort((a, b) => (!a.type ? 1 : !b.type ? -1 : a.type < b.type ? -1 : 1)),
+	items: $.select("items").sort((a, b) => (a.type == null ? -1 : b.type == null ? 1 : a.type < b.type ? -1 : 1)),
 	on_select: item => item.value(),
 })
 

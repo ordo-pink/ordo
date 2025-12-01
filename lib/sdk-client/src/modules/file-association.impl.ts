@@ -5,25 +5,19 @@
 
 declare global {
 	namespace OrdoClient.FileAssociation {
-		export type RenderFn = (params: RenderParams) => void | Promise<void>
+		export type Id = string
 
-		export type RenderToStringFn = (params: RenderParams) => string | Promise<string>
+		export type RenderFn = (params: RenderParams) => void | Promise<void>
 
 		export type RenderIconFn = (span: HTMLSpanElement) => void | Promise<void>
 
-		export type Type = {
-			description: OrdoClient.Translations.Key
-			name: string
-			readable_name: OrdoClient.Translations.Key
-		}
+		export type Type = { type: Ordo.Data.ContentType }
+
+		export type State = { fa: Instance[] }
 
 		export type Instance = {
-			name: string
-			render_icon?: RenderIconFn
-			content_to_string?: {
-				render?: RenderToStringFn
-				styles?: string[]
-			}
+			id: Id
+			render_file_icon?: RenderIconFn
 			render: RenderFn
 			types: Type[]
 		}
@@ -32,7 +26,7 @@ declare global {
 			div: HTMLDivElement
 			is_editable: boolean
 			is_embedded: boolean
-			// data: Data.Instance
+			data: Ordo.Data.Instance
 		}
 	}
 }

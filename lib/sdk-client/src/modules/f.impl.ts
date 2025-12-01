@@ -36,6 +36,9 @@ export namespace impl {
 
 			if (permission.type === "data")
 				divorces.push(global_state.query.cheat("data", state => query.update("data", () => state)))
+
+			if (permission.type === "file-associations")
+				divorces.push(global_state.query.cheat("fa", state => query.update("fa", () => state)))
 		}
 
 		const state: OrdoClient.F.InstanceState = {
@@ -97,9 +100,8 @@ export namespace impl {
 		const destroy = await callback(state)
 
 		return async () => {
-			if (ordo.validations.is_fn(destroy)) {
-				await destroy()
-			}
+			for (const divorce of divorces) if (ordo.validations.is_fn(divorce)) divorce()
+			if (ordo.validations.is_fn(destroy)) await destroy()
 		}
 	}
 }
@@ -121,7 +123,15 @@ declare global {
 
 		type ActivityPermission = { type: "activities"; details: ("current" | "all")[] }
 
-		type QueryPermission = FetchPermission | I18nPermission | ActivityPermission | DataPermission | RouterPermission
+		type FileAssociationPermission = { type: "file-associations" }
+
+		type QueryPermission =
+			| FetchPermission
+			| I18nPermission
+			| ActivityPermission
+			| DataPermission
+			| RouterPermission
+			| FileAssociationPermission
 
 		type HuntingTicket = { command: keyof Hunt.ToPreys<OrdoClient.Command.Preys> }
 
@@ -132,7 +142,13 @@ declare global {
 
 		type State = { fs: { owned: Ordo.F.Instance[]; enabled: Ordo.F.Instance[] } }
 
-		type QueryState = Aist.State & I18n.State & OrdoClient.Activity.State & OrdoClient.Data.State & State
+		type QueryState = Aist.State &
+			I18n.State &
+			OrdoClient.Activity.State &
+			OrdoClient.Data.State &
+			OrdoClient.FileAssociation.State &
+			State
+
 		type Query = Zags.ReadableInstance<QueryState>
 
 		export type InstanceState = {

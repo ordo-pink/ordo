@@ -21,7 +21,7 @@
 
 import {
 	BsBoxArrowInUpLeft,
-	BsFileEarmarkRichText,
+	bs_file_earmark_rich_text,
 	bs_info_circle,
 	BsQuote,
 	BsType,
@@ -68,7 +68,7 @@ export default create_function(
 	"pink.ordo.rich-text",
 	{
 		commands: [
-			"cmd.application.add_translations",
+			"cmd.application.add",
 			"cmd.metadata.show_create_modal",
 			"cmd.application.router.navigate",
 			"cmd.application.command_palette.show",
@@ -82,7 +82,7 @@ export default create_function(
 	ctx => {
 		const commands = ctx.commands
 
-		commands.emit("cmd.application.add_translations", {
+		commands.emit("cmd.application.add", {
 			lang: TWO_LETTER_LOCALE.ENGLISH,
 			translations: {
 				"t.rte.file_association.readable_name": "Rich Text",
@@ -255,7 +255,7 @@ export default create_function(
 					),
 			},
 			name: "pink.ordo.rich-text",
-			render_icon: BsFileEarmarkRichText,
+			render_icon: bs_file_earmark_rich_text,
 			render: ({ metadata, content, is_editable, is_embedded }) => RichText(metadata, content, is_editable, is_embedded),
 			types: [
 				{

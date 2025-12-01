@@ -48,7 +48,7 @@ export const add_command_palette_item =
 			})
 
 			return () => {
-				hunter.shoot("@ordo/main.command_palette.remove", id)
+				hunter.shoot("@ordo/main.command_palette.delete", id)
 			}
 		}
 
@@ -68,9 +68,9 @@ export const add_translations =
 	): $Async extends void ? Maoka.Jab<void> : Maoka.Jab<Promise<void>> =>
 	({ use }) => {
 		const { hunter } = use(context.consume)
-		const result = hunter.shoot("@ordo/main.i18n.add_translations", { locale, values })
+		const result = hunter.shoot("@ordo/main.i18n.add", { locale, values })
 
-		use(maoka_dom.jabs.onunmount(() => void hunter.shoot("@ordo/main.i18n.remove_translations", Object.keys(values))))
+		use(maoka_dom.jabs.onunmount(() => void hunter.shoot("@ordo/main.i18n.delete", Object.keys(values))))
 
 		if (async) return result.to_promise() as any
 	}
@@ -94,4 +94,13 @@ declare global {
 			type?: OrdoClient.CommandPalette.ItemType
 		}
 	}
+}
+
+/**
+ * @state
+ */
+export const query: Maoka.Jab<OrdoClient.F.Query> = ({ use }) => {
+	const state = use(context.consume)
+
+	return state.query
 }

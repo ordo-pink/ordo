@@ -20,7 +20,7 @@
  */
 
 import { CONTEXT_MENU_ITEM_TYPE, Metadata } from "@ordo-pink/_core"
-import { BsFileEarmarkRichText } from "@ordo-pink/frontend-icons"
+import { bs_file_earmark_rich_text } from "@ordo-pink/frontend-icons"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { type TMaokaJab } from "@ordo-pink/oss-maoka"
@@ -39,7 +39,7 @@ export const rename_file_command: TMaokaJab = ({ use }) => {
 
 	state.commands.emit("cmd.application.context_menu.add", {
 		command: "cmd.metadata.show_rename_modal",
-		render_icon: BsFileEarmarkRichText,
+		render_icon: bs_file_earmark_rich_text,
 		readable_name: "t.common.components.modals.rename_file.title",
 		should_show: ({ payload }) => Metadata.Validations.is_metadata(payload),
 		payload_creator: ({ payload }) => Metadata.Validations.is_metadata(payload) && payload.get_fsid(),

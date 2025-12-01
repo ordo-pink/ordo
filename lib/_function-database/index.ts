@@ -45,7 +45,7 @@ export default create_function(
 	"pink.ordo.database",
 	{
 		commands: [
-			"cmd.application.add_translations",
+			"cmd.application.add",
 			"cmd.application.command_palette.hide",
 			"cmd.application.command_palette.show",
 			"cmd.application.context_menu.add",
@@ -84,7 +84,7 @@ export default create_function(
 	ctx => {
 		const commands = ctx.commands
 
-		commands.emit("cmd.application.add_translations", {
+		commands.emit("cmd.application.add", {
 			lang: TWO_LETTER_LOCALE.ENGLISH,
 			translations: {
 				"t.database.columns": "Columns",

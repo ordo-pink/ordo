@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Unlicense
  */
 
-import { bs_file_earmark, bs_folder_open } from "@ordo-pink/frontend-icons"
+import { bs_file_earmark, bs_folder2_open } from "@ordo-pink/frontend-icons"
 import { maoka } from "@ordo-pink/oss-maoka"
 
 import "./file-icon.styles.css"
@@ -22,7 +22,7 @@ export const file_icon = maoka.create<{ item: Ordo.Data.Instance }>("div", ({ it
 		const children = get_children()
 
 		// TODO Show as folder only if it is an ordo file with children
-		if (children.some(ordo.data.has_parent(id))) return bs_folder_open()
+		if (children.some(ordo.data.has_parent(id))) return bs_folder2_open()
 		// TODO File association icon
 		else return bs_file_earmark()
 	}

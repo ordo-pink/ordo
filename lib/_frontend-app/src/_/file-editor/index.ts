@@ -41,7 +41,7 @@ export default create_function(
 	"pink.ordo.editor",
 	{
 		commands: [
-			"cmd.application.add_translations",
+			"cmd.application.add",
 			"cmd.application.command_palette.add",
 			"cmd.application.command_palette.hide",
 			"cmd.application.command_palette.show",
@@ -89,7 +89,7 @@ export default create_function(
 		cmd.on("cmd.file_editor.open", () => void cmd.emit("cmd.application.router.navigate", { url: "/editor" }))
 		cmd.on("cmd.file_editor.open_file", x => void cmd.emit("cmd.application.router.navigate", { url: `/editor/${x}` }))
 
-		cmd.emit("cmd.application.add_translations", {
+		cmd.emit("cmd.application.add", {
 			lang: TWO_LETTER_LOCALE.ENGLISH,
 			translations: {
 				"t.file_editor.command_palette.open": "Open File Editor",

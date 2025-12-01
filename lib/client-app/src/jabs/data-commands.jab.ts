@@ -102,7 +102,13 @@ const handle_show_move_modal: ViewHandler<"@ordo/main.data.show_move_modal"> =
 		if (!current_item) return
 
 		const items = Object.values(data)
-			.filter(i => !!i && !ordo.data.has_id(id, i) && !descs.includes(ordo.data.get_id(i)))
+			.filter(
+				i =>
+					!!i &&
+					!ordo.data.has_id(id, i) &&
+					!ordo.data.has_parent(ordo.data.get_id(i), current_item) &&
+					!descs.includes(ordo.data.get_id(i)),
+			)
 			.map(item => {
 				const id = ordo.data.get_id(item)
 				const ancestors = ordo.data.get_ancestors(id, data)

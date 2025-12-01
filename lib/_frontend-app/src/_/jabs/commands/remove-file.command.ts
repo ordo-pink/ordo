@@ -20,7 +20,7 @@
  */
 
 import { CONTEXT_MENU_ITEM_TYPE, Metadata } from "@ordo-pink/_core"
-import { BsFileEarmarkMinus } from "@ordo-pink/frontend-icons"
+import { bs_file_earmark_minus } from "@ordo-pink/frontend-icons"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { type TMaokaJab } from "@ordo-pink/oss-maoka"
@@ -42,7 +42,7 @@ export const remove_file_command: TMaokaJab = ({ use }) => {
 		command: "cmd.metadata.show_remove_modal",
 		payload_creator: ({ payload }) => Metadata.Validations.is_metadata(payload) && payload.get_fsid(),
 		readable_name: "t.common.components.modals.remove_file.title",
-		render_icon: BsFileEarmarkMinus,
+		render_icon: bs_file_earmark_minus,
 		should_show: ({ payload }) => Metadata.Validations.is_metadata(payload),
 		type: CONTEXT_MENU_ITEM_TYPE.DELETE,
 	})

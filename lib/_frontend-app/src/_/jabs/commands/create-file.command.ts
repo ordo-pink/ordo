@@ -20,7 +20,7 @@
  */
 
 import { COMMAND_PALETTE_ITEM_TYPE, CONTEXT_MENU_ITEM_TYPE, Metadata } from "@ordo-pink/_core"
-import { BsFileEarmarkPlus } from "@ordo-pink/frontend-icons"
+import { bs_file_earmark_plus } from "@ordo-pink/frontend-icons"
 import { MaokaDOM } from "@ordo-pink/maoka-render-dom"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
 import { type TMaokaJab } from "@ordo-pink/oss-maoka"
@@ -39,7 +39,7 @@ export const create_file_command: TMaokaJab = ({ use }) => {
 
 	state.commands.emit("cmd.application.context_menu.add", {
 		command: "cmd.metadata.show_create_modal",
-		render_icon: BsFileEarmarkPlus, // TODO: Move to icons
+		render_icon: bs_file_earmark_plus, // TODO: Move to icons
 		readable_name: "t.common.components.modals.create_file.title",
 		should_show: ({ payload }) => Metadata.Validations.is_metadata(payload) || payload === "root",
 		payload_creator: ({ payload }) => (Metadata.Validations.is_metadata(payload) ? payload.get_fsid() : null),
@@ -51,14 +51,14 @@ export const create_file_command: TMaokaJab = ({ use }) => {
 		type: COMMAND_PALETTE_ITEM_TYPE.FILE_CREATOR,
 		hotkey: "mod+shift+c",
 		readable_name: "t.common.components.modals.create_file.title",
-		render_icon: BsFileEarmarkPlus,
+		render_icon: bs_file_earmark_plus,
 	})
 
 	use(
 		MaokaDOM.Jabs.onunmount(() => {
 			state.commands.off("cmd.metadata.show_create_modal", handle_show_create_modal)
 			state.commands.emit("cmd.application.context_menu.remove", "cmd.metadata.show_create_modal")
-			state.commands.emit("cmd.application.command_palette.remove", "t.common.components.modals.create_file.title")
+			state.commands.emit("cmd.application.command_palette.delete", "t.common.components.modals.create_file.title")
 		}),
 	)
 }

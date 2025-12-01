@@ -24,7 +24,6 @@ export const router_pathname$: Maoka.Jab<() => Aist.Pathname> = ({ use }) => {
  */
 export const route_params$: Maoka.Jab<() => Colonoscope.Results> = ({ use }) => {
 	const { query } = use(ordo_client_maoka.context.consume)
-	use(router_pathname$)
 	const get_current_activity = use(ordo_client_maoka.jabs.cheat$(query, "activities.current"))
 
 	return () => get_current_activity()?.params ?? null

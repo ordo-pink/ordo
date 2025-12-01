@@ -19,7 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { BsFileEarmarkMinus } from "@ordo-pink/frontend-icons"
+import { bs_file_earmark_minus } from "@ordo-pink/frontend-icons"
 import { Dialog } from "@ordo-pink/maoka-components"
 import { Maoka } from "@ordo-pink/oss-maoka"
 import { MaokaOrdo } from "@ordo-pink/maoka-ordo-jabs"
@@ -35,7 +35,7 @@ export const RemoveFileModal = (fsid: Ordo.Metadata.FSID) =>
 		return () =>
 			Dialog({
 				title: t_title,
-				render_icon: BsFileEarmarkMinus,
+				render_icon: bs_file_earmark_minus,
 				action: () => {
 					commands.emit("cmd.metadata.remove", fsid)
 					commands.emit("cmd.application.modal.hide")

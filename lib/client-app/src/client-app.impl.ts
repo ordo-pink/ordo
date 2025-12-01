@@ -19,6 +19,7 @@ import { activity_bar } from "./components/activity-bar/activity-bar.component"
 import { activity_commands } from "./jabs/activity-commands.jab"
 import { background_task_status } from "./components/background-task-indicator/background-task-indicator.component"
 import { data_commands } from "./jabs/data-commands.jab"
+import { f_commands } from "./jabs/f-commands.jab"
 import { i18n_commands } from "./jabs/i18n-commands.jabs"
 import { modal } from "./components/modal/modal.component"
 import { notifications } from "./components/notifications/notifications.component"
@@ -28,7 +29,7 @@ import { title } from "./components/title/title.component"
 import { user } from "./components/user/user.component"
 
 import "./client-app.styles.css"
-import { f_commands } from "./jabs/f-commands.jab"
+import { fa_commands } from "./jabs/fa-commands.jab"
 
 export const create = maoka.create<Omit<ClientApp.Args, "name">>(
 	"div",
@@ -40,7 +41,14 @@ export const create = maoka.create<Omit<ClientApp.Args, "name">>(
 		const activities$ = zags.create<OrdoClient.Activity.State>({ activities: { items: [] } })
 		const data$ = zags.create<OrdoClient.Data.State>({ data: { root: {}, vaults: {} } })
 		const f$ = zags.create<OrdoClient.F.State>({ fs: { owned: [], enabled: [] } })
-		const query: OrdoClient.F.Query = router.$.concat(translator.$).concat(activities$).concat(data$).concat(f$).to_readable()
+		const fa$ = zags.create<OrdoClient.FileAssociation.State>({ fa: [] })
+		const query: OrdoClient.F.Query = router.$.concat(translator.$)
+			.concat(activities$)
+			.concat(data$)
+			.concat(f$)
+			.concat(fa$)
+			.to_readable()
+
 		const state = { name: "@ordo/main", fetch, hunter, logger, query }
 
 		use(ordo_client_maoka.context.provide(state))
@@ -59,13 +67,11 @@ export const create = maoka.create<Omit<ClientApp.Args, "name">>(
 		use(i18n_commands(translator))
 		use(data_commands(data$, data_repository))
 		use(f_commands(f$, content_repository))
+		use(fa_commands(fa$))
 		use(activity_commands(activities$, router))
 		use(ordo_client_maoka.jabs.add_command_palette_item("cp_support_name", handle_select_support, cp_support_params))
 		use(ordo_client_maoka.jabs.add_command_palette_item("cp_social_name", handle_select_social, cp_social_params))
 
-		// TODO Ediot (Rich text editing)
-		// TODO File Associations
-		// TODO Move styles from client-app to Ediot
 		// TODO Ediot sidebar
 		// TODO Filet ancestor link outline
 		// TODO Filet file upload + drag'n'drop

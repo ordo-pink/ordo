@@ -12,7 +12,7 @@ import { maoka_dom } from "@ordo-pink/oss-maoka/dom"
 export const activity_commands =
 	(activities$: Zags.Instance<OrdoClient.Activity.State>, router: Aist.Instance): Maoka.Jab =>
 	({ use }) => {
-		const handle_register_activity: OrdoClient.Command.GunFor<"@ordo/main.activity.register"> = item => {
+		const handle_add_activity: OrdoClient.Command.GunFor<"@ordo/main.activity.add"> = item => {
 			activities$.update("activities.items", items => (items.some(i => i.id === item.id) ? items : items.concat(item)))
 
 			const pathname = router.$.select("router.pathname")
@@ -32,7 +32,7 @@ export const activity_commands =
 			}
 		}
 
-		const handle_unregister_activity: OrdoClient.Command.GunFor<"@ordo/main.activity.unregister"> = id =>
+		const handle_delete_activity: OrdoClient.Command.GunFor<"@ordo/main.activity.delete"> = id =>
 			activities$.update("activities.items", items => items.filter(i => i.id !== id))
 
 		const handle_set_search: OrdoClient.Command.GunFor<"@ordo/main.router.set_search"> = s =>
@@ -73,8 +73,8 @@ export const activity_commands =
 
 		use(maoka_dom.jabs.onmount(handle_onmount))
 
-		use(ordo_client_maoka.jabs.handle_command("@ordo/main.activity.register", handle_register_activity))
-		use(ordo_client_maoka.jabs.handle_command("@ordo/main.activity.unregister", handle_unregister_activity))
+		use(ordo_client_maoka.jabs.handle_command("@ordo/main.activity.add", handle_add_activity))
+		use(ordo_client_maoka.jabs.handle_command("@ordo/main.activity.delete", handle_delete_activity))
 
 		use(ordo_client_maoka.jabs.handle_command("@ordo/main.router.set_hash", router.set_hash))
 		use(ordo_client_maoka.jabs.handle_command("@ordo/main.router.set_href", handle_set_href))

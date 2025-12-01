@@ -80,7 +80,7 @@ export const init_user = call_once(() => {
 		if (user) {
 			commands.off("cmd.auth.show_request_code_modal", handle_show_request_code)
 			commands.off("cmd.auth.show_validate_code_modal", handle_show_validate_code)
-			commands.emit("cmd.application.command_palette.remove", "t.auth.join")
+			commands.emit("cmd.application.command_palette.delete", "t.auth.join")
 			commands.emit("cmd.application.command_palette.add", {
 				readable_name: "t.auth.leave",
 				value: handle_sign_out,
